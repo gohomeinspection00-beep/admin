@@ -10802,12 +10802,15 @@ const silentBackupProject = async (projectOrId) => {
       merged._photosModified = Math.max(localPhotosTime, cloudPhotosTime);
       merged._deletedPhotoIds = [...allDeletedIds];
       
-      // Update timestamp to latest
-      merged._lastModified = Math.max(localTime, cloudTime, Date.now());
-      
+      // Update timestamp to latest ACTUAL modification time (NOT Date.now()).
+      // FIX: Including Date.now() here inflated _lastModified on every merge even
+      // when nothing changed, so later devices saw this copy as "newer" and rejected
+      // genuine cloud edits/deletes (deleted defects resurrected). Use real times only.
+      merged._lastModified = Math.max(localTime, cloudTime);
+
       return merged;
     };
-    
+
     // Merge meta fields dengan timestamp
     const mergeMetaFields = (localMeta, cloudMeta) => {
       const merged = { ...localMeta };
@@ -10907,12 +10910,15 @@ const silentBackupProject = async (projectOrId) => {
         merged.planRefs = cloudMeta.planRefs;
       }
       
-      // Update timestamp
-      merged._lastModified = Date.now();
-      
+      // Update timestamp to latest ACTUAL modification time (NOT Date.now()).
+      // FIX: Same bug as mergeDefectFields — Date.now() here made meta always look
+      // "locally newer" on the next sync, so cloud edits to owner/address/areas were
+      // silently rejected. Use the newest of the two real timestamps instead.
+      merged._lastModified = Math.max(localTime, cloudTime);
+
       return merged;
     };
-    
+
     // Helper to upload meta photo (front/plan) to Firebase Storage - WITH DEDUPLICATION & RETRY
     const uploadMetaPhotoToStorage = async (photoRef, photoType, index = 0) => {
       // Already a URL? Return as is - NO RE-UPLOAD!
@@ -13745,11 +13751,11 @@ const pullFromCloud = async () => {
             // Filter out deleted photos
             const filteredPhotos = cloudAfterPhotos.filter(photo => {
               if (!photo) return false;
-              let photoId = photo;
-              if (typeof photo === 'string' && photo.startsWith('http')) {
-                const parts = photo.split('/');
-                photoId = parts[parts.length - 1].split('?')[0];
-              }
+              // FIX: use canonical getPhotoIdForTracking so data:/idb: refs hash the
+              // SAME way they do when added to the deleted-IDs set. The old inline code
+              // only handled http URLs, so deleted data: photos were never matched and
+              // reappeared after a pull.
+              const photoId = getPhotoIdForTracking(photo);
               return !allDeletedAfterIds.has(photoId);
             });
             if (filteredPhotos.length > 0) {
@@ -13801,11 +13807,11 @@ const pullFromCloud = async () => {
             const cloudPhotos2 = cloudDef.secondReInspection.afterPhotoUrls || cloudDef.secondReInspection.afterPhotos || [];
             const filtered2 = cloudPhotos2.filter(photo => {
               if (!photo) return false;
-              let photoId = photo;
-              if (typeof photo === 'string' && photo.startsWith('http')) {
-                const parts = photo.split('/');
-                photoId = parts[parts.length - 1].split('?')[0];
-              }
+              // FIX: use canonical getPhotoIdForTracking so data:/idb: refs hash the
+              // SAME way they do when added to the deleted-IDs set. The old inline code
+              // only handled http URLs, so deleted data: photos were never matched and
+              // reappeared after a pull.
+              const photoId = getPhotoIdForTracking(photo);
               return !allDeletedAfter2.has(photoId);
             });
             if (filtered2.length > 0) {
@@ -13854,11 +13860,11 @@ const pullFromCloud = async () => {
             const cloudPhotos3 = cloudDef.thirdReInspection.afterPhotoUrls || cloudDef.thirdReInspection.afterPhotos || [];
             const filtered3 = cloudPhotos3.filter(photo => {
               if (!photo) return false;
-              let photoId = photo;
-              if (typeof photo === 'string' && photo.startsWith('http')) {
-                const parts = photo.split('/');
-                photoId = parts[parts.length - 1].split('?')[0];
-              }
+              // FIX: use canonical getPhotoIdForTracking so data:/idb: refs hash the
+              // SAME way they do when added to the deleted-IDs set. The old inline code
+              // only handled http URLs, so deleted data: photos were never matched and
+              // reappeared after a pull.
+              const photoId = getPhotoIdForTracking(photo);
               return !allDeletedAfter3.has(photoId);
             });
             if (filtered3.length > 0) {
@@ -13892,11 +13898,9 @@ const pullFromCloud = async () => {
           // Filter out deleted photos
           const filteredPhotos = cloudPhotos.filter(photo => {
             if (!photo) return false;
-            let photoId = photo;
-            if (typeof photo === 'string' && photo.startsWith('http')) {
-              const parts = photo.split('/');
-              photoId = parts[parts.length - 1].split('?')[0];
-            }
+            // FIX: use canonical getPhotoIdForTracking (see note above) so deleted
+            // data:/idb: photos are matched and don't reappear after a pull.
+            const photoId = getPhotoIdForTracking(photo);
             return !allDeletedPhotoIds.has(photoId);
           });
           if (filteredPhotos.length > 0 && filteredPhotos.some(p => p && p.startsWith('http'))) {
@@ -13916,7 +13920,18 @@ const pullFromCloud = async () => {
           localDef._flagModified = cloudFlagTime;
           hasChanges = true;
         }
-        
+
+        // FIX: Sync SUBMITTED status too (was missing here — only flagged synced).
+        // Without this, submit/unsubmit on one device never reached others via the
+        // 30s pull loop, so they showed stale state and could re-submit duplicates.
+        const cloudSubmittedTime = cloudDef._submittedModified || cloudTime;
+        const localSubmittedTime = localDef._submittedModified || localTime;
+        if (cloudSubmittedTime > localSubmittedTime) {
+          localDef.submitted = cloudDef.submitted;
+          localDef._submittedModified = cloudSubmittedTime;
+          hasChanges = true;
+        }
+
         // Update deleted status - BUT respect restored items
         if (cloudDef._deleted && !localDef._deleted) {
           const cloudDeletedTime = cloudDef._deletedAt || cloudTime;
