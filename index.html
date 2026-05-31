@@ -40243,6 +40243,25 @@ function sv_getUserId() { return window.currentUserData?.uid || null; }
 
 let sv_cloudLoaded = false;
 
+// FIX (#B2): per-unit merge so editing/adding units on two devices doesn't lose
+// data. Previously the whole units array was replaced by whichever side had the
+// newer document timestamp, silently dropping the other device's new/edited units.
+// Merge by unit id, keeping the copy with the newer updatedAt; union units that
+// exist on only one side. Additive + fail-safe: on any error callers fall back.
+function sv_mergeUnits(localUnits, cloudUnits) {
+  const byId = new Map();
+  const t = (u) => Date.parse(u && u.updatedAt) || 0;
+  for (const u of (localUnits || [])) { if (u && u.id) byId.set(u.id, u); }
+  for (const u of (cloudUnits || [])) {
+    if (!u || !u.id) continue;
+    const cur = byId.get(u.id);
+    if (!cur) { byId.set(u.id, u); }            // only in cloud -> keep
+    else if (t(u) > t(cur)) { byId.set(u.id, u); } // cloud copy newer -> keep cloud
+    // else keep local (newer or equal)
+  }
+  return Array.from(byId.values());
+}
+
 async function sv_loadFromCloud() {
   const uid = sv_getUserId();
   // Try localStorage first (instant)
@@ -40269,21 +40288,21 @@ async function sv_loadFromCloud() {
       if (cloudUnits.length > 0) {
         const localTime = sv_data.lastModified || 0;
         const cloudTime = cloudData.lastModified || 0;
-        // If both have timestamps, use the newer one
-        if (localTime > 0 && cloudTime > 0) {
-          if (cloudTime >= localTime) {
-            sv_data = { units: cloudUnits, lastModified: cloudTime };
-            console.log('Survey: Cloud is newer, loaded', sv_data.units.length, 'units from cloud');
-          } else {
-            console.log('Survey: Local is newer, keeping local data');
-          }
-        } else {
-          // Fallback for old data without timestamps: use count-based (original logic)
-          if (cloudUnits.length >= sv_data.units.length) {
-            sv_data = { units: cloudUnits, lastModified: cloudTime || Date.now() };
-            console.log('Survey: Loaded', sv_data.units.length, 'units from cloud (fallback)');
-          }
-        }
+        // FIX (#B2): merge per-unit instead of replacing the whole array, so a unit
+        // added/edited on one device isn't lost when the other device syncs. The
+        // document-level timestamp is kept only for bookkeeping.
+        const localUnits = sv_data.units || [];
+        const merged = sv_mergeUnits(localUnits, cloudUnits);
+        sv_data = { units: merged, lastModified: Math.max(localTime, cloudTime) || Date.now() };
+        console.log('Survey: Merged units (local', localUnits.length, '+ cloud', cloudUnits.length, '=', merged.length, ')');
+        // If the merge added local-only units (or local copies were newer), persist
+        // the union so other devices see it. Guarded so we don't write needlessly.
+        try {
+          localStorage.setItem('sv_data_' + (uid || 'guest'), JSON.stringify(sv_data));
+          const cloudIds = new Set(cloudUnits.map(u => u && u.id));
+          const mergedDiffers = merged.length !== cloudUnits.length || merged.some(u => !cloudIds.has(u.id));
+          if (mergedDiffers && typeof sv_autoSave === 'function') sv_autoSave();
+        } catch (e) {}
       }
     }
     sv_cloudLoaded = true;
