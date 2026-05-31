@@ -8469,6 +8469,27 @@ const cleanupOrphanedImages = async () => {
       }
     }
     
+    // FIX: Also protect images referenced by the OFFLINE CACHE mapping store.
+    // Downloaded cloud images live in IMG_STORE keyed by mapping.localRef and are
+    // NOT referenced from projects[]. Without this they were treated as orphans and
+    // deleted, making "downloaded for offline" photos vanish on a later app launch.
+    try {
+      const mapTx = db.transaction(CACHE_MAPPING_STORE, 'readonly');
+      const allMappings = await new Promise((res, rej) => {
+        const req = mapTx.objectStore(CACHE_MAPPING_STORE).getAll();
+        req.onsuccess = () => res(req.result || []);
+        req.onerror = () => rej(req.error);
+      });
+      for (const m of allMappings) {
+        if (m?.localRef?.startsWith('idb:')) usedRefs.add(m.localRef);
+      }
+    } catch (e) {
+      // If the cache mappings can't be read, abort cleanup rather than risk
+      // deleting cached offline images we can't account for.
+      console.warn('Orphan cleanup: cannot read cache mappings, skipping to stay safe:', e);
+      return 0;
+    }
+
     // Get all keys from IDB
     const tx = db.transaction(IMG_STORE, 'readonly');
     const store = tx.objectStore(IMG_STORE);
@@ -13159,6 +13180,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }, 5000); // Run 5 seconds after app start
   
+  // AUTO-MIGRATE: Drain base64 images out of localStorage into IndexedDB.
+  // Runs before orphan cleanup so the new idb: refs are recorded in projects first.
+  setTimeout(() => {
+    if (typeof migrateBase64ToIDB === 'function') migrateBase64ToIDB();
+  }, 10000); // 10s after start
+
   // AUTO-CLEANUP: Remove orphaned IDB images (not referenced by any project)
   setTimeout(async () => {
     try {
@@ -13209,6 +13236,48 @@ const idbPutImage = async dataUrl => {
     tx.onerror = () => rej(tx.error);
   });
   return 'idb:' + id;
+};
+
+// FIX: Drain any base64 image strings that leaked into localStorage (e.g. when an
+// earlier idbPutImage failed and the code fell back to keeping the raw data: URL).
+// Base64 in localStorage is the main cause of QuotaExceededError + lost saves, and
+// cleanupLocalStorage cannot free it. This moves them into IndexedDB as idb: refs.
+const migrateBase64ToIDB = async () => {
+  try {
+    let converted = 0;
+    const convertArr = async (arr) => {
+      if (!Array.isArray(arr)) return;
+      for (let i = 0; i < arr.length; i++) {
+        const v = arr[i];
+        if (typeof v === 'string' && v.startsWith('data:')) {
+          try { arr[i] = await idbPutImage(v); converted++; }
+          catch (e) { /* keep base64 rather than lose the photo */ }
+        }
+      }
+    };
+    for (const p of projects) {
+      if (p.meta) {
+        if (typeof p.meta.frontRef === 'string' && p.meta.frontRef.startsWith('data:')) {
+          try { p.meta.frontRef = await idbPutImage(p.meta.frontRef); converted++; } catch (e) {}
+        }
+        await convertArr(p.meta.planRefs);
+      }
+      for (const d of (p.defects || [])) {
+        await convertArr(d.photos);
+        if (d.reInspection) await convertArr(d.reInspection.afterPhotos);
+        if (d.secondReInspection) await convertArr(d.secondReInspection.afterPhotos);
+        if (d.thirdReInspection) await convertArr(d.thirdReInspection.afterPhotos);
+      }
+    }
+    if (converted > 0) {
+      console.log(`Migrated ${converted} base64 image(s) out of localStorage into IndexedDB`);
+      if (typeof saveAllSafe === 'function') saveAllSafe();
+    }
+    return converted;
+  } catch (e) {
+    console.error('migrateBase64ToIDB error:', e);
+    return 0;
+  }
 };
 
 const idbGetImageData = async ref => {
@@ -14831,7 +14900,7 @@ window.saveAllSafe = (projectId = null) => {
     console.error('Storage error:', e);
     
     // FIX 5.1: Try cleanup and retry
-    if (e.name === 'QuotaExceededError' || e.message.includes('quota')) {
+    if (e.name === 'QuotaExceededError' || (e.message || '').includes('quota')) {
       console.log('Storage full - attempting cleanup...');
       const cleaned = cleanupLocalStorage();
       
@@ -14847,6 +14916,11 @@ window.saveAllSafe = (projectId = null) => {
         }
       }
       
+      // FIX: Drain base64 images into IndexedDB in the background so the next save
+      // has room. This frees the real space hog that cleanupLocalStorage can't touch.
+      // migrateBase64ToIDB re-saves internally once images are moved out.
+      if (typeof migrateBase64ToIDB === 'function') migrateBase64ToIDB();
+
       // Show helpful error with storage info
       const usage = getLocalStorageUsage();
       const usageMB = (usage / 1024 / 1024).toFixed(2);
