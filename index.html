@@ -15126,10 +15126,11 @@ const show = (section, push=true) => {
     SECOND_INSPECTION_SUBMISSION = false; 
     THIRD_INSPECTION_SUBMISSION = false; 
     FOURTH_INSPECTION_SUBMISSION = false; 
-    RE_INSPECTION_MODE = false; 
-    SECOND_REINSPECTION_MODE = false; 
-    THIRD_REINSPECTION_MODE = false; 
-    DEFECT_FORM_MODE = false; 
+    RE_INSPECTION_MODE = false;
+    SECOND_REINSPECTION_MODE = false;
+    THIRD_REINSPECTION_MODE = false;
+    if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false; // FIX: was never reset
+    DEFECT_FORM_MODE = false;
     DEFECT_FORM_INSPECTION_LEVEL = 'original'; // Reset inspection level
     reInspectionAtFinding = false; // FIX: Reset flag
     if (typeof mp_currentPhaseId !== 'undefined') mp_currentPhaseId = null;
@@ -19540,6 +19541,13 @@ q('#submissionOpenHistory').addEventListener('click', () => {
   SECOND_INSPECTION_SUBMISSION = false; // Reset - user will choose First/Second/Third/Fourth when opening project
   THIRD_INSPECTION_SUBMISSION = false;
   FOURTH_INSPECTION_SUBMISSION = false;
+  // FIX (#2): clear any leftover re-inspection mode so a submission isn't rendered
+  // with both SUBMISSION_MODE and RE_INSPECTION_MODE active (mixed/wrong report).
+  RE_INSPECTION_MODE = false;
+  if (typeof SECOND_REINSPECTION_MODE !== 'undefined') SECOND_REINSPECTION_MODE = false;
+  if (typeof THIRD_REINSPECTION_MODE !== 'undefined') THIRD_REINSPECTION_MODE = false;
+  if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
+  document.body.classList.remove('reinspection-mode');
   show('history');
 });
 
@@ -19555,6 +19563,7 @@ q('#submissionImport').addEventListener('change', async e => {
   RE_INSPECTION_MODE = false;
   SECOND_REINSPECTION_MODE = false;
   THIRD_REINSPECTION_MODE = false;
+  if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
   document.body.classList.remove('reinspection-mode');
   e.target.value = '';
 });
@@ -19578,13 +19587,20 @@ if (reInspectImportInput) {
   reInspectImportInput.addEventListener('change', async e => {
   const f = e.target.files?.[0];
   if (!f) return;
-  RE_INSPECTION_MODE = true;
   reInspectionAtFinding = false; // FIX: Reset flag bila mula re-inspection mode
-  document.body.classList.add('reinspection-mode');
-  
+
   // Load and initialize defects with reInspection data
   await importJSON(f);
-  
+
+  // FIX: importJSON now sets mode flags from the file (a fresh file has none), so
+  // re-assert re-inspection mode AFTER import. This is a 1st-level re-inspection,
+  // so clear the 2nd/3rd/4th sub-modes explicitly.
+  RE_INSPECTION_MODE = true;
+  if (typeof SECOND_REINSPECTION_MODE !== 'undefined') SECOND_REINSPECTION_MODE = false;
+  if (typeof THIRD_REINSPECTION_MODE !== 'undefined') THIRD_REINSPECTION_MODE = false;
+  if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
+  document.body.classList.add('reinspection-mode');
+
   const proj = projects[0];
   if (proj && proj.defects) {
     proj.defects.forEach(d => {
@@ -19594,7 +19610,7 @@ if (reInspectImportInput) {
     });
     saveAllSafe();
   }
-  
+
   e.target.value = '';
 });
 }
@@ -27187,32 +27203,19 @@ const importJSON = async (f) => {
       data.reInspectionStatuses.forEach(s => reInspectionStatuses.push(s));
     }
     
-    // Set Re-Inspection mode if imported project was in Re-Inspection mode
-    if (data.reInspectionMode === true) {
-      RE_INSPECTION_MODE = true;
+    // FIX: set each mode flag EXPLICITLY from the imported data (true OR false).
+    // Previously these were one-directional (only set true), so importing a normal
+    // project after a re-inspection import left stale flags on, opening the normal
+    // project in the wrong inspection mode (cross-project mode bleed).
+    RE_INSPECTION_MODE = data.reInspectionMode === true;
+    if (RE_INSPECTION_MODE) {
       document.body.classList.add('reinspection-mode');
+    } else {
+      document.body.classList.remove('reinspection-mode');
     }
-    
-    // Set Second Re-Inspection mode if applicable
-    if (data.secondReInspectionMode === true) {
-      if (typeof SECOND_REINSPECTION_MODE !== 'undefined') {
-        SECOND_REINSPECTION_MODE = true;
-      }
-    }
-    
-    // Set Third Re-Inspection mode if applicable
-    if (data.thirdReInspectionMode === true) {
-      if (typeof THIRD_REINSPECTION_MODE !== 'undefined') {
-        THIRD_REINSPECTION_MODE = true;
-      }
-    }
-    
-    // Set Fourth Re-Inspection mode if applicable
-    if (data.fourthReInspectionMode === true) {
-      if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') {
-        FOURTH_REINSPECTION_MODE = true;
-      }
-    }
+    if (typeof SECOND_REINSPECTION_MODE !== 'undefined') SECOND_REINSPECTION_MODE = data.secondReInspectionMode === true;
+    if (typeof THIRD_REINSPECTION_MODE !== 'undefined') THIRD_REINSPECTION_MODE = data.thirdReInspectionMode === true;
+    if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = data.fourthReInspectionMode === true;
     
     updateLoadingProgress('Finalizing...');
     
@@ -34468,23 +34471,23 @@ async function downloadAllCloudImages(filterProjectIds) {
   
   for (const p of projectsToProcess) {
     if (p.meta.frontRef && p.meta.frontRef.startsWith('http')) {
-      downloadTasks.push({ type: 'front', project: p, url: p.meta.frontRef });
+      downloadTasks.push({ type: 'front', project: p, pid: p.id, url: p.meta.frontRef });
     }
     for (let i = 0; i < (p.meta.planRefs || []).length; i++) {
       if (p.meta.planRefs[i] && p.meta.planRefs[i].startsWith('http')) {
-        downloadTasks.push({ type: 'plan', project: p, index: i, url: p.meta.planRefs[i] });
+        downloadTasks.push({ type: 'plan', project: p, pid: p.id, index: i, url: p.meta.planRefs[i] });
       }
     }
     for (const d of (p.defects || [])) {
       for (let i = 0; i < (d.photos || []).length; i++) {
         if (d.photos[i] && d.photos[i].startsWith('http')) {
-          downloadTasks.push({ type: 'photo', defect: d, index: i, url: d.photos[i] });
+          downloadTasks.push({ type: 'photo', defect: d, pid: p.id, index: i, url: d.photos[i] });
         }
       }
       if (d.reInspection && d.reInspection.afterPhotos) {
         for (let i = 0; i < d.reInspection.afterPhotos.length; i++) {
           if (d.reInspection.afterPhotos[i] && d.reInspection.afterPhotos[i].startsWith('http')) {
-            downloadTasks.push({ type: 'afterPhoto', defect: d, index: i, url: d.reInspection.afterPhotos[i] });
+            downloadTasks.push({ type: 'afterPhoto', defect: d, pid: p.id, index: i, url: d.reInspection.afterPhotos[i] });
           }
         }
       }
@@ -34492,14 +34495,14 @@ async function downloadAllCloudImages(filterProjectIds) {
       if (d.secondReInspection && d.secondReInspection.afterPhotos) {
         for (let i = 0; i < d.secondReInspection.afterPhotos.length; i++) {
           if (d.secondReInspection.afterPhotos[i] && d.secondReInspection.afterPhotos[i].startsWith('http')) {
-            downloadTasks.push({ type: 'secondAfterPhoto', defect: d, index: i, url: d.secondReInspection.afterPhotos[i] });
+            downloadTasks.push({ type: 'secondAfterPhoto', defect: d, pid: p.id, index: i, url: d.secondReInspection.afterPhotos[i] });
           }
         }
       }
       if (d.thirdReInspection && d.thirdReInspection.afterPhotos) {
         for (let i = 0; i < d.thirdReInspection.afterPhotos.length; i++) {
           if (d.thirdReInspection.afterPhotos[i] && d.thirdReInspection.afterPhotos[i].startsWith('http')) {
-            downloadTasks.push({ type: 'thirdAfterPhoto', defect: d, index: i, url: d.thirdReInspection.afterPhotos[i] });
+            downloadTasks.push({ type: 'thirdAfterPhoto', defect: d, pid: p.id, index: i, url: d.thirdReInspection.afterPhotos[i] });
           }
         }
       }
@@ -34512,7 +34515,10 @@ async function downloadAllCloudImages(filterProjectIds) {
   updateSyncProgress(60, `Found ${totalImages} images. Downloading...`);
   
   // Download function
-  const downloadAndStore = async (url) => {
+  // FIX (regression): this function had no `project` in scope (it iterates `p` and
+  // stores tasks). Accept the project id from the caller so the cloud->local mapping
+  // is actually recorded (otherwise the duplicate-photo fix was a no-op on this path).
+  const downloadAndStore = async (url, pid) => {
     try {
       const response = await fetch(url);
       if (!response.ok) return null;
@@ -34524,7 +34530,7 @@ async function downloadAllCloudImages(filterProjectIds) {
         reader.readAsDataURL(blob);
       });
       const localRef = await idbPutImage(dataURL);
-      try { await saveCacheMapping(url, localRef, null, project.id); } catch (e) {}
+      try { await saveCacheMapping(url, localRef, null, pid); } catch (e) {}
       return localRef;
     } catch (err) {
       console.error('Failed to download:', url, err);
@@ -34543,7 +34549,7 @@ async function downloadAllCloudImages(filterProjectIds) {
     
     // Download batch in parallel
     const results = await Promise.all(batch.map(async (task) => {
-      const newRef = await downloadAndStore(task.url);
+      const newRef = await downloadAndStore(task.url, task.pid);
       return { task, newRef };
     }));
     
@@ -38077,7 +38083,10 @@ Respond ONLY with a valid JSON array:
       // If user chose to stay with budget, rescale costs down
       if (useRescale && budget > 0 && totalEstCost > budget) {
         mp_rescaleCosts(plan, budget);
-        totalEstCost = (plan.items || []).reduce((s, i) => s + (i.estimatedCost || 0), 0);
+        // FIX (#A1): recompute with the canonical per-item cost (prefers costBreakdown)
+        // so the total shown in the result modal matches the dashboard. The old
+        // reduce on estimatedCost undercounted items that use a cost breakdown.
+        totalEstCost = (plan.items || []).reduce((s, i) => s + mp_getItemEstCost(i), 0);
       }
 
       mp_savePlan();
@@ -40502,9 +40511,13 @@ window.sv_setRating=function(n){sv_currentRating=n;document.querySelectorAll('#s
 
 window.sv_onPhotoInputChange=function(input){
   if(!input.files[0]||!sv_currentPhotoTarget)return;
+  // FIX (#B1): capture the target NOW. sv_handleFileInput is async (compress), and
+  // sv_currentPhotoTarget is shared across front/back/floorPlan/interior. Reading it
+  // at resolve time meant a fast second pick could misfile the first photo.
+  const target=sv_currentPhotoTarget;
   sv_handleFileInput(input,(ref)=>{
-    if(sv_currentPhotoTarget==='interior')sv_formPhotos.interior.push(ref);
-    else sv_formPhotos[sv_currentPhotoTarget]=ref;
+    if(target==='interior')sv_formPhotos.interior.push(ref);
+    else sv_formPhotos[target]=ref;
     sv_refreshPhotoSlots();
   });
 };
