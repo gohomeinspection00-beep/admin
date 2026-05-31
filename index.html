@@ -4086,6 +4086,15 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
 </div>
 
 <script>
+  // FIX (#16): single debug switch. Set to true to see the ~540 diagnostic
+  // console.log() messages; false silences them in production while keeping
+  // console.warn() and console.error() intact for real problems.
+  window.DEBUG = false;
+  (function(){
+    var _log = console.log.bind(console);
+    console.log = function(){ if (window.DEBUG) _log.apply(console, arguments); };
+  })();
+
   // Daftar Service Worker untuk PWA (JANGAN run bila buka file://)
   if (location.protocol !== 'file:' && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -15332,9 +15341,9 @@ function renderOrders() {
   
   // Define order types locally
   var orderTypes = {
-    'Product': { steps: ['Order Created', 'Preparation', 'Posting', 'Order Complete'], icon: 'box' },
-    'Inspection': { steps: ['Order Created', 'Order Confirmation', 'Waiting For Inspection Date', 'Inspection Complete', 'Waiting For Report', 'Order Complete'], icon: 'search' },
-    'Submission Service': { steps: ['Order Created', 'In Progress', 'Complete'], icon: 'clipboard' }
+    'Product': { steps: ['Order Created', 'Preparation', 'Posting', 'Order Complete'], icon: '📦' },
+    'Inspection': { steps: ['Order Created', 'Order Confirmation', 'Waiting For Inspection Date', 'Inspection Complete', 'Waiting For Report', 'Order Complete'], icon: '🔍' },
+    'Submission Service': { steps: ['Order Created', 'In Progress', 'Complete'], icon: '📋' }
   };
   
   db.collection('orders')
@@ -15695,11 +15704,12 @@ document.body.addEventListener('click', e => {
   }
 });
 /* ========= HOME ========= */
-q('#startBtn').addEventListener('click', () => { SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); const p = newProject(); q('#date').value = p.meta.date; show('about'); });
-q('#btnNew').addEventListener('click', () => { SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); newProject(); show('about'); });
+q('#startBtn').addEventListener('click', () => { if (isAccountFrozen()) { showFreezePopup(); return; } SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); const p = newProject(); q('#date').value = p.meta.date; show('about'); });
+q('#btnNew').addEventListener('click', () => { if (isAccountFrozen()) { showFreezePopup(); return; } SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); newProject(); show('about'); });
 
 /* ========= MY ORDERS ========= */
 q('#myOrderBtn').addEventListener('click', () => {
+  if (isAccountFrozen()) { showFreezePopup(); return; }
   show('myOrders');
   loadMyOrders();
 });
@@ -16032,6 +16042,7 @@ const getTTPRUrl = () => appLinks.ttpr || 'https://ttpm.kpkt.gov.my/';
 
 // Initialize Track Inspection
 q('#trackInspectionBtn')?.addEventListener('click', () => {
+  if (isAccountFrozen()) { showFreezePopup(); return; }
   show('trackInspectionList');
   loadTrackInspections();
 });
@@ -24896,6 +24907,7 @@ q('#btnAddDefect').onclick = async () => {
     // 2) Gambar: tukar semua dataURL -> IndexedDB ref
     // FIX: Handle semua jenis photo refs - IDB, data URL, dan cloud URLs
     const photoRefs = [];
+    let photoSaveFailures = 0;
     for (const src of (draft.photos || [])) {
       if (!src) continue;
       try {
@@ -24914,7 +24926,14 @@ q('#btnAddDefect').onclick = async () => {
         }
       } catch (e) {
         console.error('Photo save failed:', e);
+        // FIX (#4): don't silently drop the photo. Keep the original data so it is
+        // not lost, and count the failure so we can warn the user below.
+        photoSaveFailures++;
+        if (src.startsWith('data:')) photoRefs.push(src);
       }
+    }
+    if (photoSaveFailures > 0) {
+      alert(`Amaran: ${photoSaveFailures} gambar gagal disimpan ke storan peranti (storan mungkin penuh). Gambar dikekalkan buat sementara — sila pastikan ada ruang simpanan & cuba simpan semula.`);
     }
 
     // 3) Tag
@@ -26568,10 +26587,15 @@ const exportProject = async (p) => {
     
     console.log('Export: Starting...');
     
+    // FIX (#7): count photos that couldn't be resolved to base64 (e.g. offline +
+    // not cached) so we can warn the user that the export is incomplete instead of
+    // silently dropping them.
+    let photoDropCount = 0;
+
     // Front photo - resolve ref ke dataURL, or keep URL
     updateExportProgress(10, 'Processing front photo...');
     await new Promise(r => setTimeout(r, 10));
-    
+
     let frontResolved = null;
     const originalFrontRef = clone.meta.frontRef;
     
@@ -26592,6 +26616,7 @@ const exportProject = async (p) => {
     if (frontResolved && frontResolved.startsWith('data:')) {
       clone.meta.front = frontResolved;
     } else {
+      if (originalFrontRef) photoDropCount++;
       clone.meta.front = ''; // No URL, only base64
     }
     delete clone.meta.frontRef;
@@ -26608,6 +26633,8 @@ const exportProject = async (p) => {
       const resolved = await resolveRefForExport(r);
       if (resolved && resolved.startsWith('data:')) {
         clone.meta.plans.push(resolved);
+      } else if (r) {
+        photoDropCount++;
       }
       // Skip if not base64 - don't include URLs
     }
@@ -26634,6 +26661,8 @@ const exportProject = async (p) => {
         const resolved = await resolveRefForExport(ref);
         if (resolved && resolved.startsWith('data:')) {
           out.push(resolved);
+        } else if (ref) {
+          photoDropCount++;
         }
         // Skip if not base64
       }
@@ -26646,6 +26675,8 @@ const exportProject = async (p) => {
           const resolved = await resolveRefForExport(ref);
           if (resolved && resolved.startsWith('data:')) {
             afterOut.push(resolved);
+          } else if (ref) {
+            photoDropCount++;
           }
         }
         d.reInspection.afterPhotos = afterOut;
@@ -26658,6 +26689,8 @@ const exportProject = async (p) => {
           const resolved = await resolveRefForExport(ref);
           if (resolved && resolved.startsWith('data:')) {
             afterOut.push(resolved);
+          } else if (ref) {
+            photoDropCount++;
           }
         }
         d.secondReInspection.afterPhotos = afterOut;
@@ -26670,6 +26703,8 @@ const exportProject = async (p) => {
           const resolved = await resolveRefForExport(ref);
           if (resolved && resolved.startsWith('data:')) {
             afterOut.push(resolved);
+          } else if (ref) {
+            photoDropCount++;
           }
         }
         d.thirdReInspection.afterPhotos = afterOut;
@@ -26682,6 +26717,8 @@ const exportProject = async (p) => {
           const resolved = await resolveRefForExport(ref);
           if (resolved && resolved.startsWith('data:')) {
             afterOut.push(resolved);
+          } else if (ref) {
+            photoDropCount++;
           }
         }
         d.fourthReInspection.afterPhotos = afterOut;
@@ -26701,6 +26738,12 @@ const exportProject = async (p) => {
     updateExportProgress(95, 'Creating JSON file...');
     await new Promise(r => setTimeout(r, 50));
     
+    // FIX (#7): warn the user if any photos couldn't be embedded (offline / not
+    // cached), so an incomplete export isn't shipped silently.
+    if (photoDropCount > 0) {
+      alert(`Amaran: ${photoDropCount} gambar tidak dapat dimasukkan ke dalam fail export (mungkin kerana tiada internet atau gambar belum dimuat turun untuk offline).\n\nSila pastikan ada internet & buka projek untuk muat turun gambar, kemudian export semula jika anda mahu fail lengkap.`);
+    }
+
     const json = JSON.stringify(clone, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const fileName = `GoInspect-${sanitizeName(p.meta.owner) || 'inspection'}-${p.id}.json`;
@@ -27116,8 +27159,25 @@ const importJSON = async (f) => {
         }
         d.thirdReInspection.afterPhotos = afterRefs3;
       }
+
+      // FIX (#5): Fourth Re-Inspection afterPhotos were never processed on import,
+      // so 4th-level photos stayed as raw base64 (localStorage bloat, won't resolve).
+      // Mirror the 1st/2nd/3rd handling above.
+      if (d.fourthReInspection && Array.isArray(d.fourthReInspection.afterPhotos)) {
+        const afterRefs4 = [];
+        for (const pht of d.fourthReInspection.afterPhotos) {
+          if (pht && pht.startsWith('data:')) {
+            afterRefs4.push(await idbPutImage(await compressDataURL(pht, 1600, 0.85, true)));
+          } else if (pht && pht.startsWith('http')) {
+            afterRefs4.push(pht);
+          } else if (pht) {
+            afterRefs4.push(pht);
+          }
+        }
+        d.fourthReInspection.afterPhotos = afterRefs4;
+      }
     }
-    
+
     // Import Re-Inspection statuses if exists
     if (Array.isArray(data.reInspectionStatuses)) {
       reInspectionStatuses.length = 0;
@@ -35615,8 +35675,17 @@ function escHtml(str) {
 let pendingNavAfterFreeze = null;
 
 // Show freeze popup
+// FIX (#2): single source of truth for the freeze gate. Previously only the
+// History nav was blocked, so a frozen account could still Start/New inspections,
+// open Track, Orders, etc. Use this everywhere a frozen user must be stopped.
+function isAccountFrozen() {
+  return !!(window.currentUserData && window.currentUserData.frozen === true);
+}
+
 function showFreezePopup(pendingNav = null) {
-  pendingNavAfterFreeze = pendingNav;
+  // FIX (#2): when frozen, never auto-navigate after closing the popup, otherwise
+  // the user could reach the blocked screen just by dismissing the popup.
+  pendingNavAfterFreeze = isAccountFrozen() ? null : pendingNav;
   const popup = document.getElementById('freezePopup');
   if (popup) {
     popup.style.display = 'flex';
@@ -37747,11 +37816,19 @@ function mp_startBudgetPlan() {
 // Rescale costs proportionally to fit within target budget
 function mp_rescaleCosts(plan, targetBudget) {
   const items = plan.items || [];
-  const total = items.reduce((s, i) => s + (i.estimatedCost || 0), 0);
+  // FIX (#11): use the canonical per-item cost (which prefers costBreakdown) so the
+  // rescale total matches the dashboard. Previously it only summed estimatedCost, so
+  // items with cost breakdowns were neither counted nor scaled, and the dashboard
+  // total could still exceed the budget after a "stay within budget" rescale.
+  const total = items.reduce((s, i) => s + mp_getItemEstCost(i), 0);
   if (total <= 0 || total <= targetBudget) return;
   const ratio = targetBudget / total;
   items.forEach(i => {
-    if (i.estimatedCost > 0) {
+    if (i.costBreakdown && i.costBreakdown.length > 0) {
+      i.costBreakdown.forEach(c => {
+        if (c.amount > 0) c.amount = Math.max(10, Math.round(c.amount * ratio));
+      });
+    } else if (i.estimatedCost > 0) {
       i.estimatedCost = Math.max(10, Math.round(i.estimatedCost * ratio));
     }
   });
@@ -38965,6 +39042,15 @@ async function ayieFloat_talkSend(userText) {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.content }] });
     });
     const activePrompt = atalk_talkPrompt || ATALK_DEFAULT_PROMPT;
+    // FIX (#9): guard against missing API key (otherwise key=undefined 400s and the
+    // real cause is hidden behind the generic fallback message).
+    if (!ayie_apiKey) {
+      const m = 'AI belum disetkan. Sila setup Ayie dahulu.';
+      atalk_messages.push({ role: 'model', content: m });
+      atalk_showText(m); atalk_speak(m);
+      if (thinkEl) thinkEl.style.display = 'none';
+      return;
+    }
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${ayie_model}:generateContent?key=${ayie_apiKey}`;
     const response = await fetch(geminiUrl, {
       method: 'POST',
@@ -38975,6 +39061,11 @@ async function ayieFloat_talkSend(userText) {
         generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
       })
     });
+    // FIX (#9): surface real API errors (rate-limit / bad key) instead of silently
+    // falling back, so the user knows why Talk isn't responding.
+    if (!response.ok) {
+      throw new Error('AI error ' + response.status);
+    }
     const data = await response.json();
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, saya tidak dapat respon. Cuba lagi.';
     atalk_messages.push({ role: 'model', content: reply });
@@ -39532,6 +39623,15 @@ async function atalk_sendToAyie(userText) {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.content }] });
     });
     const activePrompt = atalk_talkPrompt || ATALK_DEFAULT_PROMPT;
+    // FIX (#9): guard against missing API key (otherwise key=undefined 400s and the
+    // real cause is hidden behind the generic fallback message).
+    if (!ayie_apiKey) {
+      const m = 'AI belum disetkan. Sila setup Ayie dahulu.';
+      atalk_messages.push({ role: 'model', content: m });
+      atalk_showText(m); atalk_speak(m);
+      if (thinking) thinking.style.display = 'none';
+      return;
+    }
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${ayie_model}:generateContent?key=${ayie_apiKey}`;
     const response = await fetch(geminiUrl, {
       method: 'POST',
@@ -39542,6 +39642,11 @@ async function atalk_sendToAyie(userText) {
         generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
       })
     });
+    // FIX (#9): surface real API errors (rate-limit / bad key) instead of silently
+    // falling back, so the user knows why Talk isn't responding.
+    if (!response.ok) {
+      throw new Error('AI error ' + response.status);
+    }
     const data = await response.json();
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, saya tidak dapat respon. Cuba lagi.';
     atalk_messages.push({ role: 'model', content: reply });
@@ -40053,6 +40158,14 @@ function voice_start(targetId, btn) {
 function voice_stop() {
   if (voice_recognition) {
     try { voice_recognition.stop(); } catch (e) {}
+    // FIX (#8): detach handlers and release the recognizer so its closures
+    // (which capture the target field/button) don't accumulate across many
+    // start/stop cycles in a long session.
+    try {
+      voice_recognition.onstart = voice_recognition.onresult =
+        voice_recognition.onerror = voice_recognition.onend = null;
+    } catch (e) {}
+    voice_recognition = null;
   }
   voice_isListening = false;
 
@@ -40226,7 +40339,18 @@ function sv_uid() { return 'sv_'+Date.now().toString(36)+'_'+Math.random().toStr
 function sv_calcStampDuty(p){if(!p||p<=0)return 0;if(p<=100000)return p*.01;if(p<=500000)return 1000+(p-100000)*.02;if(p<=1000000)return 9000+(p-500000)*.03;return 24000+(p-1000000)*.04}
 function sv_calcLoanStampDuty(l){return(l||0)*0.005}
 function sv_calcMonthlyInstalment(pr,ar,yr){if(!pr||!ar||!yr)return 0;const r=ar/100/12,n=yr*12;if(r===0)return pr/n;return pr*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)}
-function sv_calcLegalFees(p){if(!p)return 0;let f=0;if(p<=500000)f=p*0.01;else if(p<=7500000)f=5000+(p-500000)*0.008;else f=61000+(p-7500000)*0.005;return Math.max(f,500)}
+// FIX (#10): correct Malaysian SPA legal-fee scale (Solicitors' Remuneration Order).
+// 1% first 500k; 0.8% next 500k (500k-1M); 0.7% next 2M (1M-3M); 0.6% next 2M (3M-5M);
+// 0.5% next 2.5M (5M-7.5M); 0.4% above 7.5M (negotiable, use 0.4% as estimate).
+function sv_calcLegalFees(p){
+  if(!p||p<=0)return 0;
+  let f=0;
+  const tiers=[[500000,0.01],[500000,0.008],[2000000,0.007],[2000000,0.006],[2500000,0.005]];
+  let rem=p;
+  for(const [band,rate] of tiers){ if(rem<=0)break; const amt=Math.min(rem,band); f+=amt*rate; rem-=amt; }
+  if(rem>0)f+=rem*0.004; // above 7.5M (negotiable)
+  return Math.max(Math.round(f),500);
+}
 
 function sv_recalcFinance(unit) {
   const price=parseFloat(unit.askingPrice)||0, dpPct=parseFloat(unit.finance.downPaymentPct)||10;
@@ -40582,22 +40706,25 @@ function sv_getIssueCost(iss){
   const manual=iss.repairCost||iss.aiEstimatedCost||'';
   if(!manual)return 0;
   // Parse single value like "2k", "1.5k", "500", "1500.50"
+  // FIX (#13): return null for invalid input so a valid 0 is distinguishable.
+  // Previously 0 was treated as "invalid", so a range like "0-500" returned 500
+  // instead of the average 250.
   function parseVal(s){
     s=s.trim().toLowerCase().replace(/rm\s*/g,'').replace(/,/g,'').trim();
-    if(!s)return 0;
+    if(!s)return null;
     // Handle "k" suffix: "2k"=2000, "1.5k"=1500
     const kMatch=s.match(/^([0-9]*\.?[0-9]+)\s*k$/);
     if(kMatch)return parseFloat(kMatch[1])*1000;
     // Handle plain number: "500", "1500.50"
     const num=parseFloat(s);
-    return(!isNaN(num)&&num>0)?num:0;
+    return(!isNaN(num)&&num>=0)?num:null;
   }
   // Handle range format: "500-1500" => take average
   const rangeParts=manual.replace(/rm\s*/gi,'').replace(/,/g,'').split('-').map(s=>s.trim()).filter(s=>s.length>0);
-  if(rangeParts.length>=2){const a=parseVal(rangeParts[0]),b=parseVal(rangeParts[1]);if(a>0&&b>0)return Math.round((a+b)/2);if(a>0)return Math.round(a);if(b>0)return Math.round(b)}
+  if(rangeParts.length>=2){const a=parseVal(rangeParts[0]),b=parseVal(rangeParts[1]);if(a!==null&&b!==null)return Math.round((a+b)/2);if(a!==null)return Math.round(a);if(b!==null)return Math.round(b)}
   // Single value
   const single=parseVal(manual);
-  return Math.round(single);
+  return Math.round(single||0);
 }
 
 // Get total repair cost for a unit
