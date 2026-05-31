@@ -30897,13 +30897,22 @@ await new Promise(r => setTimeout(r, 10));
                      <div style="color:#3b4a64">Generated on ${new Date().toLocaleString()}</div>`;
   body.appendChild(title);
 
-  const wrap = document.createElement('div'); wrap.className='plan-wrap';
-  wrap.style.maxWidth = '120mm'; wrap.style.margin = '6mm auto';
-  const img = new Image();
-  if (p.meta.frontRef) img.src = await resolveRef(p.meta.frontRef);
-  else if (p.meta.planRefs?.length) img.src = await resolveRef(p.meta.planRefs[0]);
-  else img.src = '';
-  wrap.appendChild(img); body.appendChild(wrap);
+  // FIX: resolve the cover image first, only render it when there is a real source
+  // (avoids an empty box + broken-image icon), and AWAIT its load before it gets
+  // captured/measured so it doesn't come out blank or sized against 0x0.
+  const coverSrc = p.meta.frontRef ? await resolveRef(p.meta.frontRef)
+                 : (p.meta.planRefs?.length ? await resolveRef(p.meta.planRefs[0]) : '');
+  if (coverSrc) {
+    const wrap = document.createElement('div'); wrap.className='plan-wrap';
+    wrap.style.maxWidth = '120mm'; wrap.style.margin = '6mm auto';
+    const img = new Image();
+    img.src = coverSrc;
+    await new Promise(res => {
+      if (img.complete) return res();
+      img.onload = res; img.onerror = res; setTimeout(res, 5000);
+    });
+    wrap.appendChild(img); body.appendChild(wrap);
+  }
 
   const inspectorTxt = p.meta.inspector || '—';
   const tbl = document.createElement('div');
@@ -31027,6 +31036,11 @@ for (let pi = 0; pi < (p.meta.planRefs || []).length; pi++) {
 
   const pim = new Image();
   pim.src = await resolveRef(p.meta.planRefs[pi]);
+  // FIX: await the floor-plan image load before capture so it isn't blank in the PDF.
+  await new Promise(res => {
+    if (pim.complete) return res();
+    pim.onload = res; pim.onerror = res; setTimeout(res, 5000);
+  });
   wrap.appendChild(pim);
 
   // Render hanya defect yg bertag pada plan pi, nombor ikut LIVE (numMap)
@@ -31612,6 +31626,9 @@ await new Promise(r => setTimeout(r, 10));
             return new Promise(resolve => {
               img.onload = resolve;
               img.onerror = resolve;
+              // FIX: timeout fallback so a stuck/slow image can't hang report
+              // generation forever (mirrors the 3s guard in the direct-PDF path).
+              setTimeout(resolve, 5000);
             });
           }));
         }
