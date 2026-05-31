@@ -33053,6 +33053,7 @@ window.twoWaySyncProject = async function(project) {
                       reader.readAsDataURL(blob);
                     });
                     const localRef = await idbPutImage(dataURL);
+                    try { await saveCacheMapping(url, localRef, null, projectId); } catch (e) {}
                     downloadedAfterPhotos2.push(localRef);
                   }
                 } catch (e) {
@@ -33129,6 +33130,7 @@ window.twoWaySyncProject = async function(project) {
                       reader.readAsDataURL(blob);
                     });
                     const localRef = await idbPutImage(dataURL);
+                    try { await saveCacheMapping(url, localRef, null, projectId); } catch (e) {}
                     downloadedAfterPhotos3.push(localRef);
                   }
                 } catch (e) {
@@ -33171,6 +33173,7 @@ window.twoWaySyncProject = async function(project) {
                 reader.readAsDataURL(blob);
               });
               const localRef = await idbPutImage(dataURL);
+              try { await saveCacheMapping(url, localRef, null, projectId); } catch (e) {}
               localPhotos.push(localRef);
             } else {
               // 404 or other error - keep URL as is, will try to load later
@@ -33205,6 +33208,7 @@ window.twoWaySyncProject = async function(project) {
                   reader.readAsDataURL(blob);
                 });
                 const localRef = await idbPutImage(dataURL);
+                try { await saveCacheMapping(url, localRef, null, projectId); } catch (e) {}
                 localAfterPhotos.push(localRef);
               }
             } catch (e) {
@@ -33231,6 +33235,7 @@ window.twoWaySyncProject = async function(project) {
                   reader.readAsDataURL(blob);
                 });
                 const localRef = await idbPutImage(dataURL);
+                try { await saveCacheMapping(url, localRef, null, projectId); } catch (e) {}
                 localAfterPhotos2.push(localRef);
               } else {
                 localAfterPhotos2.push(url);
@@ -33260,6 +33265,7 @@ window.twoWaySyncProject = async function(project) {
                   reader.readAsDataURL(blob);
                 });
                 const localRef = await idbPutImage(dataURL);
+                try { await saveCacheMapping(url, localRef, null, projectId); } catch (e) {}
                 localAfterPhotos3.push(localRef);
               } else {
                 localAfterPhotos3.push(url);
