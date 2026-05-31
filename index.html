@@ -8644,6 +8644,29 @@ const getCacheMapping = async (cloudUrl) => {
   }
 };
 
+// FIX (duplicate photos): reverse lookup localRef -> cloudUrl.
+// The store is keyed by cloudUrl, so scan all mappings (bounded, per-project) and
+// match on localRef. Used on upload to reuse an existing cloud URL instead of
+// re-uploading a downloaded image (which would create a duplicate file). Returns
+// null on any miss/error so callers fall back to normal upload (never worse).
+const getCloudUrlForLocalRef = async (localRef) => {
+  if (!localRef || typeof localRef !== 'string' || localRef.startsWith('http')) return null;
+  try {
+    const db = await openDB();
+    return await new Promise((res, rej) => {
+      const tx = db.transaction(CACHE_MAPPING_STORE, 'readonly');
+      const req = tx.objectStore(CACHE_MAPPING_STORE).getAll();
+      req.onsuccess = () => {
+        const m = (req.result || []).find(x => x && x.localRef === localRef);
+        res(m ? m.cloudUrl : null);
+      };
+      req.onerror = () => rej(req.error);
+    });
+  } catch (e) {
+    return null;
+  }
+};
+
 // Delete all cache mappings for a project
 const deleteCacheMappingsForProject = async (projectId) => {
   try {
@@ -10057,12 +10080,20 @@ const silentBackupProject = async (projectOrId) => {
         return photoRef;
       }
       
+      // FIX (duplicate photos): if this local ref was downloaded from the cloud,
+      // reuse its known cloud URL instead of re-uploading (re-upload = new filename
+      // = duplicate file). Falls back to normal upload when no mapping exists.
+      const knownUrl = await getCloudUrlForLocalRef(photoRef);
+      if (knownUrl) {
+        return knownUrl;
+      }
+
       // Get photo data from IndexedDB
       const photoData = await resolveRef(photoRef);
       if (!photoData || !photoData.startsWith('data:')) {
         return null;
       }
-      
+
       // Generate unique hash for this photo content
       const photoHash = hashPhoto(photoData);
       
@@ -14439,6 +14470,7 @@ const localizeCloudImages = async (showProgress = true) => {
         });
         // Store to IndexedDB
         const newRef = await idbPutImage(dataURL);
+        try { await saveCacheMapping(url, newRef, null, p.id); } catch (e) {}
         localizedCount++;
         return newRef;
       } catch (err) {
@@ -32170,11 +32202,20 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
     // Helper to upload single photo
     const uploadSinglePhoto = async (photoRef, path) => {
       const ref = typeof photoRef === 'string' ? photoRef : (photoRef.ref || photoRef);
+
+      // FIX (duplicate photos): if this local ref came from the cloud, reuse its
+      // known URL instead of re-uploading (which would create a duplicate file).
+      const knownUrl = await getCloudUrlForLocalRef(ref);
+      if (knownUrl) return knownUrl;
+
       const localData = await resolveRef(ref);
-      
+
       if (localData && localData.startsWith('data:')) {
         const photoHash = hashPhotoForSync(localData);
-        return await uploadImageToStorage(localData, `${path}_${photoHash}.jpg`);
+        const url = await uploadImageToStorage(localData, `${path}_${photoHash}.jpg`);
+        // Remember local ref -> cloud URL so future syncs reuse this file.
+        if (url && ref) { try { await saveCacheMapping(url, ref, null, projectId); } catch (e) {} }
+        return url;
       } else if (localData && localData.startsWith('http')) {
         return localData; // Already a URL
       }
@@ -32931,6 +32972,7 @@ window.twoWaySyncProject = async function(project) {
                       reader.readAsDataURL(blob);
                     });
                     const localRef = await idbPutImage(dataURL);
+                    try { await saveCacheMapping(url, localRef, null, projectId); } catch (e) {}
                     downloadedAfterPhotos.push(localRef);
                   }
                 } catch (e) {
@@ -34412,7 +34454,9 @@ async function downloadAllCloudImages(filterProjectIds) {
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
-      return await idbPutImage(dataURL);
+      const localRef = await idbPutImage(dataURL);
+      try { await saveCacheMapping(url, localRef, null, project.id); } catch (e) {}
+      return localRef;
     } catch (err) {
       console.error('Failed to download:', url, err);
       return null;
