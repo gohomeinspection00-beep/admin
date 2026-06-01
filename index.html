@@ -33094,13 +33094,28 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
           
           // Upload re-inspection afterPhotos in parallel
           if (defect.reInspection?.afterPhotos?.length > 0) {
-            const afterPromises = defect.reInspection.afterPhotos.map((photo, j) => 
+            const afterPromises = defect.reInspection.afterPhotos.map((photo, j) =>
               uploadSinglePhoto(photo, `${basePath}_after`)
             );
             const afterResults = await Promise.all(afterPromises);
             defectCopy.reInspectionAfterPhotoUrls = afterResults.filter(url => url !== null);
           }
-          
+          // FIX (H3): upload 2nd/3rd re-inspection afterPhotos too — previously only the 1st
+          // level was uploaded, so 2nd/3rd after-photos were written to cloud as local idb:
+          // refs and were broken/lost on other devices. Mirrors silentBackupProject.
+          if (defect.secondReInspection?.afterPhotos?.length > 0) {
+            const after2 = await Promise.all(defect.secondReInspection.afterPhotos.map(photo =>
+              uploadSinglePhoto(photo, `${basePath}_after2`)
+            ));
+            defectCopy.secondReInspectionAfterPhotoUrls = after2.filter(url => url !== null);
+          }
+          if (defect.thirdReInspection?.afterPhotos?.length > 0) {
+            const after3 = await Promise.all(defect.thirdReInspection.afterPhotos.map(photo =>
+              uploadSinglePhoto(photo, `${basePath}_after3`)
+            ));
+            defectCopy.thirdReInspectionAfterPhotoUrls = after3.filter(url => url !== null);
+          }
+
           return defectCopy;
         }));
         
@@ -33182,7 +33197,9 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
         secondReInspection: d.secondReInspection ? {
           status: d.secondReInspection.status || '',
           notes: d.secondReInspection.notes || '',
-          afterPhotos: d.secondReInspection.afterPhotoUrls || d.secondReInspection.afterPhotos || [],
+          // FIX (H3): use the uploaded Storage URLs (flat field set during upload) so the
+          // cloud doc stores http URLs, not local idb: refs that break on other devices.
+          afterPhotos: d.secondReInspectionAfterPhotoUrls || d.secondReInspection.afterPhotos || [],
           _statusModified: d.secondReInspection._statusModified || 0,
           _notesModified: d.secondReInspection._notesModified || 0,
           _afterPhotosModified: d.secondReInspection._afterPhotosModified || 0,
@@ -33191,7 +33208,7 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
         thirdReInspection: d.thirdReInspection ? {
           status: d.thirdReInspection.status || '',
           notes: d.thirdReInspection.notes || '',
-          afterPhotos: d.thirdReInspection.afterPhotoUrls || d.thirdReInspection.afterPhotos || [],
+          afterPhotos: d.thirdReInspectionAfterPhotoUrls || d.thirdReInspection.afterPhotos || [],
           _statusModified: d.thirdReInspection._statusModified || 0,
           _notesModified: d.thirdReInspection._notesModified || 0,
           _afterPhotosModified: d.thirdReInspection._afterPhotosModified || 0,
@@ -33578,7 +33595,15 @@ window.twoWaySyncProject = async function(project) {
       // FIX (#1/#6): remove old/ghost area names left behind by a rename
       pruneRenamedAreasFromList(project.meta);
     }
-    
+
+    // FIX (M3): union-merge inspectionDates here. This two-way path then pushes via
+    // syncProjectToCloud whose Firestore set({merge:true}) REPLACES arrays — so without
+    // merging first, a device missing a level would overwrite the cloud array and drop
+    // that inspection date. mergeInspectionDates keeps First/Second/Third from both sides.
+    if (typeof mergeInspectionDates === 'function') {
+      project.meta.inspectionDates = mergeInspectionDates(project.meta, cloudBackup?.meta || {});
+    }
+
     // STEP 4: Merge defects - find defects only in cloud
     updateSyncProgress(35, 'Merging defects...');
     
@@ -35205,36 +35230,32 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
             }
             
             // ReInspection
-            if (cd.reInspection) {
-              localDef.reInspection = localDef.reInspection || {};
-              
+            // FIX (H4): merge ALL three re-inspection levels (previously only the 1st was
+            // handled here, so 2nd/3rd status/notes/after-photos from the cloud never
+            // reached an already-existing local defect). Same logic per level.
+            const _mergeCloudReinspLevel = (lvlKey) => {
+              const cdL = cd[lvlKey];
+              if (!cdL) return;
+              localDef[lvlKey] = localDef[lvlKey] || {};
+              const locL = localDef[lvlKey];
               // Status/Notes - cloud wins if newer
               if (cloudTime > localTime) {
-                if (cd.reInspection.status) localDef.reInspection.status = cd.reInspection.status;
-                if (cd.reInspection.notes) localDef.reInspection.notes = cd.reInspection.notes;
+                if (cdL.status) locL.status = cdL.status;
+                if (cdL.notes) locL.notes = cdL.notes;
               }
-              
-              // After photos - REPLACE strategy
-              const cloudAfterTime = cd.reInspection._afterPhotosModified || cloudTime;
-              const localAfterTime = localDef.reInspection?._afterPhotosModified || localTime;
-              const cloudAfterPhotos = cd.reInspection.afterPhotoUrls || cd.reInspection.afterPhotos || [];
-              const localAfterPhotos = localDef.reInspection?.afterPhotos || [];
-              
-              // Get deleted IDs from BOTH local and cloud
-              const localDeletedAfterIds = new Set(localDef.reInspection?._deletedAfterPhotoIds || []);
-              const cloudDeletedAfterIds = new Set(cd.reInspection._deletedAfterPhotoIds || []);
+              // After photos - REPLACE strategy honoring the deletion ledger
+              const cloudAfterTime = cdL._afterPhotosModified || cloudTime;
+              const localAfterTime = locL._afterPhotosModified || localTime;
+              const cloudAfterPhotos = cdL.afterPhotoUrls || cdL.afterPhotos || [];
+              const localAfterPhotos = locL.afterPhotos || [];
+              const localDeletedAfterIds = new Set(locL._deletedAfterPhotoIds || []);
+              const cloudDeletedAfterIds = new Set(cdL._deletedAfterPhotoIds || []);
               const allDeletedAfterIds = new Set([...localDeletedAfterIds, ...cloudDeletedAfterIds]);
-              
-              // Check if local has modifications
               const localHasAfterModifications = localDeletedAfterIds.size > 0 ||
                 localAfterPhotos.some(p => p && !p.startsWith('http'));
-              
               if (localHasAfterModifications) {
-                // Local has modifications - keep local
-                console.log('Shared sync: Local has afterPhoto modifications, keeping local');
-                localDef.reInspection._deletedAfterPhotoIds = [...allDeletedAfterIds];
+                locL._deletedAfterPhotoIds = [...allDeletedAfterIds];
               } else {
-                // Filter valid cloud after photos using ALL deleted IDs
                 const validCloudAfterPhotos = cloudAfterPhotos.filter(photo => {
                   if (!photo) return false;
                   if (typeof photo === 'string' && photo.startsWith('http')) {
@@ -35244,14 +35265,16 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
                   }
                   return true;
                 });
-                
                 if (JSON.stringify(validCloudAfterPhotos) !== JSON.stringify(localAfterPhotos)) {
-                  localDef.reInspection.afterPhotos = validCloudAfterPhotos;
-                  localDef.reInspection._afterPhotosModified = Math.max(cloudAfterTime, localAfterTime);
-                  localDef.reInspection._deletedAfterPhotoIds = [...allDeletedAfterIds];
+                  locL.afterPhotos = validCloudAfterPhotos;
+                  locL._afterPhotosModified = Math.max(cloudAfterTime, localAfterTime);
+                  locL._deletedAfterPhotoIds = [...allDeletedAfterIds];
                 }
               }
-            }
+            };
+            _mergeCloudReinspLevel('reInspection');
+            _mergeCloudReinspLevel('secondReInspection');
+            _mergeCloudReinspLevel('thirdReInspection');
           }
         }
         
