@@ -20670,12 +20670,18 @@ async function openReInspectAnnotatorForEdit(src, idx) {
           showLoading('Saving', 'Saving annotation...');
           const ref = await saveAnnotatedPhoto(data);
           
-          // [FIX 7-annotate] REPLACE in-place only — do NOT mark original as deleted
-          // Marking deleted causes ID mismatch between IDB/URL refs during sync
+          // FIX (H2): REPLACE in-place AND record the old ref as deleted, so the union
+          // cloud-merge doesn't keep both the old and the annotated copy (duplicate). After
+          // a sync, refs converge to http URLs whose tracking id (filename) is stable, so the
+          // ledger filters the old copy correctly — same mechanism as the View delete button.
+          const _recordReplaced = (lvl, oldRef) => {
+            if (oldRef && imgCache[oldRef]) delete imgCache[oldRef];
+            const oid = getPhotoIdForTracking(oldRef);
+            if (oid) { if (!lvl._deletedAfterPhotoIds) lvl._deletedAfterPhotoIds = []; if (!lvl._deletedAfterPhotoIds.includes(oid)) lvl._deletedAfterPhotoIds.push(oid); }
+          };
           if (THIRD_REINSPECTION_MODE) {
             if (defect?.thirdReInspection?.afterPhotos?.[window.reInspectEditIdx] !== undefined) {
-              const oldRef = defect.thirdReInspection.afterPhotos[window.reInspectEditIdx];
-              if (oldRef && imgCache[oldRef]) delete imgCache[oldRef];
+              _recordReplaced(defect.thirdReInspection, defect.thirdReInspection.afterPhotos[window.reInspectEditIdx]);
               defect.thirdReInspection.afterPhotos[window.reInspectEditIdx] = ref;
               defect.thirdReInspection._afterPhotosModified = Date.now();
               defect._lastModified = Date.now();
@@ -20683,8 +20689,7 @@ async function openReInspectAnnotatorForEdit(src, idx) {
             }
           } else if (SECOND_REINSPECTION_MODE) {
             if (defect?.secondReInspection?.afterPhotos?.[window.reInspectEditIdx] !== undefined) {
-              const oldRef = defect.secondReInspection.afterPhotos[window.reInspectEditIdx];
-              if (oldRef && imgCache[oldRef]) delete imgCache[oldRef];
+              _recordReplaced(defect.secondReInspection, defect.secondReInspection.afterPhotos[window.reInspectEditIdx]);
               defect.secondReInspection.afterPhotos[window.reInspectEditIdx] = ref;
               defect.secondReInspection._afterPhotosModified = Date.now();
               defect._lastModified = Date.now();
@@ -20692,8 +20697,7 @@ async function openReInspectAnnotatorForEdit(src, idx) {
             }
           } else {
             if (defect?.reInspection?.afterPhotos?.[window.reInspectEditIdx] !== undefined) {
-              const oldRef = defect.reInspection.afterPhotos[window.reInspectEditIdx];
-              if (oldRef && imgCache[oldRef]) delete imgCache[oldRef];
+              _recordReplaced(defect.reInspection, defect.reInspection.afterPhotos[window.reInspectEditIdx]);
               defect.reInspection.afterPhotos[window.reInspectEditIdx] = ref;
               defect.reInspection._afterPhotosModified = Date.now();
               defect._lastModified = Date.now();
@@ -21579,6 +21583,25 @@ async function saveReEditDefect() {
   const editedBeforePhotos = await _toIdbRefs(reAddDefectData.beforePhotos);
   const editedAfterPhotos  = await _toIdbRefs(reAddDefectData.afterPhotos);
 
+  // FIX (H1/H2): record after-photos that were DELETED or REPLACED (annotated) during this
+  // edit into the current level's _deletedAfterPhotoIds. The cloud after-photo merge is a
+  // union that only drops refs listed there, so without this an Edit-dialog delete is
+  // resurrected and an annotate keeps BOTH the old and new copy after sync. Compare the
+  // level's pre-edit after-photo IDs to the final set (unchanged refs keep their id; an
+  // annotated photo becomes a new ref, so its old id is "removed" and gets recorded).
+  const _editLevelObj = THIRD_REINSPECTION_MODE ? defect.thirdReInspection
+                      : SECOND_REINSPECTION_MODE ? defect.secondReInspection
+                      : defect.reInspection;
+  const _origAfterIds = new Set(((_editLevelObj && _editLevelObj.afterPhotos) || []).map(p => getPhotoIdForTracking(p)).filter(Boolean));
+  const _finalAfterIds = new Set(editedAfterPhotos.map(p => getPhotoIdForTracking(p)).filter(Boolean));
+  const _removedAfterIds = [..._origAfterIds].filter(id => !_finalAfterIds.has(id));
+  const _recordRemovedAfter = (lvl) => {
+    if (!lvl || !_removedAfterIds.length) return;
+    if (!lvl._deletedAfterPhotoIds) lvl._deletedAfterPhotoIds = [];
+    for (const id of _removedAfterIds) if (!lvl._deletedAfterPhotoIds.includes(id)) lvl._deletedAfterPhotoIds.push(id);
+    lvl._afterPhotosModified = Date.now();
+  };
+
   // Update defect core data
   // FIX: Only update original defect properties (photos, element, type, description, tag) 
   // in First Re-Inspection mode. In Second/Third mode, user is only editing 
@@ -21604,6 +21627,7 @@ async function saveReEditDefect() {
     if (statusChanged) defect.thirdReInspection._statusModified = Date.now();
     if (notesChanged) defect.thirdReInspection._notesModified = Date.now();
     if (photosChanged) defect.thirdReInspection._afterPhotosModified = Date.now();
+    _recordRemovedAfter(defect.thirdReInspection); // FIX (H1/H2)
   } else if (SECOND_REINSPECTION_MODE) {
     // Second Re-Inspection: save to secondReInspection
     if (!defect.secondReInspection) defect.secondReInspection = { afterPhotos: [], status: '', notes: '' };
@@ -21616,6 +21640,7 @@ async function saveReEditDefect() {
     if (statusChanged) defect.secondReInspection._statusModified = Date.now();
     if (notesChanged) defect.secondReInspection._notesModified = Date.now();
     if (photosChanged) defect.secondReInspection._afterPhotosModified = Date.now();
+    _recordRemovedAfter(defect.secondReInspection); // FIX (H1/H2)
   } else {
     // First Re-Inspection (default): save to reInspection
     if (!defect.reInspection) {
@@ -21630,6 +21655,7 @@ async function saveReEditDefect() {
     if (statusChanged) defect.reInspection._statusModified = Date.now();
     if (notesChanged) defect.reInspection._notesModified = Date.now();
     if (photosChanged) defect.reInspection._afterPhotosModified = Date.now();
+    _recordRemovedAfter(defect.reInspection); // FIX (H1/H2)
   }
   defect._lastModified = Date.now();
   
