@@ -23253,7 +23253,15 @@ const renderFinding = async () => {
       
       const p = getProject();
       if (!p) return;
-      
+
+      // FIX (M-3): serialize against this device's auto-save / two-way sync so the
+      // read-merge-write below can't interleave and clobber. Non-blocking — if a sync is
+      // already running, ask the user to retry (acquireSyncLock returns false immediately).
+      if (typeof acquireSyncLock === 'function' && !acquireSyncLock(p.id)) {
+        if (typeof showSyncNotification === 'function') showSyncNotification('Sync in progress — please try again in a moment');
+        return;
+      }
+
       // Update button state
       syncUpdateBtn.disabled = true;
       syncUpdateBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>Syncing...';
@@ -24142,19 +24150,52 @@ const renderFinding = async () => {
             try { p.meta.inspectionDates = mergeInspectionDates(p.meta, cloudDoc.data()?.meta || {}); } catch (e) {}
           }
 
-          // Upload directly to Firestore
-          await db.collection('backups').doc(p.id).set({
-            projectId: p.id,
-            userEmail: userEmail.toLowerCase(),
-            meta: {
-              ...p.meta,
-              _lastModified: getCalibratedTimestamp()
-            },
-            defects: cloudDefects,
-            defectCount: activeDefectCount,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            _version: (cloudDoc.exists ? (cloudDoc.data()._version || 0) : 0) + 1
-          }, { merge: true });
+          // Upload to Firestore inside a transaction (FIX M-3: re-read + re-merge so a
+          // concurrent cross-device write isn't dropped by merge:true array-replace; FIX M-4:
+          // union customElements/customTypes so an empty local push can't wipe cloud's).
+          const _docRef = db.collection('backups').doc(p.id);
+          const _pushMeta = { ...p.meta, _lastModified: getCalibratedTimestamp() };
+          try {
+            await db.runTransaction(async (txn) => {
+              const cur = await txn.get(_docRef);
+              const curData = cur.exists ? cur.data() : null;
+              const curVersion = curData?._version || 0;
+              // Union defects by _syncId: our pushed (http-only) defects win for shared ids;
+              // cloud-only defects another device added are appended verbatim (http URLs kept).
+              const pushedIds = new Set(cloudDefects.map(d => d && d._syncId).filter(Boolean));
+              const cloudOnly = (curData?.defects || []).filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
+              const mergedDefects = cloudOnly.length ? [...cloudDefects, ...cloudOnly] : cloudDefects;
+              const mergedMeta = { ..._pushMeta };
+              if (typeof mergeInspectionDates === 'function' && curData) {
+                try { mergedMeta.inspectionDates = mergeInspectionDates(p.meta, curData.meta || {}); } catch (e) {}
+              }
+              const mergedCount = mergedDefects.filter(d => !d._deleted && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection).length;
+              txn.set(_docRef, {
+                projectId: p.id,
+                userEmail: userEmail.toLowerCase(),
+                meta: mergedMeta,
+                defects: mergedDefects,
+                defectCount: mergedCount,
+                customElements: [...new Set([...(p.customElements || []), ...((curData?.customElements) || [])])],
+                customTypes: [...new Set([...(p.customTypes || []), ...((curData?.customTypes) || [])])],
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                _version: curVersion + 1
+              }, { merge: true });
+            });
+          } catch (txErr) {
+            console.error('Update: transaction failed, falling back to direct set:', txErr);
+            await _docRef.set({
+              projectId: p.id,
+              userEmail: userEmail.toLowerCase(),
+              meta: _pushMeta,
+              defects: cloudDefects,
+              defectCount: activeDefectCount,
+              customElements: p.customElements || [],
+              customTypes: p.customTypes || [],
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+              _version: (cloudDoc.exists ? (cloudDoc.data()._version || 0) : 0) + 1
+            }, { merge: true });
+          }
           
           console.log('Update: Uploaded merged data to cloud directly');
         } catch (uploadErr) {
@@ -24170,11 +24211,12 @@ const renderFinding = async () => {
       } catch (err) {
         console.error('Update error:', err);
         alert('Update failed: ' + err.message);
+      } finally {
+        // FIX (M-3): always release the sync lock + restore the button, even on error/return.
+        if (typeof releaseSyncLock === 'function') releaseSyncLock(p.id);
+        syncUpdateBtn.disabled = false;
+        syncUpdateBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>Update';
       }
-      
-      // Restore button
-      syncUpdateBtn.disabled = false;
-      syncUpdateBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>Update';
     };
   }
 areas.forEach(area => {
