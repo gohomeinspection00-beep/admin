@@ -27419,7 +27419,10 @@ async function exportInspectionFormat() {
       // Priority: Third > Second > First (use the latest available based on mode)
       let sourceData = null;
       
-      if (THIRD_REINSPECTION_MODE && d.thirdReInspection) {
+      if (typeof FOURTH_REINSPECTION_MODE !== 'undefined' && FOURTH_REINSPECTION_MODE && d.fourthReInspection) {
+        // Fourth Re-Inspection Mode: use fourthReInspection data (matches exportProject/importJSON)
+        sourceData = d.fourthReInspection;
+      } else if (THIRD_REINSPECTION_MODE && d.thirdReInspection) {
         // Third Re-Inspection Mode: use thirdReInspection data
         sourceData = d.thirdReInspection;
       } else if (SECOND_REINSPECTION_MODE && d.secondReInspection) {
@@ -27457,6 +27460,7 @@ async function exportInspectionFormat() {
       delete d.reInspection;
       delete d.secondReInspection;
       delete d.thirdReInspection;
+      delete d.fourthReInspection;
       
       // Remove new defect flag (now it's a normal defect)
       delete d.isNewInReInspection;
