@@ -19910,6 +19910,15 @@ if (reInspectImportInput) {
     });
     syncInspectionDatesToMode(proj, false); // 1st re-inspection -> auto-add Second date
     saveAllSafe();
+    // FIX (HB): importJSON rendered About in NORMAL mode (its internal show('about') runs
+    // before this handler flips RE_INSPECTION_MODE), so _inspectionDatesDraft is the stale
+    // [{first}] and the dates block is hidden. The line above just added the Second date to
+    // meta — re-seed the draft + re-render the rows (now in re-inspection mode) so a later
+    // Save/Continue (readAbout) keeps the Second date instead of writing back the stale draft.
+    if (typeof getInspectionDates === 'function' && typeof renderInspectionDateRows === 'function') {
+      _inspectionDatesDraft = getInspectionDates(proj.meta);
+      renderInspectionDateRows();
+    }
   }
 
   e.target.value = '';
@@ -21779,8 +21788,12 @@ async function renderReAddFloorPlan() {
         img.style.cssText = 'width:100%; display:block;';
         container.appendChild(img);
         
-        // Add tag if exists
-        if (reAddDefectData.tag) {
+        // Add tag if exists — FIX (Tagging-1): only draw it when its planIndex matches the
+        // plan currently shown, matching the guarded draws in renderFinding/renderAreaDetail.
+        // Otherwise a T2 selector switch to another plan would draw the pin (old coords) on
+        // the wrong plan image. In the normal edit case planIdx === tag.planIndex (T1), so
+        // the pin still shows on its own plan.
+        if (reAddDefectData.tag && (reAddDefectData.tag.planIndex ?? 0) === planIdx) {
           const tag = document.createElement('div');
           tag.className = 'tag';
           tag.style.cssText = 'background:#f97316;'; // Orange for new defect
@@ -33696,7 +33709,7 @@ window.twoWaySyncProject = async function(project) {
       }
       if (cloudArea && !localAreas.includes(cloudArea) && !deletedAreas.has(cloudArea)) {
         // FIX: Don't add area from cloud if permanently deleted
-        const permDelSync = p.meta._permanentlyDeletedAreas || [];
+        const permDelSync = project.meta._permanentlyDeletedAreas || [];
         if (permDelSync.includes(cloudArea)) {
           console.log('manualSync: SKIP add - area permanently deleted:', cloudArea);
           continue;
