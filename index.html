@@ -22370,9 +22370,13 @@ const mergeInspectionDates = (localM, cloudM) => {
 const ensureInspectionDate = (proj, level, doSave = true) => {
   if (!proj || !proj.meta || !INSPECTION_LEVELS.includes(level)) return;
   const arr = getInspectionDates(proj.meta); // always includes 'first'
-  if (!arr.some(e => e.level === level)) {
-    arr.push({ level, date: today() });
-  }
+  // FIX (M2): only MUTATE when this level is genuinely missing. Previously it rebuilt the
+  // array and bumped _lastModified on every call — so merely previewing a re-inspection
+  // report (which calls this for each level) inflated _lastModified to "now", letting a
+  // view-only device win merge conflicts and override genuine edits/deletes from another
+  // device. If the level already exists, do nothing.
+  if (arr.some(e => e.level === level)) return;
+  arr.push({ level, date: today() });
   // keep canonical order
   proj.meta.inspectionDates = INSPECTION_LEVELS
     .map(lv => arr.find(e => e.level === lv))
@@ -28815,8 +28819,16 @@ const renderHistoryCard = (p, container) => {
       openBtn.onclick = async () => {
         SECOND_INSPECTION_SUBMISSION = false;
         THIRD_INSPECTION_SUBMISSION = false;
+        // FIX (M1): clear ALL re-inspection flags on a Normal Open so a stale
+        // RE_INSPECTION_MODE (e.g. set earlier via 'Re-Inspect from History') doesn't
+        // leak into this normal project — which would wrongly show the Re-Inspection
+        // Dates block and auto-add/save a Second date.
+        RE_INSPECTION_MODE = false;
         SECOND_REINSPECTION_MODE = false;
         THIRD_REINSPECTION_MODE = false;
+        if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
+        reInspectionAtFinding = false;
+        document.body.classList.remove('reinspection-mode');
         await openProjectForSubmission(p, openBtn);
       };
       actions.appendChild(openBtn);
