@@ -79,9 +79,10 @@ service cloud.firestore {
       allow delete: if isAdmin() || ownsByEmailField();
     }
 
-    // ---- homeSurveys/{uid} : Survey module, keyed by auth uid ----
-    match /homeSurveys/{uid} {
-      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    // ---- homeSurveys/{accountEmail} : Survey module, keyed by the account email
+    // (lowercased), consistent with the rest of the app. ----
+    match /homeSurveys/{accountEmail} {
+      allow read, write: if isAdmin() || (isSignedIn() && accountEmail == myEmail());
     }
 
     // ---- orders/{orderId} : purchases (carry userEmail) ----

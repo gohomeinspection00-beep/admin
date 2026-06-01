@@ -41115,7 +41115,13 @@ let sv_saveTimeout = null;
 const SV_COLLECTION = 'homeSurveys';
 
 // ========= FIREBASE HELPERS =========
-function sv_getUserId() { return window.currentUserData?.uid || null; }
+// Survey identity = the account email (lowercased), consistent with the rest of the app
+// (users/backups/trackInspections all key by email). The previous .uid was NEVER set on
+// currentUserData, so sv_getUserId always returned null and Survey never synced to cloud.
+function sv_getUserId() {
+  const e = (window.currentUserData && window.currentUserData.email) || window.currentUserEmail || '';
+  return e ? String(e).toLowerCase() : null;
+}
 
 let sv_cloudLoaded = false;
 
@@ -41146,9 +41152,21 @@ function sv_mergeUnits(localUnits, cloudUnits) {
 
 async function sv_loadFromCloud() {
   const uid = sv_getUserId();
+  const key = 'sv_data_' + (uid || 'guest');
+  // One-time migration: older builds keyed Survey data as 'guest' (uid was never set),
+  // so adopt any legacy guest-only data into this account's key the first time. This
+  // preserves on-device surveys and lets them sync up to the account.
+  if (uid) {
+    try {
+      if (!localStorage.getItem(key)) {
+        const legacy = localStorage.getItem('sv_data_guest');
+        if (legacy) localStorage.setItem(key, legacy);
+      }
+    } catch (e) {}
+  }
   // Try localStorage first (instant)
   try {
-    const local = localStorage.getItem('sv_data_' + (uid || 'guest'));
+    const local = localStorage.getItem(key);
     if (local) {
       const parsed = JSON.parse(local);
       if (parsed.units && parsed.units.length > 0) {
@@ -41164,28 +41182,31 @@ async function sv_loadFromCloud() {
     const db = firebase.firestore();
     if (!db) { console.log('Survey: Firestore not ready'); return; }
     const doc = await db.collection(SV_COLLECTION).doc(uid).get();
-    if (doc.exists) {
-      const cloudData = doc.data();
-      const cloudUnits = cloudData.units || [];
-      if (cloudUnits.length > 0) {
-        const localTime = sv_data.lastModified || 0;
-        const cloudTime = cloudData.lastModified || 0;
-        // FIX (#B2): merge per-unit instead of replacing the whole array, so a unit
-        // added/edited on one device isn't lost when the other device syncs. The
-        // document-level timestamp is kept only for bookkeeping.
-        const localUnits = sv_data.units || [];
-        const merged = sv_mergeUnits(localUnits, cloudUnits);
-        sv_data = { units: merged, lastModified: Math.max(localTime, cloudTime) || Date.now() };
-        console.log('Survey: Merged units (local', localUnits.length, '+ cloud', cloudUnits.length, '=', merged.length, ')');
-        // If the merge added local-only units (or local copies were newer), persist
-        // the union so other devices see it. Guarded so we don't write needlessly.
-        try {
-          localStorage.setItem('sv_data_' + (uid || 'guest'), JSON.stringify(sv_data));
-          const cloudIds = new Set(cloudUnits.map(u => u && u.id));
-          const mergedDiffers = merged.length !== cloudUnits.length || merged.some(u => !cloudIds.has(u.id));
-          if (mergedDiffers && typeof sv_autoSave === 'function') sv_autoSave();
-        } catch (e) {}
-      }
+    const cloudData = doc.exists ? (doc.data() || {}) : {};
+    const cloudUnits = cloudData.units || [];
+    if (cloudUnits.length > 0) {
+      const localTime = sv_data.lastModified || 0;
+      const cloudTime = cloudData.lastModified || 0;
+      // FIX (#B2): merge per-unit instead of replacing the whole array, so a unit
+      // added/edited on one device isn't lost when the other device syncs. The
+      // document-level timestamp is kept only for bookkeeping.
+      const localUnits = sv_data.units || [];
+      const merged = sv_mergeUnits(localUnits, cloudUnits);
+      sv_data = { units: merged, lastModified: Math.max(localTime, cloudTime) || Date.now() };
+      console.log('Survey: Merged units (local', localUnits.length, '+ cloud', cloudUnits.length, '=', merged.length, ')');
+      // If the merge added local-only units (or local copies were newer), persist
+      // the union so other devices see it. Guarded so we don't write needlessly.
+      try {
+        localStorage.setItem(key, JSON.stringify(sv_data));
+        const cloudIds = new Set(cloudUnits.map(u => u && u.id));
+        const mergedDiffers = merged.length !== cloudUnits.length || merged.some(u => !cloudIds.has(u.id));
+        if (mergedDiffers) await sv_saveToCloud();
+      } catch (e) {}
+    } else if ((sv_data.units || []).length > 0) {
+      // Cloud is empty/missing but we have local (e.g. migrated guest) data -> push it
+      // up so it appears on other devices for this account.
+      console.log('Survey: Cloud empty, pushing', sv_data.units.length, 'local units');
+      await sv_saveToCloud();
     }
     sv_cloudLoaded = true;
   } catch(e) { console.log('Survey: Cloud load failed', e.message); }
@@ -41475,7 +41496,10 @@ window.sv_saveUnit=function(){
   };
   sv_recalcFinance(ud);
   if(sv_editingUnitId){const idx=sv_data.units.findIndex(u=>u.id===sv_editingUnitId);if(idx>=0)sv_data.units[idx]=ud;else sv_data.units.push(ud)}else{sv_data.units.push(ud)}
-  sv_autoSave();show('svUnitList');
+  // Push immediately to cloud (localStorage + Firestore) so a newly added house appears
+  // on other devices for this account right away, instead of waiting on the debounce.
+  sv_saveToCloud();
+  show('svUnitList');
 };
 
 window.sv_deleteUnit=function(id){if(!confirm('Delete this unit?'))return;
