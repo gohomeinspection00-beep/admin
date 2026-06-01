@@ -33475,6 +33475,10 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
       // Re-inspection mode settings - use global reInspectionStatuses
       reInspectionMode: RE_INSPECTION_MODE || false,
       reInspectionStatuses: reInspectionStatuses || null,
+      // FIX (M-4): include custom element/type registries (unioned with cloud in the txn
+      // above) so an unused custom name propagates via Backup, not only silentBackup.
+      customElements: project.customElements || [],
+      customTypes: project.customTypes || [],
       backupAt: firebase.firestore.FieldValue.serverTimestamp(),
       // FIX 3: Exclude deleted defects from count
       defectCount: project.defects ? project.defects.filter(d => !d._deleted).length : 0
@@ -33619,12 +33623,43 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
         const currentDoc = await transaction.get(docRef);
         const currentData = currentDoc.exists ? currentDoc.data() : null;
         const currentVersion = currentData?._version || 0;
-        
-        // Add version to backup data
+
+        // FIX (M-2): re-merge intervening cloud writes INSIDE the txn so doc-level
+        // merge:true doesn't drop defects/inspection dates/custom names another device
+        // added between our read and this set. Mirrors silentBackupProject's in-txn re-merge.
+        // Retry-safe: computed fresh from immutable inputs + the freshly-read currentData
+        // each callback run (never mutates finalBackupData's arrays in place).
         finalBackupData._version = currentVersion + 1;
         finalBackupData._lastSyncDevice = `${navigator.userAgent.slice(0, 30)}_${Date.now()}`;
-        
-        transaction.set(docRef, finalBackupData, { merge: true });
+
+        let docToWrite = finalBackupData;
+        if (currentData) {
+          // Union defects by _syncId: our pushed defects win for shared ids (they carry this
+          // device's edits + uploaded http URLs); cloud-only defects are appended verbatim
+          // (keep their http URLs — no idb refs reintroduced).
+          const pushed = Array.isArray(finalBackupData.defects) ? finalBackupData.defects : [];
+          const pushedIds = new Set(pushed.map(d => d && d._syncId).filter(Boolean));
+          const cloudDefs = Array.isArray(currentData.defects) ? currentData.defects : [];
+          const cloudOnly = cloudDefs.filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
+          const mergedDefects = cloudOnly.length ? [...pushed, ...cloudOnly] : pushed;
+          // Union inspectionDates by level (no level lost).
+          let mergedDates = finalBackupData.meta?.inspectionDates;
+          if (typeof mergeInspectionDates === 'function') {
+            try { mergedDates = mergeInspectionDates(finalBackupData.meta || {}, currentData.meta || {}); } catch (e) {}
+          }
+          // FIX (M-4): union custom element/type registries so an unused name another device
+          // added isn't wiped by the array-replace, and an empty local push can't wipe cloud.
+          const mergedCustomElements = [...new Set([...(finalBackupData.customElements || []), ...(currentData.customElements || [])])];
+          const mergedCustomTypes = [...new Set([...(finalBackupData.customTypes || []), ...(currentData.customTypes || [])])];
+          docToWrite = {
+            ...finalBackupData,
+            defects: mergedDefects,
+            meta: { ...(finalBackupData.meta || {}), inspectionDates: mergedDates },
+            customElements: mergedCustomElements,
+            customTypes: mergedCustomTypes
+          };
+        }
+        transaction.set(docRef, docToWrite, { merge: true });
       });
     } catch (transactionError) {
       console.error('Transaction failed, falling back to direct set:', transactionError);
