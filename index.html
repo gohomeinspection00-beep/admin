@@ -4477,7 +4477,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
           <p>Plan & budget home repairs</p>
         </button>
 
-        <button class="home-card" id="surveyBtn" onclick="show('svUnitList')">
+        <button class="home-card" id="surveyBtn" onclick="(window.sv_enterModule ? sv_enterModule() : show('svUnitList'))">
           <div class="home-card-icon" style="background:#ede9fe;color:#7c3aed">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
@@ -41124,6 +41124,11 @@ function sv_getUserId() {
 }
 
 let sv_cloudLoaded = false;
+// FIX (#2): true only after the cloud doc has actually been fetched this session.
+// sv_saveToCloud must NOT write to Firestore before this — set({units},{merge:true})
+// replaces the whole units array, so saving before the initial load merges in the
+// existing cloud units would overwrite/lose them.
+let sv_cloudFetched = false;
 
 // FIX (#B2): per-unit merge so editing/adding units on two devices doesn't lose
 // data. Previously the whole units array was replaced by whichever side had the
@@ -41177,11 +41182,16 @@ async function sv_loadFromCloud() {
   } catch(e) {}
   
   // Then try cloud (may be newer)
-  if (!uid) { console.log('Survey: No user ID, skip cloud'); return; }
+  // FIX (#3): guest/not-logged-in has nothing to sync — mark loaded so the list
+  // renders cached data instead of spinning forever.
+  if (!uid) { console.log('Survey: No user ID, skip cloud'); sv_cloudLoaded = true; return; }
   try {
     const db = firebase.firestore();
     if (!db) { console.log('Survey: Firestore not ready'); return; }
     const doc = await db.collection(SV_COLLECTION).doc(uid).get();
+    // FIX (#2): the cloud doc is now fetched — from here it's safe for sv_saveToCloud
+    // to write the (merged) units array without clobbering existing cloud units.
+    sv_cloudFetched = true;
     const cloudData = doc.exists ? (doc.data() || {}) : {};
     const cloudUnits = cloudData.units || [];
     if (cloudUnits.length > 0) {
@@ -41224,6 +41234,11 @@ async function sv_saveToCloud() {
   
   // Save to cloud if available
   if (!uid) return;
+  // FIX (#2): don't write to Firestore before the initial cloud fetch. set({units},
+  // {merge:true}) replaces the whole array, so writing now (with only locally-known
+  // units) would overwrite existing cloud units. The data is safe in localStorage and
+  // sv_loadFromCloud will merge + push it once the fetch completes.
+  if (!sv_cloudFetched) { console.log('Survey: cloud not fetched yet — deferring cloud write (saved locally)'); return; }
   try {
     const db = firebase.firestore();
     if (!db) return;
@@ -41301,14 +41316,26 @@ function sv_recalcFinance(unit) {
   unit.pricePerSqft=unit.builtUpSqft?Math.round(price/unit.builtUpSqft):0;
 }
 
+// FIX (#3): entering the Survey module from Home re-fetches the cloud so edits made on
+// another device show up (the in-session cache is otherwise only refreshed on a full
+// page reload). Resetting sv_cloudFetched also re-arms the #2 save gate until the fresh
+// fetch lands. Back buttons keep calling show('svUnitList') directly (cached, no refetch).
+window.sv_enterModule = function() {
+  sv_cloudLoaded = false;
+  sv_cloudFetched = false;
+  show('svUnitList');
+};
+
 // ========= RENDER: UNIT LIST =========
 window.sv_renderUnitList = async function() {
   const container=document.getElementById('svUnitListItems'), empty=document.getElementById('svEmptyState'), compareSection=document.getElementById('svCompareSection');
   if(!container) return;
   if(!sv_cloudLoaded){
     container.innerHTML='<div style="text-align:center;padding:20px"><div style="width:30px;height:30px;border:3px solid #e5e7eb;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div><p style="color:var(--muted);font-size:13px;margin-top:8px">Loading...</p></div>';
+    // FIX (#3): let sv_loadFromCloud own sv_cloudLoaded — it sets it true only on a
+    // successful fetch (or guest). A failed first load now stays unloaded and retries
+    // on the next entry, instead of being permanently latched "loaded".
     await sv_loadFromCloud();
-    sv_cloudLoaded = true;
   }
   const units=sv_data.units.filter(u=>!u._deleted);
   if(!units.length){container.innerHTML='';if(empty)empty.style.display='block';if(compareSection)compareSection.style.display='none';return}
