@@ -23964,7 +23964,41 @@ const renderFinding = async () => {
         // Use a simpler upload that doesn't re-fetch and re-merge
         try {
           const userEmail = window.currentUserData?.email || 'anonymous';
-          
+
+          // FIX (M-1): upload any NOT-yet-uploaded photos to Storage BEFORE the http-only
+          // filter below. Otherwise an un-uploaded (idb:/data:) ref — e.g. a fresh
+          // annotation made just before clicking Update — is filtered to nothing, and
+          // because set({merge:true}) REPLACES the whole defects array, that wipes the
+          // cloud copy of that photo. Converting refs to http first (like silentBackup)
+          // means nothing is dropped. On failure the ref stays as-is (filtered as before
+          // — no regression). Mutating local refs to http also matches silentBackup.
+          if (typeof uploadImageToStorage === 'function') {
+            const _upRef = async (ref, basePath) => {
+              if (!ref || typeof ref !== 'string' || ref.startsWith('http')) return ref;
+              try {
+                if (typeof getCloudUrlForLocalRef === 'function') {
+                  const known = await getCloudUrlForLocalRef(ref);
+                  if (known) return known;
+                }
+                const data = await resolveRef(ref);
+                if (!data || !data.startsWith('data:')) return ref;
+                const url = await uploadImageToStorage(data, `${basePath}_${hashPhotoForSync(data)}.jpg`);
+                return (url && typeof url === 'string' && url.startsWith('http')) ? url : ref;
+              } catch (e) { return ref; }
+            };
+            for (const d of (p.defects || [])) {
+              if (!d || d._deleted) continue;
+              if (!d._syncId) d._syncId = generateSecureId('def');
+              const base = `inspections/${userEmail.toLowerCase()}/${p.id}/${d._syncId}`;
+              if (Array.isArray(d.photos)) for (let i = 0; i < d.photos.length; i++) d.photos[i] = await _upRef(d.photos[i], `${base}_photo`);
+              for (const [lvl, suf] of [['reInspection', 'after'], ['secondReInspection', 'after2'], ['thirdReInspection', 'after3']]) {
+                const o = d[lvl];
+                if (o && Array.isArray(o.afterPhotos)) for (let i = 0; i < o.afterPhotos.length; i++) o.afterPhotos[i] = await _upRef(o.afterPhotos[i], `${base}_${suf}`);
+              }
+            }
+            try { saveAllSafe(); } catch (e) {}
+          }
+
           // Prepare defects for cloud (filter out IDB refs, keep URLs)
           const cloudDefects = (p.defects || []).map(d => {
             const photos = (d.photos || []).filter(ph => ph && typeof ph === 'string' && ph.startsWith('http'));
