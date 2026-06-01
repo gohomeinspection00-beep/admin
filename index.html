@@ -21612,8 +21612,14 @@ async function saveReEditDefect() {
     defect.description = description;
     defect.photos = editedBeforePhotos;
     defect.tag = reAddDefectData.tag;
+  } else if (reAddDefectData.tag) {
+    // FIX (M5): the pin/tag is the defect's single pin location (not per-level). The
+    // floor plan stays interactive in 2nd/3rd re-inspection, so a moved pin used to be
+    // silently discarded. Persist a re-placed tag (only the tag — other original
+    // properties stay untouched in 2nd/3rd mode).
+    defect.tag = reAddDefectData.tag;
   }
-  
+
   // Update re-inspection data based on current mode
   if (THIRD_REINSPECTION_MODE) {
     // Third Re-Inspection: save to thirdReInspection
@@ -21691,8 +21697,12 @@ async function renderReAddFloorPlan() {
   // FIX (#1): use the floor plan this area is actually assigned to (was hardcoded 0,
   // so an area on plan 2 wrongly showed/tagged plan 1). Mirrors the normal flow.
   const _reArea = (q('#reAddLocation')?.textContent) || currentAreaForDetail || '';
+  // FIX (M4): when the area has an assigned plan, use it; otherwise default to the plan the
+  // user is currently viewing (uiPlanIndex) instead of always plan 0 — previously a new
+  // re-inspection defect was tagged on plan 0 even while the user was looking at plan 2.
   let planIdx = (proj.meta.areaFloorPlans && proj.meta.areaFloorPlans[_reArea] != null)
-    ? proj.meta.areaFloorPlans[_reArea] : 0;
+    ? proj.meta.areaFloorPlans[_reArea]
+    : (typeof uiPlanIndex === 'number' ? uiPlanIndex : 0);
   if (planIdx < 0 || planIdx >= plans.length) planIdx = 0; // safety clamp
   
   if (plans.length > 0 && plans[planIdx]) {
@@ -35156,17 +35166,31 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
               reInspection: cd.reInspection ? {
                 status: cd.reInspection.status || '',
                 notes: cd.reInspection.notes || '',
-                afterPhotos: cd.reInspection.afterPhotoUrls || cd.reInspection.afterPhotos || []
+                afterPhotos: cd.reInspection.afterPhotoUrls || cd.reInspection.afterPhotos || [],
+                // FIX (LOW): carry the per-field timestamps + deletion ledger so a later
+                // merge resolves correctly instead of treating them as epoch 0.
+                _statusModified: cd.reInspection._statusModified || null,
+                _notesModified: cd.reInspection._notesModified || null,
+                _afterPhotosModified: cd.reInspection._afterPhotosModified || null,
+                _deletedAfterPhotoIds: cd.reInspection._deletedAfterPhotoIds || []
               } : null,
               secondReInspection: cd.secondReInspection ? {
                 status: cd.secondReInspection.status || '',
                 notes: cd.secondReInspection.notes || '',
-                afterPhotos: cd.secondReInspection.afterPhotoUrls || cd.secondReInspection.afterPhotos || []
+                afterPhotos: cd.secondReInspection.afterPhotoUrls || cd.secondReInspection.afterPhotos || [],
+                _statusModified: cd.secondReInspection._statusModified || null,
+                _notesModified: cd.secondReInspection._notesModified || null,
+                _afterPhotosModified: cd.secondReInspection._afterPhotosModified || null,
+                _deletedAfterPhotoIds: cd.secondReInspection._deletedAfterPhotoIds || []
               } : null,
               thirdReInspection: cd.thirdReInspection ? {
                 status: cd.thirdReInspection.status || '',
                 notes: cd.thirdReInspection.notes || '',
-                afterPhotos: cd.thirdReInspection.afterPhotoUrls || cd.thirdReInspection.afterPhotos || []
+                afterPhotos: cd.thirdReInspection.afterPhotoUrls || cd.thirdReInspection.afterPhotos || [],
+                _statusModified: cd.thirdReInspection._statusModified || null,
+                _notesModified: cd.thirdReInspection._notesModified || null,
+                _afterPhotosModified: cd.thirdReInspection._afterPhotosModified || null,
+                _deletedAfterPhotoIds: cd.thirdReInspection._deletedAfterPhotoIds || []
               } : null
             });
             mergedCount++;
