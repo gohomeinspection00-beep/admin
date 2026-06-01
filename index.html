@@ -9899,39 +9899,79 @@ const showConflictNotification = (message, hasDataLoss = false) => {
 
 // ========== END SYNC LOCK & DEBOUNCE SYSTEM ==========
 
-// FIX A: Helper function to update defect locations based on renamed areas
-// This prevents orphan defects when area is renamed and other users sync
+// FIX A: Helpers to keep defect locations / area lists consistent after renames,
+// including across multi-device sync. Renames are tracked in meta._renamedAreas as
+// { oldName: { to, at, type } }.
+
+// Follow a rename chain transitively (A->B->C => C), cycle-safe.
+const resolveRenameChain = (name, renamedAreas, _seen) => {
+  if (!name || !renamedAreas) return name;
+  const seen = _seen || new Set();
+  let cur = name;
+  while (renamedAreas[cur] && renamedAreas[cur].to && !seen.has(cur)) {
+    seen.add(cur);
+    const next = renamedAreas[cur].to;
+    if (next === cur) break;
+    cur = next;
+  }
+  return cur;
+};
+
+// Move defects whose location is an old (renamed) name to the chain endpoint.
+// NOTE: includes deleted defects (so they relocate too — matches local rename and
+// avoids orphans when a deleted defect is later restored).
 const updateDefectLocationsFromRenames = (defects, renamedAreas, currentAreas) => {
   if (!renamedAreas || !defects || Object.keys(renamedAreas).length === 0) return 0;
-  
+
   let updatedCount = 0;
-  
+
   for (const defect of defects) {
-    if (defect._deleted) continue; // Skip deleted defects
-    
     const oldLocation = defect.location;
     if (oldLocation && renamedAreas[oldLocation]) {
-      const renameInfo = renamedAreas[oldLocation];
-      const newLocation = renameInfo.to;
-      
-      // Only update if new location exists in current areas list
+      const newLocation = resolveRenameChain(oldLocation, renamedAreas);
+
       if (newLocation && newLocation !== oldLocation) {
-        // Check if newLocation is valid (exists in areas or is the target of the rename)
+        // Only move to a target that exists in the current areas list (if provided),
+        // so we never strand a defect on a non-existent area.
         const areaExists = !currentAreas || currentAreas.includes(newLocation);
-        if (areaExists || !currentAreas) {
-          console.log('FIX-A: Auto-update defect location:', oldLocation, '→', newLocation, '(renamed at:', new Date(renameInfo.at).toLocaleString(), ')');
+        if (areaExists) {
           defect.location = newLocation;
           updatedCount++;
         }
       }
     }
   }
-  
+
   if (updatedCount > 0) {
     console.log('FIX-A: Updated', updatedCount, 'defect locations based on renamed areas');
   }
-  
+
   return updatedCount;
+};
+
+// Remove ghost/old area names from meta.areas after a rename: for each old name in
+// _renamedAreas whose chain endpoint already exists in meta.areas, drop the old name
+// (and its areaFloorPlans entry). Only ever removes a name that has a live
+// replacement, so it cannot delete data with no target.
+const pruneRenamedAreasFromList = (meta) => {
+  if (!meta || !meta._renamedAreas || !Array.isArray(meta.areas)) return 0;
+  const renamedAreas = meta._renamedAreas;
+  let removed = 0;
+  for (const oldName of Object.keys(renamedAreas)) {
+    const endpoint = resolveRenameChain(oldName, renamedAreas);
+    if (!endpoint || endpoint === oldName) continue;
+    if (!meta.areas.includes(endpoint)) continue; // target not present yet — leave as-is
+    const idx = meta.areas.indexOf(oldName);
+    if (idx > -1) {
+      meta.areas.splice(idx, 1);
+      if (meta.areaFloorPlans && meta.areaFloorPlans[oldName] !== undefined) {
+        delete meta.areaFloorPlans[oldName];
+      }
+      removed++;
+      console.log('FIX-A: Pruned ghost area after rename:', oldName, '→', endpoint);
+    }
+  }
+  return removed;
 };
 
 // Silent backup (no UI loading)
@@ -12286,6 +12326,8 @@ const silentBackupProject = async (projectOrId) => {
         updateDefectLocationsFromRenames(localProject.defects, mergedRenamedAreas, localProject.meta.areas);
         // FIX M2: Also update mergedDefects so cloud defects have correct locations
         updateDefectLocationsFromRenames(mergedDefects, mergedRenamedAreas, localProject.meta.areas);
+        // FIX (#1/#6): remove old/ghost area names left behind by a rename
+        pruneRenamedAreasFromList(localProject.meta);
       }
       
       // Update DEFECTS - smart merge each defect
@@ -14291,7 +14333,26 @@ const pullFromCloud = async () => {
         console.log('Pull: Added new area from cloud:', area);
       }
     }
-    
+
+    // FIX (#2): pullFromCloud previously did NOT merge area renames, so a rename on
+    // another device left this device with the OLD name (ghost) + stranded defects.
+    // Merge cloud _renamedAreas (newer 'at' wins), relocate defects, prune ghosts.
+    {
+      const cloudRenames = cloudMeta._renamedAreas || {};
+      if (Object.keys(cloudRenames).length > 0) {
+        if (!p.meta._renamedAreas) p.meta._renamedAreas = {};
+        for (const [oldName, cloudRename] of Object.entries(cloudRenames)) {
+          const localRename = p.meta._renamedAreas[oldName];
+          if (!localRename || (cloudRename.at || 0) > (localRename.at || 0)) {
+            p.meta._renamedAreas[oldName] = cloudRename;
+          }
+        }
+        const moved = updateDefectLocationsFromRenames(p.defects, p.meta._renamedAreas, p.meta.areas);
+        const pruned = pruneRenamedAreasFromList(p.meta);
+        if (moved > 0 || pruned > 0) hasChanges = true;
+      }
+    }
+
     // Pull maintenancePlan from cloud
     if (cloudData.maintenancePlan) {
       const localMpTime = p.maintenancePlan?.lastModified || 0;
@@ -22196,21 +22257,26 @@ function applyAreaRename(idx, newName) {
   if (newName === oldName) return true;
 
   // Jika nama baru dah wujud, kita MERGE: pindahkan semua defect oldName → newName, kemudian buang oldName
-  const existsIdx = (p.meta.areas || []).findIndex(a => a.toLowerCase() === newName.toLowerCase());
+  // FIX (#3): exclude the current index, otherwise a case-only change
+  // ("kitchen"->"Kitchen") matches the area against ITSELF and falls into the merge
+  // branch, which splices (destroys) the area. Mirrors the popup handler.
+  const existsIdx = (p.meta.areas || []).findIndex((a, i) => i !== idx && a.toLowerCase() === newName.toLowerCase());
 
   if (existsIdx >= 0) {
-    (p.defects || []).forEach(d => { if ((d.location || '') === oldName) d.location = p.meta.areas[existsIdx]; });
+    // Capture the target name BEFORE splicing (indices shift if existsIdx > idx).
+    const mergeTarget = p.meta.areas[existsIdx];
+    (p.defects || []).forEach(d => { if ((d.location || '') === oldName) d.location = mergeTarget; });
     // buang entri lama (ambil kira index berubah jika existsIdx < idx)
     p.meta.areas.splice(idx, 1);
-    
+
     // FIX: Cleanup areaFloorPlans untuk area yang di-merge (buang oldName)
     if (p.meta.areaFloorPlans && p.meta.areaFloorPlans[oldName] !== undefined) {
       delete p.meta.areaFloorPlans[oldName];
     }
-    
+
     // FIX: Track merged area as "renamed" to prevent ghost area from sync
     if (!p.meta._renamedAreas) p.meta._renamedAreas = {};
-    p.meta._renamedAreas[oldName] = { to: p.meta.areas[existsIdx], at: Date.now(), type: 'merged' };
+    p.meta._renamedAreas[oldName] = { to: mergeTarget, at: getCalibratedTimestamp(), type: 'merged' };
   } else {
     // tukar nama terus
     p.meta.areas[idx] = newName;
@@ -22224,11 +22290,11 @@ function applyAreaRename(idx, newName) {
     
     // FIX: Track renamed area to prevent ghost area from sync
     if (!p.meta._renamedAreas) p.meta._renamedAreas = {};
-    p.meta._renamedAreas[oldName] = { to: newName, at: Date.now(), type: 'renamed' };
+    p.meta._renamedAreas[oldName] = { to: newName, at: getCalibratedTimestamp(), type: 'renamed' };
   }
-  
-  // FIX: Add timestamp for sync
-  p.meta._lastModified = Date.now();
+
+  // FIX: Add timestamp for sync (calibrated, consistent with delete/restore)
+  p.meta._lastModified = getCalibratedTimestamp();
 
   saveAllSafe();
   
@@ -23312,7 +23378,24 @@ const renderFinding = async () => {
               console.log('Update: Added new area from cloud:', area);
             }
           }
-          
+
+          // FIX (#2): twoWaySyncProject previously did NOT merge area renames either.
+          // Merge cloud _renamedAreas (newer 'at' wins), relocate defects, prune ghosts.
+          {
+            const cloudRenames2 = backup.meta?._renamedAreas || {};
+            if (Object.keys(cloudRenames2).length > 0) {
+              if (!p.meta._renamedAreas) p.meta._renamedAreas = {};
+              for (const [oldName, cloudRename] of Object.entries(cloudRenames2)) {
+                const localRename = p.meta._renamedAreas[oldName];
+                if (!localRename || (cloudRename.at || 0) > (localRename.at || 0)) {
+                  p.meta._renamedAreas[oldName] = cloudRename;
+                }
+              }
+              updateDefectLocationsFromRenames(p.defects, p.meta._renamedAreas, p.meta.areas);
+              pruneRenamedAreasFromList(p.meta);
+            }
+          }
+
           // FIX: Sync _restoredAreasTimes from cloud - merge with local (keep newer timestamps)
           if (backup.meta?._restoredAreasTimes) {
             if (!p.meta._restoredAreasTimes) p.meta._restoredAreasTimes = {};
@@ -23824,19 +23907,20 @@ const openEditAreaPopup = (area, project) => {
       // Check for duplicate
       const existsIdx = project.meta.areas.findIndex((a, i) => i !== idx && a.toLowerCase() === newName.toLowerCase());
       if (existsIdx >= 0) {
-        if (!confirm(`Area "${project.meta.areas[existsIdx]}" already exists. Merge all defects from "${area}" into it?`)) return;
-        (project.defects || []).forEach(d => { if (d.location === area) d.location = project.meta.areas[existsIdx]; });
+        const mergeTarget = project.meta.areas[existsIdx]; // capture BEFORE splice (indices shift)
+        if (!confirm(`Area "${mergeTarget}" already exists. Merge all defects from "${area}" into it?`)) return;
+        (project.defects || []).forEach(d => { if (d.location === area) d.location = mergeTarget; });
         project.meta.areas.splice(idx, 1);
-        
+
         // Also update areaFloorPlans if needed
         if (project.meta.areaFloorPlans && project.meta.areaFloorPlans[area] !== undefined) {
           delete project.meta.areaFloorPlans[area];
         }
-        
+
         // FIX: Track merged area to prevent ghost area from sync
         if (!project.meta._renamedAreas) project.meta._renamedAreas = {};
-        project.meta._renamedAreas[area] = { to: project.meta.areas[existsIdx], at: Date.now(), type: 'merged' };
-        
+        project.meta._renamedAreas[area] = { to: mergeTarget, at: getCalibratedTimestamp(), type: 'merged' };
+
         needsUpdate = true;
         newAreaName = null; // Merged, go back to finding
       } else {
@@ -23852,8 +23936,8 @@ const openEditAreaPopup = (area, project) => {
         
         // FIX: Track renamed area to prevent ghost area from sync
         if (!project.meta._renamedAreas) project.meta._renamedAreas = {};
-        project.meta._renamedAreas[area] = { to: newName, at: Date.now(), type: 'renamed' };
-        
+        project.meta._renamedAreas[area] = { to: newName, at: getCalibratedTimestamp(), type: 'renamed' };
+
         needsUpdate = true;
         newAreaName = newName;
       }
@@ -24628,10 +24712,20 @@ function saveNewArea() {
     p.meta._lastModified = restoreTime;
   }
 
+  // FIX (#4): clear any stale rename tombstone for this name. Without this, re-adding
+  // a name that was previously renamed (e.g. "Kitchen"->"Dapur") leaves
+  // _renamedAreas["Kitchen"] alive, and sync would reroute/drop the freshly re-added
+  // area's defects. Re-adding the name means it's a real area again.
+  if (p.meta._renamedAreas) {
+    for (const k of Object.keys(p.meta._renamedAreas)) {
+      if (k.toLowerCase() === v.toLowerCase()) delete p.meta._renamedAreas[k];
+    }
+  }
+
   // Add area
   if (!p.meta.areas) p.meta.areas = [];
   p.meta.areas.push(v);
-  
+
   // Store floor plan mapping if multiple plans
   const plans = p.meta.planRefs || [];
   if (plans.length > 1) {
@@ -28433,6 +28527,8 @@ const renderHistoryCard = (p, container) => {
               updateDefectLocationsFromRenames(localDefects, mergedRenamedAreas, proj.meta.areas);
               // FIX M2: Also update cloud defects so they don't create ghost areas when merged
               updateDefectLocationsFromRenames(cloudDefects, mergedRenamedAreas, proj.meta.areas);
+              // FIX (#1/#6): remove old/ghost area names left behind by a rename
+              pruneRenamedAreasFromList(proj.meta);
             }
             
             // ========== SYNC DEFECTS ==========
@@ -32864,6 +32960,8 @@ window.twoWaySyncProject = async function(project) {
       updateDefectLocationsFromRenames(localDefects, mergedRenamedAreas, localAreas);
       // FIX M2: Also update cloud defects locations so they don't create ghost areas when merged
       updateDefectLocationsFromRenames(cloudDefectsWithIds, mergedRenamedAreas, localAreas);
+      // FIX (#1/#6): remove old/ghost area names left behind by a rename
+      pruneRenamedAreasFromList(project.meta);
     }
     
     // STEP 4: Merge defects - find defects only in cloud
