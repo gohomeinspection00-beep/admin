@@ -32503,6 +32503,13 @@ await new Promise(r => setTimeout(r, 10));
       let defectsToRender;
       if (RE_INSPECTION_MODE) {
         defectsToRender = allDefectsSorted.map(o => ({ d: o.d, displayNum: o.displayNum, isNew: o.isNew }));
+        // FIX (H5): safety net for re-inspection mode too — include any visible defect the
+        // master loop didn't number (e.g. location not in meta.areas), so it isn't dropped
+        // from Findings while still being counted in the Total. Mirrors the normal branch.
+        const _numberedRe = new Set(allDefectsSorted.map(o => o.d));
+        for (const d of sorted) {
+          if (!_numberedRe.has(d)) defectsToRender.push({ d, displayNum: null, isNew: false });
+        }
       } else {
         defectsToRender = allDefectsWithNumbers.map(o => ({ d: o.d, displayNum: o.displayNum, isNew: false }));
         // Safety net: include any filtered defect the master loop didn't number
@@ -32763,7 +32770,10 @@ await new Promise(r => setTimeout(r, 10));
         }
       }
 
-      if ((p.defects||[]).length === 0) {
+      // FIX (M6): show the empty message based on what actually rendered, not the raw
+      // defect count. In re-inspection mode a level can have defects but none visible for
+      // the current level, leaving a bare header with no rows and no message.
+      if (defectsToRender.length === 0) {
         const last = pages[pages.length - 1];
         last.querySelector('.report-body').innerHTML = '<p style="color:#64748b">No findings recorded.</p>';
       }
