@@ -27571,7 +27571,9 @@ const importJSON = async (f) => {
     
     data.meta = data.meta || {};
     data.defects = data.defects || [];
-    
+    // Guard: older/partial exports may lack meta.areas; report sort dereferences it
+    if (!Array.isArray(data.meta.areas)) data.meta.areas = [];
+
     console.log('Import: meta.front exists?', !!data.meta.front, typeof data.meta.front);
     console.log('Import: meta.frontRef exists?', !!data.meta.frontRef, typeof data.meta.frontRef);
     
@@ -32179,8 +32181,9 @@ if (RE_INSPECTION_MODE) {
     return (a.type||'').localeCompare(b.type||'') || (filteredDefects.indexOf(a) - filteredDefects.indexOf(b));
   });
 } else {
+  const areaList = p.meta.areas || [];
   sorted = (filteredDefects).slice().sort((a,b) => {
-    const areaDiff = p.meta.areas.indexOf(a.location) - p.meta.areas.indexOf(b.location);
+    const areaDiff = areaList.indexOf(a.location) - areaList.indexOf(b.location);
     if (areaDiff !== 0) return areaDiff;
     const elemDiff = elemRank(a.element) - elemRank(b.element);
     if (elemDiff !== 0) return elemDiff;
