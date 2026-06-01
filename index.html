@@ -20880,9 +20880,13 @@ function openReInspectionAddDefect() {
       opt.textContent = elem;
       elemSelect.appendChild(opt);
     });
-    // Add saved custom elements from project
-    (proj.customElements || []).forEach(elem => {
-      if (!DEFAULT_ELEMENTS.includes(elem)) {
+    // Add saved custom elements — FIX (#2): union the stored array with elements
+    // actually used on defects (getCustomElements), so customs added during the
+    // original inspection (which live on the defects, not always in customElements)
+    // still appear here.
+    const _addElems = new Set([...(proj.customElements || []), ...((typeof getCustomElements === 'function') ? getCustomElements() : [])]);
+    _addElems.forEach(elem => {
+      if (elem && !DEFAULT_ELEMENTS.includes(elem)) {
         const opt = document.createElement('option');
         opt.value = elem;
         opt.textContent = elem;
@@ -20894,7 +20898,7 @@ function openReInspectionAddDefect() {
     customOpt.value = 'custom';
     customOpt.textContent = 'Add Custom...';
     elemSelect.appendChild(customOpt);
-    
+
     // Handle custom element selection
     elemSelect.onchange = () => {
       const customInput = q('#reAddElementCustom');
@@ -20995,9 +20999,12 @@ function openReInspectionAddDefect() {
       opt.textContent = type;
       typeSelect.appendChild(opt);
     });
-    // Add saved custom types from project
-    (proj.customTypes || []).forEach(type => {
-      if (!defectTypes.includes(type)) {
+    // Add saved custom types — FIX (#2): union the stored array with types actually
+    // used on defects, so customs from the original inspection still appear here.
+    const _usedTypes = (proj.defects || []).map(d => d.type).filter(Boolean);
+    const _addTypes = new Set([...(proj.customTypes || []), ..._usedTypes]);
+    _addTypes.forEach(type => {
+      if (type && !defectTypes.includes(type)) {
         const opt = document.createElement('option');
         opt.value = type;
         opt.textContent = type;
@@ -21191,9 +21198,11 @@ function openReInspectionEdit(defectIdx) {
       elemSelect.appendChild(opt);
     });
     
-    // Add saved custom elements from project
-    (proj.customElements || []).forEach(elem => {
-      if (!DEFAULT_ELEMENTS.includes(elem)) {
+    // Add saved custom elements — FIX (#2): union stored array with elements used on
+    // defects so original-inspection customs appear.
+    const _editElems = new Set([...(proj.customElements || []), ...((typeof getCustomElements === 'function') ? getCustomElements() : [])]);
+    _editElems.forEach(elem => {
+      if (elem && !DEFAULT_ELEMENTS.includes(elem)) {
         const opt = document.createElement('option');
         opt.value = elem;
         opt.textContent = elem;
@@ -21303,9 +21312,12 @@ function openReInspectionEdit(defectIdx) {
       typeSelect.appendChild(opt);
     });
     
-    // Add saved custom types from project
-    (proj.customTypes || []).forEach(type => {
-      if (!defectTypes.includes(type)) {
+    // Add saved custom types — FIX (#2): union stored array with types used on
+    // defects so original-inspection customs appear.
+    const _editUsedTypes = (proj.defects || []).map(d => d.type).filter(Boolean);
+    const _editTypes = new Set([...(proj.customTypes || []), ..._editUsedTypes]);
+    _editTypes.forEach(type => {
+      if (type && !defectTypes.includes(type)) {
         const opt = document.createElement('option');
         opt.value = type;
         opt.textContent = type;
@@ -21585,7 +21597,12 @@ async function renderReAddFloorPlan() {
   container.style.position = 'relative';
   
   const plans = proj.meta.planRefs || [];
-  const planIdx = 0; // Use first plan
+  // FIX (#1): use the floor plan this area is actually assigned to (was hardcoded 0,
+  // so an area on plan 2 wrongly showed/tagged plan 1). Mirrors the normal flow.
+  const _reArea = (q('#reAddLocation')?.textContent) || currentAreaForDetail || '';
+  let planIdx = (proj.meta.areaFloorPlans && proj.meta.areaFloorPlans[_reArea] != null)
+    ? proj.meta.areaFloorPlans[_reArea] : 0;
+  if (planIdx < 0 || planIdx >= plans.length) planIdx = 0; // safety clamp
   
   if (plans.length > 0 && plans[planIdx]) {
     try {
@@ -21966,10 +21983,11 @@ async function _saveReAddDefectAsync() {
   }
   
   // Validation
+  if (!location) { alert('No area selected for this defect.'); return; } // FIX (#5): avoid orphan defect with no area
   if (!element) { alert('Please select an element.'); return; }
   if (!type) { alert('Please select a defect type.'); return; }
   if (!status) { alert('Please select a status.'); return; }
-  
+
   // FIX: Convert data: URLs to IDB refs to save localStorage space
   const convertToIdbRefs = async (photos) => {
     const refs = [];
@@ -22006,21 +22024,25 @@ async function _saveReAddDefectAsync() {
   };
   
   // Set flags and data based on current re-inspection mode
+  // FIX (#4): stamp the level's _modified timestamps so the re-inspection merge treats
+  // this new defect's status/notes/after-photos as authoritative (was missing → could
+  // lose to empty values from another device).
+  const _ts = (typeof getCalibratedTimestamp === 'function') ? getCalibratedTimestamp() : Date.now();
   if (THIRD_REINSPECTION_MODE) {
     // Third Re-Inspection: New defect added at third level
     newDefect.isNewInThirdReInspection = true;
     newDefect.reInspection = { status: '', notes: '', afterPhotos: [] };
     newDefect.secondReInspection = { status: '', notes: '', afterPhotos: [] };
-    newDefect.thirdReInspection = { status, notes, afterPhotos: savedAfterPhotos };
+    newDefect.thirdReInspection = { status, notes, afterPhotos: savedAfterPhotos, _statusModified: _ts, _notesModified: _ts, _afterPhotosModified: _ts };
   } else if (SECOND_REINSPECTION_MODE) {
     // Second Re-Inspection: New defect added at second level
     newDefect.isNewInSecondReInspection = true;
     newDefect.reInspection = { status: '', notes: '', afterPhotos: [] };
-    newDefect.secondReInspection = { status, notes, afterPhotos: savedAfterPhotos };
+    newDefect.secondReInspection = { status, notes, afterPhotos: savedAfterPhotos, _statusModified: _ts, _notesModified: _ts, _afterPhotosModified: _ts };
   } else {
     // First Re-Inspection (default): New defect added at first level
     newDefect.isNewInReInspection = true;
-    newDefect.reInspection = { status, notes, afterPhotos: savedAfterPhotos };
+    newDefect.reInspection = { status, notes, afterPhotos: savedAfterPhotos, _statusModified: _ts, _notesModified: _ts, _afterPhotosModified: _ts };
   }
   
   // Add to project
@@ -32753,6 +32775,26 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
           _notesModified: d.reInspection._notesModified || null,
           _afterPhotosModified: d.reInspection._afterPhotosModified || null,
           _deletedAfterPhotoIds: d.reInspection._deletedAfterPhotoIds || []
+        } : null,
+        // FIX (#3): also serialize 2nd/3rd re-inspection so a NEW defect added at
+        // those levels doesn't lose its status/notes/after-photos via this path.
+        secondReInspection: d.secondReInspection ? {
+          status: d.secondReInspection.status || '',
+          notes: d.secondReInspection.notes || '',
+          afterPhotos: d.secondReInspection.afterPhotoUrls || d.secondReInspection.afterPhotos || [],
+          _statusModified: d.secondReInspection._statusModified || 0,
+          _notesModified: d.secondReInspection._notesModified || 0,
+          _afterPhotosModified: d.secondReInspection._afterPhotosModified || 0,
+          _deletedAfterPhotoIds: d.secondReInspection._deletedAfterPhotoIds || []
+        } : null,
+        thirdReInspection: d.thirdReInspection ? {
+          status: d.thirdReInspection.status || '',
+          notes: d.thirdReInspection.notes || '',
+          afterPhotos: d.thirdReInspection.afterPhotoUrls || d.thirdReInspection.afterPhotos || [],
+          _statusModified: d.thirdReInspection._statusModified || 0,
+          _notesModified: d.thirdReInspection._notesModified || 0,
+          _afterPhotosModified: d.thirdReInspection._afterPhotosModified || 0,
+          _deletedAfterPhotoIds: d.thirdReInspection._deletedAfterPhotoIds || []
         } : null
       })),
       // Re-inspection mode settings - use global reInspectionStatuses
@@ -34445,6 +34487,26 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
               status: d.reInspection.status || '',
               notes: d.reInspection.notes || '',
               afterPhotos: d.reInspection.afterPhotoUrls || []
+            } : null,
+            // FIX (#3): also include 2nd/3rd re-inspection so new defects at those
+            // levels keep their status/notes/after-photos via this sync path too.
+            secondReInspection: d.secondReInspection ? {
+              status: d.secondReInspection.status || '',
+              notes: d.secondReInspection.notes || '',
+              afterPhotos: d.secondReInspection.afterPhotoUrls || d.secondReInspection.afterPhotos || [],
+              _statusModified: d.secondReInspection._statusModified || 0,
+              _notesModified: d.secondReInspection._notesModified || 0,
+              _afterPhotosModified: d.secondReInspection._afterPhotosModified || 0,
+              _deletedAfterPhotoIds: d.secondReInspection._deletedAfterPhotoIds || []
+            } : null,
+            thirdReInspection: d.thirdReInspection ? {
+              status: d.thirdReInspection.status || '',
+              notes: d.thirdReInspection.notes || '',
+              afterPhotos: d.thirdReInspection.afterPhotoUrls || d.thirdReInspection.afterPhotos || [],
+              _statusModified: d.thirdReInspection._statusModified || 0,
+              _notesModified: d.thirdReInspection._notesModified || 0,
+              _afterPhotosModified: d.thirdReInspection._afterPhotosModified || 0,
+              _deletedAfterPhotoIds: d.thirdReInspection._deletedAfterPhotoIds || []
             } : null
           })),
           isShared: backup.isShared || false,
