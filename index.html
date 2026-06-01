@@ -5857,6 +5857,16 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
             <input id="building" placeholder="e.g., 2-Storey Terrace" />
           </div>
         </div>
+        <div class="about-form-grid">
+          <div class="about-form-group">
+            <label>Phone No.</label>
+            <input id="phone" type="tel" placeholder="e.g., 012-3456789" />
+          </div>
+          <div class="about-form-group">
+            <label>Email</label>
+            <input id="email" type="email" placeholder="e.g., name@email.com" />
+          </div>
+        </div>
         <div class="about-form-group" style="margin-top:20px">
           <label>Property Address</label>
           <textarea id="address" rows="3" placeholder="Full address"></textarea>
@@ -10987,7 +10997,7 @@ const silentBackupProject = async (projectOrId) => {
       const cloudTime = cloudMeta?._lastModified || 0;
       
       // Fields yang perlu merge berdasarkan timestamp
-      const fieldsToMerge = ['owner', 'address', 'building', 'date', 'weather', 'inspector', 'name', 'remark'];
+      const fieldsToMerge = ['owner', 'address', 'building', 'date', 'weather', 'inspector', 'phone', 'email', 'name', 'remark'];
       
       for (const field of fieldsToMerge) {
         // Jika cloud lebih baru DAN ada value, guna cloud
@@ -12052,7 +12062,7 @@ const silentBackupProject = async (projectOrId) => {
       console.log(`Meta sync: local=${localMetaTime}, cloud=${cloudMetaTime}, cloudNewer=${cloudIsNewer}`);
       
       // Update META fields - cloud yang lebih baru menang
-      const metaFieldsToUpdate = ['owner', 'address', 'building', 'date', 'weather', 'inspector', 'name', 'remark'];
+      const metaFieldsToUpdate = ['owner', 'address', 'building', 'date', 'weather', 'inspector', 'phone', 'email', 'name', 'remark'];
       for (const field of metaFieldsToUpdate) {
         // Jika cloud lebih baru DAN ada value, guna cloud
         if (cloudIsNewer && cloudBackup?.meta?.[field]) {
@@ -15211,7 +15221,7 @@ const newProject = () => {
     meta: {
 
       owner: '', address: '', date: today(), weather: '', building: '',
-      inspector: '', frontRef: null, planRefs: [],
+      inspector: '', phone: '', email: '', frontRef: null, planRefs: [],
 areas: [],
 
 // === Section settings ===
@@ -22221,6 +22231,8 @@ const readAbout = () => {
     weather: q('#weather').value.trim(),
     building: q('#building').value.trim(),
     inspector: q('#inspectorName').value.trim(),
+    phone: q('#phone') ? q('#phone').value.trim() : (p.meta.phone || ''),
+    email: q('#email') ? q('#email').value.trim() : (p.meta.email || ''),
     frontRef: p.meta.frontRef || null,
     planRefs: p.meta.planRefs || []
   };
@@ -22239,6 +22251,8 @@ const loadAbout = m => {
   q('#weather').value = m.weather || '';
   q('#building').value = m.building || '';
   q('#inspectorName').value = m.inspector || '';
+  if (q('#phone')) q('#phone').value = m.phone || '';
+  if (q('#email')) q('#email').value = m.email || '';
   
   (async () => {
     const frontPreviewItem = q('#frontPreviewItem');
@@ -28593,6 +28607,8 @@ const renderHistoryCard = (p, container) => {
               if (cloudMeta.weather !== undefined) proj.meta.weather = cloudMeta.weather || '';
               if (cloudMeta.building !== undefined) proj.meta.building = cloudMeta.building || '';
               if (cloudMeta.inspector !== undefined) proj.meta.inspector = cloudMeta.inspector || '';
+              if (cloudMeta.phone !== undefined) proj.meta.phone = cloudMeta.phone || '';
+              if (cloudMeta.email !== undefined) proj.meta.email = cloudMeta.email || '';
               console.log('Updated property info from cloud');
             }
             
@@ -30970,6 +30986,8 @@ async function handleUrlParameters() {
           weather: cloudData.meta?.weather || '',
           building: cloudData.meta?.building || '',
           inspector: cloudData.meta?.inspector || '',
+          phone: cloudData.meta?.phone || '',
+          email: cloudData.meta?.email || '',
           frontRef: frontRef,
           planRefs: planRefs,
           areas: cloudData.meta?.areas || [],
@@ -31386,6 +31404,8 @@ await new Promise(r => setTimeout(r, 10));
   tbl.innerHTML = `<h3>Property / Inspection Details</h3>
     <table>
       <tr><th style="width:40%">Name</th><td>${escapeHtml(p.meta.owner || '')}</td></tr>
+      ${p.meta.phone ? `<tr><th>Phone No.</th><td>${escapeHtml(p.meta.phone)}</td></tr>` : ''}
+      ${p.meta.email ? `<tr><th>Email</th><td>${escapeHtml(p.meta.email)}</td></tr>` : ''}
       <tr><th>Address</th><td>${escapeHtml(p.meta.address || '')}</td></tr>
       <tr><th>Date of Inspection</th><td>${escapeHtml(p.meta.date || '')}</td></tr>
       <tr><th>Weather</th><td>${escapeHtml(p.meta.weather || '')}</td></tr>
@@ -32759,6 +32779,8 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
         weather: project.meta.weather || '',
         building: project.meta.building || '',
         inspector: project.meta.inspector || '',
+        phone: project.meta.phone || '',
+        email: project.meta.email || '',
         areas: project.meta.areas || [],
         areaFloorPlans: project.meta.areaFloorPlans || {},
         frontPhotoUrl: frontPhotoUrl,
@@ -34491,6 +34513,8 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
             weather: backup.meta?.weather || '',
             building: backup.meta?.building || '',
             inspector: backup.meta?.inspector || '',
+            phone: backup.meta?.phone || '',
+            email: backup.meta?.email || '',
             frontRef: backup.meta?.frontPhotoUrl || null,
             planRefs: backup.meta?.planUrls || [],
             areas: backup.meta?.areas || [],
@@ -35332,6 +35356,8 @@ function showChooseFilesDialog(cloudFiles) {
               weather: f.backup.meta?.weather || '',
               building: f.backup.meta?.building || '',
               inspector: f.backup.meta?.inspector || '',
+              phone: f.backup.meta?.phone || '',
+              email: f.backup.meta?.email || '',
               frontRef: f.backup.meta?.frontPhotoUrl || null,
               planRefs: f.backup.meta?.planUrls || [],
               areas: f.backup.meta?.areas || [],
