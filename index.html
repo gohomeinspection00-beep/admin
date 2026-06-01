@@ -5894,6 +5894,12 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
             <input id="weather" placeholder="e.g., Sunny, Cloudy, Rainy" />
           </div>
         </div>
+        <!-- Re-inspection dates (Second/Third/Fourth). First = Date of Inspection above. -->
+        <div class="about-form-group" style="margin-top:16px">
+          <label>Re-Inspection Dates</label>
+          <div id="inspectionDatesList" style="display:flex;flex-direction:column;gap:8px"></div>
+          <button type="button" id="btnAddInspectionDate" class="btn ghost" style="margin-top:8px;font-size:13px;padding:8px 12px;align-self:flex-start">+ Add next inspection date</button>
+        </div>
       </div>
 
       <!-- Inspector Information -->
@@ -11009,7 +11015,13 @@ const silentBackupProject = async (projectOrId) => {
           merged[field] = cloudMeta[field];
         }
       }
-      
+      // FIX: inspectionDates — union by level (newer non-empty date wins) so no
+      // inspection date is lost across devices.
+      merged.inspectionDates = mergeInspectionDates(
+        { ...localMeta, _lastModified: localTime },
+        { ...(cloudMeta || {}), _lastModified: cloudTime }
+      );
+
       // Areas: Merge semua (union) - FIX 3.2: Case-insensitive dan trim
       const localAreas = localMeta.areas || [];
       const cloudAreas = cloudMeta?.areas || [];
@@ -12077,7 +12089,9 @@ const silentBackupProject = async (projectOrId) => {
           console.log(`Filled empty meta.${field} from cloud: ${cloudBackup.meta[field]}`);
         }
       }
-      
+      // FIX: inspectionDates — union by level so no inspection date is lost.
+      localProject.meta.inspectionDates = mergeInspectionDates(localProject.meta, cloudBackup?.meta || {});
+
       // Update frontRef - cloud yang lebih baru menang (termasuk delete)
       if (cloudIsNewer) {
         // Cloud lebih baru - guna cloud value (boleh jadi URL baru, atau null/deleted)
@@ -15221,7 +15235,7 @@ const newProject = () => {
     meta: {
 
       owner: '', address: '', date: today(), weather: '', building: '',
-      inspector: '', phone: '', email: '', frontRef: null, planRefs: [],
+      inspector: '', phone: '', email: '', inspectionDates: [], frontRef: null, planRefs: [],
 areas: [],
 
 // === Section settings ===
@@ -22222,17 +22236,119 @@ async function downloadImageToLocal(url, index, type) {
   }
 }
 
+// ===== Multi-level inspection dates (First/Second/Third/Fourth) =====
+// Stored in meta.inspectionDates = [{level,date}]. meta.date stays the FIRST date
+// (source of truth); the 'first' entry always mirrors it. Older projects with no
+// inspectionDates derive a sane list from meta.date so nothing is lost.
+const INSPECTION_LEVELS = ['first', 'second', 'third', 'fourth'];
+const INSPECTION_LEVEL_LABELS = { first: 'First Inspection', second: 'Second Inspection', third: 'Third Inspection', fourth: 'Fourth Inspection' };
+
+const getInspectionDates = (m) => {
+  m = m || {};
+  const arr = Array.isArray(m.inspectionDates) ? m.inspectionDates.filter(x => x && INSPECTION_LEVELS.includes(x.level)) : [];
+  const out = [];
+  for (const lv of INSPECTION_LEVELS) {
+    const e = arr.find(x => x.level === lv);
+    if (lv === 'first') {
+      out.push({ level: 'first', date: m.date || (e && e.date) || '' });
+    } else if (e) {
+      out.push({ level: lv, date: e.date || '' });
+    }
+  }
+  return out; // always has 'first'; others only if present
+};
+
+// Union two inspectionDates arrays by level, keeping the newer non-empty date.
+// Ensures no level's date is lost across devices.
+const mergeInspectionDates = (localM, cloudM) => {
+  const local = getInspectionDates(localM);
+  const cloud = getInspectionDates(cloudM);
+  const localNewer = (localM?._lastModified || 0) >= (cloudM?._lastModified || 0);
+  const byLevel = {};
+  const put = (e, preferred) => {
+    if (!e || !e.level) return;
+    const cur = byLevel[e.level];
+    if (!cur) { byLevel[e.level] = e; return; }
+    // both present: prefer a non-empty date from the newer side
+    if (!cur.date && e.date) { byLevel[e.level] = e; return; }
+    if (cur.date && e.date && preferred) byLevel[e.level] = e;
+  };
+  // seed with the newer side first so 'preferred' resolves conflicts correctly
+  (localNewer ? local : cloud).forEach(e => put(e, true));
+  (localNewer ? cloud : local).forEach(e => put(e, false));
+  return INSPECTION_LEVELS.filter(lv => byLevel[lv]).map(lv => byLevel[lv]);
+};
+
+// Ensure meta.inspectionDates has an entry for the given level (default today),
+// without overwriting an existing date. Used when entering a re-inspection level so
+// the new level's date auto-appears (editable later in About). Saves + keeps 'first'.
+const ensureInspectionDate = (proj, level) => {
+  if (!proj || !proj.meta || !INSPECTION_LEVELS.includes(level)) return;
+  const arr = getInspectionDates(proj.meta); // always includes 'first'
+  if (!arr.some(e => e.level === level)) {
+    arr.push({ level, date: today() });
+  }
+  // keep canonical order
+  proj.meta.inspectionDates = INSPECTION_LEVELS
+    .map(lv => arr.find(e => e.level === lv))
+    .filter(Boolean);
+  proj.meta._lastModified = getCalibratedTimestamp();
+  if (typeof saveAllSafe === 'function') saveAllSafe();
+};
+
+// Working copy of inspection dates while the About form is open.
+let _inspectionDatesDraft = [];
+
+// Render the Second/Third/Fourth date rows (First is the "Date of Inspection" field).
+const renderInspectionDateRows = () => {
+  const list = document.getElementById('inspectionDatesList');
+  if (!list) return;
+  const rows = _inspectionDatesDraft.filter(e => e.level !== 'first');
+  if (rows.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted)">No re-inspection dates yet. The Date of Inspection above is the First Inspection.</div>';
+  } else {
+    list.innerHTML = '';
+    rows.forEach(e => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px';
+      row.innerHTML = `<span style="min-width:130px;font-size:13px;color:var(--ink)">${INSPECTION_LEVEL_LABELS[e.level] || e.level}</span>`;
+      const input = document.createElement('input');
+      input.type = 'date';
+      input.value = e.date || '';
+      input.style.cssText = 'flex:1';
+      input.onchange = () => { e.date = input.value; };
+      row.appendChild(input);
+      list.appendChild(row);
+    });
+  }
+  // Add button only enabled until 'fourth' exists
+  const btn = document.getElementById('btnAddInspectionDate');
+  if (btn) {
+    const have = new Set(_inspectionDatesDraft.map(x => x.level));
+    const next = INSPECTION_LEVELS.find(lv => lv !== 'first' && !have.has(lv));
+    btn.style.display = next ? 'inline-flex' : 'none';
+  }
+};
+
 const readAbout = () => {
   const p = getProject();
+  const dateVal = q('#date').value || today();
+  // Build inspectionDates from the draft; keep 'first' in lockstep with the date field.
+  let inspDates = (Array.isArray(_inspectionDatesDraft) && _inspectionDatesDraft.length)
+    ? _inspectionDatesDraft.map(e => ({ level: e.level, date: e.date || '' }))
+    : getInspectionDates(p.meta);
+  inspDates = inspDates.map(e => e.level === 'first' ? { level: 'first', date: dateVal } : e);
+  if (!inspDates.some(e => e.level === 'first')) inspDates.unshift({ level: 'first', date: dateVal });
   return {
     owner: q('#ownerName').value.trim(),
     address: q('#address').value.trim(),
-    date: q('#date').value || today(),
+    date: dateVal,
     weather: q('#weather').value.trim(),
     building: q('#building').value.trim(),
     inspector: q('#inspectorName').value.trim(),
     phone: q('#phone') ? q('#phone').value.trim() : (p.meta.phone || ''),
     email: q('#email') ? q('#email').value.trim() : (p.meta.email || ''),
+    inspectionDates: inspDates,
     frontRef: p.meta.frontRef || null,
     planRefs: p.meta.planRefs || []
   };
@@ -22253,7 +22369,10 @@ const loadAbout = m => {
   q('#inspectorName').value = m.inspector || '';
   if (q('#phone')) q('#phone').value = m.phone || '';
   if (q('#email')) q('#email').value = m.email || '';
-  
+  // Seed inspection-dates draft (always includes 'first' mirroring meta.date) + render
+  _inspectionDatesDraft = getInspectionDates(m);
+  renderInspectionDateRows();
+
   (async () => {
     const frontPreviewItem = q('#frontPreviewItem');
     const frontPreviewImg = q('#frontPreview');
@@ -22306,6 +22425,19 @@ const loadAbout = m => {
   })();
 };
 // >>> ADD THIS: Save & Next for About page
+// Add the next inspection date level (second -> third -> fourth), default today.
+q('#btnAddInspectionDate')?.addEventListener('click', () => {
+  const have = new Set((_inspectionDatesDraft || []).map(x => x.level));
+  if (!_inspectionDatesDraft.some(x => x.level === 'first')) {
+    _inspectionDatesDraft.unshift({ level: 'first', date: (q('#date').value || today()) });
+  }
+  const next = INSPECTION_LEVELS.find(lv => lv !== 'first' && !have.has(lv));
+  if (next) {
+    _inspectionDatesDraft.push({ level: next, date: today() });
+    renderInspectionDateRows();
+  }
+});
+
 q('#btnSaveAbout').addEventListener('click', async () => {
   const p = getProject(); if (!p) return;
   p.meta = { ...p.meta, ...readAbout() };
@@ -28383,6 +28515,7 @@ const renderHistoryCard = (p, container) => {
       secondReInspBtn.onclick = async () => {
         SECOND_REINSPECTION_MODE = true;
         THIRD_REINSPECTION_MODE = false;
+        ensureInspectionDate(p, 'second'); // auto-add 2nd inspection date (editable in About)
         await openProjectForSubmission(p, secondReInspBtn);
       };
       
@@ -28403,6 +28536,7 @@ const renderHistoryCard = (p, container) => {
         thirdReInspBtn.onclick = async () => {
           SECOND_REINSPECTION_MODE = false;
           THIRD_REINSPECTION_MODE = true;
+          ensureInspectionDate(p, 'third'); // auto-add 3rd inspection date (editable in About)
           await openProjectForSubmission(p, thirdReInspBtn);
         };
         actions.appendChild(thirdReInspBtn);
@@ -28635,7 +28769,13 @@ const renderHistoryCard = (p, container) => {
               if (cloudMeta.email !== undefined) proj.meta.email = cloudMeta.email || '';
               console.log('Updated property info from cloud');
             }
-            
+            // FIX: inspectionDates — union by level regardless of which side is newer,
+            // so a date added on either device is never lost.
+            proj.meta.inspectionDates = mergeInspectionDates(
+              { ...proj.meta, _lastModified: localMetaTime },
+              { ...cloudMeta, _lastModified: cloudMetaTime }
+            );
+
             // ========== SYNC FRONT VIEW ==========
             const cloudFrontRef = cloudMeta.frontRef || cloudMeta.frontPhotoUrl || null;
             const localHasFront = proj.meta.frontRef && 
@@ -31012,6 +31152,7 @@ async function handleUrlParameters() {
           inspector: cloudData.meta?.inspector || '',
           phone: cloudData.meta?.phone || '',
           email: cloudData.meta?.email || '',
+          inspectionDates: cloudData.meta?.inspectionDates || [],
           frontRef: frontRef,
           planRefs: planRefs,
           areas: cloudData.meta?.areas || [],
@@ -31424,6 +31565,13 @@ await new Promise(r => setTimeout(r, 10));
   }
 
   const inspectorTxt = p.meta.inspector || '—';
+  // Inspection date rows: single "Date of Inspection" for normal projects; the full
+  // First/Second/Third/Fourth list once re-inspection dates exist (none are lost).
+  const _inspDates = (typeof getInspectionDates === 'function') ? getInspectionDates(p.meta) : [{ level: 'first', date: p.meta.date || '' }];
+  const _hasReInspDates = _inspDates.filter(e => e.level !== 'first').some(e => e.date);
+  const inspDateRows = _hasReInspDates
+    ? _inspDates.filter(e => e.date).map(e => `<tr><th>${INSPECTION_LEVEL_LABELS[e.level] || e.level}</th><td>${escapeHtml(e.date)}</td></tr>`).join('')
+    : `<tr><th>Date of Inspection</th><td>${escapeHtml(p.meta.date || '')}</td></tr>`;
   const tbl = document.createElement('div');
   tbl.innerHTML = `<h3>Property / Inspection Details</h3>
     <table>
@@ -31431,7 +31579,7 @@ await new Promise(r => setTimeout(r, 10));
       ${p.meta.phone ? `<tr><th>Phone No.</th><td>${escapeHtml(p.meta.phone)}</td></tr>` : ''}
       ${p.meta.email ? `<tr><th>Email</th><td>${escapeHtml(p.meta.email)}</td></tr>` : ''}
       <tr><th>Address</th><td>${escapeHtml(p.meta.address || '')}</td></tr>
-      <tr><th>Date of Inspection</th><td>${escapeHtml(p.meta.date || '')}</td></tr>
+      ${inspDateRows}
       <tr><th>Weather</th><td>${escapeHtml(p.meta.weather || '')}</td></tr>
       <tr><th>Building Type</th><td>${escapeHtml(p.meta.building || '')}</td></tr>
       <tr><th>Inspected By</th><td><span class="badge">${escapeHtml(inspectorTxt)}</span></td></tr>
@@ -32805,6 +32953,7 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
         inspector: project.meta.inspector || '',
         phone: project.meta.phone || '',
         email: project.meta.email || '',
+        inspectionDates: project.meta.inspectionDates || [],
         areas: project.meta.areas || [],
         areaFloorPlans: project.meta.areaFloorPlans || {},
         frontPhotoUrl: frontPhotoUrl,
@@ -34539,6 +34688,7 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
             inspector: backup.meta?.inspector || '',
             phone: backup.meta?.phone || '',
             email: backup.meta?.email || '',
+            inspectionDates: backup.meta?.inspectionDates || [],
             frontRef: backup.meta?.frontPhotoUrl || null,
             planRefs: backup.meta?.planUrls || [],
             areas: backup.meta?.areas || [],
@@ -35382,6 +35532,7 @@ function showChooseFilesDialog(cloudFiles) {
               inspector: f.backup.meta?.inspector || '',
               phone: f.backup.meta?.phone || '',
               email: f.backup.meta?.email || '',
+              inspectionDates: f.backup.meta?.inspectionDates || [],
               frontRef: f.backup.meta?.frontPhotoUrl || null,
               planRefs: f.backup.meta?.planUrls || [],
               areas: f.backup.meta?.areas || [],
