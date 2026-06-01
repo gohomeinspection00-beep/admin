@@ -18524,11 +18524,26 @@ q('#btnSaveTrackEdit')?.addEventListener('click', async () => {
   const reInspDate = q('#editTrackReInspDate').value;
   const reInspSubDate = q('#editTrackReInspSubDate').value;
   if (reInspDate && reInspSubDate) {
+    // FIX (M3): preserve sub-data (repairUpdates / pemajuVisits / proofPhoto / etc.)
+    // instead of replacing the whole object with just the two edited dates.
     updates.reInspection = {
+      ...(track.reInspection || {}),
       date: reInspDate,
       submissionDate: reInspSubDate
     };
-  } else {
+    // reInspections[] is the source of truth and track.reInspection mirrors its LAST
+    // element, so keep the last element in sync (otherwise the dedup'd timeline would
+    // render the array's stale dates and the edit would appear to do nothing).
+    if (Array.isArray(track.reInspections) && track.reInspections.length > 0) {
+      const arr = track.reInspections.slice();
+      const last = arr.length - 1;
+      arr[last] = { ...arr[last], date: reInspDate, submissionDate: reInspSubDate };
+      updates.reInspections = arr;
+    }
+  } else if (!track.reInspections || track.reInspections.length === 0) {
+    // Legacy-only track: clearing the fields removes the re-inspection.
+    // (When an array exists it is the source of truth — removal goes through the
+    // dedicated delete flow, so we don't null the mirror here and lose array data.)
     updates.reInspection = null;
   }
   
@@ -18911,8 +18926,11 @@ function generateTrackReport(track) {
     });
   }
   
-  // Re-Inspection (legacy single)
-  if (track.reInspection) {
+  // Re-Inspection (legacy single) — only when there is NO reInspections array,
+  // because track.reInspection mirrors the LAST array element. Rendering both
+  // double-counts the re-inspection on the timeline. (Matches the guard used in
+  // the detail timeline at the `track.reInspection && (!track.reInspections...)` site.)
+  if (track.reInspection && (!track.reInspections || track.reInspections.length === 0)) {
     events.push({ date: track.reInspection.date, title: 'Re-Inspection', desc: `Submitted: ${formatDate(track.reInspection.submissionDate)}`, color: '#4f46e5', bg: '#eef2ff', icon: 'RE' });
     if (track.reInspection.repairUpdates) {
       track.reInspection.repairUpdates.forEach((u, i) => {
