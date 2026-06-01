@@ -8929,8 +8929,23 @@ const getProjectImageUrls = (project) => {
         }
       }
     }
+
+    // FIX (M2): Re-inspection after photos (4th) — was missing, so 4th-level photos
+    // showed broken offline and the cache was wrongly marked 'full'.
+    if (d.fourthReInspection) {
+      for (const ref of (d.fourthReInspection.afterPhotos || [])) {
+        if (ref?.startsWith('http')) {
+          urls.push({ url: ref, type: 'reinspection4', defectId: d._syncId });
+        }
+      }
+      for (const ref of (d.fourthReInspection.afterPhotoUrls || [])) {
+        if (ref?.startsWith('http') && !urls.find(u => u.url === ref)) {
+          urls.push({ url: ref, type: 'reinspection4', defectId: d._syncId });
+        }
+      }
+    }
   }
-  
+
   return urls;
 };
 
@@ -9038,8 +9053,19 @@ const downloadProjectForOffline = async (projectId, resolution = 'high', onProgr
   };
   await saveCacheStatus(status);
   delete activeDownloads[projectId];
-  
+
   console.log(`Download complete: ${completed}/${total} images cached (${failed} failed)`);
+
+  // FIX (M3): if some images failed AND storage is low, tell the user it was a space
+  // problem (distinct from a network failure) so a silently-partial cache isn't a surprise.
+  if (failed > 0) {
+    try {
+      const q = await checkStorageQuota();
+      if (q && q.availableMB < 50) {
+        alert(`Storan peranti hampir penuh — ${failed} gambar tidak dapat disimpan untuk offline (cache tidak lengkap).\n\nSila padam cache projek lama, kemudian muat turun semula untuk offline penuh.`);
+      }
+    } catch (e) { /* non-blocking */ }
+  }
   return true;
 };
 
@@ -9091,14 +9117,19 @@ const autoCleanupOldCaches = async () => {
   try {
     const allStatuses = await getAllCacheStatuses();
     const fiveDaysAgo = Date.now() - (5 * 24 * 60 * 60 * 1000);
+    // FIX (H2): never delete the cache of a project that still has unsynced edits —
+    // otherwise its cached images vanish and show broken when opened offline.
+    const _pendingIds = new Set(getPendingUploads());
     let cleanedCount = 0;
-    
+
     for (const status of allStatuses) {
       const lastOpened = status.lastOpenedAt || status.cachedAt || 0;
-      if (lastOpened < fiveDaysAgo && status.cacheStatus !== 'none') {
+      if (lastOpened < fiveDaysAgo && status.cacheStatus !== 'none' && !_pendingIds.has(status.projectId)) {
         console.log('Auto-cleaning old cache:', status.projectId, 'last opened:', new Date(lastOpened));
         await deleteOfflineCache(status.projectId);
         cleanedCount++;
+      } else if (_pendingIds.has(status.projectId)) {
+        console.log('Skip cache cleanup - has pending upload:', status.projectId);
       }
     }
     
@@ -9698,10 +9729,17 @@ const clearPendingUpload = (projectId) => {
   }
 };
 
+// FIX (H1): true only when we should actually push to cloud now. Respects the
+// user's explicit offline choice — in 'offline-high'/'offline-low' we still QUEUE
+// edits (markPendingUpload) but don't upload until they Sync or truly reconnect.
+// currentOfflineMode is null for normal users, so this equals plain isOnline then.
+const _canAutoUpload = () => isOnline &&
+  !(typeof currentOfflineMode === 'string' && currentOfflineMode.startsWith('offline'));
+
 // Auto backup pending projects when online
 const autoBackupPending = async () => {
-  if (!isOnline || !window.currentUserData) return;
-  
+  if (!_canAutoUpload() || !window.currentUserData) return;
+
   const pending = getPendingUploads();
   if (pending.length === 0) return;
   
@@ -15079,7 +15117,7 @@ window.saveAllSafe = (projectId = null) => {
     // [FIX 8d] Skip while re-inspection dialog is open to prevent partial data upload
     const _reInspDlg = document.getElementById('reInspectionViewDialog');
     const _reInspOpen = _reInspDlg && _reInspDlg.hasAttribute('open');
-    if (isOnline && typeof autoBackupPending === 'function' && !_reInspOpen) {
+    if (_canAutoUpload() && typeof autoBackupPending === 'function' && !_reInspOpen) {
       setTimeout(autoBackupPending, 1000);
     }
     
