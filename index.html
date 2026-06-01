@@ -21228,7 +21228,7 @@ function openReInspectionEdit(defectIdx) {
 }
 
 // Save edited defect in Re-Inspection mode
-function saveReEditDefect() {
+async function saveReEditDefect() {
   const proj = getProject();
   if (!proj || currentEditDefectIdx === null) return;
   
@@ -21266,7 +21266,25 @@ function saveReEditDefect() {
   if (!element) { alert('Please select an element.'); return; }
   if (!type) { alert('Please select a defect type.'); return; }
   if (!status) { alert('Please select a status.'); return; }
-  
+
+  // FIX: convert any raw data: photos to IndexedDB refs (same as saveReAddDefect)
+  // so editing doesn't persist base64 into localStorage (bloat / quota / bypasses sync).
+  const _toIdbRefs = async (photos) => {
+    const refs = [];
+    for (const photo of (photos || [])) {
+      if (!photo) continue;
+      if (typeof photo === 'string' && photo.startsWith('data:')) {
+        try { refs.push(await idbPutImage(photo)); }
+        catch (e) { refs.push(photo); } // fallback: keep data URL rather than lose it
+      } else {
+        refs.push(photo); // idb: or http: refs stay as-is
+      }
+    }
+    return refs;
+  };
+  const editedBeforePhotos = await _toIdbRefs(reAddDefectData.beforePhotos);
+  const editedAfterPhotos  = await _toIdbRefs(reAddDefectData.afterPhotos);
+
   // Update defect core data
   // FIX: Only update original defect properties (photos, element, type, description, tag) 
   // in First Re-Inspection mode. In Second/Third mode, user is only editing 
@@ -21275,7 +21293,7 @@ function saveReEditDefect() {
     defect.element = element;
     defect.type = type;
     defect.description = description;
-    defect.photos = reAddDefectData.beforePhotos;
+    defect.photos = editedBeforePhotos;
     defect.tag = reAddDefectData.tag;
   }
   
@@ -21285,10 +21303,10 @@ function saveReEditDefect() {
     if (!defect.thirdReInspection) defect.thirdReInspection = { afterPhotos: [], status: '', notes: '' };
     const statusChanged = defect.thirdReInspection.status !== status;
     const notesChanged = defect.thirdReInspection.notes !== notes;
-    const photosChanged = JSON.stringify(defect.thirdReInspection.afterPhotos || []) !== JSON.stringify(reAddDefectData.afterPhotos || []);
+    const photosChanged = JSON.stringify(defect.thirdReInspection.afterPhotos || []) !== JSON.stringify(editedAfterPhotos || []);
     defect.thirdReInspection.status = status;
     defect.thirdReInspection.notes = notes;
-    defect.thirdReInspection.afterPhotos = reAddDefectData.afterPhotos;
+    defect.thirdReInspection.afterPhotos = editedAfterPhotos;
     if (statusChanged) defect.thirdReInspection._statusModified = Date.now();
     if (notesChanged) defect.thirdReInspection._notesModified = Date.now();
     if (photosChanged) defect.thirdReInspection._afterPhotosModified = Date.now();
@@ -21297,10 +21315,10 @@ function saveReEditDefect() {
     if (!defect.secondReInspection) defect.secondReInspection = { afterPhotos: [], status: '', notes: '' };
     const statusChanged = defect.secondReInspection.status !== status;
     const notesChanged = defect.secondReInspection.notes !== notes;
-    const photosChanged = JSON.stringify(defect.secondReInspection.afterPhotos || []) !== JSON.stringify(reAddDefectData.afterPhotos || []);
+    const photosChanged = JSON.stringify(defect.secondReInspection.afterPhotos || []) !== JSON.stringify(editedAfterPhotos || []);
     defect.secondReInspection.status = status;
     defect.secondReInspection.notes = notes;
-    defect.secondReInspection.afterPhotos = reAddDefectData.afterPhotos;
+    defect.secondReInspection.afterPhotos = editedAfterPhotos;
     if (statusChanged) defect.secondReInspection._statusModified = Date.now();
     if (notesChanged) defect.secondReInspection._notesModified = Date.now();
     if (photosChanged) defect.secondReInspection._afterPhotosModified = Date.now();
@@ -21311,10 +21329,10 @@ function saveReEditDefect() {
     }
     const statusChanged = defect.reInspection.status !== status;
     const notesChanged = defect.reInspection.notes !== notes;
-    const photosChanged = JSON.stringify(defect.reInspection.afterPhotos || []) !== JSON.stringify(reAddDefectData.afterPhotos || []);
+    const photosChanged = JSON.stringify(defect.reInspection.afterPhotos || []) !== JSON.stringify(editedAfterPhotos || []);
     defect.reInspection.status = status;
     defect.reInspection.notes = notes;
-    defect.reInspection.afterPhotos = reAddDefectData.afterPhotos;
+    defect.reInspection.afterPhotos = editedAfterPhotos;
     if (statusChanged) defect.reInspection._statusModified = Date.now();
     if (notesChanged) defect.reInspection._notesModified = Date.now();
     if (photosChanged) defect.reInspection._afterPhotosModified = Date.now();
