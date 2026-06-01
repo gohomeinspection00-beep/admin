@@ -32114,10 +32114,22 @@ await new Promise(r => setTimeout(r, 10));
       let tagNo = 1;
 
       // For RE_INSPECTION_MODE, use allDefectsSorted (already in correct order with new defects mixed in by area)
-      // For normal mode, use sorted
-      const defectsToRender = RE_INSPECTION_MODE 
-        ? allDefectsSorted.map(o => ({ d: o.d, displayNum: o.displayNum, isNew: o.isNew }))
-        : sorted.map(d => ({ d, displayNum: null, isNew: false }));
+      // For normal mode, use the MASTER numbered list so card order AND numbers match
+      // the Summary and the floor-plan tags (FIX: was using a divergent local `sorted`
+      // array + a running tagNo counter, which mismatched Summary/tags for default data
+      // like "General Photos" vs "Alignment issues" and for custom elements).
+      let defectsToRender;
+      if (RE_INSPECTION_MODE) {
+        defectsToRender = allDefectsSorted.map(o => ({ d: o.d, displayNum: o.displayNum, isNew: o.isNew }));
+      } else {
+        defectsToRender = allDefectsWithNumbers.map(o => ({ d: o.d, displayNum: o.displayNum, isNew: false }));
+        // Safety net: include any filtered defect the master loop didn't number
+        // (e.g. a defect whose location isn't in meta.areas), so no card is dropped.
+        const _numbered = new Set(allDefectsWithNumbers.map(o => o.d));
+        for (const d of sorted) {
+          if (!_numbered.has(d)) defectsToRender.push({ d, displayNum: null, isNew: false });
+        }
+      }
 
       for (let i=0; i<defectsToRender.length; i++) {
         // Check if cancelled
@@ -32345,8 +32357,12 @@ await new Promise(r => setTimeout(r, 10));
           const tr = document.createElement('tr');
           const picsWrap = await buildPicsWrapCached(displayPhotos);
           const locHtml = `${escapeHtml(d.location || '')}<br><small style="color:#475569">${escapeHtml(d.element || '')}</small>`;
+          // FIX: print the MASTER number (displayNum) so the card number matches the
+          // Summary and floor-plan tag; fall back to the running counter only for
+          // safety-net leftovers that have no master number.
+          const cardNum = (displayNum != null) ? displayNum : tagNo;
           tr.innerHTML = `<td>${locHtml}</td>
-            <td style="text-align:center;font-weight:700">${tagNo}</td>
+            <td style="text-align:center;font-weight:700">${cardNum}</td>
             <td><strong>${escapeHtml(d.type || '')}</strong><br>${escapeHtml(displayDescription)}</td>`;
           const tdPics = document.createElement('td'); tdPics.appendChild(picsWrap); tr.appendChild(tdPics);
           
