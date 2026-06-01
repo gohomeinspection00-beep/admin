@@ -9788,7 +9788,9 @@ const acquireSyncLock = (projectId) => {
   setTimeout(() => {
     if (isSyncLocked(projectId)) {
       console.warn('Sync lock timeout - force releasing:', projectId);
-      syncLocks.set(projectId, false);
+      // FIX (M4): route through releaseSyncLock so a queued follow-up sync is drained
+      // (direct syncLocks.set left the queue stuck until the next save/online event).
+      releaseSyncLock(projectId);
     }
   }, 60000); // 60 second timeout
   return true;
@@ -9851,6 +9853,16 @@ const debouncedSync = (projectId) => {
 };
 
 // Retry wrapper for uploads
+// FIX (H2): wrap a promise so a dropped/slow connection can't hang forever. On
+// timeout it REJECTS, so the caller's existing try/catch runs (retry + re-queue,
+// release lock, hide overlay) instead of freezing on "Syncing…". Generous default
+// (30s) so slow-but-working uploads still succeed.
+const withTimeout = (promise, ms = 30000, label = 'Network operation') =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(label + ' timed out')), ms))
+  ]);
+
 const retryOperation = async (operation, maxRetries = MAX_RETRY_ATTEMPTS) => {
   let lastError;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -10006,23 +10018,25 @@ const silentBackupProject = async (projectOrId) => {
   const projectId = project.id;
   
   // FIX 1.1: Check minimum sync interval to prevent rapid fire
+  // FIX (H1): return false on early-out so callers know the push did NOT happen
+  // (it's queued) and don't clear the pending flag / claim "Synced".
   if (!canSyncNow(projectId)) {
     console.log('Sync too soon for', projectId, '- queuing...');
     syncQueue.set(projectId, true);
-    return;
+    return false;
   }
-  
+
   // FIX 1: Check sync lock - prevent concurrent syncs
   if (isSyncLocked(projectId)) {
     console.log('Sync already in progress for', projectId, '- queuing...');
     syncQueue.set(projectId, true);
-    return;
+    return false;
   }
-  
+
   // Acquire lock
   if (!acquireSyncLock(projectId)) {
     console.log('Failed to acquire sync lock for', projectId);
-    return;
+    return false;
   }
   
   // Track uploaded photos to prevent duplicate uploads in same session
@@ -10094,7 +10108,7 @@ const silentBackupProject = async (projectOrId) => {
 
   try {
     // STEP 1: Check cloud for existing data (conflict detection)
-    const cloudDoc = await db.collection('backups').doc(projectId).get();
+    const cloudDoc = await withTimeout(db.collection('backups').doc(projectId).get(), 20000, 'Cloud read');
     const cloudBackup = cloudDoc.exists ? cloudDoc.data() : null;
     
     // Generate unique ID for OLD defects that don't have _syncId yet (migration)
@@ -10184,8 +10198,8 @@ const silentBackupProject = async (projectOrId) => {
       const uploadWithRetry = async () => {
         const response = await fetch(photoData);
         const blob = await response.blob();
-        await storageRef.put(blob);
-        return await storageRef.getDownloadURL();
+        await withTimeout(storageRef.put(blob), 30000, 'Photo upload');
+        return await withTimeout(storageRef.getDownloadURL(), 15000, 'Get photo URL');
       };
       
       try {
@@ -10209,7 +10223,7 @@ const silentBackupProject = async (projectOrId) => {
           const failedUploads = JSON.parse(localStorage.getItem('goinspect.failedPhotoUploads') || '[]');
           const failedEntry = {
             projectId: projectId,
-            defectSyncId: defectSyncId,
+            defectSyncId: defectId, // FIX (M6): param is defectId, not defectSyncId (ReferenceError broke tracking)
             photoIndex: photoIndex,
             photoType: photoType,
             idbRef: photoRef,
@@ -10217,9 +10231,9 @@ const silentBackupProject = async (projectOrId) => {
             error: e.message
           };
           // Avoid duplicates
-          const exists = failedUploads.some(f => 
-            f.projectId === projectId && 
-            f.defectSyncId === defectSyncId && 
+          const exists = failedUploads.some(f =>
+            f.projectId === projectId &&
+            f.defectSyncId === defectId &&
             f.photoIndex === photoIndex &&
             f.photoType === photoType
           );
@@ -11073,8 +11087,8 @@ const silentBackupProject = async (projectOrId) => {
       const uploadWithRetry = async () => {
         const response = await fetch(photoData);
         const blob = await response.blob();
-        await storageRef.put(blob);
-        return await storageRef.getDownloadURL();
+        await withTimeout(storageRef.put(blob), 30000, 'Photo upload');
+        return await withTimeout(storageRef.getDownloadURL(), 15000, 'Get photo URL');
       };
       
       try {
@@ -11166,12 +11180,16 @@ const silentBackupProject = async (projectOrId) => {
               afterPhotoUrls.push(ref);
             } else {
               const url = await uploadPhotoToStorage(ref, syncId, i, 'after');
-              if (url) afterPhotoUrls.push(url);
+              if (url) {
+                afterPhotoUrls.push(url);
+              } else {
+                afterPhotoUrls.push(ref); // FIX (H3): keep original ref on failure so the photo isn't lost (retried next sync)
+              }
             }
           }
         }
       }
-      
+
       // Upload second re-inspection after photos
       let secondAfterPhotoUrls = [];
       if (d.secondReInspection?.afterPhotos) {
@@ -11217,6 +11235,9 @@ const silentBackupProject = async (projectOrId) => {
               if (url) {
                 thirdAfterPhotoUrls.push(url);
                 console.log('UPLOAD: Third ReInsp photo', i, 'SUCCESS');
+              } else {
+                thirdAfterPhotoUrls.push(ref); // FIX (H3): keep original ref on failure so the photo isn't lost
+                console.log('UPLOAD: Third ReInsp photo', i, 'FAILED - keeping original ref');
               }
             }
           }
@@ -13104,10 +13125,11 @@ const silentBackupProject = async (projectOrId) => {
     }
     
     console.log('Silent backup complete:', projectId, mergeInfo);
-    
+
     // Check for failed uploads and notify user
     checkAndNotifyFailedUploads();
-    
+
+    return true; // FIX (H1): signal that the push actually completed
   } catch (e) {
     console.error('Silent backup error:', e);
     throw e;
@@ -14476,19 +14498,25 @@ const syncToCloud = async (force = false) => {
     
     // FIX: Use silentBackupProject for consistent sync to 'backups' collection
     // This ensures all data (defects, photos, etc.) is synced properly
-    await silentBackupProject(p.id);
-    
-    // Update last sync time
-    lastCloudSync = now;
-    localStorage.setItem('goinspect.lastCloudSync', now.toString());
-    pendingCloudSync = false;
-    localStorage.removeItem('goinspect.pendingSync');
-    
-    console.log('Cloud sync completed:', new Date().toLocaleTimeString());
-    
-    // Show subtle indicator
-    showSyncIndicator('Synced to cloud');
-    
+    const didSync = await silentBackupProject(p.id);
+
+    // FIX (H1): only clear the pending flag / claim "Synced" if the push actually
+    // happened. silentBackupProject returns false when it was queued (lock held /
+    // too soon) — clearing pending there would lose the unsynced-state signal.
+    if (didSync === false) {
+      console.log('Cloud sync queued (not pushed yet) — keeping pending flag');
+    } else {
+      lastCloudSync = now;
+      localStorage.setItem('goinspect.lastCloudSync', now.toString());
+      pendingCloudSync = false;
+      localStorage.removeItem('goinspect.pendingSync');
+
+      console.log('Cloud sync completed:', new Date().toLocaleTimeString());
+
+      // Show subtle indicator
+      showSyncIndicator('Synced to cloud');
+    }
+
   } catch (error) {
     console.error('Cloud sync error:', error);
     markPendingSync();
@@ -14512,19 +14540,21 @@ const fullBackupToCloud = async (showProgress = true) => {
     
     // FIX: Use silentBackupProject for consistent sync to 'backups' collection
     // This ensures proper merge, version control, and conflict resolution
-    await silentBackupProject(p.id);
-    
+    const didSync = await silentBackupProject(p.id);
+
     if (showProgress) updateSyncProgress(90, 'Finalizing...');
-    
-    // Update last sync time
-    const now = Date.now();
-    lastCloudSync = now;
-    localStorage.setItem('goinspect.lastCloudSync', now.toString());
-    pendingCloudSync = false;
-    localStorage.removeItem('goinspect.pendingSync');
-    
+
+    // FIX (H1): only clear pending if the push actually happened (not just queued).
+    if (didSync !== false) {
+      const now = Date.now();
+      lastCloudSync = now;
+      localStorage.setItem('goinspect.lastCloudSync', now.toString());
+      pendingCloudSync = false;
+      localStorage.removeItem('goinspect.pendingSync');
+    }
+
     if (showProgress) {
-      updateSyncProgress(100, 'Backup complete!');
+      updateSyncProgress(100, didSync === false ? 'Queued — will finish shortly' : 'Backup complete!');
       setTimeout(() => hideSyncLoadingOverlay(), 1000);
     }
     
@@ -14855,13 +14885,22 @@ window.addEventListener('online', async () => {
   if (p && p.id) {
     _reconnectPushInProgress = true;
     console.log('FIX A: Reconnect - pushing local changes first...');
+    let _pushedNow = true;
     try {
-      await silentBackupProject(p.id);
-      console.log('FIX A: Reconnect push complete');
+      const didSync = await silentBackupProject(p.id);
+      _pushedNow = (didSync !== false);
+      console.log('FIX A: Reconnect push', _pushedNow ? 'complete' : 'queued (lock/interval)');
     } catch (e) {
       console.log('FIX A: Reconnect push failed (will retry):', e.message);
     } finally {
-      _reconnectPushInProgress = false;
+      // FIX (M5): if the push was only QUEUED (returned false), the real push runs a
+      // moment later via releaseSyncLock's queued sync. Keep pull held briefly so it
+      // can't overwrite fresh local edits before that queued push lands.
+      if (_pushedNow) {
+        _reconnectPushInProgress = false;
+      } else {
+        setTimeout(() => { _reconnectPushInProgress = false; }, 4000);
+      }
     }
   }
   
@@ -32372,11 +32411,11 @@ async function uploadImageToStorage(dataUrl, path, maxRetries = 3) {
       const response = await fetch(compressed);
       const blob = await response.blob();
       
-      // Upload to storage
-      await ref.put(blob);
-      
+      // Upload to storage (FIX H2: timeout so a dropped connection can't hang)
+      await withTimeout(ref.put(blob), 30000, 'Image upload');
+
       // Get download URL
-      const url = await ref.getDownloadURL();
+      const url = await withTimeout(ref.getDownloadURL(), 15000, 'Get image URL');
       return url;
     } catch (error) {
       console.error(`Upload error (attempt ${attempt}/${maxRetries}):`, error);
@@ -32507,7 +32546,9 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
         const url = await uploadImageToStorage(localData, `${path}_${photoHash}.jpg`);
         // Remember local ref -> cloud URL so future syncs reuse this file.
         if (url && ref) { try { await saveCacheMapping(url, ref, null, projectId); } catch (e) {} }
-        return url;
+        // FIX (H3): on upload failure keep the original local ref instead of null, so
+        // the photo isn't filtered out / lost — it stays and is retried next sync.
+        return url || ref;
       } else if (localData && localData.startsWith('http')) {
         return localData; // Already a URL
       }
@@ -32867,7 +32908,7 @@ window.twoWaySyncProject = async function(project) {
     // STEP 1: Get cloud backup
     updateSyncProgress(10, 'Fetching cloud data...');
     
-    const cloudDoc = await db.collection('backups').doc(projectId).get();
+    const cloudDoc = await withTimeout(db.collection('backups').doc(projectId).get(), 20000, 'Cloud read');
     const cloudBackup = cloudDoc.exists ? cloudDoc.data() : null;
     
     let cloudDefects = [];
