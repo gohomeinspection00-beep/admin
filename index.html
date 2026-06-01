@@ -8844,7 +8844,7 @@ const resolveRefWithCache = async (ref, projectId = null) => {
     try {
       const d = await idbGetImageData(ref);
       if (d) {
-        imgCache[ref] = d;
+        imgCacheSet(ref, d);
         return d;
       }
     } catch { /* continue */ }
@@ -8858,7 +8858,7 @@ const resolveRefWithCache = async (ref, projectId = null) => {
       try {
         const cachedData = await idbGetImageData(mapping.localRef);
         if (cachedData) {
-          imgCache[ref] = cachedData;
+          imgCacheSet(ref, cachedData);
           return cachedData;
         }
       } catch { /* continue to fetch from URL */ }
@@ -8866,7 +8866,7 @@ const resolveRefWithCache = async (ref, projectId = null) => {
     
     // No cache or cache invalid - return URL for online loading
     // Browser will fetch directly
-    imgCache[ref] = ref;
+    imgCacheSet(ref, ref);
     return ref;
   }
   
@@ -13525,6 +13525,20 @@ const idbGetImageData = async ref => {
   });
 };
 const imgCache = {};
+// FIX (M6): imgCache held every resolved (full base64) photo for the whole session
+// with no eviction, bloating memory on large projects on mobile. Route writes
+// through a capped setter that drops the oldest entries once the cap is reached.
+// Eviction only forces a re-resolve later (perf), never a correctness change.
+const IMG_CACHE_MAX = 150;
+function imgCacheSet(ref, val) {
+  if (!(ref in imgCache) && Object.keys(imgCache).length >= IMG_CACHE_MAX) {
+    const keys = Object.keys(imgCache);
+    const drop = Math.min(20, keys.length);
+    for (let k = 0; k < drop; k++) delete imgCache[keys[k]];
+  }
+  imgCache[ref] = val;
+  return val;
+}
 const resolveRef = async ref => {
   if (!ref) return '';
   // Handle base64 data URLs
@@ -13537,7 +13551,7 @@ const resolveRef = async ref => {
     try { 
       const d = await idbGetImageData(ref); 
       if (d) {
-        imgCache[ref] = d;
+        imgCacheSet(ref, d);
         return d;
       }
     } catch { /* continue */ }
@@ -13551,7 +13565,7 @@ const resolveRef = async ref => {
       if (mapping && mapping.localRef) {
         const cachedData = await idbGetImageData(mapping.localRef);
         if (cachedData) {
-          imgCache[ref] = cachedData;
+          imgCacheSet(ref, cachedData);
           return cachedData;
         }
       }
@@ -13561,7 +13575,7 @@ const resolveRef = async ref => {
     
     // No local cache - return URL for browser to fetch directly
     // This works when online, but will fail when offline
-    imgCache[ref] = ref;
+    imgCacheSet(ref, ref);
     return ref;
   }
   
@@ -13580,7 +13594,7 @@ const resolveRefForExport = async (ref, retryCount = 3) => {
   try { 
     const d = await idbGetImageData(ref); 
     if (d && d.startsWith('data:')) {
-      imgCache[ref] = d;
+      imgCacheSet(ref, d);
       return d;
     }
   } catch { /* continue */ }
@@ -13599,7 +13613,7 @@ const resolveRefForExport = async (ref, retryCount = 3) => {
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
-        imgCache[ref] = dataURL;
+        imgCacheSet(ref, dataURL);
         console.log('resolveRefForExport: Successfully converted to base64');
         return dataURL;
       } catch (err) {
