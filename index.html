@@ -9705,6 +9705,19 @@ const clearUserSession = async () => {
   }
 };
 
+// FIX (1A): union two arrays of {id,...} by id — keep all from `base`, append any
+// from `extra` whose id isn't already present. Used in maintenancePlan merge so a
+// phase/trade added on one device isn't lost when the other device's plan is "newer"
+// (previously phases/trades were taken wholesale from the newer side).
+const mpUnionById = (base, extra) => {
+  const out = Array.isArray(base) ? base.slice() : [];
+  const ids = new Set(out.map(x => x && x.id).filter(Boolean));
+  for (const x of (Array.isArray(extra) ? extra : [])) {
+    if (x && x.id && !ids.has(x.id)) { out.push(x); ids.add(x.id); }
+  }
+  return out;
+};
+
 // Mark project as pending upload
 const markPendingUpload = (projectId) => {
   const pending = JSON.parse(localStorage.getItem('goinspect.pendingUploads') || '[]');
@@ -11684,8 +11697,16 @@ const silentBackupProject = async (projectOrId) => {
           cloudMp.items = cloudMp.items || [];
           cloudMp.items.push(localItem);
         }
+        // FIX (1A): union phases & trades by id so a local-only phase/trade isn't lost
+        cloudMp.phases = mpUnionById(cloudMp.phases, mpCopy.phases);
+        cloudMp.trades = mpUnionById(cloudMp.trades, mpCopy.trades);
         saveData.maintenancePlan = cloudMp;
       } else {
+        // Local is newer/base — union any cloud-only phases/trades back in
+        if (cloudBackup?.maintenancePlan) {
+          mpCopy.phases = mpUnionById(mpCopy.phases, cloudBackup.maintenancePlan.phases);
+          mpCopy.trades = mpUnionById(mpCopy.trades, cloudBackup.maintenancePlan.trades);
+        }
         saveData.maintenancePlan = mpCopy;
       }
     } else if (cloudBackup?.maintenancePlan) {
@@ -13065,8 +13086,14 @@ const silentBackupProject = async (projectOrId) => {
           // Cloud is newer — use cloud as base, preserve local completionPhotos
           const localItems = localProject.maintenancePlan.items || [];
           const localItemMap = new Map(localItems.map(i => [i.id, i]));
-          
+          // FIX (1A): capture local phases/trades before overwrite so they aren't lost
+          const _localPhases = localProject.maintenancePlan.phases;
+          const _localTrades = localProject.maintenancePlan.trades;
+
           localProject.maintenancePlan = cloudBackup.maintenancePlan;
+          // FIX (1A): union local-only phases/trades back in
+          localProject.maintenancePlan.phases = mpUnionById(localProject.maintenancePlan.phases, _localPhases);
+          localProject.maintenancePlan.trades = mpUnionById(localProject.maintenancePlan.trades, _localTrades);
           
           // Restore local completionPhotos/customPhotos (cloud strips base64)
           for (const item of (localProject.maintenancePlan.items || [])) {
@@ -13099,6 +13126,9 @@ const silentBackupProject = async (projectOrId) => {
           // If local items is empty but cloud has items, user likely did a reset — respect it
           const localItems = localProject.maintenancePlan.items || [];
           const cloudItems = cloudBackup.maintenancePlan.items || [];
+          // FIX (1A): union cloud-only phases/trades into the (newer) local plan
+          localProject.maintenancePlan.phases = mpUnionById(localProject.maintenancePlan.phases, cloudBackup.maintenancePlan.phases);
+          localProject.maintenancePlan.trades = mpUnionById(localProject.maintenancePlan.trades, cloudBackup.maintenancePlan.trades);
           
           if (localItems.length === 0 && cloudItems.length > 0) {
             // User intentionally cleared items (Reset All) — don't re-add cloud items
@@ -14455,8 +14485,14 @@ const pullFromCloud = async () => {
         // Cloud newer — use cloud, but preserve local photos (base64 stripped in cloud)
         const localItemMap = new Map((p.maintenancePlan.items || []).map(i => [i.id, i]));
         const localItemCount = (p.maintenancePlan.items || []).length;
-        
+        // FIX (1A): capture local phases/trades before overwrite so they aren't lost
+        const _localPhases = p.maintenancePlan.phases;
+        const _localTrades = p.maintenancePlan.trades;
+
         p.maintenancePlan = cloudData.maintenancePlan;
+        // FIX (1A): union local-only phases/trades back in
+        p.maintenancePlan.phases = mpUnionById(p.maintenancePlan.phases, _localPhases);
+        p.maintenancePlan.trades = mpUnionById(p.maintenancePlan.trades, _localTrades);
         for (const item of (p.maintenancePlan.items || [])) {
           const localItem = localItemMap.get(item.id);
           if (localItem) {
@@ -36492,6 +36528,14 @@ function mp_renderDashboard() {
       const pi=activeItems.filter(i=>i.phaseId===ph.id), pc=pi.reduce((s,i)=>s+mp_getItemEstCost(i),0), pd=pi.filter(i=>i.status==='done').length;
       bh+=`<div class="mp-budget-row"><span class="mp-br-label"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${ph.color};margin-right:6px"></span>${escHtml(ph.name)}</span><span class="mp-br-value">RM ${pc.toLocaleString()} <span style="font-weight:400;color:var(--muted);font-size:12px">(${pd}/${pi.length})</span></span></div>`;
     });
+    // FIX (H2): show an Unassigned subtotal row so the breakdown sums to the headline
+    // total when items have no (or a dangling) phase. Without this, unassigned items
+    // were counted in the total but appeared in no row.
+    const _unassigned = activeItems.filter(i => !i.phaseId || !(plan.phases||[]).some(p=>p.id===i.phaseId));
+    if(_unassigned.length>0){
+      const uc=_unassigned.reduce((s,i)=>s+mp_getItemEstCost(i),0), ud=_unassigned.filter(i=>i.status==='done').length;
+      bh+=`<div class="mp-budget-row"><span class="mp-br-label"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#94a3b8;margin-right:6px"></span>Unassigned</span><span class="mp-br-value">RM ${uc.toLocaleString()} <span style="font-weight:400;color:var(--muted);font-size:12px">(${ud}/${_unassigned.length})</span></span></div>`;
+    }
     if(stats.actualTotal>0) bh+=`<div class="mp-budget-row" style="border-top:2px solid var(--line);margin-top:4px;padding-top:8px"><span class="mp-br-label" style="font-weight:600;color:var(--ink)">Actual Spent</span><span class="mp-br-value" style="color:var(--accent)">RM ${stats.actualTotal.toLocaleString()}</span></div>`;
     bd.innerHTML=bh;
   }
@@ -36510,11 +36554,29 @@ function mp_renderDashboard() {
         const ts=p.targetMonth?new Date(p.targetMonth+'-01').toLocaleDateString('en-MY',{month:'short',year:'numeric'}):'Flexible';
         ph+=`<div class="mp-phase-card" onclick="mp_openPhase('${p.id}')"><div class="mp-phase-dot" style="background:${p.color}"></div><div class="mp-phase-info"><div class="mp-phase-name">${escHtml(p.name)}</div><div class="mp-phase-meta"><span style="display:inline-flex;align-items:center;gap:2px">${MP_ICON.list} ${pi.length}</span><span style="display:inline-flex;align-items:center;gap:2px">${MP_ICON.money} RM ${pc.toLocaleString()}</span><span style="display:inline-flex;align-items:center;gap:2px">${MP_ICON.calendar} ${ts}</span><span style="display:inline-flex;align-items:center;gap:2px">${MP_ICON.check} ${pd}/${pi.length}</span></div></div><div class="mp-phase-arrow">&#8250;</div></div>`;
       });
+      // FIX (H1): surface unassigned items (e.g. from "delete phase, keep items") so
+      // they're reachable for reassignment — previously they were invisible but still
+      // counted in the total. Tapping opens them via the unassigned-items view.
+      const _ua=activeItems.filter(i=>!i.phaseId||!phases.some(p=>p.id===i.phaseId));
+      if(_ua.length>0){
+        const uc=_ua.reduce((s,i)=>s+mp_getItemEstCost(i),0), ud=_ua.filter(i=>i.status==='done').length;
+        ph+=`<div class="mp-phase-card" onclick="mp_openUnassigned()"><div class="mp-phase-dot" style="background:#94a3b8"></div><div class="mp-phase-info"><div class="mp-phase-name">Unassigned</div><div class="mp-phase-meta"><span style="display:inline-flex;align-items:center;gap:2px">${MP_ICON.list} ${_ua.length}</span><span style="display:inline-flex;align-items:center;gap:2px">${MP_ICON.money} RM ${uc.toLocaleString()}</span><span style="display:inline-flex;align-items:center;gap:2px">${MP_ICON.check} ${ud}/${_ua.length}</span></div></div><div class="mp-phase-arrow">&#8250;</div></div>`;
+      }
       pl.innerHTML=ph;
     }
   }
 }
 function mp_openPhase(id) { mp_currentPhaseId=id; show('mpPhaseDetail'); }
+// FIX (H1): open unassigned items for reassignment. Opens the first unassigned item's
+// edit screen, where the phase <select> (with "-- Unassigned --") lets the user assign
+// it to a phase; on return the dashboard re-renders and shows the next one.
+function mp_openUnassigned() {
+  const proj=getProject(), plan=mp_getPlan(); if(!proj||!plan){show('mpDashboard');return;}
+  const phases=plan.phases||[];
+  const ua=mp_getActiveItems(plan, proj).filter(i=>!i.phaseId||!phases.some(p=>p.id===i.phaseId));
+  if(ua.length===0){ mp_renderDashboard(); return; }
+  mp_openItem(ua[0].id, 'mpDashboard');
+}
 function mp_addPhase() {
   const plan=mp_getPlan(); if(!plan)return;
   const idx=(plan.phases||[]).length+1;
@@ -37034,8 +37096,17 @@ function mp_zoomMpReport(delta) {
   if (label) label.textContent = Math.round(mp_currentZoom * 100) + '%';
 }
 
-function mp_printReport() {
+async function mp_printReport() {
   mp_zoomMpReport(0); // reset zoom
+  // FIX (2C): await all report images before printing so photos aren't blank
+  // (mp photos resolve async; the fixed-200ms print fired before they loaded).
+  const root = document.getElementById('mpReportRoot');
+  if (root) {
+    const imgs = root.querySelectorAll('img');
+    for (const img of imgs) {
+      if (!img.complete) await new Promise(r => { img.onload = r; img.onerror = r; setTimeout(r, 3000); });
+    }
+  }
   setTimeout(() => window.print(), 200);
 }
 
@@ -38144,8 +38215,11 @@ function mp_startBudgetPlan() {
 }
 
 // Rescale costs proportionally to fit within target budget
-function mp_rescaleCosts(plan, targetBudget) {
-  const items = plan.items || [];
+function mp_rescaleCosts(plan, targetBudget, onlyIds) {
+  // FIX (M3): when onlyIds is given, rescale ONLY the items just planned in this
+  // budget run — don't silently scale down the user's pre-existing manual costs.
+  const allItems = plan.items || [];
+  const items = (onlyIds instanceof Set) ? allItems.filter(i => onlyIds.has(i.id)) : allItems;
   // FIX (#11): use the canonical per-item cost (which prefers costBreakdown) so the
   // rescale total matches the dashboard. Previously it only summed estimatedCost, so
   // items with cost breakdowns were neither counted nor scaled, and the dashboard
@@ -38339,10 +38413,11 @@ Respond ONLY with a valid JSON array:
     document.getElementById('mpAIOverlay')?.remove();
 
     if (!usedProvider) {
-      mp_showResultModal('AI Failed', 'xCircle', [
-        { label: 'Status', value: 'All AI providers failed', style: 'color:#dc2626' },
-        { label: 'Tip', value: 'Try "Auto-Plan All Defects" instead' }
-      ]);
+      // FIX (M5): AI fully failed — fall back to rule-based planning (same as the
+      // non-budget path) instead of leaving the user with nothing planned.
+      // mp_autoPlanRuleBased saves, re-renders, and shows its own summary alert.
+      console.warn('Budget AI failed — falling back to rule-based.');
+      mp_autoPlanRuleBased(avail, plan, proj, skipped);
       return;
     }
 
@@ -38371,6 +38446,7 @@ Respond ONLY with a valid JSON array:
         return general?.id || plan.trades[0]?.id || '';
       };
 
+      const _plannedIds = new Set(); // FIX (M3): track items added in THIS budget run
       avail.forEach((d, i) => {
         const aiResult = allAiResults.find(r => r.idx === i);
         let prio = aiResult?.priority || mp_suggestPriority(d);
@@ -38387,8 +38463,10 @@ Respond ONLY with a valid JSON array:
         totalEstCost += estCost;
 
         maxO++;
+        const _newId = 'mp_' + Date.now() + '_' + maxO;
+        _plannedIds.add(_newId);
         plan.items.push({
-          id: 'mp_' + Date.now() + '_' + maxO,
+          id: _newId,
           defectSyncId: d._syncId,
           linkedDefects: null,
           customLocation: '', customElement: '', customType: '', customDescription: '', customPhoto: null,
@@ -38403,11 +38481,11 @@ Respond ONLY with a valid JSON array:
 
       // If user chose to stay with budget, rescale costs down
       if (useRescale && budget > 0 && totalEstCost > budget) {
-        mp_rescaleCosts(plan, budget);
-        // FIX (#A1): recompute with the canonical per-item cost (prefers costBreakdown)
-        // so the total shown in the result modal matches the dashboard. The old
-        // reduce on estimatedCost undercounted items that use a cost breakdown.
-        totalEstCost = (plan.items || []).reduce((s, i) => s + mp_getItemEstCost(i), 0);
+        mp_rescaleCosts(plan, budget, _plannedIds); // FIX (M3): only scale items planned this run
+        // FIX (#A1 + M3): recompute the planned-items total with the canonical per-item
+        // cost (prefers costBreakdown), scoped to THIS run's items so the result modal
+        // total matches what was actually planned (not pre-existing items' costs).
+        totalEstCost = (plan.items || []).filter(i => _plannedIds.has(i.id)).reduce((s, i) => s + mp_getItemEstCost(i), 0);
       }
 
       mp_savePlan();
@@ -38527,15 +38605,41 @@ function mp_showBudgetResult(isAiEstimate, usedProvider, budget, totalEstCost, a
 
 // ============ DEFECT NUMBER MAP ============
 function mp_buildDefectNumMap(proj) {
-  // Build a map: _syncId -> display number, matching the inspection report numbering
+  // FIX (3A): number defects EXACTLY like the inspection report (buildReport) so MP
+  // "#N" matches the report "#N". Report order = meta.areas, then within each area
+  // sort by element rank (ELEM_ORDER) then type rank (TYPE_ORDER_RPT) then type name.
+  // (These order arrays are block-scoped inside buildReport and not visible here, so
+  // we keep local copies that mirror them.)
+  // Exact copies of the report's order arrays (buildReport ~31352/31397).
+  const ELEM_ORDER_MP = ['View','Floor','Wall','Ceiling','Door','Window','Roof','Plumbing & Sanitary Fitting','M&E','Fixtures','Structure','Other'];
+  const TYPE_ORDER_MP = [
+    'General Photos', 'Alignment issues', 'Finishing issues', 'Minor defects',
+    'Major defects', 'Jointing Issue', 'Hollowness issues', 'Functionality issues',
+    'Leaking issues', 'Stains/Water Mark', 'Accessories Defects',
+    'Standard & Regulation', 'Poor Drainage System', 'Others'
+  ];
+  const elemRank = (e) => { const i = ELEM_ORDER_MP.indexOf(e || ''); return i === -1 ? 999 : i; };
+  const typeRank = (t) => { const i = TYPE_ORDER_MP.indexOf(t || ''); return i === -1 ? 998 : i; };
+
   const defects = (proj.defects || []).filter(d => mp_isDefectAlive(d) && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection);
   const numMap = new Map();
   let num = 1;
-  // Sort by area order then element/type (simplified — match report order as close as possible)
-  const areaOrder = [];
+
+  // Area order: follow meta.areas (the report's getReportOrder); append any leftover
+  // areas (defects whose location isn't in meta.areas) in first-appearance order.
+  const metaAreas = (proj.meta && Array.isArray(proj.meta.areas)) ? proj.meta.areas.slice() : [];
+  const areaOrder = metaAreas.slice();
   defects.forEach(d => { if (d.location && !areaOrder.includes(d.location)) areaOrder.push(d.location); });
+
   areaOrder.forEach(area => {
     const inArea = defects.filter(d => d.location === area);
+    inArea.sort((a, b) => {
+      const elemDiff = elemRank(a.element) - elemRank(b.element);
+      if (elemDiff !== 0) return elemDiff;
+      const typeDiff = typeRank(a.type) - typeRank(b.type);
+      if (typeDiff !== 0) return typeDiff;
+      return (a.type || '').localeCompare(b.type || '');
+    });
     inArea.forEach(d => {
       if (d._syncId) numMap.set(d._syncId, num++);
     });
