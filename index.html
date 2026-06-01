@@ -26306,6 +26306,9 @@ const DEFAULT_ELEMENTS = ['View','Floor','Wall','Ceiling','Door','Window','Roof'
 const getCustomElements = () => {
   const p = getProject(); if (!p) return [];
   const allUsed = new Set((p.defects||[]).map(d => d.element).filter(Boolean));
+  // FIX (M7): also include elements created in the Element Manager but not yet
+  // attached to any defect, so they survive a reopen/reload and reach other devices.
+  (p.customElements||[]).forEach(e => { if (e) allUsed.add(e); });
   return Array.from(allUsed).filter(e => !DEFAULT_ELEMENTS.includes(e));
 };
 
@@ -26439,13 +26442,23 @@ q('#btnAddNewElement')?.addEventListener('click', () => {
     return;
   }
   
+  // FIX (M7): persist to the project so the element survives reload and syncs,
+  // even before any defect uses it (the sync merge already carries customElements).
+  const p = getProject();
+  if (p) {
+    if (!p.customElements) p.customElements = [];
+    if (!p.customElements.includes(val)) p.customElements.push(val);
+    if (typeof p.meta === 'object' && p.meta) p.meta._lastModified = getCalibratedTimestamp();
+    saveAllSafe();
+  }
+
   // Add to dropdown in defect dialog
   const sel = q('#defElem');
   if (sel) {
     const opt = new Option(val, val);
     sel.add(opt, sel.querySelector('option[value="Other"]'));
   }
-  
+
   q('#newElementInput').value = '';
   renderElementManager();
   alert(`Element "${val}" added successfully.`);
@@ -26474,6 +26487,14 @@ if (addElBtn) {
       sel.add(new Option(v, v), insertBefore ?? sel.options[lastIdx+1] ?? null);
     }
     sel.value = v; // pilih yang baru
+    // FIX (M7): persist so it survives even if the defect isn't saved with it.
+    const _p = getProject();
+    if (_p) {
+      if (!_p.customElements) _p.customElements = [];
+      if (!_p.customElements.some(e => (e||'').toLowerCase() === v.toLowerCase())) _p.customElements.push(v);
+      if (_p.meta) _p.meta._lastModified = getCalibratedTimestamp();
+      saveAllSafe();
+    }
   };
 }
 
