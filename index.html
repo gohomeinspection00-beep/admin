@@ -7677,6 +7677,8 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
       <div class="stack">
         <!-- FLOOR PLAN with Tagging -->
         <label>Floor Plan - Tap to Tag Location</label>
+        <!-- FIX (T2): plan picker for unassigned multi-plan areas (shown via JS) -->
+        <select id="reAddPlanSel" style="display:none; padding:8px; border:1px solid var(--line); border-radius:10px; margin-bottom:6px;"></select>
         <div id="reAddFloorPlan" class="tagboard" style="min-height:200px; cursor:crosshair;"></div>
         <p style="font-size:11px; color:var(--muted); margin:4px 0;">Tap on the floor plan to mark defect location</p>
       </div>
@@ -15972,6 +15974,18 @@ document.body.addEventListener('click', e => {
     if (['about', 'areas', 'reportSetup'].includes(navTarget)) {
       SUBMISSION_MODE = false;
     }
+    // FIX (F2): tapping the bottom-nav Home/History tab is a normal navigation — clear any
+    // lingering re-inspection mode so it can't leak into a normal project opened from there.
+    // (Re-Inspect-from-History uses its OWN button which sets the flag then calls
+    // show('history') directly, so it is not affected by this bottom-nav handler.)
+    if (navTarget === 'home' || navTarget === 'history') {
+      RE_INSPECTION_MODE = false;
+      if (typeof SECOND_REINSPECTION_MODE !== 'undefined') SECOND_REINSPECTION_MODE = false;
+      if (typeof THIRD_REINSPECTION_MODE !== 'undefined') THIRD_REINSPECTION_MODE = false;
+      if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
+      reInspectionAtFinding = false;
+      document.body.classList.remove('reinspection-mode');
+    }
     show(navTarget);
   }
 });
@@ -20911,6 +20925,8 @@ let reAddDefectData = {
   afterPhotos: [],
   tag: null
 };
+// FIX (T2): user-chosen plan for the re-add/edit dialog (null = auto). Reset per dialog open.
+let reAddPlanIdxOverride = null;
 
 // Open Add New Defect dialog for Re-Inspection Mode
 function openReInspectionAddDefect() {
@@ -20923,10 +20939,11 @@ function openReInspectionAddDefect() {
   
   // Reset temp data
   reAddDefectData = { beforePhotos: [], afterPhotos: [], tag: null };
-  
+  reAddPlanIdxOverride = null; // FIX (T2): fresh plan choice per dialog open
+
   const dlg = q('#reInspectionAddDialog');
   if (!dlg) return;
-  
+
   // Hide custom inputs
   if (q('#reAddElementCustom')) {
     q('#reAddElementCustom').style.display = 'none';
@@ -21237,7 +21254,8 @@ function openReInspectionEdit(defectIdx) {
     afterPhotos: editAfterPhotos,
     tag: defect.tag ? { ...defect.tag } : null
   };
-  
+  reAddPlanIdxOverride = null; // FIX (T2): fresh plan choice per dialog open
+
   const dlg = q('#reInspectionAddDialog');
   if (!dlg) return;
   
@@ -21706,16 +21724,36 @@ async function renderReAddFloorPlan() {
   // actually on (tag.planIndex) so it isn't mis-drawn on a different plan and a tap can't
   // silently relocate it. Otherwise (new defect / no tag) fall back to M4: the area's
   // assigned plan, else the plan the user is currently viewing, else plan 0.
+  const _reAssigned = (proj.meta.areaFloorPlans && proj.meta.areaFloorPlans[_reArea] != null);
   let planIdx;
-  if (reAddDefectData.tag && typeof reAddDefectData.tag.planIndex === 'number') {
+  if (reAddPlanIdxOverride != null) {
+    // FIX (T2): user explicitly picked a plan from the dialog selector.
+    planIdx = reAddPlanIdxOverride;
+  } else if (reAddDefectData.tag && typeof reAddDefectData.tag.planIndex === 'number') {
     planIdx = reAddDefectData.tag.planIndex;
-  } else if (proj.meta.areaFloorPlans && proj.meta.areaFloorPlans[_reArea] != null) {
+  } else if (_reAssigned) {
     planIdx = proj.meta.areaFloorPlans[_reArea];
   } else {
     planIdx = (typeof uiPlanIndex === 'number' ? uiPlanIndex : 0);
   }
   if (planIdx < 0 || planIdx >= plans.length) planIdx = 0; // safety clamp
-  
+
+  // FIX (T2): show a plan picker for unassigned multi-plan areas so the user can choose
+  // which plan to tag a new defect on (assigned areas stay locked to their plan, matching
+  // the area-detail behaviour).
+  const _planSel = q('#reAddPlanSel');
+  if (_planSel) {
+    if (plans.length > 1 && !_reAssigned) {
+      _planSel.style.display = '';
+      _planSel.innerHTML = '';
+      plans.forEach((_, i) => _planSel.add(new Option(`Plan ${i + 1}`, String(i))));
+      _planSel.value = String(planIdx);
+      _planSel.onchange = () => { reAddPlanIdxOverride = parseInt(_planSel.value, 10) || 0; renderReAddFloorPlan(); };
+    } else {
+      _planSel.style.display = 'none';
+    }
+  }
+
   if (plans.length > 0 && plans[planIdx]) {
     try {
       const src = await resolveRef(plans[planIdx]);
@@ -22970,11 +23008,16 @@ const renderFinding = async () => {
     // Mirror the report's isNew split EXACTLY (buildReport): 2nd/3rd levels decide
     // purely by the current level's treatAsNew status (NOT the isNewInSecond/Third
     // flag), so Finding numbering/markers match the delivered report.
+    // FIX (R3): a defect first ADDED at the 2nd/3rd level is NEW at that level even if its
+    // status isn't a treatAsNew one — so check the isNewInSecond/Third flag too (kept in
+    // lockstep with the report's isNew split so numbering/markers stay identical).
     if (THIRD_REINSPECTION_MODE) {
+      if (d.isNewInThirdReInspection) return true;
       const s = d.thirdReInspection?.status || '';
       return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
     }
     if (SECOND_REINSPECTION_MODE) {
+      if (d.isNewInSecondReInspection) return true;
       const s = d.secondReInspection?.status || '';
       return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
     }
@@ -24627,11 +24670,16 @@ const renderAreaDetail = async () => {
     // Mirror the report's isNew split EXACTLY (buildReport): 2nd/3rd levels decide
     // purely by the current level's treatAsNew status (NOT the isNewInSecond/Third
     // flag), so Finding numbering/markers match the delivered report.
+    // FIX (R3): a defect first ADDED at the 2nd/3rd level is NEW at that level even if its
+    // status isn't a treatAsNew one — so check the isNewInSecond/Third flag too (kept in
+    // lockstep with the report's isNew split so numbering/markers stay identical).
     if (THIRD_REINSPECTION_MODE) {
+      if (d.isNewInThirdReInspection) return true;
       const s = d.thirdReInspection?.status || '';
       return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
     }
     if (SECOND_REINSPECTION_MODE) {
+      if (d.isNewInSecondReInspection) return true;
       const s = d.secondReInspection?.status || '';
       return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
     }
@@ -31891,15 +31939,17 @@ reportOrder.forEach(area => {
     let isNew = false;
     
     if (THIRD_REINSPECTION_MODE) {
-      // Third Re-Inspection: Only NEW if thirdReInspection status has treatAsNew
+      // Third Re-Inspection: NEW if added at this level (isNewInThirdReInspection) OR
+      // the thirdReInspection status is treatAsNew. (FIX R3: was status-only.)
       const status = o.d.thirdReInspection?.status || '';
       const statusInfo = reInspectionStatuses.find(s => s.name === status);
-      isNew = statusInfo?.treatAsNew || false;
+      isNew = o.d.isNewInThirdReInspection || statusInfo?.treatAsNew || false;
     } else if (SECOND_REINSPECTION_MODE) {
-      // Second Re-Inspection: Only NEW if secondReInspection status has treatAsNew
+      // Second Re-Inspection: NEW if added at this level (isNewInSecondReInspection) OR
+      // the secondReInspection status is treatAsNew. (FIX R3: was status-only.)
       const status = o.d.secondReInspection?.status || '';
       const statusInfo = reInspectionStatuses.find(s => s.name === status);
-      isNew = statusInfo?.treatAsNew || false;
+      isNew = o.d.isNewInSecondReInspection || statusInfo?.treatAsNew || false;
     } else if (DEFECT_FORM_MODE && DEFECT_FORM_INSPECTION_LEVEL !== 'original') {
       // DEFECT_FORM First/Second/Third: NO defects are "new" - all get numbers
       isNew = false;
