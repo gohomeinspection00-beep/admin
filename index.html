@@ -23608,24 +23608,39 @@ const renderFinding = async () => {
                 const cloudDeletedAfterIds = new Set(cd.reInspection?._deletedAfterPhotoIds || []);
                 const allDeletedAfterIds = new Set([...localDeletedAfterIds, ...cloudDeletedAfterIds]);
                 
-                // FIX: Check if local has NEW unuploaded changes (not just deletedIds)
-                const localHasNewAnnotation = localAfterPhotos.some(p => p && typeof p === 'string' && p.startsWith('data:'));
-                
+                // FIX: local has NEW un-uploaded changes (idb:/data: — idbPutImage stores
+                // idb:, so a 'data:'-only check missed every real edit and dropped it).
+                const localHasNewAnnotation = localAfterPhotos.some(p => p && typeof p === 'string' && !p.startsWith('http'));
+
                 // FIX: Compare timestamps - cloud wins if newer
                 const cloudIsNewer = cloudAfterTime > localAfterTime;
-                
+
                 // Filter cloud photos using ALL deleted IDs
                 const validCloudAfterPhotos = cloudAfterPhotos.filter(photo => {
                   if (!photo) return false;
                   const photoId = getPhotoIdForTracking(photo);
                   return photoId && !allDeletedAfterIds.has(photoId);
                 });
-                
+
                 let finalAfterPhotos;
                 if (localHasNewAnnotation) {
-                  // Local has NEW annotation (not uploaded yet) - keep local
-                  console.log('Update: Local has new annotation, keeping local afterPhotos');
-                  finalAfterPhotos = localAfterPhotos;
+                  // FIX: local has un-uploaded refs -> UNION cloud + local (not keep-local-only,
+                  // which would miss a newer cloud photo and clobber it on push). Cloud first
+                  // (source of truth), then local refs not already present, honoring the
+                  // deletion ledger so a cloud-deleted photo isn't resurrected from local.
+                  const _seen = new Set();
+                  finalAfterPhotos = [];
+                  for (const ph of validCloudAfterPhotos) {
+                    const id = getPhotoIdForTracking(ph);
+                    if (id && !_seen.has(id)) { _seen.add(id); finalAfterPhotos.push(ph); }
+                  }
+                  for (const ph of localAfterPhotos) {
+                    if (!ph || typeof ph !== 'string') continue;
+                    const id = getPhotoIdForTracking(ph);
+                    if (!id || allDeletedAfterIds.has(id) || _seen.has(id)) continue;
+                    _seen.add(id); finalAfterPhotos.push(ph);
+                  }
+                  console.log('Update: Local has un-uploaded afterPhotos, UNION local+cloud. Count:', finalAfterPhotos.length);
                 } else if (cloudIsNewer) {
                   // Cloud is newer - use cloud
                   console.log('Update: Cloud afterPhotos is newer, using cloud. Count:', validCloudAfterPhotos.length);
@@ -23679,19 +23694,31 @@ const renderFinding = async () => {
                 const cloudDeletedAfterIds2 = new Set(cd.secondReInspection?._deletedAfterPhotoIds || []);
                 const allDeletedAfterIds2 = new Set([...localDeletedAfterIds2, ...cloudDeletedAfterIds2]);
                 
-                const localHasNewAnnotation2 = localAfterPhotos2.some(p => p && typeof p === 'string' && p.startsWith('data:'));
+                const localHasNewAnnotation2 = localAfterPhotos2.some(p => p && typeof p === 'string' && !p.startsWith('http'));
                 const cloudIsNewer2 = cloudAfterTime2 > localAfterTime2;
-                
+
                 const validCloudAfterPhotos2 = cloudAfterPhotos2.filter(photo => {
                   if (!photo) return false;
                   const photoId = getPhotoIdForTracking(photo);
                   return photoId && !allDeletedAfterIds2.has(photoId);
                 });
-                
+
                 let finalAfterPhotos2;
                 if (localHasNewAnnotation2) {
-                  console.log('Update: Second ReInsp - Local has new annotation, keeping local');
-                  finalAfterPhotos2 = localAfterPhotos2;
+                  // FIX: UNION cloud + local un-uploaded (not keep-local-only) — see L1.
+                  const _seen2 = new Set();
+                  finalAfterPhotos2 = [];
+                  for (const ph of validCloudAfterPhotos2) {
+                    const id = getPhotoIdForTracking(ph);
+                    if (id && !_seen2.has(id)) { _seen2.add(id); finalAfterPhotos2.push(ph); }
+                  }
+                  for (const ph of localAfterPhotos2) {
+                    if (!ph || typeof ph !== 'string') continue;
+                    const id = getPhotoIdForTracking(ph);
+                    if (!id || allDeletedAfterIds2.has(id) || _seen2.has(id)) continue;
+                    _seen2.add(id); finalAfterPhotos2.push(ph);
+                  }
+                  console.log('Update: Second ReInsp - UNION local+cloud. Count:', finalAfterPhotos2.length);
                 } else if (cloudIsNewer2 || validCloudAfterPhotos2.length > 0) {
                   console.log('Update: Second ReInsp - Using cloud afterPhotos. Count:', validCloudAfterPhotos2.length);
                   finalAfterPhotos2 = validCloudAfterPhotos2;
@@ -23741,18 +23768,31 @@ const renderFinding = async () => {
                 const cloudDeletedAfterIds3 = new Set(cd.thirdReInspection?._deletedAfterPhotoIds || []);
                 const allDeletedAfterIds3 = new Set([...localDeletedAfterIds3, ...cloudDeletedAfterIds3]);
                 
-                const localHasNewAnnotation3 = localAfterPhotos3.some(p => p && typeof p === 'string' && p.startsWith('data:'));
+                const localHasNewAnnotation3 = localAfterPhotos3.some(p => p && typeof p === 'string' && !p.startsWith('http'));
                 const cloudIsNewer3 = cloudAfterTime3 > localAfterTime3;
-                
+
                 const validCloudAfterPhotos3 = cloudAfterPhotos3.filter(photo => {
                   if (!photo) return false;
                   const photoId = getPhotoIdForTracking(photo);
                   return photoId && !allDeletedAfterIds3.has(photoId);
                 });
-                
+
                 let finalAfterPhotos3;
                 if (localHasNewAnnotation3) {
-                  finalAfterPhotos3 = localAfterPhotos3;
+                  // FIX: UNION cloud + local un-uploaded (not keep-local-only) — see L1.
+                  const _seen3 = new Set();
+                  finalAfterPhotos3 = [];
+                  for (const ph of validCloudAfterPhotos3) {
+                    const id = getPhotoIdForTracking(ph);
+                    if (id && !_seen3.has(id)) { _seen3.add(id); finalAfterPhotos3.push(ph); }
+                  }
+                  for (const ph of localAfterPhotos3) {
+                    if (!ph || typeof ph !== 'string') continue;
+                    const id = getPhotoIdForTracking(ph);
+                    if (!id || allDeletedAfterIds3.has(id) || _seen3.has(id)) continue;
+                    _seen3.add(id); finalAfterPhotos3.push(ph);
+                  }
+                  console.log('Update: Third ReInsp - UNION local+cloud. Count:', finalAfterPhotos3.length);
                 } else if (cloudIsNewer3 || validCloudAfterPhotos3.length > 0) {
                   console.log('Update: Third ReInsp - Using cloud afterPhotos. Count:', validCloudAfterPhotos3.length);
                   finalAfterPhotos3 = validCloudAfterPhotos3;
