@@ -14320,6 +14320,11 @@ const pullFromCloud = async () => {
     
     // FIX: Sync areas and _deletedAreas from cloud - USE TIMESTAMP to determine winner
     const cloudMeta = cloudData.meta || cloudData;
+    // FIX (S4): union-merge inspectionDates on the periodic pull too, so a Second/Third
+    // inspection date added on another device appears without waiting for an open/backup.
+    if (typeof mergeInspectionDates === 'function') {
+      try { p.meta.inspectionDates = mergeInspectionDates(p.meta, cloudMeta); } catch (e) {}
+    }
     const cloudAreas = cloudMeta.areas || [];
     const cloudDeletedAreas = cloudMeta._deletedAreas || [];
     const cloudDeletedAreasTimes = cloudMeta._deletedAreasTimes || {};
@@ -24595,10 +24600,14 @@ const renderAreaDetail = async () => {
       // Set uiPlanIndex to the assigned plan
       uiPlanIndex = assignedPlanIndex;
     } else {
+      // FIX (T3): clamp uiPlanIndex itself (not just the selector display) so a stale
+      // value carried in from an area/screen with more plans can't make the board render
+      // plans[uiPlanIndex] = undefined (blank plan).
+      if (uiPlanIndex < 0 || uiPlanIndex >= plans.length) uiPlanIndex = Math.max(0, Math.min(uiPlanIndex, plans.length - 1));
       // Show selector for all plans
       const sel = document.createElement('select'); sel.id = 'planPickerDetail';
       plans.forEach((_, i) => sel.add(new Option(`Plan ${i+1}`, String(i))));
-      sel.value = String(Math.min(uiPlanIndex, plans.length-1));
+      sel.value = String(uiPlanIndex);
       sel.onchange = () => { uiPlanIndex = parseInt(sel.value,10)||0; renderAreaDetail(); };
       sw.append(lab, sel);
     }
