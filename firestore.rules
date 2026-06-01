@@ -1,0 +1,129 @@
+rules_version = '2';
+
+// =============================================================================
+// GoInspect — Firestore Security Rules  (TEMPLATE — VERIFY BEFORE DEPLOY)
+// -----------------------------------------------------------------------------
+// Purpose: stop any logged-in customer from reading data that isn't theirs, and
+// (most importantly) stop them from reading the AI provider keys held in
+// settings/ayieConfig. Firestore is open by default in test mode — without
+// rules like these, every authenticated user can read every document.
+//
+// HOW TO TEST SAFELY (do NOT deploy blind on a live app):
+//   1. Firebase Console > Firestore > Rules > paste this.
+//   2. Use the "Rules Playground" to simulate:
+//        - a normal user reading their OWN backups/{projectId}  -> ALLOW
+//        - the same user reading SOMEONE ELSE'S backup          -> DENY
+//        - an admin user reading settings/ayieConfig            -> ALLOW
+//        - a normal user reading settings/ayieConfig            -> DENY
+//   3. Then test the real app end-to-end with a normal account BEFORE relying on it.
+//
+// NOTE ON EMAIL CASE: the app stores all emails lowercased (doc ids + userEmail
+// fields). We compare against request.auth.token.email.lower(). If your project
+// has users registered with mixed-case emails, verify lower() behaves as expected
+// in the Playground.
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Lower-cased email of the signed-in user (app keys everything in lowercase).
+    function myEmail() {
+      return isSignedIn() ? request.auth.token.email.lower() : '';
+    }
+
+    // Admin = users/{email}.isAdmin == true OR accountType == 'admin'
+    // (mirrors the client check at the admin-view code path).
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(myEmail()))
+        && (
+             get(/databases/$(database)/documents/users/$(myEmail())).data.isAdmin == true
+          || get(/databases/$(database)/documents/users/$(myEmail())).data.accountType == 'admin'
+        );
+    }
+
+    function ownsByEmailField() {
+      return isSignedIn() && resource.data.userEmail == myEmail();
+    }
+    function creatingOwnByEmailField() {
+      return isSignedIn() && request.resource.data.userEmail == myEmail();
+    }
+
+    // ---- users/{email} : a user's own profile/quota + their AI chat history ----
+    match /users/{email} {
+      allow read, write: if isAdmin() || (isSignedIn() && email == myEmail());
+
+      // AI chat history subcollections are per-user.
+      match /ayieChats/{doc}      { allow read, write: if isAdmin() || (isSignedIn() && email == myEmail()); }
+      match /ayieFloatChats/{doc} { allow read, write: if isAdmin() || (isSignedIn() && email == myEmail()); }
+      match /{sub=**}             { allow read, write: if isAdmin() || (isSignedIn() && email == myEmail()); }
+    }
+
+    // ---- backups/{projectId} : inspection projects (carry userEmail) ----
+    match /backups/{projectId} {
+      allow read:   if isAdmin() || ownsByEmailField();
+      allow create: if creatingOwnByEmailField();
+      allow update: if isAdmin() || (ownsByEmailField() && creatingOwnByEmailField());
+      allow delete: if isAdmin() || ownsByEmailField();
+    }
+
+    // ---- trackInspections/{id} : repair-tracking docs (carry userEmail) ----
+    match /trackInspections/{id} {
+      allow read:   if isAdmin() || ownsByEmailField();
+      allow create: if creatingOwnByEmailField();
+      allow update: if isAdmin() || (ownsByEmailField() && creatingOwnByEmailField());
+      allow delete: if isAdmin() || ownsByEmailField();
+    }
+
+    // ---- homeSurveys/{uid} : Survey module, keyed by auth uid ----
+    match /homeSurveys/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ---- orders/{orderId} : purchases (carry userEmail) ----
+    // Customers may read their own orders. Writes are restricted to admin/server
+    // (orders should be created by your trusted backend, not the client). If your
+    // app legitimately creates orders client-side, relax `create` after verifying.
+    match /orders/{orderId} {
+      allow read:   if isAdmin() || ownsByEmailField();
+      allow write:  if isAdmin();
+    }
+
+    // ---- settings/ayieConfig : AI provider keys (Gemini/Groq/Google TTS) ----
+    // *** THE IMPORTANT ONE ***  Restrict reads to admin so customers can't pull
+    // your billable keys out of the document.
+    //
+    // ⚠️ TRADE-OFF: the CURRENT client reads settings/ayieConfig directly to call
+    // the AI providers. If you lock it to admin-only, normal users' AI features
+    // (Ayie chat/voice, Survey AI) will STOP working, because the keys live on the
+    // client. Properly fixing this means moving AI calls to a server proxy
+    // (Cloud Function) that holds the keys, then the client never needs them.
+    //
+    //   Phase 1 (no code change, partial): keep this readable by signed-in users
+    //     but block writes — prevents tampering, but keys are still extractable.
+    //     -> allow read: if isSignedIn();  allow write: if isAdmin();
+    //   Phase 2 (recommended, needs the proxy): admin-only read as below, AND
+    //     route all AI calls through a Cloud Function.
+    match /settings/ayieConfig {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+    // Any other settings docs: admin-only by default.
+    match /settings/{doc} {
+      allow read, write: if isAdmin();
+    }
+
+    // ---- time-calibration / ping : safe to read publicly, no client writes ----
+    match /_timeSync/{doc} { allow read: if true;  allow write: if false; }
+    match /_ping/{doc}     { allow read: if true;  allow write: if isSignedIn(); }
+
+    // ---- default deny everything else ----
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
