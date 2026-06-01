@@ -22200,6 +22200,22 @@ const renderPlanThumbs = async (refs) => {
     btn.onclick = () => {
       const p = getProject();
       p.meta.planRefs.splice(i, 1);
+      // FIX (H4): reindex references that point at plan indices, otherwise every
+      // plan after `i` shifts down by one and areaFloorPlans / defect tag.planIndex
+      // start pointing at the wrong (or a now-missing) plan.
+      if (p.meta.areaFloorPlans) {
+        for (const area of Object.keys(p.meta.areaFloorPlans)) {
+          const v = p.meta.areaFloorPlans[area];
+          if (v === i) delete p.meta.areaFloorPlans[area];   // its plan was deleted -> fall back to plan 0
+          else if (v > i) p.meta.areaFloorPlans[area] = v - 1;
+        }
+      }
+      (p.defects || []).forEach(d => {
+        if (d && d.tag && typeof d.tag.planIndex === 'number') {
+          if (d.tag.planIndex === i) d.tag = null;           // pin was on the deleted plan
+          else if (d.tag.planIndex > i) d.tag.planIndex -= 1;
+        }
+      });
       p.meta._lastModified = getCalibratedTimestamp(); // Update timestamp
       saveAllSafe();
       renderPlanThumbs(p.meta.planRefs);
