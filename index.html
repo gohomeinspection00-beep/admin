@@ -12156,6 +12156,16 @@ const silentBackupProject = async (projectOrId) => {
                 localProject.meta.areas = localProject.meta.areas || [];
                 localProject.meta.areas.push(area);
               }
+              // FIX (#1): cascade the restore to this area's defects (mirror of the
+              // delete cascade). Without this the area comes back EMPTY on other
+              // devices while its defects stay _deleted forever.
+              (localProject.defects || []).forEach(d => {
+                if (d._deleted && (d.location || '').toLowerCase() === (area || '').toLowerCase()) {
+                  d._deleted = false;
+                  d._deletedAt = null;
+                  d._lastModified = cloudMetaTime;
+                }
+              });
               console.log('silentBackup: Restored area from cloud:', area);
             }
           }
@@ -14236,6 +14246,16 @@ const pullFromCloud = async () => {
             if (!p.meta.areas.includes(area)) {
               p.meta.areas.push(area);
             }
+            // FIX (#1): cascade the restore to this area's defects (mirror of the
+            // delete cascade) so the area doesn't come back empty with its defects
+            // stuck deleted.
+            (p.defects || []).forEach(d => {
+              if (d._deleted && (d.location || '').toLowerCase() === (area || '').toLowerCase()) {
+                d._deleted = false;
+                d._deletedAt = null;
+                d._lastModified = cloudMetaTime;
+              }
+            });
             hasChanges = true;
             console.log('Pull: Restored area from cloud:', area);
           }
@@ -23259,6 +23279,15 @@ const renderFinding = async () => {
                   if (!p.meta.areas.includes(area)) {
                     p.meta.areas.push(area);
                   }
+                  // FIX (#1): cascade the restore to this area's defects (mirror of
+                  // the delete cascade) so it doesn't return empty with defects stuck.
+                  (p.defects || []).forEach(d => {
+                    if (d._deleted && (d.location || '').toLowerCase() === (area || '').toLowerCase()) {
+                      d._deleted = false;
+                      d._deletedAt = null;
+                      d._lastModified = cloudMetaTime;
+                    }
+                  });
                   console.log('Update: Restored area from cloud:', area);
                 }
               }
@@ -24566,15 +24595,42 @@ function saveNewArea() {
     return; 
   }
   
-  // FIX: Remove from _deletedAreas if re-adding same area name
+  // FIX: Remove from _deletedAreas if re-adding same area name.
+  // This must be a true RESTORE (mirror of restoreSingleArea) so the re-added area
+  // survives multi-device sync: set _restoredAreasTimes, clear the delete tombstone,
+  // un-delete the area's old defects, and bump _lastModified. Without this, a stale
+  // cloud tombstone re-deletes the area on the next pull.
+  let _wasDeletedArea = false;
+  let _deletedAreaName = v;
   if (p.meta._deletedAreas && p.meta._deletedAreas.length > 0) {
     const deletedIdx = p.meta._deletedAreas.findIndex(a => a.toLowerCase() === v.toLowerCase());
     if (deletedIdx > -1) {
+      _wasDeletedArea = true;
+      _deletedAreaName = p.meta._deletedAreas[deletedIdx]; // exact stored name (casing)
       p.meta._deletedAreas.splice(deletedIdx, 1);
       console.log('Removed from _deletedAreas (re-adding):', v);
     }
   }
-  
+  if (_wasDeletedArea) {
+    const restoreTime = getCalibratedTimestamp();
+    if (p.meta._deletedAreasTimes) {
+      delete p.meta._deletedAreasTimes[_deletedAreaName];
+      delete p.meta._deletedAreasTimes[v];
+    }
+    if (!p.meta._restoredAreasTimes) p.meta._restoredAreasTimes = {};
+    p.meta._restoredAreasTimes[_deletedAreaName] = restoreTime;
+    p.meta._restoredAreasTimes[v] = restoreTime;
+    // Un-delete the old defects that belonged to this area
+    (p.defects || []).forEach(d => {
+      if (d._deleted && (d.location || '').toLowerCase() === _deletedAreaName.toLowerCase()) {
+        d._deleted = false;
+        d._deletedAt = null;
+        d._lastModified = restoreTime;
+      }
+    });
+    p.meta._lastModified = restoreTime;
+  }
+
   // Add area
   if (!p.meta.areas) p.meta.areas = [];
   p.meta.areas.push(v);
@@ -25401,8 +25457,15 @@ function updateRestoreEmptyState() {
 function restoreSingleDefect(idx) {
   const p = getProject();
   if (!p || !p.defects[idx]) return;
-  
+
   const defect = p.defects[idx];
+  // FIX (#5): guard against a stale index. If a cloud pull changed p.defects while
+  // the Restore page was open, this index could now point at a non-deleted defect.
+  // Only act on a genuinely deleted defect, and re-render so the list is fresh.
+  if (!defect._deleted) {
+    if (typeof renderRestoreDefects === 'function') renderRestoreDefects();
+    return;
+  }
   const areaName = defect.location;
   const restoreTime = getCalibratedTimestamp();
   
@@ -25535,7 +25598,9 @@ function restoreAllSelected() {
   const defectCbs = document.querySelectorAll('.restore-defect-cb:checked');
   defectCbs.forEach(cb => {
     const idx = parseInt(cb.dataset.idx);
-    if (p.defects[idx]) {
+    // FIX (#5): only restore a genuinely deleted defect, so a stale index (after a
+    // cloud pull re-ordered/appended p.defects) can't flip an active defect.
+    if (p.defects[idx] && p.defects[idx]._deleted) {
       const defect = p.defects[idx];
       defect._deleted = false;
       defect._deletedAt = null;
