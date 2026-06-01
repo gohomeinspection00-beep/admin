@@ -15949,8 +15949,8 @@ document.body.addEventListener('click', e => {
   }
 });
 /* ========= HOME ========= */
-q('#startBtn').addEventListener('click', () => { if (isAccountFrozen()) { showFreezePopup(); return; } SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); const p = newProject(); q('#date').value = p.meta.date; show('about'); });
-q('#btnNew').addEventListener('click', () => { if (isAccountFrozen()) { showFreezePopup(); return; } SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); newProject(); show('about'); });
+q('#startBtn').addEventListener('click', () => { if (isAccountFrozen()) { showFreezePopup(); return; } SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); const p = newProject(); if (!p) return; q('#date').value = p.meta.date; show('about'); });
+q('#btnNew').addEventListener('click', () => { if (isAccountFrozen()) { showFreezePopup(); return; } SUBMISSION_MODE = false; RE_INSPECTION_MODE = false; reInspectionAtFinding = false; document.body.classList.remove('reinspection-mode'); if (!newProject()) return; show('about'); });
 
 /* ========= MY ORDERS ========= */
 q('#myOrderBtn').addEventListener('click', () => {
