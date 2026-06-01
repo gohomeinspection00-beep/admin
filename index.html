@@ -5894,11 +5894,12 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
             <input id="weather" placeholder="e.g., Sunny, Cloudy, Rainy" />
           </div>
         </div>
-        <!-- Re-inspection dates (Second/Third/Fourth). First = Date of Inspection above. -->
-        <div class="about-form-group" style="margin-top:16px">
+        <!-- Re-inspection dates (Second/Third). First = Date of Inspection above. -->
+        <!-- Auto-managed: shown only in re-inspection mode; dates are added by level. -->
+        <div id="inspectionDatesBlock" class="about-form-group" style="margin-top:16px;display:none">
           <label>Re-Inspection Dates</label>
           <div id="inspectionDatesList" style="display:flex;flex-direction:column;gap:8px"></div>
-          <button type="button" id="btnAddInspectionDate" class="btn ghost" style="margin-top:8px;font-size:13px;padding:8px 12px;align-self:flex-start">+ Add next inspection date</button>
+          <button type="button" id="btnAddInspectionDate" class="btn ghost" style="margin-top:8px;font-size:13px;padding:8px 12px;align-self:flex-start;display:none">+ Add next inspection date</button>
         </div>
       </div>
 
@@ -19888,6 +19889,7 @@ if (reInspectImportInput) {
         d.reInspection = { status: '', afterPhotos: [], notes: '' };
       }
     });
+    syncInspectionDatesToMode(proj, false); // 1st re-inspection -> auto-add Second date
     saveAllSafe();
   }
 
@@ -22339,7 +22341,7 @@ const mergeInspectionDates = (localM, cloudM) => {
 // Ensure meta.inspectionDates has an entry for the given level (default today),
 // without overwriting an existing date. Used when entering a re-inspection level so
 // the new level's date auto-appears (editable later in About). Saves + keeps 'first'.
-const ensureInspectionDate = (proj, level) => {
+const ensureInspectionDate = (proj, level, doSave = true) => {
   if (!proj || !proj.meta || !INSPECTION_LEVELS.includes(level)) return;
   const arr = getInspectionDates(proj.meta); // always includes 'first'
   if (!arr.some(e => e.level === level)) {
@@ -22350,7 +22352,30 @@ const ensureInspectionDate = (proj, level) => {
     .map(lv => arr.find(e => e.level === lv))
     .filter(Boolean);
   proj.meta._lastModified = getCalibratedTimestamp();
-  if (typeof saveAllSafe === 'function') saveAllSafe();
+  if (doSave && typeof saveAllSafe === 'function') saveAllSafe();
+};
+
+// Any re-inspection mode active? (sub-modes are nested under RE_INSPECTION_MODE)
+const isReInspectionActive = () =>
+  (typeof RE_INSPECTION_MODE !== 'undefined' && RE_INSPECTION_MODE) ||
+  (typeof SECOND_REINSPECTION_MODE !== 'undefined' && SECOND_REINSPECTION_MODE) ||
+  (typeof THIRD_REINSPECTION_MODE !== 'undefined' && THIRD_REINSPECTION_MODE);
+
+// Auto-add the inspection dates that the CURRENT re-inspection level implies, so the
+// user never presses "Add". Level mapping (original = First):
+//   RE_INSPECTION_MODE (1st re-inspection) -> up to Second
+//   SECOND_REINSPECTION_MODE (2nd re-insp) -> up to Third
+//   THIRD_REINSPECTION_MODE (3rd re-insp)  -> up to Third (capped at three per design)
+// Normal mode -> nothing (block stays hidden). Never removes existing dates.
+const syncInspectionDatesToMode = (proj, doSave = true) => {
+  if (!proj || !proj.meta) return;
+  let upto = null;
+  if (typeof THIRD_REINSPECTION_MODE !== 'undefined' && THIRD_REINSPECTION_MODE) upto = 'third';
+  else if (typeof SECOND_REINSPECTION_MODE !== 'undefined' && SECOND_REINSPECTION_MODE) upto = 'third';
+  else if (typeof RE_INSPECTION_MODE !== 'undefined' && RE_INSPECTION_MODE) upto = 'second';
+  if (!upto) return; // normal mode
+  const maxIdx = INSPECTION_LEVELS.indexOf(upto);
+  for (let i = 1; i <= maxIdx; i++) ensureInspectionDate(proj, INSPECTION_LEVELS[i], doSave);
 };
 
 // Working copy of inspection dates while the About form is open.
@@ -22359,32 +22384,32 @@ let _inspectionDatesDraft = [];
 // Render the Second/Third/Fourth date rows (First is the "Date of Inspection" field).
 const renderInspectionDateRows = () => {
   const list = document.getElementById('inspectionDatesList');
-  if (!list) return;
+  const block = document.getElementById('inspectionDatesBlock');
+  const btn = document.getElementById('btnAddInspectionDate');
+  const active = isReInspectionActive();
+  // The block is meaningful only during re-inspection. In normal mode hide it so the
+  // user just sees the single "Date of Inspection" (First). Dates are auto-managed.
+  if (block) block.style.display = active ? '' : 'none';
+  if (btn) btn.style.display = 'none'; // auto-added by level — no manual Add
+  if (!list || !active) return;
   const rows = _inspectionDatesDraft.filter(e => e.level !== 'first');
   if (rows.length === 0) {
-    list.innerHTML = '<div style="font-size:12px;color:var(--muted)">No re-inspection dates yet. The Date of Inspection above is the First Inspection.</div>';
-  } else {
-    list.innerHTML = '';
-    rows.forEach(e => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px';
-      row.innerHTML = `<span style="min-width:130px;font-size:13px;color:var(--ink)">${INSPECTION_LEVEL_LABELS[e.level] || e.level}</span>`;
-      const input = document.createElement('input');
-      input.type = 'date';
-      input.value = e.date || '';
-      input.style.cssText = 'flex:1';
-      input.onchange = () => { e.date = input.value; };
-      row.appendChild(input);
-      list.appendChild(row);
-    });
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted)">First Inspection = Date of Inspection above.</div>';
+    return;
   }
-  // Add button only enabled until 'fourth' exists
-  const btn = document.getElementById('btnAddInspectionDate');
-  if (btn) {
-    const have = new Set(_inspectionDatesDraft.map(x => x.level));
-    const next = INSPECTION_LEVELS.find(lv => lv !== 'first' && !have.has(lv));
-    btn.style.display = next ? 'inline-flex' : 'none';
-  }
+  list.innerHTML = '';
+  rows.forEach(e => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px';
+    row.innerHTML = `<span style="min-width:130px;font-size:13px;color:var(--ink)">${INSPECTION_LEVEL_LABELS[e.level] || e.level}</span>`;
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.value = e.date || '';
+    input.style.cssText = 'flex:1';
+    input.onchange = () => { e.date = input.value; };
+    row.appendChild(input);
+    list.appendChild(row);
+  });
 };
 
 const readAbout = () => {
@@ -22426,7 +22451,11 @@ const loadAbout = m => {
   q('#inspectorName').value = m.inspector || '';
   if (q('#phone')) q('#phone').value = m.phone || '';
   if (q('#email')) q('#email').value = m.email || '';
-  // Seed inspection-dates draft (always includes 'first' mirroring meta.date) + render
+  // Auto-ensure the inspection dates implied by the current re-inspection level
+  // (no-op in normal mode), then seed the draft from meta and render. The block is
+  // hidden in normal mode by renderInspectionDateRows.
+  const _projAbout = getProject();
+  if (_projAbout && _projAbout.meta === m) syncInspectionDatesToMode(_projAbout, true);
   _inspectionDatesDraft = getInspectionDates(m);
   renderInspectionDateRows();
 
@@ -28582,6 +28611,7 @@ const renderHistoryCard = (p, container) => {
       firstReInspBtn.onclick = async () => {
         SECOND_REINSPECTION_MODE = false;
         THIRD_REINSPECTION_MODE = false;
+        syncInspectionDatesToMode(p); // 1st re-inspection -> auto-add Second date
         await openProjectForSubmission(p, firstReInspBtn);
       };
       
@@ -28599,7 +28629,7 @@ const renderHistoryCard = (p, container) => {
       secondReInspBtn.onclick = async () => {
         SECOND_REINSPECTION_MODE = true;
         THIRD_REINSPECTION_MODE = false;
-        ensureInspectionDate(p, 'second'); // auto-add 2nd inspection date (editable in About)
+        syncInspectionDatesToMode(p); // 2nd re-inspection -> auto-add up to Third date
         await openProjectForSubmission(p, secondReInspBtn);
       };
       
@@ -28620,7 +28650,7 @@ const renderHistoryCard = (p, container) => {
         thirdReInspBtn.onclick = async () => {
           SECOND_REINSPECTION_MODE = false;
           THIRD_REINSPECTION_MODE = true;
-          ensureInspectionDate(p, 'third'); // auto-add 3rd inspection date (editable in About)
+          syncInspectionDatesToMode(p); // 3rd re-inspection -> capped at Third date
           await openProjectForSubmission(p, thirdReInspBtn);
         };
         actions.appendChild(thirdReInspBtn);
@@ -31650,7 +31680,10 @@ await new Promise(r => setTimeout(r, 10));
 
   const inspectorTxt = p.meta.inspector || '—';
   // Inspection date rows: single "Date of Inspection" for normal projects; the full
-  // First/Second/Third/Fourth list once re-inspection dates exist (none are lost).
+  // First/Second/Third list once re-inspection dates exist (none are lost).
+  // Auto-ensure the dates implied by the active re-inspection level (no-op in normal
+  // mode; no save during report build) so the cover is correct even if About wasn't opened.
+  if (typeof syncInspectionDatesToMode === 'function') syncInspectionDatesToMode(p, false);
   const _inspDates = (typeof getInspectionDates === 'function') ? getInspectionDates(p.meta) : [{ level: 'first', date: p.meta.date || '' }];
   const _hasReInspDates = _inspDates.filter(e => e.level !== 'first').some(e => e.date);
   const inspDateRows = _hasReInspDates
