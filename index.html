@@ -22720,6 +22720,10 @@ const renderFinding = async () => {
       if (elemDiff !== 0) return elemDiff;
       const typeDiff = typeRankFP(a.d.type) - typeRankFP(b.d.type);
       if (typeDiff !== 0) return typeDiff;
+      // FIX: tiebreak by element NAME so custom elements sort predictably (alphabetical)
+      // before falling back to type name. Only runs when elem rank AND type rank are equal.
+      const elemNameDiff = (a.d.element || '').localeCompare(b.d.element || '');
+      if (elemNameDiff !== 0) return elemNameDiff;
       return (a.d.type || '').localeCompare(b.d.type || '');
     });
 
@@ -24352,6 +24356,10 @@ const renderAreaDetail = async () => {
     const typeDiff = typeRank(a.d.type) - typeRank(b.d.type);
     if (typeDiff !== 0) return typeDiff;
     
+    // FIX: tiebreak by element NAME first so custom elements sort predictably
+    // (alphabetical); only runs when elem rank AND type rank are equal.
+    const elemNameDiff = (a.d.element || '').localeCompare(b.d.element || '');
+    if (elemNameDiff !== 0) return elemNameDiff;
     // Finally alphabetical for custom types
     return (a.d.type || '').localeCompare(b.d.type || '');
   });
@@ -31434,6 +31442,10 @@ reportOrder.forEach(area => {
     if (elemDiff !== 0) return elemDiff;
     const typeDiff = typeRankRpt(a.d.type) - typeRankRpt(b.d.type);
     if (typeDiff !== 0) return typeDiff;
+    // FIX: tiebreak by element NAME so custom elements sort predictably (alphabetical);
+    // only runs when elem rank AND type rank are equal. Keeps Report == Finding order.
+    const elemNameDiff = (a.d.element || '').localeCompare(b.d.element || '');
+    if (elemNameDiff !== 0) return elemNameDiff;
     return (a.d.type || '').localeCompare(b.d.type || '');
   });
 
@@ -33831,7 +33843,11 @@ window.twoWaySyncProject = async function(project) {
       // Then by defect type order (not alphabetical)
       const typeDiff = typeRank(a.type) - typeRank(b.type);
       if (typeDiff !== 0) return typeDiff;
-      
+
+      // FIX: tiebreak by element NAME so custom elements sort predictably; only runs
+      // when elem rank AND type rank are equal.
+      const elemNameDiff = (a.element || '').localeCompare(b.element || '');
+      if (elemNameDiff !== 0) return elemNameDiff;
       // Finally alphabetical for custom types
       return (a.type || '').localeCompare(b.type || '');
     });
@@ -38700,6 +38716,10 @@ function mp_buildDefectNumMap(proj) {
       if (elemDiff !== 0) return elemDiff;
       const typeDiff = typeRank(a.type) - typeRank(b.type);
       if (typeDiff !== 0) return typeDiff;
+      // FIX: tiebreak by element NAME so custom elements sort predictably (alphabetical);
+      // only runs when elem rank AND type rank are equal. Keeps MP numbering == report.
+      const elemNameDiff = (a.element || '').localeCompare(b.element || '');
+      if (elemNameDiff !== 0) return elemNameDiff;
       return (a.type || '').localeCompare(b.type || '');
     });
     inArea.forEach(d => {
