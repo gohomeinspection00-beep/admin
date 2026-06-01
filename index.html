@@ -19873,6 +19873,9 @@ q('#submissionImport').addEventListener('change', async e => {
 const reInspectHistoryBtn = q('#reInspectFromHistory');
 if (reInspectHistoryBtn) {
   reInspectHistoryBtn.addEventListener('click', () => {
+    // FIX (M-B): frozen accounts must not enter re-inspection (consistent with #startBtn/
+    // #btnNew/My Orders which all gate on isAccountFrozen). Re-inspection writes + syncs data.
+    if (typeof isAccountFrozen === 'function' && isAccountFrozen()) { showFreezePopup(); return; }
     RE_INSPECTION_MODE = true;
     SECOND_REINSPECTION_MODE = false; // Reset - user will choose when opening project
     THIRD_REINSPECTION_MODE = false;
@@ -19887,6 +19890,8 @@ if (reInspectImportInput) {
   reInspectImportInput.addEventListener('change', async e => {
   const f = e.target.files?.[0];
   if (!f) return;
+  // FIX (M-B): block frozen accounts from re-inspect-via-import too.
+  if (typeof isAccountFrozen === 'function' && isAccountFrozen()) { showFreezePopup(); e.target.value=''; return; }
   reInspectionAtFinding = false; // FIX: Reset flag bila mula re-inspection mode
 
   // Load and initialize defects with reInspection data
@@ -19956,7 +19961,18 @@ function editStatusName(idx) {
   if (!status) return;
   const newName = prompt('Edit status name:', status.name);
   if (!newName || newName.trim() === '') return;
-  reInspectionStatuses[idx].name = newName.trim();
+  const oldName = status.name;
+  const trimmed = newName.trim();
+  if (trimmed === oldName) return;
+  reInspectionStatuses[idx].name = trimmed;
+  // FIX (M-A): migrate existing defects' stored status NAME across all 3 re-inspection
+  // levels (status is stored by name), so a rename doesn't orphan them — losing their
+  // tag colour and treatAsNew/NEW classification and shifting report numbers.
+  (projects || []).forEach(p => (p.defects || []).forEach(d => {
+    ['reInspection', 'secondReInspection', 'thirdReInspection'].forEach(lvl => {
+      if (d[lvl] && d[lvl].status === oldName) d[lvl].status = trimmed;
+    });
+  }));
   saveAllSafe();
   renderStatusCheckboxes();
 }
@@ -22954,9 +22970,11 @@ const renderFinding = async () => {
       if (!RE_INSPECTION_MODE && !SECOND_INSPECTION_SUBMISSION && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
     }
     
-    // isNewInSecondReInspection: visible in SECOND_REINSPECTION_MODE or THIRD/FOURTH_INSPECTION_SUBMISSION
+    // isNewInSecondReInspection: visible in SECOND_REINSPECTION_MODE, THIRD_REINSPECTION_MODE
+    // (FIX H1: carry forward — a defect added at the 2nd re-inspection must still be visible/
+    // re-inspectable at the 3rd level), or THIRD/FOURTH_INSPECTION_SUBMISSION.
     if (d.isNewInSecondReInspection) {
-      if (!SECOND_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
+      if (!SECOND_REINSPECTION_MODE && !THIRD_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
     }
     
     // isNewInThirdReInspection: visible only in THIRD_REINSPECTION_MODE or FOURTH_INSPECTION_SUBMISSION
@@ -24659,9 +24677,11 @@ const renderAreaDetail = async () => {
       if (!RE_INSPECTION_MODE && !SECOND_INSPECTION_SUBMISSION && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
     }
     
-    // isNewInSecondReInspection: visible in SECOND_REINSPECTION_MODE or THIRD/FOURTH_INSPECTION_SUBMISSION
+    // isNewInSecondReInspection: visible in SECOND_REINSPECTION_MODE, THIRD_REINSPECTION_MODE
+    // (FIX H1: carry forward — a defect added at the 2nd re-inspection must still be visible/
+    // re-inspectable at the 3rd level), or THIRD/FOURTH_INSPECTION_SUBMISSION.
     if (d.isNewInSecondReInspection) {
-      if (!SECOND_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
+      if (!SECOND_REINSPECTION_MODE && !THIRD_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
     }
     
     // isNewInThirdReInspection: visible only in THIRD_REINSPECTION_MODE or FOURTH_INSPECTION_SUBMISSION
@@ -24855,6 +24875,9 @@ const renderAreaDetail = async () => {
   const board = q('#areaDetailPlanBoard'); board.innerHTML = '';
   if (plans.length) {
     board.style.display = 'block';
+    // FIX (LOW, symmetric to T3/renderFinding): clamp uiPlanIndex so a single-plan area
+    // (no selector to clamp it) can't render plans[uiPlanIndex]=undefined (blank board).
+    if (uiPlanIndex < 0 || uiPlanIndex >= plans.length) uiPlanIndex = Math.max(0, Math.min(uiPlanIndex, plans.length - 1));
     const im = new Image(); im.src = await resolveRef(plans[uiPlanIndex]);
     im.style.cursor = 'pointer';
     im.onclick = () => resolveRef(plans[uiPlanIndex]).then(src => viewFullImage(src));
@@ -31827,9 +31850,11 @@ const buildReport = async () => {
       if (!RE_INSPECTION_MODE && !SECOND_INSPECTION_SUBMISSION && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
     }
     
-    // isNewInSecondReInspection: visible in SECOND_REINSPECTION_MODE or THIRD/FOURTH_INSPECTION_SUBMISSION
+    // isNewInSecondReInspection: visible in SECOND_REINSPECTION_MODE, THIRD_REINSPECTION_MODE
+    // (FIX H1: carry forward — a defect added at the 2nd re-inspection must still be visible/
+    // re-inspectable at the 3rd level), or THIRD/FOURTH_INSPECTION_SUBMISSION.
     if (d.isNewInSecondReInspection) {
-      if (!SECOND_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
+      if (!SECOND_REINSPECTION_MODE && !THIRD_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
     }
     
     // isNewInThirdReInspection: visible only in THIRD_REINSPECTION_MODE or FOURTH_INSPECTION_SUBMISSION
