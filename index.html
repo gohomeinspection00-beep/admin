@@ -21624,6 +21624,12 @@ async function saveReEditDefect() {
     for (const id of _removedAfterIds) if (!lvl._deletedAfterPhotoIds.includes(id)) lvl._deletedAfterPhotoIds.push(id);
     lvl._afterPhotosModified = Date.now();
   };
+  // FIX (H-A): same deletion-ledger for ORIGINAL (before) photos, which are only written in
+  // 1st-level edit (defect.photos). Capture the pre-edit ids NOW, before defect.photos is
+  // overwritten below; the original-photo cloud merge unions and only drops ids listed in
+  // defect._deletedPhotoIds, so a delete/annotate here must be recorded or it
+  // resurrects/duplicates on sync (the symmetric gap to the after-photo fix).
+  const _origBeforeIds = new Set((defect.photos || []).map(p => getPhotoIdForTracking(p)).filter(Boolean));
 
   // Update defect core data
   // FIX: Only update original defect properties (photos, element, type, description, tag) 
@@ -21635,6 +21641,14 @@ async function saveReEditDefect() {
     defect.description = description;
     defect.photos = editedBeforePhotos;
     defect.tag = reAddDefectData.tag;
+    // FIX (H-A): record removed/replaced original photos into the defect deletion ledger.
+    const _finalBeforeIds = new Set((editedBeforePhotos || []).map(p => getPhotoIdForTracking(p)).filter(Boolean));
+    const _removedBeforeIds = [..._origBeforeIds].filter(id => !_finalBeforeIds.has(id));
+    if (_removedBeforeIds.length) {
+      if (!defect._deletedPhotoIds) defect._deletedPhotoIds = [];
+      for (const id of _removedBeforeIds) if (!defect._deletedPhotoIds.includes(id)) defect._deletedPhotoIds.push(id);
+      defect._photosModified = Date.now();
+    }
   } else if (reAddDefectData.tag) {
     // FIX (M5): the pin/tag is the defect's single pin location (not per-level). The
     // floor plan stays interactive in 2nd/3rd re-inspection, so a moved pin used to be
@@ -23085,6 +23099,9 @@ const renderFinding = async () => {
   const board = q('#planBoard'); board.innerHTML = '';
   if (plans.length) {
     board.style.display = 'block';
+    // FIX (LOW, symmetric to T3): clamp uiPlanIndex itself so a stale value from a screen
+    // with more plans can't make plans[uiPlanIndex] undefined (blank board image).
+    if (uiPlanIndex < 0 || uiPlanIndex >= plans.length) uiPlanIndex = Math.max(0, Math.min(uiPlanIndex, plans.length - 1));
     const im = new Image(); im.src = await resolveRef(plans[uiPlanIndex]);
     im.style.cursor = 'pointer';
     im.onclick = () => resolveRef(plans[uiPlanIndex]).then(src => viewFullImage(src));
@@ -34908,8 +34925,13 @@ document.getElementById('btnSyncReport')?.addEventListener('click', async functi
     await new Promise(r => setTimeout(r, 300));
     
     updateSyncProgress(50, 'Uploading to cloud...');
-    await syncProjectToCloud(p);
-    
+    // FIX (H-B): merge the cloud copy first (two-way) before pushing. Calling
+    // syncProjectToCloud directly did a blind set({merge:true}) that REPLACES the defects
+    // and inspectionDates arrays — dropping a level/defect another device added. twoWaySync
+    // merges (incl. mergeInspectionDates) then pushes via syncProjectToCloud, like the other
+    // sync buttons.
+    await twoWaySyncProject(p);
+
     updateSyncProgress(90, 'Updating status...');
     updateReportBackupStatus();
     
@@ -35035,7 +35057,13 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
             reInspection: d.reInspection ? {
               status: d.reInspection.status || '',
               notes: d.reInspection.notes || '',
-              afterPhotos: d.reInspection.afterPhotoUrls || []
+              afterPhotos: d.reInspection.afterPhotoUrls || d.reInspection.afterPhotos || [],
+              // FIX (LOW): carry L1 per-field timestamps + deletion ledger (2nd/3rd already do)
+              // so a later merge resolves correctly instead of treating them as epoch 0.
+              _statusModified: d.reInspection._statusModified || 0,
+              _notesModified: d.reInspection._notesModified || 0,
+              _afterPhotosModified: d.reInspection._afterPhotosModified || 0,
+              _deletedAfterPhotoIds: d.reInspection._deletedAfterPhotoIds || []
             } : null,
             // FIX (#3): also include 2nd/3rd re-inspection so new defects at those
             // levels keep their status/notes/after-photos via this sync path too.
@@ -35100,6 +35128,11 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
         
         // Update timestamp
         existingProject.meta._lastModified = Math.max(cloudMetaTime, localMetaTime);
+        // FIX (LOW): union-merge inspectionDates so a Second/Third date added on another
+        // device appears via 'Sync All Files' too (this pull path didn't merge it before).
+        if (typeof mergeInspectionDates === 'function') {
+          try { existingProject.meta.inspectionDates = mergeInspectionDates(existingProject.meta, cloudMeta); } catch (e) {}
+        }
         
         // ========== FRONT PHOTO - SMART MERGE ==========
         // Check if local has actual image vs cloud has image
