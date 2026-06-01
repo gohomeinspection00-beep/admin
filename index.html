@@ -41512,7 +41512,7 @@ window.sv_saveUnit=function(){
     projectName:pn||'',unitNo:un||'',unitType:document.getElementById('svUnitType')?.value||'',propertyStatus:document.getElementById('svPropStatus')?.value||'',titleType:document.getElementById('svTitleType')?.value||'',developer:document.getElementById('svDeveloper')?.value?.trim()||'',location:document.getElementById('svLocation')?.value?.trim()||'',visitDate:document.getElementById('svVisitDate')?.value||'',
     agentName:document.getElementById('svAgentName')?.value?.trim()||'',agentPhone:document.getElementById('svAgentPhone')?.value?.trim()||'',agentCompany:document.getElementById('svAgentCompany')?.value?.trim()||'',
     builtUpSqft:parseFloat(document.getElementById('svBuiltUp')?.value)||0,landAreaSqft:parseFloat(document.getElementById('svLandArea')?.value)||0,bedrooms:parseInt(document.getElementById('svBedrooms')?.value)||0,bathrooms:parseInt(document.getElementById('svBathrooms')?.value)||0,carParks:parseInt(document.getElementById('svCarParks')?.value)||0,floorLevel:parseInt(document.getElementById('svFloor')?.value)||0,facing:document.getElementById('svFacing')?.value||'',furnishing:document.getElementById('svFurnishing')?.value||'',
-    askingPrice:parseFloat(document.getElementById('svAskingPrice')?.value)||0,marketValue:parseFloat(document.getElementById('svMarketValue')?.value)||0,pricePerSqft:0,finance:finance,photos:{...sv_formPhotos},
+    askingPrice:parseFloat(document.getElementById('svAskingPrice')?.value)||0,marketValue:parseFloat(document.getElementById('svMarketValue')?.value)||0,pricePerSqft:0,finance:finance,photos:{...sv_formPhotos,interior:[...(sv_formPhotos.interior||[])]},
     pros:document.getElementById('svPros')?.value?.trim()||'',cons:document.getElementById('svCons')?.value?.trim()||'',overallRating:sv_currentRating||0,notes:document.getElementById('svNotes')?.value?.trim()||'',
     // Preserve from existing unit, or defaults for new
     issues: existing?.issues || [],
@@ -41534,10 +41534,25 @@ window.sv_deleteUnit=function(id){if(!confirm('Delete this unit?'))return;
   // locally, but sv_mergeUnits would re-add it from the cloud copy on the next
   // sync (resurrecting a deleted unit). Marking _deleted (and bumping updatedAt)
   // lets the deletion win the merge; list/compare/report already filter _deleted.
-  // Photos are intentionally kept — the unit object still references them.
   const unit=sv_data.units.find(u=>u.id===id);
-  if(unit){unit._deleted=true;sv_touchUnit(unit);}
+  // FIX (#4): free this unit's local IndexedDB photos (unit photos + all issue photos)
+  // so soft-deleted units don't leak storage forever. Survey photos are device-local
+  // (idb:) and never synced, so freeing them on the deleting device is safe.
+  const photoRefs=[];
+  if(unit){
+    const ph=unit.photos||{};
+    if(ph.front)photoRefs.push(ph.front);
+    if(ph.back)photoRefs.push(ph.back);
+    if(ph.floorPlan)photoRefs.push(ph.floorPlan);
+    (ph.interior||[]).forEach(p=>{if(p)photoRefs.push(p)});
+    (unit.issues||[]).forEach(iss=>{(iss.photos||[]).forEach(p=>{if(p)photoRefs.push(p)})});
+    unit._deleted=true;sv_touchUnit(unit);
+  }
   sv_autoSave();sv_renderUnitList();
+  const idbRefs=photoRefs.filter(r=>typeof r==='string'&&r.startsWith('idb:'));
+  if(idbRefs.length>0){
+    try{const db_open=indexedDB.open('goinspect-db');db_open.onsuccess=function(){const db=db_open.result;idbRefs.forEach(ref=>{try{const tx=db.transaction('images','readwrite');tx.objectStore('images').delete(ref.slice(4))}catch(e){}});console.log('Survey: Cleaned '+idbRefs.length+' photos from deleted unit')};db_open.onerror=function(){}}catch(e){}
+  }
 };
 
 // ========= VIEW UNIT DETAIL =========
