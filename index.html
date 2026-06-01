@@ -40993,6 +40993,12 @@ let sv_cloudLoaded = false;
 // newer document timestamp, silently dropping the other device's new/edited units.
 // Merge by unit id, keeping the copy with the newer updatedAt; union units that
 // exist on only one side. Additive + fail-safe: on any error callers fall back.
+// FIX (M1): bump a unit's updatedAt whenever it (or one of its issues) changes,
+// so sv_mergeUnits can pick the genuinely newer copy across devices. Without this
+// stamp, issue-only edits never updated the unit timestamp and the merge always
+// kept the local copy, silently dropping a newer edit from the other device.
+function sv_touchUnit(u) { if (u) u.updatedAt = new Date().toISOString(); }
+
 function sv_mergeUnits(localUnits, cloudUnits) {
   const byId = new Map();
   const t = (u) => Date.parse(u && u.updatedAt) || 0;
@@ -41342,23 +41348,14 @@ window.sv_saveUnit=function(){
 };
 
 window.sv_deleteUnit=function(id){if(!confirm('Delete this unit?'))return;
-  // Collect photo refs before removing unit
+  // FIX (M1): soft-delete instead of hard-remove. A hard filter dropped the unit
+  // locally, but sv_mergeUnits would re-add it from the cloud copy on the next
+  // sync (resurrecting a deleted unit). Marking _deleted (and bumping updatedAt)
+  // lets the deletion win the merge; list/compare/report already filter _deleted.
+  // Photos are intentionally kept — the unit object still references them.
   const unit=sv_data.units.find(u=>u.id===id);
-  const photoRefs=[];
-  if(unit){
-    if(unit.photos?.front)photoRefs.push(unit.photos.front);
-    if(unit.photos?.back)photoRefs.push(unit.photos.back);
-    if(unit.photos?.floorPlan)photoRefs.push(unit.photos.floorPlan);
-    (unit.photos?.interior||[]).forEach(p=>{if(p)photoRefs.push(p)});
-    (unit.issues||[]).forEach(iss=>{(iss.photos||[]).forEach(p=>{if(p)photoRefs.push(p)})});
-  }
-  // Delete unit data first (critical path - must succeed)
-  sv_data.units=sv_data.units.filter(u=>u.id!==id);sv_autoSave();sv_renderUnitList();
-  // Then cleanup orphaned photos (non-critical - fail silently)
-  const idbRefs=photoRefs.filter(r=>typeof r==='string'&&r.startsWith('idb:'));
-  if(idbRefs.length>0){
-    try{const db_open=indexedDB.open('goinspect-db');db_open.onsuccess=function(){const db=db_open.result;idbRefs.forEach(ref=>{try{const imgId=ref.slice(4);const tx=db.transaction('images','readwrite');tx.objectStore('images').delete(imgId)}catch(e){}});console.log('Survey: Cleaned '+idbRefs.length+' orphaned photos')};db_open.onerror=function(){}}catch(e){}
-  }
+  if(unit){unit._deleted=true;sv_touchUnit(unit);}
+  sv_autoSave();sv_renderUnitList();
 };
 
 // ========= VIEW UNIT DETAIL =========
@@ -41453,7 +41450,7 @@ window.sv_saveIssue=function(){
     aiAssessment: existing?.aiAssessment || '',
     aiRecommendation: existing?.aiRecommendation || ''};
   if(sv_editingIssueId){const idx=unit.issues.findIndex(i=>i.id===sv_editingIssueId);if(idx>=0)unit.issues[idx]=d;else unit.issues.push(d)}else{unit.issues.push(d)}
-  sv_autoSave();document.getElementById('svIssueDialog').close();sv_renderUnitDetail();
+  sv_touchUnit(unit);sv_autoSave();document.getElementById('svIssueDialog').close();sv_renderUnitDetail();
 };
 
 window.sv_deleteIssue=function(uid,iid){if(!confirm('Delete?'))return;const u=sv_data.units.find(x=>x.id===uid);if(!u)return;
@@ -41461,7 +41458,7 @@ window.sv_deleteIssue=function(uid,iid){if(!confirm('Delete?'))return;const u=sv
   const iss=(u.issues||[]).find(i=>i.id===iid);
   const photoRefs=(iss?.photos||[]).filter(p=>typeof p==='string'&&p.startsWith('idb:'));
   // Delete issue data first (critical path)
-  u.issues=(u.issues||[]).filter(i=>i.id!==iid);sv_autoSave();sv_renderUnitDetail();
+  u.issues=(u.issues||[]).filter(i=>i.id!==iid);sv_touchUnit(u);sv_autoSave();sv_renderUnitDetail();
   // Cleanup orphaned photos (non-critical - fail silently)
   if(photoRefs.length>0){
     try{const db_open=indexedDB.open('goinspect-db');db_open.onsuccess=function(){const db=db_open.result;photoRefs.forEach(ref=>{try{const tx=db.transaction('images','readwrite');tx.objectStore('images').delete(ref.slice(4))}catch(e){}})};db_open.onerror=function(){}}catch(e){}
@@ -41471,14 +41468,14 @@ window.sv_deleteIssue=function(uid,iid){if(!confirm('Delete?'))return;const u=sv
 // Toggle AI assessment in/out of report
 window.sv_toggleAiInReport=function(uid,checked){
   const u=sv_data.units.find(x=>x.id===uid);if(!u)return;
-  u.includeAiInReport=checked;sv_autoSave();
+  u.includeAiInReport=checked;sv_touchUnit(u);sv_autoSave();
 };
 
 // Update issue repair cost manually
 window.sv_updateIssueCost=function(uid,iid,val){
   const u=sv_data.units.find(x=>x.id===uid);if(!u)return;
   const iss=(u.issues||[]).find(i=>i.id===iid);if(!iss)return;
-  iss.repairCost=val.trim();sv_autoSave();
+  iss.repairCost=val.trim();sv_touchUnit(u);sv_autoSave();
 };
 
 // Helper: get issue cost (manual or AI)
@@ -41538,7 +41535,7 @@ window.sv_analyseIssue=async function(uid,iid){
   const btn=event.target.closest('button')||event.target;btn.textContent='Analysing...';btn.disabled=true;
   try{const t=await sv_callAI(`Analyse property defect:\nArea: ${iss.area}\nCategory: ${iss.category}\nSeverity: ${iss.severity}\nDescription: ${iss.description}\n\nJSON only (no backticks):\n{"estimatedCost":"500-1500","severityScore":6,"assessment":"Brief assessment","recommendation":"What to do"}`);
   const p=sv_parseAiJson(t);
-  if(p){iss.aiEstimatedCost=p.estimatedCost||'';iss.aiAssessment=p.assessment||'';iss.aiRecommendation=p.recommendation||'';if(!iss.repairCost)iss.repairCost=p.estimatedCost||'';sv_autoSave();sv_renderUnitDetail()}
+  if(p){iss.aiEstimatedCost=p.estimatedCost||'';iss.aiAssessment=p.assessment||'';iss.aiRecommendation=p.recommendation||'';if(!iss.repairCost)iss.repairCost=p.estimatedCost||'';sv_touchUnit(u);sv_autoSave();sv_renderUnitDetail()}
   else{if(confirm('AI response format tidak dikenali. Cuba lagi?'))sv_analyseIssue(uid,iid)}}
   catch(e){if(confirm('AI gagal: '+e.message+'\n\nCuba lagi?'))sv_analyseIssue(uid,iid)}btn.textContent='Analyse';btn.disabled=false;
 };
@@ -41551,7 +41548,7 @@ window.sv_generateAiAssessment=async function(uid){
   try{const is=(u.issues||[]).map(i=>`- ${i.category} in ${i.area} (${i.severity})${i.aiEstimatedCost?' ~RM'+i.aiEstimatedCost:''}: ${i.description}`).join('\n');
   const t=await sv_callAI(`Overall property assessment:\nProperty: ${u.projectName} - ${u.unitNo}\nType: ${u.unitType}\nPrice: RM ${(u.askingPrice||0).toLocaleString()}\nSize: ${u.builtUpSqft||0} sqft\nLocation: ${u.location}\nPros: ${u.pros||'-'}\nCons: ${u.cons||'-'}\nIssues (${(u.issues||[]).length}):\n${is||'None'}\n\nJSON only:\n{"verdict":"Recommended|Proceed with Caution|Not Recommended","totalRepairEstimate":"2000-5000","assessment":"2-3 sentence assessment"}`);
   const p=sv_parseAiJson(t);
-  if(p){u.aiVerdict=p.verdict||'Proceed with Caution';u.aiTotalRepairEstimate=p.totalRepairEstimate||'';u.aiOverallAssessment=p.assessment||'';sv_autoSave();sv_renderUnitDetail()}
+  if(p){u.aiVerdict=p.verdict||'Proceed with Caution';u.aiTotalRepairEstimate=p.totalRepairEstimate||'';u.aiOverallAssessment=p.assessment||'';sv_touchUnit(u);sv_autoSave();sv_renderUnitDetail()}
   else{if(confirm('AI response format tidak dikenali. Cuba lagi?')){document.getElementById('svAiLoading')?.remove();sv_generateAiAssessment(uid);return}}}
   catch(e){if(confirm('AI gagal: '+e.message+'\n\nCuba lagi?')){document.getElementById('svAiLoading')?.remove();sv_generateAiAssessment(uid);return}}document.getElementById('svAiLoading')?.remove();
 };
