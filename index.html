@@ -9782,9 +9782,16 @@ const autoBackupPending = async () => {
     }
     
     try {
-      await silentBackupProject(project);
-      clearPendingUpload(projectId);
-      console.log('Auto-backup success:', projectId);
+      // FIX (M2): silentBackupProject returns false when the push was only queued
+      // (sync too soon / locked / offline). Only clear the pending flag when it
+      // actually completed, otherwise the project can be silently never uploaded.
+      const didSync = await silentBackupProject(project);
+      if (didSync !== false) {
+        clearPendingUpload(projectId);
+        console.log('Auto-backup success:', projectId);
+      } else {
+        console.log('Auto-backup queued (kept pending):', projectId);
+      }
     } catch (e) {
       console.error('Auto-backup failed for', projectId, e);
     }
@@ -10065,7 +10072,7 @@ const silentBackupProject = async (projectOrId) => {
     } else {
       markPendingUpload(projectOrId.id);
     }
-    return;
+    return false; // FIX (M2): not pushed (offline) -> callers must keep pending flag
   }
   
   // Accept both project object or project ID
