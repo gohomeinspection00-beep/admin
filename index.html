@@ -29942,27 +29942,51 @@ async function handleDirectPDF() {
             if (natW > 0 && natH > 0) {
               // Detect if this wrap has a maxWidth constraint (e.g. cover photo = 120mm ≈ 454px)
               const origWrap = origPlanWraps[wIdx];
+              const isCoverPhoto = !!(origWrap && origWrap.dataset && origWrap.dataset.coverPhoto === '1');
               let containerW = A4_CONTENT_WIDTH_PX;
               if (origWrap && origWrap.style.maxWidth) {
                 const mw = origWrap.style.maxWidth;
                 if (mw.includes('mm')) containerW = Math.round(parseFloat(mw) * 3.78); // mm to px
                 else if (mw.includes('px')) containerW = parseInt(mw);
               }
-              
-              // Calculate contain-fit dimensions
-              const ratioW = containerW / natW;
-              const ratioH = MAX_PLAN_HEIGHT_PX / natH;
-              const fitScale = Math.min(ratioW, ratioH);
-              const fitW = Math.round(natW * fitScale);
-              const fitH = Math.round(natH * fitScale);
-              
-              img.style.width = fitW + 'px';
-              img.style.height = fitH + 'px';
-              img.style.maxWidth = '100%';
-              img.style.maxHeight = 'none';
-              img.style.objectFit = 'fill';
-              img.style.display = 'block';
-              img.style.margin = '0 auto';
+
+              if (isCoverPhoto) {
+                // 1:1 square center-crop (object-fit:cover equivalent; html2canvas can't
+                // do object-fit). Fill a fixed square and clip the overflow.
+                const side = containerW; // square side (120mm ≈ 454px)
+                const coverScale = Math.max(side / natW, side / natH);
+                const cw = Math.round(natW * coverScale);
+                const ch = Math.round(natH * coverScale);
+                wrap.style.width = side + 'px';
+                wrap.style.height = side + 'px';
+                wrap.style.maxWidth = side + 'px';
+                wrap.style.overflow = 'hidden';
+                wrap.style.position = 'relative';
+                img.style.position = 'absolute';
+                img.style.width = cw + 'px';
+                img.style.height = ch + 'px';
+                img.style.left = Math.round((side - cw) / 2) + 'px';
+                img.style.top = Math.round((side - ch) / 2) + 'px';
+                img.style.maxWidth = 'none';
+                img.style.maxHeight = 'none';
+                img.style.objectFit = 'fill';
+                img.style.margin = '0';
+              } else {
+                // Calculate contain-fit dimensions (floor plans — unchanged)
+                const ratioW = containerW / natW;
+                const ratioH = MAX_PLAN_HEIGHT_PX / natH;
+                const fitScale = Math.min(ratioW, ratioH);
+                const fitW = Math.round(natW * fitScale);
+                const fitH = Math.round(natH * fitScale);
+
+                img.style.width = fitW + 'px';
+                img.style.height = fitH + 'px';
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = 'none';
+                img.style.objectFit = 'fill';
+                img.style.display = 'block';
+                img.style.margin = '0 auto';
+              }
             }
           });
           
@@ -31667,10 +31691,20 @@ await new Promise(r => setTimeout(r, 10));
   const coverSrc = p.meta.frontRef ? await resolveRef(p.meta.frontRef)
                  : (p.meta.planRefs?.length ? await resolveRef(p.meta.planRefs[0]) : '');
   if (coverSrc) {
+    const isFrontPhoto = !!p.meta.frontRef; // real front-house photo -> 1:1 crop like defect photos
     const wrap = document.createElement('div'); wrap.className='plan-wrap';
     wrap.style.maxWidth = '120mm'; wrap.style.margin = '6mm auto';
     const img = new Image();
     img.src = coverSrc;
+    if (isFrontPhoto) {
+      // Square 1:1, center-cropped (same concept as defect photos). The flag tells the
+      // html2canvas PDF pass to crop to a square instead of contain-fitting. The floor-plan
+      // fallback (no front photo) keeps the default contain behaviour below.
+      wrap.dataset.coverPhoto = '1';
+      wrap.style.width = '120mm';
+      wrap.style.aspectRatio = '1 / 1';
+      img.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block;';
+    }
     await new Promise(res => {
       if (img.complete) return res();
       img.onload = res; img.onerror = res; setTimeout(res, 5000);
