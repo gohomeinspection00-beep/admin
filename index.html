@@ -41111,6 +41111,7 @@ let sv_compareSelection = [];
 let sv_reportMode = 'single';
 let sv_reportUnitIds = [];
 let sv_zoomLevel = 0.5;
+let sv_reportReady = false; // FIX (F4): true once the report DOM is fully built
 let sv_saveTimeout = null;
 const SV_COLLECTION = 'homeSurveys';
 
@@ -41129,6 +41130,15 @@ let sv_cloudLoaded = false;
 // replaces the whole units array, so saving before the initial load merges in the
 // existing cloud units would overwrite/lose them.
 let sv_cloudFetched = false;
+// FIX (F2): serialize cloud ops so fire-and-forget saves and double-tap loads can't
+// overlap and race sv_data.units. sv_loadInFlight de-dupes concurrent loads; sv_saveChain
+// runs saves strictly one-after-another.
+let sv_loadInFlight = null;
+let sv_saveChain = Promise.resolve();
+// FIX (F1): the background photo-migration push runs at most once per page session
+// (sv_enterModule must NOT reset this), so an unresolvable local photo can't trigger a
+// redundant Storage/Firestore write on every module entry.
+let sv_photoMigrationTried = false;
 
 // FIX (#B2): per-unit merge so editing/adding units on two devices doesn't lose
 // data. Previously the whole units array was replaced by whichever side had the
@@ -41155,7 +41165,14 @@ function sv_mergeUnits(localUnits, cloudUnits) {
   return Array.from(byId.values());
 }
 
-async function sv_loadFromCloud() {
+// FIX (F2): de-dupe concurrent loads — a second call while one is in flight returns the
+// same promise instead of starting an overlapping fetch/merge that races sv_data.
+function sv_loadFromCloud() {
+  if (sv_loadInFlight) return sv_loadInFlight;
+  sv_loadInFlight = sv_loadFromCloudInner().finally(() => { sv_loadInFlight = null; });
+  return sv_loadInFlight;
+}
+async function sv_loadFromCloudInner() {
   const uid = sv_getUserId();
   const key = 'sv_data_' + (uid || 'guest');
   // One-time migration: older builds keyed Survey data as 'guest' (uid was never set),
@@ -41210,7 +41227,9 @@ async function sv_loadFromCloud() {
         localStorage.setItem(key, JSON.stringify(sv_data));
         const cloudIds = new Set(cloudUnits.map(u => u && u.id));
         const mergedDiffers = merged.length !== cloudUnits.length || merged.some(u => !cloudIds.has(u.id));
-        if (mergedDiffers) await sv_saveToCloud();
+        // FIX (F3): keep the merged Math.max(local,cloud) timestamp instead of letting
+        // the push overwrite it with Date.now().
+        if (mergedDiffers) await sv_saveToCloud({ keepTimestamp: true });
       } catch (e) {}
     } else if ((sv_data.units || []).length > 0) {
       // Cloud is empty/missing but we have local (e.g. migrated guest) data -> push it
@@ -41224,16 +41243,28 @@ async function sv_loadFromCloud() {
     // in the background so sv_saveToCloud uploads them to Storage. Not awaited (doesn't
     // delay the list render); if the merge branch above already pushed, photos are already
     // URLs so this is a cheap no-op.
+    // FIX (F1): run the migration push at most once per session (not reset by
+    // sv_enterModule), so an unresolvable local photo can't spam writes on every entry.
     try {
-      if ((sv_data.units || []).some(u => u && !u._deleted && sv_unitHasLocalPhoto(u))) sv_saveToCloud();
+      if (!sv_photoMigrationTried && (sv_data.units || []).some(u => u && !u._deleted && sv_unitHasLocalPhoto(u))) {
+        sv_photoMigrationTried = true;
+        sv_saveToCloud();
+      }
     } catch (e) {}
   } catch(e) { console.log('Survey: Cloud load failed', e.message); }
 }
 
-async function sv_saveToCloud() {
+// FIX (F2): serialize saves — chain each call so two never run concurrently (which could
+// race the sv_data.units array / clobber lastModified / drop a photo URL swap).
+function sv_saveToCloud(opts) {
+  sv_saveChain = sv_saveChain.then(() => sv_saveToCloudInner(opts)).catch(e => { console.log('Survey: save chain error', e && e.message); });
+  return sv_saveChain;
+}
+async function sv_saveToCloudInner(opts) {
+  opts = opts || {};
   const uid = sv_getUserId();
-  // Stamp local modification time
-  sv_data.lastModified = Date.now();
+  // Stamp local modification time (FIX F3: callers may keep an already-merged timestamp)
+  if (!opts.keepTimestamp) sv_data.lastModified = Date.now();
   // Always save to localStorage
   try {
     localStorage.setItem('sv_data_' + (uid || 'guest'), JSON.stringify(sv_data));
@@ -41879,15 +41910,20 @@ window.sv_zoom = function(delta) {
 
 // ========= RENDER REPORT =========
 window.sv_renderCurrentReport = async function() {
+  sv_reportReady = false; // FIX (F4): block Download/Print until the report DOM is built
   sv_zoomLevel = 0.5;
   const root = document.getElementById('svReportRoot');
   if (root) { root.style.transform = `scale(0.5)`; root.style.transformOrigin = 'top center'; }
   document.getElementById('svZoomLevel').textContent = '50%';
 
-  if (sv_reportMode === 'compare' && sv_reportUnitIds.length === 2) {
-    await sv_buildCompareReport();
-  } else if (sv_reportUnitIds.length >= 1) {
-    await sv_buildSingleReport(sv_reportUnitIds[0]);
+  try {
+    if (sv_reportMode === 'compare' && sv_reportUnitIds.length === 2) {
+      await sv_buildCompareReport();
+    } else if (sv_reportUnitIds.length >= 1) {
+      await sv_buildSingleReport(sv_reportUnitIds[0]);
+    }
+  } finally {
+    sv_reportReady = true;
   }
 };
 
@@ -42254,6 +42290,8 @@ async function sv_generateCompareAI(u1, u2) {
 
 // ========= PDF & PRINT =========
 window.sv_printReport = function() {
+  // FIX (F4): the report builds asynchronously; don't print a half-built/empty DOM.
+  if (!sv_reportReady) { alert('Report is still loading — please wait a moment and try again.'); return; }
   const root = document.getElementById('svReportRoot');
   if (root) {
     root.style.transform = 'none';
@@ -42274,6 +42312,8 @@ window.sv_printReport = function() {
 };
 
 window.sv_downloadPdf = async function() {
+  // FIX (F4): the report builds asynchronously; don't capture a half-built/empty DOM.
+  if (!sv_reportReady) { alert('Report is still loading — please wait a moment and try again.'); return; }
   const root = document.getElementById('svReportRoot');
   if (!root) return;
 
