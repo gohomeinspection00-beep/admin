@@ -22240,8 +22240,10 @@ async function downloadImageToLocal(url, index, type) {
 // Stored in meta.inspectionDates = [{level,date}]. meta.date stays the FIRST date
 // (source of truth); the 'first' entry always mirrors it. Older projects with no
 // inspectionDates derive a sane list from meta.date so nothing is lost.
-const INSPECTION_LEVELS = ['first', 'second', 'third', 'fourth'];
-const INSPECTION_LEVEL_LABELS = { first: 'First Inspection', second: 'Second Inspection', third: 'Third Inspection', fourth: 'Fourth Inspection' };
+// App supports up to THIRD inspection only (Fourth is a contact-admin placeholder),
+// so the inspection-date list caps at 'third' — no Fourth date row.
+const INSPECTION_LEVELS = ['first', 'second', 'third'];
+const INSPECTION_LEVEL_LABELS = { first: 'First Inspection', second: 'Second Inspection', third: 'Third Inspection' };
 
 const getInspectionDates = (m) => {
   m = m || {};
