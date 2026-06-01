@@ -13621,14 +13621,14 @@ const getDeletedProjectIds = () => {
   }
 };
 
-// Get deleted project IDs that are still within 30-day hide period (for device-level delete)
+// Get deleted project IDs to hide on THIS device. Device-delete hides permanently
+// (cloud copy is untouched; restore any time via History → Sync Cloud → Choose Files).
 const getHiddenProjectIds = () => {
   try {
     const data = JSON.parse(localStorage.getItem(LS_DELETED_KEY) || '{}');
     if (Array.isArray(data)) return data; // Old format - return as is
-    
-    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-    return Object.keys(data).filter(id => data[id] > thirtyDaysAgo);
+    // FIX: no 30-day window — stay hidden until the user explicitly restores.
+    return Object.keys(data);
   } catch {
     return [];
   }
@@ -14895,31 +14895,19 @@ const cleanupLocalStorage = () => {
     console.warn('URL cache cleanup failed:', e);
   }
   
-  // 3. Clean old deleted project IDs (older than 30 days)
-  // After 30 days, deleted projects will show in Choose Files again (can be restored)
+  // 3. Normalize the deleted-project-IDs store (migrate legacy array format).
+  // FIX: do NOT prune entries after 30 days — device-delete hides a project
+  // permanently on this device. The cloud copy is untouched and the project can
+  // be restored any time via History → Sync Cloud → Choose Files.
   try {
     let data = JSON.parse(localStorage.getItem(LS_DELETED_KEY) || '{}');
-    
+
     // Migrate old array format if needed
     if (Array.isArray(data)) {
       const migrated = {};
       data.forEach(id => { migrated[id] = Date.now(); });
       data = migrated;
-    }
-    
-    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-    let cleanedCount = 0;
-    
-    for (const id of Object.keys(data)) {
-      if (data[id] < thirtyDaysAgo) {
-        delete data[id];
-        cleanedCount++;
-      }
-    }
-    
-    if (cleanedCount > 0) {
       localStorage.setItem(LS_DELETED_KEY, JSON.stringify(data));
-      console.log(`Cleaned ${cleanedCount} old deleted project IDs (>30 days) - will show in Choose Files`);
       cleaned = true;
     }
   } catch (e) {
@@ -15638,7 +15626,7 @@ function showDeleteFromDevicePopup() {
       const idx = window.projects.findIndex(p => p.id === id);
       if (idx !== -1) {
         window.projects.splice(idx, 1);
-        markProjectAsDeleted(id); // Mark as deleted (will show in Choose Files after 30 days)
+        markProjectAsDeleted(id); // Hide on this device permanently; restore any time via Choose Files
         deletedCount++;
       }
     }
