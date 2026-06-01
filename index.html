@@ -22693,14 +22693,26 @@ const renderFinding = async () => {
 
   // Helper function to check if defect should be treated as "new"
   const isNewDefect = (d) => {
-    // In SECOND_REINSPECTION_MODE: defects added in first re-inspection are NO LONGER "new"
-    // They become regular defects that can be re-inspected
-    if ((SECOND_REINSPECTION_MODE || THIRD_REINSPECTION_MODE) && d.isNewInReInspection) return false;
-    
+    // FIX: decide "new" using the CURRENT re-inspection level's status — identical to
+    // the report (buildReport isNew split). Previously this always read the FIRST level
+    // (reInspection.status), so a treatAsNew status set at 2nd/3rd level (or set at 1st
+    // but not current) made Finding disagree with the report on NEW markers and shifted
+    // every following defect number between Finding and report.
+    // Mirror the report's isNew split EXACTLY (buildReport): 2nd/3rd levels decide
+    // purely by the current level's treatAsNew status (NOT the isNewInSecond/Third
+    // flag), so Finding numbering/markers match the delivered report.
+    if (THIRD_REINSPECTION_MODE) {
+      const s = d.thirdReInspection?.status || '';
+      return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
+    }
+    if (SECOND_REINSPECTION_MODE) {
+      const s = d.secondReInspection?.status || '';
+      return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
+    }
+    // First re-inspection / normal: isNewInReInspection OR 1st-level treatAsNew status
     if (d.isNewInReInspection) return true;
-    const defectStatus = d.reInspection?.status || '';
-    const statusInfo = reInspectionStatuses.find(s => s.name === defectStatus);
-    return statusInfo?.treatAsNew || false;
+    const s = d.reInspection?.status || '';
+    return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
   };
 
   // FIX 4: Get defects to display - filter deleted, and in Normal Mode exclude new defects
@@ -24323,14 +24335,26 @@ const renderAreaDetail = async () => {
 
   // Helper function to check if defect should be treated as "new"
   const isNewDefect = (d) => {
-    // In SECOND_REINSPECTION_MODE: defects added in first re-inspection are NO LONGER "new"
-    // They become regular defects that can be re-inspected
-    if ((SECOND_REINSPECTION_MODE || THIRD_REINSPECTION_MODE) && d.isNewInReInspection) return false;
-    
+    // FIX: decide "new" using the CURRENT re-inspection level's status — identical to
+    // the report (buildReport isNew split). Previously this always read the FIRST level
+    // (reInspection.status), so a treatAsNew status set at 2nd/3rd level (or set at 1st
+    // but not current) made Finding disagree with the report on NEW markers and shifted
+    // every following defect number between Finding and report.
+    // Mirror the report's isNew split EXACTLY (buildReport): 2nd/3rd levels decide
+    // purely by the current level's treatAsNew status (NOT the isNewInSecond/Third
+    // flag), so Finding numbering/markers match the delivered report.
+    if (THIRD_REINSPECTION_MODE) {
+      const s = d.thirdReInspection?.status || '';
+      return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
+    }
+    if (SECOND_REINSPECTION_MODE) {
+      const s = d.secondReInspection?.status || '';
+      return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
+    }
+    // First re-inspection / normal: isNewInReInspection OR 1st-level treatAsNew status
     if (d.isNewInReInspection) return true;
-    const defectStatus = d.reInspection?.status || '';
-    const statusInfo = reInspectionStatuses.find(s => s.name === defectStatus);
-    return statusInfo?.treatAsNew || false;
+    const s = d.reInspection?.status || '';
+    return reInspectionStatuses.find(x => x.name === s)?.treatAsNew || false;
   };
 
   // FIX 5: In Normal Mode, exclude new defects and deleted defects
