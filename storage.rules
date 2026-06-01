@@ -1,0 +1,48 @@
+rules_version = '2';
+
+// =============================================================================
+// GoInspect — Firebase Storage Security Rules  (TEMPLATE — VERIFY BEFORE DEPLOY)
+// -----------------------------------------------------------------------------
+// Scopes photo uploads to the owning account. Download URLs returned by the app
+// carry an access token, so reads are allowed (the app shares those URLs across
+// devices); writes are restricted to the owner.
+//
+// ⚠️ IMPORTANT: deploying Storage rules affects ALL uploads. This file covers the
+// two prefixes the app uses today:
+//   - inspections/<email>/...   (inspection module photos)
+//   - surveys/<email>/...       (Home Survey photos — new)
+// If your app uploads to any OTHER path, ADD it here first, then test in the
+// Firebase Console "Rules Playground" with a real account BEFORE deploying, or
+// uploads will start failing. If you do NOT deploy this (Storage stays in test
+// mode), the app still works — this only adds protection.
+//
+// NOTE ON EMAIL CASE: the app lowercases emails; we compare against
+// request.auth.token.email.lower(). Verify lower() in the Playground if any
+// account uses a mixed-case email.
+// =============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() { return request.auth != null; }
+    function myEmail() { return isSignedIn() ? request.auth.token.email.lower() : ''; }
+
+    // Home Survey photos: surveys/<email>/<unitId>/<file>
+    match /surveys/{accountEmail}/{allPaths=**} {
+      allow read:  if true;                                  // download URLs carry a token
+      allow write: if isSignedIn() && accountEmail == myEmail();
+    }
+
+    // Inspection photos: inspections/<email>/<projectId>/<file>
+    match /inspections/{accountEmail}/{allPaths=**} {
+      allow read:  if true;
+      allow write: if isSignedIn() && accountEmail == myEmail();
+    }
+
+    // Everything else: deny by default. If the app uses other Storage paths, add
+    // explicit match blocks above BEFORE deploying (otherwise those uploads break).
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

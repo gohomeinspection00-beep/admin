@@ -41219,6 +41219,14 @@ async function sv_loadFromCloud() {
       await sv_saveToCloud();
     }
     sv_cloudLoaded = true;
+    // FIX (#1): one-time migration — if any unit still has device-local photos (e.g. old
+    // data uploaded before this feature, or photos that haven't uploaded yet), push once
+    // in the background so sv_saveToCloud uploads them to Storage. Not awaited (doesn't
+    // delay the list render); if the merge branch above already pushed, photos are already
+    // URLs so this is a cheap no-op.
+    try {
+      if ((sv_data.units || []).some(u => u && !u._deleted && sv_unitHasLocalPhoto(u))) sv_saveToCloud();
+    } catch (e) {}
   } catch(e) { console.log('Survey: Cloud load failed', e.message); }
 }
 
@@ -41239,6 +41247,19 @@ async function sv_saveToCloud() {
   // units) would overwrite existing cloud units. The data is safe in localStorage and
   // sv_loadFromCloud will merge + push it once the fetch completes.
   if (!sv_cloudFetched) { console.log('Survey: cloud not fetched yet — deferring cloud write (saved locally)'); return; }
+  // FIX (#1): upload any device-local photos to Storage and swap refs -> https URLs so the
+  // cloud doc stores shareable URLs (photos sync to other devices). Failures keep the
+  // local ref (never lost) and just retry next time; already-URL photos are skipped with
+  // no network. Persist the ref->URL swaps locally before the Firestore write.
+  try {
+    let anyChanged = false;
+    for (const u of (sv_data.units || [])) {
+      if (u && !u._deleted) { if (await sv_uploadUnitPhotos(u, uid)) anyChanged = true; }
+    }
+    if (anyChanged) {
+      try { localStorage.setItem('sv_data_' + (uid || 'guest'), JSON.stringify(sv_data)); } catch (e) {}
+    }
+  } catch (e) { console.log('Survey: photo upload pass error', e.message); }
   try {
     const db = firebase.firestore();
     if (!db) return;
@@ -41260,6 +41281,62 @@ async function sv_resolvePhoto(ref) {
   if (typeof ref==='string' && (ref.startsWith('data:')||ref.startsWith('http')||ref.startsWith('blob:'))) return ref;
   if (typeof resolveRef==='function') { try { return await resolveRef(ref); } catch(e) { return null; } }
   return null;
+}
+
+// FIX (#1): does a unit still have any device-local (non-http) photo? Used to decide
+// whether to run a one-time upload pass after loading.
+function sv_unitHasLocalPhoto(u) {
+  if (!u) return false;
+  const isLocal = r => typeof r === 'string' && r && !r.startsWith('http');
+  const ph = u.photos || {};
+  if (isLocal(ph.front) || isLocal(ph.back) || isLocal(ph.floorPlan)) return true;
+  if ((ph.interior || []).some(isLocal)) return true;
+  if ((u.issues || []).some(iss => (iss.photos || []).some(isLocal))) return true;
+  return false;
+}
+
+// FIX (#1): upload a unit's local photos (idb:/data:) to Firebase Storage and replace the
+// refs with https download URLs, so survey photos sync across devices (the cloud doc
+// previously stored only local idb: refs that don't exist on other devices). CONSERVATIVE:
+//  - reuses the same tested uploader as the inspection module (uploadImageToStorage);
+//  - on ANY failure (offline / can't resolve / upload error) it KEEPS the original ref,
+//    so a photo is never lost — it just retries on the next save;
+//  - it does NOT delete the local idb copy (kept as a cache).
+// Returns true if at least one ref was replaced with a URL.
+async function sv_uploadUnitPhotos(unit, uid) {
+  if (!unit || !uid) return false;
+  if (typeof uploadImageToStorage !== 'function' || typeof hashPhotoForSync !== 'function') return false;
+  let changed = false;
+  const up = async (ref, label) => {
+    if (!ref || typeof ref !== 'string') return ref;
+    if (ref.startsWith('http')) return ref;            // already uploaded -> no network
+    let dataUrl = ref;
+    if (!ref.startsWith('data:')) {
+      try { dataUrl = await sv_resolvePhoto(ref); } catch (e) { dataUrl = null; }
+    }
+    if (!dataUrl || !dataUrl.startsWith('data:')) return ref; // can't resolve -> keep local ref
+    const hash = (hashPhotoForSync(dataUrl) || Math.random().toString(36).slice(2));
+    const path = `surveys/${uid}/${unit.id}/${label}_${hash}.jpg`;
+    let url = null;
+    try { url = await uploadImageToStorage(dataUrl, path); } catch (e) { url = null; }
+    if (url && typeof url === 'string' && url.startsWith('http')) { changed = true; return url; }
+    return ref; // upload failed -> keep local ref, retry next time (never null)
+  };
+  const ph = unit.photos || (unit.photos = {});
+  ph.front = await up(ph.front, 'front');
+  ph.back = await up(ph.back, 'back');
+  ph.floorPlan = await up(ph.floorPlan, 'floorPlan');
+  if (Array.isArray(ph.interior)) {
+    for (let i = 0; i < ph.interior.length; i++) ph.interior[i] = await up(ph.interior[i], 'interior' + i);
+  }
+  if (Array.isArray(unit.issues)) {
+    for (const iss of unit.issues) {
+      if (iss && Array.isArray(iss.photos)) {
+        for (let j = 0; j < iss.photos.length; j++) iss.photos[j] = await up(iss.photos[j], 'issue_' + (iss.id || 'x') + '_' + j);
+      }
+    }
+  }
+  return changed;
 }
 
 function sv_handleFileInput(inputEl, callback) {
