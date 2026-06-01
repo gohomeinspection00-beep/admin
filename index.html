@@ -12144,9 +12144,12 @@ const silentBackupProject = async (projectOrId) => {
             continue;
           }
           
-          // If cloud has the area (not deleted), it means cloud restored it
-          // Apply restoration if cloud is newer
-          if (cloudMetaTime > localDeletedTime) {
+          // If cloud has the area (not deleted), it means cloud restored it.
+          // FIX (#3): only restore when cloud has a genuine area-specific RESTORE
+          // time newer than our local delete — NOT just a newer project meta time
+          // (which any stale device bumps on any edit, wrongly resurrecting deletes).
+          const cloudRestoredTime = (cloudBackup?.meta?._restoredAreasTimes || {})[area] || 0;
+          if (cloudRestoredTime > localDeletedTime) {
             const idx = (localProject.meta._deletedAreas || []).indexOf(area);
             if (idx > -1) {
               localProject.meta._deletedAreas.splice(idx, 1);
@@ -14236,7 +14239,10 @@ const pullFromCloud = async () => {
       // If cloud has area (and NOT in cloud._deletedAreas) but local has it in _deletedAreas
       if (localDeletedAreas.has(area)) {
         const localDeletedTime = localDeletedAreasTimes[area] || 0;
-        if (cloudMetaTime > localDeletedTime) {
+        // FIX (#3): require a genuine cloud area-restore time (not just newer project
+        // meta time, which any stale device bumps) before un-deleting locally.
+        const cloudRestoredTime = (cloudMeta._restoredAreasTimes || {})[area] || 0;
+        if (cloudRestoredTime > localDeletedTime) {
           // Restore from cloud
           const idx = (p.meta._deletedAreas || []).indexOf(area);
           if (idx > -1) {
@@ -23269,7 +23275,10 @@ const renderFinding = async () => {
             // If cloud has area (and NOT in cloud._deletedAreas) but local has it in _deletedAreas
             if (localDeletedAreas.includes(area)) {
               const localDeletedTime = localDeletedAreasTimes[area] || 0;
-              if (cloudMetaTime > localDeletedTime) {
+              // FIX (#3): require a genuine cloud area-restore time (not just newer
+              // project meta time, which any stale device bumps) before un-deleting.
+              const cloudRestoredTime = (backup.meta?._restoredAreasTimes || {})[area] || 0;
+              if (cloudRestoredTime > localDeletedTime) {
                 // Restore from cloud
                 const idx = (p.meta._deletedAreas || []).indexOf(area);
                 if (idx > -1) {
