@@ -21697,12 +21697,18 @@ async function renderReAddFloorPlan() {
   // FIX (#1): use the floor plan this area is actually assigned to (was hardcoded 0,
   // so an area on plan 2 wrongly showed/tagged plan 1). Mirrors the normal flow.
   const _reArea = (q('#reAddLocation')?.textContent) || currentAreaForDetail || '';
-  // FIX (M4): when the area has an assigned plan, use it; otherwise default to the plan the
-  // user is currently viewing (uiPlanIndex) instead of always plan 0 — previously a new
-  // re-inspection defect was tagged on plan 0 even while the user was looking at plan 2.
-  let planIdx = (proj.meta.areaFloorPlans && proj.meta.areaFloorPlans[_reArea] != null)
-    ? proj.meta.areaFloorPlans[_reArea]
-    : (typeof uiPlanIndex === 'number' ? uiPlanIndex : 0);
+  // FIX (T1): when EDITING a defect that already has a pin, show the plan the pin is
+  // actually on (tag.planIndex) so it isn't mis-drawn on a different plan and a tap can't
+  // silently relocate it. Otherwise (new defect / no tag) fall back to M4: the area's
+  // assigned plan, else the plan the user is currently viewing, else plan 0.
+  let planIdx;
+  if (reAddDefectData.tag && typeof reAddDefectData.tag.planIndex === 'number') {
+    planIdx = reAddDefectData.tag.planIndex;
+  } else if (proj.meta.areaFloorPlans && proj.meta.areaFloorPlans[_reArea] != null) {
+    planIdx = proj.meta.areaFloorPlans[_reArea];
+  } else {
+    planIdx = (typeof uiPlanIndex === 'number' ? uiPlanIndex : 0);
+  }
   if (planIdx < 0 || planIdx >= plans.length) planIdx = 0; // safety clamp
   
   if (plans.length > 0 && plans[planIdx]) {
@@ -22981,7 +22987,10 @@ const renderFinding = async () => {
 
   // Untuk setiap area, susun defect mengikut element + type, kemudian assign nombor berturut-turut
   // EXCLUDE new defects from numbering in RE_INSPECTION_MODE
-  const reportOrder = getReportOrder();
+  // FIX (R1): include out-of-area defect locations (location not in meta.areas) so they
+  // get numbered here too — keeps the live Finding numbering consistent with the report.
+  const reportOrder = getReportOrder().slice();
+  defectsToDisplay.forEach(d => { if (d && d.location && !reportOrder.includes(d.location)) reportOrder.push(d.location); });
   const allDefectsWithNumbers = [];
   let globalNum = 1;
 
@@ -23954,7 +23963,15 @@ const renderFinding = async () => {
           
           // Count active defects (not deleted and not ANY new re-inspection defects)
           const activeDefectCount = cloudDefects.filter(d => !d._deleted && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection).length;
-          
+
+          // FIX (S1): union-merge inspectionDates with the cloud before this set({merge:true})
+          // push. merge:true REPLACES arrays, so without this a device missing a level would
+          // overwrite the cloud array and permanently drop an inspection date another device
+          // added. Same fix as the silentBackup/two-way paths.
+          if (typeof mergeInspectionDates === 'function' && cloudDoc && cloudDoc.exists) {
+            try { p.meta.inspectionDates = mergeInspectionDates(p.meta, cloudDoc.data()?.meta || {}); } catch (e) {}
+          }
+
           // Upload directly to Firestore
           await db.collection('backups').doc(p.id).set({
             projectId: p.id,
@@ -27921,7 +27938,21 @@ const importJSON = async (f) => {
     alert('Invalid JSON or failed to import.\n\nError: ' + err.message);
   }
 };
-q('#importFileHistory').addEventListener('change', async e => { const f = e.target.files?.[0]; if (!f) return; await importJSON(f); });
+q('#importFileHistory').addEventListener('change', async e => {
+  const f = e.target.files?.[0]; if (!f) return;
+  await importJSON(f);
+  // FIX (F1): a normal import must NOT inherit a re-inspection mode from the file. importJSON
+  // sets the mode flags from the JSON (a file exported while in re-inspection mode carries
+  // reInspectionMode:true), which would open About in re-inspection mode and auto-write a
+  // spurious Second inspection date. Reset all re-inspection flags for a normal import.
+  RE_INSPECTION_MODE = false;
+  if (typeof SECOND_REINSPECTION_MODE !== 'undefined') SECOND_REINSPECTION_MODE = false;
+  if (typeof THIRD_REINSPECTION_MODE !== 'undefined') THIRD_REINSPECTION_MODE = false;
+  if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
+  reInspectionAtFinding = false;
+  document.body.classList.remove('reinspection-mode');
+  e.target.value = '';
+});
 
 /* ========= Report Setup (reorder areas + manage defects) ========= */
 /* ========= Report Setup (Sections + Areas) ========= */
@@ -31809,7 +31840,11 @@ await new Promise(r => setTimeout(r, 10));
 const ELEM_ORDER = ['View','Floor','Wall','Ceiling','Door','Window','Roof','Plumbing & Sanitary Fitting','M&E','Fixtures','Structure','Other'];
 const elemRank = (e) => { const i = ELEM_ORDER.indexOf(e || ''); return i === -1 ? 999 : i; };
 
-const reportOrder = getReportOrder();
+// FIX (R1): append out-of-area defect locations (e.g. after an area rename/removal) so they
+// get numbered and appear in Summary + Findings + floor-plan tags consistently, instead of
+// being dropped everywhere except an unnumbered '?' Findings card.
+const reportOrder = getReportOrder().slice();
+filteredDefects.forEach(d => { if (d && d.location && !reportOrder.includes(d.location)) reportOrder.push(d.location); });
 const allDefectsWithNumbers = []; // Original defects with numbers
 const allDefectsSorted = []; // All defects sorted by area (including new ones)
 let globalNum = 1;
@@ -34558,46 +34593,34 @@ window.checkCloudForNewDefects = async function() {
             }
             
             // ReInspection status/notes
-            if (cloudDef.reInspection) {
-              if (!localDef.reInspection) localDef.reInspection = {};
-              
-              const cloudStatusTime = cloudDef.reInspection._statusModified || cloudTime;
-              const localStatusTime = localDef.reInspection?._statusModified || localTime;
-              if (cloudStatusTime > localStatusTime && cloudDef.reInspection.status) {
-                localDef.reInspection.status = cloudDef.reInspection.status;
-                localDef.reInspection._statusModified = cloudStatusTime;
-                updatedCount++;
-              }
-              
-              const cloudNotesTime = cloudDef.reInspection._notesModified || cloudTime;
-              const localNotesTime = localDef.reInspection?._notesModified || localTime;
-              if (cloudNotesTime > localNotesTime && cloudDef.reInspection.notes) {
-                localDef.reInspection.notes = cloudDef.reInspection.notes;
-                localDef.reInspection._notesModified = cloudNotesTime;
-                updatedCount++;
-              }
-              
-              // After photos - REPLACE strategy
-              const cloudAfterTime = cloudDef.reInspection._afterPhotosModified || cloudTime;
-              const localAfterTime = localDef.reInspection?._afterPhotosModified || localTime;
-              const cloudAfterPhotos = cloudDef.reInspection.afterPhotoUrls || cloudDef.reInspection.afterPhotos || [];
-              const localAfterPhotos = localDef.reInspection?.afterPhotos || [];
-              
-              // Get deleted IDs from BOTH local and cloud
-              const localDeletedAfterIds = new Set(localDef.reInspection?._deletedAfterPhotoIds || []);
-              const cloudDeletedAfterIds = new Set(cloudDef.reInspection._deletedAfterPhotoIds || []);
+            // FIX (S2): merge ALL three re-inspection levels for existing defects (this
+            // History-open path previously handled only the 1st level, so 2nd/3rd status/
+            // notes/after-photo changes never reached an existing local defect until the
+            // project was opened). Per-field timestamps; honors the deletion ledger.
+            const _mergeCheckLevel = (lvlKey) => {
+              const cdL = cloudDef[lvlKey];
+              if (!cdL) return;
+              if (!localDef[lvlKey]) localDef[lvlKey] = {};
+              const locL = localDef[lvlKey];
+              const cloudStatusTime = cdL._statusModified || cloudTime;
+              const localStatusTime = locL._statusModified || localTime;
+              if (cloudStatusTime > localStatusTime && cdL.status) { locL.status = cdL.status; locL._statusModified = cloudStatusTime; updatedCount++; }
+              const cloudNotesTime = cdL._notesModified || cloudTime;
+              const localNotesTime = locL._notesModified || localTime;
+              if (cloudNotesTime > localNotesTime && cdL.notes) { locL.notes = cdL.notes; locL._notesModified = cloudNotesTime; updatedCount++; }
+              // After photos - REPLACE strategy honoring the deletion ledger
+              const cloudAfterTime = cdL._afterPhotosModified || cloudTime;
+              const localAfterTime = locL._afterPhotosModified || localTime;
+              const cloudAfterPhotos = cdL.afterPhotoUrls || cdL.afterPhotos || [];
+              const localAfterPhotos = locL.afterPhotos || [];
+              const localDeletedAfterIds = new Set(locL._deletedAfterPhotoIds || []);
+              const cloudDeletedAfterIds = new Set(cdL._deletedAfterPhotoIds || []);
               const allDeletedAfterIds = new Set([...localDeletedAfterIds, ...cloudDeletedAfterIds]);
-              
-              // Check if local has modifications (deletions or new uploads)
-              const localHasAfterModifications = localDeletedAfterIds.size > 0 || 
+              const localHasAfterModifications = localDeletedAfterIds.size > 0 ||
                 localAfterPhotos.some(p => p && !p.startsWith('http'));
-              
               if (localHasAfterModifications) {
-                // Local has modifications - DON'T overwrite, just sync deleted IDs
-                localDef.reInspection._deletedAfterPhotoIds = [...allDeletedAfterIds];
-                console.log('checkCloud: Local has afterPhoto modifications, keeping local');
+                locL._deletedAfterPhotoIds = [...allDeletedAfterIds];
               } else {
-                // Filter cloud photos using ALL deleted IDs
                 const validCloudAfterPhotos = cloudAfterPhotos.filter(photo => {
                   if (!photo) return false;
                   if (typeof photo === 'string' && photo.startsWith('http')) {
@@ -34607,15 +34630,17 @@ window.checkCloudForNewDefects = async function() {
                   }
                   return true;
                 });
-                
                 if (JSON.stringify(validCloudAfterPhotos) !== JSON.stringify(localAfterPhotos)) {
-                  localDef.reInspection.afterPhotos = validCloudAfterPhotos;
-                  localDef.reInspection._afterPhotosModified = Math.max(cloudAfterTime, localAfterTime);
-                  localDef.reInspection._deletedAfterPhotoIds = [...allDeletedAfterIds];
+                  locL.afterPhotos = validCloudAfterPhotos;
+                  locL._afterPhotosModified = Math.max(cloudAfterTime, localAfterTime);
+                  locL._deletedAfterPhotoIds = [...allDeletedAfterIds];
                   updatedCount++;
                 }
               }
-            }
+            };
+            _mergeCheckLevel('reInspection');
+            _mergeCheckLevel('secondReInspection');
+            _mergeCheckLevel('thirdReInspection');
           }
         }
         
@@ -35284,11 +35309,16 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
               if (!cdL) return;
               localDef[lvlKey] = localDef[lvlKey] || {};
               const locL = localDef[lvlKey];
-              // Status/Notes - cloud wins if newer
-              if (cloudTime > localTime) {
-                if (cdL.status) locL.status = cdL.status;
-                if (cdL.notes) locL.notes = cdL.notes;
-              }
+              // FIX (S3): resolve status/notes by PER-FIELD timestamps (not the whole-defect
+              // _lastModified), so a same-level conflict where one device edited status and
+              // another edited notes keeps both instead of clobbering one. Matches the
+              // per-field merge used by silentBackupProject/pull/two-way.
+              const cStatusT = cdL._statusModified || cloudTime;
+              const lStatusT = locL._statusModified || localTime;
+              if (cStatusT > lStatusT && cdL.status) { locL.status = cdL.status; locL._statusModified = cStatusT; }
+              const cNotesT = cdL._notesModified || cloudTime;
+              const lNotesT = locL._notesModified || localTime;
+              if (cNotesT > lNotesT && cdL.notes !== undefined) { locL.notes = cdL.notes; locL._notesModified = cNotesT; }
               // After photos - REPLACE strategy honoring the deletion ledger
               const cloudAfterTime = cdL._afterPhotosModified || cloudTime;
               const localAfterTime = locL._afterPhotosModified || localTime;
