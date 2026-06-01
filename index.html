@@ -27981,15 +27981,17 @@ const importJSON = async (f) => {
     // Previously these were one-directional (only set true), so importing a normal
     // project after a re-inspection import left stale flags on, opening the normal
     // project in the wrong inspection mode (cross-project mode bleed).
-    RE_INSPECTION_MODE = data.reInspectionMode === true;
-    if (RE_INSPECTION_MODE) {
-      document.body.classList.add('reinspection-mode');
-    } else {
-      document.body.classList.remove('reinspection-mode');
-    }
-    if (typeof SECOND_REINSPECTION_MODE !== 'undefined') SECOND_REINSPECTION_MODE = data.secondReInspectionMode === true;
-    if (typeof THIRD_REINSPECTION_MODE !== 'undefined') THIRD_REINSPECTION_MODE = data.thirdReInspectionMode === true;
-    if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = data.fourthReInspectionMode === true;
+    // FIX (F-1): import ALWAYS lands in normal mode. Previously importJSON applied the
+    // file's reInspectionMode, so importing a file that was exported mid-re-inspection
+    // opened About in re-inspection mode and auto-WROTE a spurious Second date (during the
+    // show('about') at the end of this function, before any caller could reset). The only
+    // caller that wants re-inspection (#reInspectImport) re-asserts RE_INSPECTION_MODE
+    // itself AFTER importJSON, so always-false here is safe and stops the spurious write.
+    RE_INSPECTION_MODE = false;
+    if (typeof SECOND_REINSPECTION_MODE !== 'undefined') SECOND_REINSPECTION_MODE = false;
+    if (typeof THIRD_REINSPECTION_MODE !== 'undefined') THIRD_REINSPECTION_MODE = false;
+    if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
+    document.body.classList.remove('reinspection-mode');
     
     updateLoadingProgress('Finalizing...');
     
