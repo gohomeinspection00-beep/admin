@@ -12045,10 +12045,18 @@ const silentBackupProject = async (projectOrId) => {
         
         // FIX: Skip if area was renamed locally (old name should not be re-added)
         if (renamedAreas[area]) {
-          console.log('silentBackup: SKIP add area - was renamed locally:', area, '→', renamedAreas[area].to);
-          continue;
+          // FIX (#5): unless cloud shows this name was legitimately re-created AFTER
+          // our rename — then drop the stale tombstone and let the area through.
+          const _renameAt = renamedAreas[area].at || 0;
+          const _cloudRestored = (cloudBackup?.meta?._restoredAreasTimes || {})[area] || 0;
+          if (_cloudRestored > _renameAt) {
+            delete localProject.meta._renamedAreas[area];
+          } else {
+            console.log('silentBackup: SKIP add area - was renamed locally:', area, '→', renamedAreas[area].to);
+            continue;
+          }
         }
-        
+
         if (area && !existingAreas.has(area) && !deletedAreas.has(area)) {
           // FIX: Don't add area from cloud if it was permanently deleted
           const permDelCheck = localProject.meta._permanentlyDeletedAreas || [];
@@ -12167,10 +12175,17 @@ const silentBackupProject = async (projectOrId) => {
         
         // FIX: Skip if area was renamed locally (old name should not be restored)
         if (renamedAreas[area]) {
-          console.log('silentBackup: SKIP restore - area was renamed locally:', area, '→', renamedAreas[area].to);
-          continue;
+          // FIX (#5): unless cloud re-created this name after our rename.
+          const _renameAt = renamedAreas[area].at || 0;
+          const _cloudRestored = (cloudBackup?.meta?._restoredAreasTimes || {})[area] || 0;
+          if (_cloudRestored > _renameAt) {
+            delete localProject.meta._renamedAreas[area];
+          } else {
+            console.log('silentBackup: SKIP restore - area was renamed locally:', area, '→', renamedAreas[area].to);
+            continue;
+          }
         }
-        
+
         // If cloud has this area (and NOT in cloud._deletedAreas) AND local has it in _deletedAreas
         // Check timestamps to see if cloud restoration is newer
         if (deletedAreas.has(area)) {
@@ -14274,10 +14289,17 @@ const pullFromCloud = async () => {
       
       // FIX: Skip if area was renamed locally (old name should not be restored)
       if (renamedAreas[area]) {
-        console.log('Pull: SKIP restore - area was renamed locally:', area, '→', renamedAreas[area].to);
-        continue;
+        // FIX (#5): unless cloud re-created this name after our rename.
+        const _renameAt = renamedAreas[area].at || 0;
+        const _cloudRestored = (cloudMeta._restoredAreasTimes || {})[area] || 0;
+        if (_cloudRestored > _renameAt) {
+          delete p.meta._renamedAreas[area];
+        } else {
+          console.log('Pull: SKIP restore - area was renamed locally:', area, '→', renamedAreas[area].to);
+          continue;
+        }
       }
-      
+
       // If cloud has area (and NOT in cloud._deletedAreas) but local has it in _deletedAreas
       if (localDeletedAreas.has(area)) {
         const localDeletedTime = localDeletedAreasTimes[area] || 0;
@@ -14317,8 +14339,15 @@ const pullFromCloud = async () => {
     for (const area of cloudAreas) {
       // FIX: Also check if area was renamed locally
       if (renamedAreas[area]) {
-        console.log('Pull: SKIP add - area was renamed locally:', area, '→', renamedAreas[area].to);
-        continue;
+        // FIX (#5): unless cloud re-created this name after our rename.
+        const _renameAt = renamedAreas[area].at || 0;
+        const _cloudRestored = (cloudMeta._restoredAreasTimes || {})[area] || 0;
+        if (_cloudRestored > _renameAt) {
+          delete p.meta._renamedAreas[area];
+        } else {
+          console.log('Pull: SKIP add - area was renamed locally:', area, '→', renamedAreas[area].to);
+          continue;
+        }
       }
       if (area && !localAreasSet.has(area) && !allDeletedAreas.has(area)) {
         // FIX: Don't add area from cloud if permanently deleted
@@ -23322,10 +23351,17 @@ const renderFinding = async () => {
             
             // FIX: Skip if area was renamed locally (old name should not be restored)
             if (renamedAreas[area]) {
-              console.log('Update: SKIP restore - area was renamed locally:', area, '→', renamedAreas[area].to);
-              continue;
+              // FIX (#5): unless cloud re-created this name after our rename.
+              const _renameAt = renamedAreas[area].at || 0;
+              const _cloudRestored = (backup.meta?._restoredAreasTimes || {})[area] || 0;
+              if (_cloudRestored > _renameAt) {
+                delete p.meta._renamedAreas[area];
+              } else {
+                console.log('Update: SKIP restore - area was renamed locally:', area, '→', renamedAreas[area].to);
+                continue;
+              }
             }
-            
+
             // If cloud has area (and NOT in cloud._deletedAreas) but local has it in _deletedAreas
             if (localDeletedAreas.includes(area)) {
               const localDeletedTime = localDeletedAreasTimes[area] || 0;
@@ -23363,8 +23399,15 @@ const renderFinding = async () => {
           for (const area of cloudAreas) {
             // FIX: Skip if area was renamed locally (old name should not be re-added)
             if (renamedAreas[area]) {
-              console.log('Update: SKIP add - area was renamed locally:', area, '→', renamedAreas[area].to);
-              continue;
+              // FIX (#5): unless cloud re-created this name after our rename.
+              const _renameAt = renamedAreas[area].at || 0;
+              const _cloudRestored = (backup.meta?._restoredAreasTimes || {})[area] || 0;
+              if (_cloudRestored > _renameAt) {
+                delete p.meta._renamedAreas[area];
+              } else {
+                console.log('Update: SKIP add - area was renamed locally:', area, '→', renamedAreas[area].to);
+                continue;
+              }
             }
             if (area && !localAreasSet.has(area) && !allDeletedAreas.has(area)) {
               // FIX: Don't add area from cloud if permanently deleted
@@ -28459,8 +28502,15 @@ const renderHistoryCard = (p, container) => {
               for (const area of cloudAreas) {
                 // FIX: Skip renamed areas (old name should not be re-added)
                 if (renamedAreas[area]) {
-                  console.log('Open sync: SKIP add area - was renamed locally:', area, '→', renamedAreas[area].to);
-                  continue;
+                  // FIX (#5): unless cloud re-created this name after our rename.
+                  const _renameAt = renamedAreas[area].at || 0;
+                  const _cloudRestored = (cloudMeta._restoredAreasTimes || {})[area] || 0;
+                  if (_cloudRestored > _renameAt) {
+                    delete proj.meta._renamedAreas[area];
+                  } else {
+                    console.log('Open sync: SKIP add area - was renamed locally:', area, '→', renamedAreas[area].to);
+                    continue;
+                  }
                 }
                 // FIX: Skip deleted areas
                 if (area && !localAreasSet.has(area) && !deletedAreas.has(area)) {
@@ -32880,8 +32930,15 @@ window.twoWaySyncProject = async function(project) {
     for (const cloudArea of cloudAreas) {
       // FIX: Skip if area was renamed locally
       if (renamedAreas[cloudArea]) {
-        console.log('manualSync: SKIP add area - was renamed locally:', cloudArea, '→', renamedAreas[cloudArea].to);
-        continue;
+        // FIX (#5): unless cloud re-created this name after our rename.
+        const _renameAt = renamedAreas[cloudArea].at || 0;
+        const _cloudRestored = (cloudBackup?.meta?._restoredAreasTimes || {})[cloudArea] || 0;
+        if (_cloudRestored > _renameAt) {
+          delete project.meta._renamedAreas[cloudArea];
+        } else {
+          console.log('manualSync: SKIP add area - was renamed locally:', cloudArea, '→', renamedAreas[cloudArea].to);
+          continue;
+        }
       }
       if (cloudArea && !localAreas.includes(cloudArea) && !deletedAreas.has(cloudArea)) {
         // FIX: Don't add area from cloud if permanently deleted
@@ -34397,8 +34454,15 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
         for (const area of (cloudMeta.areas || [])) {
           // FIX: Also check if area was renamed locally
           if (renamedAreas[area]) {
-            console.log('checkCloud: SKIP add area - was renamed locally:', area, '→', renamedAreas[area].to);
-            continue;
+            // FIX (#5): unless cloud re-created this name after our rename.
+            const _renameAt = renamedAreas[area].at || 0;
+            const _cloudRestored = (cloudMeta._restoredAreasTimes || {})[area] || 0;
+            if (_cloudRestored > _renameAt) {
+              delete existingProject.meta._renamedAreas[area];
+            } else {
+              console.log('checkCloud: SKIP add area - was renamed locally:', area, '→', renamedAreas[area].to);
+              continue;
+            }
           }
           if (area && !existingAreas.has(area) && !deletedAreas.has(area)) {
             existingProject.meta.areas.push(area);
