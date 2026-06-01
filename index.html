@@ -19964,6 +19964,13 @@ function editStatusName(idx) {
   const oldName = status.name;
   const trimmed = newName.trim();
   if (trimmed === oldName) return;
+  // Reject a rename that collides with another existing status name. Two entries
+  // with the same name make reInspectionStatuses.find(s => s.name === ...) map
+  // defects to the first match, silently mis-colouring/mis-classifying them.
+  if (reInspectionStatuses.some((s, i) => i !== idx && s.name === trimmed)) {
+    alert(`A status named "${trimmed}" already exists. Choose a different name.`);
+    return;
+  }
   reInspectionStatuses[idx].name = trimmed;
   // FIX (M-A): migrate existing defects' stored status NAME across all 3 re-inspection
   // levels (status is stored by name), so a rename doesn't orphan them — losing their
@@ -19981,7 +19988,19 @@ function editStatusName(idx) {
 function deleteStatus(idx) {
   const status = reInspectionStatuses[idx];
   if (!status) return;
-  if (!confirm(`Delete status "${status.name}"?`)) return;
+  const name = status.name;
+  // Block deletion if any defect (all projects, all 3 re-inspection levels) still
+  // uses this status. Deleting an in-use status would orphan those defects (their
+  // tag colour + treatAsNew/NEW classification fall back to default), silently
+  // shifting report numbering. Consistent with the rename-migration in editStatusName.
+  const inUse = (projects || []).some(p => (p.defects || []).some(d =>
+    ['reInspection', 'secondReInspection', 'thirdReInspection'].some(l => d[l] && d[l].status === name)
+  ));
+  if (inUse) {
+    alert(`Cannot delete "${name}" — it is still assigned to one or more defects.\nReassign or rename those defects' status first.`);
+    return;
+  }
+  if (!confirm(`Delete status "${name}"?`)) return;
   reInspectionStatuses.splice(idx, 1);
   saveAllSafe();
   renderStatusCheckboxes();
@@ -20004,9 +20023,15 @@ function showSettings() {
 function addNewStatus() {
   const name = prompt('Status name:');
   if (!name) return;
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  if (reInspectionStatuses.some(s => s.name === trimmed)) {
+    alert(`A status named "${trimmed}" already exists.`);
+    return;
+  }
   const color = prompt('Color code (e.g., #ff0000):', '#3b82f6');
   const treatAsNew = confirm('Treat defects with this status as NEW in report?');
-  reInspectionStatuses.push({ name: name.trim(), color: color, enabled: true, treatAsNew: treatAsNew });
+  reInspectionStatuses.push({ name: trimmed, color: color, enabled: true, treatAsNew: treatAsNew });
   saveAllSafe();
   renderStatusCheckboxes();
 }
@@ -20110,8 +20135,16 @@ function openReInspectionView(defectIdx) {
   // Open dialog
   const dlg = q('#reInspectionViewDialog');
   if (!dlg) { alert('Dialog not found'); return; }
+  // Reset the stale defect index whenever this dialog closes by ANY path (Save,
+  // Cancel, browser Back/popstate). currentReInspectDefectIdx is a bare array
+  // index with no project binding; if a project switch happened while it lingered,
+  // a later write could land in the wrong project's defects. Wired once.
+  if (!dlg._reInspectCloseWired) {
+    dlg.addEventListener('close', () => { currentReInspectDefectIdx = null; });
+    dlg._reInspectCloseWired = true;
+  }
   openDlg(dlg);
-  
+
   // Populate immediately
   populateReInspectionDialog(defectIdx, defect, proj);
 }
@@ -24184,16 +24217,25 @@ const renderFinding = async () => {
             });
           } catch (txErr) {
             console.error('Update: transaction failed, falling back to direct set:', txErr);
+            // Degraded-but-correct fallback: the transaction (the primary lost-update guard)
+            // threw, so mirror its merge against the pre-read cloudDoc snapshot instead of a
+            // blind array-replace. All additive — can only append cloud-only data, never drop
+            // local: union defects by _syncId and union customElements/customTypes.
+            const _fbData = (cloudDoc && cloudDoc.exists) ? cloudDoc.data() : null;
+            const _fbPushedIds = new Set(cloudDefects.map(d => d && d._syncId).filter(Boolean));
+            const _fbCloudOnly = (_fbData?.defects || []).filter(cd => cd && cd._syncId && !_fbPushedIds.has(cd._syncId));
+            const _fbDefects = _fbCloudOnly.length ? [...cloudDefects, ..._fbCloudOnly] : cloudDefects;
+            const _fbCount = _fbDefects.filter(d => !d._deleted && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection).length;
             await _docRef.set({
               projectId: p.id,
               userEmail: userEmail.toLowerCase(),
               meta: _pushMeta,
-              defects: cloudDefects,
-              defectCount: activeDefectCount,
-              customElements: p.customElements || [],
-              customTypes: p.customTypes || [],
+              defects: _fbDefects,
+              defectCount: _fbCount,
+              customElements: [...new Set([...(p.customElements || []), ...((_fbData?.customElements) || [])])],
+              customTypes: [...new Set([...(p.customTypes || []), ...((_fbData?.customTypes) || [])])],
               updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-              _version: (cloudDoc.exists ? (cloudDoc.data()._version || 0) : 0) + 1
+              _version: (_fbData ? (_fbData._version || 0) : 0) + 1
             }, { merge: true });
           }
           
@@ -32074,7 +32116,11 @@ const elemRank = (e) => { const i = ELEM_ORDER.indexOf(e || ''); return i === -1
 // get numbered and appear in Summary + Findings + floor-plan tags consistently, instead of
 // being dropped everywhere except an unnumbered '?' Findings card.
 const reportOrder = getReportOrder().slice();
-filteredDefects.forEach(d => { if (d && d.location && !reportOrder.includes(d.location)) reportOrder.push(d.location); });
+// Include EVERY filtered defect's location group — even a falsy/empty location — so a
+// defect with no location is still numbered and shown (renders as '-' via display
+// fallbacks) instead of being silently dropped from the report. For well-formed data
+// (all truthy locations) this is identical to the prior `&& d.location` guard.
+filteredDefects.forEach(d => { if (d && !reportOrder.includes(d.location)) reportOrder.push(d.location); });
 const allDefectsWithNumbers = []; // Original defects with numbers
 const allDefectsSorted = []; // All defects sorted by area (including new ones)
 let globalNum = 1;
@@ -33522,8 +33568,11 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
       customElements: project.customElements || [],
       customTypes: project.customTypes || [],
       backupAt: firebase.firestore.FieldValue.serverTimestamp(),
-      // FIX 3: Exclude deleted defects from count
-      defectCount: project.defects ? project.defects.filter(d => !d._deleted).length : 0
+      // FIX 3: Exclude deleted defects AND all new re-inspection defects from the count,
+      // matching the canonical computation in silentBackupProject (activeDefectCount) and
+      // every display site (the cloud-file picker reads this field) so the count is
+      // consistent regardless of which sync path last wrote the doc.
+      defectCount: project.defects ? project.defects.filter(d => !d._deleted && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection).length : 0
     };
     
     // SANITIZE: Remove any undefined values before saving to Firestore
@@ -33705,8 +33754,37 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
       });
     } catch (transactionError) {
       console.error('Transaction failed, falling back to direct set:', transactionError);
-      // Fallback to direct set
-      await docRef.set(finalBackupData, { merge: true });
+      // Degraded-but-correct fallback: the transaction (the primary lost-update guard) threw,
+      // so do a guarded re-read and mirror its union (defects by _syncId, inspectionDates,
+      // customElements/customTypes) against that snapshot instead of a blind array-replace.
+      // All additive. If even the re-read throws, fall back to the original blind set.
+      try {
+        const fbDoc = await docRef.get();
+        const fbData = fbDoc.exists ? fbDoc.data() : null;
+        let fbWrite = finalBackupData;
+        if (fbData) {
+          const pushed = Array.isArray(finalBackupData.defects) ? finalBackupData.defects : [];
+          const pushedIds = new Set(pushed.map(d => d && d._syncId).filter(Boolean));
+          const cloudDefs = Array.isArray(fbData.defects) ? fbData.defects : [];
+          const cloudOnly = cloudDefs.filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
+          const mergedDefects = cloudOnly.length ? [...pushed, ...cloudOnly] : pushed;
+          let mergedDates = finalBackupData.meta?.inspectionDates;
+          if (typeof mergeInspectionDates === 'function') {
+            try { mergedDates = mergeInspectionDates(finalBackupData.meta || {}, fbData.meta || {}); } catch (e) {}
+          }
+          fbWrite = {
+            ...finalBackupData,
+            defects: mergedDefects,
+            meta: { ...(finalBackupData.meta || {}), inspectionDates: mergedDates },
+            customElements: [...new Set([...(finalBackupData.customElements || []), ...(fbData.customElements || [])])],
+            customTypes: [...new Set([...(finalBackupData.customTypes || []), ...(fbData.customTypes || [])])]
+          };
+        }
+        await docRef.set(fbWrite, { merge: true });
+      } catch (fbErr) {
+        console.error('Fallback re-read failed, using blind set:', fbErr);
+        await docRef.set(finalBackupData, { merge: true });
+      }
     }
     
     // 5. Update local project with backup ID
@@ -35278,9 +35356,13 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
             } : null
           })),
           isShared: backup.isShared || false,
-          sharedWith: backup.sharedWith || []
+          sharedWith: backup.sharedWith || [],
+          // Carry the custom element/type registries from the cloud backup so an imported
+          // project keeps its custom names (matches the other import/sync paths).
+          customElements: backup.customElements || [],
+          customTypes: backup.customTypes || []
         };
-        
+
         window.projects.push(newProject);
         imported++;
       } else {
@@ -35324,7 +35406,11 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
         if (typeof mergeInspectionDates === 'function') {
           try { existingProject.meta.inspectionDates = mergeInspectionDates(existingProject.meta, cloudMeta); } catch (e) {}
         }
-        
+        // FIX (LOW): union the custom element/type registries so a custom name added on
+        // another device survives this pull path too (additive — never drops a local name).
+        existingProject.customElements = [...new Set([...(existingProject.customElements || []), ...(backup.customElements || [])])];
+        existingProject.customTypes = [...new Set([...(existingProject.customTypes || []), ...(backup.customTypes || [])])];
+
         // ========== FRONT PHOTO - SMART MERGE ==========
         // Check if local has actual image vs cloud has image
         // Cloud boleh guna frontRef ATAU frontPhotoUrl (legacy)
