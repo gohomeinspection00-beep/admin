@@ -28936,8 +28936,12 @@ const renderHistoryCard = (p, container) => {
         };
         actions.appendChild(fourthInspBtn);
       }
-    } else if (RE_INSPECTION_MODE && hasReInspectionData) {
-      // RE_INSPECTION_MODE with existing re-inspection data - show First/Second Re-Inspection buttons
+    } else if (RE_INSPECTION_MODE) {
+      // RE_INSPECTION_MODE (with OR without existing re-inspection data) — always offer the
+      // First Re-Inspection button so a never-re-inspected project can start its FIRST
+      // re-inspection from history (previously this required hasReInspectionData, so a fresh
+      // project fell through to the Normal-Open else which cleared RE_INSPECTION_MODE → opened
+      // in normal mode). Second/Third/Fourth stay gated behind prior-level data below.
       // First Re-Inspection button (re-inspect original data)
       const firstReInspBtn = document.createElement('button');
       firstReInspBtn.className = 'btn';
@@ -28974,8 +28978,14 @@ const renderHistoryCard = (p, container) => {
         await openProjectForSubmission(p, secondReInspBtn);
       };
       
-      actions.append(firstReInspBtn, secondReInspBtn);
-      
+      // Always offer First. Only offer Second once the FIRST re-inspection has data,
+      // otherwise a never-re-inspected project would let the user jump to a 2nd
+      // re-inspection on empty 1st-level data.
+      actions.appendChild(firstReInspBtn);
+      if (hasReInspectionData) {
+        actions.appendChild(secondReInspBtn);
+      }
+
       // Third Re-Inspection button (only show if has second re-inspection data)
       if (hasSecondReInspectionData) {
         const thirdReInspBtn = document.createElement('button');
