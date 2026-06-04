@@ -1596,7 +1596,11 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .fp-ctrl{display:flex;align-items:center;gap:12px;pointer-events:auto}
 .fp-ctrl label{color:#fff;font-size:12px;width:56px;flex-shrink:0}
 .fp-ctrl input[type=range]{flex:1;accent-color:var(--accent);height:24px}
-.fp-ar-btns{display:flex;gap:10px;justify-content:center;margin-top:4px;pointer-events:auto}
+.fp-ar-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:4px;pointer-events:auto}
+.fp-ar-panel.locked .fp-ctrl,
+.fp-ar-panel.locked #fpFlipBtn,
+.fp-ar-panel.locked #fpRetagBtn{display:none}
+.fp-ar-panel.locked{background:linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0))}
 
 /* ============================================
    CHAT MODE
@@ -11848,6 +11852,7 @@ async function startFloorPlanAR() {
       '<div class="fp-ar-btns">' +
         '<button class="ar-btn" id="fpFlipBtn">Flip</button>' +
         '<button class="ar-btn" id="fpRetagBtn">Re-tag</button>' +
+        '<button class="ar-btn" id="fpLockBtn">🔒 Lock</button>' +
         '<button class="ar-btn" id="fpExitBtn2">Exit</button>' +
       '</div>' +
     '</div>';
@@ -11873,7 +11878,7 @@ async function startFloorPlanAR() {
   const points = [];
   const markers = [];
   let planGroup = null, planMesh = null, planMat = null, texture = null;
-  let flip = false, phase = 'tag';
+  let flip = false, phase = 'tag', locked = false;
 
   const hintEl = overlay.querySelector('#fpArHint');
   const crossEl = overlay.querySelector('#fpCross');
@@ -11958,6 +11963,17 @@ async function startFloorPlanAR() {
     crossEl.style.display = 'block';
     hintEl.textContent = 'Aim the dot & Add Point for point 1';
   });
+
+  function setLocked(v) {
+    locked = v;
+    panel.classList.toggle('locked', v);
+    ['#fpOpacity', '#fpScale', '#fpRotate'].forEach(function(id) { const el = overlay.querySelector(id); if (el) el.disabled = v; });
+    const lb = overlay.querySelector('#fpLockBtn');
+    lb.textContent = v ? '🔓 Unlock' : '🔒 Lock';
+    lb.classList.toggle('ar-btn-primary', v);
+    hintEl.textContent = v ? 'Locked — walk around to view' : 'Adjust the overlay below';
+  }
+  overlay.querySelector('#fpLockBtn').addEventListener('click', function() { setLocked(!locked); });
 
   let session;
   try {
