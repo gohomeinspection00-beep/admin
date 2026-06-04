@@ -1403,6 +1403,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .cat-assess .tools-list-icon{background:var(--accent-soft);color:var(--accent)}
 .cat-orient .tools-list-icon{background:var(--success-soft);color:var(--success)}
 .cat-measure .tools-list-icon{background:var(--warning-soft);color:var(--warning)}
+.cat-ai .tools-list-icon{background:var(--accent-soft);color:var(--accent)}
 .tools-list-content{flex:1;min-width:0}
 .tools-list-name{
   font-size:15px;font-weight:700;
@@ -1548,6 +1549,21 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 }
 .fp-upload:active{opacity:0.65}
 .fp-preview{width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius);margin-top:12px;background:rgba(127,127,127,0.08)}
+
+/* Sketch to Real — result */
+.sk-result{
+  width:100%;background:#fff;border-radius:var(--radius);overflow:auto;
+  max-height:48vh;border:1px solid var(--border);padding:8px;
+}
+.sk-result svg{width:100%;height:auto;display:block}
+.sk-actions{display:flex;gap:8px;width:100%}
+.sk-actions .tool-btn{flex:1}
+.sk-spin{
+  display:inline-block;width:13px;height:13px;border-radius:50%;
+  border:2px solid var(--border);border-top-color:var(--accent);
+  animation:sk-rot 0.8s linear infinite;vertical-align:-2px;margin-right:5px;
+}
+@keyframes sk-rot{to{transform:rotate(360deg)}}
 
 /* AR Floor Plan — tagging screen */
 .fp-overlay{
@@ -6226,6 +6242,7 @@ body.site-mode-active .voice-mode{
         <button class="tools-chip" data-cat="assessment">Assessment</button>
         <button class="tools-chip" data-cat="orientation">Orientation</button>
         <button class="tools-chip" data-cat="measurement">Measurement</button>
+        <button class="tools-chip" data-cat="ai">AI</button>
       </div>
 
       <div class="tools-group" data-cat="assessment">
@@ -6323,6 +6340,25 @@ body.site-mode-active .voice-mode{
           <div class="tools-list-content">
             <div class="tools-list-name">AR Floor Plan</div>
             <div class="tools-list-desc">Overlay a floor plan onto the real site in AR. Tag 2 points to align, then scale, rotate &amp; fade.</div>
+          </div>
+          <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      </div>
+
+      <div class="tools-group" data-cat="ai">
+      <div class="tools-section-divider">
+        <span>AI Tools</span>
+      </div>
+
+      <div class="tools-list">
+        <button class="tools-list-item cat-ai" data-tool="sketch2real">
+          <div class="tools-list-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4"/><path d="M13 3l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>
+          </div>
+          <div class="tools-list-content">
+            <div class="tools-list-name">Sketch to Real</div>
+            <div class="tools-list-desc">Photo a hand-drawn floor plan — AI redraws it clean &amp; ready to use in AR.</div>
           </div>
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
@@ -9687,6 +9723,7 @@ function openTool(toolKey) {
   else if (toolKey === 'crackruler') openCrackRuler();
   else if (toolKey === 'armeasure') openARMeasure();
   else if (toolKey === 'arfloorplan') openARFloorPlan();
+  else if (toolKey === 'sketch2real') openSketchToReal();
 }
 
 function closeTool() {
@@ -12043,6 +12080,208 @@ async function startFloorPlanAR() {
     }
     renderer.render(scene, camera);
   });
+}
+
+// =======================================================
+// TOOL: SKETCH TO REAL (AI floor-plan cleanup)
+// =======================================================
+let _skState = null;
+
+function openSketchToReal() {
+  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4"/><path d="M13 3l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>';
+  document.getElementById('toolModalName').textContent = 'Sketch to Real';
+  document.getElementById('toolModalDesc').textContent = 'AI redraws your hand-drawn floor plan, clean';
+
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="ar-intro-steps">' +
+      '<div class="ar-step"><span class="ar-step-n">1</span><span>Take a clear photo of your hand-drawn floor plan (good light, flat, whole plan in frame).</span></div>' +
+      '<div class="ar-step"><span class="ar-step-n">2</span><span>AI redraws it as a clean, labelled floor plan.</span></div>' +
+      '<div class="ar-step"><span class="ar-step-n">3</span><span>Save it, or send it straight to AR Floor Plan.</span></div>' +
+    '</div>' +
+    '<div class="fp-upload" id="skUpload">' +
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+      '<span id="skUploadText">Tap to photo or upload your sketch</span>' +
+    '</div>' +
+    '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none">' +
+    '<img id="skPreview" class="fp-preview" style="display:none" alt="">' +
+    '<div id="skStatus" class="ar-status"></div>';
+
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="skMainBtn">Choose sketch photo</button>';
+
+  showToolModal();
+
+  const fileInput = document.getElementById('skFile');
+  const uploadEl = document.getElementById('skUpload');
+  const mainBtn = document.getElementById('skMainBtn');
+  const statusEl = document.getElementById('skStatus');
+  _skState = null;
+
+  uploadEl.addEventListener('click', function() { fileInput.click(); });
+  fileInput.addEventListener('change', function() {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      _skState = { dataUrl: ev.target.result };
+      const pv = document.getElementById('skPreview');
+      if (pv) { pv.src = _skState.dataUrl; pv.style.display = 'block'; }
+      const t = document.getElementById('skUploadText'); if (t) t.textContent = 'Change photo';
+      mainBtn.textContent = '✨ Redraw with AI';
+      statusEl.className = 'ar-status'; statusEl.textContent = '';
+    };
+    reader.readAsDataURL(f);
+  });
+
+  mainBtn.onclick = function() {
+    if (!_skState || !_skState.dataUrl) { fileInput.click(); return; }
+    runSketchConvert(_skState.dataUrl, statusEl, mainBtn);
+  };
+}
+
+async function runSketchConvert(dataUrl, statusEl, mainBtn) {
+  mainBtn.disabled = true;
+  mainBtn.textContent = 'Redrawing… (10–25s)';
+  statusEl.className = 'ar-status';
+  statusEl.innerHTML = '<span class="sk-spin"></span> AI is reading your sketch and redrawing it…';
+  let raw;
+  try {
+    raw = await callGeminiSketch(dataUrl);
+  } catch (e) {
+    statusEl.className = 'ar-status warn'; statusEl.textContent = 'AI error: ' + e.message;
+    mainBtn.disabled = false; mainBtn.textContent = '✨ Try again';
+    return;
+  }
+  const svg = extractSVG(raw);
+  if (!svg) {
+    statusEl.className = 'ar-status warn'; statusEl.textContent = 'AI did not return a usable drawing. Try a clearer, flatter photo.';
+    mainBtn.disabled = false; mainBtn.textContent = '✨ Try again';
+    return;
+  }
+  const norm = ensureSVGSize(svg);
+  showSketchResult(norm.svg, norm.w, norm.h);
+}
+
+function showSketchResult(svg, w, h) {
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="sk-result" id="skResult">' + svg + '</div>' +
+    '<div class="ar-status" id="skStatus2" style="margin-top:10px">Clean floor plan ready. Save it, or send it to AR Floor Plan.</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<div class="sk-actions">' +
+      '<button class="tool-btn" id="skRedo">Redo</button>' +
+      '<button class="tool-btn" id="skSave">Save PNG</button>' +
+      '<button class="tool-btn tool-btn-primary" id="skToAR">Use in AR</button>' +
+    '</div>';
+  document.getElementById('skRedo').onclick = function() { openSketchToReal(); };
+  document.getElementById('skSave').onclick = function() { saveSketchPNG(svg, w, h); };
+  document.getElementById('skToAR').onclick = function() { sketchToAR(svg, w, h); };
+}
+
+async function callGeminiSketch(dataUrl) {
+  const apiKey = (typeof getApiKey === 'function') ? getApiKey() : '';
+  if (!apiKey) throw new Error('AI key not set. Add your Gemini key in chat settings first.');
+  const model = (typeof getModel === 'function') ? getModel() : 'gemini-2.5-flash';
+  const base64 = dataUrl.split(',')[1] || dataUrl;
+  const mime = dataUrl.indexOf('data:image/png') === 0 ? 'image/png' : 'image/jpeg';
+  const prompt = [
+    'You are an architectural draftsman. The image is a HAND-DRAWN floor plan sketch.',
+    'Redraw it as a clean, professional 2D floor plan in SVG.',
+    'Rules:',
+    '- Add a white background rect covering the whole canvas.',
+    '- Walls as solid black lines, stroke-width about 6, straightened and squared (right angles where intended).',
+    '- Show door openings as gaps with a thin quarter-circle swing arc.',
+    '- Show windows as a thinner double line on the wall.',
+    '- Label every room with a centered <text> (use names written in the sketch; otherwise infer e.g. Bedroom, Kitchen, Bathroom, Living, Toilet).',
+    '- If dimensions are written on the sketch, include them as small <text> near the relevant wall.',
+    '- Keep the same overall layout and proportions as the sketch.',
+    '- Use a viewBox and set width and height. Use font-family sans-serif.',
+    'Output ONLY the SVG code. No markdown, no backticks, no explanation.'
+  ].join('\n');
+
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ role: 'user', parts: [{ inlineData: { mimeType: mime, data: base64 } }, { text: prompt }] }],
+      generationConfig: { temperature: 0.2, maxOutputTokens: 8192 }
+    })
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(function() { return {}; });
+    if (res.status === 429) throw new Error('Rate limit — wait a moment and retry.');
+    throw new Error((e && e.error && e.error.message) || ('API ' + res.status));
+  }
+  const data = await res.json();
+  return (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '';
+}
+
+function extractSVG(t) {
+  const m = t.match(/<svg[\s\S]*?<\/svg>/i);
+  return m ? m[0] : null;
+}
+
+function ensureSVGSize(svg) {
+  svg = svg.replace(/<script[\s\S]*?<\/script>/gi, '');
+  if (!/xmlns=/.test(svg)) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+  let w = 1000, h = 750;
+  const vb = svg.match(/viewBox="([\d.\-\s]+)"/i);
+  if (vb) { const p = vb[1].trim().split(/\s+/).map(Number); if (p.length === 4 && p[2] && p[3]) { w = p[2]; h = p[3]; } }
+  if (!/<svg[^>]*\swidth=/.test(svg)) svg = svg.replace('<svg', '<svg width="' + w + '" height="' + h + '"');
+  return { svg: svg, w: w, h: h };
+}
+
+function svgToImage(svg) {
+  return new Promise(function(resolve, reject) {
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = function() { resolve({ img: img, url: url }); };
+    img.onerror = function() { URL.revokeObjectURL(url); reject(new Error('Could not render SVG')); };
+    img.src = url;
+  });
+}
+
+async function saveSketchPNG(svg, w, h) {
+  try {
+    const r = await svgToImage(svg);
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = w * scale; c.height = h * scale;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(r.img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(r.url);
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = 'floorplan-' + Date.now() + '.png';
+    a.click();
+    if (typeof showToast === 'function') showToast('Saved PNG');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Save failed: ' + e.message);
+  }
+}
+
+async function sketchToAR(svg, w, h) {
+  try {
+    const r = await svgToImage(svg);
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(r.img, 0, 0, w, h);
+    URL.revokeObjectURL(r.url);
+    const pngUrl = c.toDataURL('image/png');
+    const im = new Image();
+    im.onload = function() {
+      _fpState = { imgEl: im, imgURL: pngUrl, w: im.naturalWidth, h: im.naturalHeight };
+      if (typeof closeTool === 'function') closeTool();
+      openFloorPlanTag();
+    };
+    im.src = pngUrl;
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Could not send to AR: ' + e.message);
+  }
 }
 
 // =======================================================
