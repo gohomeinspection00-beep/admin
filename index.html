@@ -1497,39 +1497,41 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
   pointer-events:none;
   font-family:var(--font-body);
 }
-#arOverlay > *{pointer-events:auto}
-.ar-top{padding:calc(env(safe-area-inset-top) + 16px) 16px 0;display:flex;justify-content:center}
+.ar-tap{position:absolute;inset:0;z-index:1;pointer-events:auto;background:transparent}
+.ar-crosshair{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:2;pointer-events:none;
+  width:8px;height:8px;border-radius:50%;background:#22d3ee;
+  box-shadow:0 0 0 3px rgba(255,255,255,0.4), 0 0 0 4px rgba(0,0,0,0.35), 0 0 9px rgba(34,211,238,0.7);
+}
+.ar-top{position:relative;z-index:2;pointer-events:none;padding:calc(env(safe-area-inset-top) + 16px) 16px 0;display:flex;justify-content:center}
 .ar-hint{
   background:rgba(0,0,0,0.62);color:#fff;
   padding:10px 16px;border-radius:999px;
   font-size:13px;font-weight:500;text-align:center;
   -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
 }
-.ar-readout{
-  align-self:center;margin-top:18px;
-  background:rgba(0,0,0,0.7);color:#22d3ee;
-  font-family:var(--font-mono);font-size:30px;font-weight:700;
-  padding:12px 24px;border-radius:14px;
-  opacity:0;transform:scale(0.9);transition:opacity 0.2s ease, transform 0.2s ease;
+.ar-label{
+  position:absolute;z-index:2;pointer-events:none;display:none;
+  transform:translate(-50%,-50%);white-space:nowrap;
+  background:rgba(0,0,0,0.8);color:#22d3ee;
+  font-family:var(--font-mono);font-size:18px;font-weight:700;
+  padding:6px 12px;border-radius:10px;
+  border:1px solid rgba(34,211,238,0.5);
 }
-.ar-readout.show{opacity:1;transform:scale(1)}
 .ar-controls{
-  display:flex;gap:10px;justify-content:center;align-items:center;
+  position:relative;z-index:3;pointer-events:none;
+  display:flex;gap:12px;justify-content:center;align-items:center;
   padding:16px 16px calc(env(safe-area-inset-bottom) + 22px);
 }
 .ar-btn{
-  padding:14px 20px;border-radius:999px;
+  pointer-events:auto;
+  padding:14px 24px;border-radius:999px;
   background:rgba(255,255,255,0.16);color:#fff;
   font-size:14px;font-weight:600;
   border:1px solid rgba(255,255,255,0.28);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
 }
-.ar-btn-primary{
-  background:var(--accent);color:var(--accent-fg);
-  border-color:var(--accent);
-  flex:1;max-width:200px;
-}
-.ar-btn:disabled{opacity:0.45}
 
 /* ============================================
    CHAT MODE
@@ -11353,11 +11355,12 @@ async function startARSession(statusEl, startBtn) {
   overlay = document.createElement('div');
   overlay.id = 'arOverlay';
   overlay.innerHTML =
+    '<div class="ar-tap" id="arTap"></div>' +
+    '<div class="ar-crosshair"></div>' +
     '<div class="ar-top"><div class="ar-hint" id="arHint">Move your phone to find a surface…</div></div>' +
-    '<div class="ar-readout" id="arReadout"></div>' +
+    '<div class="ar-label" id="arLabel"></div>' +
     '<div class="ar-controls">' +
       '<button class="ar-btn" id="arResetBtn">Reset</button>' +
-      '<button class="ar-btn ar-btn-primary" id="arAddBtn" disabled>Add Point</button>' +
       '<button class="ar-btn" id="arExitBtn">Exit</button>' +
     '</div>';
   document.body.appendChild(overlay);
@@ -11387,8 +11390,8 @@ async function startARSession(statusEl, startBtn) {
   let lineObj = null;
 
   const hintEl = overlay.querySelector('#arHint');
-  const readoutEl = overlay.querySelector('#arReadout');
-  const addBtn = overlay.querySelector('#arAddBtn');
+  const labelEl = overlay.querySelector('#arLabel');
+  const tapEl = overlay.querySelector('#arTap');
   const resetBtn = overlay.querySelector('#arResetBtn');
   const exitBtn = overlay.querySelector('#arExitBtn');
 
@@ -11398,8 +11401,8 @@ async function startARSession(statusEl, startBtn) {
     return meters.toFixed(2) + ' m';
   }
   function updateHint() {
-    if (points.length === 0) hintEl.textContent = reticle.visible ? 'Tap "Add Point" for the start' : 'Move your phone to find a surface…';
-    else if (points.length === 1) hintEl.textContent = 'Move to the end, then "Add Point"';
+    if (points.length === 0) hintEl.textContent = reticle.visible ? 'Tap anywhere to place the start point' : 'Move your phone to find a surface…';
+    else if (points.length === 1) hintEl.textContent = 'Move to the end, then tap to place';
     else hintEl.textContent = 'Tap Reset to measure again';
   }
   function addMarker(pos) {
@@ -11415,12 +11418,10 @@ async function startARSession(statusEl, startBtn) {
     addMarker(pos);
     if (points.length === 2) {
       const d = points[0].distanceTo(points[1]);
-      readoutEl.textContent = fmt(d);
-      readoutEl.classList.add('show');
+      labelEl.textContent = fmt(d);
       const geom = new THREE.BufferGeometry().setFromPoints([points[0], points[1]]);
       lineObj = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: 0x22d3ee }));
       scene.add(lineObj);
-      addBtn.disabled = true;
       _arLastResult = fmt(d);
     }
     updateHint();
@@ -11430,12 +11431,12 @@ async function startARSession(statusEl, startBtn) {
     markers.forEach(function(m) { scene.remove(m); });
     markers.length = 0;
     if (lineObj) { scene.remove(lineObj); lineObj = null; }
-    readoutEl.textContent = '';
-    readoutEl.classList.remove('show');
+    labelEl.style.display = 'none';
+    labelEl.textContent = '';
     _arLastResult = null;
     updateHint();
   }
-  addBtn.addEventListener('click', doAddPoint);
+  tapEl.addEventListener('click', doAddPoint);
   resetBtn.addEventListener('click', doReset);
 
   let session;
@@ -11461,10 +11462,6 @@ async function startARSession(statusEl, startBtn) {
   const localSpace = await session.requestReferenceSpace('local');
   let hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
 
-  const controller = renderer.xr.getController(0);
-  controller.addEventListener('select', doAddPoint);
-  scene.add(controller);
-
   session.addEventListener('end', function() {
     if (hitTestSource) { if (hitTestSource.cancel) hitTestSource.cancel(); hitTestSource = null; }
     renderer.setAnimationLoop(null);
@@ -11475,6 +11472,7 @@ async function startARSession(statusEl, startBtn) {
     if (_arLastResult && typeof showToast === 'function') showToast('AR distance: ' + _arLastResult);
   });
 
+  const _mid = new THREE.Vector3();
   renderer.setAnimationLoop(function(timestamp, frame) {
     if (!frame) { renderer.render(scene, camera); return; }
     if (hitTestSource) {
@@ -11484,15 +11482,24 @@ async function startARSession(statusEl, startBtn) {
         if (pose) {
           reticle.visible = points.length < 2;
           reticle.matrix.fromArray(pose.transform.matrix);
-          if (points.length < 2) addBtn.disabled = false;
         }
       } else {
         reticle.visible = false;
-        if (points.length < 2) addBtn.disabled = true;
       }
     }
     updateHint();
     renderer.render(scene, camera);
+    // float the distance label at the midpoint of the line (projected to screen)
+    if (points.length === 2) {
+      _mid.addVectors(points[0], points[1]).multiplyScalar(0.5).project(camera);
+      if (_mid.z < 1) {
+        labelEl.style.left = ((_mid.x * 0.5 + 0.5) * window.innerWidth) + 'px';
+        labelEl.style.top = ((-_mid.y * 0.5 + 0.5) * window.innerHeight) + 'px';
+        labelEl.style.display = 'block';
+      } else {
+        labelEl.style.display = 'none';
+      }
+    }
   });
 }
 
