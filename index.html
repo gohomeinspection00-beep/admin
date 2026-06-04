@@ -1443,6 +1443,35 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .tools-footnote svg{color:var(--accent);flex-shrink:0;margin-top:1px}
 .tools-footnote span{font-size:12px;line-height:1.5;color:var(--fg-dim)}
 
+/* Category filter chips */
+.tools-filter{
+  display:flex;gap:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  margin-bottom:4px;
+  padding:2px 0 6px;
+}
+.tools-filter::-webkit-scrollbar{height:0}
+.tools-chip{
+  flex-shrink:0;
+  padding:9px 18px;
+  border-radius:999px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--fg-dim);
+  font-size:13px;font-weight:600;
+  white-space:nowrap;
+  transition:background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.tools-chip:hover{border-color:var(--line-2)}
+.tools-chip.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:var(--accent-fg);
+  box-shadow:var(--shadow-2);
+}
+.tools-group{margin:0}
+
 /* ============================================
    CHAT MODE
 ============================================ */
@@ -6053,12 +6082,15 @@ body.site-mode-active .voice-mode{
   <!-- TOOLS MODE -->
   <main class="tools-mode" id="toolsMode">
     <div class="tools-content">
-      <div class="tools-header">
-        <div class="tools-eyebrow">Field Toolkit</div>
-        <h1 class="tools-title">Quick <em>tools</em> for site work.</h1>
-        <p class="tools-desc">Single-purpose instruments for fast, structured on-site decisions — every result can be sent straight to chat for a full write-up.</p>
+      <!-- Category filter chips -->
+      <div class="tools-filter" id="toolsFilter">
+        <button class="tools-chip active" data-cat="all">All</button>
+        <button class="tools-chip" data-cat="assessment">Assessment</button>
+        <button class="tools-chip" data-cat="orientation">Orientation</button>
+        <button class="tools-chip" data-cat="measurement">Measurement</button>
       </div>
 
+      <div class="tools-group" data-cat="assessment">
       <div class="tools-section-divider">
         <span>Assessment</span>
       </div>
@@ -6086,7 +6118,9 @@ body.site-mode-active .voice-mode{
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       </div>
-      
+      </div>
+
+      <div class="tools-group" data-cat="orientation">
       <div class="tools-section-divider">
         <span>Orientation</span>
       </div>
@@ -6114,7 +6148,9 @@ body.site-mode-active .voice-mode{
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       </div>
-      
+      </div>
+
+      <div class="tools-group" data-cat="measurement">
       <div class="tools-section-divider">
         <span>Measurement</span>
       </div>
@@ -6130,6 +6166,7 @@ body.site-mode-active .voice-mode{
           </div>
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
+      </div>
       </div>
 
       <div class="tools-footnote">
@@ -11169,6 +11206,18 @@ document.querySelectorAll('.fab-option').forEach(function(opt) {
 document.querySelectorAll('#toolsMode [data-tool]').forEach(function(item) {
   item.addEventListener('click', function() {
     openTool(item.dataset.tool);
+  });
+});
+
+// Tools category filter chips
+document.querySelectorAll('#toolsFilter .tools-chip').forEach(function(chip) {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('#toolsFilter .tools-chip').forEach(function(c) { c.classList.remove('active'); });
+    chip.classList.add('active');
+    const cat = chip.dataset.cat;
+    document.querySelectorAll('#toolsMode .tools-group').forEach(function(g) {
+      g.style.display = (cat === 'all' || g.dataset.cat === cat) ? '' : 'none';
+    });
   });
 });
 
