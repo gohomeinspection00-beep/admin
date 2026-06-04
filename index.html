@@ -1406,6 +1406,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .cat-ai .tools-list-icon{background:var(--accent-soft);color:var(--accent)}
 .cat-draw .tools-list-icon{background:var(--success-soft);color:var(--success)}
 .cat-talk .tools-list-icon{background:var(--accent-soft);color:var(--accent)}
+.cat-calc .tools-list-icon{background:var(--warning-soft);color:var(--warning)}
 .tools-list-content{flex:1;min-width:0}
 .tools-list-name{
   font-size:15px;font-weight:700;
@@ -1629,6 +1630,24 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .vt-mic.listening{animation:vt-pulse 1s infinite}
 .vt-mic-ic{display:flex;align-items:center;justify-content:center;line-height:0}
 @keyframes vt-pulse{0%,100%{opacity:1}50%{opacity:0.45}}
+
+/* Converter & Calc */
+.cv-tabs{display:flex;gap:8px;margin-bottom:14px}
+.cv-tab{flex:1;padding:10px;border-radius:10px;background:rgba(127,127,127,0.08);color:var(--fg-dim);font-size:14px;font-weight:600;border:1px solid var(--border);text-align:center}
+.cv-tab.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.cv-chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}
+.cv-chip{flex:0 0 auto;padding:7px 13px;border-radius:999px;background:rgba(127,127,127,0.08);color:var(--fg-dim);font-size:13px;font-weight:600;border:1px solid transparent}
+.cv-chip.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.cv-field{margin-bottom:12px}
+.cv-label{font-size:12px;color:var(--fg-dim);margin-bottom:5px;font-weight:600}
+.cv-input,.cv-select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(127,127,127,0.05);color:inherit;font-size:15px;box-sizing:border-box;font-family:inherit}
+.cv-inline{display:flex;gap:8px}
+.cv-inline>*{flex:1}
+.cv-result{margin-top:6px;padding:14px;border-radius:12px;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:15px;text-align:center;line-height:1.55}
+.cv-list{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.cv-list-row{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border-radius:10px;background:rgba(127,127,127,0.06);font-size:14px}
+.cv-list-row b{font-family:var(--font-mono);font-size:15px}
+.cv-note{font-size:11.5px;color:var(--fg-dim);margin-top:10px;line-height:1.45}
 
 /* AR Floor Plan — tagging screen */
 .fp-overlay{
@@ -6310,6 +6329,7 @@ body.site-mode-active .voice-mode{
         <button class="tools-chip" data-cat="ai">AI</button>
         <button class="tools-chip" data-cat="draw">Draw</button>
         <button class="tools-chip" data-cat="talk">Talk</button>
+        <button class="tools-chip" data-cat="calc">Calc</button>
       </div>
 
       <div class="tools-group" data-cat="assessment">
@@ -6464,6 +6484,25 @@ body.site-mode-active .voice-mode{
           <div class="tools-list-content">
             <div class="tools-list-name">Voice Translator</div>
             <div class="tools-list-desc">Two-way voice translation — Bangla, Mandarin, Tamil, Urdu ⇄ BM/English. Speak &amp; hear replies.</div>
+          </div>
+          <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      </div>
+
+      <div class="tools-group" data-cat="calc">
+      <div class="tools-section-divider">
+        <span>Calculate</span>
+      </div>
+
+      <div class="tools-list">
+        <button class="tools-list-item cat-calc" data-tool="converter">
+          <div class="tools-list-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="19"/><line x1="8" y1="19" x2="12" y2="19"/></svg>
+          </div>
+          <div class="tools-list-content">
+            <div class="tools-list-name">Converter &amp; Calc</div>
+            <div class="tools-list-desc">Unit converter (length, area, volume…) plus on-site calculators: tiles, paint, slope, diagonal.</div>
           </div>
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
@@ -9831,6 +9870,7 @@ function openTool(toolKey) {
   else if (toolKey === 'sketch2real') openSketchToReal();
   else if (toolKey === 'planeditor') openPlanEditor();
   else if (toolKey === 'voicetranslate') openVoiceTranslator();
+  else if (toolKey === 'converter') openConverter();
 }
 
 function closeTool() {
@@ -12931,6 +12971,204 @@ function openVoiceTranslator() {
     try { speechSynthesis.cancel(); } catch (e) {}
     ov.remove();
   });
+}
+
+// =======================================================
+// TOOL: CONVERTER & CALCULATOR
+// =======================================================
+const CV_UNITS = {
+  Length: { list: [['mm', 0.001], ['cm', 0.01], ['m', 1], ['inch', 0.0254], ['ft', 0.3048], ['yd', 0.9144]] },
+  Area: { list: [['mm²', 1e-6], ['cm²', 1e-4], ['m²', 1], ['ft²', 0.092903], ['in²', 0.00064516], ['yd²', 0.836127], ['acre', 4046.8564], ['hectare', 10000]] },
+  Volume: { list: [['ml', 0.001], ['litre', 1], ['m³', 1000], ['cm³', 0.001], ['ft³', 28.3168], ['gallon (US)', 3.78541]] },
+  Weight: { list: [['g', 0.001], ['kg', 1], ['tonne', 1000], ['lb', 0.453592], ['oz', 0.0283495]] }
+};
+const CV_DEF = { Length: 'm', Area: 'm²', Volume: 'm³', Weight: 'kg', Temperature: '°C' };
+const CV_LEN = { m: 1, cm: 0.01, mm: 0.001, ft: 0.3048, in: 0.0254 };
+
+function cvFmt(n) {
+  if (!isFinite(n)) return '—';
+  const a = Math.abs(n);
+  if (a !== 0 && (a >= 1e6 || a < 1e-4)) return n.toExponential(3);
+  return String(Math.round(n * 1000) / 1000);
+}
+function cvNum(id) { const el = document.getElementById(id); return el ? (parseFloat(el.value) || 0) : 0; }
+function cvSetVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+function cvBind(ids, fn) { ids.forEach(function(id) { const el = document.getElementById(id); if (el) { el.addEventListener('input', fn); el.addEventListener('change', fn); } }); fn(); }
+function cvLenOpts(sel) { return Object.keys(CV_LEN).map(function(u) { return '<option' + (u === sel ? ' selected' : '') + '>' + u + '</option>'; }).join(''); }
+function cvField1(id, label) { return '<div class="cv-field"><div class="cv-label">' + label + '</div><input class="cv-input" type="number" inputmode="decimal" id="' + id + '"></div>'; }
+function cvField2(id1, l1, id2, l2) { return '<div class="cv-inline">' + cvField1(id1, l1) + cvField1(id2, l2) + '</div>'; }
+
+function openConverter() {
+  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="16" y2="19"/><line x1="8" y1="19" x2="12" y2="19"/></svg>';
+  document.getElementById('toolModalName').textContent = 'Converter & Calc';
+  document.getElementById('toolModalDesc').textContent = 'Convert units & run on-site calculations';
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="cv-tabs">' +
+      '<button class="cv-tab active" data-cvtab="convert">Convert</button>' +
+      '<button class="cv-tab" data-cvtab="calc">Calculate</button>' +
+    '</div>' +
+    '<div id="cvBody"></div>';
+  document.getElementById('toolModalFoot').innerHTML = '<button class="tool-btn tool-btn-primary" id="cvClose">Close</button>';
+  showToolModal();
+  document.getElementById('cvClose').addEventListener('click', function() { if (typeof closeTool === 'function') closeTool(); });
+  document.querySelectorAll('.cv-tab').forEach(function(t) {
+    t.addEventListener('click', function() {
+      document.querySelectorAll('.cv-tab').forEach(function(x) { x.classList.toggle('active', x === t); });
+      if (t.dataset.cvtab === 'convert') renderConvertTab(); else renderCalcTab();
+    });
+  });
+  renderConvertTab();
+}
+
+function renderConvertTab() {
+  const body = document.getElementById('cvBody');
+  let cat = 'Length';
+  const cats = ['Length', 'Area', 'Volume', 'Weight', 'Temperature'];
+  body.innerHTML =
+    '<div class="cv-chips" id="cvCats">' + cats.map(function(c) { return '<button class="cv-chip' + (c === cat ? ' active' : '') + '" data-cat="' + c + '">' + c + '</button>'; }).join('') + '</div>' +
+    '<div class="cv-field"><div class="cv-label">Value</div><input class="cv-input" id="cvValue" type="number" inputmode="decimal" value="1"></div>' +
+    '<div class="cv-field"><div class="cv-label">From unit</div><select class="cv-select" id="cvFrom"></select></div>' +
+    '<div class="cv-list" id="cvList"></div>';
+  const fromSel = body.querySelector('#cvFrom');
+  const valIn = body.querySelector('#cvValue');
+  const listEl = body.querySelector('#cvList');
+  function unitNames() { return (cat === 'Temperature') ? ['°C', '°F', 'K'] : CV_UNITS[cat].list.map(function(u) { return u[0]; }); }
+  function fillFrom() {
+    fromSel.innerHTML = unitNames().map(function(n) { return '<option>' + n + '</option>'; }).join('');
+    fromSel.value = CV_DEF[cat];
+  }
+  function recompute() {
+    const v = parseFloat(valIn.value) || 0;
+    const from = fromSel.value;
+    let rows;
+    if (cat === 'Temperature') {
+      const c = (from === '°C') ? v : (from === '°F') ? (v - 32) * 5 / 9 : v - 273.15;
+      rows = [['°C', c], ['°F', c * 9 / 5 + 32], ['K', c + 273.15]];
+    } else {
+      const list = CV_UNITS[cat].list;
+      const ff = list.find(function(u) { return u[0] === from; })[1];
+      const base = v * ff;
+      rows = list.map(function(u) { return [u[0], base / u[1]]; });
+    }
+    listEl.innerHTML = rows.map(function(r) { return '<div class="cv-list-row"><span>' + r[0] + '</span><b>' + cvFmt(r[1]) + '</b></div>'; }).join('');
+  }
+  body.querySelector('#cvCats').addEventListener('click', function(e) {
+    const b = e.target.closest('.cv-chip'); if (!b) return;
+    cat = b.dataset.cat;
+    body.querySelectorAll('#cvCats .cv-chip').forEach(function(x) { x.classList.toggle('active', x === b); });
+    fillFrom(); recompute();
+  });
+  valIn.addEventListener('input', recompute);
+  fromSel.addEventListener('change', recompute);
+  fillFrom();
+  recompute();
+}
+
+function renderCalcTab() {
+  const body = document.getElementById('cvBody');
+  const types = [['area', 'Area'], ['volume', 'Volume'], ['tiles', 'Tiles'], ['paint', 'Paint'], ['slope', 'Slope/Fall'], ['diagonal', 'Diagonal']];
+  let cur = 'area';
+  body.innerHTML = '<div class="cv-chips" id="cvCalcTypes">' + types.map(function(t) { return '<button class="cv-chip' + (t[0] === cur ? ' active' : '') + '" data-ct="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div><div id="cvCalcBody"></div>';
+  body.querySelector('#cvCalcTypes').addEventListener('click', function(e) {
+    const b = e.target.closest('.cv-chip'); if (!b) return;
+    cur = b.dataset.ct;
+    body.querySelectorAll('#cvCalcTypes .cv-chip').forEach(function(x) { x.classList.toggle('active', x === b); });
+    renderCalc(cur);
+  });
+  renderCalc(cur);
+}
+
+function renderCalc(type) {
+  const b = document.getElementById('cvCalcBody');
+  if (type === 'area') {
+    b.innerHTML =
+      '<div class="cv-inline"><div class="cv-field"><div class="cv-label">Shape</div><select class="cv-select" id="cvAreaShape"><option>Rectangle</option><option>Triangle</option><option>Circle</option></select></div>' +
+      '<div class="cv-field"><div class="cv-label">Unit</div><select class="cv-select" id="cvAreaUnit">' + cvLenOpts('m') + '</select></div></div>' +
+      '<div id="cvAreaFields"></div>' +
+      '<div class="cv-result" id="cvAreaResult">—</div>';
+    const ss = document.getElementById('cvAreaShape');
+    function comp() {
+      const u = CV_LEN[document.getElementById('cvAreaUnit').value]; const s = ss.value; let m2 = 0;
+      if (s === 'Rectangle') m2 = (cvNum('cvA1') * u) * (cvNum('cvA2') * u);
+      else if (s === 'Triangle') m2 = 0.5 * (cvNum('cvA1') * u) * (cvNum('cvA2') * u);
+      else { const r = cvNum('cvA1') * u; m2 = Math.PI * r * r; }
+      document.getElementById('cvAreaResult').innerHTML = 'Area: ' + cvFmt(m2) + ' m²<br>' + cvFmt(m2 / 0.092903) + ' ft²';
+    }
+    function bf() {
+      const s = ss.value; const f = document.getElementById('cvAreaFields');
+      if (s === 'Rectangle') f.innerHTML = cvField2('cvA1', 'Length', 'cvA2', 'Width');
+      else if (s === 'Triangle') f.innerHTML = cvField2('cvA1', 'Base', 'cvA2', 'Height');
+      else f.innerHTML = cvField1('cvA1', 'Radius');
+      cvBind(['cvA1', 'cvA2', 'cvAreaUnit'], comp);
+    }
+    ss.addEventListener('change', bf); bf();
+  } else if (type === 'volume') {
+    b.innerHTML =
+      '<div class="cv-inline"><div class="cv-field"><div class="cv-label">Shape</div><select class="cv-select" id="cvVolShape"><option>Box</option><option>Cylinder</option></select></div>' +
+      '<div class="cv-field"><div class="cv-label">Unit</div><select class="cv-select" id="cvVolUnit">' + cvLenOpts('m') + '</select></div></div>' +
+      '<div id="cvVolFields"></div>' +
+      '<div class="cv-result" id="cvVolResult">—</div>';
+    const ss = document.getElementById('cvVolShape');
+    function comp() {
+      const u = CV_LEN[document.getElementById('cvVolUnit').value]; const s = ss.value; let m3 = 0;
+      if (s === 'Box') m3 = (cvNum('cvV1') * u) * (cvNum('cvV2') * u) * (cvNum('cvV3') * u);
+      else { const r = cvNum('cvV1') * u, h = cvNum('cvV2') * u; m3 = Math.PI * r * r * h; }
+      document.getElementById('cvVolResult').innerHTML = 'Volume: ' + cvFmt(m3) + ' m³<br>' + cvFmt(m3 * 1000) + ' L &nbsp;·&nbsp; ' + cvFmt(m3 / 0.0283168) + ' ft³';
+    }
+    function bf() {
+      const s = ss.value; const f = document.getElementById('cvVolFields');
+      if (s === 'Box') f.innerHTML = cvField2('cvV1', 'Length', 'cvV2', 'Width') + cvField1('cvV3', 'Height');
+      else f.innerHTML = cvField2('cvV1', 'Radius', 'cvV2', 'Height');
+      cvBind(['cvV1', 'cvV2', 'cvV3', 'cvVolUnit'], comp);
+    }
+    ss.addEventListener('change', bf); bf();
+  } else if (type === 'tiles') {
+    b.innerHTML =
+      cvField2('cvT_L', 'Room length (m)', 'cvT_W', 'Room width (m)') +
+      cvField2('cvT_tw', 'Tile width (cm)', 'cvT_th', 'Tile height (cm)') +
+      cvField1('cvT_waste', 'Wastage %') +
+      '<div class="cv-result" id="cvT_res">—</div>' +
+      '<div class="cv-note">Adds wastage for cuts. Round up to full boxes at the shop.</div>';
+    cvSetVal('cvT_tw', 30); cvSetVal('cvT_th', 30); cvSetVal('cvT_waste', 10);
+    cvBind(['cvT_L', 'cvT_W', 'cvT_tw', 'cvT_th', 'cvT_waste'], function() {
+      const roomA = cvNum('cvT_L') * cvNum('cvT_W');
+      const tileA = (cvNum('cvT_tw') / 100) * (cvNum('cvT_th') / 100);
+      let tiles = 0; if (tileA > 0) tiles = Math.ceil(roomA / tileA * (1 + cvNum('cvT_waste') / 100));
+      document.getElementById('cvT_res').innerHTML = 'Tiles needed: ' + tiles + '<br>Room area: ' + cvFmt(roomA) + ' m²';
+    });
+  } else if (type === 'paint') {
+    b.innerHTML =
+      cvField1('cvP_area', 'Wall area (m²)') +
+      cvField2('cvP_cov', 'Coverage (m²/L)', 'cvP_coats', 'Coats') +
+      '<div class="cv-result" id="cvP_res">—</div>' +
+      '<div class="cv-note">Typical emulsion ≈ 10–12 m²/L per coat. Round up when buying.</div>';
+    cvSetVal('cvP_cov', 11); cvSetVal('cvP_coats', 2);
+    cvBind(['cvP_area', 'cvP_cov', 'cvP_coats'], function() {
+      const cov = cvNum('cvP_cov'); let L = 0; if (cov > 0) L = cvNum('cvP_area') * cvNum('cvP_coats') / cov;
+      document.getElementById('cvP_res').innerHTML = 'Paint needed: ' + cvFmt(L) + ' L';
+    });
+  } else if (type === 'slope') {
+    b.innerHTML =
+      cvField2('cvS_rise', 'Rise', 'cvS_run', 'Run') +
+      '<div class="cv-result" id="cvS_res">—</div>' +
+      '<div class="cv-note">Rise &amp; run in the same unit. Common drainage fall ≈ 1:80 to 1:40.</div>';
+    cvBind(['cvS_rise', 'cvS_run'], function() {
+      const rise = cvNum('cvS_rise'), run = cvNum('cvS_run');
+      if (run <= 0 || rise <= 0) { document.getElementById('cvS_res').innerHTML = '—'; return; }
+      const pct = rise / run * 100, ratio = run / rise, deg = Math.atan2(rise, run) * 180 / Math.PI;
+      document.getElementById('cvS_res').innerHTML = 'Gradient: ' + cvFmt(pct) + '%<br>1 : ' + cvFmt(ratio) + ' &nbsp;·&nbsp; ' + cvFmt(deg) + '°';
+    });
+  } else if (type === 'diagonal') {
+    b.innerHTML =
+      '<div class="cv-field"><div class="cv-label">Unit</div><select class="cv-select" id="cvD_unit">' + cvLenOpts('m') + '</select></div>' +
+      cvField2('cvD_a', 'Side A', 'cvD_b', 'Side B') +
+      '<div class="cv-result" id="cvD_res">—</div>' +
+      '<div class="cv-note">Diagonal of a rectangle (Pythagoras). For a true 90° corner the measured diagonal should match this (3-4-5 rule).</div>';
+    cvBind(['cvD_a', 'cvD_b', 'cvD_unit'], function() {
+      const a = cvNum('cvD_a'), bb = cvNum('cvD_b'); const d = Math.sqrt(a * a + bb * bb);
+      document.getElementById('cvD_res').innerHTML = 'Diagonal: ' + cvFmt(d) + ' ' + document.getElementById('cvD_unit').value;
+    });
+  }
 }
 
 // =======================================================
