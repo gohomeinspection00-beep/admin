@@ -1601,6 +1601,14 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .fp-ar-panel.locked #fpFlipBtn,
 .fp-ar-panel.locked #fpRetagBtn{display:none}
 .fp-ar-panel.locked{background:linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0))}
+.fp-snap-bar{
+  position:relative;z-index:4;pointer-events:auto;margin-top:auto;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-left:16px;margin-right:16px;margin-bottom:calc(env(safe-area-inset-bottom) + 16px);
+  padding:12px 14px;border-radius:14px;background:rgba(0,0,0,0.78);color:#fff;
+  font-size:12.5px;line-height:1.4;
+}
+.fp-snap-bar .ar-btn{padding:10px 16px;flex-shrink:0}
 
 /* ============================================
    CHAT MODE
@@ -11852,9 +11860,14 @@ async function startFloorPlanAR() {
       '<div class="fp-ar-btns">' +
         '<button class="ar-btn" id="fpFlipBtn">Flip</button>' +
         '<button class="ar-btn" id="fpRetagBtn">Re-tag</button>' +
+        '<button class="ar-btn" id="fpSnapBtn">📸 Snap</button>' +
         '<button class="ar-btn" id="fpLockBtn">🔒 Lock</button>' +
         '<button class="ar-btn" id="fpExitBtn2">Exit</button>' +
       '</div>' +
+    '</div>' +
+    '<div class="fp-snap-bar" id="fpSnapBar" style="display:none">' +
+      '<span>📸 Clean view — take your phone screenshot now (Power + Vol&nbsp;Down)</span>' +
+      '<button class="ar-btn ar-btn-primary" id="fpSnapDone">Done</button>' +
     '</div>';
   document.body.appendChild(overlay);
   overlay.style.display = 'flex';
@@ -11974,6 +11987,19 @@ async function startFloorPlanAR() {
     hintEl.textContent = v ? 'Locked — walk around to view' : 'Adjust the overlay below';
   }
   overlay.querySelector('#fpLockBtn').addEventListener('click', function() { setLocked(!locked); });
+
+  const snapBar = overlay.querySelector('#fpSnapBar');
+  const arTop = overlay.querySelector('.ar-top');
+  overlay.querySelector('#fpSnapBtn').addEventListener('click', function() {
+    panel.style.display = 'none';
+    if (arTop) arTop.style.display = 'none';
+    snapBar.style.display = 'flex';
+  });
+  overlay.querySelector('#fpSnapDone').addEventListener('click', function() {
+    snapBar.style.display = 'none';
+    if (arTop) arTop.style.display = '';
+    panel.style.display = 'flex';
+  });
 
   let session;
   try {
