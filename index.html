@@ -1674,6 +1674,21 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .cnt-row-count{font-weight:800;font-size:20px;font-family:var(--font-mono);color:var(--accent)}
 .cnt-row-del{background:none;border:none;color:#9ca3af;line-height:0;padding:6px}
 
+/* Spirit Level — iOS-style redesign */
+.lvl-wrap{display:flex;flex-direction:column;align-items:center;padding:6px 0 2px}
+.lvl-stage{position:relative;width:100%;max-width:300px;aspect-ratio:1/1;border-radius:30px;background:#0f141a;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:background 0.2s ease}
+.lvl-stage.level{background:#13361f}
+.lvl-ring-fixed,.lvl-ring-move{position:absolute;width:62%;height:62%;border-radius:50%;box-sizing:border-box}
+.lvl-ring-fixed{border:2px dashed rgba(255,255,255,0.22)}
+.lvl-ring-move{border:3px solid #fff;will-change:transform}
+.lvl-stage.level .lvl-ring-move{border-color:#34d399;box-shadow:0 0 22px rgba(52,211,153,0.5)}
+.lvl-deg{position:absolute;font-family:var(--font-mono);font-size:42px;font-weight:700;color:#fff;letter-spacing:-1px}
+.lvl-stage.level .lvl-deg{color:#34d399}
+.lvl-line-ref{position:absolute;width:78%;height:2px;background:rgba(255,255,255,0.18)}
+.lvl-line{position:absolute;width:84%;height:4px;background:#fff;border-radius:3px;will-change:transform}
+.lvl-stage.level .lvl-line{background:#34d399;box-shadow:0 0 18px rgba(52,211,153,0.5)}
+.lvl-hint{text-align:center;margin-top:14px;font-size:13px;color:var(--fg-dim);line-height:1.4}
+
 /* AR Floor Plan — tagging screen */
 .fp-overlay{
   position:fixed;inset:0;z-index:3100;background:#0b0f14;
@@ -10206,106 +10221,46 @@ let spiritActiveMode = 'horizontal'; // actual UI mode (changes if auto)
 
 function renderSpiritLevelUI() {
   document.getElementById('toolModalBody').innerHTML =
-    '<div class="sensor-tool-body">' +
-      '<div class="spirit-mode-toggle">' +
-        '<button class="spirit-mode-btn active" data-mode="auto">' +
-          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>' +
-          'Auto<span class="spirit-mode-btn-auto-indicator" id="spiritAutoIndicator"></span>' +
-        '</button>' +
-        '<button class="spirit-mode-btn" data-mode="horizontal">' +
-          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>' +
-          'Horizontal' +
-        '</button>' +
-        '<button class="spirit-mode-btn" data-mode="vertical">' +
-          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/></svg>' +
-          'Vertical' +
-        '</button>' +
-      '</div>' +
-      '<div id="spiritUiArea" style="display:flex;flex-direction:column;align-items:center;gap:18px;width:100%"></div>' +
-      '<div class="spirit-status" id="spiritStatus">Waiting for sensor data...</div>' +
+    '<div class="lvl-wrap">' +
+      '<div class="lvl-stage" id="lvlStage"></div>' +
+      '<div class="lvl-hint" id="lvlHint">Lay the phone flat, or hold it against a wall</div>' +
     '</div>';
-  
+
   document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-secondary" id="spiritCalibrateBtn">Calibrate (set as 0°)</button>' +
+    '<button class="tool-btn tool-btn-secondary" id="spiritCalibrateBtn">Set 0°</button>' +
     '<button class="tool-btn tool-btn-primary" id="spiritDoneBtn">Done</button>';
-  
-  // Wire mode toggle
-  document.querySelectorAll('.spirit-mode-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      spiritMode = btn.dataset.mode;
-      document.querySelectorAll('.spirit-mode-btn').forEach(function(b) {
-        b.classList.toggle('active', b.dataset.mode === spiritMode);
-      });
-      // If user picks specific mode, lock it
-      if (spiritMode !== 'auto') {
-        spiritActiveMode = spiritMode;
-      }
-      renderSpiritUiForMode(spiritActiveMode);
-    });
-  });
-  
+
   document.getElementById('spiritCalibrateBtn').addEventListener('click', function() {
-    spiritCalibration = { 
-      beta: window._lastBeta || 0, 
-      gamma: window._lastGamma || 0 
-    };
+    spiritCalibration = { beta: window._lastBeta || 0, gamma: window._lastGamma || 0 };
     showToast('Calibrated · current position is now 0°');
   });
-  
   document.getElementById('spiritDoneBtn').addEventListener('click', function() {
     stopSpiritLevel();
     closeTool();
   });
-  
-  // Default render horizontal
+
   spiritMode = 'auto';
   spiritActiveMode = 'horizontal';
   renderSpiritUiForMode('horizontal');
-  
-  // Start sensor
   startSpiritLevel();
 }
 
 function renderSpiritUiForMode(mode) {
-  const area = document.getElementById('spiritUiArea');
-  if (!area) return;
-  
+  const stage = document.getElementById('lvlStage');
+  const hint = document.getElementById('lvlHint');
+  if (!stage) return;
   if (mode === 'vertical') {
-    area.innerHTML =
-      '<div class="spirit-tube-container">' +
-        '<div class="spirit-tube-marker-top"></div>' +
-        '<div class="spirit-tube-center-line"></div>' +
-        '<div class="spirit-tube-target"></div>' +
-        '<div class="spirit-tube-bubble" id="spiritBubble"></div>' +
-        '<div class="spirit-tube-marker-bot"></div>' +
-      '</div>' +
-      '<div class="spirit-readout">' +
-        '<div class="spirit-readout-item">' +
-          '<div class="spirit-readout-label">Plumb tilt</div>' +
-          '<div class="spirit-readout-value" id="spiritPitch">—°</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="spirit-mode-label">Vertical mode · hold phone against wall</div>';
+    stage.innerHTML =
+      '<div class="lvl-line-ref"></div>' +
+      '<div class="lvl-line" id="lvlLine"></div>' +
+      '<div class="lvl-deg" id="lvlDeg">0°</div>';
+    if (hint) hint.textContent = 'Wall mode · hold the phone flat against the wall';
   } else {
-    // horizontal
-    area.innerHTML =
-      '<div class="spirit-bubble-container">' +
-        '<div class="spirit-crosshair-h"></div>' +
-        '<div class="spirit-crosshair-v"></div>' +
-        '<div class="spirit-target"></div>' +
-        '<div class="spirit-bubble" id="spiritBubble"></div>' +
-      '</div>' +
-      '<div class="spirit-readout">' +
-        '<div class="spirit-readout-item">' +
-          '<div class="spirit-readout-label">Pitch</div>' +
-          '<div class="spirit-readout-value" id="spiritPitch">—°</div>' +
-        '</div>' +
-        '<div class="spirit-readout-item">' +
-          '<div class="spirit-readout-label">Roll</div>' +
-          '<div class="spirit-readout-value" id="spiritRoll">—°</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="spirit-mode-label">Horizontal mode · place phone flat on surface</div>';
+    stage.innerHTML =
+      '<div class="lvl-ring-fixed"></div>' +
+      '<div class="lvl-ring-move" id="lvlMove"></div>' +
+      '<div class="lvl-deg" id="lvlDeg">0°</div>';
+    if (hint) hint.textContent = 'Flat mode · place the phone on the surface';
   }
 }
 
@@ -10313,150 +10268,70 @@ function startSpiritLevel() {
   if (spiritOrientationHandler) {
     window.removeEventListener('deviceorientation', spiritOrientationHandler);
   }
-  
-  let lastHapticTime = 0;
+
+  let lastHaptic = 0;
   let wasLevel = false;
   let lastAutoSwitch = 0;
-  
+  const TOL = 0.7; // degrees considered "level"
+
   spiritOrientationHandler = function(e) {
-    if (e.beta === null || e.gamma === null) {
-      const statusEl = document.getElementById('spiritStatus');
-      if (statusEl) statusEl.textContent = 'No sensor data';
-      return;
-    }
-    
+    if (e.beta === null || e.gamma === null) return;
+
     window._lastBeta = e.beta;
     window._lastGamma = e.gamma;
-    
-    // Apply calibration
+
     const beta = e.beta - spiritCalibration.beta;
     const gamma = e.gamma - spiritCalibration.gamma;
-    
-    // ==== AUTO-DETECT MODE ====
+
+    // Auto-detect flat vs wall (hysteresis to avoid flicker)
     if (spiritMode === 'auto') {
-      const absBeta = Math.abs(e.beta); // raw beta — phone orientation in space
+      const absBeta = Math.abs(e.beta);
       const now = Date.now();
-      
-      let detectedMode = spiritActiveMode;
-      // Hysteresis to prevent flicker: different thresholds for entering each mode
-      if (absBeta < 30) detectedMode = 'horizontal';
-      else if (absBeta > 60) detectedMode = 'vertical';
-      // Between 30-60 = stay in current mode
-      
-      if (detectedMode !== spiritActiveMode && now - lastAutoSwitch > 300) {
-        spiritActiveMode = detectedMode;
+      let detected = spiritActiveMode;
+      if (absBeta < 35) detected = 'horizontal';
+      else if (absBeta > 55) detected = 'vertical';
+      if (detected !== spiritActiveMode && now - lastAutoSwitch > 300) {
+        spiritActiveMode = detected;
         lastAutoSwitch = now;
-        renderSpiritUiForMode(detectedMode);
-        const indicator = document.getElementById('spiritAutoIndicator');
-        if (indicator) indicator.textContent = '· ' + detectedMode.charAt(0).toUpperCase();
+        renderSpiritUiForMode(detected);
       }
     }
-    
-    const activeMode = spiritActiveMode;
-    const bubble = document.getElementById('spiritBubble');
-    if (!bubble) return;
-    
-    const pitchEl = document.getElementById('spiritPitch');
-    const rollEl = document.getElementById('spiritRoll');
-    const statusEl = document.getElementById('spiritStatus');
-    
-    if (pitchEl) pitchEl.classList.remove('level-color', 'warn-color');
-    if (rollEl) rollEl.classList.remove('level-color', 'warn-color');
-    if (statusEl) statusEl.classList.remove('level', 'warn');
-    bubble.classList.remove('level', 'warn');
-    
-    if (activeMode === 'vertical') {
-      // ===== VERTICAL MODE =====
-      // Phone held against wall. Bubble moves horizontally based on gamma (roll).
-      
-      const MAX_TILT = 20;
-      const MAX_PX = 30; // tube is 80px wide, max travel ±30px from center
-      
-      const pxX = Math.max(-MAX_PX, Math.min(MAX_PX, (gamma / MAX_TILT) * MAX_PX));
-      bubble.style.transform = 'translate(' + pxX + 'px, 0)';
-      
-      const tiltMag = Math.abs(gamma);
-      
-      if (tiltMag < 1) {
-        bubble.classList.add('level');
-        if (pitchEl) pitchEl.classList.add('level-color');
-        if (statusEl) {
-          statusEl.classList.add('level');
-          statusEl.textContent = '✓ Plumb (vertical)';
-        }
-        // Haptic
-        if (!wasLevel && navigator.vibrate) {
-          const now = Date.now();
-          if (now - lastHapticTime > 500) {
-            navigator.vibrate(30);
-            lastHapticTime = now;
-          }
-        }
-        wasLevel = true;
-      } else if (tiltMag < 5) {
-        bubble.classList.add('warn');
-        if (pitchEl) pitchEl.classList.add('warn-color');
-        if (statusEl) {
-          statusEl.classList.add('warn');
-          statusEl.textContent = 'Nearly plumb — adjust slightly';
-        }
-        wasLevel = false;
-      } else {
-        if (statusEl) statusEl.textContent = 'Off-plumb';
-        wasLevel = false;
-      }
-      
-      if (pitchEl) pitchEl.textContent = (gamma >= 0 ? '+' : '') + gamma.toFixed(1) + '°';
-      
+
+    const stage = document.getElementById('lvlStage');
+    const degEl = document.getElementById('lvlDeg');
+    if (!stage || !degEl) return;
+
+    let tilt;
+    if (spiritActiveMode === 'vertical') {
+      // Wall mode: line rotates with roll; deviation from plumb = |gamma|
+      const line = document.getElementById('lvlLine');
+      if (line) line.style.transform = 'rotate(' + (-gamma) + 'deg)';
+      tilt = Math.abs(gamma);
     } else {
-      // ===== HORIZONTAL MODE =====
-      // Phone flat on surface. Bubble moves 2D based on pitch (beta) and roll (gamma).
-      const MAX_TILT = 30;
-      const MAX_PX = 80;
-      
+      // Flat mode: ring drifts in 2D by pitch/roll
+      const move = document.getElementById('lvlMove');
+      const MAX_TILT = 25, MAX_PX = 64;
       const pxX = Math.max(-MAX_PX, Math.min(MAX_PX, (gamma / MAX_TILT) * MAX_PX));
       const pxY = Math.max(-MAX_PX, Math.min(MAX_PX, (beta / MAX_TILT) * MAX_PX));
-      
-      bubble.style.transform = 'translate(' + pxX + 'px, ' + pxY + 'px)';
-      
-      const tiltMag = Math.sqrt(beta * beta + gamma * gamma);
-      
-      if (tiltMag < 1) {
-        bubble.classList.add('level');
-        if (pitchEl) pitchEl.classList.add('level-color');
-        if (rollEl) rollEl.classList.add('level-color');
-        if (statusEl) {
-          statusEl.classList.add('level');
-          statusEl.textContent = '✓ Level';
-        }
-        // Haptic
-        if (!wasLevel && navigator.vibrate) {
-          const now = Date.now();
-          if (now - lastHapticTime > 500) {
-            navigator.vibrate(30);
-            lastHapticTime = now;
-          }
-        }
-        wasLevel = true;
-      } else if (tiltMag < 5) {
-        bubble.classList.add('warn');
-        if (pitchEl) pitchEl.classList.add('warn-color');
-        if (rollEl) rollEl.classList.add('warn-color');
-        if (statusEl) {
-          statusEl.classList.add('warn');
-          statusEl.textContent = 'Nearly level — adjust slightly';
-        }
-        wasLevel = false;
-      } else {
-        if (statusEl) statusEl.textContent = 'Not level';
-        wasLevel = false;
+      if (move) move.style.transform = 'translate(' + pxX + 'px,' + pxY + 'px)';
+      tilt = Math.sqrt(beta * beta + gamma * gamma);
+    }
+
+    const isLevel = tilt < TOL;
+    stage.classList.toggle('level', isLevel);
+    degEl.textContent = isLevel ? '0°' : tilt.toFixed(1) + '°';
+
+    if (isLevel) {
+      if (!wasLevel && navigator.vibrate) {
+        const now = Date.now();
+        if (now - lastHaptic > 500) { navigator.vibrate(30); lastHaptic = now; }
       }
-      
-      if (pitchEl) pitchEl.textContent = (beta >= 0 ? '+' : '') + beta.toFixed(1) + '°';
-      if (rollEl) rollEl.textContent = (gamma >= 0 ? '+' : '') + gamma.toFixed(1) + '°';
+      wasLevel = true;
+    } else {
+      wasLevel = false;
     }
   };
-  
+
   window.addEventListener('deviceorientation', spiritOrientationHandler);
 }
 
