@@ -1538,6 +1538,64 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 }
 .ar-btn:disabled{opacity:0.45}
 
+/* AR Floor Plan — upload */
+.fp-upload{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  border:2px dashed var(--border);border-radius:var(--radius);
+  padding:24px 16px;margin-top:14px;cursor:pointer;color:var(--fg-dim);
+  font-size:13px;text-align:center;
+}
+.fp-preview{width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius);margin-top:12px;background:rgba(127,127,127,0.08)}
+
+/* AR Floor Plan — tagging screen */
+.fp-overlay{
+  position:fixed;inset:0;z-index:3100;background:#0b0f14;
+  display:none;flex-direction:column;font-family:var(--font-body);
+}
+.fp-tag-top{padding:calc(env(safe-area-inset-top) + 14px) 16px 10px;text-align:center}
+.fp-tag-hint{color:#fff;font-size:13px;opacity:0.92;line-height:1.4}
+.fp-stage{flex:1;position:relative;overflow:hidden;touch-action:none;background:#0b0f14}
+.fp-canvas{position:absolute;left:0;top:0;transform-origin:0 0}
+.fp-canvas img{display:block;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.fp-pin{
+  position:absolute;width:30px;height:30px;border-radius:50% 50% 50% 0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,0.55);border:2px solid #fff;
+}
+.fp-pin span{color:#fff;font-size:13px;font-weight:700}
+.fp-pin-1{background:#22d3ee}
+.fp-pin-2{background:#f59e0b}
+.fp-zoom{position:absolute;right:14px;bottom:18px;display:flex;flex-direction:column;gap:8px}
+.fp-zoom button{
+  width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.14);
+  color:#fff;font-size:20px;font-weight:600;border:1px solid rgba(255,255,255,0.25);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.fp-zoom button:last-child{font-size:12px}
+.fp-tag-foot{display:flex;gap:10px;padding:12px 16px calc(env(safe-area-inset-bottom) + 16px)}
+.fp-btn{
+  flex:1;padding:14px;border-radius:12px;background:rgba(255,255,255,0.14);color:#fff;
+  font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,0.25);
+}
+.fp-btn-primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+
+/* AR Floor Plan — AR overlay & control panel */
+#fpArOverlay{
+  position:fixed;inset:0;z-index:3000;
+  display:none;flex-direction:column;justify-content:space-between;
+  pointer-events:none;font-family:var(--font-body);
+}
+.fp-ar-panel{
+  position:relative;z-index:3;pointer-events:none;
+  display:flex;flex-direction:column;gap:9px;
+  padding:14px 16px calc(env(safe-area-inset-bottom) + 16px);
+  background:linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0));
+}
+.fp-ctrl{display:flex;align-items:center;gap:12px;pointer-events:auto}
+.fp-ctrl label{color:#fff;font-size:12px;width:56px;flex-shrink:0}
+.fp-ctrl input[type=range]{flex:1;accent-color:var(--accent);height:24px}
+.fp-ar-btns{display:flex;gap:10px;justify-content:center;margin-top:4px;pointer-events:auto}
+
 /* ============================================
    CHAT MODE
 ============================================ */
@@ -6243,6 +6301,17 @@ body.site-mode-active .voice-mode{
           </div>
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
+
+        <button class="tools-list-item cat-measure" data-tool="arfloorplan">
+          <div class="tools-list-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="14" y2="9"/><line x1="14" y1="3" x2="14" y2="21"/><line x1="14" y1="14" x2="21" y2="14"/></svg>
+          </div>
+          <div class="tools-list-content">
+            <div class="tools-list-name">AR Floor Plan</div>
+            <div class="tools-list-desc">Overlay a floor plan onto the real site in AR. Tag 2 points to align, then scale, rotate &amp; fade.</div>
+          </div>
+          <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
       </div>
       </div>
 
@@ -9603,6 +9672,7 @@ function openTool(toolKey) {
   else if (toolKey === 'compass') openCompass();
   else if (toolKey === 'crackruler') openCrackRuler();
   else if (toolKey === 'armeasure') openARMeasure();
+  else if (toolKey === 'arfloorplan') openARFloorPlan();
 }
 
 function closeTool() {
@@ -11509,6 +11579,427 @@ async function startARSession(statusEl, startBtn) {
         labelEl.style.display = 'none';
       }
     }
+  });
+}
+
+// =======================================================
+// TOOL: AR FLOOR PLAN OVERLAY (WebXR)
+// =======================================================
+let _fpImgURL = null;
+let _fpState = null;
+
+function fpWarn(statusEl, html, btn, btnText) {
+  statusEl.className = 'ar-status warn';
+  statusEl.innerHTML = html;
+  if (btn) { btn.disabled = true; btn.textContent = btnText || 'AR not available'; }
+}
+
+// Map the 4 image corners to world-space Vector3s using a 2-point similarity
+// (a -> P1, b -> P2) on the horizontal ground plane. `flip` mirrors across the line.
+function fpPlanCorners(P1, P2, st, flip) {
+  const THREE = window.THREE;
+  const A = P1.clone();
+  const ex = new THREE.Vector3(P2.x - P1.x, 0, P2.z - P1.z);
+  const worldLen = ex.length() || 0.001;
+  ex.normalize();
+  const up = new THREE.Vector3(0, 1, 0);
+  const ez = new THREE.Vector3().crossVectors(up, ex).normalize();
+  if (flip) ez.negate();
+  const idx = st.p2.x - st.p1.x, idy = st.p2.y - st.p1.y;
+  const imgLen = Math.hypot(idx, idy) || 1;
+  const dx = idx / imgLen, dy = idy / imgLen, px = -dy, py = dx;
+  const s = worldLen / imgLen;
+  const corners = [[0, 0], [st.w, 0], [st.w, st.h], [0, st.h]];
+  const out = [];
+  for (let i = 0; i < 4; i++) {
+    const ou = corners[i][0] - st.p1.x, ov = corners[i][1] - st.p1.y;
+    const along = ou * dx + ov * dy, perp = ou * px + ov * py;
+    out.push(new THREE.Vector3().copy(A).addScaledVector(ex, along * s).addScaledVector(ez, perp * s));
+  }
+  return out;
+}
+
+function openARFloorPlan() {
+  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="14" y2="9"/><line x1="14" y1="3" x2="14" y2="21"/><line x1="14" y1="14" x2="21" y2="14"/></svg>';
+  document.getElementById('toolModalName').textContent = 'AR Floor Plan';
+  document.getElementById('toolModalDesc').textContent = 'Overlay a floor plan onto the real site in AR';
+
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="ar-intro-steps">' +
+      '<div class="ar-step"><span class="ar-step-n">1</span><span>Upload your floor plan image.</span></div>' +
+      '<div class="ar-step"><span class="ar-step-n">2</span><span>Drag two pins onto two known points on the plan (zoom in for accuracy).</span></div>' +
+      '<div class="ar-step"><span class="ar-step-n">3</span><span>In AR, tag the same two real-world points — the plan appears to scale.</span></div>' +
+      '<div class="ar-step"><span class="ar-step-n">4</span><span>Fine-tune scale, rotation, flip &amp; transparency.</span></div>' +
+    '</div>' +
+    '<label class="fp-upload" id="fpUploadLabel">' +
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+      '<span id="fpUploadText">Tap to choose a floor plan image</span>' +
+      '<input type="file" accept="image/*" id="fpFile" hidden>' +
+    '</label>' +
+    '<img id="fpPreview" class="fp-preview" style="display:none" alt="">' +
+    '<div id="fpStatus" class="ar-status"></div>';
+
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="fpStartBtn" disabled>Choose a floor plan</button>';
+
+  showToolModal();
+
+  const startBtn = document.getElementById('fpStartBtn');
+  const statusEl = document.getElementById('fpStatus');
+  const fileInput = document.getElementById('fpFile');
+  let arOK = false;
+
+  function updateStart() {
+    if (arOK && _fpState && _fpState.imgEl) {
+      startBtn.disabled = false;
+      startBtn.textContent = 'Tag points on the plan';
+    } else if (arOK) {
+      startBtn.disabled = true;
+      startBtn.textContent = 'Choose a floor plan';
+    }
+  }
+
+  if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
+    fpWarn(statusEl, 'AR isn\'t available here. It needs Chrome on an <strong>ARCore Android</strong> phone, opened over <strong>https://</strong>.', startBtn, 'AR not available');
+  } else {
+    navigator.xr.isSessionSupported('immersive-ar').then(function(s) {
+      arOK = s;
+      if (!s) fpWarn(statusEl, 'This phone or browser doesn\'t support AR.', startBtn, 'AR not supported');
+      else updateStart();
+    }).catch(function() { fpWarn(statusEl, 'Could not check AR support.', startBtn, 'AR unavailable'); });
+  }
+
+  fileInput.addEventListener('change', function() {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    if (_fpImgURL) URL.revokeObjectURL(_fpImgURL);
+    _fpImgURL = URL.createObjectURL(f);
+    const im = new Image();
+    im.onload = function() {
+      _fpState = { imgEl: im, imgURL: _fpImgURL, w: im.naturalWidth, h: im.naturalHeight };
+      const pv = document.getElementById('fpPreview');
+      if (pv) { pv.src = _fpImgURL; pv.style.display = 'block'; }
+      const t = document.getElementById('fpUploadText');
+      if (t) t.textContent = 'Change image (' + im.naturalWidth + '×' + im.naturalHeight + ')';
+      updateStart();
+    };
+    im.onerror = function() { fpWarn(statusEl, 'Could not read that image. Try a PNG or JPG.', null); };
+    im.src = _fpImgURL;
+  });
+
+  startBtn.onclick = function() {
+    if (_fpState && _fpState.imgEl) openFloorPlanTag();
+  };
+}
+
+function openFloorPlanTag() {
+  let ov = document.getElementById('fpTagOverlay');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'fpTagOverlay';
+  ov.className = 'fp-overlay';
+  ov.innerHTML =
+    '<div class="fp-tag-top"><div class="fp-tag-hint">Drag pin <strong>1</strong> &amp; <strong>2</strong> onto two matching points on your plan. Pinch / use buttons to zoom.</div></div>' +
+    '<div class="fp-stage" id="fpStage">' +
+      '<div class="fp-canvas" id="fpCanvas">' +
+        '<img id="fpImg" alt="">' +
+        '<div class="fp-pin fp-pin-1" id="fpPin1"><span>1</span></div>' +
+        '<div class="fp-pin fp-pin-2" id="fpPin2"><span>2</span></div>' +
+      '</div>' +
+      '<div class="fp-zoom">' +
+        '<button id="fpZoomIn">+</button>' +
+        '<button id="fpZoomOut">−</button>' +
+        '<button id="fpZoomFit">Fit</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fp-tag-foot">' +
+      '<button class="fp-btn" id="fpTagCancel">Cancel</button>' +
+      '<button class="fp-btn fp-btn-primary" id="fpTagNext">Continue to AR</button>' +
+    '</div>';
+  document.body.appendChild(ov);
+  ov.style.display = 'flex';
+
+  const stage = ov.querySelector('#fpStage');
+  const canvas = ov.querySelector('#fpCanvas');
+  const img = ov.querySelector('#fpImg');
+  const pin1 = ov.querySelector('#fpPin1');
+  const pin2 = ov.querySelector('#fpPin2');
+  const W = _fpState.w, H = _fpState.h;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  img.src = _fpState.imgURL;
+
+  const p1 = { x: W * 0.33, y: H * 0.5 };
+  const p2 = { x: W * 0.66, y: H * 0.5 };
+  let zoom = 1, panX = 0, panY = 0;
+
+  function placePin(el, p) {
+    el.style.left = p.x + 'px';
+    el.style.top = p.y + 'px';
+    el.style.transform = 'translate(-50%,-100%) scale(' + (1 / zoom) + ')';
+  }
+  function apply() {
+    canvas.style.transform = 'translate(' + panX + 'px,' + panY + 'px) scale(' + zoom + ')';
+    placePin(pin1, p1);
+    placePin(pin2, p2);
+  }
+  function fit() {
+    const r = stage.getBoundingClientRect();
+    zoom = Math.min(r.width / W, r.height / H) * 0.9 || 1;
+    panX = (r.width - W * zoom) / 2;
+    panY = (r.height - H * zoom) / 2;
+    apply();
+  }
+  if (img.complete && img.naturalWidth) fit(); else img.onload = fit;
+  setTimeout(fit, 60);
+
+  const pointers = new Map();
+  let mode = null, dragPin = null, startPan = null, pinchStart = null;
+  function toImg(cx, cy) { const r = stage.getBoundingClientRect(); return { x: (cx - r.left - panX) / zoom, y: (cy - r.top - panY) / zoom }; }
+  function pinScreen(p) { const r = stage.getBoundingClientRect(); return { x: r.left + panX + p.x * zoom, y: r.top + panY + p.y * zoom }; }
+
+  stage.addEventListener('pointerdown', function(e) {
+    stage.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 1) {
+      const s1 = pinScreen(p1), s2 = pinScreen(p2);
+      const d1 = Math.hypot(e.clientX - s1.x, e.clientY - s1.y);
+      const d2 = Math.hypot(e.clientX - s2.x, e.clientY - s2.y);
+      if (d1 < 34 && d1 <= d2) { mode = 'pin'; dragPin = p1; }
+      else if (d2 < 34) { mode = 'pin'; dragPin = p2; }
+      else { mode = 'pan'; startPan = { panX: panX, panY: panY, x: e.clientX, y: e.clientY }; }
+    } else if (pointers.size === 2) {
+      mode = 'pinch'; dragPin = null;
+      const pts = Array.from(pointers.values());
+      pinchStart = { dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), zoom: zoom, panX: panX, panY: panY, midx: (pts[0].x + pts[1].x) / 2, midy: (pts[0].y + pts[1].y) / 2 };
+    }
+  });
+  stage.addEventListener('pointermove', function(e) {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (mode === 'pin' && dragPin) {
+      const im = toImg(e.clientX, e.clientY);
+      dragPin.x = Math.max(0, Math.min(W, im.x));
+      dragPin.y = Math.max(0, Math.min(H, im.y));
+      apply();
+    } else if (mode === 'pan' && startPan) {
+      panX = startPan.panX + (e.clientX - startPan.x);
+      panY = startPan.panY + (e.clientY - startPan.y);
+      apply();
+    } else if (mode === 'pinch' && pinchStart) {
+      const pts = Array.from(pointers.values());
+      if (pts.length < 2) return;
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      const r = stage.getBoundingClientRect();
+      let nz = pinchStart.zoom * (dist / pinchStart.dist);
+      nz = Math.max(0.05, Math.min(25, nz));
+      const mx = pinchStart.midx - r.left, my = pinchStart.midy - r.top;
+      const ix = (mx - pinchStart.panX) / pinchStart.zoom, iy = (my - pinchStart.panY) / pinchStart.zoom;
+      panX = mx - ix * nz; panY = my - iy * nz; zoom = nz; apply();
+    }
+  });
+  function up(e) {
+    if (pointers.has(e.pointerId)) pointers.delete(e.pointerId);
+    if (pointers.size === 0) { mode = null; dragPin = null; startPan = null; pinchStart = null; }
+    else if (pointers.size === 1) { mode = 'pan'; const pv = Array.from(pointers.values())[0]; startPan = { panX: panX, panY: panY, x: pv.x, y: pv.y }; }
+  }
+  stage.addEventListener('pointerup', up);
+  stage.addEventListener('pointercancel', up);
+
+  function zoomBy(f) {
+    const r = stage.getBoundingClientRect();
+    const cx = r.width / 2, cy = r.height / 2;
+    const ix = (cx - panX) / zoom, iy = (cy - panY) / zoom;
+    zoom = Math.max(0.05, Math.min(25, zoom * f));
+    panX = cx - ix * zoom; panY = cy - iy * zoom; apply();
+  }
+  ov.querySelector('#fpZoomIn').onclick = function() { zoomBy(1.3); };
+  ov.querySelector('#fpZoomOut').onclick = function() { zoomBy(1 / 1.3); };
+  ov.querySelector('#fpZoomFit').onclick = fit;
+  ov.querySelector('#fpTagCancel').onclick = function() { ov.remove(); };
+  ov.querySelector('#fpTagNext').onclick = function() {
+    _fpState.p1 = { x: p1.x, y: p1.y };
+    _fpState.p2 = { x: p2.x, y: p2.y };
+    ov.remove();
+    startFloorPlanAR();
+  };
+}
+
+async function startFloorPlanAR() {
+  try { await loadThree(); } catch (e) { if (typeof showToast === 'function') showToast('Failed to load AR library'); return; }
+  const THREE = window.THREE;
+
+  let overlay = document.getElementById('fpArOverlay');
+  if (overlay) overlay.remove();
+  overlay = document.createElement('div');
+  overlay.id = 'fpArOverlay';
+  overlay.innerHTML =
+    '<div class="ar-crosshair" id="fpCross"></div>' +
+    '<div class="ar-top"><div class="ar-hint" id="fpArHint">Move your phone to find the floor…</div></div>' +
+    '<div class="ar-controls" id="fpTagControls">' +
+      '<button class="ar-btn" id="fpArReset">Reset</button>' +
+      '<button class="ar-btn ar-btn-primary" id="fpArAdd" disabled>Add Point</button>' +
+      '<button class="ar-btn" id="fpArExit">Exit</button>' +
+    '</div>' +
+    '<div class="fp-ar-panel" id="fpArPanel" style="display:none">' +
+      '<div class="fp-ctrl"><label>Opacity</label><input type="range" id="fpOpacity" min="10" max="100" value="65"></div>' +
+      '<div class="fp-ctrl"><label>Scale</label><input type="range" id="fpScale" min="25" max="400" value="100"></div>' +
+      '<div class="fp-ctrl"><label>Rotate</label><input type="range" id="fpRotate" min="-180" max="180" value="0"></div>' +
+      '<div class="fp-ar-btns">' +
+        '<button class="ar-btn" id="fpFlipBtn">Flip</button>' +
+        '<button class="ar-btn" id="fpRetagBtn">Re-tag</button>' +
+        '<button class="ar-btn" id="fpExitBtn2">Exit</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.style.display = 'flex';
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.xr.enabled = true;
+  renderer.xr.setReferenceSpaceType('local');
+  renderer.domElement.style.display = 'none';
+  document.body.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 50);
+
+  const reticle = new THREE.Mesh(new THREE.RingGeometry(0.045, 0.06, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x22d3ee }));
+  reticle.matrixAutoUpdate = false;
+  reticle.visible = false;
+  scene.add(reticle);
+
+  const points = [];
+  const markers = [];
+  let planGroup = null, planMesh = null, planMat = null, texture = null;
+  let flip = false, phase = 'tag';
+
+  const hintEl = overlay.querySelector('#fpArHint');
+  const crossEl = overlay.querySelector('#fpCross');
+  const tagControls = overlay.querySelector('#fpTagControls');
+  const panel = overlay.querySelector('#fpArPanel');
+  const addBtn = overlay.querySelector('#fpArAdd');
+
+  function addMarker(pos) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.012, 16, 16), new THREE.MeshBasicMaterial({ color: 0xf59e0b }));
+    m.position.copy(pos);
+    scene.add(m);
+    markers.push(m);
+  }
+  function clearMarkers() { markers.forEach(function(m) { scene.remove(m); }); markers.length = 0; }
+
+  function makeGeometry() {
+    const A = points[0];
+    const verts = fpPlanCorners(points[0], points[1], _fpState, flip);
+    const g = new THREE.BufferGeometry();
+    const pos = new Float32Array(12);
+    for (let i = 0; i < 4; i++) { pos[i * 3] = verts[i].x - A.x; pos[i * 3 + 1] = verts[i].y - A.y; pos[i * 3 + 2] = verts[i].z - A.z; }
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array([0, 1, 1, 1, 1, 0, 0, 0]), 2));
+    g.setIndex([0, 1, 2, 0, 2, 3]);
+    return g;
+  }
+
+  function buildPlan() {
+    clearMarkers();
+    reticle.visible = false;
+    if (!texture) {
+      texture = new THREE.Texture(_fpState.imgEl);
+      texture.needsUpdate = true;
+      if (THREE.sRGBEncoding) texture.encoding = THREE.sRGBEncoding;
+    }
+    planMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.65, side: THREE.DoubleSide, depthWrite: false });
+    planMesh = new THREE.Mesh(makeGeometry(), planMat);
+    planGroup = new THREE.Group();
+    planGroup.position.copy(points[0]);
+    planGroup.add(planMesh);
+    scene.add(planGroup);
+    phase = 'placed';
+    tagControls.style.display = 'none';
+    crossEl.style.display = 'none';
+    panel.style.display = 'flex';
+    hintEl.textContent = 'Adjust the overlay below';
+    overlay.querySelector('#fpOpacity').oninput();
+    overlay.querySelector('#fpScale').oninput();
+    overlay.querySelector('#fpRotate').oninput();
+  }
+
+  function doAddPoint() {
+    if (phase !== 'tag' || !reticle.visible || points.length >= 2) return;
+    const p = new THREE.Vector3().setFromMatrixPosition(reticle.matrix);
+    points.push(p);
+    addMarker(p);
+    if (points.length === 1) hintEl.textContent = 'Move to point 2, aim & Add Point';
+    if (points.length === 2) buildPlan();
+  }
+
+  addBtn.addEventListener('click', doAddPoint);
+  overlay.querySelector('#fpArReset').addEventListener('click', function() {
+    points.length = 0; clearMarkers();
+    hintEl.textContent = 'Aim the dot & Add Point for point 1';
+  });
+
+  overlay.querySelector('#fpOpacity').oninput = function() { if (planMat) planMat.opacity = this.value / 100; };
+  overlay.querySelector('#fpScale').oninput = function() { if (planGroup) planGroup.scale.setScalar(this.value / 100); };
+  overlay.querySelector('#fpRotate').oninput = function() { if (planGroup) planGroup.rotation.y = this.value * Math.PI / 180; };
+  overlay.querySelector('#fpFlipBtn').addEventListener('click', function() {
+    if (!planMesh) return;
+    flip = !flip;
+    planMesh.geometry.dispose();
+    planMesh.geometry = makeGeometry();
+  });
+  overlay.querySelector('#fpRetagBtn').addEventListener('click', function() {
+    if (planGroup) { scene.remove(planGroup); planGroup = null; planMesh = null; planMat = null; }
+    points.length = 0; clearMarkers();
+    phase = 'tag';
+    panel.style.display = 'none';
+    tagControls.style.display = 'flex';
+    crossEl.style.display = 'block';
+    hintEl.textContent = 'Aim the dot & Add Point for point 1';
+  });
+
+  let session;
+  try {
+    session = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: overlay } });
+  } catch (e) {
+    overlay.remove();
+    if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    if (typeof showToast === 'function') showToast('Could not start AR: ' + e.message);
+    return;
+  }
+
+  overlay.querySelector('#fpArExit').addEventListener('click', function() { session.end(); });
+  overlay.querySelector('#fpExitBtn2').addEventListener('click', function() { session.end(); });
+
+  await renderer.xr.setSession(session);
+  const viewerSpace = await session.requestReferenceSpace('viewer');
+  const localSpace = await session.requestReferenceSpace('local');
+  let hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
+
+  hintEl.textContent = 'Aim the dot & Add Point for point 1';
+
+  session.addEventListener('end', function() {
+    if (hitTestSource) { if (hitTestSource.cancel) hitTestSource.cancel(); hitTestSource = null; }
+    renderer.setAnimationLoop(null);
+    if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    try { renderer.dispose(); } catch (e) {}
+    if (overlay && overlay.parentNode) overlay.remove();
+    if (typeof closeTool === 'function') closeTool();
+  });
+
+  renderer.setAnimationLoop(function(timestamp, frame) {
+    if (!frame) { renderer.render(scene, camera); return; }
+    if (phase === 'tag' && hitTestSource) {
+      const res = frame.getHitTestResults(hitTestSource);
+      if (res.length > 0) {
+        const pose = res[0].getPose(localSpace);
+        if (pose) { reticle.visible = true; reticle.matrix.fromArray(pose.transform.matrix); addBtn.disabled = false; }
+      } else {
+        reticle.visible = false; addBtn.disabled = true;
+      }
+    }
+    renderer.render(scene, camera);
   });
 }
 
