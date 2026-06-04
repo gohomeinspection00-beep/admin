@@ -1541,10 +1541,12 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 /* AR Floor Plan — upload */
 .fp-upload{
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  border:2px dashed var(--border);border-radius:var(--radius);
-  padding:24px 16px;margin-top:14px;cursor:pointer;color:var(--fg-dim);
-  font-size:13px;text-align:center;
+  border:2px dashed var(--accent);border-radius:var(--radius);
+  background:var(--accent-soft);
+  padding:28px 16px;margin-top:14px;cursor:pointer;color:var(--accent);
+  font-size:13px;font-weight:600;text-align:center;
 }
+.fp-upload:active{opacity:0.65}
 .fp-preview{width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius);margin-top:12px;background:rgba(127,127,127,0.08)}
 
 /* AR Floor Plan — tagging screen */
@@ -11640,7 +11642,7 @@ function openARFloorPlan() {
     '<div id="fpStatus" class="ar-status"></div>';
 
   document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-primary" id="fpStartBtn" disabled>Choose a floor plan</button>';
+    '<button class="tool-btn tool-btn-primary" id="fpStartBtn">Choose floor plan image</button>';
 
   showToolModal();
 
@@ -11652,23 +11654,18 @@ function openARFloorPlan() {
   let arOK = false;
 
   function updateStart() {
-    if (arOK && _fpState && _fpState.imgEl) {
-      startBtn.disabled = false;
-      startBtn.textContent = 'Tag points on the plan';
-    } else if (arOK) {
-      startBtn.disabled = true;
-      startBtn.textContent = 'Choose a floor plan';
-    }
+    if (_fpState && _fpState.imgEl) startBtn.textContent = 'Continue — tag points →';
+    else startBtn.textContent = 'Choose floor plan image';
   }
 
   if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
-    fpWarn(statusEl, 'AR isn\'t available here. It needs Chrome on an <strong>ARCore Android</strong> phone, opened over <strong>https://</strong>.', startBtn, 'AR not available');
+    statusEl.className = 'ar-status warn';
+    statusEl.innerHTML = 'Note: live AR needs Chrome on an <strong>ARCore Android</strong> phone over <strong>https://</strong>. You can still pick an image, but the AR step may not start here.';
   } else {
     navigator.xr.isSessionSupported('immersive-ar').then(function(s) {
       arOK = s;
-      if (!s) fpWarn(statusEl, 'This phone or browser doesn\'t support AR.', startBtn, 'AR not supported');
-      else updateStart();
-    }).catch(function() { fpWarn(statusEl, 'Could not check AR support.', startBtn, 'AR unavailable'); });
+      if (!s) { statusEl.className = 'ar-status warn'; statusEl.innerHTML = 'Note: this phone or browser may not support live AR.'; }
+    }).catch(function() {});
   }
 
   fileInput.addEventListener('change', function() {
@@ -11691,6 +11688,7 @@ function openARFloorPlan() {
 
   startBtn.onclick = function() {
     if (_fpState && _fpState.imgEl) openFloorPlanTag();
+    else fileInput.click();
   };
 }
 
