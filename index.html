@@ -12198,8 +12198,11 @@ async function callGeminiImage(dataUrl, notes) {
   const prompt = [
     'This is a rough hand-drawn floor plan sketch.',
     'Redraw it as a clean, professional top-down 2D architectural floor plan.',
-    'Keep the SAME layout, room positions, walls and proportions as the sketch — do not invent or rearrange rooms.',
-    'Use crisp straight black walls on a plain white background, show doors and windows, and keep any room labels written in the sketch (copy the text exactly).',
+    'Keep the SAME layout, room positions, walls and proportions as the sketch.',
+    'STRICT: Do NOT add, invent or imagine anything that is not clearly drawn — no extra rooms, walls, boxes, furniture, doors or windows. Only redraw what is actually there.',
+    'If any part is scribbled over, crossed out, or messily scribbled, treat it as a mistake the person deleted — do NOT redraw that part, leave it out.',
+    'Use crisp straight black walls on a plain white background. Draw doors and windows only where they are clearly drawn.',
+    'For room labels, keep the same words written in the sketch, but typeset them in a clean formal sans-serif font (like Calibri or Arial), NOT in a handwriting style.',
     notes ? ('Notes from the user (follow these): ' + notes) : '',
     'Produce a clean floor-plan image.'
   ].filter(Boolean).join(' ');
