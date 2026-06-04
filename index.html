@@ -1404,6 +1404,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .cat-orient .tools-list-icon{background:var(--success-soft);color:var(--success)}
 .cat-measure .tools-list-icon{background:var(--warning-soft);color:var(--warning)}
 .cat-ai .tools-list-icon{background:var(--accent-soft);color:var(--accent)}
+.cat-draw .tools-list-icon{background:var(--success-soft);color:var(--success)}
 .tools-list-content{flex:1;min-width:0}
 .tools-list-name{
   font-size:15px;font-weight:700;
@@ -1570,6 +1571,36 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
   animation:sk-rot 0.8s linear infinite;vertical-align:-2px;margin-right:5px;
 }
 @keyframes sk-rot{to{transform:rotate(360deg)}}
+
+/* Plan Editor */
+.pe-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:#1f242b;font-family:var(--font-body)}
+.pe-top{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:#11151a;color:#fff}
+.pe-title{flex:1;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.pe-tbtn{padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.12);color:#fff;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,0.18)}
+.pe-tbtn.pe-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.pe-stage{flex:1;position:relative;overflow:hidden;touch-action:none;background:#e5e7eb;display:flex;align-items:center;justify-content:center}
+.pe-zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.pe-zoom button{width:40px;height:40px;border-radius:10px;background:rgba(0,0,0,0.6);color:#fff;font-size:18px;border:none}
+.pe-zoom button:last-child{font-size:11px}
+.pe-tools{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#11151a;-webkit-overflow-scrolling:touch}
+.pe-tool{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:54px;padding:8px 6px;border-radius:10px;background:rgba(255,255,255,0.08);color:#cbd5e1;font-size:10.5px;font-weight:600;border:1px solid transparent}
+.pe-tool.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.pe-tool svg{width:20px;height:20px}
+.pe-actions{display:flex;gap:8px;padding:10px 12px calc(env(safe-area-inset-bottom) + 12px);background:#11151a}
+.pe-actions .pe-tbtn{flex:1;text-align:center}
+.pe-panel{position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:10;padding:20px}
+.pe-panel-card{background:#fff;color:#111;width:100%;max-width:420px;max-height:80%;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pe-panel-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;font-weight:700;border-bottom:1px solid #e5e7eb}
+.pe-panel-head button{background:none;border:none;font-size:16px;color:inherit}
+.pe-panel-list{overflow:auto;padding:8px}
+.pe-empty{padding:24px;text-align:center;color:#6b7280;font-size:13px}
+.pe-plan{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px}
+.pe-plan:active{background:rgba(0,0,0,0.06)}
+.pe-plan img{width:56px;height:42px;object-fit:contain;background:#fff;border:1px solid #e5e7eb;border-radius:6px}
+.pe-plan-meta{flex:1;min-width:0}
+.pe-plan-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pe-plan-date{font-size:11px;color:#6b7280}
+.pe-plan-del{background:none;border:none;font-size:16px}
 
 /* AR Floor Plan — tagging screen */
 .fp-overlay{
@@ -6249,6 +6280,7 @@ body.site-mode-active .voice-mode{
         <button class="tools-chip" data-cat="orientation">Orientation</button>
         <button class="tools-chip" data-cat="measurement">Measurement</button>
         <button class="tools-chip" data-cat="ai">AI</button>
+        <button class="tools-chip" data-cat="draw">Draw</button>
       </div>
 
       <div class="tools-group" data-cat="assessment">
@@ -6365,6 +6397,25 @@ body.site-mode-active .voice-mode{
           <div class="tools-list-content">
             <div class="tools-list-name">Sketch to Real</div>
             <div class="tools-list-desc">Photo a hand-drawn floor plan — AI redraws it clean &amp; ready to use in AR.</div>
+          </div>
+          <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      </div>
+
+      <div class="tools-group" data-cat="draw">
+      <div class="tools-section-divider">
+        <span>Draw</span>
+      </div>
+
+      <div class="tools-list">
+        <button class="tools-list-item cat-draw" data-tool="planeditor">
+          <div class="tools-list-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          </div>
+          <div class="tools-list-content">
+            <div class="tools-list-name">Plan Editor</div>
+            <div class="tools-list-desc">Draw your own floor plan — walls, rooms, doors, text. Drag, scale, rotate, save &amp; reopen.</div>
           </div>
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
@@ -9730,6 +9781,7 @@ function openTool(toolKey) {
   else if (toolKey === 'armeasure') openARMeasure();
   else if (toolKey === 'arfloorplan') openARFloorPlan();
   else if (toolKey === 'sketch2real') openSketchToReal();
+  else if (toolKey === 'planeditor') openPlanEditor();
 }
 
 function closeTool() {
@@ -12294,6 +12346,335 @@ function sketchToAR(imgUrl) {
   };
   im.onerror = function() { if (typeof showToast === 'function') showToast('Could not load image'); };
   im.src = imgUrl;
+}
+
+// =======================================================
+// TOOL: PLAN EDITOR (Fabric.js 2D drawing)
+// =======================================================
+let _fabricLoading = null;
+function loadFabric() {
+  if (window.fabric) return Promise.resolve();
+  if (_fabricLoading) return _fabricLoading;
+  _fabricLoading = new Promise(function(resolve, reject) {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js';
+    s.onload = function() { resolve(); };
+    s.onerror = function() { _fabricLoading = null; reject(new Error('Failed to load drawing library')); };
+    document.head.appendChild(s);
+  });
+  return _fabricLoading;
+}
+
+function peEsc(s) { return (s || '').replace(/[&<>"]/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+function openPlanEditor() {
+  if (typeof closeTool === 'function') closeTool();
+  loadFabric().then(buildPlanEditor).catch(function(e) {
+    if (typeof showToast === 'function') showToast('Editor failed to load: ' + e.message);
+  });
+}
+
+function buildPlanEditor() {
+  const fabric = window.fabric;
+  const PE_KEY = 'pe_plans_v1';
+
+  let ov = document.getElementById('peOverlay');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'peOverlay';
+  ov.className = 'pe-overlay';
+  ov.innerHTML =
+    '<div class="pe-top">' +
+      '<button class="pe-tbtn" id="peClose">Close</button>' +
+      '<div class="pe-title" id="peTitle">Untitled plan</div>' +
+      '<button class="pe-tbtn" id="peNew">New</button>' +
+      '<button class="pe-tbtn" id="peOpen">Open</button>' +
+      '<button class="pe-tbtn pe-primary" id="peSave">Save</button>' +
+    '</div>' +
+    '<div class="pe-stage" id="peStage">' +
+      '<canvas id="peCanvasEl"></canvas>' +
+      '<div class="pe-zoom">' +
+        '<button id="peZoomIn">+</button>' +
+        '<button id="peZoomOut">−</button>' +
+        '<button id="peZoomFit">Fit</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="pe-tools" id="peTools">' +
+      peToolBtn('select', 'Select', '<path d="M4 3l7 17 2-7 7-2z"/>') +
+      peToolBtn('pen', 'Pen', '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>') +
+      peToolBtn('wall', 'Wall', '<line x1="4" y1="20" x2="20" y2="4"/>') +
+      peToolBtn('room', 'Room', '<rect x="4" y="5" width="16" height="14"/>') +
+      peToolBtn('door', 'Door', '<path d="M5 20h14"/><path d="M7 20V6h7"/><path d="M14 6a9 9 0 0 1 0 14"/>') +
+      peToolBtn('window', 'Window', '<rect x="3" y="9" width="18" height="6"/><line x1="12" y1="9" x2="12" y2="15"/>') +
+      peToolBtn('text', 'Text', '<path d="M5 6h14"/><path d="M12 6v13"/>') +
+      peToolBtn('pan', 'Pan', '<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 11V6.5a1.5 1.5 0 0 1 3 0V14a6 6 0 0 1-6 6h-2a6 6 0 0 1-5-2.7L6 16"/><path d="M9 11V8.5a1.5 1.5 0 0 0-3 0v5"/>') +
+      peToolBtn('delete', 'Delete', '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>') +
+    '</div>' +
+    '<div class="pe-actions">' +
+      '<button class="pe-tbtn" id="peExport">Save PNG</button>' +
+      '<button class="pe-tbtn pe-primary" id="peToAR">Use in AR</button>' +
+    '</div>';
+  document.body.appendChild(ov);
+
+  const stageEl = ov.querySelector('#peStage');
+  const r = stageEl.getBoundingClientRect();
+  const canvas = new fabric.Canvas('peCanvasEl', { width: r.width, height: r.height, backgroundColor: '#ffffff', preserveObjectStacking: true });
+
+  let mode = 'select';
+  let curId = null;
+  let curName = 'Untitled plan';
+
+  function setTitle(n) { ov.querySelector('#peTitle').textContent = n; }
+  function viewportCenter() {
+    const vt = canvas.viewportTransform;
+    return { x: (canvas.getWidth() / 2 - vt[4]) / vt[0], y: (canvas.getHeight() / 2 - vt[5]) / vt[3] };
+  }
+
+  function setMode(m) {
+    mode = m;
+    canvas.isDrawingMode = (m === 'pen');
+    if (m === 'pen') {
+      canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+      canvas.freeDrawingBrush.width = 3;
+      canvas.freeDrawingBrush.color = '#111111';
+    }
+    canvas.selection = (m === 'select');
+    canvas.skipTargetFind = (m !== 'select');
+    canvas.defaultCursor = (m === 'pan') ? 'grab' : 'default';
+    ov.querySelectorAll('.pe-tool').forEach(function(b) { b.classList.toggle('active', b.dataset.petool === m); });
+  }
+
+  function addCentered(obj) { canvas.add(obj); canvas.setActiveObject(obj); canvas.requestRenderAll(); }
+
+  function addDoor() {
+    const c = viewportCenter(), s = 70;
+    const leaf = new fabric.Line([0, 0, 0, -s], { stroke: '#111111', strokeWidth: 4 });
+    const arc = new fabric.Path('M 0 ' + (-s) + ' A ' + s + ' ' + s + ' 0 0 1 ' + s + ' 0', { fill: '', stroke: '#111111', strokeWidth: 2 });
+    const g = new fabric.Group([leaf, arc], { left: c.x, top: c.y, originX: 'center', originY: 'center' });
+    addCentered(g);
+  }
+  function addWindow() {
+    const c = viewportCenter(), w = 90;
+    const base = new fabric.Rect({ width: w, height: 8, fill: '#ffffff', stroke: '#111111', strokeWidth: 2, originX: 'center', originY: 'center' });
+    const mid = new fabric.Line([-w / 2, 0, w / 2, 0], { stroke: '#111111', strokeWidth: 1 });
+    const g = new fabric.Group([base, mid], { left: c.x, top: c.y, originX: 'center', originY: 'center' });
+    addCentered(g);
+  }
+  function addText() {
+    const c = viewportCenter();
+    const t = new fabric.IText('Text', { left: c.x, top: c.y, fontFamily: 'Arial', fontSize: 24, fill: '#111111', originX: 'center', originY: 'center' });
+    canvas.add(t); canvas.setActiveObject(t); t.enterEditing(); t.selectAll(); canvas.requestRenderAll();
+  }
+  function deleteSel() {
+    const objs = canvas.getActiveObjects();
+    objs.forEach(function(o) { canvas.remove(o); });
+    canvas.discardActiveObject();
+    canvas.requestRenderAll();
+  }
+
+  // ---- drawing (wall / room) ----
+  let drawing = false, startPt = null, tempObj = null;
+  function startDraw(o) {
+    drawing = true;
+    const p = canvas.getPointer(o.e);
+    startPt = p;
+    if (mode === 'wall') tempObj = new fabric.Line([p.x, p.y, p.x, p.y], { stroke: '#111111', strokeWidth: 6, strokeLineCap: 'round' });
+    else tempObj = new fabric.Rect({ left: p.x, top: p.y, width: 1, height: 1, fill: '', stroke: '#111111', strokeWidth: 6 });
+    canvas.add(tempObj);
+  }
+  function moveDraw(o) {
+    if (!tempObj) return;
+    const p = canvas.getPointer(o.e);
+    if (mode === 'wall') tempObj.set({ x2: p.x, y2: p.y });
+    else tempObj.set({ left: Math.min(p.x, startPt.x), top: Math.min(p.y, startPt.y), width: Math.abs(p.x - startPt.x), height: Math.abs(p.y - startPt.y) });
+    canvas.requestRenderAll();
+  }
+  function endDraw() {
+    drawing = false;
+    if (tempObj) {
+      let tiny = false;
+      if (mode === 'wall') tiny = Math.hypot((tempObj.x2 - tempObj.x1), (tempObj.y2 - tempObj.y1)) < 4;
+      else tiny = (tempObj.width < 4 && tempObj.height < 4);
+      if (tiny) canvas.remove(tempObj);
+      else tempObj.setCoords();
+    }
+    tempObj = null;
+  }
+
+  // ---- pan ----
+  let panning = false, lastX = 0, lastY = 0;
+  function evXY(e) { return e.touches && e.touches[0] ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
+
+  canvas.on('mouse:down', function(o) {
+    if (mode === 'pan') { panning = true; const p = evXY(o.e); lastX = p.x; lastY = p.y; return; }
+    if (mode === 'wall' || mode === 'room') startDraw(o);
+  });
+  canvas.on('mouse:move', function(o) {
+    if (panning) { const p = evXY(o.e); const vt = canvas.viewportTransform; vt[4] += p.x - lastX; vt[5] += p.y - lastY; lastX = p.x; lastY = p.y; canvas.requestRenderAll(); return; }
+    if (drawing) moveDraw(o);
+  });
+  canvas.on('mouse:up', function() { panning = false; if (drawing) endDraw(); });
+  canvas.on('mouse:wheel', function(opt) {
+    let z = canvas.getZoom() * Math.pow(0.999, opt.e.deltaY);
+    z = Math.max(0.1, Math.min(8, z));
+    canvas.zoomToPoint(new fabric.Point(opt.e.offsetX, opt.e.offsetY), z);
+    opt.e.preventDefault(); opt.e.stopPropagation();
+  });
+
+  // ---- pinch zoom/pan (2 fingers) ----
+  let pz = null;
+  stageEl.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      const a = e.touches[0], b = e.touches[1];
+      pz = { dist: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), mx: (a.clientX + b.clientX) / 2, my: (a.clientY + b.clientY) / 2, skip: canvas.skipTargetFind };
+      canvas.discardActiveObject(); canvas.skipTargetFind = true; canvas.selection = false; canvas.requestRenderAll();
+    }
+  }, { passive: false });
+  stageEl.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2 && pz) {
+      e.preventDefault();
+      const a = e.touches[0], b = e.touches[1];
+      const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      const mx = (a.clientX + b.clientX) / 2, my = (a.clientY + b.clientY) / 2;
+      const rect = canvas.upperCanvasEl.getBoundingClientRect();
+      let z = canvas.getZoom() * (dist / pz.dist);
+      z = Math.max(0.1, Math.min(8, z));
+      canvas.zoomToPoint(new fabric.Point(mx - rect.left, my - rect.top), z);
+      const vt = canvas.viewportTransform; vt[4] += mx - pz.mx; vt[5] += my - pz.my; canvas.requestRenderAll();
+      pz.dist = dist; pz.mx = mx; pz.my = my;
+    }
+  }, { passive: false });
+  stageEl.addEventListener('touchend', function(e) { if (e.touches.length < 2 && pz) { pz = null; setMode(mode); } });
+
+  function zoomBtn(f) {
+    let z = canvas.getZoom() * f; z = Math.max(0.1, Math.min(8, z));
+    canvas.zoomToPoint(new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2), z);
+  }
+  ov.querySelector('#peZoomIn').onclick = function() { zoomBtn(1.25); };
+  ov.querySelector('#peZoomOut').onclick = function() { zoomBtn(0.8); };
+  ov.querySelector('#peZoomFit').onclick = function() { canvas.setViewportTransform([1, 0, 0, 1, 0, 0]); };
+
+  // ---- toolbar ----
+  ov.querySelectorAll('.pe-tool').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const t = btn.dataset.petool;
+      if (t === 'door') { addDoor(); setMode('select'); }
+      else if (t === 'window') { addWindow(); setMode('select'); }
+      else if (t === 'text') { addText(); setMode('select'); }
+      else if (t === 'delete') { deleteSel(); }
+      else setMode(t);
+    });
+  });
+
+  // ---- storage ----
+  function loadPlans() { try { return JSON.parse(localStorage.getItem(PE_KEY) || '[]'); } catch (e) { return []; } }
+  function storePlans(a) { try { localStorage.setItem(PE_KEY, JSON.stringify(a)); } catch (e) { if (typeof showToast === 'function') showToast('Storage full — delete old plans'); } }
+
+  function savePlan() {
+    const name = prompt('Plan name:', curName || 'My plan');
+    if (name === null) return;
+    const json = canvas.toJSON();
+    let thumb = '';
+    try { thumb = canvas.toDataURL({ format: 'png', multiplier: 0.25 }); } catch (e) {}
+    let plans = loadPlans();
+    let ex = curId ? plans.find(function(p) { return p.id === curId; }) : null;
+    if (ex) { ex.name = name; ex.json = json; ex.thumb = thumb; ex.updated = Date.now(); }
+    else { curId = 'pe_' + Date.now(); plans.unshift({ id: curId, name: name, json: json, thumb: thumb, updated: Date.now() }); }
+    storePlans(plans);
+    curName = name; setTitle(name);
+    if (typeof showToast === 'function') showToast('Saved "' + name + '"');
+  }
+
+  function loadPlan(p) {
+    canvas.loadFromJSON(p.json, function() { canvas.requestRenderAll(); });
+    curId = p.id; curName = p.name; setTitle(p.name);
+    setMode('select');
+  }
+
+  function openPlansList() {
+    const plans = loadPlans();
+    let panel = ov.querySelector('#pePanel');
+    if (panel) panel.remove();
+    panel = document.createElement('div');
+    panel.id = 'pePanel';
+    panel.className = 'pe-panel';
+    let html = '<div class="pe-panel-card"><div class="pe-panel-head"><span>Saved plans</span><button id="pePanelClose">✕</button></div><div class="pe-panel-list">';
+    if (plans.length === 0) html += '<div class="pe-empty">No saved plans yet. Draw something and tap Save.</div>';
+    plans.forEach(function(p) {
+      html += '<div class="pe-plan" data-id="' + p.id + '"><img src="' + (p.thumb || '') + '" alt=""><div class="pe-plan-meta"><div class="pe-plan-name">' + peEsc(p.name) + '</div><div class="pe-plan-date">' + new Date(p.updated).toLocaleString() + '</div></div><button class="pe-plan-del" data-id="' + p.id + '">🗑</button></div>';
+    });
+    html += '</div></div>';
+    panel.innerHTML = html;
+    ov.appendChild(panel);
+    panel.addEventListener('click', function(e) { if (e.target === panel) panel.remove(); });
+    panel.querySelector('#pePanelClose').onclick = function() { panel.remove(); };
+    panel.querySelectorAll('.pe-plan').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        if (e.target.classList.contains('pe-plan-del')) return;
+        const p = loadPlans().find(function(x) { return x.id === el.dataset.id; });
+        if (p) { loadPlan(p); panel.remove(); }
+      });
+    });
+    panel.querySelectorAll('.pe-plan-del').forEach(function(b) {
+      b.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!confirm('Delete this plan?')) return;
+        storePlans(loadPlans().filter(function(x) { return x.id !== b.dataset.id; }));
+        openPlansList();
+      });
+    });
+  }
+
+  function newPlan() {
+    if (!confirm('Start a new blank plan? Unsaved changes are lost.')) return;
+    canvas.clear(); canvas.backgroundColor = '#ffffff'; canvas.setViewportTransform([1, 0, 0, 1, 0, 0]); canvas.requestRenderAll();
+    curId = null; curName = 'Untitled plan'; setTitle(curName); setMode('select');
+  }
+
+  function exportPNG() {
+    canvas.discardActiveObject(); canvas.requestRenderAll();
+    const url = canvas.toDataURL({ format: 'png', multiplier: 2 });
+    const a = document.createElement('a'); a.href = url; a.download = 'plan-' + Date.now() + '.png'; a.click();
+  }
+  function useInAR() {
+    canvas.discardActiveObject(); canvas.requestRenderAll();
+    const url = canvas.toDataURL({ format: 'png', multiplier: 2 });
+    const im = new Image();
+    im.onload = function() {
+      _fpState = { imgEl: im, imgURL: url, w: im.naturalWidth, h: im.naturalHeight };
+      closeEditor();
+      openFloorPlanTag();
+    };
+    im.onerror = function() { if (typeof showToast === 'function') showToast('Could not export image'); };
+    im.src = url;
+  }
+
+  function peResize() {
+    const rr = stageEl.getBoundingClientRect();
+    canvas.setDimensions({ width: rr.width, height: rr.height });
+  }
+  window.addEventListener('resize', peResize);
+
+  function closeEditor() {
+    window.removeEventListener('resize', peResize);
+    try { canvas.dispose(); } catch (e) {}
+    ov.remove();
+  }
+
+  ov.querySelector('#peClose').onclick = closeEditor;
+  ov.querySelector('#peNew').onclick = newPlan;
+  ov.querySelector('#peOpen').onclick = openPlansList;
+  ov.querySelector('#peSave').onclick = savePlan;
+  ov.querySelector('#peExport').onclick = exportPNG;
+  ov.querySelector('#peToAR').onclick = useInAR;
+
+  setMode('select');
+}
+
+function peToolBtn(tool, label, paths) {
+  return '<button class="pe-tool" data-petool="' + tool + '">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>' +
+    '<span>' + label + '</span></button>';
 }
 
 // =======================================================
