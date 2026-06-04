@@ -1558,6 +1558,12 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .sk-result svg{width:100%;height:auto;display:block}
 .sk-actions{display:flex;gap:8px;width:100%}
 .sk-actions .tool-btn{flex:1}
+.sk-notes{
+  width:100%;margin-top:12px;padding:11px 12px;border-radius:var(--radius);
+  border:1px solid var(--border);background:rgba(127,127,127,0.06);color:inherit;
+  font-family:var(--font-body);font-size:13px;resize:vertical;min-height:62px;
+  line-height:1.4;box-sizing:border-box;
+}
 .sk-spin{
   display:inline-block;width:13px;height:13px;border-radius:50%;
   border:2px solid var(--border);border-top-color:var(--accent);
@@ -12087,7 +12093,7 @@ async function startFloorPlanAR() {
 // =======================================================
 let _skState = null;
 
-function openSketchToReal() {
+function openSketchToReal(retain) {
   document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4"/><path d="M13 3l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4z"/></svg>';
   document.getElementById('toolModalName').textContent = 'Sketch to Real';
   document.getElementById('toolModalDesc').textContent = 'AI redraws your hand-drawn floor plan, clean';
@@ -12104,6 +12110,7 @@ function openSketchToReal() {
     '</div>' +
     '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none">' +
     '<img id="skPreview" class="fp-preview" style="display:none" alt="">' +
+    '<textarea id="skNotes" class="sk-notes" placeholder="Optional notes for the AI (helps a lot) — e.g. left = Bed 1, top-right = Bathroom, bottom-right = Toilet, main door at bottom-left, room ~3m x 4m"></textarea>' +
     '<div id="skStatus" class="ar-status"></div>';
 
   document.getElementById('toolModalFoot').innerHTML =
@@ -12133,20 +12140,32 @@ function openSketchToReal() {
     reader.readAsDataURL(f);
   });
 
+  if (retain && retain.dataUrl) {
+    _skState = { dataUrl: retain.dataUrl, notes: retain.notes || '' };
+    const pv = document.getElementById('skPreview');
+    if (pv) { pv.src = retain.dataUrl; pv.style.display = 'block'; }
+    const t = document.getElementById('skUploadText'); if (t) t.textContent = 'Change photo';
+    const nt = document.getElementById('skNotes'); if (nt && retain.notes) nt.value = retain.notes;
+    mainBtn.textContent = '✨ Redraw with AI';
+  }
+
   mainBtn.onclick = function() {
     if (!_skState || !_skState.dataUrl) { fileInput.click(); return; }
-    runSketchConvert(_skState.dataUrl, statusEl, mainBtn);
+    const notesEl = document.getElementById('skNotes');
+    const notes = notesEl ? notesEl.value.trim() : '';
+    runSketchConvert(_skState.dataUrl, notes, statusEl, mainBtn);
   };
 }
 
-async function runSketchConvert(dataUrl, statusEl, mainBtn) {
+async function runSketchConvert(dataUrl, notes, statusEl, mainBtn) {
+  if (_skState) _skState.notes = notes;
   mainBtn.disabled = true;
   mainBtn.textContent = 'Redrawing… (10–25s)';
   statusEl.className = 'ar-status';
   statusEl.innerHTML = '<span class="sk-spin"></span> AI is reading your sketch and redrawing it…';
   let raw;
   try {
-    raw = await callGeminiSketch(dataUrl);
+    raw = await callGeminiSketch(dataUrl, notes);
   } catch (e) {
     statusEl.className = 'ar-status warn'; statusEl.textContent = 'AI error: ' + e.message;
     mainBtn.disabled = false; mainBtn.textContent = '✨ Try again';
@@ -12172,12 +12191,12 @@ function showSketchResult(svg, w, h) {
       '<button class="tool-btn" id="skSave">Save PNG</button>' +
       '<button class="tool-btn tool-btn-primary" id="skToAR">Use in AR</button>' +
     '</div>';
-  document.getElementById('skRedo').onclick = function() { openSketchToReal(); };
+  document.getElementById('skRedo').onclick = function() { openSketchToReal({ dataUrl: _skState && _skState.dataUrl, notes: _skState && _skState.notes }); };
   document.getElementById('skSave').onclick = function() { saveSketchPNG(svg, w, h); };
   document.getElementById('skToAR').onclick = function() { sketchToAR(svg, w, h); };
 }
 
-async function callGeminiSketch(dataUrl) {
+async function callGeminiSketch(dataUrl, notes) {
   const apiKey = (typeof getApiKey === 'function') ? getApiKey() : '';
   if (!apiKey) throw new Error('AI key not set. Add your Gemini key in chat settings first.');
   const model = (typeof getModel === 'function') ? getModel() : 'gemini-2.5-flash';
@@ -12185,18 +12204,18 @@ async function callGeminiSketch(dataUrl) {
   const mime = dataUrl.indexOf('data:image/png') === 0 ? 'image/png' : 'image/jpeg';
   const prompt = [
     'You are an architectural draftsman. The image is a HAND-DRAWN floor plan sketch.',
-    'Redraw it as a clean, professional 2D floor plan in SVG.',
-    'Rules:',
-    '- Add a white background rect covering the whole canvas.',
-    '- Walls as solid black lines, stroke-width about 6, straightened and squared (right angles where intended).',
-    '- Show door openings as gaps with a thin quarter-circle swing arc.',
-    '- Show windows as a thinner double line on the wall.',
-    '- Label every room with a centered <text> (use names written in the sketch; otherwise infer e.g. Bedroom, Kitchen, Bathroom, Living, Toilet).',
-    '- If dimensions are written on the sketch, include them as small <text> near the relevant wall.',
-    '- Keep the same overall layout and proportions as the sketch.',
-    '- Use a viewBox and set width and height. Use font-family sans-serif.',
+    'Trace it FAITHFULLY into a clean 2D floor plan in SVG. Matching the sketch matters MORE than looking pretty.',
+    'STRICT RULES:',
+    '- Reproduce the SAME outer shape and the SAME number, position and orientation of internal walls / partitions as drawn.',
+    '- Do NOT invent, add, remove, merge or rearrange rooms or walls. Keep the exact room count you see.',
+    '- Copy handwritten labels EXACTLY as written, in the same place. For example if it says "Bed 1", write "Bed 1" (never "Bed 2"). Do NOT rename, translate or guess names. If a room has no label in the sketch, leave it blank.',
+    '- Only draw doors (a gap with a thin quarter-circle swing arc) and windows where they are actually drawn in the sketch.',
+    '- Keep proportions close to the sketch.',
+    'STYLE: add a white background rect; walls = solid black lines, stroke-width about 6, straightened and squared; labels = centered <text>, font-family sans-serif.',
+    'Use a viewBox and set width and height.',
+    (notes ? ('USER NOTES — treat these as authoritative for labels and layout: ' + notes) : ''),
     'Output ONLY the SVG code. No markdown, no backticks, no explanation.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
   const res = await fetch(url, {
