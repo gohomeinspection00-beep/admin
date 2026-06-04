@@ -1649,6 +1649,31 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .cv-list-row b{font-family:var(--font-mono);font-size:15px}
 .cv-note{font-size:11.5px;color:var(--fg-dim);margin-top:10px;line-height:1.45}
 
+/* Tally Counter */
+.cnt-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:#0f141a;color:#e5e7eb;font-family:var(--font-body)}
+.cnt-top{display:flex;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top) + 10px) 10px 10px;background:#0a0d12}
+.cnt-title{flex:1;text-align:center;font-weight:700;font-size:14px}
+.cnt-top button{padding:7px 10px;border-radius:9px;background:rgba(255,255,255,0.12);color:#fff;font-weight:700;font-size:12.5px;border:1px solid rgba(255,255,255,0.18)}
+.cnt-top button.cnt-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.cnt-labelwrap{padding:12px 14px;background:#0a0d12}
+.cnt-labelinput{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;box-sizing:border-box;text-align:center;font-weight:600}
+.cnt-labelinput::placeholder{color:#64748b;font-weight:400}
+.cnt-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.cnt-main:active{background:rgba(34,211,238,0.07)}
+.cnt-num{font-size:clamp(76px,30vw,170px);font-weight:800;font-family:var(--font-mono);line-height:1;color:#fff}
+.cnt-hint{font-size:14px;color:#64748b}
+.cnt-controls{display:flex;gap:12px;padding:16px 16px calc(env(safe-area-inset-bottom) + 18px);background:#0a0d12}
+.cnt-minus{width:80px;height:66px;border-radius:14px;background:#1e293b;color:#fff;font-size:32px;font-weight:700;border:1px solid rgba(255,255,255,0.15)}
+.cnt-minus:active{background:#0f1924}
+.cnt-reset{flex:1;border-radius:14px;background:rgba(255,255,255,0.08);color:#cbd5e1;font-weight:600;font-size:14px;border:1px solid rgba(255,255,255,0.15)}
+.cnt-row{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px}
+.cnt-row:active{background:rgba(0,0,0,0.06)}
+.cnt-row-meta{flex:1;min-width:0}
+.cnt-row-label{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111}
+.cnt-row-date{font-size:11px;color:#6b7280}
+.cnt-row-count{font-weight:800;font-size:20px;font-family:var(--font-mono);color:var(--accent)}
+.cnt-row-del{background:none;border:none;color:#9ca3af;line-height:0;padding:6px}
+
 /* AR Floor Plan — tagging screen */
 .fp-overlay{
   position:fixed;inset:0;z-index:3100;background:#0b0f14;
@@ -6506,6 +6531,17 @@ body.site-mode-active .voice-mode{
           </div>
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
+
+        <button class="tools-list-item cat-calc" data-tool="counter">
+          <div class="tools-list-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="4" x2="6" y2="20"/><line x1="13" y1="4" x2="11" y2="20"/><line x1="18" y1="4" x2="16" y2="20"/><line x1="4" y1="13" x2="20" y2="9"/></svg>
+          </div>
+          <div class="tools-list-content">
+            <div class="tools-list-name">Tally Counter</div>
+            <div class="tools-list-desc">Tap to count defects on site (e.g. broken tiles). Label it, save the count &amp; reopen later.</div>
+          </div>
+          <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
       </div>
       </div>
 
@@ -9871,6 +9907,7 @@ function openTool(toolKey) {
   else if (toolKey === 'planeditor') openPlanEditor();
   else if (toolKey === 'voicetranslate') openVoiceTranslator();
   else if (toolKey === 'converter') openConverter();
+  else if (toolKey === 'counter') openCounter();
 }
 
 function closeTool() {
@@ -13169,6 +13206,105 @@ function renderCalc(type) {
       document.getElementById('cvD_res').innerHTML = 'Diagonal: ' + cvFmt(d) + ' ' + document.getElementById('cvD_unit').value;
     });
   }
+}
+
+// =======================================================
+// TOOL: TALLY COUNTER
+// =======================================================
+function openCounter() {
+  if (typeof closeTool === 'function') closeTool();
+  const LIST_KEY = 'cnt_items_v1', CUR_KEY = 'cnt_current_v1';
+
+  let ov = document.getElementById('cntOverlay');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'cntOverlay';
+  ov.className = 'cnt-overlay';
+  ov.innerHTML =
+    '<div class="cnt-top">' +
+      '<button id="cntClose">Close</button>' +
+      '<div class="cnt-title">Tally</div>' +
+      '<button id="cntNew">New</button>' +
+      '<button id="cntOpen">Open</button>' +
+      '<button class="cnt-primary" id="cntSave">Save</button>' +
+    '</div>' +
+    '<div class="cnt-labelwrap"><input class="cnt-labelinput" id="cntLabel" placeholder="What are you counting? e.g. Broken tiles – Unit A"></div>' +
+    '<div class="cnt-main" id="cntMain"><div class="cnt-num" id="cntNum">0</div><div class="cnt-hint">Tap anywhere to add +1</div></div>' +
+    '<div class="cnt-controls">' +
+      '<button class="cnt-minus" id="cntMinus">−</button>' +
+      '<button class="cnt-reset" id="cntReset">Reset</button>' +
+    '</div>';
+  document.body.appendChild(ov);
+
+  let count = 0, curId = null;
+  const numEl = ov.querySelector('#cntNum');
+  const labelEl = ov.querySelector('#cntLabel');
+  function render() { numEl.textContent = count; }
+  function loadList() { try { return JSON.parse(localStorage.getItem(LIST_KEY) || '[]'); } catch (e) { return []; } }
+  function storeList(a) { try { localStorage.setItem(LIST_KEY, JSON.stringify(a)); } catch (e) { if (typeof showToast === 'function') showToast('Storage full'); } }
+  function persistCurrent() { try { localStorage.setItem(CUR_KEY, JSON.stringify({ label: labelEl.value, count: count, curId: curId })); } catch (e) {} }
+  function buzz(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+
+  try { const c = JSON.parse(localStorage.getItem(CUR_KEY) || 'null'); if (c) { count = c.count || 0; curId = c.curId || null; labelEl.value = c.label || ''; } } catch (e) {}
+  render();
+
+  function inc() { count++; render(); persistCurrent(); buzz(15); }
+  function dec() { if (count > 0) count--; render(); persistCurrent(); buzz(10); }
+
+  ov.querySelector('#cntMain').addEventListener('click', inc);
+  ov.querySelector('#cntMinus').addEventListener('click', function(e) { e.stopPropagation(); dec(); });
+  ov.querySelector('#cntReset').addEventListener('click', function() { if (confirm('Reset count to 0?')) { count = 0; render(); persistCurrent(); } });
+  labelEl.addEventListener('input', persistCurrent);
+
+  function save() {
+    const label = (labelEl.value || '').trim() || 'Untitled count';
+    let list = loadList();
+    let ex = curId ? list.find(function(p) { return p.id === curId; }) : null;
+    if (ex) { ex.label = label; ex.count = count; ex.updated = Date.now(); }
+    else { curId = 'cnt_' + Date.now(); list.unshift({ id: curId, label: label, count: count, updated: Date.now() }); }
+    storeList(list); labelEl.value = label; persistCurrent();
+    if (typeof showToast === 'function') showToast('Saved "' + label + '" = ' + count);
+  }
+  function newCount() { count = 0; curId = null; labelEl.value = ''; render(); persistCurrent(); labelEl.focus(); }
+
+  function openList() {
+    const list = loadList();
+    let panel = ov.querySelector('#cntPanel');
+    if (panel) panel.remove();
+    panel = document.createElement('div');
+    panel.id = 'cntPanel';
+    panel.className = 'pe-panel';
+    let html = '<div class="pe-panel-card"><div class="pe-panel-head"><span>Saved counts</span><button id="cntPanelClose">✕</button></div><div class="pe-panel-list">';
+    if (list.length === 0) html += '<div class="pe-empty">No saved counts yet. Tap Save to keep one.</div>';
+    list.forEach(function(p) {
+      html += '<div class="cnt-row" data-id="' + p.id + '"><div class="cnt-row-meta"><div class="cnt-row-label">' + peEsc(p.label) + '</div><div class="cnt-row-date">' + new Date(p.updated).toLocaleString() + '</div></div><div class="cnt-row-count">' + p.count + '</div><button class="cnt-row-del" data-id="' + p.id + '"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div>';
+    });
+    html += '</div></div>';
+    panel.innerHTML = html;
+    ov.appendChild(panel);
+    panel.addEventListener('click', function(e) { if (e.target === panel) panel.remove(); });
+    panel.querySelector('#cntPanelClose').onclick = function() { panel.remove(); };
+    panel.querySelectorAll('.cnt-row').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        if (e.target.closest('.cnt-row-del')) return;
+        const p = loadList().find(function(x) { return x.id === el.dataset.id; });
+        if (p) { count = p.count; curId = p.id; labelEl.value = p.label; render(); persistCurrent(); panel.remove(); }
+      });
+    });
+    panel.querySelectorAll('.cnt-row-del').forEach(function(bt) {
+      bt.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!confirm('Delete this count?')) return;
+        storeList(loadList().filter(function(x) { return x.id !== bt.dataset.id; }));
+        openList();
+      });
+    });
+  }
+
+  ov.querySelector('#cntClose').addEventListener('click', function() { persistCurrent(); ov.remove(); });
+  ov.querySelector('#cntNew').addEventListener('click', newCount);
+  ov.querySelector('#cntOpen').addEventListener('click', openList);
+  ov.querySelector('#cntSave').addEventListener('click', save);
 }
 
 // =======================================================
