@@ -5726,7 +5726,7 @@ body.site-mode-active .voice-mode{
 <body class="has-bottom-nav">
 
 <!-- ============ AUTH SCREEN ============ -->
-<div class="auth-screen" id="authScreen">
+<div class="auth-screen show" id="authScreen">
   <div class="auth-card">
     <div class="auth-brand">
       <div class="auth-mark">
@@ -6986,18 +6986,6 @@ function getSystemPrompt(forVoice = false) {
 }
 
 // =======================================================
-// ⚠️ DEV AUTO-LOGIN — TESTING ONLY. REMOVE BEFORE PRODUCTION.
-// Skips the login screen and signs in automatically.
-// To disable: set enabled to false (or delete this whole block).
-// =======================================================
-const DEV_AUTOLOGIN = {
-  enabled: true,
-  email: 'fikri@gmail.com',
-  password: 'Fikri12345'
-};
-let devAutoLoginTried = false;
-
-// =======================================================
 // AUTH FLOW
 // =======================================================
 auth.onAuthStateChanged(async (user) => {
@@ -7027,38 +7015,6 @@ auth.onAuthStateChanged(async (user) => {
       showApp();
     }
   } else {
-    // ⚠️ DEV AUTO-LOGIN (testing only) — sign in silently without showing the login screen
-    if (DEV_AUTOLOGIN.enabled && !devAutoLoginTried) {
-      devAutoLoginTried = true;
-      // The auth screen ships with `show` on by default — hide it while we sign in.
-      document.getElementById('authScreen').classList.remove('show');
-      const showLoginFallback = (msg) => {
-        const eEl = document.getElementById('loginEmail');
-        const pEl = document.getElementById('loginPassword');
-        if (eEl) eEl.value = DEV_AUTOLOGIN.email;
-        if (pEl) pEl.value = DEV_AUTOLOGIN.password;
-        document.getElementById('authScreen').classList.add('show');
-        const errEl = document.getElementById('loginError');
-        if (errEl && msg) { errEl.textContent = msg; errEl.classList.add('show'); }
-      };
-      console.log('[DEV Auto-login] Signing in as', DEV_AUTOLOGIN.email);
-      auth.signInWithEmailAndPassword(DEV_AUTOLOGIN.email, DEV_AUTOLOGIN.password)
-        .catch((err) => {
-          console.warn('[DEV Auto-login] Sign-in failed:', err.code, err.message);
-          // Account may not exist yet — create it automatically (testing convenience).
-          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials') {
-            console.log('[DEV Auto-login] Creating account...');
-            auth.createUserWithEmailAndPassword(DEV_AUTOLOGIN.email, DEV_AUTOLOGIN.password)
-              .catch((err2) => {
-                console.error('[DEV Auto-login] Create failed:', err2.code, err2.message);
-                showLoginFallback('Auto-login failed: ' + err2.message);
-              });
-          } else {
-            showLoginFallback('Auto-login failed: ' + err.message);
-          }
-        });
-      return;
-    }
     document.getElementById('authScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
     document.getElementById('app').style.display = 'none';
