@@ -12101,7 +12101,7 @@ function openSketchToReal(retain) {
   document.getElementById('toolModalBody').innerHTML =
     '<div class="ar-intro-steps">' +
       '<div class="ar-step"><span class="ar-step-n">1</span><span>Take a clear photo of your hand-drawn floor plan (good light, flat, whole plan in frame).</span></div>' +
-      '<div class="ar-step"><span class="ar-step-n">2</span><span>AI redraws it as a clean, labelled floor plan.</span></div>' +
+      '<div class="ar-step"><span class="ar-step-n">2</span><span>AI redraws it as a clean floor-plan image.</span></div>' +
       '<div class="ar-step"><span class="ar-step-n">3</span><span>Save it, or send it straight to AR Floor Plan.</span></div>' +
     '</div>' +
     '<div class="fp-upload" id="skUpload">' +
@@ -12160,31 +12160,25 @@ function openSketchToReal(retain) {
 async function runSketchConvert(dataUrl, notes, statusEl, mainBtn) {
   if (_skState) _skState.notes = notes;
   mainBtn.disabled = true;
-  mainBtn.textContent = 'Redrawing… (10–25s)';
+  mainBtn.textContent = 'Generating… (10–30s)';
   statusEl.className = 'ar-status';
-  statusEl.innerHTML = '<span class="sk-spin"></span> AI is reading your sketch and redrawing it…';
-  let raw;
+  statusEl.innerHTML = '<span class="sk-spin"></span> AI is redrawing your floor plan…';
+  let img;
   try {
-    raw = await callGeminiSketch(dataUrl, notes);
+    img = await callGeminiImage(dataUrl, notes);
   } catch (e) {
     statusEl.className = 'ar-status warn'; statusEl.textContent = 'AI error: ' + e.message;
     mainBtn.disabled = false; mainBtn.textContent = '✨ Try again';
     return;
   }
-  const svg = extractSVG(raw);
-  if (!svg) {
-    statusEl.className = 'ar-status warn'; statusEl.textContent = 'AI did not return a usable drawing. Try a clearer, flatter photo.';
-    mainBtn.disabled = false; mainBtn.textContent = '✨ Try again';
-    return;
-  }
-  const norm = ensureSVGSize(svg);
-  showSketchResult(norm.svg, norm.w, norm.h);
+  showSketchResult(img);
 }
 
-function showSketchResult(svg, w, h) {
+function showSketchResult(imgUrl) {
+  if (_skState) _skState.result = imgUrl;
   document.getElementById('toolModalBody').innerHTML =
-    '<div class="sk-result" id="skResult">' + svg + '</div>' +
-    '<div class="ar-status" id="skStatus2" style="margin-top:10px">Clean floor plan ready. Save it, or send it to AR Floor Plan.</div>';
+    '<div class="sk-result"><img src="' + imgUrl + '" alt="" style="width:100%;display:block;border-radius:8px"></div>' +
+    '<div class="ar-status" style="margin-top:10px">Clean floor plan ready. Save it, or send it to AR Floor Plan.</div>';
   document.getElementById('toolModalFoot').innerHTML =
     '<div class="sk-actions">' +
       '<button class="tool-btn" id="skRedo">Redo</button>' +
@@ -12192,58 +12186,57 @@ function showSketchResult(svg, w, h) {
       '<button class="tool-btn tool-btn-primary" id="skToAR">Use in AR</button>' +
     '</div>';
   document.getElementById('skRedo').onclick = function() { openSketchToReal({ dataUrl: _skState && _skState.dataUrl, notes: _skState && _skState.notes }); };
-  document.getElementById('skSave').onclick = function() { saveSketchPNG(svg, w, h); };
-  document.getElementById('skToAR').onclick = function() { sketchToAR(svg, w, h); };
+  document.getElementById('skSave').onclick = function() { saveSketchPNG(imgUrl); };
+  document.getElementById('skToAR').onclick = function() { sketchToAR(imgUrl); };
 }
 
-async function callGeminiSketch(dataUrl, notes) {
+async function callGeminiImage(dataUrl, notes) {
   const apiKey = (typeof getApiKey === 'function') ? getApiKey() : '';
   if (!apiKey) throw new Error('AI key not set. Add your Gemini key in chat settings first.');
-  const model = (typeof getModel === 'function') ? getModel() : 'gemini-2.5-flash';
   const base64 = dataUrl.split(',')[1] || dataUrl;
   const mime = dataUrl.indexOf('data:image/png') === 0 ? 'image/png' : 'image/jpeg';
   const prompt = [
-    'You are an architectural draftsman. The image is a HAND-DRAWN floor plan sketch.',
-    'Trace it FAITHFULLY into a clean 2D floor plan in SVG. Matching the sketch matters MORE than looking pretty.',
-    'STRICT RULES:',
-    '- Reproduce the SAME outer shape and the SAME number, position and orientation of internal walls / partitions as drawn.',
-    '- Do NOT invent, add, remove, merge or rearrange rooms or walls. Keep the exact room count you see.',
-    '- Copy handwritten labels EXACTLY as written, in the same place. For example if it says "Bed 1", write "Bed 1" (never "Bed 2"). Do NOT rename, translate or guess names. If a room has no label in the sketch, leave it blank.',
-    '- Only draw doors (a gap with a thin quarter-circle swing arc) and windows where they are actually drawn in the sketch.',
-    '- Keep proportions close to the sketch.',
-    'STYLE: add a white background rect; walls = solid black lines, stroke-width about 6, straightened and squared; labels = centered <text>, font-family sans-serif.',
-    'Use a viewBox and set width and height.',
-    (notes ? ('USER NOTES — treat these as authoritative for labels and layout: ' + notes) : ''),
-    'Output ONLY the SVG code. No markdown, no backticks, no explanation.'
-  ].filter(Boolean).join('\n');
+    'This is a rough hand-drawn floor plan sketch.',
+    'Redraw it as a clean, professional top-down 2D architectural floor plan.',
+    'Keep the SAME layout, room positions, walls and proportions as the sketch — do not invent or rearrange rooms.',
+    'Use crisp straight black walls on a plain white background, show doors and windows, and keep any room labels written in the sketch (copy the text exactly).',
+    notes ? ('Notes from the user (follow these): ' + notes) : '',
+    'Produce a clean floor-plan image.'
+  ].filter(Boolean).join(' ');
 
-  const genConfig = { temperature: 0.2, maxOutputTokens: 8192 };
-  // gemini-2.5-* "think" by default and can spend the whole token budget on
-  // reasoning, leaving no SVG. Disable thinking so the model draws directly.
-  if (model.indexOf('2.5') !== -1) genConfig.thinkingConfig = { thinkingBudget: 0 };
-
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ inlineData: { mimeType: mime, data: base64 } }, { text: prompt }] }],
-      generationConfig: genConfig,
-      safetySettings: [
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-      ]
-    })
-  });
-  if (!res.ok) {
-    const e = await res.json().catch(function() { return {}; });
-    if (res.status === 429) throw new Error('Rate limit — wait a moment and retry.');
-    throw new Error((e && e.error && e.error.message) || ('API ' + res.status));
+  // Free-tier-friendly image models on the same Gemini key. Try in order.
+  const models = ['gemini-2.5-flash-image', 'gemini-2.0-flash-preview-image-generation'];
+  let lastErr = 'Image generation not available on this key';
+  for (let i = 0; i < models.length; i++) {
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + models[i] + ':generateContent?key=' + apiKey;
+    let res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ inlineData: { mimeType: mime, data: base64 } }, { text: prompt }] }],
+          generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
+        })
+      });
+    } catch (e) { lastErr = e.message; continue; }
+    if (!res.ok) {
+      const e = await res.json().catch(function() { return {}; });
+      lastErr = (e && e.error && e.error.message) || ('API ' + res.status);
+      if (res.status === 404 || res.status === 400) continue; // model unavailable -> try next
+      if (res.status === 429) throw new Error('Free quota reached — wait a bit and retry.');
+      throw new Error(lastErr);
+    }
+    const data = await res.json();
+    const parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
+    for (let p = 0; p < parts.length; p++) {
+      if (parts[p].inlineData && parts[p].inlineData.data) {
+        return 'data:' + (parts[p].inlineData.mimeType || 'image/png') + ';base64,' + parts[p].inlineData.data;
+      }
+    }
+    lastErr = 'Model returned no image';
   }
-  const data = await res.json();
-  return (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '';
+  throw new Error(lastErr);
 }
 
 function extractSVG(t) {
@@ -12277,46 +12270,27 @@ function svgToImage(svg) {
   });
 }
 
-async function saveSketchPNG(svg, w, h) {
+function saveSketchPNG(imgUrl) {
   try {
-    const r = await svgToImage(svg);
-    const scale = 2;
-    const c = document.createElement('canvas');
-    c.width = w * scale; c.height = h * scale;
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
-    ctx.drawImage(r.img, 0, 0, c.width, c.height);
-    URL.revokeObjectURL(r.url);
     const a = document.createElement('a');
-    a.href = c.toDataURL('image/png');
+    a.href = imgUrl;
     a.download = 'floorplan-' + Date.now() + '.png';
     a.click();
-    if (typeof showToast === 'function') showToast('Saved PNG');
+    if (typeof showToast === 'function') showToast('Saved');
   } catch (e) {
     if (typeof showToast === 'function') showToast('Save failed: ' + e.message);
   }
 }
 
-async function sketchToAR(svg, w, h) {
-  try {
-    const r = await svgToImage(svg);
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
-    ctx.drawImage(r.img, 0, 0, w, h);
-    URL.revokeObjectURL(r.url);
-    const pngUrl = c.toDataURL('image/png');
-    const im = new Image();
-    im.onload = function() {
-      _fpState = { imgEl: im, imgURL: pngUrl, w: im.naturalWidth, h: im.naturalHeight };
-      if (typeof closeTool === 'function') closeTool();
-      openFloorPlanTag();
-    };
-    im.src = pngUrl;
-  } catch (e) {
-    if (typeof showToast === 'function') showToast('Could not send to AR: ' + e.message);
-  }
+function sketchToAR(imgUrl) {
+  const im = new Image();
+  im.onload = function() {
+    _fpState = { imgEl: im, imgURL: imgUrl, w: im.naturalWidth, h: im.naturalHeight };
+    if (typeof closeTool === 'function') closeTool();
+    openFloorPlanTag();
+  };
+  im.onerror = function() { if (typeof showToast === 'function') showToast('Could not load image'); };
+  im.src = imgUrl;
 }
 
 // =======================================================
