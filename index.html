@@ -12217,13 +12217,24 @@ async function callGeminiSketch(dataUrl, notes) {
     'Output ONLY the SVG code. No markdown, no backticks, no explanation.'
   ].filter(Boolean).join('\n');
 
+  const genConfig = { temperature: 0.2, maxOutputTokens: 8192 };
+  // gemini-2.5-* "think" by default and can spend the whole token budget on
+  // reasoning, leaving no SVG. Disable thinking so the model draws directly.
+  if (model.indexOf('2.5') !== -1) genConfig.thinkingConfig = { thinkingBudget: 0 };
+
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ role: 'user', parts: [{ inlineData: { mimeType: mime, data: base64 } }, { text: prompt }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 8192 }
+      generationConfig: genConfig,
+      safetySettings: [
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+      ]
     })
   });
   if (!res.ok) {
@@ -12236,8 +12247,13 @@ async function callGeminiSketch(dataUrl, notes) {
 }
 
 function extractSVG(t) {
+  if (!t) return null;
   const m = t.match(/<svg[\s\S]*?<\/svg>/i);
-  return m ? m[0] : null;
+  if (m) return m[0];
+  // output may be truncated (no closing tag) — salvage and close it
+  const open = t.search(/<svg[\s>]/i);
+  if (open !== -1) return t.slice(open) + '</svg>';
+  return null;
 }
 
 function ensureSVGSize(svg) {
