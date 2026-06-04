@@ -11631,11 +11631,11 @@ function openARFloorPlan() {
       '<div class="ar-step"><span class="ar-step-n">3</span><span>In AR, tag the same two real-world points — the plan appears to scale.</span></div>' +
       '<div class="ar-step"><span class="ar-step-n">4</span><span>Fine-tune scale, rotation, flip &amp; transparency.</span></div>' +
     '</div>' +
-    '<label class="fp-upload" id="fpUploadLabel">' +
+    '<div class="fp-upload" id="fpUploadLabel">' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
       '<span id="fpUploadText">Tap to choose a floor plan image</span>' +
-      '<input type="file" accept="image/*" id="fpFile" hidden>' +
-    '</label>' +
+    '</div>' +
+    '<input type="file" accept="image/*" id="fpFile" style="display:none">' +
     '<img id="fpPreview" class="fp-preview" style="display:none" alt="">' +
     '<div id="fpStatus" class="ar-status"></div>';
 
@@ -11647,6 +11647,8 @@ function openARFloorPlan() {
   const startBtn = document.getElementById('fpStartBtn');
   const statusEl = document.getElementById('fpStatus');
   const fileInput = document.getElementById('fpFile');
+  const uploadEl = document.getElementById('fpUploadLabel');
+  uploadEl.addEventListener('click', function() { fileInput.click(); });
   let arOK = false;
 
   function updateStart() {
