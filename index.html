@@ -6986,6 +6986,18 @@ function getSystemPrompt(forVoice = false) {
 }
 
 // =======================================================
+// ⚠️ DEV AUTO-LOGIN — TESTING ONLY. REMOVE BEFORE PRODUCTION.
+// Skips the login screen and signs in automatically.
+// To disable: set enabled to false (or delete this whole block).
+// =======================================================
+const DEV_AUTOLOGIN = {
+  enabled: true,
+  email: 'fikri@gmail.com',
+  password: 'Fikri12345'
+};
+let devAutoLoginTried = false;
+
+// =======================================================
 // AUTH FLOW
 // =======================================================
 auth.onAuthStateChanged(async (user) => {
@@ -7015,6 +7027,24 @@ auth.onAuthStateChanged(async (user) => {
       showApp();
     }
   } else {
+    // ⚠️ DEV AUTO-LOGIN (testing only) — sign in silently without showing the login screen
+    if (DEV_AUTOLOGIN.enabled && !devAutoLoginTried) {
+      devAutoLoginTried = true;
+      console.log('[DEV Auto-login] Signing in as', DEV_AUTOLOGIN.email);
+      auth.signInWithEmailAndPassword(DEV_AUTOLOGIN.email, DEV_AUTOLOGIN.password)
+        .catch((err) => {
+          console.error('[DEV Auto-login] Failed:', err.message);
+          // Fall back to the normal login screen, prefilled for convenience
+          const eEl = document.getElementById('loginEmail');
+          const pEl = document.getElementById('loginPassword');
+          if (eEl) eEl.value = DEV_AUTOLOGIN.email;
+          if (pEl) pEl.value = DEV_AUTOLOGIN.password;
+          document.getElementById('authScreen').classList.add('show');
+          const errEl = document.getElementById('loginError');
+          if (errEl) { errEl.textContent = 'Auto-login failed: ' + err.message; errEl.classList.add('show'); }
+        });
+      return;
+    }
     document.getElementById('authScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
     document.getElementById('app').style.display = 'none';
