@@ -1627,7 +1627,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .vt-mic-worker{background:#13202e;color:#7dd3fc;border-color:#1e3a5f}
 .vt-mic-me{background:#15201a;color:#86efac;border-color:#1f3d2b}
 .vt-mic.listening{animation:vt-pulse 1s infinite}
-.vt-mic-ic{font-size:22px}
+.vt-mic-ic{display:flex;align-items:center;justify-content:center;line-height:0}
 @keyframes vt-pulse{0%,100%{opacity:1}50%{opacity:0.45}}
 
 /* AR Floor Plan — tagging screen */
@@ -12779,6 +12779,7 @@ function vtSpeak(text, lang) {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
+    u.volume = 1; u.rate = 1; u.pitch = 1;
     const pre = lang.split('-')[0].toLowerCase();
     const v = _vtVoices.find(function(x) { return x.lang && x.lang.toLowerCase().indexOf(pre) === 0; });
     if (v) u.voice = v;
@@ -12828,8 +12829,8 @@ function openVoiceTranslator() {
     '<div class="vt-convo" id="vtConvo"><div class="vt-empty">Pick the worker\'s language, tap a mic and speak. The translation appears here and is spoken aloud. Tap the other mic to reply.</div></div>' +
     '<div class="vt-status" id="vtStatus"></div>' +
     '<div class="vt-mics">' +
-      '<button class="vt-mic vt-mic-worker" id="vtMicWorker"><span class="vt-mic-ic">🎤</span><span>Worker · <b id="vtWorkerLabel">Bangla</b></span></button>' +
-      '<button class="vt-mic vt-mic-me" id="vtMicMe"><span class="vt-mic-ic">🎤</span><span>Me · <b id="vtMeLabel">BM</b></span></button>' +
+      '<button class="vt-mic vt-mic-worker" id="vtMicWorker"><span class="vt-mic-ic"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></span><span>Worker · <b id="vtWorkerLabel">Bangla</b></span></button>' +
+      '<button class="vt-mic vt-mic-me" id="vtMicMe"><span class="vt-mic-ic"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></span><span>Me · <b id="vtMeLabel">BM</b></span></button>' +
     '</div>';
   document.body.appendChild(ov);
 
@@ -12874,7 +12875,7 @@ function openVoiceTranslator() {
     if (empty) empty.remove();
     const div = document.createElement('div');
     div.className = 'vt-msg ' + (side === 'worker' ? 'vt-worker' : 'vt-me');
-    div.innerHTML = '<div class="vt-orig">' + peEsc(original) + '</div><div class="vt-trans">' + peEsc(translated) + '</div><button class="vt-replay">🔊 Play</button>';
+    div.innerHTML = '<div class="vt-orig">' + peEsc(original) + '</div><div class="vt-trans">' + peEsc(translated) + '</div><button class="vt-replay"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>Play</button>';
     convo.appendChild(div);
     convo.scrollTop = convo.scrollHeight;
     div.querySelector('.vt-replay').onclick = function() { vtSpeak(translated, speakLang); };
