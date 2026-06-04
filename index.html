@@ -1497,7 +1497,6 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
   pointer-events:none;
   font-family:var(--font-body);
 }
-.ar-tap{position:absolute;inset:0;z-index:1;pointer-events:auto;background:transparent}
 .ar-crosshair{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   z-index:2;pointer-events:none;
@@ -1526,12 +1525,18 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 }
 .ar-btn{
   pointer-events:auto;
-  padding:14px 24px;border-radius:999px;
+  padding:14px 22px;border-radius:999px;
   background:rgba(255,255,255,0.16);color:#fff;
   font-size:14px;font-weight:600;
   border:1px solid rgba(255,255,255,0.28);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
 }
+.ar-btn-primary{
+  background:var(--accent);color:var(--accent-fg);
+  border-color:var(--accent);
+  flex:1;max-width:200px;
+}
+.ar-btn:disabled{opacity:0.45}
 
 /* ============================================
    CHAT MODE
@@ -11355,12 +11360,12 @@ async function startARSession(statusEl, startBtn) {
   overlay = document.createElement('div');
   overlay.id = 'arOverlay';
   overlay.innerHTML =
-    '<div class="ar-tap" id="arTap"></div>' +
     '<div class="ar-crosshair"></div>' +
     '<div class="ar-top"><div class="ar-hint" id="arHint">Move your phone to find a surface…</div></div>' +
     '<div class="ar-label" id="arLabel"></div>' +
     '<div class="ar-controls">' +
       '<button class="ar-btn" id="arResetBtn">Reset</button>' +
+      '<button class="ar-btn ar-btn-primary" id="arAddBtn" disabled>Add Point</button>' +
       '<button class="ar-btn" id="arExitBtn">Exit</button>' +
     '</div>';
   document.body.appendChild(overlay);
@@ -11391,7 +11396,7 @@ async function startARSession(statusEl, startBtn) {
 
   const hintEl = overlay.querySelector('#arHint');
   const labelEl = overlay.querySelector('#arLabel');
-  const tapEl = overlay.querySelector('#arTap');
+  const addBtn = overlay.querySelector('#arAddBtn');
   const resetBtn = overlay.querySelector('#arResetBtn');
   const exitBtn = overlay.querySelector('#arExitBtn');
 
@@ -11401,8 +11406,8 @@ async function startARSession(statusEl, startBtn) {
     return meters.toFixed(2) + ' m';
   }
   function updateHint() {
-    if (points.length === 0) hintEl.textContent = reticle.visible ? 'Tap anywhere to place the start point' : 'Move your phone to find a surface…';
-    else if (points.length === 1) hintEl.textContent = 'Move to the end, then tap to place';
+    if (points.length === 0) hintEl.textContent = reticle.visible ? 'Aim the dot, then tap "Add Point"' : 'Move your phone to find a surface…';
+    else if (points.length === 1) hintEl.textContent = 'Move to the end, then "Add Point"';
     else hintEl.textContent = 'Tap Reset to measure again';
   }
   function addMarker(pos) {
@@ -11422,6 +11427,7 @@ async function startARSession(statusEl, startBtn) {
       const geom = new THREE.BufferGeometry().setFromPoints([points[0], points[1]]);
       lineObj = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: 0x22d3ee }));
       scene.add(lineObj);
+      addBtn.disabled = true;
       _arLastResult = fmt(d);
     }
     updateHint();
@@ -11433,10 +11439,11 @@ async function startARSession(statusEl, startBtn) {
     if (lineObj) { scene.remove(lineObj); lineObj = null; }
     labelEl.style.display = 'none';
     labelEl.textContent = '';
+    addBtn.disabled = !reticle.visible;
     _arLastResult = null;
     updateHint();
   }
-  tapEl.addEventListener('click', doAddPoint);
+  addBtn.addEventListener('click', doAddPoint);
   resetBtn.addEventListener('click', doReset);
 
   let session;
@@ -11482,9 +11489,11 @@ async function startARSession(statusEl, startBtn) {
         if (pose) {
           reticle.visible = points.length < 2;
           reticle.matrix.fromArray(pose.transform.matrix);
+          if (points.length < 2) addBtn.disabled = false;
         }
       } else {
         reticle.visible = false;
+        if (points.length < 2) addBtn.disabled = true;
       }
     }
     updateHint();
