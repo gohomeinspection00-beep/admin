@@ -1405,6 +1405,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .cat-measure .tools-list-icon{background:var(--warning-soft);color:var(--warning)}
 .cat-ai .tools-list-icon{background:var(--accent-soft);color:var(--accent)}
 .cat-draw .tools-list-icon{background:var(--success-soft);color:var(--success)}
+.cat-talk .tools-list-icon{background:var(--accent-soft);color:var(--accent)}
 .tools-list-content{flex:1;min-width:0}
 .tools-list-name{
   font-size:15px;font-weight:700;
@@ -1602,6 +1603,32 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .pe-plan-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pe-plan-date{font-size:11px;color:#6b7280}
 .pe-plan-del{background:none;border:none;font-size:16px}
+
+/* Voice Translator */
+.vt-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:#0f141a;color:#e5e7eb;font-family:var(--font-body)}
+.vt-top{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:#0a0d12}
+.vt-title{flex:1;font-size:15px;font-weight:700;text-align:center}
+.vt-top button{padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.12);color:#fff;font-size:13px;font-weight:700;border:1px solid rgba(255,255,255,0.18)}
+.vt-langs{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:#0a0d12}
+.vt-chip{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,0.08);color:#cbd5e1;font-size:13px;font-weight:600;border:1px solid transparent}
+.vt-chip.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.vt-convo{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
+.vt-empty{margin:auto;color:#6b7280;font-size:13px;text-align:center;line-height:1.5;max-width:280px}
+.vt-msg{max-width:82%;padding:10px 12px;border-radius:14px;font-size:14px;line-height:1.4}
+.vt-msg .vt-orig{opacity:0.65;font-size:12px;margin-bottom:3px}
+.vt-msg .vt-trans{font-weight:600}
+.vt-replay{margin-top:6px;font-size:11px;background:rgba(255,255,255,0.15);border:none;color:#fff;padding:3px 10px;border-radius:999px}
+.vt-worker{align-self:flex-start;background:#1e293b;border-bottom-left-radius:4px}
+.vt-me{align-self:flex-end;background:var(--accent);color:var(--accent-fg);border-bottom-right-radius:4px}
+.vt-me .vt-replay{background:rgba(0,0,0,0.18);color:var(--accent-fg)}
+.vt-status{padding:2px 14px;min-height:18px;font-size:12px;color:var(--accent);text-align:center}
+.vt-mics{display:flex;gap:10px;padding:12px 12px calc(env(safe-area-inset-bottom) + 14px);background:#0a0d12}
+.vt-mic{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px;border-radius:14px;border:2px solid transparent;font-size:12.5px;font-weight:600}
+.vt-mic-worker{background:#13202e;color:#7dd3fc;border-color:#1e3a5f}
+.vt-mic-me{background:#15201a;color:#86efac;border-color:#1f3d2b}
+.vt-mic.listening{animation:vt-pulse 1s infinite}
+.vt-mic-ic{font-size:22px}
+@keyframes vt-pulse{0%,100%{opacity:1}50%{opacity:0.45}}
 
 /* AR Floor Plan — tagging screen */
 .fp-overlay{
@@ -6282,6 +6309,7 @@ body.site-mode-active .voice-mode{
         <button class="tools-chip" data-cat="measurement">Measurement</button>
         <button class="tools-chip" data-cat="ai">AI</button>
         <button class="tools-chip" data-cat="draw">Draw</button>
+        <button class="tools-chip" data-cat="talk">Talk</button>
       </div>
 
       <div class="tools-group" data-cat="assessment">
@@ -6417,6 +6445,25 @@ body.site-mode-active .voice-mode{
           <div class="tools-list-content">
             <div class="tools-list-name">Plan Editor</div>
             <div class="tools-list-desc">Draw your own floor plan — walls, rooms, doors, text. Drag, scale, rotate, save &amp; reopen.</div>
+          </div>
+          <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      </div>
+
+      <div class="tools-group" data-cat="talk">
+      <div class="tools-section-divider">
+        <span>Talk</span>
+      </div>
+
+      <div class="tools-list">
+        <button class="tools-list-item cat-talk" data-tool="voicetranslate">
+          <div class="tools-list-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg>
+          </div>
+          <div class="tools-list-content">
+            <div class="tools-list-name">Voice Translator</div>
+            <div class="tools-list-desc">Two-way voice translation — Bangla, Mandarin, Tamil, Urdu ⇄ BM/English. Speak &amp; hear replies.</div>
           </div>
           <svg class="tools-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
@@ -9783,6 +9830,7 @@ function openTool(toolKey) {
   else if (toolKey === 'arfloorplan') openARFloorPlan();
   else if (toolKey === 'sketch2real') openSketchToReal();
   else if (toolKey === 'planeditor') openPlanEditor();
+  else if (toolKey === 'voicetranslate') openVoiceTranslator();
 }
 
 function closeTool() {
@@ -12710,6 +12758,178 @@ function peToolBtn(tool, label, paths) {
   return '<button class="pe-tool" data-petool="' + tool + '">' +
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>' +
     '<span>' + label + '</span></button>';
+}
+
+// =======================================================
+// TOOL: VOICE TRANSLATOR (Web Speech + Gemini + TTS)
+// =======================================================
+let _vtVoices = [];
+const VT_LANGS = {
+  'bn-BD': { name: 'Bangla', label: 'Bangla' },
+  'zh-CN': { name: 'Mandarin Chinese', label: '中文' },
+  'ta-IN': { name: 'Tamil', label: 'தமிழ்' },
+  'ur-PK': { name: 'Urdu', label: 'اردو' },
+  'ms-MY': { name: 'Malay', label: 'BM' },
+  'en-US': { name: 'English', label: 'EN' }
+};
+
+function vtSpeak(text, lang) {
+  if (!window.speechSynthesis || !text) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    const pre = lang.split('-')[0].toLowerCase();
+    const v = _vtVoices.find(function(x) { return x.lang && x.lang.toLowerCase().indexOf(pre) === 0; });
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+async function vtTranslate(text, toName) {
+  const apiKey = (typeof getApiKey === 'function') ? getApiKey() : '';
+  if (!apiKey) throw new Error('AI key not set');
+  const model = (typeof getModel === 'function') ? getModel() : 'gemini-2.5-flash';
+  const genConfig = { temperature: 0.1, maxOutputTokens: 1024 };
+  if (model.indexOf('2.5') !== -1) genConfig.thinkingConfig = { thinkingBudget: 0 };
+  const prompt = 'You are a translator for a construction site. Translate the text into ' + toName + '. Output ONLY the translation in ' + toName + ' — no quotes, no notes, no romanization, no original text.\n\nText: ' + text;
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
+  const res = await fetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: genConfig })
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(function() { return {}; });
+    if (res.status === 429) throw new Error('Quota reached — wait a bit');
+    throw new Error((e && e.error && e.error.message) || ('API ' + res.status));
+  }
+  const data = await res.json();
+  return ((data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '').trim();
+}
+
+function openVoiceTranslator() {
+  if (typeof closeTool === 'function') closeTool();
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  let ov = document.getElementById('vtOverlay');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'vtOverlay';
+  ov.className = 'vt-overlay';
+  const workers = ['bn-BD', 'zh-CN', 'ta-IN', 'ur-PK'];
+  const chips = workers.map(function(code) { return '<button class="vt-chip" data-lang="' + code + '">' + VT_LANGS[code].label + '</button>'; }).join('');
+  ov.innerHTML =
+    '<div class="vt-top">' +
+      '<button id="vtClose">Close</button>' +
+      '<div class="vt-title">Voice Translator</div>' +
+      '<button id="vtMyLang">BM</button>' +
+    '</div>' +
+    '<div class="vt-langs">' + chips + '</div>' +
+    '<div class="vt-convo" id="vtConvo"><div class="vt-empty">Pick the worker\'s language, tap a mic and speak. The translation appears here and is spoken aloud. Tap the other mic to reply.</div></div>' +
+    '<div class="vt-status" id="vtStatus"></div>' +
+    '<div class="vt-mics">' +
+      '<button class="vt-mic vt-mic-worker" id="vtMicWorker"><span class="vt-mic-ic">🎤</span><span>Worker · <b id="vtWorkerLabel">Bangla</b></span></button>' +
+      '<button class="vt-mic vt-mic-me" id="vtMicMe"><span class="vt-mic-ic">🎤</span><span>Me · <b id="vtMeLabel">BM</b></span></button>' +
+    '</div>';
+  document.body.appendChild(ov);
+
+  if (window.speechSynthesis) {
+    _vtVoices = speechSynthesis.getVoices();
+    speechSynthesis.onvoiceschanged = function() { _vtVoices = speechSynthesis.getVoices(); };
+  }
+
+  let workerLang = 'bn-BD';
+  let myLang = 'ms-MY';
+
+  function refreshLabels() {
+    ov.querySelector('#vtWorkerLabel').textContent = VT_LANGS[workerLang].label;
+    ov.querySelector('#vtMeLabel').textContent = VT_LANGS[myLang].label;
+    ov.querySelector('#vtMyLang').textContent = VT_LANGS[myLang].label;
+  }
+  ov.querySelectorAll('.vt-chip').forEach(function(c) {
+    c.addEventListener('click', function() {
+      workerLang = c.dataset.lang;
+      ov.querySelectorAll('.vt-chip').forEach(function(x) { x.classList.toggle('active', x === c); });
+      refreshLabels();
+    });
+  });
+  ov.querySelector('.vt-chip[data-lang="bn-BD"]').classList.add('active');
+  ov.querySelector('#vtMyLang').addEventListener('click', function() {
+    myLang = (myLang === 'ms-MY') ? 'en-US' : 'ms-MY';
+    refreshLabels();
+  });
+  refreshLabels();
+
+  const statusEl = ov.querySelector('#vtStatus');
+  function status(t) { statusEl.textContent = t || ''; }
+
+  function setMic(which, on) {
+    ov.querySelector('#vtMicWorker').classList.toggle('listening', on && which === 'worker');
+    ov.querySelector('#vtMicMe').classList.toggle('listening', on && which === 'me');
+  }
+
+  function addBubble(side, original, translated, speakLang) {
+    const convo = ov.querySelector('#vtConvo');
+    const empty = convo.querySelector('.vt-empty');
+    if (empty) empty.remove();
+    const div = document.createElement('div');
+    div.className = 'vt-msg ' + (side === 'worker' ? 'vt-worker' : 'vt-me');
+    div.innerHTML = '<div class="vt-orig">' + peEsc(original) + '</div><div class="vt-trans">' + peEsc(translated) + '</div><button class="vt-replay">🔊 Play</button>';
+    convo.appendChild(div);
+    convo.scrollTop = convo.scrollHeight;
+    div.querySelector('.vt-replay').onclick = function() { vtSpeak(translated, speakLang); };
+    vtSpeak(translated, speakLang);
+  }
+
+  function processSpeech(side, text) {
+    const toLang = (side === 'worker') ? myLang : workerLang;
+    status('Translating…');
+    vtTranslate(text, VT_LANGS[toLang].name).then(function(tr) {
+      status('');
+      addBubble(side, text, tr, toLang);
+    }).catch(function(e) { status('Translate error: ' + e.message); });
+  }
+
+  let recog = null, listening = false, side = null, finalText = '';
+  if (SR) {
+    recog = new SR();
+    recog.interimResults = true;
+    recog.maxAlternatives = 1;
+    recog.continuous = false;
+    recog.onstart = function() { listening = true; setMic(side, true); status('Listening… speak now'); };
+    recog.onresult = function(e) {
+      let f = '', interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const tr = e.results[i][0].transcript;
+        if (e.results[i].isFinal) f += tr; else interim += tr;
+      }
+      if (f) finalText += f;
+      status('“' + (finalText || interim) + '”');
+    };
+    recog.onerror = function(e) { status('Mic: ' + e.error + (e.error === 'not-allowed' ? ' — allow microphone access' : '')); };
+    recog.onend = function() {
+      listening = false; setMic(side, false);
+      const t = finalText.trim(); finalText = '';
+      if (t) processSpeech(side, t); else status('');
+    };
+  }
+
+  function startListen(s) {
+    if (!SR) { status('Voice input not supported on this browser. Use Chrome on Android.'); return; }
+    if (listening) { recog.stop(); return; }
+    side = s;
+    finalText = '';
+    recog.lang = (s === 'worker') ? workerLang : myLang;
+    try { recog.start(); } catch (e) { try { recog.stop(); } catch (_) {} }
+  }
+  ov.querySelector('#vtMicWorker').addEventListener('click', function() { startListen('worker'); });
+  ov.querySelector('#vtMicMe').addEventListener('click', function() { startListen('me'); });
+
+  ov.querySelector('#vtClose').addEventListener('click', function() {
+    try { if (recog) recog.abort(); } catch (e) {}
+    try { speechSynthesis.cancel(); } catch (e) {}
+    ov.remove();
+  });
 }
 
 // =======================================================
