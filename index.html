@@ -7361,7 +7361,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
 </dialog>
 
 <!-- ============ GoInspect In-App Camera Overlay ============ -->
-<dialog id="goCamOverlay" style="position:fixed;inset:0;width:100vw;height:100vh;max-width:100vw;max-height:100vh;margin:0;padding:0;border:none;background:#000;overflow:hidden;">
+<dialog id="goCamOverlay" style="position:fixed;inset:0;width:100vw;height:100dvh;max-width:100vw;max-height:100dvh;margin:0;padding:0;border:none;background:#000;overflow:hidden;">
   <video id="goCamVideo" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;"></video>
   <!-- aspect frame guide -->
   <div id="goCamFrame" style="position:absolute;border:2px solid rgba(255,255,255,0.55);box-shadow:0 0 0 4000px rgba(0,0,0,0.28);pointer-events:none;border-radius:4px;"></div>
@@ -7384,9 +7384,9 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
     </div>
   </div>
 
-  <!-- aspect quick chips -->
-  <div style="position:absolute;top:46px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3;">
-    <div id="goCamAspectChips" style="display:flex;gap:6px;background:rgba(0,0,0,0.4);padding:5px;border-radius:20px;"></div>
+  <!-- aspect quick chips (container ignores pointer events so corner icons stay tappable; inner pills re-enable) -->
+  <div style="position:absolute;top:30px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:4;pointer-events:none;">
+    <div id="goCamAspectChips" style="display:flex;gap:6px;background:rgba(0,0,0,0.4);padding:5px;border-radius:20px;pointer-events:auto;"></div>
   </div>
 
   <!-- right-side vertical zoom slider -->
@@ -7396,7 +7396,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
   </div>
 
   <!-- bottom bar -->
-  <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.6));padding:10px 0 18px;">
+  <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.6));padding:10px 0 calc(16px + env(safe-area-inset-bottom, 0px));">
     <!-- review strip -->
     <div id="goCamStrip" style="display:flex;gap:8px;overflow-x:auto;padding:0 14px 10px;min-height:0;"></div>
     <!-- lens chips -->
@@ -32163,18 +32163,35 @@ function goCam_renderStrip() {
   });
 }
 
+function cam_dataURLtoFile(dataurl, filename) {
+  const arr = dataurl.split(',');
+  const mime = (arr[0].match(/:(.*?);/) || [null, 'image/jpeg'])[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length; const u8 = new Uint8Array(n);
+  while (n--) u8[n] = bstr.charCodeAt(n);
+  return new File([u8], filename, { type: mime });
+}
+
+// Feed captured frames into the EXISTING defect file input and fire its change
+// handler. handleDefectFiles/addPhotoThumb live inside openDefect()'s closure
+// (re-wired each open) and are NOT global, so we must trigger them via the input
+// rather than call them directly — this keeps the 7-cap, dedupe, thumbnails,
+// offerSaveToDevice and storage identical to a normal multi-file pick.
+function cam_feedDefectInput(dataURLs) {
+  const inp = document.getElementById('defPhotosFile');
+  if (!inp) return false;
+  try {
+    const dt = new DataTransfer();
+    dataURLs.forEach((u, i) => dt.items.add(cam_dataURLtoFile(u, 'goinspect-cam-' + Date.now() + '-' + i + '.jpg')));
+    inp.files = dt.files;
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  } catch (e) { console.warn('cam: feed defect input failed', e); return false; }
+}
+
 async function cam_addDefectPhotos(dataURLs) {
   if (!dataURLs || !dataURLs.length) return;
-  if (typeof defectDraft === 'undefined' || !defectDraft) return;
-  for (const data of dataURLs) {
-    if (defectDraft.photos.length >= 7) { alert('Maximum 7 photos per defect'); break; }
-    defectDraft.photos.push(data);
-    defectDraft._photosModified = Date.now();
-    addPhotoThumb(data, defectDraft.photos.length - 1);
-    try {
-      await offerSaveToDevice(data, `GoInspect-defect-${(editIndex != null ? editIndex + 1 : (getProject().defects.length + 1))}-${pad2(defectDraft.photos.length)}.jpg`);
-    } catch (e) {}
-  }
+  cam_feedDefectInput(dataURLs);
 }
 
 async function goCam_saveAll() {
@@ -32182,7 +32199,7 @@ async function goCam_saveAll() {
   const shots = goCamShots.slice();
   const ctx = goCamContext;
   goCam_close();
-  if (ctx === 'defect') { await cam_addDefectPhotos(shots); }
+  if (ctx === 'defect') { cam_feedDefectInput(shots); }
   else { for (const u of shots) { await addReInspectPhoto(u); } }
 }
 
@@ -32193,8 +32210,14 @@ async function goCam_saveAndAnnotate(stripIdx) {
   if (ctx === 'defect') {
     const start = (defectDraft && defectDraft.photos) ? defectDraft.photos.length : 0;
     goCam_close();
-    await cam_addDefectPhotos(shots);
+    cam_feedDefectInput(shots);
+    // handleDefectFiles is async (compresses each frame); wait for the target photo
+    // to land, then open the existing annotator on it.
     const idx = start + stripIdx;
+    let waited = 0;
+    while ((!defectDraft || !defectDraft.photos || defectDraft.photos.length <= idx) && waited < 5000) {
+      await new Promise(r => setTimeout(r, 80)); waited += 80;
+    }
     if (defectDraft && defectDraft.photos[idx] && typeof openAnnotator === 'function') openAnnotator(defectDraft.photos[idx], idx);
   } else {
     const lvl = goCam_reinspLevel(true);
