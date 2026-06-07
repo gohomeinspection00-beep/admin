@@ -31843,8 +31843,9 @@ if (location.hash) {
 
 /* ===================================================================
    GoInspect In-App Camera (getUserMedia). Additive module — feeds the
-   EXISTING photo sinks (cam_addDefectPhotos / addReInspectPhoto) so sync,
-   IDB storage and the 7-photo caps behave identically to the device camera.
+   EXISTING photo sinks (cam_feedDefectInput -> handleDefectFiles for defects,
+   addReInspectPhoto for re-inspection) so sync, IDB storage and the 7-photo
+   caps behave identically to the device camera.
    Default source = phone; user opts in via Profile > Camera. Falls back to
    the native <input capture> on any failure. Icons only, no emoji.
 =================================================================== */
@@ -31925,8 +31926,9 @@ async function goCam_startStream(deviceId, facing) {
   goCamTrack = goCamStream.getVideoTracks()[0] || null;
   goCamCaps = (goCamTrack && goCamTrack.getCapabilities) ? (goCamTrack.getCapabilities() || {}) : {};
   goCamDeviceId = (goCamTrack && goCamTrack.getSettings) ? (goCamTrack.getSettings().deviceId || null) : null;
-  // a fresh track is unlocked
+  // a fresh track is unlocked, and its torch is physically OFF
   goCam_locked = false;
+  goCam_torchState = false;
   const _lb = document.getElementById('goCamLockBadge'); if (_lb) _lb.style.display = 'none';
   const v = document.getElementById('goCamVideo');
   if (v) {
@@ -32123,12 +32125,12 @@ async function goCam_tapFocus(clientX, clientY) {
   } catch (e) { /* device rejected the focus constraint — ring feedback already shown */ }
 }
 
-async function goCam_setTorch(force) {
+async function goCam_setTorch(force, skipUI) {
   if (!goCamTrack || !goCamCaps || !goCamCaps.torch) return;
   const want = (typeof force === 'boolean') ? force : !goCam_torchState;
   try { await goCamTrack.applyConstraints({ advanced: [{ torch: want }] }); goCam_torchState = want; }
   catch (e) { console.warn('torch failed', e); }
-  goCam_updateUI();
+  if (!skipUI) goCam_updateUI();
 }
 let goCam_torchState = false;
 
@@ -32147,13 +32149,6 @@ function goCam_applyZoom(val) {
   }
 }
 
-async function goCam_switchTo(deviceId, digital) {
-  goCamDigitalZoom = 1;
-  const v = document.getElementById('goCamVideo'); if (v) v.style.transform = 'none';
-  if (deviceId && deviceId !== goCamDeviceId) { await goCam_startStream(deviceId, null); }
-  if (digital) goCam_applyZoom(digital);
-  goCam_updateUI();
-}
 
 function goCam_layoutFrame() {
   const f = document.getElementById('goCamFrame'); if (!f) return;
@@ -32248,7 +32243,7 @@ function goCam_renderLensChips() {
   const resetTransform = () => { const v = document.getElementById('goCamVideo'); if (v) v.style.transform = 'none'; };
   const chips = [];
   // 0.5x: switch to the ultra-wide back camera (Android, when detected).
-  if (goCamUltrawideId) chips.push(['0.5x', async () => { goCamDigitalZoom = 1; resetTransform(); await goCam_startStream(goCamUltrawideId, null); goCam_updateUI(); }]);
+  if (goCamUltrawideId) chips.push(['0.5x', async () => { goCamDigitalZoom = 1; resetTransform(); const ok = await goCam_startStream(goCamUltrawideId, null); if (!ok) { await goCam_startStream(null, goCamFacing); } goCam_updateUI(); }]);
   // 1x: always restart the default (main) camera by facingMode so it works even
   // when currently on the ultra-wide lens (deviceId-based restart could no-op).
   chips.push(['1x', async () => { goCamDigitalZoom = 1; resetTransform(); await goCam_startStream(null, goCamFacing); goCam_updateUI(); }]);
@@ -32350,10 +32345,11 @@ async function goCam_snap() {
   const wantFlash = goCamCaps && goCamCaps.torch && !goCam_torchState &&
     (cameraSettings.flash === 'on' || (cameraSettings.flash === 'auto' && goCam_sceneIsDark()));
   if (wantFlash) {
-    try { await goCam_setTorch(true); usedFlash = true; await new Promise(r => setTimeout(r, 200)); } catch (e) {}
+    try { await goCam_setTorch(true, true); usedFlash = true; await new Promise(r => setTimeout(r, 200)); } catch (e) {}
   }
-  const url = goCam_captureFrame();
-  if (usedFlash) { try { await goCam_setTorch(false); } catch (e) {} }
+  let url = null;
+  try { url = goCam_captureFrame(); }
+  finally { if (usedFlash) { try { await goCam_setTorch(false, true); } catch (e) {} } }
   if (!url) return;
   goCamShots.push(url);
   goCam_playShutter();
@@ -32364,21 +32360,24 @@ async function goCam_snap() {
   goCam_updateUI();
 }
 
-// Full-screen viewer for a captured shot (self-contained; appended inside the
-// camera dialog so it sits in the top layer).
+// Full-screen viewer for a captured shot. A modal <dialog> stacked above the
+// camera so Escape/Android-back closes only the viewer (not the camera), and a
+// single reused dialog can't stack on rapid taps.
 function goCam_viewFull(url) {
-  const ov = document.getElementById('goCamOverlay'); if (!ov || !url) return;
-  const m = document.createElement('div');
-  m.style.cssText = 'position:absolute;inset:0;z-index:9;background:rgba(0,0,0,0.93);display:flex;align-items:center;justify-content:center;';
-  const im = document.createElement('img');
-  im.src = url; im.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
-  const cl = document.createElement('button'); cl.type = 'button';
-  cl.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-  cl.style.cssText = 'position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.5);border:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;';
-  const close = () => m.remove();
-  cl.onclick = close; m.onclick = (e) => { if (e.target === m) close(); };
-  m.appendChild(im); m.appendChild(cl);
-  ov.appendChild(m);
+  if (!url) return;
+  let dlg = document.getElementById('goCamViewDlg');
+  if (!dlg) {
+    dlg = document.createElement('dialog');
+    dlg.id = 'goCamViewDlg';
+    dlg.style.cssText = 'position:fixed;inset:0;width:100vw;height:100dvh;max-width:100vw;max-height:100dvh;margin:0;padding:0;border:none;background:rgba(0,0,0,0.93);';
+    dlg.innerHTML = '<img id="goCamViewImg" style="position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;object-fit:contain;">' +
+      '<button type="button" id="goCamViewClose" style="position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.5);border:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>';
+    document.body.appendChild(dlg);
+    dlg.querySelector('#goCamViewClose').onclick = () => { try { dlg.close(); } catch (e) {} };
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) { try { dlg.close(); } catch (e2) {} } });
+  }
+  dlg.querySelector('#goCamViewImg').src = url;
+  if (!dlg.open) { try { dlg.showModal(); } catch (e) {} }
 }
 
 // Synthesized shutter "click" (no audio asset). Toggleable via cameraSettings.sound.
@@ -32455,11 +32454,6 @@ function cam_feedDefectInput(dataURLs) {
   } catch (e) { console.warn('cam: feed defect input failed', e); return false; }
 }
 
-async function cam_addDefectPhotos(dataURLs) {
-  if (!dataURLs || !dataURLs.length) return;
-  cam_feedDefectInput(dataURLs);
-}
-
 // Annotate a captured shot IN PLACE and return to the camera (does not commit to
 // the defect/re-inspection — that only happens on Save). Reuses the existing
 // annotator via a one-shot callback so all its drawing tools/teardown are shared.
@@ -32483,35 +32477,6 @@ async function goCam_saveAll() {
   goCam_close();
   if (ctx === 'defect') { cam_feedDefectInput(shots); }
   else { for (const u of shots) { await addReInspectPhoto(u); } }
-}
-
-async function goCam_saveAndAnnotate(stripIdx) {
-  if (!goCamShots.length) { goCam_close(); return; }
-  const shots = goCamShots.slice();
-  const ctx = goCamContext;
-  if (ctx === 'defect') {
-    const start = (defectDraft && defectDraft.photos) ? defectDraft.photos.length : 0;
-    goCam_close();
-    cam_feedDefectInput(shots);
-    // handleDefectFiles is async (compresses each frame); wait for the target photo
-    // to land, then open the existing annotator on it.
-    const idx = start + stripIdx;
-    let waited = 0;
-    while ((!defectDraft || !defectDraft.photos || defectDraft.photos.length <= idx) && waited < 5000) {
-      await new Promise(r => setTimeout(r, 80)); waited += 80;
-    }
-    if (defectDraft && defectDraft.photos[idx] && typeof openAnnotator === 'function') openAnnotator(defectDraft.photos[idx], idx);
-  } else {
-    const lvl = goCam_reinspLevel(true);
-    const start = lvl ? (lvl.afterPhotos || []).length : 0;
-    goCam_close();
-    for (const u of shots) { await addReInspectPhoto(u); }
-    const lvl2 = goCam_reinspLevel(false);
-    const idx = start + stripIdx;
-    if (lvl2 && lvl2.afterPhotos && lvl2.afterPhotos[idx] && typeof openReInspectAnnotatorForEdit === 'function') {
-      try { const src = await resolveRef(lvl2.afterPhotos[idx]); openReInspectAnnotatorForEdit(src, idx); } catch (e) {}
-    }
-  }
 }
 
 // Intercept the existing native camera inputs: if the user chose the GoInspect
