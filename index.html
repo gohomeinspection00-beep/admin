@@ -7361,31 +7361,31 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
 </dialog>
 
 <!-- ============ GoInspect In-App Camera Overlay ============ -->
-<div id="goCamOverlay" style="display:none;position:fixed;inset:0;z-index:100000;background:#000;flex-direction:column;align-items:center;justify-content:center;">
+<dialog id="goCamOverlay" style="position:fixed;inset:0;width:100vw;height:100vh;max-width:100vw;max-height:100vh;margin:0;padding:0;border:none;background:#000;overflow:hidden;">
   <video id="goCamVideo" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;"></video>
   <!-- aspect frame guide -->
   <div id="goCamFrame" style="position:absolute;border:2px solid rgba(255,255,255,0.55);box-shadow:0 0 0 4000px rgba(0,0,0,0.28);pointer-events:none;border-radius:4px;"></div>
 
   <!-- top bar -->
-  <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:10px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0));z-index:3;">
-    <button id="goCamClose" type="button" aria-label="Close" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+  <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;gap:10px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0));z-index:4;">
+    <button id="goCamClose" type="button" aria-label="Close" style="background:rgba(0,0,0,0.45);border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
     <div style="display:flex;align-items:center;gap:8px;">
-      <button id="goCamTsBtn" type="button" aria-label="Timestamp" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;">
+      <button id="goCamTsBtn" type="button" aria-label="Timestamp" style="background:rgba(0,0,0,0.45);border:none;width:38px;height:38px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg>
       </button>
-      <button id="goCamTorchBtn" type="button" aria-label="Torch" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;">
+      <button id="goCamTorchBtn" type="button" aria-label="Torch" style="background:rgba(0,0,0,0.45);border:none;width:38px;height:38px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 2h6l-1 7h3l-7 13 1-9H7z"></path></svg>
       </button>
-      <button id="goCamFlipBtn" type="button" aria-label="Flip camera" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <button id="goCamFlipBtn" type="button" aria-label="Flip camera" style="background:rgba(0,0,0,0.45);border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
       </button>
     </div>
   </div>
 
   <!-- aspect quick chips -->
-  <div style="position:absolute;top:64px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3;">
+  <div style="position:absolute;top:46px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3;">
     <div id="goCamAspectChips" style="display:flex;gap:6px;background:rgba(0,0,0,0.4);padding:5px;border-radius:20px;"></div>
   </div>
 
@@ -7411,7 +7411,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
       </button>
     </div>
   </div>
-</div>
+</dialog>
 
 <!-- Settings Menu Popup (New Style) -->
 <div id="settingsPopup" class="freeze-popup-overlay" style="display:none">
@@ -31858,7 +31858,9 @@ async function goCam_open(context) {
   try {
     goCam_setupControls();
     const ov = document.getElementById('goCamOverlay');
-    if (ov) ov.style.display = 'flex';
+    // Open as a modal <dialog> so it joins the browser top layer ABOVE the
+    // defect/re-inspection dialog (a z-index div would render behind it).
+    if (ov && !ov.open) { try { ov.showModal(); } catch (e2) { try { ov.show(); } catch (e3) {} } }
     goCam_updateUI();
     window.addEventListener('resize', goCam_layoutFrame);
     return true;
@@ -31915,10 +31917,10 @@ function goCam_stopStream() {
 
 function goCam_close() {
   goCam_stopStream();
-  const ov = document.getElementById('goCamOverlay');
-  if (ov) ov.style.display = 'none';
   goCamShots = [];
   window.removeEventListener('resize', goCam_layoutFrame);
+  const ov = document.getElementById('goCamOverlay');
+  if (ov && ov.open) { try { ov.close(); } catch (e) {} }
 }
 
 let _goCamWired = false;
@@ -31926,6 +31928,10 @@ function goCam_setupControls() {
   if (_goCamWired) { goCam_layoutFrame(); return; }
   _goCamWired = true;
   const byId = id => document.getElementById(id);
+  // Escape / Android back closes a modal <dialog> by default — make sure the
+  // camera stream is stopped on every close path (idempotent).
+  const ov = byId('goCamOverlay');
+  if (ov) ov.addEventListener('close', () => { goCam_stopStream(); goCamShots = []; window.removeEventListener('resize', goCam_layoutFrame); });
   byId('goCamClose').onclick = () => goCam_close();
   byId('goCamShutter').onclick = () => goCam_snap();
   byId('goCamDone').onclick = () => goCam_saveAll();
