@@ -31835,6 +31835,7 @@ let goCamStream = null, goCamTrack = null, goCamCaps = null;
 let goCamContext = null, goCamShots = [];
 let goCamFacing = 'environment', goCamDeviceId = null, goCamVideoInputs = [];
 let goCamDigitalZoom = 1, goCamUltrawideId = null;
+let goCam_lastError = '';
 
 function goCam_aspectValue() {
   switch (cameraSettings.aspect) {
@@ -31876,8 +31877,10 @@ async function goCam_startStream(deviceId, facing) {
   else constraints = { video: { facingMode: { ideal: facing || 'environment' } }, audio: false };
   try {
     goCamStream = await navigator.mediaDevices.getUserMedia(constraints);
+    goCam_lastError = '';
   } catch (err) {
     console.warn('goCam: getUserMedia failed', err);
+    goCam_lastError = (err && err.name ? err.name : 'Error') + (err && err.message ? (': ' + err.message) : '');
     return false;
   }
   goCamTrack = goCamStream.getVideoTracks()[0] || null;
@@ -32217,11 +32220,11 @@ function goCam_attachInterceptor(inputEl, context) {
       // rejection (it would be outside the user-gesture window and blocked on iOS),
       // so on failure we inform the user instead of silently doing nothing.
       goCam_open(context).then(ok => {
-        if (!ok) alert(CAM_FAIL_MSG);
+        if (!ok) alert(CAM_FAIL_MSG + (goCam_lastError ? '\n\n[' + goCam_lastError + ']' : ''));
       }).catch(err => {
         console.warn('goCam: open error', err);
         goCam_close();
-        alert(CAM_FAIL_MSG);
+        alert(CAM_FAIL_MSG + (err && err.message ? '\n\n[' + err.message + ']' : ''));
       });
     }
   }, true);
@@ -32267,13 +32270,47 @@ function showCameraSettings() {
           <input type="checkbox" id="camSetTorch" style="width:20px;height:20px;">
         </label>
         <p id="camSetNote" style="font-size:11px;color:var(--muted,#94a3b8);margin:4px 0 0;"></p>
-        <button class="btn" type="button" style="width:100%;margin-top:8px;" onclick="this.closest('dialog').close()">Selesai</button>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#e5e7eb);">
+          <button id="camTestBtn" class="btn ghost" type="button" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            <span>Uji Camera</span>
+          </button>
+          <p id="camTestResult" style="font-size:12px;margin:8px 0 0;white-space:pre-wrap;word-break:break-word;"></p>
+          <p id="camDiag" style="font-size:10px;color:var(--muted,#94a3b8);margin:6px 0 0;white-space:pre-wrap;"></p>
+        </div>
+        <button class="btn" type="button" style="width:100%;margin-top:12px;" onclick="this.closest('dialog').close()">Selesai</button>
       </div>`;
     document.body.appendChild(dlg);
     dlg.querySelector('#camSetSource').addEventListener('change', e => { cameraSettings.source = e.target.value; saveCameraSettings(); });
     dlg.querySelector('#camSetAspect').addEventListener('change', e => { cameraSettings.aspect = e.target.value; saveCameraSettings(); });
     dlg.querySelector('#camSetTimestamp').addEventListener('change', e => { cameraSettings.timestamp = e.target.checked; saveCameraSettings(); });
     dlg.querySelector('#camSetTorch').addEventListener('change', e => { cameraSettings.torchDefault = e.target.checked; saveCameraSettings(); });
+    // Diagnostic test: directly attempts getUserMedia (real user gesture) and reports
+    // the exact result/error so a device that "can't use" the camera can be diagnosed.
+    dlg.querySelector('#camTestBtn').addEventListener('click', async () => {
+      const out = dlg.querySelector('#camTestResult');
+      out.style.color = 'var(--muted,#94a3b8)';
+      out.textContent = 'Menguji kamera...';
+      if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+        out.style.color = '#dc2626';
+        out.textContent = 'GAGAL: pelayar ini tiada getUserMedia (kemungkinan in-app browser cth WhatsApp/Facebook, atau bukan https). Buka dalam Safari/Chrome atau pasang sebagai app.';
+        return;
+      }
+      try {
+        const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+        s.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
+        out.style.color = '#16a34a';
+        out.textContent = 'BERJAYA — kamera boleh diakses. Camera GoInspect sepatutnya berfungsi. Pastikan "Sumber camera" = Camera GoInspect.';
+      } catch (err) {
+        out.style.color = '#dc2626';
+        const n = err && err.name ? err.name : 'Error';
+        let hint = '';
+        if (n === 'NotAllowedError' || n === 'SecurityError') hint = ' (akses kamera DITOLAK — benarkan kamera dalam tetapan pelayar untuk laman ini)';
+        else if (n === 'NotFoundError' || n === 'OverconstrainedError') hint = ' (kamera belakang tidak dijumpai)';
+        else if (n === 'NotReadableError') hint = ' (kamera sedang digunakan app lain)';
+        out.textContent = 'GAGAL: ' + n + (err && err.message ? ' - ' + err.message : '') + hint;
+      }
+    });
   }
   dlg.querySelector('#camSetSource').value = cameraSettings.source;
   dlg.querySelector('#camSetAspect').value = cameraSettings.aspect;
@@ -32284,6 +32321,14 @@ function showCameraSettings() {
     if (!camAvailable()) note.textContent = 'Nota: peranti/pelayar ini tidak menyokong camera dalam-app — camera phone akan digunakan.';
     else if (camIsIOS()) note.textContent = 'Nota: di iOS, torch & zoom optik/0.5x tidak disokong — digital zoom digunakan.';
     else note.textContent = '';
+  }
+  const diag = dlg.querySelector('#camDiag');
+  if (diag) {
+    const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    diag.textContent = 'Diagnostik: https/secure=' + (window.isSecureContext ? 'ya' : 'TIDAK') +
+      ' | getUserMedia=' + ((navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ? 'ada' : 'TIADA') +
+      ' | iOS=' + (camIsIOS() ? 'ya' : 'tidak') +
+      ' | PWA-standalone=' + (standalone ? 'ya' : 'tidak');
   }
   dlg.showModal();
 }
