@@ -7384,9 +7384,9 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
     </div>
   </div>
 
-  <!-- aspect quick chips (container ignores pointer events so corner icons stay tappable; inner pills re-enable) -->
-  <div style="position:absolute;top:30px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:4;pointer-events:none;">
-    <div id="goCamAspectChips" style="display:flex;gap:6px;background:rgba(0,0,0,0.4);padding:5px;border-radius:20px;pointer-events:auto;"></div>
+  <!-- aspect quick chips (sit just below the top icon row to avoid overlap) -->
+  <div style="position:absolute;top:52px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3;">
+    <div id="goCamAspectChips" style="display:flex;gap:6px;background:rgba(0,0,0,0.4);padding:5px;border-radius:20px;"></div>
   </div>
 
   <!-- right-side vertical zoom slider -->
@@ -31874,9 +31874,12 @@ async function goCam_open(context) {
 
 async function goCam_startStream(deviceId, facing) {
   goCam_stopStream();
+  // Request a high-res sharp stream (low default resolution looked blurry when
+  // shown full-screen) + continuous autofocus. All 'ideal' so it never throws.
+  const baseVideo = { width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: { ideal: 'continuous' } };
   let constraints;
-  if (deviceId) constraints = { video: { deviceId: { exact: deviceId } }, audio: false };
-  else constraints = { video: { facingMode: { ideal: facing || 'environment' } }, audio: false };
+  if (deviceId) constraints = { video: Object.assign({}, baseVideo, { deviceId: { exact: deviceId } }), audio: false };
+  else constraints = { video: Object.assign({}, baseVideo, { facingMode: { ideal: facing || 'environment' } }), audio: false };
   try {
     goCamStream = await navigator.mediaDevices.getUserMedia(constraints);
     goCam_lastError = '';
@@ -31903,6 +31906,12 @@ async function goCam_startStream(deviceId, facing) {
       if (/ultra|0\.5|wide angle|wide-angle/i.test(d.label || '')) { goCamUltrawideId = d.deviceId; break; }
     }
   } catch (e) { goCamVideoInputs = []; }
+  // Continuous autofocus when supported (sharper preview + captures).
+  try {
+    if (goCamCaps && goCamCaps.focusMode && goCamCaps.focusMode.includes && goCamCaps.focusMode.includes('continuous')) {
+      await goCamTrack.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+    }
+  } catch (e) {}
   // apply torch default (Android only)
   if (cameraSettings.torchDefault && goCamCaps && goCamCaps.torch) { await goCam_setTorch(true); }
   return true;
@@ -31948,6 +31957,44 @@ function goCam_setupControls() {
   };
   const zoom = byId('goCamZoom');
   zoom.oninput = () => goCam_applyZoom(parseFloat(zoom.value));
+  // Tap on the preview to focus (best-effort; shows a focus ring either way).
+  const vid = byId('goCamVideo');
+  if (vid) vid.addEventListener('click', e => goCam_tapFocus(e.clientX, e.clientY));
+}
+
+function goCam_showFocusRing(x, y) {
+  const ov = document.getElementById('goCamOverlay'); if (!ov) return;
+  const r = document.createElement('div');
+  r.style.cssText = 'position:absolute;width:72px;height:72px;border:2px solid #ffd60a;border-radius:50%;left:' + (x - 36) + 'px;top:' + (y - 36) + 'px;z-index:6;pointer-events:none;transition:transform .22s ease, opacity .45s ease;box-shadow:0 0 0 1px rgba(0,0,0,0.35);transform:scale(1.25);';
+  ov.appendChild(r);
+  requestAnimationFrame(() => { r.style.transform = 'scale(0.9)'; });
+  setTimeout(() => { r.style.opacity = '0'; }, 500);
+  setTimeout(() => r.remove(), 950);
+}
+
+async function goCam_tapFocus(clientX, clientY) {
+  goCam_showFocusRing(clientX, clientY);
+  if (!goCamTrack || !goCamCaps) return;
+  const fm = goCamCaps.focusMode;
+  if (!fm || !fm.includes) return;
+  const v = document.getElementById('goCamVideo');
+  const adv = {};
+  try {
+    if (v) {
+      const rect = v.getBoundingClientRect();
+      const px = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+      const py = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+      if (goCamCaps.pointsOfInterest) adv.pointsOfInterest = [{ x: px, y: py }];
+    }
+    if (fm.includes('single-shot')) adv.focusMode = 'single-shot';
+    else if (fm.includes('manual')) adv.focusMode = 'manual';
+    else if (fm.includes('continuous')) adv.focusMode = 'continuous';
+    if (Object.keys(adv).length) await goCamTrack.applyConstraints({ advanced: [adv] });
+    // Return to continuous AF shortly after so the scene stays sharp as it moves.
+    if (fm.includes('continuous')) {
+      setTimeout(async () => { try { await goCamTrack.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (e) {} }, 2500);
+    }
+  } catch (e) { /* device rejected the focus constraint — ring feedback already shown */ }
 }
 
 async function goCam_setTorch(force) {
@@ -31988,11 +32035,15 @@ function goCam_layoutFrame() {
   if (!ar) { f.style.display = 'none'; return; }
   f.style.display = 'block';
   const vw = window.innerWidth, vh = window.innerHeight;
-  const availW = vw * 0.9, availH = vh * 0.6;
+  // Anchor the frame near the top (just below the chips) instead of centering it,
+  // so the capture box sits higher. Reserve room for the bottom controls.
+  const topAnchor = 92;
+  const bottomReserve = 210;
+  const availW = vw * 0.9, availH = Math.max(120, vh - topAnchor - bottomReserve);
   let w = availW, h = w / ar;
   if (h > availH) { h = availH; w = h * ar; }
   f.style.width = Math.round(w) + 'px'; f.style.height = Math.round(h) + 'px';
-  f.style.left = Math.round((vw - w) / 2) + 'px'; f.style.top = Math.round((vh - h) / 2) + 'px';
+  f.style.left = Math.round((vw - w) / 2) + 'px'; f.style.top = topAnchor + 'px';
 }
 
 function goCam_updateUI() {
@@ -32116,13 +32167,17 @@ function goCam_drawTimestamp(ctx, w, h) {
   const fs = Math.max(13, Math.round(w * 0.038));
   ctx.font = 'bold ' + fs + 'px sans-serif';
   ctx.textBaseline = 'alphabetic';
-  const pad = Math.round(fs * 0.45);
+  const pad = Math.round(fs * 0.5);
   const tw = ctx.measureText(txt).width;
-  const bx = w - tw - pad * 3, by = h - fs - pad * 2;
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(bx, by, tw + pad * 2, fs + pad * 1.6);
-  ctx.fillStyle = '#fff';
-  ctx.fillText(txt, bx + pad, by + fs + pad * 0.3);
+  const x = w - tw - pad;
+  const y = h - pad;
+  // Dark-orange text with a thin dark outline (no black box) for legibility on any background.
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(2, fs * 0.14);
+  ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+  ctx.strokeText(txt, x, y);
+  ctx.fillStyle = '#c2410c';
+  ctx.fillText(txt, x, y);
 }
 
 function goCam_snap() {
