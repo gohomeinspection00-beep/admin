@@ -31849,7 +31849,7 @@ if (location.hash) {
    the native <input capture> on any failure. Icons only, no emoji.
 =================================================================== */
 const CAMERA_SETTINGS_KEY = 'goinspect.cameraSettings';
-const CAM_DEFAULTS = { source:'phone', timestamp:false, aspect:'1:1', torchDefault:false, grid:false, flash:'off' };
+const CAM_DEFAULTS = { source:'phone', timestamp:false, aspect:'1:1', torchDefault:false, grid:false, flash:'off', sound:true };
 let cameraSettings = (() => {
   try { return { ...CAM_DEFAULTS, ...(JSON.parse(localStorage.getItem(CAMERA_SETTINGS_KEY) || '{}')) }; }
   catch (e) { return { ...CAM_DEFAULTS }; }
@@ -32356,11 +32356,50 @@ async function goCam_snap() {
   if (usedFlash) { try { await goCam_setTorch(false); } catch (e) {} }
   if (!url) return;
   goCamShots.push(url);
+  goCam_playShutter();
   if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
   // brief flash
   const ov = document.getElementById('goCamOverlay');
   if (ov) { const fl = document.createElement('div'); fl.style.cssText = 'position:absolute;inset:0;background:#fff;opacity:0.7;z-index:5;pointer-events:none;transition:opacity .25s;'; ov.appendChild(fl); requestAnimationFrame(() => { fl.style.opacity = '0'; }); setTimeout(() => fl.remove(), 280); }
   goCam_updateUI();
+}
+
+// Full-screen viewer for a captured shot (self-contained; appended inside the
+// camera dialog so it sits in the top layer).
+function goCam_viewFull(url) {
+  const ov = document.getElementById('goCamOverlay'); if (!ov || !url) return;
+  const m = document.createElement('div');
+  m.style.cssText = 'position:absolute;inset:0;z-index:9;background:rgba(0,0,0,0.93);display:flex;align-items:center;justify-content:center;';
+  const im = document.createElement('img');
+  im.src = url; im.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+  const cl = document.createElement('button'); cl.type = 'button';
+  cl.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+  cl.style.cssText = 'position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.5);border:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+  const close = () => m.remove();
+  cl.onclick = close; m.onclick = (e) => { if (e.target === m) close(); };
+  m.appendChild(im); m.appendChild(cl);
+  ov.appendChild(m);
+}
+
+// Synthesized shutter "click" (no audio asset). Toggleable via cameraSettings.sound.
+let _goCamAudioCtx = null;
+function goCam_playShutter() {
+  if (!cameraSettings.sound) return;
+  try {
+    _goCamAudioCtx = _goCamAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _goCamAudioCtx;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    [[0, 1300], [0.07, 950]].forEach(([t, freq]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'square'; o.frequency.setValueAtTime(freq, now + t);
+      g.gain.setValueAtTime(0.0001, now + t);
+      g.gain.exponentialRampToValueAtTime(0.22, now + t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + t + 0.05);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now + t); o.stop(now + t + 0.06);
+    });
+  } catch (e) {}
 }
 
 function goCam_renderStrip() {
@@ -32370,7 +32409,8 @@ function goCam_renderStrip() {
     const cell = document.createElement('div');
     cell.style.cssText = 'position:relative;flex:0 0 auto;width:58px;height:58px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.5);';
     const img = document.createElement('img');
-    img.src = url; img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    img.src = url; img.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:pointer;';
+    img.onclick = (e) => { e.stopPropagation(); goCam_viewFull(goCamShots[i]); };
     cell.appendChild(img);
     const del = document.createElement('button');
     del.type = 'button';
@@ -32536,9 +32576,13 @@ function showCameraSettings() {
           <span style="font-size:14px;">Timestamp (tarikh &amp; masa)</span>
           <input type="checkbox" id="camSetTimestamp" style="width:20px;height:20px;">
         </label>
-        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;">
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line,#e5e7eb);">
           <span style="font-size:14px;">Torch default <span style="color:var(--muted,#94a3b8);font-size:11px;">(Android)</span></span>
           <input type="checkbox" id="camSetTorch" style="width:20px;height:20px;">
+        </label>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;">
+          <span style="font-size:14px;">Bunyi shutter</span>
+          <input type="checkbox" id="camSetSound" style="width:20px;height:20px;">
         </label>
         <p id="camSetNote" style="font-size:11px;color:var(--muted,#94a3b8);margin:4px 0 0;"></p>
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#e5e7eb);">
@@ -32556,6 +32600,7 @@ function showCameraSettings() {
     dlg.querySelector('#camSetAspect').addEventListener('change', e => { cameraSettings.aspect = e.target.value; saveCameraSettings(); });
     dlg.querySelector('#camSetTimestamp').addEventListener('change', e => { cameraSettings.timestamp = e.target.checked; saveCameraSettings(); });
     dlg.querySelector('#camSetTorch').addEventListener('change', e => { cameraSettings.torchDefault = e.target.checked; saveCameraSettings(); });
+    dlg.querySelector('#camSetSound').addEventListener('change', e => { cameraSettings.sound = e.target.checked; saveCameraSettings(); });
     // Diagnostic test: directly attempts getUserMedia (real user gesture) and reports
     // the exact result/error so a device that "can't use" the camera can be diagnosed.
     dlg.querySelector('#camTestBtn').addEventListener('click', async () => {
@@ -32587,6 +32632,7 @@ function showCameraSettings() {
   dlg.querySelector('#camSetAspect').value = cameraSettings.aspect;
   dlg.querySelector('#camSetTimestamp').checked = !!cameraSettings.timestamp;
   dlg.querySelector('#camSetTorch').checked = !!cameraSettings.torchDefault;
+  dlg.querySelector('#camSetSound').checked = cameraSettings.sound !== false;
   const note = dlg.querySelector('#camSetNote');
   if (note) {
     if (!camAvailable()) note.textContent = 'Nota: peranti/pelayar ini tidak menyokong camera dalam-app — camera phone akan digunakan.';
