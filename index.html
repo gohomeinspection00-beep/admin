@@ -7422,7 +7422,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
   </div>
 
   <!-- bottom bar -->
-  <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.6));padding:10px 0 calc(44px + env(safe-area-inset-bottom, 0px));">
+  <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.6));padding:10px 0 calc(74px + env(safe-area-inset-bottom, 0px));">
     <!-- review strip -->
     <div id="goCamStrip" style="display:flex;gap:8px;overflow-x:auto;padding:0 14px 10px;min-height:0;"></div>
     <!-- lens chips -->
@@ -27419,6 +27419,14 @@ if (fillSel) {
   q('#annApply').onclick  = () => {
     drawAnnotator();
     const data = annCanvas.toDataURL('image/jpeg', 0.95);
+    // In-camera annotation: route the result to a one-shot callback and return to
+    // the camera (don't touch defectDraft). Used by openCameraAnnotator.
+    if (typeof window._annCameraCallback === 'function') {
+      const cb = window._annCameraCallback; window._annCameraCallback = null;
+      try { cb(data); } catch (e) {}
+      teardown(); closeDlg(dlg);
+      return;
+    }
     if (annApplyIndex > -1) {
       // FIX: Mark original photo as deleted to prevent UNION merge double (use short hash)
       const originalPhoto = defectDraft.photos[annApplyIndex];
@@ -32149,8 +32157,14 @@ async function goCam_switchTo(deviceId, digital) {
 
 function goCam_layoutFrame() {
   const f = document.getElementById('goCamFrame'); if (!f) return;
+  const grid = document.getElementById('goCamGrid');
   const ar = goCam_aspectValue();
-  if (!ar) { f.style.display = 'none'; return; }
+  if (!ar) {
+    // Full mode: no frame; grid (if on) covers the whole preview.
+    f.style.display = 'none';
+    if (grid) { grid.style.left = '0'; grid.style.top = '0'; grid.style.right = '0'; grid.style.bottom = '0'; grid.style.width = ''; grid.style.height = ''; }
+    return;
+  }
   f.style.display = 'block';
   const vw = window.innerWidth, vh = window.innerHeight;
   // Anchor the frame near the top (just below the chips) instead of centering it,
@@ -32160,8 +32174,12 @@ function goCam_layoutFrame() {
   const availW = vw * 0.9, availH = Math.max(120, vh - topAnchor - bottomReserve);
   let w = availW, h = w / ar;
   if (h > availH) { h = availH; w = h * ar; }
-  f.style.width = Math.round(w) + 'px'; f.style.height = Math.round(h) + 'px';
-  f.style.left = Math.round((vw - w) / 2) + 'px'; f.style.top = topAnchor + 'px';
+  w = Math.round(w); h = Math.round(h);
+  const left = Math.round((vw - w) / 2);
+  f.style.width = w + 'px'; f.style.height = h + 'px';
+  f.style.left = left + 'px'; f.style.top = topAnchor + 'px';
+  // Grid follows the aspect frame exactly (rule-of-thirds within the capture box).
+  if (grid) { grid.style.left = left + 'px'; grid.style.top = topAnchor + 'px'; grid.style.width = w + 'px'; grid.style.height = h + 'px'; grid.style.right = 'auto'; grid.style.bottom = 'auto'; }
 }
 
 function goCam_updateUI() {
@@ -32365,7 +32383,7 @@ function goCam_renderStrip() {
     ann.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"></path></svg>';
     ann.title = 'Annotate';
     ann.style.cssText = 'position:absolute;bottom:1px;right:1px;background:rgba(13,148,136,0.92);border:none;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;';
-    ann.onclick = (e) => { e.stopPropagation(); goCam_saveAndAnnotate(i); };
+    ann.onclick = (e) => { e.stopPropagation(); openCameraAnnotator(i); };
     cell.appendChild(ann);
     strip.appendChild(cell);
   });
@@ -32400,6 +32418,22 @@ function cam_feedDefectInput(dataURLs) {
 async function cam_addDefectPhotos(dataURLs) {
   if (!dataURLs || !dataURLs.length) return;
   cam_feedDefectInput(dataURLs);
+}
+
+// Annotate a captured shot IN PLACE and return to the camera (does not commit to
+// the defect/re-inspection — that only happens on Save). Reuses the existing
+// annotator via a one-shot callback so all its drawing tools/teardown are shared.
+function openCameraAnnotator(idx) {
+  if (!goCamShots[idx] || typeof openAnnotator !== 'function') return;
+  const dlg = document.getElementById('annotateDialog');
+  if (dlg && !dlg._camAnnWired) {
+    dlg._camAnnWired = true;
+    // Clear the callback on ANY close (cancel included) so it can never leak into a
+    // later normal defect annotation.
+    dlg.addEventListener('close', () => { window._annCameraCallback = null; });
+  }
+  window._annCameraCallback = (data) => { goCamShots[idx] = data; goCam_renderStrip(); };
+  openAnnotator(goCamShots[idx], -1);
 }
 
 async function goCam_saveAll() {
