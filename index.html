@@ -6298,6 +6298,20 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
           <div class="menu-arrow">›</div>
         </button>
 
+        <button class="profile-menu-item" onclick="showCameraSettings()">
+          <div class="menu-icon" style="background:#f0fdfa;color:#0d9488">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </div>
+          <div class="menu-content">
+            <span class="menu-title">Camera</span>
+            <span class="menu-desc">Camera phone atau camera GoInspect, timestamp, aspect ratio</span>
+          </div>
+          <div class="menu-arrow">›</div>
+        </button>
+
         <button class="profile-menu-item" onclick="requestMoreQuota()">
           <div class="menu-icon" style="background:#fef3c7;color:#d97706">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -7345,6 +7359,59 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
     </div>
   </div>
 </dialog>
+
+<!-- ============ GoInspect In-App Camera Overlay ============ -->
+<div id="goCamOverlay" style="display:none;position:fixed;inset:0;z-index:100000;background:#000;flex-direction:column;align-items:center;justify-content:center;">
+  <video id="goCamVideo" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;"></video>
+  <!-- aspect frame guide -->
+  <div id="goCamFrame" style="position:absolute;border:2px solid rgba(255,255,255,0.55);box-shadow:0 0 0 4000px rgba(0,0,0,0.28);pointer-events:none;border-radius:4px;"></div>
+
+  <!-- top bar -->
+  <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:10px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0));z-index:3;">
+    <button id="goCamClose" type="button" aria-label="Close" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button id="goCamTsBtn" type="button" aria-label="Timestamp" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg>
+      </button>
+      <button id="goCamTorchBtn" type="button" aria-label="Torch" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 2h6l-1 7h3l-7 13 1-9H7z"></path></svg>
+      </button>
+      <button id="goCamFlipBtn" type="button" aria-label="Flip camera" style="background:rgba(0,0,0,0.45);border:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- aspect quick chips -->
+  <div style="position:absolute;top:64px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3;">
+    <div id="goCamAspectChips" style="display:flex;gap:6px;background:rgba(0,0,0,0.4);padding:5px;border-radius:20px;"></div>
+  </div>
+
+  <!-- right-side vertical zoom slider -->
+  <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;">
+    <span id="goCamZoomLabel" style="color:#fff;font-size:12px;font-weight:600;background:rgba(0,0,0,0.4);padding:2px 8px;border-radius:10px;">1.0x</span>
+    <input id="goCamZoom" type="range" min="1" max="5" step="0.1" value="1" style="writing-mode:vertical-lr;direction:rtl;width:34px;height:180px;accent-color:#fff;">
+  </div>
+
+  <!-- bottom bar -->
+  <div style="position:absolute;bottom:0;left:0;right:0;z-index:3;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.6));padding:10px 0 18px;">
+    <!-- review strip -->
+    <div id="goCamStrip" style="display:flex;gap:8px;overflow-x:auto;padding:0 14px 10px;min-height:0;"></div>
+    <!-- lens chips -->
+    <div id="goCamLensChips" style="display:flex;justify-content:center;gap:8px;margin-bottom:12px;"></div>
+    <!-- controls row -->
+    <div style="display:flex;align-items:center;justify-content:space-around;padding:0 20px;">
+      <button id="goCamReviewBtn" type="button" style="background:rgba(255,255,255,0.15);border:none;min-width:64px;height:48px;border-radius:24px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;padding:0 14px;">0/7</button>
+      <button id="goCamShutter" type="button" aria-label="Capture" style="width:74px;height:74px;border-radius:50%;background:#fff;border:5px solid rgba(255,255,255,0.45);cursor:pointer;flex-shrink:0;"></button>
+      <button id="goCamDone" type="button" style="background:var(--accent,#0d9488);border:none;min-width:64px;height:48px;border-radius:24px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span>Save</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Settings Menu Popup (New Style) -->
 <div id="settingsPopup" class="freeze-popup-overlay" style="display:none">
@@ -31739,6 +31806,467 @@ if (location.hash) {
 } else {
   show('history', false);
 }
+
+/* ===================================================================
+   GoInspect In-App Camera (getUserMedia). Additive module — feeds the
+   EXISTING photo sinks (cam_addDefectPhotos / addReInspectPhoto) so sync,
+   IDB storage and the 7-photo caps behave identically to the device camera.
+   Default source = phone; user opts in via Profile > Camera. Falls back to
+   the native <input capture> on any failure. Icons only, no emoji.
+=================================================================== */
+const CAMERA_SETTINGS_KEY = 'goinspect.cameraSettings';
+const CAM_DEFAULTS = { source:'phone', timestamp:false, aspect:'1:1', torchDefault:false };
+let cameraSettings = (() => {
+  try { return { ...CAM_DEFAULTS, ...(JSON.parse(localStorage.getItem(CAMERA_SETTINGS_KEY) || '{}')) }; }
+  catch (e) { return { ...CAM_DEFAULTS }; }
+})();
+function saveCameraSettings() {
+  try { localStorage.setItem(CAMERA_SETTINGS_KEY, JSON.stringify(cameraSettings)); } catch (e) {}
+}
+function camAvailable() {
+  return !!(window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
+function camIsIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+let goCamStream = null, goCamTrack = null, goCamCaps = null;
+let goCamContext = null, goCamShots = [];
+let goCamFacing = 'environment', goCamDeviceId = null, goCamVideoInputs = [];
+let goCamDigitalZoom = 1, goCamUltrawideId = null;
+
+function goCam_aspectValue() {
+  switch (cameraSettings.aspect) {
+    case '1:1': return 1;
+    case '4:3': return 4 / 3;
+    case '3:4': return 3 / 4;
+    case '16:9': return 16 / 9;
+    default: return null; // 'full'
+  }
+}
+
+async function goCam_open(context) {
+  if (typeof isAccountFrozen === 'function' && isAccountFrozen()) { showFreezePopup(); return false; }
+  if (!camAvailable()) return false;
+  goCamContext = context;
+  goCamShots = [];
+  goCamDigitalZoom = 1;
+  const started = await goCam_startStream(null, goCamFacing);
+  if (!started) return false;
+  goCam_setupControls();
+  const ov = document.getElementById('goCamOverlay');
+  if (ov) ov.style.display = 'flex';
+  goCam_updateUI();
+  window.addEventListener('resize', goCam_layoutFrame);
+  return true;
+}
+
+async function goCam_startStream(deviceId, facing) {
+  goCam_stopStream();
+  let constraints;
+  if (deviceId) constraints = { video: { deviceId: { exact: deviceId } }, audio: false };
+  else constraints = { video: { facingMode: { ideal: facing || 'environment' } }, audio: false };
+  try {
+    goCamStream = await navigator.mediaDevices.getUserMedia(constraints);
+  } catch (err) {
+    console.warn('goCam: getUserMedia failed', err);
+    return false;
+  }
+  goCamTrack = goCamStream.getVideoTracks()[0] || null;
+  goCamCaps = (goCamTrack && goCamTrack.getCapabilities) ? (goCamTrack.getCapabilities() || {}) : {};
+  goCamDeviceId = (goCamTrack && goCamTrack.getSettings) ? (goCamTrack.getSettings().deviceId || null) : null;
+  const v = document.getElementById('goCamVideo');
+  if (v) {
+    v.srcObject = goCamStream;
+    v.setAttribute('playsinline', ''); v.muted = true;
+    try { await v.play(); } catch (e) {}
+  }
+  // enumerate back cameras (labels available once permission granted) to find ultra-wide
+  try {
+    const devs = await navigator.mediaDevices.enumerateDevices();
+    goCamVideoInputs = devs.filter(d => d.kind === 'videoinput');
+    goCamUltrawideId = null;
+    for (const d of goCamVideoInputs) {
+      if (/ultra|0\.5|wide angle|wide-angle/i.test(d.label || '')) { goCamUltrawideId = d.deviceId; break; }
+    }
+  } catch (e) { goCamVideoInputs = []; }
+  // apply torch default (Android only)
+  if (cameraSettings.torchDefault && goCamCaps && goCamCaps.torch) { await goCam_setTorch(true); }
+  return true;
+}
+
+function goCam_stopStream() {
+  try { if (goCamStream) goCamStream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} }); } catch (e) {}
+  goCamStream = null; goCamTrack = null;
+  const v = document.getElementById('goCamVideo');
+  if (v) { try { v.srcObject = null; } catch (e) {} }
+}
+
+function goCam_close() {
+  goCam_stopStream();
+  const ov = document.getElementById('goCamOverlay');
+  if (ov) ov.style.display = 'none';
+  goCamShots = [];
+  window.removeEventListener('resize', goCam_layoutFrame);
+}
+
+let _goCamWired = false;
+function goCam_setupControls() {
+  if (_goCamWired) { goCam_layoutFrame(); return; }
+  _goCamWired = true;
+  const byId = id => document.getElementById(id);
+  byId('goCamClose').onclick = () => goCam_close();
+  byId('goCamShutter').onclick = () => goCam_snap();
+  byId('goCamDone').onclick = () => goCam_saveAll();
+  byId('goCamReviewBtn').onclick = () => { const s = byId('goCamStrip'); if (s) s.scrollIntoView({ block: 'nearest' }); };
+  byId('goCamFlipBtn').onclick = async () => {
+    goCamFacing = (goCamFacing === 'environment') ? 'user' : 'environment';
+    goCamDigitalZoom = 1;
+    await goCam_startStream(null, goCamFacing);
+    goCam_updateUI();
+  };
+  byId('goCamTorchBtn').onclick = () => goCam_setTorch();
+  byId('goCamTsBtn').onclick = () => {
+    cameraSettings.timestamp = !cameraSettings.timestamp; saveCameraSettings(); goCam_updateUI();
+  };
+  const zoom = byId('goCamZoom');
+  zoom.oninput = () => goCam_applyZoom(parseFloat(zoom.value));
+}
+
+async function goCam_setTorch(force) {
+  if (!goCamTrack || !goCamCaps || !goCamCaps.torch) return;
+  const want = (typeof force === 'boolean') ? force : !goCam_torchState;
+  try { await goCamTrack.applyConstraints({ advanced: [{ torch: want }] }); goCam_torchState = want; }
+  catch (e) { console.warn('torch failed', e); }
+  goCam_updateUI();
+}
+let goCam_torchState = false;
+
+function goCam_applyZoom(val) {
+  // Optical zoom if supported (Android), else digital (crop on capture + CSS preview).
+  if (goCamTrack && goCamCaps && goCamCaps.zoom) {
+    const z = Math.min(goCamCaps.zoom.max, Math.max(goCamCaps.zoom.min, val));
+    try { goCamTrack.applyConstraints({ advanced: [{ zoom: z }] }); } catch (e) {}
+    goCamDigitalZoom = 1;
+    const lbl = document.getElementById('goCamZoomLabel'); if (lbl) lbl.textContent = z.toFixed(1) + 'x';
+  } else {
+    goCamDigitalZoom = Math.max(1, val);
+    const v = document.getElementById('goCamVideo');
+    if (v) { v.style.transform = 'scale(' + goCamDigitalZoom + ')'; }
+    const lbl = document.getElementById('goCamZoomLabel'); if (lbl) lbl.textContent = goCamDigitalZoom.toFixed(1) + 'x';
+  }
+}
+
+async function goCam_switchTo(deviceId, digital) {
+  goCamDigitalZoom = 1;
+  const v = document.getElementById('goCamVideo'); if (v) v.style.transform = 'none';
+  if (deviceId && deviceId !== goCamDeviceId) { await goCam_startStream(deviceId, null); }
+  if (digital) goCam_applyZoom(digital);
+  goCam_updateUI();
+}
+
+function goCam_layoutFrame() {
+  const f = document.getElementById('goCamFrame'); if (!f) return;
+  const ar = goCam_aspectValue();
+  if (!ar) { f.style.display = 'none'; return; }
+  f.style.display = 'block';
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const availW = vw * 0.9, availH = vh * 0.6;
+  let w = availW, h = w / ar;
+  if (h > availH) { h = availH; w = h * ar; }
+  f.style.width = Math.round(w) + 'px'; f.style.height = Math.round(h) + 'px';
+  f.style.left = Math.round((vw - w) / 2) + 'px'; f.style.top = Math.round((vh - h) / 2) + 'px';
+}
+
+function goCam_updateUI() {
+  const byId = id => document.getElementById(id);
+  // counts
+  const remain = goCam_remainingSlots();
+  const total = (goCamShots.length) + Math.max(0, goCam_usedSlots());
+  const rb = byId('goCamReviewBtn'); if (rb) rb.textContent = (goCamShots.length) + ' / ' + Math.min(7, total + Math.max(0, remain));
+  // shutter disabled when full
+  const sh = byId('goCamShutter'); if (sh) { sh.style.opacity = remain <= 0 ? '0.4' : '1'; sh.disabled = remain <= 0; }
+  // torch button visibility (Android w/ capability)
+  const tb = byId('goCamTorchBtn');
+  if (tb) {
+    tb.style.display = (goCamCaps && goCamCaps.torch) ? 'flex' : 'none';
+    tb.style.background = goCam_torchState ? 'rgba(255,214,10,0.85)' : 'rgba(0,0,0,0.45)';
+  }
+  // timestamp button
+  const tsb = byId('goCamTsBtn');
+  if (tsb) { tsb.style.display = 'flex'; tsb.style.background = cameraSettings.timestamp ? 'rgba(13,148,136,0.85)' : 'rgba(0,0,0,0.45)'; }
+  // zoom slider config
+  const zoom = byId('goCamZoom');
+  if (zoom) {
+    if (goCamCaps && goCamCaps.zoom) {
+      zoom.min = goCamCaps.zoom.min; zoom.max = goCamCaps.zoom.max; zoom.step = goCamCaps.zoom.step || 0.1;
+      if (parseFloat(zoom.value) < goCamCaps.zoom.min || parseFloat(zoom.value) > goCamCaps.zoom.max) zoom.value = goCamCaps.zoom.min;
+    } else { zoom.min = 1; zoom.max = 5; zoom.step = 0.1; }
+  }
+  goCam_renderAspectChips();
+  goCam_renderLensChips();
+  goCam_renderStrip();
+  goCam_layoutFrame();
+}
+
+function goCam_renderAspectChips() {
+  const wrap = document.getElementById('goCamAspectChips'); if (!wrap) return;
+  const opts = goCamContext === 'defect'
+    ? [['1:1', '1:1'], ['4:3', '4:3'], ['full', 'Full']]
+    : [['1:1', '1:1'], ['4:3', '4:3'], ['3:4', '3:4'], ['full', 'Full']];
+  wrap.innerHTML = '';
+  opts.forEach(([val, label]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = label;
+    const active = cameraSettings.aspect === val;
+    b.style.cssText = 'border:none;border-radius:14px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:#fff;background:' + (active ? 'var(--accent,#0d9488)' : 'rgba(255,255,255,0.18)');
+    b.onclick = () => { cameraSettings.aspect = val; saveCameraSettings(); goCam_updateUI(); };
+    wrap.appendChild(b);
+  });
+}
+
+function goCam_renderLensChips() {
+  const wrap = document.getElementById('goCamLensChips'); if (!wrap) return;
+  wrap.innerHTML = '';
+  const chips = [];
+  if (goCamUltrawideId) chips.push(['0.5x', () => goCam_switchTo(goCamUltrawideId, null)]);
+  chips.push(['1x', () => goCam_switchTo(goCamDeviceId === goCamUltrawideId ? null : goCamDeviceId, 1)]);
+  chips.push(['2x', () => goCam_applyZoom(2)]);
+  if (chips.length <= 1) return;
+  chips.forEach(([label, fn]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = label;
+    b.style.cssText = 'border:none;border-radius:16px;width:46px;height:32px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;background:rgba(255,255,255,0.18);';
+    b.onclick = fn;
+    wrap.appendChild(b);
+  });
+}
+
+function goCam_usedSlots() {
+  if (goCamContext === 'defect') return (typeof defectDraft !== 'undefined' && defectDraft && defectDraft.photos) ? defectDraft.photos.length : 0;
+  const lvl = goCam_reinspLevel(false);
+  return lvl ? (lvl.afterPhotos || []).length : 0;
+}
+function goCam_remainingSlots() { return 7 - (goCam_usedSlots() + goCamShots.length); }
+
+function goCam_reinspLevel(create) {
+  const proj = getProject(); if (!proj || currentReInspectDefectIdx == null) return null;
+  const d = proj.defects[currentReInspectDefectIdx]; if (!d) return null;
+  if (typeof THIRD_REINSPECTION_MODE !== 'undefined' && THIRD_REINSPECTION_MODE) {
+    if (create && !d.thirdReInspection) d.thirdReInspection = { afterPhotos: [], status: '', notes: '' };
+    return d.thirdReInspection || null;
+  }
+  if (typeof SECOND_REINSPECTION_MODE !== 'undefined' && SECOND_REINSPECTION_MODE) {
+    if (create && !d.secondReInspection) d.secondReInspection = { afterPhotos: [], status: '', notes: '' };
+    return d.secondReInspection || null;
+  }
+  if (create && !d.reInspection) d.reInspection = { status: '', afterPhotos: [], notes: '' };
+  return d.reInspection || null;
+}
+
+function goCam_captureFrame() {
+  const v = document.getElementById('goCamVideo');
+  const vw = v ? v.videoWidth : 0, vh = v ? v.videoHeight : 0;
+  if (!vw || !vh) return null;
+  const dz = Math.max(1, goCamDigitalZoom || 1);
+  let rw = vw / dz, rh = vh / dz;            // digital-zoom region (center)
+  const ar = goCam_aspectValue();
+  let cw = rw, ch = rh;
+  if (ar) { if (rw / rh > ar) { cw = rh * ar; ch = rh; } else { cw = rw; ch = rw / ar; } }
+  const sx = (vw - cw) / 2, sy = (vh - ch) / 2;
+  let ow = cw, oh = ch;
+  const maxSide = 1600;
+  if (Math.max(ow, oh) > maxSide) { const s = maxSide / Math.max(ow, oh); ow = Math.round(ow * s); oh = Math.round(oh * s); }
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(ow)); c.height = Math.max(1, Math.round(oh));
+  const ctx = c.getContext('2d');
+  try { ctx.drawImage(v, sx, sy, cw, ch, 0, 0, c.width, c.height); }
+  catch (e) { return null; }
+  if (cameraSettings.timestamp) goCam_drawTimestamp(ctx, c.width, c.height);
+  const url = c.toDataURL('image/jpeg', 0.85);
+  c.width = c.height = 0; // release
+  return url;
+}
+
+function goCam_drawTimestamp(ctx, w, h) {
+  const d = new Date();
+  const txt = pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear() + '  ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  const fs = Math.max(13, Math.round(w * 0.038));
+  ctx.font = 'bold ' + fs + 'px sans-serif';
+  ctx.textBaseline = 'alphabetic';
+  const pad = Math.round(fs * 0.45);
+  const tw = ctx.measureText(txt).width;
+  const bx = w - tw - pad * 3, by = h - fs - pad * 2;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(bx, by, tw + pad * 2, fs + pad * 1.6);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(txt, bx + pad, by + fs + pad * 0.3);
+}
+
+function goCam_snap() {
+  if (goCam_remainingSlots() <= 0) { alert('Maksimum 7 gambar'); return; }
+  const url = goCam_captureFrame();
+  if (!url) return;
+  goCamShots.push(url);
+  if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
+  // brief flash
+  const ov = document.getElementById('goCamOverlay');
+  if (ov) { const fl = document.createElement('div'); fl.style.cssText = 'position:absolute;inset:0;background:#fff;opacity:0.7;z-index:5;pointer-events:none;transition:opacity .25s;'; ov.appendChild(fl); requestAnimationFrame(() => { fl.style.opacity = '0'; }); setTimeout(() => fl.remove(), 280); }
+  goCam_updateUI();
+}
+
+function goCam_renderStrip() {
+  const strip = document.getElementById('goCamStrip'); if (!strip) return;
+  strip.innerHTML = '';
+  goCamShots.forEach((url, i) => {
+    const cell = document.createElement('div');
+    cell.style.cssText = 'position:relative;flex:0 0 auto;width:58px;height:58px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.5);';
+    const img = document.createElement('img');
+    img.src = url; img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    cell.appendChild(img);
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+    del.style.cssText = 'position:absolute;top:1px;right:1px;background:rgba(220,38,38,0.9);border:none;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;';
+    del.onclick = (e) => { e.stopPropagation(); goCamShots.splice(i, 1); goCam_updateUI(); };
+    cell.appendChild(del);
+    const ann = document.createElement('button');
+    ann.type = 'button';
+    ann.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"></path></svg>';
+    ann.title = 'Annotate';
+    ann.style.cssText = 'position:absolute;bottom:1px;right:1px;background:rgba(13,148,136,0.92);border:none;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;';
+    ann.onclick = (e) => { e.stopPropagation(); goCam_saveAndAnnotate(i); };
+    cell.appendChild(ann);
+    strip.appendChild(cell);
+  });
+}
+
+async function cam_addDefectPhotos(dataURLs) {
+  if (!dataURLs || !dataURLs.length) return;
+  if (typeof defectDraft === 'undefined' || !defectDraft) return;
+  for (const data of dataURLs) {
+    if (defectDraft.photos.length >= 7) { alert('Maximum 7 photos per defect'); break; }
+    defectDraft.photos.push(data);
+    defectDraft._photosModified = Date.now();
+    addPhotoThumb(data, defectDraft.photos.length - 1);
+    try {
+      await offerSaveToDevice(data, `GoInspect-defect-${(editIndex != null ? editIndex + 1 : (getProject().defects.length + 1))}-${pad2(defectDraft.photos.length)}.jpg`);
+    } catch (e) {}
+  }
+}
+
+async function goCam_saveAll() {
+  if (!goCamShots.length) { goCam_close(); return; }
+  const shots = goCamShots.slice();
+  const ctx = goCamContext;
+  goCam_close();
+  if (ctx === 'defect') { await cam_addDefectPhotos(shots); }
+  else { for (const u of shots) { await addReInspectPhoto(u); } }
+}
+
+async function goCam_saveAndAnnotate(stripIdx) {
+  if (!goCamShots.length) { goCam_close(); return; }
+  const shots = goCamShots.slice();
+  const ctx = goCamContext;
+  if (ctx === 'defect') {
+    const start = (defectDraft && defectDraft.photos) ? defectDraft.photos.length : 0;
+    goCam_close();
+    await cam_addDefectPhotos(shots);
+    const idx = start + stripIdx;
+    if (defectDraft && defectDraft.photos[idx] && typeof openAnnotator === 'function') openAnnotator(defectDraft.photos[idx], idx);
+  } else {
+    const lvl = goCam_reinspLevel(true);
+    const start = lvl ? (lvl.afterPhotos || []).length : 0;
+    goCam_close();
+    for (const u of shots) { await addReInspectPhoto(u); }
+    const lvl2 = goCam_reinspLevel(false);
+    const idx = start + stripIdx;
+    if (lvl2 && lvl2.afterPhotos && lvl2.afterPhotos[idx] && typeof openReInspectAnnotatorForEdit === 'function') {
+      try { const src = await resolveRef(lvl2.afterPhotos[idx]); openReInspectAnnotatorForEdit(src, idx); } catch (e) {}
+    }
+  }
+}
+
+// Intercept the existing native camera inputs: if the user chose the GoInspect
+// camera AND it's available, open the overlay instead; otherwise let the native
+// picker run (also the fallback if getUserMedia fails).
+function goCam_attachInterceptor(inputEl, context) {
+  if (!inputEl || inputEl._goCamWired) return;
+  inputEl._goCamWired = true;
+  inputEl.addEventListener('click', function (e) {
+    if (inputEl._goCamBypass) { inputEl._goCamBypass = false; return; }
+    if (cameraSettings.source === 'goinspect' && camAvailable()) {
+      e.preventDefault();
+      goCam_open(context).then(ok => {
+        if (!ok) { inputEl._goCamBypass = true; inputEl.click(); }
+      });
+    }
+  }, true);
+}
+goCam_attachInterceptor(document.getElementById('defPhotosCam'), 'defect');
+goCam_attachInterceptor(document.getElementById('reInspectAfterCam'), 'reinspect');
+
+// Profile > Camera settings dialog
+function showCameraSettings() {
+  let dlg = document.getElementById('cameraSettingsDialog');
+  if (!dlg) {
+    dlg = document.createElement('dialog');
+    dlg.id = 'cameraSettingsDialog';
+    dlg.innerHTML = `
+      <div class="card stack" style="max-width:380px;">
+        <h3 style="margin:0 0 4px;display:flex;align-items:center;gap:8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          Camera
+        </h3>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line,#e5e7eb);">
+          <span style="font-size:14px;">Sumber camera</span>
+          <select id="camSetSource" style="padding:8px;border-radius:8px;border:1px solid var(--line,#cbd5e1);">
+            <option value="phone">Camera Phone</option>
+            <option value="goinspect">Camera GoInspect</option>
+          </select>
+        </label>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line,#e5e7eb);">
+          <span style="font-size:14px;">Aspect ratio</span>
+          <select id="camSetAspect" style="padding:8px;border-radius:8px;border:1px solid var(--line,#cbd5e1);">
+            <option value="1:1">1:1 (default)</option>
+            <option value="4:3">4:3</option>
+            <option value="3:4">3:4</option>
+            <option value="16:9">16:9</option>
+            <option value="full">Full</option>
+          </select>
+        </label>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line,#e5e7eb);">
+          <span style="font-size:14px;">Timestamp (tarikh &amp; masa)</span>
+          <input type="checkbox" id="camSetTimestamp" style="width:20px;height:20px;">
+        </label>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;">
+          <span style="font-size:14px;">Torch default <span style="color:var(--muted,#94a3b8);font-size:11px;">(Android)</span></span>
+          <input type="checkbox" id="camSetTorch" style="width:20px;height:20px;">
+        </label>
+        <p id="camSetNote" style="font-size:11px;color:var(--muted,#94a3b8);margin:4px 0 0;"></p>
+        <button class="btn" type="button" style="width:100%;margin-top:8px;" onclick="this.closest('dialog').close()">Selesai</button>
+      </div>`;
+    document.body.appendChild(dlg);
+    dlg.querySelector('#camSetSource').addEventListener('change', e => { cameraSettings.source = e.target.value; saveCameraSettings(); });
+    dlg.querySelector('#camSetAspect').addEventListener('change', e => { cameraSettings.aspect = e.target.value; saveCameraSettings(); });
+    dlg.querySelector('#camSetTimestamp').addEventListener('change', e => { cameraSettings.timestamp = e.target.checked; saveCameraSettings(); });
+    dlg.querySelector('#camSetTorch').addEventListener('change', e => { cameraSettings.torchDefault = e.target.checked; saveCameraSettings(); });
+  }
+  dlg.querySelector('#camSetSource').value = cameraSettings.source;
+  dlg.querySelector('#camSetAspect').value = cameraSettings.aspect;
+  dlg.querySelector('#camSetTimestamp').checked = !!cameraSettings.timestamp;
+  dlg.querySelector('#camSetTorch').checked = !!cameraSettings.torchDefault;
+  const note = dlg.querySelector('#camSetNote');
+  if (note) {
+    if (!camAvailable()) note.textContent = 'Nota: peranti/pelayar ini tidak menyokong camera dalam-app — camera phone akan digunakan.';
+    else if (camIsIOS()) note.textContent = 'Nota: di iOS, torch & zoom optik/0.5x tidak disokong — digital zoom digunakan.';
+    else note.textContent = '';
+  }
+  dlg.showModal();
+}
+window.showCameraSettings = showCameraSettings;
+
 </script>
 <script>
 /* ====== Simple Bar Chart (for "Defect By Type") ====== */
