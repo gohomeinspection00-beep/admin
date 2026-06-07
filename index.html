@@ -31854,12 +31854,19 @@ async function goCam_open(context) {
   goCamDigitalZoom = 1;
   const started = await goCam_startStream(null, goCamFacing);
   if (!started) return false;
-  goCam_setupControls();
-  const ov = document.getElementById('goCamOverlay');
-  if (ov) ov.style.display = 'flex';
-  goCam_updateUI();
-  window.addEventListener('resize', goCam_layoutFrame);
-  return true;
+  try {
+    goCam_setupControls();
+    const ov = document.getElementById('goCamOverlay');
+    if (ov) ov.style.display = 'flex';
+    goCam_updateUI();
+    window.addEventListener('resize', goCam_layoutFrame);
+    return true;
+  } catch (e) {
+    // Setup failed after the stream started — never leave a live camera running.
+    console.warn('goCam: setup failed', e);
+    goCam_stopStream();
+    return false;
+  }
 }
 
 async function goCam_startStream(deviceId, facing) {
@@ -32029,9 +32036,14 @@ function goCam_renderAspectChips() {
 function goCam_renderLensChips() {
   const wrap = document.getElementById('goCamLensChips'); if (!wrap) return;
   wrap.innerHTML = '';
+  const resetTransform = () => { const v = document.getElementById('goCamVideo'); if (v) v.style.transform = 'none'; };
   const chips = [];
-  if (goCamUltrawideId) chips.push(['0.5x', () => goCam_switchTo(goCamUltrawideId, null)]);
-  chips.push(['1x', () => goCam_switchTo(goCamDeviceId === goCamUltrawideId ? null : goCamDeviceId, 1)]);
+  // 0.5x: switch to the ultra-wide back camera (Android, when detected).
+  if (goCamUltrawideId) chips.push(['0.5x', async () => { goCamDigitalZoom = 1; resetTransform(); await goCam_startStream(goCamUltrawideId, null); goCam_updateUI(); }]);
+  // 1x: always restart the default (main) camera by facingMode so it works even
+  // when currently on the ultra-wide lens (deviceId-based restart could no-op).
+  chips.push(['1x', async () => { goCamDigitalZoom = 1; resetTransform(); await goCam_startStream(null, goCamFacing); goCam_updateUI(); }]);
+  // 2x: digital/optical zoom on the current lens.
   chips.push(['2x', () => goCam_applyZoom(2)]);
   if (chips.length <= 1) return;
   chips.forEach(([label, fn]) => {
@@ -32194,12 +32206,22 @@ async function goCam_saveAndAnnotate(stripIdx) {
 function goCam_attachInterceptor(inputEl, context) {
   if (!inputEl || inputEl._goCamWired) return;
   inputEl._goCamWired = true;
+  const CAM_FAIL_MSG = 'Tidak dapat membuka Camera GoInspect (akses kamera mungkin ditolak). Benarkan akses kamera, atau tukar ke Camera Phone di Profile > Camera.';
   inputEl.addEventListener('click', function (e) {
-    if (inputEl._goCamBypass) { inputEl._goCamBypass = false; return; }
+    // Only take over when the user opted in AND the API is usable (secure context
+    // + getUserMedia present). When camAvailable() is false we do NOT preventDefault,
+    // so the native <input capture> opens within the same user gesture (true fallback).
     if (cameraSettings.source === 'goinspect' && camAvailable()) {
       e.preventDefault();
+      // NOTE: we cannot re-open the native picker after an async getUserMedia
+      // rejection (it would be outside the user-gesture window and blocked on iOS),
+      // so on failure we inform the user instead of silently doing nothing.
       goCam_open(context).then(ok => {
-        if (!ok) { inputEl._goCamBypass = true; inputEl.click(); }
+        if (!ok) alert(CAM_FAIL_MSG);
+      }).catch(err => {
+        console.warn('goCam: open error', err);
+        goCam_close();
+        alert(CAM_FAIL_MSG);
       });
     }
   }, true);
