@@ -24225,6 +24225,7 @@ const renderFinding = async () => {
           // — no regression). Mutating local refs to http also matches silentBackup.
           if (typeof uploadImageToStorage === 'function') {
             const _upRef = async (ref, basePath) => {
+              if (typeof touchSyncLock === 'function') touchSyncLock(p.id); // per-photo heartbeat: keep the lock through a slow upload
               if (!ref || typeof ref !== 'string' || ref.startsWith('http')) return ref;
               try {
                 if (typeof getCloudUrlForLocalRef === 'function') {
@@ -24357,10 +24358,13 @@ const renderFinding = async () => {
           } catch (txErr) {
             console.error('Update: transaction failed, falling back to direct set:', txErr);
             // Degraded-but-correct fallback: the transaction (the primary lost-update guard)
-            // threw, so mirror its merge against the pre-read cloudDoc snapshot instead of a
-            // blind array-replace. All additive — can only append cloud-only data, never drop
-            // local: union defects by _syncId and union customElements/customTypes.
-            const _fbData = (cloudDoc && cloudDoc.exists) ? cloudDoc.data() : null;
+            // threw, so mirror its merge instead of a blind array-replace. All additive — can
+            // only append cloud-only data, never drop local: union defects by _syncId and union
+            // customElements/customTypes. Re-read the LATEST cloud doc (the pre-read snapshot may
+            // be minutes stale after a slow upload); fall back to the snapshot if the get throws.
+            let _fbData = null;
+            try { const _fbDoc = await _docRef.get(); _fbData = _fbDoc.exists ? _fbDoc.data() : null; }
+            catch (e) { _fbData = (cloudDoc && cloudDoc.exists) ? cloudDoc.data() : null; }
             const _fbPushedIds = new Set(cloudDefects.map(d => d && d._syncId).filter(Boolean));
             const _fbCloudOnly = (_fbData?.defects || []).filter(cd => cd && cd._syncId && !_fbPushedIds.has(cd._syncId));
             const _fbDefects = _fbCloudOnly.length ? [...cloudDefects, ..._fbCloudOnly] : cloudDefects;
