@@ -12138,9 +12138,41 @@ const silentBackupProject = async (projectOrId) => {
       
     } catch (transactionError) {
       console.error('Transaction failed, falling back to direct set:', transactionError);
-      // Fallback to direct set if transaction fails
+      // A-iv: version-safe fallback. The transaction (the primary lost-update + dedup guard)
+      // threw, so re-read the cloud doc and UNION by _syncId (+ inspection dates + custom
+      // registries) instead of a blind merge:true array-replace — which would either drop a
+      // concurrent write or, combined with the conflict path, re-append duplicates. Mirrors the
+      // proven fallback in syncProjectToCloud. Degrades to the original blind set only if the
+      // re-read itself throws.
       try {
-        await docRef.set(compressedSaveData, { merge: true });
+        let fbWrite = compressedSaveData;
+        try {
+          const fbDoc = await docRef.get();
+          const fbData = fbDoc.exists ? fbDoc.data() : null;
+          if (fbData) {
+            const pushed = Array.isArray(compressedSaveData.defects) ? compressedSaveData.defects : [];
+            const pushedIds = new Set(pushed.map(d => d && d._syncId).filter(Boolean));
+            const cloudDefs = Array.isArray(fbData.defects) ? fbData.defects : [];
+            const cloudOnly = cloudDefs.filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
+            const mergedDefects = cloudOnly.length ? [...pushed, ...cloudOnly] : pushed;
+            let mergedDates = compressedSaveData.meta && compressedSaveData.meta.inspectionDates;
+            if (typeof mergeInspectionDates === 'function') {
+              try { mergedDates = mergeInspectionDates(compressedSaveData.meta || {}, fbData.meta || {}); } catch (e) {}
+            }
+            fbWrite = {
+              ...compressedSaveData,
+              defects: mergedDefects,
+              meta: { ...(compressedSaveData.meta || {}), inspectionDates: mergedDates },
+              customElements: [...new Set([...(compressedSaveData.customElements || []), ...(fbData.customElements || [])])],
+              customTypes: [...new Set([...(compressedSaveData.customTypes || []), ...(fbData.customTypes || [])])],
+              _version: (fbData._version || 0) + 1
+            };
+          }
+        } catch (reReadErr) {
+          console.error('Fallback re-read failed, using blind set:', reReadErr);
+          fbWrite = compressedSaveData;
+        }
+        await docRef.set(fbWrite, { merge: true });
         clearPendingUpload(projectId);
         markSyncTime(projectId); // FIX 1.1
       } catch (fallbackError) {
