@@ -10320,6 +10320,7 @@ const silentBackupProject = async (projectOrId) => {
     
     // Helper to upload photo to Firebase Storage - WITH DEDUPLICATION & RETRY
     const uploadPhotoToStorage = async (photoRef, defectId, photoIndex, photoType = 'photo') => {
+      touchSyncLock(projectId); // per-photo heartbeat: keep the lock alive through a slow upload
       // ALREADY A URL? Return as is - NO RE-UPLOAD!
       if (photoRef && photoRef.startsWith('http')) {
         return photoRef;
