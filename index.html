@@ -25694,6 +25694,11 @@ q('#defDesc').value = d.description || '';
     try {
       const resolved = await Promise.all((d.photos || []).map(ref => resolveRef(ref)));
       defectDraft.photos = [...resolved];
+      // Bug B: remember each photo's ORIGINAL stored ref (http filename / idb:) per index, so
+      // annotate/remove can record the deleted-id in the SAME id-form the CLOUD copy uses.
+      // (resolveRef turns refs into data: URLs whose hash id never matches the cloud filename,
+      // which is why an annotated/removed original used to re-appear on sync = double/triple.)
+      defectDraft._origRefs = [...(d.photos || [])];
       const tray = q('#photoTray'); tray.innerHTML = '';
       defectDraft.photos.forEach((src, i) => addPhotoThumb(src, i));
     } catch { alert('Failed to load defect photos.'); }
@@ -25799,6 +25804,7 @@ const handleDefectFiles = async (files) => {
       }
 
       defectDraft.photos.push(data);
+      if (defectDraft._origRefs) defectDraft._origRefs.push(null); // Bug B: new photo has no original stored ref
       defectDraft._photosModified = Date.now(); // FIX: Update timestamp when adding photo
       _lastSig = sig;
       _lastAddedAt = now;
@@ -25883,19 +25889,18 @@ function addPhotoThumb(src, index){
       // FIX E: Use live DOM position instead of stale closure src/indexOf
       const liveIdx = [...tray.children].indexOf(wrap);
       if (liveIdx > -1 && liveIdx < defectDraft.photos.length) {
-        // Track deleted photo ID (use short hash)
-        const photoToDelete = defectDraft.photos[liveIdx];
-        const photoId = getPhotoIdForTracking(photoToDelete);
-        
-        if (photoId) {
-          if (!defectDraft._deletedPhotoIds) {
-            defectDraft._deletedPhotoIds = [];
-          }
-          if (!defectDraft._deletedPhotoIds.includes(photoId)) {
-            defectDraft._deletedPhotoIds.push(photoId);
-          }
+        // Bug B: record the deleted-id in EVERY known id-form — the current draft entry AND the
+        // ORIGINAL stored ref (http filename / idb:) — so the union merge suppresses the cloud
+        // copy too (whose id is the http filename, not the resolved data: hash).
+        if (!defectDraft._deletedPhotoIds) defectDraft._deletedPhotoIds = [];
+        const _delIds = [
+          getPhotoIdForTracking(defectDraft.photos[liveIdx]),
+          (defectDraft._origRefs ? getPhotoIdForTracking(defectDraft._origRefs[liveIdx]) : null)
+        ];
+        for (const _pid of _delIds) {
+          if (_pid && !defectDraft._deletedPhotoIds.includes(_pid)) defectDraft._deletedPhotoIds.push(_pid);
         }
-        
+        if (defectDraft._origRefs) defectDraft._origRefs.splice(liveIdx, 1);
         defectDraft.photos.splice(liveIdx, 1);
         defectDraft._photosModified = Date.now();
         wrap.remove();
@@ -27428,23 +27433,25 @@ if (fillSel) {
       return;
     }
     if (annApplyIndex > -1) {
-      // FIX: Mark original photo as deleted to prevent UNION merge double (use short hash)
-      const originalPhoto = defectDraft.photos[annApplyIndex];
-      const photoId = getPhotoIdForTracking(originalPhoto);
-      
-      // Add to deleted list so UNION merge won't re-add it
-      if (photoId) {
-        if (!defectDraft._deletedPhotoIds) {
-          defectDraft._deletedPhotoIds = [];
-        }
-        if (!defectDraft._deletedPhotoIds.includes(photoId)) {
-          defectDraft._deletedPhotoIds.push(photoId);
-          console.log('Normal annotation: Marked original photo as deleted:', photoId);
+      // FIX Bug B: record the deleted-id in EVERY known id-form of the original photo — the
+      // resolved data: draft entry AND the ORIGINAL stored ref (http filename / idb:). The union
+      // merge computes getPhotoIdForTracking on the CLOUD copy (http filename), which never
+      // matches the data: hash, so without the original-ref id the original re-appears = double.
+      if (!defectDraft._deletedPhotoIds) defectDraft._deletedPhotoIds = [];
+      const _annDelIds = [
+        getPhotoIdForTracking(defectDraft.photos[annApplyIndex]),
+        (defectDraft._origRefs ? getPhotoIdForTracking(defectDraft._origRefs[annApplyIndex]) : null)
+      ];
+      for (const _pid of _annDelIds) {
+        if (_pid && !defectDraft._deletedPhotoIds.includes(_pid)) {
+          defectDraft._deletedPhotoIds.push(_pid);
+          console.log('Normal annotation: Marked original photo as deleted:', _pid);
         }
       }
-      
+
       // Replace with annotated version
       defectDraft.photos[annApplyIndex] = data;
+      if (defectDraft._origRefs) defectDraft._origRefs[annApplyIndex] = null; // annotated slot has no original ref now
       // FIX: Update _photosModified timestamp bila annotate gambar
       defectDraft._photosModified = Date.now();
       defectDraft._lastModified = Date.now();
