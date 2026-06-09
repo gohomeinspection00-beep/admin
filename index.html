@@ -9899,6 +9899,7 @@ const autoBackupPending = async () => {
 // ========== SYNC LOCK & DEBOUNCE SYSTEM ==========
 const syncLocks = new Map(); // Track ongoing syncs per project
 const syncQueue = new Map(); // Queue pending syncs
+const syncLockBeat = new Map(); // projectId -> last progress timestamp (heartbeat)
 const syncDebounceTimers = new Map(); // Debounce timers
 const SYNC_DEBOUNCE_MS = 3000; // Wait 3 seconds before syncing
 const MAX_RETRY_ATTEMPTS = 3; // Retry failed uploads up to 3 times
@@ -9950,25 +9951,36 @@ const calibrateServerTime = async () => {
 // Check if sync is currently running for a project
 const isSyncLocked = (projectId) => syncLocks.get(projectId) === true;
 
+// Heartbeat: a long sync calls this as it makes progress (e.g. per photo uploaded). The
+// watchdog then keeps the lock while the run is alive instead of force-releasing a slow-but-
+// progressing run — which used to let a SECOND sync start concurrently and double/triple
+// defects under slow internet. A genuinely hung run (no progress for 60s) is still released.
+const touchSyncLock = (projectId) => { if (isSyncLocked(projectId)) syncLockBeat.set(projectId, Date.now()); };
+
+// Re-arming watchdog: only force-releases after 60s of NO progress; otherwise re-checks later.
+const _armSyncWatchdog = (projectId) => {
+  setTimeout(() => {
+    if (!isSyncLocked(projectId)) return; // released normally already
+    const last = syncLockBeat.get(projectId) || 0;
+    if (Date.now() - last < 60000) { _armSyncWatchdog(projectId); return; } // alive -> keep holding
+    console.warn('Sync lock timeout (no progress for 60s) - force releasing:', projectId);
+    releaseSyncLock(projectId);
+  }, 60000);
+};
+
 // Acquire sync lock
 const acquireSyncLock = (projectId) => {
   if (isSyncLocked(projectId)) return false;
   syncLocks.set(projectId, true);
-  // FIX 1.1: Set timeout to auto-release stuck locks (safety net)
-  setTimeout(() => {
-    if (isSyncLocked(projectId)) {
-      console.warn('Sync lock timeout - force releasing:', projectId);
-      // FIX (M4): route through releaseSyncLock so a queued follow-up sync is drained
-      // (direct syncLocks.set left the queue stuck until the next save/online event).
-      releaseSyncLock(projectId);
-    }
-  }, 60000); // 60 second timeout
+  syncLockBeat.set(projectId, Date.now());
+  _armSyncWatchdog(projectId);
   return true;
 };
 
 // Release sync lock
 const releaseSyncLock = (projectId) => {
   syncLocks.set(projectId, false);
+  syncLockBeat.delete(projectId);
   // Check if there's a queued sync
   if (syncQueue.get(projectId)) {
     syncQueue.set(projectId, false);
@@ -11308,6 +11320,7 @@ const silentBackupProject = async (projectOrId) => {
     // STEP 2b: Prepare local defects with IDs and upload photos
     const localDefects = [];
     for (const d of (project.defects || [])) {
+      touchSyncLock(projectId); // heartbeat: this run is alive (keeps the lock through a slow upload)
       const syncId = ensureSyncId(d);
       if (!d._syncId) {
         d._syncId = syncId;
@@ -34347,6 +34360,7 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
       const DEFECT_BATCH_SIZE = 3;
       
       for (let batchStart = 0; batchStart < project.defects.length; batchStart += DEFECT_BATCH_SIZE) {
+        touchSyncLock(projectId); // heartbeat (no-op if this path doesn't hold the lock)
         const batchEnd = Math.min(batchStart + DEFECT_BATCH_SIZE, project.defects.length);
         const defectBatch = project.defects.slice(batchStart, batchEnd);
         
