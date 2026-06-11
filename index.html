@@ -10379,6 +10379,7 @@ const silentBackupProject = async (projectOrId) => {
       
       // FIX 5: Upload with RETRY mechanism
       const uploadWithRetry = async () => {
+        touchSyncLock(projectId); // per-attempt heartbeat: keep the lock alive through a single slow photo's retries (<=45s/attempt < 60s watchdog), so the watchdog can't release mid-upload and let a 2nd sync run concurrently
         const response = await fetch(photoData);
         const blob = await response.blob();
         await withTimeout(storageRef.put(blob), 30000, 'Photo upload');
@@ -11274,6 +11275,7 @@ const silentBackupProject = async (projectOrId) => {
       
       // Upload with RETRY mechanism
       const uploadWithRetry = async () => {
+        touchSyncLock(projectId); // per-attempt heartbeat: keep the lock alive through a single slow photo's retries (<=45s/attempt < 60s watchdog), so the watchdog can't release mid-upload and let a 2nd sync run concurrently
         const response = await fetch(photoData);
         const blob = await response.blob();
         await withTimeout(storageRef.put(blob), 30000, 'Photo upload');
@@ -29377,7 +29379,11 @@ const renderHistoryCard = (p, container) => {
       }
       
       // FULL REFRESH: Sync semua data dari cloud sebelum buka project
-      if (navigator.onLine && window.currentUserData) {
+      // HOLE #2 FIX: skip the open-time cloud merge while a sync is mid-write for this project —
+      // ingesting a half-written cloud doc here can keep both a local idb ref and its just-uploaded
+      // http twin = doubled photo. The merge defers to the next sync; the project still opens from
+      // local data below. (Bounded: the heartbeat lock releases on sync completion / 60s-no-progress.)
+      if (navigator.onLine && window.currentUserData && !(typeof isSyncLocked === 'function' && isSyncLocked(proj.id))) {
         try {
           btn.innerHTML = '<span>Syncing...</span>';
           btn.disabled = true;
