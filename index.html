@@ -12125,9 +12125,17 @@ const silentBackupProject = async (projectOrId) => {
                   localDef.thirdReInspection._notesModified = cNT3;
                 }
               }
+
+              // MULTI-USER FIX: re-union photo arrays so a photo another device added to
+              // the cloud copy of this shared defect isn't dropped by our pushed snapshot.
+              // Additive + delete-respecting + cid-deduped; idempotent so it's safe even if
+              // this transaction callback retries.
+              if (typeof reunionDefectPhotos === 'function') {
+                try { Object.assign(localDef, reunionDefectPhotos(localDef, cloudDef)); } catch (e) {}
+              }
             }
           }
-          
+
           // Add missed defects to our list
           if (missedDefects.length > 0) {
             mergedDefectsForSave = [...sanitizedDefects, ...missedDefects];
@@ -12170,7 +12178,13 @@ const silentBackupProject = async (projectOrId) => {
             const pushedIds = new Set(pushed.map(d => d && d._syncId).filter(Boolean));
             const cloudDefs = Array.isArray(fbData.defects) ? fbData.defects : [];
             const cloudOnly = cloudDefs.filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
-            const mergedDefects = cloudOnly.length ? [...pushed, ...cloudOnly] : pushed;
+            // MULTI-USER FIX: re-union shared-id photos against the re-read cloud copy.
+            let _reun = pushed;
+            if (typeof reunionDefectPhotos === 'function' && cloudDefs.length) {
+              const _cm = new Map(cloudDefs.filter(cd => cd && cd._syncId).map(cd => [cd._syncId, cd]));
+              if (_cm.size) _reun = pushed.map(pd => (pd && pd._syncId && _cm.has(pd._syncId)) ? reunionDefectPhotos(pd, _cm.get(pd._syncId)) : pd);
+            }
+            const mergedDefects = cloudOnly.length ? [..._reun, ...cloudOnly] : _reun;
             let mergedDates = compressedSaveData.meta && compressedSaveData.meta.inspectionDates;
             if (typeof mergeInspectionDates === 'function') {
               try { mergedDates = mergeInspectionDates(compressedSaveData.meta || {}, fbData.meta || {}); } catch (e) {}
@@ -13965,6 +13979,63 @@ const migrateDeletedPhotoIdsToCid = () => {
     localStorage.setItem('goinspect.cidLedgerMigrated', '1');
   } catch (e) { console.warn('migrateDeletedPhotoIdsToCid error:', e); }
 };
+
+// MULTI-USER SAME-DEFECT re-union: inside a sync transaction, when this device and the
+// cloud hold the SAME defect (shared _syncId), the existing merge lets our pushed defect
+// win wholesale for shared ids -> a photo another device added concurrently to the cloud
+// copy gets DROPPED. This re-unions the photo arrays so neither side's photos are lost.
+// It is PURE (returns a new defect object, never mutates inputs) so it is safe to call
+// inside a transaction callback that may retry. Rules:
+//  - union the delete-ledgers FIRST, then drop any photo whose id is in that union
+//    (so a photo this device deleted is NOT resurrected from the cloud copy),
+//  - add local photos first then cloud-only photos (additive: can only add, never drop),
+//  - dedup by canonical content id (depends on part-1 cid so the same image present as a
+//    cloud URL + an idb ref doesn't double).
+function reunionDefectPhotos(localDef, cloudDef) {
+  if (!localDef || !cloudDef) return localDef;
+  const unionArr = (a, b) => { const s = new Set(a || []); for (const x of (b || [])) s.add(x); return [...s]; };
+  const mergePhotos = (localArr, cloudArr, delIds) => {
+    const delSet = new Set(delIds || []);
+    const seen = new Set(); const res = [];
+    const add = (arr) => {
+      for (const ph of (arr || [])) {
+        if (!ph || typeof ph !== 'string') continue;
+        const id = (typeof getPhotoIdForTracking === 'function') ? getPhotoIdForTracking(ph) : ph;
+        if ((id && delSet.has(id)) || delSet.has(ph)) continue; // respect deletes (cid or raw)
+        const k = id || ph;
+        if (seen.has(k)) continue;                               // dedup same image
+        seen.add(k); res.push(ph);
+      }
+    };
+    add(localArr); add(cloudArr);
+    return res;
+  };
+  const out = { ...localDef };
+  // Before photos
+  const beforeDel = unionArr(localDef._deletedPhotoIds, cloudDef._deletedPhotoIds);
+  if (beforeDel.length) out._deletedPhotoIds = beforeDel;
+  const beforeMerged = mergePhotos(localDef.photos, cloudDef.photos, beforeDel);
+  out.photos = beforeMerged;
+  if (localDef.photoUrls !== undefined || cloudDef.photoUrls !== undefined) out.photoUrls = beforeMerged;
+  out._photosModified = Math.max(localDef._photosModified || 0, cloudDef._photosModified || 0) || localDef._photosModified;
+  // After photos, per re-inspection level
+  for (const lvl of ['reInspection', 'secondReInspection', 'thirdReInspection']) {
+    const Ll = localDef[lvl], Lc = cloudDef[lvl];
+    if (!Ll && !Lc) continue;
+    const L = { ...(Ll || {}) };
+    const C = Lc || {};
+    const afterDel = unionArr(L._deletedAfterPhotoIds, C._deletedAfterPhotoIds);
+    if (afterDel.length) L._deletedAfterPhotoIds = afterDel;
+    if ((L.afterPhotos && L.afterPhotos.length) || (C.afterPhotos && C.afterPhotos.length)) {
+      const afterMerged = mergePhotos(L.afterPhotos, C.afterPhotos, afterDel);
+      L.afterPhotos = afterMerged;
+      if (L.afterPhotoUrls !== undefined || C.afterPhotoUrls !== undefined) L.afterPhotoUrls = afterMerged;
+    }
+    out[lvl] = L;
+  }
+  return out;
+}
+window.reunionDefectPhotos = reunionDefectPhotos;
 
 // === FIX: Deduplicate photo URLs that are same image uploaded with different hashes ===
 // Root cause: JPEG compression is non-deterministic across devices/sessions
@@ -24425,7 +24496,14 @@ const renderFinding = async () => {
               // cloud-only defects another device added are appended verbatim (http URLs kept).
               const pushedIds = new Set(cloudDefects.map(d => d && d._syncId).filter(Boolean));
               const cloudOnly = (curData?.defects || []).filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
-              const mergedDefects = cloudOnly.length ? [...cloudDefects, ...cloudOnly] : cloudDefects;
+              // MULTI-USER FIX: for shared ids, re-union photos against the cloud copy so a
+              // photo another device added concurrently isn't dropped (pure -> retry-safe).
+              let _pushedReun = cloudDefects;
+              if (typeof reunionDefectPhotos === 'function' && curData && Array.isArray(curData.defects) && curData.defects.length) {
+                const _cm = new Map(curData.defects.filter(cd => cd && cd._syncId).map(cd => [cd._syncId, cd]));
+                _pushedReun = cloudDefects.map(pd => (pd && pd._syncId && _cm.has(pd._syncId)) ? reunionDefectPhotos(pd, _cm.get(pd._syncId)) : pd);
+              }
+              const mergedDefects = cloudOnly.length ? [..._pushedReun, ...cloudOnly] : _pushedReun;
               const mergedMeta = { ..._pushMeta };
               if (typeof mergeInspectionDates === 'function' && curData) {
                 try { mergedMeta.inspectionDates = mergeInspectionDates(p.meta, curData.meta || {}); } catch (e) {}
@@ -24455,7 +24533,13 @@ const renderFinding = async () => {
             catch (e) { _fbData = (cloudDoc && cloudDoc.exists) ? cloudDoc.data() : null; }
             const _fbPushedIds = new Set(cloudDefects.map(d => d && d._syncId).filter(Boolean));
             const _fbCloudOnly = (_fbData?.defects || []).filter(cd => cd && cd._syncId && !_fbPushedIds.has(cd._syncId));
-            const _fbDefects = _fbCloudOnly.length ? [...cloudDefects, ..._fbCloudOnly] : cloudDefects;
+            // MULTI-USER FIX: re-union shared-id photos against the re-read cloud copy too.
+            let _fbPushedReun = cloudDefects;
+            if (typeof reunionDefectPhotos === 'function' && _fbData && Array.isArray(_fbData.defects) && _fbData.defects.length) {
+              const _fbcm = new Map(_fbData.defects.filter(cd => cd && cd._syncId).map(cd => [cd._syncId, cd]));
+              _fbPushedReun = cloudDefects.map(pd => (pd && pd._syncId && _fbcm.has(pd._syncId)) ? reunionDefectPhotos(pd, _fbcm.get(pd._syncId)) : pd);
+            }
+            const _fbDefects = _fbCloudOnly.length ? [..._fbPushedReun, ..._fbCloudOnly] : _fbPushedReun;
             const _fbCount = _fbDefects.filter(d => !d._deleted && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection).length;
             await _docRef.set({
               projectId: p.id,
@@ -34800,7 +34884,14 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
           const pushedIds = new Set(pushed.map(d => d && d._syncId).filter(Boolean));
           const cloudDefs = Array.isArray(currentData.defects) ? currentData.defects : [];
           const cloudOnly = cloudDefs.filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
-          const mergedDefects = cloudOnly.length ? [...pushed, ...cloudOnly] : pushed;
+          // MULTI-USER FIX: re-union shared-id photos against the cloud copy so a photo
+          // another device added concurrently isn't dropped (pure -> retry-safe).
+          let _reun = pushed;
+          if (typeof reunionDefectPhotos === 'function' && cloudDefs.length) {
+            const _cm = new Map(cloudDefs.filter(cd => cd && cd._syncId).map(cd => [cd._syncId, cd]));
+            if (_cm.size) _reun = pushed.map(pd => (pd && pd._syncId && _cm.has(pd._syncId)) ? reunionDefectPhotos(pd, _cm.get(pd._syncId)) : pd);
+          }
+          const mergedDefects = cloudOnly.length ? [..._reun, ...cloudOnly] : _reun;
           // Union inspectionDates by level (no level lost).
           let mergedDates = finalBackupData.meta?.inspectionDates;
           if (typeof mergeInspectionDates === 'function') {
@@ -34835,7 +34926,14 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
           const pushedIds = new Set(pushed.map(d => d && d._syncId).filter(Boolean));
           const cloudDefs = Array.isArray(fbData.defects) ? fbData.defects : [];
           const cloudOnly = cloudDefs.filter(cd => cd && cd._syncId && !pushedIds.has(cd._syncId));
-          const mergedDefects = cloudOnly.length ? [...pushed, ...cloudOnly] : pushed;
+          // MULTI-USER FIX: re-union shared-id photos against the cloud copy so a photo
+          // another device added concurrently isn't dropped (pure -> retry-safe).
+          let _reun = pushed;
+          if (typeof reunionDefectPhotos === 'function' && cloudDefs.length) {
+            const _cm = new Map(cloudDefs.filter(cd => cd && cd._syncId).map(cd => [cd._syncId, cd]));
+            if (_cm.size) _reun = pushed.map(pd => (pd && pd._syncId && _cm.has(pd._syncId)) ? reunionDefectPhotos(pd, _cm.get(pd._syncId)) : pd);
+          }
+          const mergedDefects = cloudOnly.length ? [..._reun, ...cloudOnly] : _reun;
           let mergedDates = finalBackupData.meta?.inspectionDates;
           if (typeof mergeInspectionDates === 'function') {
             try { mergedDates = mergeInspectionDates(finalBackupData.meta || {}, fbData.meta || {}); } catch (e) {}
