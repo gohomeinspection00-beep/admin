@@ -13562,6 +13562,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Runs before orphan cleanup so the new idb: refs are recorded in projects first.
   setTimeout(() => {
     if (typeof migrateBase64ToIDB === 'function') migrateBase64ToIDB();
+    if (typeof migrateDeletedPhotoIdsToCid === 'function') migrateDeletedPhotoIdsToCid();
   }, 10000); // 10s after start
 
   // AUTO-CLEANUP: Remove orphaned IDB images (not referenced by any project)
@@ -13606,7 +13607,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 const idbPutImage = async dataUrl => {
   const db = await openDB();
-  const id = 'img_' + uid();
+  // CONTENT-KEY the image: identical bytes reuse one entry (idempotent) and the ref
+  // carries the content hash so getPhotoIdForTracking can dedup it against the cloud
+  // filename's hash across devices. GUARD #1: a 31-bit hash WILL collide at fleet scale,
+  // so read-before-put and compare the full bytes — only reuse the key when the stored
+  // bytes are identical; on a genuine collision (different image, same hash) fall back to
+  // a unique key so we never overwrite or alias a different photo. Crash-safe: we only
+  // ever write a new entry, never delete an existing one.
+  let id = null;
+  if (typeof hashPhotoForSync === 'function') {
+    const h = hashPhotoForSync(dataUrl);
+    if (h) {
+      const key = 'imgc_' + h;
+      const existing = await new Promise((res) => {
+        try {
+          const tx = db.transaction(IMG_STORE, 'readonly');
+          const req = tx.objectStore(IMG_STORE).get(key);
+          req.onsuccess = () => res(req.result ? req.result.data : null);
+          req.onerror = () => res(null);
+        } catch (e) { res(null); }
+      });
+      if (existing == null) {
+        id = key;                       // free slot -> take the canonical content key
+      } else if (existing === dataUrl) {
+        return 'idb:' + key;            // identical bytes already stored -> reuse, no write
+      } else {
+        id = key + '_' + uid();        // hash collision (distinct image) -> unique key
+      }
+    }
+  }
+  if (!id) id = 'img_' + uid();        // no hash available -> legacy random key
   await new Promise((res, rej) => {
     const tx = db.transaction(IMG_STORE, 'readwrite');
     tx.objectStore(IMG_STORE).put({ id, data: dataUrl });
@@ -13820,55 +13850,76 @@ let currentId = projects[0]?.id || null;
 const photoIdCache = new Map();
 const PHOTO_ID_CACHE_MAX = 500; // Limit cache size to prevent memory issues
 
+// CONTENT-IDENTITY (cross-device dedup): the cloud filename for a defect photo is
+// `{defectId}_{photoType}_{hash}.jpg` where {hash} === hashPhotoForSync(content). The
+// SAME image stored as data:/idb: on another device hashes to the SAME value, so we
+// canonicalize every form to one id `cid_<hash>`. That kills cross-device photo doubles
+// (same image arriving as a cloud URL on one device and an idb ref on another no longer
+// counts as two photos). Comparisons are always within ONE defect+level scope
+// (_deletedPhotoIds is per-defect, _deletedAfterPhotoIds per-level), where the dropped
+// `{defectId}_{photoType}_` prefix is constant, so reducing to the bare content hash is
+// collision-safe in every place this id is actually compared. Legacy/meta filenames that
+// don't match the defect-photo shape, and legacy random-keyed idb refs, keep their old
+// raw id (unchanged behaviour) so nothing pre-existing breaks.
+const _PHOTO_TYPE_SEG = new Set(['photo', 'after', 'after2', 'after3']);
+const _extractDefectPhotoHash = (fname) => {
+  if (!fname || typeof fname !== 'string') return null;
+  const base = fname.replace(/\.[a-z0-9]+$/i, ''); // strip extension
+  const parts = base.split('_');
+  if (parts.length < 3) return null;               // need {defectId}_{type}_{hash}
+  const type = parts[parts.length - 2];
+  if (!_PHOTO_TYPE_SEG.has(type)) return null;      // not a defect-photo filename (meta/legacy)
+  const h = parts[parts.length - 1];
+  if (!h || !/^[0-9a-z]+$/.test(h)) return null;    // hash is base36
+  return h;
+};
+
 window.getPhotoIdForTracking = (photo) => {
   if (!photo) return null;
   if (typeof photo !== 'string') return null;
-  
-  // HTTP URLs - extract filename (already short, no need to cache)
+
+  // HTTP(S) cloud URLs - canonicalize defect photos to cid_<hash>; keep legacy/meta
+  // filenames (front.jpg, plan_N.jpg, anything without the _{type}_{hash} tail) as-is.
   if (photo.startsWith('http')) {
     const parts = photo.split('/');
-    return parts[parts.length - 1].split('?')[0];
+    const fname = parts[parts.length - 1].split('?')[0];
+    const h = _extractDefectPhotoHash(fname);
+    return h ? ('cid_' + h) : fname;
   }
-  
-  // IDB refs - already short, no need to cache
+
+  // Content-keyed IDB refs (idb:imgc_<hash>) -> same canonical cid. Legacy random-keyed
+  // refs (idb:img_<random>) and photo_ refs cannot derive a content hash synchronously,
+  // so keep them raw (unchanged); they re-key to imgc_ form on next save (backfill).
   if (photo.startsWith('idb:') || photo.startsWith('photo_')) {
+    const m = photo.match(/^idb:imgc_([0-9a-z]+)$/);
+    if (m) return 'cid_' + m[1];
     return photo;
   }
-  
+
   // For data URLs, check cache first (these are expensive to hash)
   if (photo.startsWith('data:')) {
     // Use length + first 50 chars as cache key (faster than full string)
     const cacheKey = photo.length + '_' + photo.substring(20, 70);
-    
+
     if (photoIdCache.has(cacheKey)) {
       return photoIdCache.get(cacheKey);
     }
-    
-    // Calculate hash from multiple parts of the string
-    const len = photo.length;
-    const sample1 = photo.substring(23, 123);
-    const sample2 = photo.substring(Math.floor(len/2), Math.floor(len/2) + 100);
-    const sample3 = photo.substring(len - 100);
-    const combined = sample1 + sample2 + sample3 + len;
-    
-    let hash = 0;
-    for (let i = 0; i < combined.length; i++) {
-      const char = combined.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    const result = 'ph_' + (hash >>> 0).toString(16);
-    
+
+    // Use the SAME hash as the cloud filename so a data: photo and its later uploaded
+    // http URL share one id. Guard typeof for any early-load (pre-init) call.
+    const h = (typeof hashPhotoForSync === 'function') ? hashPhotoForSync(photo) : null;
+    const result = h ? ('cid_' + h) : ('ph_' + photo.length.toString(16));
+
     // Store in cache (with size limit)
     if (photoIdCache.size >= PHOTO_ID_CACHE_MAX) {
       // Clear oldest entries (simple approach: clear all)
       photoIdCache.clear();
     }
     photoIdCache.set(cacheKey, result);
-    
+
     return result;
   }
-  
+
   // Fallback - generate hash from string
   let hash = 0;
   const str = photo.substring(0, 500);
@@ -13879,6 +13930,41 @@ window.getPhotoIdForTracking = (photo) => {
   return 'ph_' + (hash >>> 0).toString(16);
 };
 const getPhotoIdForTracking = window.getPhotoIdForTracking;
+
+// One-time migration: rewrite persisted deletion-ledger entries that were recorded in
+// the OLD whole-filename form ({defectId}_{photoType}_{hash}.jpg) into the new cid form,
+// so a photo deleted before this update stays suppressed (its http ref now resolves to
+// cid_<hash>). Idempotent and crash-safe (only rewrites strings, never touches photo
+// refs or deletes data); `ph_`/idb/legacy entries are left untouched.
+const migrateDeletedPhotoIdsToCid = () => {
+  try {
+    if (localStorage.getItem('goinspect.cidLedgerMigrated') === '1') return;
+    const conv = (arr) => {
+      if (!Array.isArray(arr)) return false;
+      let changed = false;
+      for (let i = 0; i < arr.length; i++) {
+        const id = arr[i];
+        if (typeof id !== 'string' || id.startsWith('cid_')) continue;
+        if (/\.(jpe?g|png|webp)$/i.test(id)) {
+          const h = _extractDefectPhotoHash(id);
+          if (h) { arr[i] = 'cid_' + h; changed = true; }
+        }
+      }
+      return changed;
+    };
+    let any = false;
+    for (const p of (projects || [])) {
+      for (const d of (p.defects || [])) {
+        if (conv(d._deletedPhotoIds)) any = true;
+        for (const lvl of ['reInspection', 'secondReInspection', 'thirdReInspection']) {
+          if (d[lvl] && conv(d[lvl]._deletedAfterPhotoIds)) any = true;
+        }
+      }
+    }
+    if (any && typeof saveAllSafe === 'function') saveAllSafe();
+    localStorage.setItem('goinspect.cidLedgerMigrated', '1');
+  } catch (e) { console.warn('migrateDeletedPhotoIdsToCid error:', e); }
+};
 
 // === FIX: Deduplicate photo URLs that are same image uploaded with different hashes ===
 // Root cause: JPEG compression is non-deterministic across devices/sessions
@@ -38233,9 +38319,13 @@ function mp_getDefectPhotos(d) {
     if (!p) return false;
     // If it's a string URL or data URI, check if its ID is deleted
     if (typeof p === 'string') {
-      // photoUrls are usually full URLs, photos can be IDB refs like 'idb_xxx'
-      // _deletedPhotoIds stores the ref/url, so check directly
+      // photoUrls are usually full URLs, photos can be IDB refs like 'idb_xxx'.
+      // _deletedPhotoIds now stores canonical content ids (cid_<hash>); compare via
+      // getPhotoIdForTracking so deleted photos stay hidden here too. Keep the raw
+      // string check as a belt-and-suspenders for any un-migrated legacy entry.
       if (deletedIds.has(p)) return false;
+      const pid = (typeof getPhotoIdForTracking === 'function') ? getPhotoIdForTracking(p) : null;
+      if (pid && deletedIds.has(pid)) return false;
       return true;
     }
     return true;
