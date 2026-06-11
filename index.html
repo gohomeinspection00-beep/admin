@@ -26007,8 +26007,17 @@ q('#btnAddDefect').onclick = async () => {
     // FIX: Handle semua jenis photo refs - IDB, data URL, dan cloud URLs
     const photoRefs = [];
     let photoSaveFailures = 0;
-    for (const src of (draft.photos || [])) {
+    const _draftOrig = draft._origRefs || [];
+    for (let i = 0; i < (draft.photos || []).length; i++) {
+      const src = draft.photos[i];
       if (!src) continue;
+      // Bug fix (edit-resave double): an UNCHANGED already-stored photo was resolved to a data:
+      // URL at openDefect; re-encoding it here would produce a NEW idb ref / cloud filename, so the
+      // merge keeps BOTH the original cloud copy and this re-encoded copy = double (worse with
+      // multiple users editing the same project). Keep the ORIGINAL stored ref (http/idb) instead —
+      // _origRefs[i] is set only for unchanged photos (null for new/annotated, which still re-encode).
+      const _orig = _draftOrig[i];
+      if (_orig && typeof _orig === 'string') { photoRefs.push(_orig); continue; }
       try {
         if (src.startsWith('idb:')) {
           // Already an IDB ref - keep as is
