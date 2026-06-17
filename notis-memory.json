@@ -1,0 +1,374 @@
+{
+  "_meta": {
+    "description": "Memory file for Notis 1 (First Notice) and Notis 2 (Final Notice) defect rectification claim generators for GoXpert Pocket app. This file contains all finalized formats, wording templates, data schemas, PDF layout rules, and legal references.",
+    "version": "1.0",
+    "lastUpdated": "2026-06-17",
+    "files": {
+      "notis1Generator": "generate-notis1-dummy.js",
+      "notis2Generator": "generate-notis2-dummy.js",
+      "notis1PDF": "NOTIS_1_DUMMY_IMPROVED.pdf",
+      "notis2PDF": "NOTIS_2_DUMMY_IMPROVED.pdf"
+    }
+  },
+
+  "formatSuratRasmi": {
+    "description": "Format surat rasmi Malaysia yang digunakan untuk kedua-dua notis",
+    "layout": {
+      "pageSize": "A4 (210mm x 297mm)",
+      "orientation": "portrait",
+      "margins": { "left": "25mm", "right": "25mm", "top": "25mm", "bottom": "22mm" },
+      "contentWidth": "160mm (210 - 25 - 25)",
+      "font": "Helvetica (jsPDF built-in)",
+      "colors": "All black (0,0,0) — NO colors anywhere for professionalism",
+      "bahasa": "Dwibahasa BM + BI (istilah penting dalam kurungan)"
+    },
+    "fontSizes": {
+      "BODY": 12,
+      "TITLE": 12,
+      "SMALL": 10,
+      "TABLE": 10,
+      "FOOTNOTE": 9,
+      "CAPTION": 9,
+      "FOOTER": 8
+    },
+    "lineHeights": {
+      "LH": "6mm (body text)",
+      "LH_S": "5mm (smaller spacing — addresses, s.k.)"
+    },
+    "headerStructure": [
+      "1. NAMA PENGIRIM — bold, top-left",
+      "2. Alamat pengirim — normal (multiple lines)",
+      "3. E-mel & Telefon pengirim — normal",
+      "4. GARIS PEMISAH — horizontal line (0.5mm weight, full width)",
+      "5. 'Kepada:' — bold (Notis 2 ada, Notis 1 tiada — perlu standardize)",
+      "6. NAMA PENERIMA — bold",
+      "7. Alamat penerima — normal, TIADA underline pada baris terakhir (cth: 'Johor.' tiada garis)",
+      "8. TARIKH — right-aligned, sejajar baris terakhir penerima",
+      "9. Rujukan — 10pt, format 'Ruj. Kami: NOTIS-X/YYYY/NNN'"
+    ],
+    "bodyStructure": [
+      "1. Panggilan hormat: 'Tuan,' (dengan koma)",
+      "2. PERKARA — bold + underlined, setiap baris",
+      "3. Perenggan pertama — TIADA nombor",
+      "4. Perenggan seterusnya — bernombor bermula '2.'",
+      "5. Bullet points — indent 14mm, teks indent 19mm",
+      "6. Sub-tajuk (cth: Peringatan Undang-undang) — bold + underlined"
+    ],
+    "signatureBlock": [
+      "'Yang benar,' (dengan koma)",
+      "Gap 20mm untuk tandatangan",
+      "Garis tandatangan (60mm)",
+      "Nama dalam kurungan — BOLD, UPPERCASE: '(NAMA PENUH)'",
+      "No. K/P — 10pt",
+      "E-mel — 10pt",
+      "Telefon — 10pt"
+    ],
+    "salinanKepada": {
+      "format": "Garis pemisah → 's.k.:' bold → bullet list of recipients",
+      "fontSize": 10
+    },
+    "footer": {
+      "format": "Garis (0.2mm) → Left: 'Ruj: NOTIS-X/YYYY/NNN' → Right: 'Muka X daripada Y'",
+      "fontSize": 8,
+      "position": "pageH - 13mm (below line at pageH - 18mm)",
+      "implementation": "Write ALL footers in final pass after total page count known"
+    },
+    "tableRules": {
+      "style": "Proper bordered cells using doc.rect() — NO colored fills, NO alternating rows",
+      "headerRow": "Bold text",
+      "cellPadding": "2.5mm",
+      "rowLineHeight": "5mm per text line",
+      "lineWidth": "0.3mm borders",
+      "dynamicHeight": "Calculate row height based on text wrapping before drawing",
+      "footnoteGap": "5mm gap (y += 5) between table bottom and footnote text to prevent clashing"
+    },
+    "attachmentPages": {
+      "titleFormat": "Centered + underlined (bold), with BI subtitle below (normal, 10pt)",
+      "examples": ["KRONOLOGI TINDAKAN", "AKUAN TERIMA OLEH PEMAJU", "LAMPIRAN A", "LAMPIRAN B"]
+    }
+  },
+
+  "notis1": {
+    "title": "Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim)",
+    "totalPages": 7,
+    "pageBreakdown": [
+      "Pages 1-3: Surat utama (main letter)",
+      "Page 4: Kronologi Tindakan (Chronology of Actions)",
+      "Page 5: Akuan Terima — Salinan Pemaju (Developer's Copy)",
+      "Page 6: Akuan Terima — Salinan Pemilik (Owner's Copy)",
+      "Page 7: Lampiran A — Gambar Bukti Kecacatan (placeholder photos)"
+    ],
+    "rujukanFormat": "NOTIS-1/YYYY/NNN",
+    "perkara": [
+      "Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim)",
+      "Hartanah di {alamatHartanah}"
+    ],
+    "ayatTemplate": {
+      "perenggan1_tiadaNombor": "Merujuk kepada Perjanjian Jual Beli (Sales and Purchase Agreement) bertarikh {tarikhSPA} dengan nombor rujukan {noRujukanSPA} ({jenisSPA}), Laporan Pemeriksaan Kecacatan (Defect Inspection Report) bernombor rujukan {noRujukanLaporan} telah dikemukakan secara rasmi kepada pihak tuan melalui penghantaran secara {kaedahSerahanLaporan} pada {tarikhSerahanLaporan}. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan selaras dengan tanggungjawab pemaju di bawah Klausa {klausaSPA} Perjanjian Jual Beli ({jenisSPA}). Unit ini masih berada dalam Tempoh Liabiliti Kecacatan (Defect Liability Period — DLP) selama {tempohDLP} bulan dari tarikh Penyerahan Milik Kosong (Vacant Possession) pada {tarikhVP}.",
+      "perenggan2": "Susulan laporan yang telah dikemukakan sebelum ini, hasil daripada pemerhatian kali kedua (Second Inspection) pada {tarikhPemeriksaanKedua} mendapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya atau tidak dilakukan langsung seperti berikut:",
+      "jadualKecacatan_tajuk": "Senarai Kecacatan yang Masih Belum Diselesaikan:",
+      "jadualKecacatan_footnote": "*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan (Ruj: {noRujukanLaporan})",
+      "perenggan3": "Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh {tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada {tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan {tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa {klausaSPA} Perjanjian Jual Beli ({jenisSPA}).",
+      "perenggan4_intro": "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:",
+      "perenggan4_bullets": [
+        "Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;",
+        "Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan dan pihak berkepentingan (stakeholders); dan",
+        "Menghantar surat rasmi kepada peguam pemaju (stakeholder) untuk memohon agar kos pembaikan ditolak/ditahan daripada Wang Tahanan 5% (Retention Sum 5%) yang sedang dipegang, sebagaimana diperuntukkan di bawah Klausa 27(3) Perjanjian Jual Beli ({jenisSPA})."
+      ],
+      "perenggan5": "Merujuk kepada Klausa Penyampaian Dokumen {klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui {kaedahPenghantaranNotis}. Selain itu, saya juga telah menghantar Laporan Kecacatan bagi pemeriksaan kali kedua pada {tarikhHantarLaporanKedua} kepada pihak pemaju.",
+      "peringatanUndangUndang_tajuk": "Peringatan Tindakan Undang-undang (Legal Action Notice)",
+      "perenggan6": "Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.",
+      "penutup": "Saya berharap pihak tuan mengambil tindakan segera terhadap Notis Pertama ini. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.",
+      "sekian": "Sekian."
+    },
+    "kronologi_notis1": [
+      "{tarikhSPA} — Perjanjian Jual Beli (SPA) ditandatangani",
+      "{tarikhVP} — Penyerahan Milik Kosong (Vacant Possession)",
+      "{tarikhSerahanLaporan} — Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju ({kaedahSerahanLaporan})",
+      "30 hari selepas serahan — Tamat tempoh 30 hari pembaikan oleh pemaju",
+      "{tarikhPemeriksaanKedua} — Pemeriksaan kali kedua (Second Inspection) dijalankan",
+      "{tarikhHantarLaporanKedua} — Laporan pemeriksaan kali kedua dihantar kepada pemaju",
+      "{tarikhNotis} — Notis Pertama dikeluarkan",
+      "{tarikhDeadline} — Tarikh akhir pembaikan ({tempohNotis1} hari dari Notis Pertama)"
+    ],
+    "akuanTerima": {
+      "tajuk": "AKUAN TERIMA OLEH PEMAJU",
+      "tajukBI": "(Developer's Acknowledgement of Receipt)",
+      "copies": ["Salinan Pemaju (Developer's Copy)", "Salinan Pemilik (Owner's Copy)"],
+      "ayat": "Dengan ini diakui bahawa {namaPemaju} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh {tarikhNotis} dengan rujukan {noRujukan} daripada {namaPembeli} berhubung hartanah di {alamatHartanah}.",
+      "fields": ["Nama", "Jawatan", "Tarikh"],
+      "copSyarikat": "Rectangle 60mm x 35mm"
+    }
+  },
+
+  "notis2": {
+    "title": "Notis Kedua / Notis Akhir — Tuntutan Pembetulan Kecacatan (Final Notice — Defect Rectification Claim)",
+    "totalPages": 8,
+    "pageBreakdown": [
+      "Pages 1-3: Surat utama (main letter)",
+      "Page 4: Kronologi Tindakan (11 events — more than Notis 1)",
+      "Page 5: Akuan Terima — Salinan Pemaju (Developer's Copy)",
+      "Page 6: Akuan Terima — Salinan Pemilik (Owner's Copy)",
+      "Page 7: Lampiran A — Gambar Bukti Kecacatan (placeholder photos)",
+      "Page 8: Lampiran B — Sebut Harga Kontraktor (placeholder)"
+    ],
+    "rujukanFormat": "NOTIS-2/YYYY/NNN",
+    "extraRujukan": "Ruj. Notis Pertama: {noRujukanNotis1}",
+    "perkara": [
+      "Notis Kedua / Notis Akhir — Tuntutan Pembetulan Kecacatan",
+      "(Final Notice — Defect Rectification Claim)",
+      "Hartanah di {alamatHartanah}"
+    ],
+    "bezaDenganNotis1": [
+      "Ada dua nombor rujukan (Notis 2 + rujukan balik ke Notis 1)",
+      "Perenggan 1 merujuk kepada Notis Pertama (bukan SPA)",
+      "Sebut pemeriksaan kali ketiga (Third Inspection) bukan kedua",
+      "Ada perenggan sebutharga kontraktor + jumlah (RM)",
+      "Ada perenggan DLP dengan tarikh tamat",
+      "Amaran undang-undang lebih tegas — 4 bullet points tindakan",
+      "Ayat penutup: 'Notis Kedua' bukan 'Notis Pertama'",
+      "Kronologi lebih panjang (11 events vs 8)",
+      "Ada Lampiran B — Sebut Harga Kontraktor",
+      "CC tambah TTPR",
+      "Ada 'Kepada:' bold sebelum nama penerima"
+    ],
+    "ayatTemplate": {
+      "perenggan1_tiadaNombor": "Merujuk kepada Notis Pertama (First Notice) bertarikh {tarikhNotis1} dengan nombor rujukan {noRujukanNotis1} yang telah dihantar melalui {kaedahPenghantaranNotis1}, pihak tuan telah diberikan tempoh {tempohNotis1} hari sehingga {tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa {klausaSPA} Perjanjian Jual Beli ({jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].",
+      "perenggan2": "Namun, hasil daripada pemeriksaan kali ketiga (Third Inspection) pada {tarikhPemeriksaanKetiga}, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya atau tidak dilakukan langsung. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan.",
+      "jadualKecacatan_tajuk": "Senarai Kecacatan yang Masih Belum Diselesaikan:",
+      "jadualKecacatan_tajukBI": "(List of Outstanding Defects)",
+      "jadualKecacatan_footnote": "*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan (Ruj: {noRujukanLaporan})",
+      "perenggan3": "Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh {tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada {tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa {klausaSPA} Perjanjian Jual Beli ({jenisSPA}).",
+      "perenggan4_sebutharga": "Di sini juga disertakan sebut harga rasmi (Official Repair Quotation) daripada kontraktor bertauliah, {namaKontraktor}, mengenai jumlah anggaran kos pembaikan kecacatan di unit rumah saya yang berjumlah {jumlahSebutharga}. Sebut harga ini dilampirkan sebagai Lampiran B bersama-sama notis ini.",
+      "perenggan5_serahan": "Merujuk kepada Klausa Penyampaian Dokumen {klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui {kaedahPenghantaranNotis2}.",
+      "perenggan6_DLP": "Adalah dimaklumkan bahawa Tempoh Liabiliti Kecacatan (Defect Liability Period — DLP) selama {tempohDLP} bulan bagi unit ini bermula dari tarikh Penyerahan Milik Kosong (Vacant Possession) pada {tarikhVP} dan akan tamat pada {tarikhDLPTamat}. Oleh itu, pihak tuan hendaklah menyelesaikan semua pembaikan sebelum tempoh DLP tamat bagi mengelakkan tindakan lanjut.",
+      "peringatanUndangUndang_tajuk": "Peringatan Tindakan Undang-undang (Legal Action Notice)",
+      "perenggan7_intro": "Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Kedua (Final Notice) ini tamat tempohnya pada {tarikhDeadlineNotis2}, saya akan tanpa berlengah lagi mengambil tindakan berikut:",
+      "perenggan7_bullets": [
+        "Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan atau pampasan berjumlah {jumlahSebutharga} atau lebih;",
+        "Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan 5% (Retention Sum 5%) yang sedang dipegang sebagaimana diperuntukkan di bawah Klausa 27(3) Perjanjian Jual Beli ({jenisSPA});",
+        "Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempatan (KPKT) serta pihak berkuasa berkaitan; dan/atau",
+        "Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118)."
+      ],
+      "penutup": "Saya berharap pihak tuan mengambil tindakan segera dan muktamad terhadap Notis Kedua ini. Ini merupakan notis akhir sebelum tindakan undang-undang dimulakan. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.",
+      "sekian": "Sekian."
+    },
+    "kronologi_notis2": [
+      "{tarikhSPA} — Perjanjian Jual Beli (SPA) ditandatangani",
+      "{tarikhVP} — Penyerahan Milik Kosong (Vacant Possession)",
+      "{tarikhSerahanLaporan} — Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju ({kaedahSerahanLaporan})",
+      "30 hari selepas serahan — Tamat tempoh 30 hari pembaikan oleh pemaju",
+      "{tarikhPemeriksaanKedua} — Pemeriksaan kali kedua (Second Inspection) dijalankan",
+      "{tarikhHantarLaporanKedua} — Laporan pemeriksaan kali kedua dihantar kepada pemaju",
+      "{tarikhNotis1} — Notis Pertama (First Notice) dikeluarkan",
+      "{tarikhDeadlineNotis1} — Tarikh akhir pembaikan Notis Pertama ({tempohNotis1} hari)",
+      "{tarikhPemeriksaanKetiga} — Pemeriksaan kali ketiga (Third Inspection) dijalankan",
+      "{tarikhNotis2} — Notis Kedua / Notis Akhir (Final Notice) dikeluarkan",
+      "{tarikhDeadlineNotis2} — Tarikh akhir pembaikan Notis Kedua ({tempohNotis2} hari) — TARIKH MUKTAMAD"
+    ],
+    "lampiranB": {
+      "tajuk": "LAMPIRAN B",
+      "subtitle": "Sebut Harga Rasmi Pembaikan Kecacatan (Official Repair Quotation)",
+      "fields": ["Kontraktor: {namaKontraktor}", "Jumlah Anggaran: {jumlahSebutharga}"],
+      "placeholder": "Rectangle full-width x 150mm for quotation document"
+    }
+  },
+
+  "dataSchema": {
+    "description": "All dynamic data fields needed to generate Notis 1 and/or Notis 2",
+    "pembeli": {
+      "namaPembeli": "string — full name UPPERCASE",
+      "alamatPengirim": "string[] — each line of address",
+      "emailPembeli": "string",
+      "telefonPembeli": "string — format: 0XX-XXXXXXX",
+      "noKP": "string — full IC number, NO censoring (e.g., 991005015843)"
+    },
+    "pemaju": {
+      "namaPemaju": "string — company name UPPERCASE",
+      "alamatPenerima": "string[] — each line of address",
+      "emailPemaju": "string"
+    },
+    "hartanah": {
+      "alamatHartanah": "string — full address on one line"
+    },
+    "spa": {
+      "noRujukanSPA": "string — e.g., SPA/SCUDAI/2024/1039",
+      "tarikhSPA": "string — e.g., 15 Mac 2024",
+      "jenisSPA": "string — 'Jadual G' (landed) or 'Jadual H' (strata/apartment)",
+      "klausaSPA": "string — '27(1)' for Jadual G, '30(1)' for Jadual H",
+      "klausaSerahan": "string — '29(1)' for Jadual G, '32' for Jadual H"
+    },
+    "dlp": {
+      "tarikhVP": "string — Vacant Possession date",
+      "tempohDLP": "string — '24' (months)",
+      "tarikhDLPTamat": "string — VP date + 24 months (Notis 2 only, but good to track)"
+    },
+    "laporan": {
+      "noRujukanLaporan": "string — e.g., RPK/IMRAN/2026/001",
+      "tarikhSerahanLaporan": "string — date first report submitted",
+      "kaedahSerahanLaporan": "string — 'serahan tangan' / 'pos berdaftar' / 'e-mel' / combo",
+      "tarikhPemeriksaanKedua": "string — second inspection date",
+      "tarikhHantarLaporanKedua": "string — date second report sent"
+    },
+    "notis1Fields": {
+      "noRujukan": "string — NOTIS-1/YYYY/NNN",
+      "tarikhNotis": "string — date Notis 1 issued",
+      "tarikhDeadline": "string — Notis 1 deadline",
+      "tempohNotis1": "string — '15' (days)",
+      "tempohNotis2": "string — '15' (days, mentioned as preview)",
+      "kaedahPenghantaranNotis": "string — delivery method"
+    },
+    "notis2Fields": {
+      "noRujukanNotis2": "string — NOTIS-2/YYYY/NNN",
+      "noRujukanNotis1": "string — reference back to Notis 1",
+      "tarikhNotis1": "string — for reference",
+      "tarikhDeadlineNotis1": "string — for reference",
+      "kaedahPenghantaranNotis1": "string — Notis 1 delivery method",
+      "tarikhPemeriksaanKetiga": "string — third inspection date",
+      "tarikhNotis2": "string — date Notis 2 issued",
+      "tarikhDeadlineNotis2": "string — Notis 2 final deadline",
+      "tempohNotis2": "string — '15' (days)",
+      "kaedahPenghantaranNotis2": "string — delivery method",
+      "jumlahSebutharga": "string — e.g., RM 18,500.00",
+      "namaKontraktor": "string — registered contractor name"
+    },
+    "kecacatan": {
+      "type": "array of objects",
+      "fields": {
+        "tag": "string — tagging number from inspection report",
+        "lokasi": "string — location in house",
+        "kecacatan": "string — defect description",
+        "status": "string — 'Tiada Tindakan' / 'Pembaikan Tidak Sempurna' / 'Selesai'"
+      },
+      "tableColumns": ["No. (tag)", "Lokasi", "Kecacatan (Defect)", "Status"],
+      "tableColumnWidths": [15, 35, 55, "remaining (cW - 105)"]
+    },
+    "kronologi": {
+      "type": "array of objects",
+      "fields": {
+        "tarikh": "string — date",
+        "peristiwa": "string — event description (BM with BI in brackets)"
+      },
+      "tableColumns": ["Tarikh (Date)", "Peristiwa (Event)"],
+      "tableColumnWidths": [40, "remaining (cW - 40)"]
+    },
+    "salinanKepada": {
+      "type": "string[]",
+      "notis1Default": [
+        "Peguam Pemaju — {nama firma}, {lokasi}",
+        "Jabatan Perumahan Negara (KPKT)"
+      ],
+      "notis2Default": [
+        "Peguam Pemaju — {nama firma}, {lokasi}",
+        "Jabatan Perumahan Negara (KPKT)",
+        "Tribunal Tuntutan Pembeli Rumah (TTPR)"
+      ]
+    }
+  },
+
+  "undangUndang": {
+    "description": "Legal references used in both notices",
+    "aktaUtama": "Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]",
+    "seksyen": "Seksyen 12(2) Akta 118",
+    "tribunal": "Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002",
+    "jadualG": {
+      "description": "Untuk rumah bertanah (landed property)",
+      "klausaPembaikan": "Klausa 27(1)",
+      "klausaWangTahanan": "Klausa 27(3) — Wang Tahanan 5% (Retention Sum 5%)",
+      "klausaSerahan": "Klausa 29(1) (Service of Documents)"
+    },
+    "jadualH": {
+      "description": "Untuk pangsapuri/strata (apartment/strata)",
+      "klausaPembaikan": "Klausa 30(1)",
+      "klausaWangTahanan": "Klausa 30(3)",
+      "klausaSerahan": "Klausa 32 (Service of Documents)"
+    },
+    "DLP": {
+      "tempoh": "24 bulan dari tarikh VP",
+      "description": "Tempoh Liabiliti Kecacatan (Defect Liability Period)"
+    },
+    "TTPR": {
+      "fullName": "Tribunal Tuntutan Pembeli Rumah (Homebuyer Claims Tribunal)",
+      "peraturan": "Peraturan-peraturan Pemajuan Perumahan (Tuntutan Tribunal) 2002"
+    },
+    "statusKecacatan": {
+      "allowed": ["Tiada Tindakan", "Pembaikan Tidak Sempurna", "Selesai"],
+      "note": "BUKAN 'Tidak ditindakan' — yang betul ialah 'Tiada Tindakan'"
+    },
+    "kaedahSerahan": {
+      "sah": ["serahan tangan", "pos berdaftar", "e-mel"],
+      "bolehGabung": true,
+      "contoh": "serahan tangan dan e-mel"
+    }
+  },
+
+  "pdfTechnical": {
+    "library": "jsPDF v2.5.1",
+    "cdnForApp": "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+    "npmForScript": "jspdf (package.json)",
+    "helperFunctions": {
+      "bk()": "Reset text and draw color to black (0,0,0)",
+      "newPage()": "Add page, increment pageNum, reset y to 25",
+      "checkBreak(n)": "If y + n exceeds pageH - 22, trigger newPage()",
+      "para(text, opts)": "Write paragraph with optional indent, style, size",
+      "numPara(num, text)": "Write numbered paragraph (indent 10mm for text)",
+      "bullet(text)": "Write bullet point (• at 14mm indent, text at 19mm)",
+      "drawTable(headers, rows, colWidths)": "Draw bordered table with proper cells",
+      "drawAkuanTerima(copyLabel)": "Draw full Akuan Terima page with fields"
+    },
+    "knownLimitations": {
+      "inlineBold": "jsPDF cannot mix bold and normal within a single text() call. writeMixed() function exists but is complex. Current approach: write full paragraphs in normal, use bold for headers/names only.",
+      "footerTotalPages": "Must write ALL footers in a final pass after all pages created, to get correct total page count."
+    }
+  },
+
+  "pendingTasks": [
+    "Integration of Notis 1 generator into index.html app UI",
+    "Integration of Notis 2 generator into index.html app UI",
+    "User input form for all data fields",
+    "Auto-calculation of dates (deadline = notis date + tempoh days)",
+    "Auto-detect Jadual G vs H klausa based on jenisSPA selection",
+    "Photo attachment support (replace placeholders with actual images)",
+    "Quotation PDF attachment for Lampiran B"
+  ]
+}
