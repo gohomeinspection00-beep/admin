@@ -52,11 +52,21 @@ Tarikh VP          :
 --------------------------------------------
 E. MAKLUMAT LAPORAN & PEMERIKSAAN
 --------------------------------------------
-No. Rujukan Laporan       :
-Tarikh Serahan Laporan    :
-Kaedah Serahan Laporan    : [serahan tangan / pos berdaftar / e-mel / gabungan]
-Tarikh Pemeriksaan Kedua  :
-Tarikh Hantar Laporan Ke-2:
+No. Rujukan Laporan             :
+Tarikh Serahan Laporan          :
+Kaedah Serahan Laporan          : [serahan tangan / pos berdaftar / e-mel / gabungan]
+Tarikh Pemeriksaan Kedua        :
+Tarikh Hantar Laporan Ke-2      :
+Kaedah Serahan Laporan Ke-2     : [serahan tangan / pos berdaftar / e-mel / gabungan]
+
+--------------------------------------------
+E2. SEJARAH SERAHAN REPORT SEBELUM INI
+--------------------------------------------
+(Isi semua serahan report yang pernah dibuat sebelum notis ini)
+
+1. Tarikh:          Jenis Report:          Kaedah Serahan:
+2. Tarikh:          Jenis Report:          Kaedah Serahan:
+3. Tarikh:          Jenis Report:          Kaedah Serahan:
 
 --------------------------------------------
 F. MAKLUMAT NOTIS 1
@@ -89,14 +99,29 @@ H. SENARAI KECACATAN
 5. Tag:          Lokasi:          Kecacatan:          Status:
 
 --------------------------------------------
-I. SALINAN KEPADA (CC)
+I. KRONOLOGI TINDAKAN
+--------------------------------------------
+(Senarai tarikh & peristiwa penting mengikut turutan. Salin & tambah jika perlu)
+(Saya akan bantu isi dari data di atas, tapi boleh tambah/ubah di sini)
+
+1. Tarikh:          Peristiwa:
+2. Tarikh:          Peristiwa:
+3. Tarikh:          Peristiwa:
+4. Tarikh:          Peristiwa:
+5. Tarikh:          Peristiwa:
+6. Tarikh:          Peristiwa:
+7. Tarikh:          Peristiwa:
+8. Tarikh:          Peristiwa:
+
+--------------------------------------------
+J. SALINAN KEPADA (CC)
 --------------------------------------------
 1.
 2.
 3.
 
 --------------------------------------------
-J. NOTA TAMBAHAN (jika ada)
+K. NOTA TAMBAHAN (jika ada)
 --------------------------------------------
 
 
