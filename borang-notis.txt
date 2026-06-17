@@ -3,6 +3,14 @@ BORANG MAKLUMAT NOTIS KECACATAN
 ============================================
 
 JENIS NOTIS: [Notis 1 / Notis 2 / Kedua-dua]
+Tujuan Notis (jika ada):
+
+--------------------------------------------
+DOKUMEN YANG DIHANTAR BERSAMA NOTIS
+--------------------------------------------
+Dihantar bersama Laporan Re-Inspection? : [Ya / Tidak]
+Dokumen lain yang disertakan             :
+(cth: laporan pemeriksaan, sebut harga, gambar bukti, salinan S&P, dll)
 
 --------------------------------------------
 A. MAKLUMAT PEMBELI (PENGIRIM)
