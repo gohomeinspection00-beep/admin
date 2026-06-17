@@ -2,51 +2,42 @@ const { jsPDF } = require("jspdf");
 const fs = require("fs");
 
 // ============================================================
-// DUMMY DATA — nanti user hanya perlu tukar bahagian ini
+// DUMMY DATA
 // ============================================================
 const data = {
-  // Rujukan surat
   noRujukan: "NOTIS-1/2026/039",
 
-  // Maklumat Pembeli
   namaPembeli: "MUHAMMAD IMRAN BIN MOHAMAD NAZARUDIN",
   alamatPembeli: "No.39, Jalan Seluang, Tg Puteri Resort,\n81700, Pasir Gudang, Johor Darul Takzim.",
   emailPembeli: "imranalan20@gmail.com",
   telefonPembeli: "013-6749124",
   noKP: "991005-XX-XXXX",
 
-  // Maklumat Pemaju
   namaPemaju: "SCUDAI DEVELOPMENT SDN. BHD.",
   alamatPemaju: "Jalan Seluang 35, Tg Puteri Resort,\n81700 Pasir Gudang, Johor.",
   emailPemaju: "scudai@scudai.com.my",
 
-  // Maklumat Hartanah
   alamatHartanah: "No.39, Jalan Seluang, Tg Puteri Resort, 81700, Pasir Gudang, Johor Darul Takzim",
 
-  // Maklumat SPA & DLP
   noRujukanSPA: "SPA/SCUDAI/2024/1039",
   tarikhSPA: "15 Mac 2024",
   jenisSPA: "Jadual G",
   tarikhVP: "1 Mac 2025",
   tempohDLP: "24",
 
-  // Maklumat Laporan & Tarikh
   noRujukanLaporan: "RPK/IMRAN/2026/001",
   tarikhSerahanLaporan: "25 Februari 2026",
   kaedahSerahanLaporan: "serahan tangan",
   tarikhPemeriksaanKedua: "6 Jun 2026",
   tarikhHantarLaporanKedua: "10 Jun 2026",
 
-  // Tarikh Notis
   tarikhNotis: "18 Jun 2026",
   tarikhDeadline: "3 Julai 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
-  // Kaedah penghantaran notis ini
   kaedahPenghantaranNotis: "serahan tangan dan e-mel",
 
-  // Senarai Kecacatan
   kecacatan: [
     { tag: "155", lokasi: "Tandas 1", kecacatan: "Kebocoran pada paip basin", status: "Tidak ditindakan" },
     { tag: "168", lokasi: "Bilik Tidur 2", kecacatan: "Kelembapan di dinding", status: "Tidak ditindakan" },
@@ -56,15 +47,14 @@ const data = {
     { tag: "242", lokasi: "Atas Bumbung (Tingkat 1)", kecacatan: "Atap genting pecah dan retak", status: "Tidak ditindakan" },
   ],
 
-  // Salinan Kepada (CC)
-  salianKepada: [
+  salinanKepada: [
     "Peguam Pemaju — Tetuan ABC & Partners, Johor Bahru",
     "Jabatan Perumahan Negara (KPKT)",
   ],
 };
 
 // ============================================================
-// PDF GENERATION
+// PDF SETUP
 // ============================================================
 const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 const pageW = 210;
@@ -72,26 +62,43 @@ const pageH = 297;
 const marginL = 25;
 const marginR = 25;
 const contentW = pageW - marginL - marginR;
+const BLACK = [0, 0, 0];
 let y = 0;
 let pageNum = 1;
-let totalPages = 4; // estimated, we'll update footer later
 
-function setFont(style = "normal", size = 11) {
-  doc.setFont("helvetica", style);
-  doc.setFontSize(size);
-}
+// ============================================================
+// FONT SIZE STANDARD (Surat Rasmi)
+// ============================================================
+const FONT = {
+  NAME: 12,        // Nama pengirim
+  TITLE: 14,       // Tajuk utama (NOTIS PERTAMA)
+  SUBTITLE: 12,    // Sub-tajuk
+  BODY: 12,        // Teks badan surat
+  SMALL: 10,       // Alamat, maklumat kecil
+  TABLE_HEAD: 10,  // Header jadual
+  TABLE_BODY: 10,  // Isi jadual
+  CAPTION: 9,      // Caption gambar
+  FOOTNOTE: 9,     // Nota kaki
+  FOOTER: 8,       // Footer muka surat
+  FIELD_LABEL: 12, // Label borang (Nama, Jawatan)
+};
 
-function setColor(r = 33, g = 33, b = 33) {
-  doc.setTextColor(r, g, b);
-}
+const LH = {
+  BODY: 6,
+  SMALL: 5,
+  TABLE: 5.5,
+};
 
-function addFooter(pg) {
-  // no-op during generation; footers are written in the final pass
+// ============================================================
+// HELPER FUNCTIONS
+// ============================================================
+function resetColor() {
+  doc.setTextColor(0, 0, 0);
+  doc.setDrawColor(0, 0, 0);
 }
 
 function checkPageBreak(needed = 20) {
   if (y + needed > pageH - 25) {
-    addFooter(pageNum);
     doc.addPage();
     pageNum++;
     y = 25;
@@ -100,34 +107,26 @@ function checkPageBreak(needed = 20) {
   return false;
 }
 
-function drawLine() {
-  doc.setDrawColor(60, 60, 60);
-  doc.setLineWidth(0.5);
+function drawLine(weight = 0.5) {
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(weight);
   doc.line(marginL, y, pageW - marginR, y);
-  y += 3;
-}
-
-function drawThinLine() {
-  doc.setDrawColor(180, 180, 180);
-  doc.setLineWidth(0.2);
-  doc.line(marginL, y, pageW - marginR, y);
-  y += 3;
+  y += 4;
 }
 
 function writeText(text, options = {}) {
   const {
     style = "normal",
-    size = 11,
+    size = FONT.BODY,
     align = "left",
-    color = [33, 33, 33],
     maxWidth = contentW,
-    lineHeight = 5.5,
+    lineHeight = LH.BODY,
     indent = 0,
   } = options;
 
   doc.setFont("helvetica", style);
   doc.setFontSize(size);
-  doc.setTextColor(color[0], color[1], color[2]);
+  doc.setTextColor(0, 0, 0);
 
   const x = align === "right" ? pageW - marginR : marginL + indent;
   const lines = doc.splitTextToSize(text, maxWidth - indent);
@@ -140,13 +139,13 @@ function writeText(text, options = {}) {
 }
 
 function writeNumberedParagraph(num, text, options = {}) {
-  const { style = "normal", size = 11, lineHeight = 5.5 } = options;
-  doc.setFont("helvetica", style);
+  const { size = FONT.BODY, lineHeight = LH.BODY } = options;
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(size);
-  doc.setTextColor(33, 33, 33);
+  doc.setTextColor(0, 0, 0);
 
   const numStr = `${num}.`;
-  const numWidth = 8;
+  const numWidth = 10;
   const textX = marginL + numWidth;
   const textW = contentW - numWidth;
 
@@ -162,10 +161,10 @@ function writeNumberedParagraph(num, text, options = {}) {
 }
 
 function writeBullet(text, options = {}) {
-  const { indent = 12, size = 11, lineHeight = 5.5 } = options;
+  const { indent = 14, size = FONT.BODY, lineHeight = LH.BODY } = options;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(size);
-  doc.setTextColor(33, 33, 33);
+  doc.setTextColor(0, 0, 0);
 
   const bulletX = marginL + indent;
   const textX = bulletX + 5;
@@ -182,58 +181,78 @@ function writeBullet(text, options = {}) {
 }
 
 // ============================================================
-// PAGE 1 — HEADER & BODY
+// PAGE 1 — HEADER
 // ============================================================
-y = 22;
+y = 25;
 
-// Sender header
-writeText(data.namaPembeli, { style: "bold", size: 13 });
+// Nama pengirim
+writeText(data.namaPembeli, { style: "bold", size: FONT.NAME });
 y += 1;
 
 const alamatLines = data.alamatPembeli.split("\n");
 for (const line of alamatLines) {
-  writeText(line, { size: 10, color: [80, 80, 80] });
+  writeText(line, { size: FONT.SMALL, lineHeight: LH.SMALL });
 }
-writeText(`E-mel: ${data.emailPembeli}`, { size: 10, color: [80, 80, 80] });
-writeText(`Telefon: ${data.telefonPembeli}`, { size: 10, color: [80, 80, 80] });
+writeText(`E-mel: ${data.emailPembeli}`, { size: FONT.SMALL, lineHeight: LH.SMALL });
+writeText(`Telefon: ${data.telefonPembeli}`, { size: FONT.SMALL, lineHeight: LH.SMALL });
 
-y += 2;
-drawLine();
-y += 2;
+y += 3;
+drawLine(0.5);
+y += 1;
 
-// Reference number (left) and Date (right)
-setFont("bold", 10);
-setColor(100, 100, 100);
+// Rujukan & Tarikh
+doc.setFont("helvetica", "normal");
+doc.setFontSize(FONT.SMALL);
+doc.setTextColor(0, 0, 0);
 doc.text(`Ruj: ${data.noRujukan}`, marginL, y);
 doc.text(`Tarikh: ${data.tarikhNotis}`, pageW - marginR, y, { align: "right" });
 y += 8;
 
-// Recipient
-writeText("Kepada:", { style: "bold", size: 10, color: [100, 100, 100] });
-writeText(data.namaPemaju, { style: "bold", size: 11 });
+// Penerima
+writeText("Kepada:", { style: "bold", size: FONT.SMALL, lineHeight: LH.SMALL });
+writeText(data.namaPemaju, { style: "bold", size: FONT.BODY });
 const pemajuLines = data.alamatPemaju.split("\n");
 for (const line of pemajuLines) {
-  writeText(line, { size: 10, color: [80, 80, 80] });
+  writeText(line, { size: FONT.SMALL, lineHeight: LH.SMALL });
 }
-writeText(`E-mel: ${data.emailPemaju}`, { size: 10, color: [80, 80, 80] });
+writeText(`E-mel: ${data.emailPemaju}`, { size: FONT.SMALL, lineHeight: LH.SMALL });
 
+y += 8;
+
+// ============================================================
+// TAJUK — centered, underlined (format surat rasmi)
+// ============================================================
+doc.setFont("helvetica", "bold");
+doc.setFontSize(FONT.TITLE);
+doc.setTextColor(0, 0, 0);
+const titleText = "NOTIS PERTAMA";
+doc.text(titleText, pageW / 2, y, { align: "center" });
+const titleW = doc.getTextWidth(titleText);
+doc.setLineWidth(0.5);
+doc.line(pageW / 2 - titleW / 2, y + 1, pageW / 2 + titleW / 2, y + 1);
+y += 7;
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(FONT.SUBTITLE);
+const subTitle = "Tuntutan Pembetulan Kecacatan (Defect Rectification Claim)";
+doc.text(subTitle, pageW / 2, y, { align: "center" });
+const subW = doc.getTextWidth(subTitle);
+doc.setLineWidth(0.3);
+doc.line(pageW / 2 - subW / 2, y + 1, pageW / 2 + subW / 2, y + 1);
 y += 6;
-drawThinLine();
-y += 3;
 
-// Title — shortened per suggestion B2
-writeText("NOTIS PERTAMA", { style: "bold", size: 13, align: "left" });
-writeText("Tuntutan Pembetulan Kecacatan (Defect Rectification Claim)", { style: "bold", size: 11 });
-y += 1;
-writeText(`Hartanah: ${data.alamatHartanah}`, { size: 10, color: [80, 80, 80] });
+doc.setFont("helvetica", "normal");
+doc.setFontSize(FONT.SMALL);
+doc.text(`Hartanah: ${data.alamatHartanah}`, pageW / 2, y, { align: "center" });
+y += 8;
 
-y += 6;
+// Salam
+writeText("Tuan/Puan,", { style: "bold", size: FONT.BODY });
+y += 4;
 
-// Salutation
-writeText("Tuan/Puan,", { style: "bold", size: 11 });
-y += 3;
-
-// Paragraph 1 — with SPA ref, VP date (A1, A2, A3, B3)
+// ============================================================
+// PERENGGAN 1
+// ============================================================
 writeNumberedParagraph(
   1,
   `Merujuk kepada Perjanjian Jual Beli (Sales and Purchase Agreement) bertarikh ${data.tarikhSPA} dengan nombor rujukan ${data.noRujukanSPA} (${data.jenisSPA}), Laporan Pemeriksaan Kecacatan (Defect Inspection Report) bernombor rujukan ${data.noRujukanLaporan} telah dikemukakan secara rasmi kepada pihak tuan melalui penghantaran secara ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`
@@ -242,12 +261,14 @@ y += 2;
 
 writeText(
   `Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan selaras dengan tanggungjawab pemaju di bawah Klausa 27(1) Perjanjian Jual Beli (${data.jenisSPA}). Unit ini masih berada dalam Tempoh Liabiliti Kecacatan (Defect Liability Period — DLP) selama ${data.tempohDLP} bulan dari tarikh Penyerahan Milik Kosong (Vacant Possession) pada ${data.tarikhVP}.`,
-  { indent: 8 }
+  { indent: 10 }
 );
 
 y += 4;
 
-// Paragraph 2
+// ============================================================
+// PERENGGAN 2
+// ============================================================
 writeNumberedParagraph(
   2,
   `Susulan laporan yang telah dikemukakan sebelum ini, hasil daripada pemerhatian kali kedua (Second Inspection) pada ${data.tarikhPemeriksaanKedua} mendapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya atau tidak dilakukan langsung seperti berikut:`
@@ -255,115 +276,121 @@ writeNumberedParagraph(
 
 y += 5;
 
-// Defect Table Header — with Status column (B4)
-writeText("Senarai Kecacatan yang Masih Belum Diselesaikan:", { style: "bold", size: 11 });
-y += 3;
+// ============================================================
+// JADUAL KECACATAN — hitam putih, formal
+// ============================================================
+writeText("Senarai Kecacatan yang Masih Belum Diselesaikan:", { style: "bold", size: FONT.BODY });
+y += 4;
 
 const colTag = marginL;
-const colLokasi = marginL + 18;
-const colKecacatan = marginL + 55;
-const colStatus = marginL + 115;
+const colLokasi = marginL + 15;
+const colKecacatan = marginL + 52;
+const colStatus = marginL + 110;
 const tableRight = pageW - marginR;
 
-// Table header background
-doc.setFillColor(45, 55, 72);
-doc.rect(marginL, y - 4, contentW, 8, "F");
+// Table header — border sahaja, tiada warna
+doc.setDrawColor(0, 0, 0);
+doc.setLineWidth(0.5);
+doc.line(marginL, y - 5, tableRight, y - 5); // top border
 doc.setFont("helvetica", "bold");
-doc.setFontSize(9);
-doc.setTextColor(255, 255, 255);
-doc.text("Tag", colTag + 2, y);
-doc.text("Lokasi", colLokasi + 2, y);
-doc.text("Kecacatan (Defect)", colKecacatan + 2, y);
-doc.text("Status", colStatus + 2, y);
-y += 7;
+doc.setFontSize(FONT.TABLE_HEAD);
+doc.setTextColor(0, 0, 0);
+doc.text("No.", colTag + 1, y);
+doc.text("Lokasi", colLokasi + 1, y);
+doc.text("Kecacatan (Defect)", colKecacatan + 1, y);
+doc.text("Status", colStatus + 1, y);
+y += 2;
+doc.setLineWidth(0.5);
+doc.line(marginL, y, tableRight, y); // header bottom border
+y += 5;
 
-// Table rows
+// Table rows — tiada warna, tiada background
 doc.setFont("helvetica", "normal");
-doc.setFontSize(9);
+doc.setFontSize(FONT.TABLE_BODY);
+doc.setTextColor(0, 0, 0);
 
 for (let i = 0; i < data.kecacatan.length; i++) {
   const item = data.kecacatan[i];
   checkPageBreak(14);
 
-  // Alternating row bg
-  if (i % 2 === 0) {
-    doc.setFillColor(245, 247, 250);
-    doc.rect(marginL, y - 4, contentW, 10, "F");
-  }
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(FONT.TABLE_BODY);
+  doc.setTextColor(0, 0, 0);
 
-  // Status color coding
-  const statusColor = item.status === "Tidak ditindakan" ? [220, 38, 38] : [234, 138, 0];
-
-  doc.setTextColor(33, 33, 33);
-  doc.text(item.tag, colTag + 2, y);
+  doc.text(item.tag, colTag + 1, y);
 
   const lokasiLines = doc.splitTextToSize(item.lokasi, 34);
-  doc.text(lokasiLines[0], colLokasi + 2, y);
-  if (lokasiLines.length > 1) {
-    doc.text(lokasiLines[1], colLokasi + 2, y + 4);
+  for (let j = 0; j < lokasiLines.length; j++) {
+    doc.text(lokasiLines[j], colLokasi + 1, y + j * LH.TABLE);
   }
 
-  const kecacatanLines = doc.splitTextToSize(item.kecacatan, 56);
-  doc.text(kecacatanLines[0], colKecacatan + 2, y);
-  if (kecacatanLines.length > 1) {
-    doc.text(kecacatanLines[1], colKecacatan + 2, y + 4);
+  const kecacatanLines = doc.splitTextToSize(item.kecacatan, 54);
+  for (let j = 0; j < kecacatanLines.length; j++) {
+    doc.text(kecacatanLines[j], colKecacatan + 1, y + j * LH.TABLE);
   }
 
-  doc.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
-  doc.setFont("helvetica", "bold");
-  const statusLines = doc.splitTextToSize(item.status, 40);
-  doc.text(statusLines[0], colStatus + 2, y);
-  if (statusLines.length > 1) {
-    doc.text(statusLines[1], colStatus + 2, y + 4);
+  const statusLines = doc.splitTextToSize(item.status, 42);
+  for (let j = 0; j < statusLines.length; j++) {
+    doc.text(statusLines[j], colStatus + 1, y + j * LH.TABLE);
   }
-  doc.setFont("helvetica", "normal");
 
-  const rowH = Math.max(lokasiLines.length, kecacatanLines.length, statusLines.length) > 1 ? 12 : 8;
+  const maxLines = Math.max(lokasiLines.length, kecacatanLines.length, statusLines.length);
+  const rowH = maxLines * LH.TABLE + 3;
   y += rowH;
+
+  // Row separator line
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.15);
+  doc.line(marginL, y - 2, tableRight, y - 2);
 }
 
-// Table bottom line
-doc.setDrawColor(45, 55, 72);
-doc.setLineWidth(0.3);
+// Table bottom border
+doc.setLineWidth(0.5);
 doc.line(marginL, y - 2, tableRight, y - 2);
-y += 3;
+y += 2;
 
-// Table footnote
+// Footnote
 doc.setFont("helvetica", "italic");
-doc.setFontSize(8);
-doc.setTextColor(120, 120, 120);
+doc.setFontSize(FONT.FOOTNOTE);
+doc.setTextColor(0, 0, 0);
 doc.text(`*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan (Ruj: ${data.noRujukanLaporan})`, marginL, y);
 y += 8;
 
-// Paragraph 3 — notice demand
-setColor();
+// ============================================================
+// PERENGGAN 3
+// ============================================================
+resetColor();
 writeNumberedParagraph(
   3,
   `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}.`
 );
-y += 1;
+y += 2;
 writeText(
   `Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa 27(1) Perjanjian Jual Beli (${data.jenisSPA}).`,
-  { indent: 8 }
+  { indent: 10 }
 );
 
 y += 4;
 
-// Paragraph 4 — consequences
+// ============================================================
+// PERENGGAN 4
+// ============================================================
 writeNumberedParagraph(
   4,
   "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:"
 );
-y += 1;
+y += 2;
 writeBullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
-writeBullet(`Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan dan pihak berkepentingan (stakeholders); dan`);
+writeBullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan dan pihak berkepentingan (stakeholders); dan");
 writeBullet(
   `Menghantar surat rasmi kepada peguam pemaju (stakeholder) untuk memohon agar kos pembaikan ditolak/ditahan daripada Wang Tahanan 5% (Retention Sum 5%) yang sedang dipegang, sebagaimana diperuntukkan di bawah Klausa 27(3) Perjanjian Jual Beli (${data.jenisSPA}).`
 );
 
 y += 4;
 
-// Paragraph 5 — service of documents (B6)
+// ============================================================
+// PERENGGAN 5
+// ============================================================
 writeNumberedParagraph(
   5,
   `Merujuk kepada Klausa Penyampaian Dokumen 29(1) (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui ${data.kaedahPenghantaranNotis}. Selain itu, saya juga telah menghantar Laporan Kecacatan bagi pemeriksaan kali kedua pada ${data.tarikhHantarLaporanKedua} kepada pihak pemaju.`
@@ -371,7 +398,9 @@ writeNumberedParagraph(
 
 y += 4;
 
-// Paragraph 6
+// ============================================================
+// PERENGGAN 6
+// ============================================================
 writeNumberedParagraph(
   6,
   "Oleh yang demikian, pihak tuan hendaklah menerima sepenuhnya notis ini secara rasmi serta mengambil tindakan sewajarnya untuk menyelesaikan isu kecacatan yang berlaku di unit kediaman saya."
@@ -379,187 +408,208 @@ writeNumberedParagraph(
 
 y += 6;
 
-// Legal Warning Section
-checkPageBreak(40);
-doc.setFillColor(254, 243, 243);
-doc.rect(marginL, y - 4, contentW, 6, "F");
-writeText("Peringatan Tindakan Undang-undang (Legal Action Notice)", { style: "bold", size: 11, color: [180, 30, 30] });
-y += 2;
+// ============================================================
+// PERINGATAN UNDANG-UNDANG — bold underline, tiada warna
+// ============================================================
+checkPageBreak(45);
+doc.setFont("helvetica", "bold");
+doc.setFontSize(FONT.BODY);
+doc.setTextColor(0, 0, 0);
+const legalTitle = "Peringatan Tindakan Undang-undang (Legal Action Notice)";
+doc.text(legalTitle, marginL, y);
+const legalTitleW = doc.getTextWidth(legalTitle);
+doc.setLineWidth(0.4);
+doc.line(marginL, y + 1, marginL + legalTitleW, y + 1);
+y += 8;
 
-// Paragraph 7 — enhanced with Akta 118 (A5)
+// Perenggan 7
 writeNumberedParagraph(
   7,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 
-y += 6;
+y += 8;
 
-writeText("Saya berharap pihak tuan mengambil tindakan segera terhadap Notis Pertama ini.", { style: "italic" });
-y += 3;
+// Penutup
+writeText("Saya berharap pihak tuan mengambil tindakan segera terhadap Notis Pertama ini.");
+y += 4;
 writeText("Sekian, terima kasih.");
 
-y += 10;
+y += 12;
 writeText("Yang benar,");
-y += 15;
+y += 18;
 
-// Signature line
-doc.setDrawColor(33, 33, 33);
+// Tandatangan
+doc.setDrawColor(0, 0, 0);
 doc.setLineWidth(0.4);
-doc.line(marginL, y, marginL + 60, y);
+doc.line(marginL, y, marginL + 65, y);
 y += 5;
-writeText(data.namaPembeli, { style: "bold", size: 11 });
-writeText(`(No. K/P: ${data.noKP})`, { size: 10, color: [100, 100, 100] });
+writeText(data.namaPembeli, { style: "bold", size: FONT.BODY });
+writeText(`(No. K/P: ${data.noKP})`, { size: FONT.SMALL });
 
-y += 6;
-
-// CC section (A6)
-drawThinLine();
-y += 2;
-writeText("s.k. (Salinan Kepada / Carbon Copy):", { style: "bold", size: 9, color: [100, 100, 100] });
-for (const cc of data.salianKepada) {
-  writeText(`• ${cc}`, { size: 9, color: [100, 100, 100] });
-}
-
-// Footer for page 1 area
-addFooter(pageNum);
+y += 8;
 
 // ============================================================
-// PAGE 3 — AKUAN TERIMA OLEH PEMAJU
+// SALINAN KEPADA (CC)
+// ============================================================
+drawLine(0.3);
+y += 1;
+writeText("s.k. (Salinan Kepada / Carbon Copy):", { style: "bold", size: FONT.SMALL, lineHeight: LH.SMALL });
+for (const cc of data.salinanKepada) {
+  writeText(`• ${cc}`, { size: FONT.SMALL, lineHeight: LH.SMALL });
+}
+
+// ============================================================
+// MUKA SURAT BARU — AKUAN TERIMA OLEH PEMAJU
 // ============================================================
 doc.addPage();
 pageNum++;
 y = 30;
 
-writeText("AKUAN TERIMA OLEH PEMAJU", { style: "bold", size: 14, align: "left" });
-writeText("(Developer's Acknowledgement of Receipt)", { style: "normal", size: 10, color: [100, 100, 100] });
-
-y += 5;
-drawLine();
-y += 5;
+// Tajuk centered, underlined
+doc.setFont("helvetica", "bold");
+doc.setFontSize(FONT.TITLE);
+doc.setTextColor(0, 0, 0);
+const akuanTitle = "AKUAN TERIMA OLEH PEMAJU";
+doc.text(akuanTitle, pageW / 2, y, { align: "center" });
+const akuanW = doc.getTextWidth(akuanTitle);
+doc.setLineWidth(0.5);
+doc.line(pageW / 2 - akuanW / 2, y + 1, pageW / 2 + akuanW / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal");
+doc.setFontSize(FONT.SMALL);
+doc.text("(Developer's Acknowledgement of Receipt)", pageW / 2, y, { align: "center" });
+y += 10;
 
 writeText(
   `Dengan ini diakui bahawa ${data.namaPemaju} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`
 );
 
-y += 15;
+y += 18;
 writeText("Diterima oleh:", { style: "bold" });
 y += 12;
 
-// Signature fields
-const fieldLabelX = marginL;
+// Borang
 const fieldLineStart = marginL + 30;
 const fieldLineEnd = marginL + 120;
 
 const fields = ["Nama", "Jawatan", "Tarikh"];
 for (const field of fields) {
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(33, 33, 33);
-  doc.text(`${field}`, fieldLabelX, y);
-  doc.text(":", fieldLabelX + 25, y);
-  doc.setDrawColor(180, 180, 180);
+  doc.setFontSize(FONT.FIELD_LABEL);
+  doc.setTextColor(0, 0, 0);
+  doc.text(field, marginL, y);
+  doc.text(":", marginL + 25, y);
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.3);
   doc.line(fieldLineStart, y + 1, fieldLineEnd, y + 1);
-  y += 12;
+  y += 14;
 }
 
-y += 5;
-writeText("Cop Syarikat (Company Stamp):", { style: "bold", size: 10 });
-y += 3;
-doc.setDrawColor(180, 180, 180);
+y += 8;
+writeText("Cop Syarikat (Company Stamp):", { style: "bold", size: FONT.SMALL });
+y += 4;
+doc.setDrawColor(0, 0, 0);
 doc.setLineWidth(0.3);
-doc.rect(marginL, y, 60, 30);
-doc.setFont("helvetica", "italic");
-doc.setFontSize(8);
-doc.setTextColor(180, 180, 180);
-doc.text("[Cop Syarikat di sini]", marginL + 10, y + 17);
-
-addFooter(pageNum);
+doc.rect(marginL, y, 60, 35);
 
 // ============================================================
-// PAGE 4 — LAMPIRAN A: GAMBAR BUKTI KECACATAN (C1 — placeholder)
+// MUKA SURAT BARU — LAMPIRAN A
 // ============================================================
 doc.addPage();
 pageNum++;
-y = 22;
+y = 25;
 
-writeText("LAMPIRAN A", { style: "bold", size: 14 });
-writeText("Gambar Bukti Kecacatan (Defect Evidence Photos)", { style: "normal", size: 10, color: [100, 100, 100] });
-y += 2;
-drawLine();
-y += 5;
+// Tajuk centered, underlined
+doc.setFont("helvetica", "bold");
+doc.setFontSize(FONT.TITLE);
+doc.setTextColor(0, 0, 0);
+const lampTitle = "LAMPIRAN A";
+doc.text(lampTitle, pageW / 2, y, { align: "center" });
+const lampW = doc.getTextWidth(lampTitle);
+doc.setLineWidth(0.5);
+doc.line(pageW / 2 - lampW / 2, y + 1, pageW / 2 + lampW / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal");
+doc.setFontSize(FONT.SMALL);
+doc.text("Gambar Bukti Kecacatan (Defect Evidence Photos)", pageW / 2, y, { align: "center" });
+y += 10;
 
-writeText(`Rujukan Laporan: ${data.noRujukanLaporan}`, { size: 9, color: [100, 100, 100] });
-writeText(`Tarikh Pemeriksaan Kedua: ${data.tarikhPemeriksaanKedua}`, { size: 9, color: [100, 100, 100] });
-y += 5;
+writeText(`Rujukan Laporan: ${data.noRujukanLaporan}`, { size: FONT.SMALL, lineHeight: LH.SMALL });
+writeText(`Tarikh Pemeriksaan Kedua: ${data.tarikhPemeriksaanKedua}`, { size: FONT.SMALL, lineHeight: LH.SMALL });
+y += 6;
 
-// Photo placeholders — 2 columns, 3 rows
-const photoW = (contentW - 8) / 2;
+// Photo grid — 2 columns, border sahaja
+const photoW = (contentW - 10) / 2;
 const photoH = 55;
-const gap = 8;
+const gap = 10;
 
 for (let i = 0; i < data.kecacatan.length; i++) {
   const col = i % 2;
-  const row = Math.floor(i / 2);
 
   if (col === 0 && i > 0) {
-    y += 0; // handled by row logic
+    // already advanced by previous row
   }
 
   const px = marginL + col * (photoW + gap);
-  const py = col === 0 ? y : y; // same row
+  const py = y;
 
-  // Photo box
-  doc.setDrawColor(200, 200, 200);
+  checkPageBreak(photoH + 20);
+  const pyActual = y;
+
+  // Photo box — border only
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.3);
-  doc.setFillColor(248, 249, 250);
-  doc.rect(px, py, photoW, photoH, "FD");
+  doc.rect(px, pyActual, photoW, photoH);
 
-  // Placeholder icon
-  doc.setFontSize(20);
-  doc.setTextColor(200, 200, 200);
-  doc.text("[FOTO]", px + photoW / 2, py + photoH / 2 - 3, { align: "center" });
-
-  doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
-  doc.text(`Tag #${data.kecacatan[i].tag}`, px + photoW / 2, py + photoH / 2 + 5, { align: "center" });
-
-  // Caption below photo
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.setTextColor(33, 33, 33);
-  doc.text(`Tag ${data.kecacatan[i].tag} — ${data.kecacatan[i].lokasi}`, px + 2, py + photoH + 5);
+  // Placeholder text
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.setTextColor(80, 80, 80);
-  const captionLines = doc.splitTextToSize(data.kecacatan[i].kecacatan, photoW - 4);
-  doc.text(captionLines[0], px + 2, py + photoH + 9);
+  doc.setFontSize(14);
+  doc.setTextColor(180, 180, 180);
+  doc.text("[FOTO]", px + photoW / 2, pyActual + photoH / 2 - 2, { align: "center" });
 
-  // Move to next row after second column
+  doc.setFontSize(FONT.FOOTNOTE);
+  doc.setTextColor(150, 150, 150);
+  doc.text(`Tag #${data.kecacatan[i].tag}`, px + photoW / 2, pyActual + photoH / 2 + 6, { align: "center" });
+
+  // Caption below
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(FONT.CAPTION);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Tag ${data.kecacatan[i].tag} — ${data.kecacatan[i].lokasi}`, px + 2, pyActual + photoH + 5);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(FONT.CAPTION);
+  const captionLines = doc.splitTextToSize(data.kecacatan[i].kecacatan, photoW - 4);
+  doc.text(captionLines[0], px + 2, pyActual + photoH + 10);
+
   if (col === 1) {
     y += photoH + 18;
   }
 }
 
-// If odd number of items, still advance y
 if (data.kecacatan.length % 2 === 1) {
   y += photoH + 18;
 }
 
-addFooter(pageNum);
-
 // ============================================================
-// FIX: Update total page count in all footers
+// FOOTER — tulis pada semua muka surat di akhir
 // ============================================================
-totalPages = pageNum;
+const totalPages = pageNum;
 const allPages = doc.internal.getNumberOfPages();
 for (let p = 1; p <= allPages; p++) {
   doc.setPage(p);
+
+  // Footer line
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(marginL, pageH - 18, pageW - marginR, pageH - 18);
+
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
-  doc.text(`Muka ${p} daripada ${totalPages}`, pageW / 2, pageH - 12, { align: "center" });
-  doc.text(`Ruj: ${data.noRujukan}`, marginL, pageH - 12);
+  doc.setFontSize(FONT.FOOTER);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Ruj: ${data.noRujukan}`, marginL, pageH - 13);
+  doc.text(`Muka ${p} daripada ${totalPages}`, pageW - marginR, pageH - 13, { align: "right" });
 }
 
 // ============================================================
