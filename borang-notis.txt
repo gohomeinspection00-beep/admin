@@ -1,0 +1,95 @@
+============================================
+BORANG MAKLUMAT NOTIS KECACATAN
+============================================
+
+JENIS NOTIS: [Notis 1 / Notis 2 / Kedua-dua]
+
+--------------------------------------------
+A. MAKLUMAT PEMBELI (PENGIRIM)
+--------------------------------------------
+Nama Penuh        :
+No. K/P            :
+Alamat (baris 1)   :
+Alamat (baris 2)   :
+Poskod & Bandar    :
+Negeri             :
+E-mel              :
+No. Telefon        :
+
+--------------------------------------------
+B. MAKLUMAT PEMAJU (PENERIMA)
+--------------------------------------------
+Nama Syarikat      :
+No. Syarikat       :
+Alamat (baris 1)   :
+Alamat (baris 2)   :
+Poskod & Bandar    :
+Negeri             :
+E-mel              :
+No. Telefon        :
+
+--------------------------------------------
+C. MAKLUMAT HARTANAH
+--------------------------------------------
+Alamat Penuh Unit  :
+
+--------------------------------------------
+D. MAKLUMAT SPA
+--------------------------------------------
+No. Rujukan SPA    :
+Tarikh SPA         :
+Jenis SPA          : [Jadual G / Jadual H]
+Tarikh VP          :
+
+--------------------------------------------
+E. MAKLUMAT LAPORAN & PEMERIKSAAN
+--------------------------------------------
+No. Rujukan Laporan       :
+Tarikh Serahan Laporan    :
+Kaedah Serahan Laporan    : [serahan tangan / pos berdaftar / e-mel / gabungan]
+Tarikh Pemeriksaan Kedua  :
+Tarikh Hantar Laporan Ke-2:
+
+--------------------------------------------
+F. MAKLUMAT NOTIS 1
+--------------------------------------------
+Tarikh Notis 1            :
+Tempoh (hari)             : [15]
+Tarikh Deadline Notis 1   :
+Kaedah Penghantaran       : [serahan tangan / pos berdaftar / e-mel / gabungan]
+
+--------------------------------------------
+G. MAKLUMAT NOTIS 2 (isi jika Notis 2)
+--------------------------------------------
+Tarikh Pemeriksaan Ketiga :
+Tarikh Notis 2            :
+Tempoh (hari)             : [15]
+Tarikh Deadline Notis 2   :
+Kaedah Penghantaran       : [serahan tangan / pos berdaftar / e-mel / gabungan]
+Nama Kontraktor           :
+Jumlah Sebut Harga (RM)   :
+
+--------------------------------------------
+H. SENARAI KECACATAN
+--------------------------------------------
+(Salin & tambah baris jika perlu)
+
+1. Tag:          Lokasi:          Kecacatan:          Status: [Tiada Tindakan / Pembaikan Tidak Sempurna]
+2. Tag:          Lokasi:          Kecacatan:          Status:
+3. Tag:          Lokasi:          Kecacatan:          Status:
+4. Tag:          Lokasi:          Kecacatan:          Status:
+5. Tag:          Lokasi:          Kecacatan:          Status:
+
+--------------------------------------------
+I. SALINAN KEPADA (CC)
+--------------------------------------------
+1.
+2.
+3.
+
+--------------------------------------------
+J. NOTA TAMBAHAN (jika ada)
+--------------------------------------------
+
+
+============================================
