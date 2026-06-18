@@ -9917,34 +9917,40 @@ const getCalibratedTimestamp = () => {
 const calibrateServerTime = async () => {
   if (!firebase.firestore) return;
   
+  // FIX (leak): tempRef declared outside try so the finally can ALWAYS delete the temp
+  // doc — previously delete ran only inside the success `if`, so a read failure / missing
+  // serverTime / early page-close left the doc behind and _timeSync accumulated forever.
+  let tempRef = null;
   try {
     const localBefore = Date.now();
-    
+
     // Write a temp document with server timestamp
-    const tempRef = firebase.firestore().collection('_timeSync').doc('temp_' + localBefore);
-    await tempRef.set({ 
+    tempRef = firebase.firestore().collection('_timeSync').doc('temp_' + localBefore);
+    await tempRef.set({
       serverTime: firebase.firestore.FieldValue.serverTimestamp(),
       clientTime: localBefore
     });
-    
+
     // Read it back to get server timestamp
     const doc = await tempRef.get();
     const localAfter = Date.now();
-    
+
     if (doc.exists && doc.data().serverTime) {
       const serverTime = doc.data().serverTime.toMillis();
       const networkLatency = (localAfter - localBefore) / 2;
       serverTimeOffset = serverTime - (localBefore + networkLatency);
       serverTimeCalibrated = true;
       console.log('Server time calibrated, offset:', serverTimeOffset, 'ms');
-      
-      // Cleanup temp document
-      tempRef.delete().catch(() => {});
     }
   } catch (e) {
     console.warn('Failed to calibrate server time:', e.message);
     // Continue without calibration - use local time
     serverTimeOffset = 0;
+  } finally {
+    // Cleanup temp doc ALWAYS (success, read-fail, or no-serverTime). MUST keep its own
+    // .catch() and stay un-awaited: a delete rejection (offline / rules) must never throw
+    // into the catch above, which would wrongly reset the just-computed serverTimeOffset.
+    if (tempRef) tempRef.delete().catch(() => {});
   }
 };
 
