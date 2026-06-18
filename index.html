@@ -37440,6 +37440,49 @@ function showChooseFilesDialog(cloudFiles) {
 
 // Helper to update UI with user data
 function updateUIWithUserData(userData, email) {
+  // ===== ACCESS GUARD (#4 frozen account, #5 expired subscription) =====
+  // Every login path (online auth-restore, online form, offline cache) funnels through this one
+  // function, so a single guard here hard-blocks frozen/expired accounts everywhere. SAFE-DEFAULT:
+  // block ONLY on unambiguous signals — any missing/odd field falls through to ALLOW, so a paying
+  // user is never locked out by accident. Admins are exempt. Blocking never clears inspection data
+  // (clearUserSession only drops the session key, not localStorage projects / IndexedDB images).
+  try {
+    const _ud = userData || {};
+    const _isAdmin = _ud.isAdmin === true || _ud.accountType === 'admin';
+    if (!_isAdmin) {
+      const _frozen = _ud.frozen === true; // strict, mirrors isAccountFrozen()
+      let _expired = false;
+      const _days = Number(_ud.activeDays);
+      if (Number.isFinite(_days) && _days > 0) {        // only accounts with a real day-limit can expire
+        let _createdMs = null;
+        const _c = _ud.createdAt;
+        if (_c && typeof _c.toDate === 'function') { try { _createdMs = _c.toDate().getTime(); } catch (e) {} } // Firestore Timestamp
+        else if (typeof _c === 'number' && isFinite(_c)) _createdMs = _c;                                       // epoch ms
+        else if (typeof _c === 'string') { const _t = Date.parse(_c); if (!isNaN(_t)) _createdMs = _t; }        // ISO string
+        if (_createdMs) {
+          const _GRACE = 24 * 60 * 60 * 1000;            // 1-day grace vs device-clock skew
+          if (Date.now() > _createdMs + _days * 86400000 + _GRACE) _expired = true;
+        }
+      }
+      if (_frozen || _expired) {
+        window.currentUserData = null;
+        window.currentUserEmail = null;
+        try { if (typeof isOnline !== 'undefined' && isOnline && typeof auth !== 'undefined' && auth) auth.signOut(); } catch (e) {}
+        try { if (typeof clearUserSession === 'function') clearUserSession(); } catch (e) {}
+        try { if (loginPage) loginPage.style.display = 'flex'; } catch (e) {}
+        try { if (mainApp) mainApp.style.display = 'none'; } catch (e) {}
+        try {
+          showLoginError(_frozen
+            ? 'Akaun anda telah dibekukan. Sila hubungi admin.'
+            : 'Langganan akaun anda telah tamat tempoh. Sila hubungi admin untuk pembaharuan.');
+        } catch (e) {}
+        try { if (typeof loginBtn !== 'undefined' && loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Login'; } } catch (e) {}
+        return; // app is never revealed for a blocked account
+      }
+    }
+  } catch (e) { console.warn('Access guard error (allowing login):', e); }
+  // ===== end access guard =====
+
   window.currentUserData = { ...userData, email: email };
   window.currentUserEmail = email.toLowerCase();
   
