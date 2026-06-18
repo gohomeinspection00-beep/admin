@@ -16654,6 +16654,57 @@ q('#trackFizikalMethod')?.addEventListener('change', (e) => {
   q('#trackFizikalOtherWrap').style.display = e.target.value === 'other' ? 'block' : 'none';
 });
 
+// ===== TRACK PHOTOS -> Firebase Storage (cost fix: stop storing base64 in Firestore) =====
+// Upload one Track photo to Storage and return its URL. IDEMPOTENT (returns http URLs
+// unchanged) and SAFE: on offline / upload failure it returns the original base64 so a
+// photo is NEVER lost — the doc just keeps base64 for that one save and uploads next time.
+async function trackPhotoToUrl(value, trackId, label) {
+  if (typeof value !== 'string' || !value) return value;
+  if (value.startsWith('http')) return value;                       // already a URL
+  if (!value.startsWith('data:')) return value;                     // not a photo
+  if (typeof isOnline !== 'undefined' && !isOnline) return value;   // offline -> keep base64
+  if (typeof uploadImageToStorage !== 'function') return value;
+  try {
+    const email = ((window.currentUserData && window.currentUserData.email) || 'unknown').toLowerCase();
+    const hash = (typeof hashPhotoForSync === 'function') ? hashPhotoForSync(value) : Date.now().toString(36);
+    const url = await uploadImageToStorage(value, `trackInspections/${email}/${trackId}/${label}_${hash}.jpg`);
+    return url || value;                                            // upload failed -> keep base64
+  } catch (e) { return value; }                                     // never lose the photo
+}
+
+// Walk every photo field of a Track object (or write payload) and replace base64 with a
+// Storage URL, in place. Comprehensive (no field missed) and idempotent (http skipped),
+// so it is cheap on already-migrated tracks and safe to call before every Track write.
+async function uploadAllTrackPhotos(t) {
+  if (!t || typeof t !== 'object') return t;
+  const id = t.id || ('track_' + Date.now());
+  const one = (v, label) => trackPhotoToUrl(v, id, label);
+  if (t.proofPhoto) t.proofPhoto = await one(t.proofPhoto, 'proof');
+  for (const u of (t.repairUpdates || [])) if (u && u.photo) u.photo = await one(u.photo, 'repair');
+  for (const v of (t.pemajuVisits || [])) if (v && v.photo) v.photo = await one(v.photo, 'pemaju');
+  for (const c of (t.developerClaims || [])) if (c && c.photo) c.photo = await one(c.photo, 'claim');
+  for (const f of (t.otherFollowUps || [])) if (f && f.photo) f.photo = await one(f.photo, 'follow');
+  const walkDelay = async (da) => {
+    if (!da || typeof da !== 'object') return;
+    for (const k of Object.keys(da)) {
+      const node = da[k];
+      if (Array.isArray(node)) { for (const e of node) if (e && e.photo) e.photo = await one(e.photo, 'delay'); }
+      else if (node && node.photo) node.photo = await one(node.photo, 'delay');
+    }
+  };
+  await walkDelay(t.delayActions);
+  const walkReinsp = async (ri) => {
+    if (!ri || typeof ri !== 'object') return ri;
+    if (ri.proofPhoto) ri.proofPhoto = await one(ri.proofPhoto, 'reinsp');
+    for (const u of (ri.repairUpdates || [])) if (u && u.photo) u.photo = await one(u.photo, 'reinsp_repair');
+    for (const v of (ri.pemajuVisits || [])) if (v && v.photo) v.photo = await one(v.photo, 'reinsp_pemaju');
+    return ri;
+  };
+  if (t.reInspection) t.reInspection = await walkReinsp(t.reInspection);
+  if (Array.isArray(t.reInspections)) for (let i = 0; i < t.reInspections.length; i++) t.reInspections[i] = await walkReinsp(t.reInspections[i]);
+  return t;
+}
+
 // Proof upload
 q('#trackProofUpload')?.addEventListener('click', () => {
   q('#trackProofInput').click();
@@ -16732,6 +16783,7 @@ q('#btnSaveTrackInspection')?.addEventListener('click', async () => {
   
   // Save to Firebase
   try {
+    await uploadAllTrackPhotos(trackData); // photos -> Storage URLs (cost fix; base64 fallback if offline)
     await db.collection('trackInspections').doc(trackData.id).set(trackData);
     alert('Inspection saved successfully!');
     show('trackInspectionList');
@@ -17951,8 +18003,9 @@ q('#btnSaveTrackUpdate')?.addEventListener('click', async () => {
     // Save to Re-Inspection repair updates
     if (!track.reInspection.repairUpdates) track.reInspection.repairUpdates = [];
     track.reInspection.repairUpdates.push(update);
-    
+
     try {
+      await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
       await db.collection('trackInspections').doc(track.id).update({
         reInspection: track.reInspection
       });
@@ -17965,8 +18018,9 @@ q('#btnSaveTrackUpdate')?.addEventListener('click', async () => {
     // Save to main repair updates
     if (!track.repairUpdates) track.repairUpdates = [];
     track.repairUpdates.push(update);
-    
+
     try {
+      await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
       await db.collection('trackInspections').doc(track.id).update({
         repairUpdates: track.repairUpdates
       });
@@ -18086,8 +18140,9 @@ q('#btnSaveAddReInsp')?.addEventListener('click', async () => {
   
   // Also update legacy field for backward compatibility
   track.reInspection = newReInspection;
-  
+
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(track.id).update({
       reInspections: track.reInspections,
       reInspection: track.reInspection
@@ -18178,8 +18233,9 @@ q('#btnSaveEditReInsp')?.addEventListener('click', async () => {
   
   // Also update legacy field
   track.reInspection = track.reInspections[track.reInspections.length - 1];
-  
+
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(track.id).update({
       reInspections: track.reInspections,
       reInspection: track.reInspection
@@ -18337,8 +18393,13 @@ function editDelayProof(key) {
 q('#btnSaveProofEdits')?.addEventListener('click', async () => {
   const track = trackInspections.find(t => t.id === currentTrackId);
   if (!track) return;
-  
+
   try {
+    // photos -> Storage URLs (cost fix): arrays/objects convert in place (by reference),
+    // submission is a string so read it back from the walked wrapper.
+    const _ep = { id: track.id, proofPhoto: editingProofs.submission, repairUpdates: editingProofs.repairUpdates, delayActions: editingProofs.delayActions };
+    await uploadAllTrackPhotos(_ep);
+    editingProofs.submission = _ep.proofPhoto;
     await db.collection('trackInspections').doc(track.id).update({
       proofPhoto: editingProofs.submission,
       repairUpdates: editingProofs.repairUpdates,
@@ -18437,8 +18498,9 @@ q('#btnSavePemajuVisit')?.addEventListener('click', async () => {
   } else {
     track.pemajuVisits.push(visitData);
   }
-  
+
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(track.id).update({
       pemajuVisits: track.pemajuVisits
     });
@@ -18544,8 +18606,9 @@ q('#btnSaveDeveloperClaim')?.addEventListener('click', async () => {
     // Add new
     track.developerClaims.push(claimData);
   }
-  
+
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(track.id).update({
       developerClaims: track.developerClaims
     });
@@ -18761,10 +18824,11 @@ q('#btnSaveDelayAction')?.addEventListener('click', async () => {
   }
   
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(track.id).update({
       delayActions: track.delayActions
     });
-    
+
     q('#delayActionDialog').close();
     renderTrackDetail(track);
   } catch (error) {
@@ -19618,7 +19682,21 @@ async function downloadTrackReportPDF() {
     loadingOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999';
     loadingOverlay.innerHTML = '<div style="background:white;padding:24px 40px;border-radius:12px;text-align:center"><div style="margin-bottom:8px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" class="spin-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><div>Generating PDF...</div></div>';
     document.body.appendChild(loadingOverlay);
-    
+
+    // PDF cost-fix: track photos may now be Firebase Storage URLs. html2canvas can taint the
+    // canvas on cross-origin images (-> toDataURL throws -> PDF fails), so pre-resolve every
+    // <img> to a data: URL first. base64 srcs pass through unchanged. Same helper the defect
+    // report uses; failures are swallowed so the PDF still generates (image just missing).
+    if (typeof resolveRefForExport === 'function') {
+      const _imgs = root.querySelectorAll('img');
+      for (const _im of _imgs) {
+        const _src = _im.getAttribute('src') || '';
+        if (_src.startsWith('http')) {
+          try { const _d = await resolveRefForExport(_src); if (_d) _im.src = _d; } catch (e) {}
+        }
+      }
+    }
+
     // Get all pages
     const pages = root.querySelectorAll('.page');
     const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
@@ -19816,8 +19894,9 @@ q('#btnSaveActionProof')?.addEventListener('click', async () => {
   track.delayActions[actionKey].note = q('#actionProofNote').value;
   track.delayActions[actionKey].photo = currentActionProofPhoto;
   track.delayActions[actionKey].done = true;
-  
+
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(currentTrackId).update({
       delayActions: track.delayActions
     });
@@ -19874,8 +19953,9 @@ q('#btnSaveFollowUp')?.addEventListener('click', async () => {
     photo: currentFollowUpPhoto,
     createdAt: new Date().toISOString()
   });
-  
+
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(currentTrackId).update({
       otherFollowUps: track.otherFollowUps
     });
@@ -19989,8 +20069,10 @@ q('#btnSaveEditRepairUpdate')?.addEventListener('click', async () => {
     caption: q('#editRepairUpdateCaption').value,
     photo: currentEditRepairPhoto
   };
-  
+
   try {
+    // photo -> Storage URL (cost fix) before placing into the array; base64 fallback if offline
+    updateData.photo = await trackPhotoToUrl(updateData.photo, track.id, currentEditInspectionNum === 2 ? 'reinsp_repair' : 'repair');
     if (currentEditInspectionNum === 2 && track.reInspection) {
       // Update Re-Inspection repair updates
       track.reInspection.repairUpdates[index] = updateData;
@@ -20079,8 +20161,9 @@ q('#btnSaveSubProof')?.addEventListener('click', async () => {
   if (!track) return;
   
   track.proofPhoto = currentEditSubProofPhoto;
-  
+
   try {
+    await uploadAllTrackPhotos(track); // photos -> Storage URLs (cost fix)
     await db.collection('trackInspections').doc(currentTrackId).update({
       proofPhoto: track.proofPhoto
     });

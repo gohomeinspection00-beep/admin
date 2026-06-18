@@ -4469,6 +4469,21 @@ tr:hover td {
         </button>
         <div id="timeSyncCleanResult" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
       </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Migrasi Gambar Track (Jimat Kos)</h3>
+        <p style="color:var(--muted);font-size:13px;margin:8px 0 16px">
+          Pindahkan gambar <strong>Track Your Inspection</strong> lama yang tersimpan sebagai base64 di
+          dalam Firestore ke Firebase Storage (simpan URL sahaja). Ini mengurangkan kos data Firestore.
+          Selamat: setiap dokumen ditulis sekali sahaja selepas semua gambarnya berjaya di-upload;
+          yang gagal dibiar utuh (base64) &amp; boleh diulang. Idempotent &mdash; gambar yang sudah jadi URL dilangkau.
+        </p>
+        <button class="btn btn-primary" style="width:auto" id="btnMigrateTrackPhotos" onclick="migrateTrackPhotos()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Migrasi Gambar Track
+        </button>
+        <div id="trackMigrateResult" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+      </div>
     </div>
 
     <!-- App Links Settings Section -->
@@ -5470,6 +5485,88 @@ async function cleanupTimeSyncDocs() {
   }
 }
 window.cleanupTimeSyncDocs = cleanupTimeSyncDocs;
+
+// ===== COST FIX: migrate OLD Track photos (base64-in-Firestore) to Firebase Storage =====
+// One-time, idempotent, crash-safe. For each trackInspections doc: upload every base64
+// photo to Storage, build the fully-migrated doc in memory, then ONE write. A mid-doc
+// failure leaves that doc 100% untouched (still base64) and is reported for re-run.
+// SAFETY: only touches `data:` values; http (already migrated) is skipped; never deletes.
+async function migrateTrackPhotos() {
+  const btn = document.getElementById('btnMigrateTrackPhotos');
+  const out = document.getElementById('trackMigrateResult');
+  if (!currentAdminEmail) { alert('Sila login sebagai admin dahulu.'); return; }
+  if (!confirm('Pindahkan gambar Track lama (base64) ke Storage?\n\nIni mengurangkan kos. Selamat: setiap dokumen ditulis sekali sahaja selepas semua gambarnya berjaya di-upload; yang gagal dibiar utuh (base64) dan boleh diulang. Tiada data dipadam.')) return;
+  const orig = btn ? btn.textContent : '';
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  let migrated = 0, alreadyOk = 0, failed = [];
+  try {
+    if (btn) { btn.disabled = true; btn.textContent = 'Memindah...'; }
+    if (out) { out.style.color = 'var(--muted)'; out.textContent = 'Membaca trackInspections...'; }
+    const snap = await db.collection('trackInspections').get();
+    const docs = snap.docs;
+    for (let di = 0; di < docs.length; di++) {
+      const d = docs[di];
+      const data = d.data();
+      const id = d.id;
+      const ownerEmail = (data.userEmail || 'unknown').toLowerCase();
+      let touched = false;
+      // upload one value: http/empty/non-data left as-is; data: -> Storage URL (may throw)
+      const up = async (value, label) => {
+        if (typeof value !== 'string' || !value) return value;
+        if (value.startsWith('http')) return value;
+        if (!value.startsWith('data:')) return value;
+        const path = `trackInspections/${ownerEmail}/${id}/${label}_${Date.now()}_${Math.random().toString(36).slice(2,8)}.jpg`;
+        const blob = await fetch(value).then(r => r.blob());
+        const ref = storage.ref().child(path);
+        await ref.put(blob);
+        const url = await ref.getDownloadURL();
+        touched = true;
+        await sleep(120); // throttle
+        return url;
+      };
+      try {
+        const o = JSON.parse(JSON.stringify(data)); // deep clone; mutate clone only
+        o.proofPhoto = await up(o.proofPhoto, 'proof');
+        for (const u of (o.repairUpdates || [])) if (u) u.photo = await up(u.photo, 'repair');
+        for (const v of (o.pemajuVisits || [])) if (v) v.photo = await up(v.photo, 'pemaju');
+        for (const c of (o.developerClaims || [])) if (c) c.photo = await up(c.photo, 'claim');
+        for (const f of (o.otherFollowUps || [])) if (f) f.photo = await up(f.photo, 'follow');
+        const walkDelay = async (da) => {
+          if (!da || typeof da !== 'object') return;
+          for (const k of Object.keys(da)) {
+            const node = da[k];
+            if (Array.isArray(node)) { for (const e of node) if (e) e.photo = await up(e.photo, 'delay'); }
+            else if (node && node.photo) node.photo = await up(node.photo, 'delay');
+          }
+        };
+        await walkDelay(o.delayActions);
+        const reinsp = async (ri) => {
+          if (!ri || typeof ri !== 'object') return ri;
+          ri.proofPhoto = await up(ri.proofPhoto, 'reinsp');
+          for (const u of (ri.repairUpdates || [])) if (u) u.photo = await up(u.photo, 'reinsp_repair');
+          for (const v of (ri.pemajuVisits || [])) if (v) v.photo = await up(v.photo, 'reinsp_pemaju');
+          return ri;
+        };
+        if (o.reInspection) o.reInspection = await reinsp(o.reInspection);
+        if (Array.isArray(o.reInspections)) for (let i = 0; i < o.reInspections.length; i++) o.reInspections[i] = await reinsp(o.reInspections[i]);
+        if (Array.isArray(o.reInspections) && o.reInspections.length) o.reInspection = o.reInspections[o.reInspections.length - 1];
+        if (touched) { await db.collection('trackInspections').doc(id).set(o); migrated++; }
+        else alreadyOk++;
+      } catch (e) {
+        failed.push(id); // doc left untouched (still base64) -> safe to re-run
+      }
+      if (out) out.textContent = `Diproses ${di+1}/${docs.length} — dipindah ${migrated}, sedia URL ${alreadyOk}, gagal ${failed.length}...`;
+    }
+    if (out) out.textContent = `Selesai. Dipindah ${migrated}, sudah-URL ${alreadyOk}, gagal ${failed.length}` + (failed.length ? ` (ulang butang untuk cuba lagi yang gagal: ${failed.slice(0,5).join(', ')}${failed.length>5?'…':''})` : '') + '.';
+  } catch (e) {
+    console.error('migrateTrackPhotos error:', e);
+    if (out) { out.style.color = '#dc2626'; out.textContent = 'Ralat: ' + ((e && e.message) || e) + '. Dokumen yang belum diproses kekal utuh.'; }
+    alert('Gagal migrasi: ' + ((e && e.message) || e));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = orig || 'Migrasi Gambar Track'; }
+  }
+}
+window.migrateTrackPhotos = migrateTrackPhotos;
 
 // Check if email is admin (super admin or from admins collection)
 async function isAdminUser(email) {
