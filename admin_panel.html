@@ -4457,8 +4457,17 @@ tr:hover td {
     <!-- Settings Section -->
     <div id="sectionSettings" class="page-section" style="display:none">
       <div class="card">
-        <h3>Settings</h3>
-        <p style="color:var(--muted);padding:40px;text-align:center">Settings content coming soon...</p>
+        <h3>Database Maintenance</h3>
+        <p style="color:var(--muted);font-size:13px;margin:8px 0 16px">
+          Bersihkan dokumen sementara <code>_timeSync</code> (sampah kalibrasi jam) yang terkumpul.
+          Selamat &mdash; ia <strong>tidak</strong> menyentuh data inspeksi, defect, gambar atau pengguna.
+          Hanya dokumen <code>temp_*</code> yang lebih lama dari 5 minit akan dipadam.
+        </p>
+        <button class="btn btn-primary" style="width:auto" id="btnCleanTimeSync" onclick="cleanupTimeSyncDocs()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Bersihkan _timeSync
+        </button>
+        <div id="timeSyncCleanResult" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
       </div>
     </div>
 
@@ -5415,6 +5424,52 @@ let currentAdminEmail = '';
 let currentAdminRole = 'superadmin';
 let currentAdminAccess = [];
 let cachedAdminEmails = [];
+
+// ===== DATABASE MAINTENANCE: clean up accumulated _timeSync temp docs =====
+// One-time housekeeping. _timeSync is a throwaway clock-calibration collection (no link to
+// inspections / defects / photos / users), so deleting its temp docs cannot affect any real
+// data. SAFETY LAYERS: (1) admin-only (panel is gated + we re-check currentAdminEmail);
+// (2) confirm dialog; (3) ONLY delete docs whose id starts with 'temp_'; (4) SKIP any doc
+// younger than 5 minutes (a device could be mid-calibration on it — it would just recalibrate);
+// (5) batched deletes (<=450, under Firestore's 500-op limit), awaited; (6) errors are caught
+// and reported, never crash the page.
+async function cleanupTimeSyncDocs() {
+  const btn = document.getElementById('btnCleanTimeSync');
+  const out = document.getElementById('timeSyncCleanResult');
+  if (!currentAdminEmail) { alert('Sila login sebagai admin dahulu.'); return; }
+  if (!confirm('Padam dokumen _timeSync sementara yang lama?\n\nIni HANYA membersihkan sampah kalibrasi jam. Ia TIDAK menyentuh data inspeksi, defect, gambar atau pengguna.')) return;
+  const orig = btn ? btn.textContent : '';
+  try {
+    if (btn) { btn.disabled = true; btn.textContent = 'Membersih...'; }
+    if (out) { out.style.color = 'var(--muted)'; out.textContent = 'Membaca _timeSync...'; }
+    const snap = await db.collection('_timeSync').get();
+    const cutoff = Date.now() - 5 * 60 * 1000; // skip docs < 5 min old
+    const refs = [];
+    snap.forEach(d => {
+      if (!d.id || d.id.indexOf('temp_') !== 0) return;        // only throwaway temp_ docs
+      const ts = parseInt(d.id.slice(5), 10);                  // temp_<localBefore>
+      if (Number.isFinite(ts) && ts > cutoff) return;          // keep freshly-created docs
+      refs.push(d.ref);
+    });
+    let done = 0;
+    for (let i = 0; i < refs.length; i += 450) {
+      const batch = db.batch();
+      const slice = refs.slice(i, i + 450);
+      slice.forEach(ref => batch.delete(ref));
+      await batch.commit();
+      done += slice.length;
+      if (out) out.textContent = 'Dipadam ' + done + '/' + refs.length + '...';
+    }
+    if (out) out.textContent = 'Selesai. Dipadam ' + done + ' dokumen temp lama. (' + (snap.size - done) + ' dibiar: bukan temp / terlalu baru.)';
+  } catch (e) {
+    console.error('cleanupTimeSyncDocs error:', e);
+    if (out) { out.style.color = '#dc2626'; out.textContent = 'Ralat: ' + ((e && e.message) || e) + '. Tiada data lain terjejas.'; }
+    alert('Gagal membersih: ' + ((e && e.message) || e));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = orig || 'Bersihkan _timeSync'; }
+  }
+}
+window.cleanupTimeSyncDocs = cleanupTimeSyncDocs;
 
 // Check if email is admin (super admin or from admins collection)
 async function isAdminUser(email) {
