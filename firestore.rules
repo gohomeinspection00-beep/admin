@@ -1,49 +1,66 @@
 rules_version = '2';
 
 // =============================================================================
-// GoInspect — Firestore Security Rules  (TEMPLATE — VERIFY BEFORE DEPLOY)
+// GoInspect — Firestore Security Rules  (COMPLETE — matches the live app)
 // -----------------------------------------------------------------------------
-// Purpose: stop any logged-in customer from reading data that isn't theirs, and
-// (most importantly) stop them from reading the AI provider keys held in
-// settings/ayieConfig. Firestore is open by default in test mode — without
-// rules like these, every authenticated user can read every document.
+// Replaces the wide-open test-mode rules (allow read,write: if true) WITHOUT
+// breaking the app: every collection/path the app and admin panel actually use
+// is covered, with per-user / shared / admin scoping. Anything else is denied.
 //
-// HOW TO TEST SAFELY (do NOT deploy blind on a live app):
+// HOW TO DEPLOY SAFELY (rules are instant + instantly reversible; they never
+// touch data — they only gate access):
 //   1. Firebase Console > Firestore > Rules > paste this.
-//   2. Use the "Rules Playground" to simulate:
-//        - a normal user reading their OWN backups/{projectId}  -> ALLOW
-//        - the same user reading SOMEONE ELSE'S backup          -> DENY
-//        - an admin user reading settings/ayieConfig            -> ALLOW
-//        - a normal user reading settings/ayieConfig            -> DENY
-//   3. Then test the real app end-to-end with a normal account BEFORE relying on it.
+//   2. Rules Playground — simulate (all should match the comment):
+//        - user reads OWN backups/{id} (userEmail == them)        -> ALLOW
+//        - user reads SOMEONE ELSE'S backups/{id}                 -> DENY
+//        - user reads a backup SHARED with them (in sharedWith)   -> ALLOW
+//        - user writes _timeSync/temp_x (calibration)             -> ALLOW
+//        - normal user reads settings/ayieConfig (AI keys)        -> ALLOW (Phase 1)
+//        - normal user reads settings/appConfig                   -> DENY
+//        - admin reads users (collection), trackInspections, etc. -> ALLOW
+//   3. Test the real app end-to-end with a NORMAL account AND an ADMIN account
+//      AND a shared project, BEFORE relying on it. Keep the old rules handy to
+//      revert if anything is denied unexpectedly.
 //
-// NOTE ON EMAIL CASE: the app stores all emails lowercased (doc ids + userEmail
-// fields). We compare against request.auth.token.email.lower(). If your project
-// has users registered with mixed-case emails, verify lower() behaves as expected
-// in the Playground.
+// EMAIL CASE: the app keys everything lowercased; we compare token.email.lower().
+// AI KEYS: Phase 1 keeps settings/ayieConfig readable by any signed-in user so
+// AI features keep working with no code change (rotate the keys + set billing
+// caps, since a logged-in user can still extract them). Phase 2 (recommended):
+// move AI calls to a Cloud Function proxy, then switch ayieConfig read to admin.
 // =============================================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isSignedIn() {
-      return request.auth != null;
-    }
+    function isSignedIn() { return request.auth != null; }
 
-    // Lower-cased email of the signed-in user (app keys everything in lowercase).
+    // Lower-cased email of the signed-in user (or '' if not signed in / no email).
     function myEmail() {
-      return isSignedIn() ? request.auth.token.email.lower() : '';
+      return (isSignedIn() && request.auth.token.email != null)
+        ? request.auth.token.email.lower() : '';
     }
 
-    // Admin = users/{email}.isAdmin == true OR accountType == 'admin'
-    // (mirrors the client check at the admin-view code path).
+    // Hardcoded super admin (mirrors admin_panel SUPER_ADMIN_EMAIL).
+    function isSuperAdmin() {
+      return isSignedIn() && myEmail() == 'team.gohomeinspection@gmail.com';
+    }
+
+    // Admin = super admin, OR has an admins/{email} doc (admin panel model),
+    // OR users/{email}.isAdmin == true / accountType == 'admin' (app model).
+    // get()/exists() bypass rules (no recursion). Cheap checks are placed first
+    // at each call site so normal users rarely trigger these reads.
     function isAdmin() {
-      return isSignedIn()
-        && exists(/databases/$(database)/documents/users/$(myEmail()))
-        && (
-             get(/databases/$(database)/documents/users/$(myEmail())).data.isAdmin == true
-          || get(/databases/$(database)/documents/users/$(myEmail())).data.accountType == 'admin'
-        );
+      return isSignedIn() && (
+        isSuperAdmin()
+        || exists(/databases/$(database)/documents/admins/$(myEmail()))
+        || (
+             exists(/databases/$(database)/documents/users/$(myEmail()))
+             && (
+                  get(/databases/$(database)/documents/users/$(myEmail())).data.isAdmin == true
+               || get(/databases/$(database)/documents/users/$(myEmail())).data.accountType == 'admin'
+             )
+           )
+      );
     }
 
     function ownsByEmailField() {
@@ -52,75 +69,97 @@ service cloud.firestore {
     function creatingOwnByEmailField() {
       return isSignedIn() && request.resource.data.userEmail == myEmail();
     }
+    // True when the current user is listed in the doc's sharedWith[] array.
+    function isSharedWithMe() {
+      return isSignedIn()
+        && ('sharedWith' in resource.data)
+        && (resource.data.sharedWith is list)
+        && (myEmail() in resource.data.sharedWith);
+    }
 
-    // ---- users/{email} : a user's own profile/quota + their AI chat history ----
+    // ---- users/{email} : own profile/quota + AI chat subcollections ----
     match /users/{email} {
-      allow read, write: if isAdmin() || (isSignedIn() && email == myEmail());
-
-      // AI chat history subcollections are per-user.
-      match /ayieChats/{doc}      { allow read, write: if isAdmin() || (isSignedIn() && email == myEmail()); }
-      match /ayieFloatChats/{doc} { allow read, write: if isAdmin() || (isSignedIn() && email == myEmail()); }
-      match /{sub=**}             { allow read, write: if isAdmin() || (isSignedIn() && email == myEmail()); }
+      allow read, write: if (isSignedIn() && email == myEmail()) || isAdmin();
+      // ayieChats / ayieFloatChats and any other per-user subcollection.
+      match /{sub=**} {
+        allow read, write: if (isSignedIn() && email == myEmail()) || isAdmin();
+      }
     }
 
-    // ---- backups/{projectId} : inspection projects (carry userEmail) ----
-    match /backups/{projectId} {
-      allow read:   if isAdmin() || ownsByEmailField();
-      allow create: if creatingOwnByEmailField();
-      allow update: if isAdmin() || (ownsByEmailField() && creatingOwnByEmailField());
-      allow delete: if isAdmin() || ownsByEmailField();
-    }
-
-    // ---- trackInspections/{id} : repair-tracking docs (carry userEmail) ----
-    match /trackInspections/{id} {
-      allow read:   if isAdmin() || ownsByEmailField();
-      allow create: if creatingOwnByEmailField();
-      allow update: if isAdmin() || (ownsByEmailField() && creatingOwnByEmailField());
-      allow delete: if isAdmin() || ownsByEmailField();
-    }
-
-    // ---- homeSurveys/{accountEmail} : Survey module, keyed by the account email
-    // (lowercased), consistent with the rest of the app. ----
-    match /homeSurveys/{accountEmail} {
-      allow read, write: if isAdmin() || (isSignedIn() && accountEmail == myEmail());
-    }
-
-    // ---- orders/{orderId} : purchases (carry userEmail) ----
-    // Customers may read their own orders. Writes are restricted to admin/server
-    // (orders should be created by your trusted backend, not the client). If your
-    // app legitimately creates orders client-side, relax `create` after verifying.
-    match /orders/{orderId} {
-      allow read:   if isAdmin() || ownsByEmailField();
-      allow write:  if isAdmin();
-    }
-
-    // ---- settings/ayieConfig : AI provider keys (Gemini/Groq/Google TTS) ----
-    // *** THE IMPORTANT ONE ***  Restrict reads to admin so customers can't pull
-    // your billable keys out of the document.
-    //
-    // ⚠️ TRADE-OFF: the CURRENT client reads settings/ayieConfig directly to call
-    // the AI providers. If you lock it to admin-only, normal users' AI features
-    // (Ayie chat/voice, Survey AI) will STOP working, because the keys live on the
-    // client. Properly fixing this means moving AI calls to a server proxy
-    // (Cloud Function) that holds the keys, then the client never needs them.
-    //
-    //   Phase 1 (no code change, partial): keep this readable by signed-in users
-    //     but block writes — prevents tampering, but keys are still extractable.
-    //     -> allow read: if isSignedIn();  allow write: if isAdmin();
-    //   Phase 2 (recommended, needs the proxy): admin-only read as below, AND
-    //     route all AI calls through a Cloud Function.
-    match /settings/ayieConfig {
+    // ---- admins/{email} : admin-panel role lookup ----
+    match /admins/{email} {
       allow read:  if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // ---- backups/{projectId} : inspection projects (userEmail + sharedWith[]) ----
+    match /backups/{projectId} {
+      allow read:   if ownsByEmailField() || isSharedWithMe() || isAdmin();
+      allow create: if creatingOwnByEmailField() || isAdmin();
+      // owner, a shared collaborator, or admin may sync/edit. (A non-owner who is
+      // neither shared nor admin fails ownsByEmailField/isSharedWithMe -> denied,
+      // so no hijack is possible.)
+      allow update: if ownsByEmailField() || isSharedWithMe() || isAdmin();
+      allow delete: if ownsByEmailField() || isAdmin();
+    }
+
+    // ---- trackInspections/{id} : repair-tracking docs (userEmail) ----
+    match /trackInspections/{id} {
+      allow read:   if ownsByEmailField() || isAdmin();
+      allow create: if creatingOwnByEmailField() || isAdmin();
+      allow update: if ownsByEmailField() || isAdmin();
+      allow delete: if ownsByEmailField() || isAdmin();
+    }
+
+    // ---- homeSurveys/{accountEmail} : Survey module (doc id == email) ----
+    match /homeSurveys/{accountEmail} {
+      allow read, write: if (isSignedIn() && accountEmail == myEmail()) || isAdmin();
+      match /{sub=**} {
+        allow read, write: if (isSignedIn() && accountEmail == myEmail()) || isAdmin();
+      }
+    }
+
+    // ---- assignedInspections/{id} : admin-created assignments (userEmail) ----
+    // The assigned user reads their own; only admin creates/updates/deletes.
+    match /assignedInspections/{id} {
+      allow read:  if ownsByEmailField() || isAdmin();
       allow write: if isAdmin();
     }
-    // Any other settings docs: admin-only by default.
-    match /settings/{doc} {
+
+    // ---- inspectionBackups/{id} : admin cleanup only ----
+    match /inspectionBackups/{id} {
       allow read, write: if isAdmin();
     }
 
-    // ---- time-calibration / ping : safe to read publicly, no client writes ----
-    match /_timeSync/{doc} { allow read: if true;  allow write: if false; }
-    match /_ping/{doc}     { allow read: if true;  allow write: if isSignedIn(); }
+    // ---- userGroups/{id} : admin-only management ----
+    match /userGroups/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // ---- orders/{orderId} : customer reads own; writes admin/server only ----
+    match /orders/{orderId} {
+      allow read:  if ownsByEmailField() || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ---- settings : some docs the APP reads as a normal user, others admin-only.
+    // The specific blocks below grant signed-in read where the app needs it; the
+    // wildcard makes every OTHER settings doc admin-only. (Firestore allows a
+    // request if ANY matching rule allows it, so specific-allow wins over the
+    // wildcard for these docs.) Writes always admin-only.
+    match /settings/ayieConfig       { allow read: if isSignedIn(); allow write: if isAdmin(); }
+    match /settings/ayieTalkConfig   { allow read: if isSignedIn(); allow write: if isAdmin(); }
+    match /settings/appLinks         { allow read: if isSignedIn(); allow write: if isAdmin(); }
+    match /settings/voiceCorrections { allow read: if isSignedIn(); allow write: if isAdmin(); }
+    // appConfig, trackTimeline, and any future settings: admin-only (app never
+    // reads them as a normal user).
+    match /settings/{doc}            { allow read, write: if isAdmin(); }
+
+    // ---- clock calibration + ping : public read, signed-in write ----
+    // The app writes a throwaway _timeSync/temp_<ts> doc to read serverTime, then
+    // deletes it (and an admin button batch-cleans old ones) — both need write.
+    match /_timeSync/{doc} { allow read: if true; allow write: if isSignedIn(); }
+    match /_ping/{doc}     { allow read: if true; allow write: if isSignedIn(); }
 
     // ---- default deny everything else ----
     match /{document=**} {

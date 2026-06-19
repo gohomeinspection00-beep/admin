@@ -1,46 +1,84 @@
 rules_version = '2';
 
 // =============================================================================
-// GoInspect — Firebase Storage Security Rules  (TEMPLATE — VERIFY BEFORE DEPLOY)
+// GoInspect — Firebase Storage Security Rules  (COMPLETE — matches the live app)
 // -----------------------------------------------------------------------------
-// Scopes photo uploads to the owning account. Download URLs returned by the app
-// carry an access token, so reads are allowed (the app shares those URLs across
-// devices); writes are restricted to the owner.
+// Replaces wide-open test mode WITHOUT breaking uploads. Covers every prefix the
+// app/admin upload to: inspections/, surveys/, trackInspections/ (per-user), and
+// assignments/ (admin-only, no email in the path). Reads stay public because the
+// app shares tokenized download URLs across devices. Everything else denied.
 //
-// ⚠️ IMPORTANT: deploying Storage rules affects ALL uploads. This file covers the
-// two prefixes the app uses today:
-//   - inspections/<email>/...   (inspection module photos)
-//   - surveys/<email>/...       (Home Survey photos — new)
-// If your app uploads to any OTHER path, ADD it here first, then test in the
-// Firebase Console "Rules Playground" with a real account BEFORE deploying, or
-// uploads will start failing. If you do NOT deploy this (Storage stays in test
-// mode), the app still works — this only adds protection.
+// DEPLOY SAFELY (instant + reversible; rules never touch the stored bytes):
+//   1. Firebase Console > Storage > Rules > paste this.
+//   2. Rules Playground — simulate:
+//        - user uploads inspections/<theirEmail>/...      -> ALLOW
+//        - user uploads inspections/<otherEmail>/...      -> DENY
+//        - user uploads trackInspections/<theirEmail>/... -> ALLOW
+//        - admin uploads assignments/...                  -> ALLOW
+//        - read any covered path                          -> ALLOW
+//   3. Test real uploads with a normal account AND the admin (Track migration +
+//      assignment photo upload) BEFORE relying on it. Keep old rules to revert.
 //
-// NOTE ON EMAIL CASE: the app lowercases emails; we compare against
-// request.auth.token.email.lower(). Verify lower() in the Playground if any
-// account uses a mixed-case email.
+// NOTE: reads remain `if true` (download URLs carry an access token and are
+// shared across devices). This means a known/guessed path stays readable; the
+// real protection here is locking WRITES (no overwrite/delete by strangers).
+// EMAIL CASE: compared lowercased, matching the app's path convention.
 // =============================================================================
 
 service firebase.storage {
   match /b/{bucket}/o {
 
     function isSignedIn() { return request.auth != null; }
-    function myEmail() { return isSignedIn() ? request.auth.token.email.lower() : ''; }
-
-    // Home Survey photos: surveys/<email>/<unitId>/<file>
-    match /surveys/{accountEmail}/{allPaths=**} {
-      allow read:  if true;                                  // download URLs carry a token
-      allow write: if isSignedIn() && accountEmail == myEmail();
+    function myEmail() {
+      return (isSignedIn() && request.auth.token.email != null)
+        ? request.auth.token.email.lower() : '';
+    }
+    function isSuperAdmin() {
+      return isSignedIn() && myEmail() == 'team.gohomeinspection@gmail.com';
+    }
+    // Storage rules may read Firestore to recognise admins (admins/{email} doc or
+    // users/{email}.isAdmin), so the admin's Track-migration cross-user uploads
+    // and assignment uploads are allowed.
+    function isAdmin() {
+      return isSignedIn() && (
+        isSuperAdmin()
+        || firestore.exists(/databases/(default)/documents/admins/$(myEmail()))
+        || (
+             firestore.exists(/databases/(default)/documents/users/$(myEmail()))
+             && (
+                  firestore.get(/databases/(default)/documents/users/$(myEmail())).data.isAdmin == true
+               || firestore.get(/databases/(default)/documents/users/$(myEmail())).data.accountType == 'admin'
+             )
+           )
+      );
     }
 
     // Inspection photos: inspections/<email>/<projectId>/<file>
     match /inspections/{accountEmail}/{allPaths=**} {
       allow read:  if true;
-      allow write: if isSignedIn() && accountEmail == myEmail();
+      allow write: if (isSignedIn() && accountEmail == myEmail()) || isAdmin();
     }
 
-    // Everything else: deny by default. If the app uses other Storage paths, add
-    // explicit match blocks above BEFORE deploying (otherwise those uploads break).
+    // Home Survey photos: surveys/<email>/<unitId>/<file>
+    match /surveys/{accountEmail}/{allPaths=**} {
+      allow read:  if true;
+      allow write: if (isSignedIn() && accountEmail == myEmail()) || isAdmin();
+    }
+
+    // Track Your Inspection photos: trackInspections/<email>/<trackId>/<file>
+    match /trackInspections/{accountEmail}/{allPaths=**} {
+      allow read:  if true;
+      allow write: if (isSignedIn() && accountEmail == myEmail()) || isAdmin();
+    }
+
+    // Admin assignment photos: assignments/<file> (flat prefix, no email segment)
+    // -> must be admin-gated, not owner-by-path.
+    match /assignments/{allPaths=**} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // Everything else: deny.
     match /{allPaths=**} {
       allow read, write: if false;
     }
