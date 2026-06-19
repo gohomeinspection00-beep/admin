@@ -161,6 +161,37 @@ service cloud.firestore {
     match /_timeSync/{doc} { allow read: if true; allow write: if isSignedIn(); }
     match /_ping/{doc}     { allow read: if true; allow write: if isSignedIn(); }
 
+    // ===========================================================================
+    // OTHER APPS sharing this same Firebase project (NOT part of the GoInspect
+    // app/admin audited here). Their rules are PRESERVED so deploying this file
+    // does NOT break them. Without these explicit blocks the default-deny below
+    // would lock them out. TODO: tighten these once each app's code is reviewed.
+    // ===========================================================================
+
+    // Contractor Job Mode (existing deployed rules, kept verbatim).
+    match /contractorJobs/{jobId} {
+      allow create: if request.auth != null;
+      allow read:   if true;
+      allow update, delete: if request.auth != null
+        && request.auth.token.email == resource.data.userEmail;
+
+      match /quotations/{qId} {
+        allow create: if true;
+        allow read, update, delete: if request.auth != null
+          && get(/databases/$(database)/documents/contractorJobs/$(jobId)).data.userEmail == request.auth.token.email;
+      }
+    }
+
+    // Other apps' collections — preserved as currently-open to avoid breakage.
+    // (These were covered by the old `match /{document=**}: if true`.)
+    match /pocketChats/{p=**}        { allow read, write: if true; }
+    match /pocketInspections/{p=**}  { allow read, write: if true; }
+    match /siteSessions/{p=**}       { allow read, write: if true; }
+    match /ssDocuments/{p=**}        { allow read, write: if true; }
+    match /ssPropertyProfile/{p=**}  { allow read, write: if true; }
+    match /ssRenovation/{p=**}       { allow read, write: if true; }
+    match /ssSchedule/{p=**}         { allow read, write: if true; }
+
     // ---- default deny everything else ----
     match /{document=**} {
       allow read, write: if false;
