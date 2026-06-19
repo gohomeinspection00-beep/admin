@@ -29707,11 +29707,15 @@ const renderHistoryCard = (p, container) => {
       // ingesting a half-written cloud doc here can keep both a local idb ref and its just-uploaded
       // http twin = doubled photo. The merge defers to the next sync; the project still opens from
       // local data below. (Bounded: the heartbeat lock releases on sync completion / 60s-no-progress.)
-      if (navigator.onLine && window.currentUserData && !(typeof isSyncLocked === 'function' && isSyncLocked(proj.id))) {
+      // AUTH GATE (security rollout) added to the condition: inert until AUTH_ENFORCED;
+      // when enforced and no auth session, the whole open-time merge is skipped (the
+      // button is only touched inside this block, so nothing is left stuck) and the
+      // project opens from local data below.
+      if (navigator.onLine && window.currentUserData && !(typeof isSyncLocked === 'function' && isSyncLocked(proj.id)) && (await authGateOk())) {
         try {
           btn.innerHTML = '<span>Syncing...</span>';
           btn.disabled = true;
-          
+
           const cloudDoc = await db.collection('backups').doc(proj.id).get();
           
           if (cloudDoc.exists) {
