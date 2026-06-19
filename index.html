@@ -9801,12 +9801,54 @@ const getUserSession = async () => {
   }
 };
 
+// ===== AUTH SESSION GATE (security rollout — Phase 1) =====
+// The app gates cloud ops on window.currentUserData, NOT on a real Firebase Auth
+// session, so it can talk to Firestore with request.auth == null (works only
+// because the backend is in open test mode). Before we deploy security rules we
+// must guarantee a real Auth session. ensureAuthSession() restores one silently.
+//
+// SAFETY: AUTH_ENFORCED stays false until firestore.rules + storage.rules are
+// deployed. While false, authGateOk() ALWAYS returns true (after an opportunistic
+// re-auth) so behaviour is 100% unchanged. When the rules are live, flip
+// AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
+// skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
+let AUTH_ENFORCED = false; // <-- flip to true ONLY after the security rules are deployed
+let _lastAuthAttempt = 0;
+const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
+
+async function ensureAuthSession() {
+  try {
+    if (firebase.auth().currentUser) return true;           // common case: already authed
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return false; // offline -> stay local
+    if (Date.now() - _lastAuthAttempt < _AUTH_RETRY_MS) return false;         // cooldown
+    _lastAuthAttempt = Date.now();
+    const sess = await getUserSession();
+    if (!sess || !sess.email || !sess.password) return false;
+    await firebase.auth().signInWithEmailAndPassword(sess.email, sess.password);
+    return !!firebase.auth().currentUser;
+  } catch (e) {
+    console.warn('ensureAuthSession: silent re-auth failed (staying local):', e && e.code);
+    return false;
+  }
+}
+
+// Call at the top of every cloud entry point: `if (!(await authGateOk())) { ...cleanup...; return; }`
+// Returns true => proceed with the cloud op; false => skip and stay local. While
+// AUTH_ENFORCED is false this returns true even when re-auth fails (open rules), so
+// nothing changes yet; the skip branch only fires once enforcement is turned on.
+async function authGateOk() {
+  const ok = await ensureAuthSession();
+  if (ok) return true;
+  return AUTH_ENFORCED ? false : true;
+}
+window.ensureAuthSession = ensureAuthSession;
+window.authGateOk = authGateOk;
+
 // Clear user session
 const clearUserSession = async () => {
   try {
     const db = await openDB();
-    await new Promise((res, rej) => {
-      const tx = db.transaction(SESSION_STORE, 'readwrite');
+    await new Promise((res, rej) => {      const tx = db.transaction(SESSION_STORE, 'readwrite');
       tx.objectStore(SESSION_STORE).delete('currentUser');
       tx.oncomplete = () => res();
       tx.onerror = () => rej(tx.error);
@@ -15291,13 +15333,18 @@ const startCloudSync = () => {
     }
   }, CLOUD_PULL_INTERVAL);
   
-  // FIX: Pull from cloud when tab becomes visible (user switches back to app)
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && isOnline && window.currentUserEmail) {
-      console.log('Tab visible - pulling from cloud');
-      setTimeout(pullFromCloud, 1000);
-    }
-  });
+  // FIX: Pull from cloud when tab becomes visible (user switches back to app).
+  // Guarded so re-calling startCloudSync (e.g. after a silent re-auth) doesn't
+  // stack duplicate visibilitychange listeners.
+  if (!window._goVisListenerAdded) {
+    window._goVisListenerAdded = true;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && isOnline && window.currentUserEmail) {
+        console.log('Tab visible - pulling from cloud');
+        setTimeout(pullFromCloud, 1000);
+      }
+    });
+  }
   
   // Pull immediately on start
   setTimeout(pullFromCloud, 3000);
