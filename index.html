@@ -9958,7 +9958,12 @@ const getCalibratedTimestamp = () => {
 // Calibrate local clock with server time
 const calibrateServerTime = async () => {
   if (!firebase.firestore) return;
-  
+
+  // AUTH GATE (security rollout): _timeSync write needs auth once rules are deployed.
+  // Inert until AUTH_ENFORCED; when enforced and no session, skip (offset stays 0 ->
+  // calibration degrades to local time, which the app already tolerates).
+  if (!(await authGateOk())) return;
+
   // FIX (leak): tempRef declared outside try so the finally can ALWAYS delete the temp
   // doc — previously delete ran only inside the success `if`, so a read failure / missing
   // serverTime / early page-close left the doc behind and _timeSync accumulated forever.
@@ -10230,7 +10235,16 @@ const silentBackupProject = async (projectOrId) => {
     }
     return false; // FIX (M2): not pushed (offline) -> callers must keep pending flag
   }
-  
+
+  // AUTH GATE (security rollout): ensure a real Firebase Auth session before any cloud
+  // write. Inert while AUTH_ENFORCED is false (authGateOk() returns true). When enforced
+  // and no session can be restored, keep the pending flag and stay local (no data loss).
+  if (!(await authGateOk())) {
+    const _pid = (typeof projectOrId === 'string') ? projectOrId : (projectOrId && projectOrId.id);
+    if (_pid && typeof markPendingUpload === 'function') markPendingUpload(_pid);
+    return false;
+  }
+
   // Accept both project object or project ID
   let project;
   if (typeof projectOrId === 'string') {
@@ -14272,7 +14286,11 @@ const _flushPendingCloudRefresh = () => {
 const pullFromCloud = async () => {
   // Check if user is logged in and online
   if (!window.currentUserEmail || !isOnline) return;
-  
+
+  // AUTH GATE (security rollout): inert until AUTH_ENFORCED; when enforced and no auth
+  // session, skip the pull silently and stay on local data.
+  if (!(await authGateOk())) return;
+
   // FIX A: Don't pull while reconnect push is in progress
   // Push must complete first to ensure local changes are in cloud before pulling
   if (_reconnectPushInProgress) {
@@ -34579,7 +34597,13 @@ window.syncProjectToCloud = async function(project, progressCallback = null) {
   if (!window.currentUserData) {
     throw new Error('Please login first');
   }
-  
+
+  // AUTH GATE (security rollout): inert until AUTH_ENFORCED. When enforced and no auth
+  // session can be restored, fail gently (caller alerts) and the project stays local.
+  if (!(await authGateOk())) {
+    throw new Error('Sesi log masuk tamat. Sila log masuk semula untuk sync.');
+  }
+
   const userEmail = window.currentUserData.email.toLowerCase();
   const projectId = project.id;
   
@@ -35142,10 +35166,17 @@ window.twoWaySyncProject = async function(project) {
   if (!isOnline) {
     throw new Error('Tiada sambungan internet. Sila cuba lagi apabila online.');
   }
-  
+
+  // AUTH GATE (security rollout): inert until AUTH_ENFORCED. When enforced and no auth
+  // session can be restored, fail gently BEFORE acquiring the lock / showing the overlay
+  // (nothing left stuck); the caller shows the message and the project stays local.
+  if (!(await authGateOk())) {
+    throw new Error('Sesi log masuk tamat. Sila log masuk semula untuk sync.');
+  }
+
   const userEmail = window.currentUserData.email.toLowerCase();
   const projectId = project.id;
-  
+
   if (!acquireSyncLock(projectId)) {
     throw new Error('Sync sedang berjalan. Sila tunggu.');
   }
@@ -36034,7 +36065,11 @@ window.twoWaySyncProject = async function(project) {
 // Check cloud for new defects (called periodically or on history load)
 window.checkCloudForNewDefects = async function() {
   if (!window.currentUserData || !navigator.onLine) return;
-  
+
+  // AUTH GATE (security rollout): inert until AUTH_ENFORCED; when enforced and no auth
+  // session, skip the cloud queries silently and stay on local data.
+  if (!(await authGateOk())) return;
+
   const userEmail = window.currentUserData.email.toLowerCase();
   let totalMerged = 0;
   let totalAreasAdded = 0;
