@@ -37894,57 +37894,38 @@ loginForm.addEventListener("submit", async function(e) {
   }
   
   try {
-    // First check if user exists in Firestore
-    const userDoc = await db.collection("users").doc(email).get();
-    
-    if (!userDoc.exists) {
-      throw new Error("Account tidak dijumpai. Sila hubungi admin.");
-    }
-    
-    const userData = userDoc.data();
-    
-    // Save password hash for offline login (optional security)
-    userData.password = password;
-    
-    // Try to sign in first
+    // SECURITY (rules): reading users/{email} requires being signed in, so we must
+    // authenticate to Firebase Auth FIRST, then read the profile. Passwords were
+    // reconciled to match Firestore, so signing in directly works. (The old flow
+    // read the doc pre-auth to bootstrap an Auth account; that read is now denied,
+    // and the bootstrap is no longer needed — every user has a reconciled Auth
+    // account, and admin create/edit auto-syncs new ones via the Cloud Function.)
+    await auth.signInWithEmailAndPassword(email, password);
+
+    // Signed in -> the user-doc read is now permitted. Get profile for the offline
+    // session cache (onAuthStateChanged also fetches it for the UI).
+    let userData = {};
     try {
-      await auth.signInWithEmailAndPassword(email, password);
-      
-      // Save session for offline use after successful login
-      await saveUserSession({ ...userData, email: email });
-      
-    } catch (authError) {
-      console.log('Auth error code:', authError.code);
-      
-      if (authError.code === "auth/user-not-found") {
-        if (userData.password === password) {
-          await auth.createUserWithEmailAndPassword(email, password);
-          await saveUserSession({ ...userData, email: email });
-        } else {
-          throw new Error("Password salah.");
-        }
-      } else if (authError.code === "auth/wrong-password" || authError.code === "auth/invalid-credential") {
-        if (userData.password === password) {
-          try {
-            await auth.createUserWithEmailAndPassword(email, password);
-            await saveUserSession({ ...userData, email: email });
-          } catch (createError) {
-            if (createError.code === "auth/email-already-in-use") {
-              throw new Error("Password salah.");
-            }
-            throw createError;
-          }
-        } else {
-          throw new Error("Password salah.");
-        }
-      } else {
-        throw authError;
-      }
-    }
-    
-  } catch (error) {
-    console.error("Login error:", error);
-    showLoginError(error.message || "Login gagal. Sila cuba lagi.");
+      const userDoc = await db.collection("users").doc(email).get();
+      if (userDoc.exists) userData = userDoc.data();
+    } catch (e) { /* non-fatal: onAuthStateChanged refetches for the UI */ }
+    userData.password = password; // keep for offline login
+    await saveUserSession({ ...userData, email: email });
+
+    // The startup settings reads (appLinks etc.) ran pre-auth and were denied; now
+    // that we're signed in, refresh the external app links.
+    if (typeof loadAppLinks === 'function') { try { loadAppLinks(); } catch (e) {} }
+
+  } catch (authError) {
+    console.error("Login error:", authError && authError.code, authError);
+    let msg = "Login gagal. Sila cuba lagi.";
+    const c = authError && authError.code;
+    if (c === "auth/wrong-password" || c === "auth/invalid-credential") msg = "Password salah.";
+    else if (c === "auth/user-not-found") msg = "Account tidak dijumpai. Sila hubungi admin.";
+    else if (c === "auth/too-many-requests") msg = "Terlalu banyak cubaan. Sila cuba lagi sebentar nanti.";
+    else if (c === "auth/network-request-failed") msg = "Masalah sambungan internet. Sila cuba lagi.";
+    else if (authError && authError.message) msg = authError.message;
+    showLoginError(msg);
     loginBtn.disabled = false;
     loginBtn.textContent = "Login";
   }
