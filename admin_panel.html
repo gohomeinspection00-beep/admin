@@ -3225,7 +3225,6 @@ tr:hover td {
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
-            <th>Password</th>
             <th>Quota</th>
             <th>Active Status</th>
             <th>Status</th>
@@ -4499,6 +4498,19 @@ tr:hover td {
           Selaras Password (Auth)
         </button>
         <div id="reconcileResult" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+        <hr style="margin:16px 0;border:none;border-top:1px solid var(--border)">
+        <p style="color:var(--muted);font-size:13px;margin:8px 0 16px">
+          <strong>Phase 5 &mdash; Buang Password Plaintext.</strong> Buang password yang tersimpan dalam
+          Firestore (login tetap guna Firebase Auth). Selepas ini admin <strong>TAK boleh nampak</strong>
+          password lagi &mdash; hanya RESET. <strong>WAJIB</strong> klik &quot;Selaras Password (Auth)&quot;
+          di atas DAHULU supaya semua user ada password Auth.
+          <br><em>Super admin sahaja.</em>
+        </p>
+        <button class="btn btn-primary" style="width:auto;background:#dc2626" id="btnStripPasswords" onclick="stripPlaintextPasswords()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Buang Password Plaintext
+        </button>
+        <div id="stripResult" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
       </div>
     </div>
 
@@ -5608,6 +5620,55 @@ async function migrateTrackPhotos() {
 }
 window.migrateTrackPhotos = migrateTrackPhotos;
 
+// ===== SECURITY Phase 5: delete plaintext passwords from Firestore =====
+// Login uses Firebase Auth (hashed), so the Firestore users/{email}.password and
+// admins/{email}.password fields are no longer needed. Run AFTER "Selaras Password
+// (Auth)" so every account is guaranteed to have a working Auth password. Super-admin
+// only (writing admins/{email} requires super-admin per the security rules). Batched
+// FieldValue.delete() — safe & idempotent (re-running just finds nothing left).
+async function stripPlaintextPasswords() {
+  const out = document.getElementById('stripResult');
+  if (!currentAdminEmail) { alert('Sila login sebagai admin dahulu.'); return; }
+  if ((currentAdminRole || '') !== 'superadmin' && (currentAdminEmail || '').toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    alert('Super admin sahaja boleh buang password plaintext.'); return;
+  }
+  if (!confirm('Buang SEMUA password plaintext dari Firestore?\n\nPASTIKAN awak dah klik "Selaras Password (Auth)" dahulu (supaya semua user ada password Auth & tak terkunci).\n\nSelepas ini admin TIDAK boleh nampak password lagi — hanya RESET. Login tetap berfungsi.\n\nTeruskan?')) return;
+  const btn = document.getElementById('btnStripPasswords');
+  if (btn) { btn.disabled = true; }
+  if (out) out.textContent = 'Sedang membuang...';
+  const FV = firebase.firestore.FieldValue;
+  let removed = 0;
+  async function stripCollection(name) {
+    let snap;
+    try { snap = await db.collection(name).get(); } catch (e) { return { skipped: true, error: (e && e.message) || 'read failed' }; }
+    let batch = db.batch(), n = 0;
+    for (const d of snap.docs) {
+      const data = d.data() || {};
+      if (Object.prototype.hasOwnProperty.call(data, 'password')) {
+        batch.update(d.ref, { password: FV.delete() });
+        removed++; n++;
+        if (n >= 400) { await batch.commit(); batch = db.batch(); n = 0; }
+      }
+    }
+    if (n > 0) await batch.commit();
+    return { ok: true };
+  }
+  try {
+    await stripCollection('users');
+    const adminRes = await stripCollection('admins'); // needs super-admin write
+    let msg = 'Siap! ' + removed + ' password plaintext dibuang. Login tetap berfungsi (Firebase Auth).';
+    if (adminRes && adminRes.skipped) msg += ' (Nota: koleksi admins dilangkau: ' + adminRes.error + ')';
+    if (out) { out.textContent = msg; out.style.color = '#16a34a'; }
+    alert(msg);
+    if (typeof loadUsers === 'function') loadUsers();
+  } catch (e) {
+    if (out) { out.textContent = 'Ralat: ' + ((e && e.message) || e); out.style.color = '#dc2626'; }
+    alert('Ralat semasa membuang: ' + ((e && e.message) || e));
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
 // ===== SECURITY Phase 1.5: one-time reconcile of ALL Auth passwords from Firestore =====
 // Calls the reconcileAllPasswords Cloud Function (super-admin only) so the existing user
 // population's Firebase Auth passwords match users/{email}.password — needed before the
@@ -6149,10 +6210,6 @@ function renderUsersSection(users) {
               <span class="um-detail-value">${escapeHtml(user.phone || '-')}</span>
             </div>
             <div class="um-detail-item">
-              <span class="um-detail-label">Password</span>
-              <span class="um-detail-value" style="font-family:monospace">${escapeHtml(user.password || '-')}</span>
-            </div>
-            <div class="um-detail-item">
               <span class="um-detail-label">Created</span>
               <span class="um-detail-value">${createdDate}</span>
             </div>
@@ -6355,7 +6412,6 @@ async function addUserFromSection(e) {
       name: name,
       email: email,
       phone: phone,
-      password: password,
       inspectionLimit: limit,
       inspectionUsed: 0,
       activeDays: activeDays,
@@ -6365,8 +6421,10 @@ async function addUserFromSection(e) {
       featureAccess: faCollectToggles('add')
     });
 
-    // Phase 1.5: align the Firebase Auth password (best-effort; never blocks creation)
-    await syncAuthPassword(email, password);
+    // Phase 5: Firebase Auth is the ONLY password store now (not Firestore). Surface
+    // any failure so a user is never left unable to log in.
+    const _sync = await syncAuthPassword(email, password);
+    if (!_sync.ok) alert('AMARAN: User dicipta tetapi password Auth GAGAL diset (' + (_sync.reason || 'ralat') + ').\nUser mungkin TIDAK boleh log masuk. Sila buka Edit user ini dan set password semula.');
 
     successDiv.textContent = 'User created successfully!';
     successDiv.style.display = 'block';
@@ -6422,7 +6480,6 @@ function viewUserDetails(email) {
         <div style="display:flex;flex-direction:column;gap:8px">
           <div><strong>Email:</strong> ${escapeHtml(user.email)}</div>
           <div><strong>Phone:</strong> ${escapeHtml(user.phone || '-')}</div>
-          <div><strong>Password:</strong> <code style="background:#f1f5f9;padding:2px 8px;border-radius:4px">${escapeHtml(user.password || '-')}</code></div>
         </div>
       </div>
       
@@ -6660,7 +6717,6 @@ function createUserRow(email, user) {
     <td><strong>${esc(user.name || '-')}</strong></td>
     <td>${esc(email)}</td>
     <td>${esc(user.phone || '-')}</td>
-    <td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">${esc(user.password || '-')}</code></td>
     <td><strong>${used}</strong> / ${limit}</td>
     <td>${activeStatusHtml}</td>
     <td>${badge}</td>
@@ -6838,7 +6894,6 @@ async function addUser(e) {
       name: name,
       email: email,
       phone: phone,
-      password: password,
       inspectionLimit: limit,
       inspectionUsed: 0,
       activeDays: activeDays,
@@ -6846,8 +6901,10 @@ async function addUser(e) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Phase 1.5: align the Firebase Auth password (best-effort; never blocks creation)
-    await syncAuthPassword(email, password);
+    // Phase 5: Firebase Auth is the ONLY password store now (not Firestore). Surface
+    // any failure so a user is never left unable to log in.
+    const _sync = await syncAuthPassword(email, password);
+    if (!_sync.ok) alert('AMARAN: User dicipta tetapi password Auth GAGAL diset (' + (_sync.reason || 'ralat') + ').\nUser mungkin TIDAK boleh log masuk. Sila buka Edit user ini dan set password semula.');
 
     // Clear form
     document.getElementById('userName').value = '';
@@ -6899,7 +6956,6 @@ async function addUserFromUM(e) {
       name: name,
       email: email,
       phone: phone,
-      password: password,
       inspectionLimit: limit,
       inspectionUsed: 0,
       activeDays: activeDays,
@@ -6907,8 +6963,10 @@ async function addUserFromUM(e) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Phase 1.5: align the Firebase Auth password (best-effort; never blocks creation)
-    await syncAuthPassword(email, password);
+    // Phase 5: Firebase Auth is the ONLY password store now (not Firestore). Surface
+    // any failure so a user is never left unable to log in.
+    const _sync = await syncAuthPassword(email, password);
+    if (!_sync.ok) alert('AMARAN: User dicipta tetapi password Auth GAGAL diset (' + (_sync.reason || 'ralat') + ').\nUser mungkin TIDAK boleh log masuk. Sila buka Edit user ini dan set password semula.');
 
     // Clear form
     document.getElementById('umUserName').value = '';
@@ -7042,14 +7100,12 @@ async function editUser(email) {
     };
     
     const newPassword = document.getElementById('editPassword').value;
-    if (newPassword) {
-      updateData.password = newPassword;
-    }
-    
+    // Phase 5: do NOT store the password in Firestore — set it only in Firebase Auth below.
+
     try {
       await db.collection('users').doc(email).update(updateData);
-      // Phase 1.5: if the password was changed, align Firebase Auth too (best-effort).
-      if (newPassword) await syncAuthPassword(email, newPassword);
+      // Phase 5: if the password was changed, set it in Firebase Auth (the only store).
+      if (newPassword) { const _sync = await syncAuthPassword(email, newPassword); if (!_sync.ok) alert('AMARAN: Password Auth GAGAL ditukar (' + (_sync.reason || 'ralat') + '). Sila cuba lagi.'); }
       document.getElementById('editModal').remove();
       alert('User updated successfully!');
       loadUsers();
@@ -10859,7 +10915,6 @@ async function addNewAdmin(e) {
     await db.collection('admins').doc(email).set({
       name: name,
       email: email,
-      password: password,
       role: role,
       access: access,
       addedBy: currentAdminEmail,
@@ -10957,12 +11012,13 @@ async function saveEditAdmin(email) {
   });
   
   const newPassword = document.getElementById('editAdminPassword').value;
-  if (newPassword) {
-    updates.password = newPassword;
-  }
-  
+  // Phase 5: admin password is NOT stored in Firestore — set it in Firebase Auth via
+  // the Cloud Function (this also FIXES the old bug where an admin password edit only
+  // wrote Firestore and never updated the actual Auth login password).
+
   try {
     await db.collection('admins').doc(email).update(updates);
+    if (newPassword) { const _s = await syncAuthPassword(email, newPassword); if (!_s.ok) alert('AMARAN: Password Auth admin GAGAL ditukar (' + (_s.reason || 'ralat') + ').'); }
     document.getElementById('editAdminModal').remove();
     alert('Admin updated successfully!');
     loadAdminAccounts();
