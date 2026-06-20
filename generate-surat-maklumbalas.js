@@ -326,45 +326,124 @@ y += 10;
 
 doc.setFontSize(SZ.SMALL); bk();
 doc.text(`Tarikh Perbualan: ${data.tarikhKenyataanPemaju}`, mL, y); y += LH_S;
-doc.text("Platform: WhatsApp (En Faqeh - Faire Development)", mL, y); y += LH_S;
+doc.text("Platform: WhatsApp", mL, y); y += LH_S;
+doc.text("Kenalan: En Faqeh — Faire Development Sdn. Bhd.", mL, y); y += LH_S;
 doc.text(`Berkaitan: Tag ${data.defectTag} — ${data.defectDescription}`, mL, y); y += 10;
 
-// Try to load screenshot image if exists
-const screenshotPath = "/home/user/admin/screenshot_whatsapp_faire.png";
-let hasImage = false;
-try {
-  if (fs.existsSync(screenshotPath)) {
-    const imgData = fs.readFileSync(screenshotPath);
-    const base64 = imgData.toString("base64");
-    const imgW = 90;
-    const imgH = 160;
-    const imgX = (pageW - imgW) / 2;
-    doc.addImage("data:image/png;base64," + base64, "PNG", imgX, y, imgW, imgH);
-    y += imgH + 5;
-    hasImage = true;
-  }
-} catch (e) {}
+// Transkrip WhatsApp
+const chatMessages = [
+  { time: "14:13", sender: "Pemilik", text: "[Gambar laporan pemeriksaan dihantar]", italic: true },
+  { time: "14:14", sender: "Pemilik", text: "Boleh saya tau kenapa tangga senget ni status as void?" },
+  { time: "14:15", sender: "En Faqeh (Faire Dev)", text: "Saya dapatkan kepastian dulu dari project team" },
+  { time: "14:18", sender: "Pemilik", text: "Ok baik. Tolong maklumkan saya segera ya. Sebab saya pun nak maklumkan & dapatkan penerangan dari Building Surveyor." },
+  { time: "16:37", sender: "En Faqeh (Faire Dev)", text: "Tuan, untuk makluman tuan misalignment 15mm yang dimaksudkan masih lagi dalam kelonggaran binaan bangunan yang ditetapkan. Pihak kami sudah beberapa kali periksa untuk pastikan keadaan dan tangga yang dimaklumkan", highlight: true },
+];
 
-if (!hasImage) {
-  const boxW = 100;
-  const boxH = 170;
-  const boxX = (pageW - boxW) / 2;
-  doc.setLineWidth(0.3); bk();
-  doc.rect(boxX, y, boxW, boxH);
-  doc.setFont("helvetica", "normal"); doc.setFontSize(14);
-  doc.setTextColor(180, 180, 180);
-  doc.text("[SCREENSHOT WHATSAPP]", pageW / 2, y + boxH / 2 - 10, { align: "center" });
-  doc.setFontSize(SZ.SMALL);
-  doc.setTextColor(150, 150, 150);
-  doc.text("Perbualan WhatsApp bertarikh", pageW / 2, y + boxH / 2 + 2, { align: "center" });
-  doc.text(`${data.tarikhKenyataanPemaju}`, pageW / 2, y + boxH / 2 + 8, { align: "center" });
-  doc.text("dengan En Faqeh (Faire Development)", pageW / 2, y + boxH / 2 + 14, { align: "center" });
-  y += boxH + 5;
+// Draw chat transcript box
+const boxX = mL;
+const boxW = cW;
+doc.setLineWidth(0.4); bk();
+
+// Header bar
+doc.setFillColor(37, 211, 102);
+doc.rect(boxX, y, boxW, 8, "F");
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL);
+doc.setTextColor(255, 255, 255);
+doc.text("WhatsApp — En Faqeh - Faire Development", boxX + 3, y + 5.5);
+y += 8;
+
+// Date label
+doc.setFillColor(240, 240, 240);
+doc.rect(boxX, y, boxW, 7, "F");
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.FOOTNOTE);
+doc.setTextColor(100, 100, 100);
+doc.text("12 June 2026", pageW / 2, y + 4.5, { align: "center" });
+y += 7;
+
+// Chat background
+const chatStartY = y;
+doc.setFillColor(230, 221, 212);
+
+// Pre-calculate total height
+let tempY = 0;
+for (const msg of chatMessages) {
+  doc.setFont("helvetica", msg.italic ? "italic" : "normal"); doc.setFontSize(SZ.SMALL);
+  const lines = doc.splitTextToSize(msg.text, boxW - 30);
+  tempY += lines.length * 5 + 16;
+}
+doc.rect(boxX, y, boxW, tempY + 5, "F");
+
+// Draw messages
+for (const msg of chatMessages) {
+  const isOwner = msg.sender === "Pemilik";
+  const bubbleMaxW = boxW - 30;
+  doc.setFont("helvetica", msg.italic ? "italic" : "normal"); doc.setFontSize(SZ.SMALL);
+  const lines = doc.splitTextToSize(msg.text, bubbleMaxW - 10);
+  const bubbleH = lines.length * 5 + 12;
+  const bubbleW = bubbleMaxW;
+
+  let bubbleX;
+  if (isOwner) {
+    bubbleX = boxX + boxW - bubbleW - 5;
+    doc.setFillColor(212, 251, 211);
+  } else {
+    bubbleX = boxX + 5;
+    doc.setFillColor(255, 255, 255);
+  }
+
+  doc.roundedRect(bubbleX, y + 2, bubbleW, bubbleH, 2, 2, "F");
+
+  // Sender name
+  doc.setFont("helvetica", "bold"); doc.setFontSize(8);
+  if (isOwner) {
+    doc.setTextColor(0, 128, 0);
+  } else {
+    doc.setTextColor(0, 100, 180);
+  }
+  doc.text(msg.sender, bubbleX + 4, y + 7);
+
+  // Message text
+  doc.setFont("helvetica", msg.italic ? "italic" : "normal"); doc.setFontSize(SZ.SMALL);
+  if (msg.highlight) {
+    doc.setTextColor(180, 0, 0);
+  } else {
+    doc.setTextColor(0, 0, 0);
+  }
+  let textY = y + 12;
+  for (const line of lines) {
+    doc.text(line, bubbleX + 4, textY);
+    textY += 5;
+  }
+
+  // Timestamp
+  doc.setFont("helvetica", "normal"); doc.setFontSize(7);
+  doc.setTextColor(130, 130, 130);
+  doc.text(msg.time, bubbleX + bubbleW - 4, y + bubbleH - 1, { align: "right" });
+
+  y += bubbleH + 4;
 }
 
+y += 10;
 bk();
+
+// Highlight box for key statement
+doc.setLineWidth(0.5);
+doc.setDrawColor(200, 0, 0);
+doc.rect(mL, y, cW, 28);
+doc.setDrawColor(0, 0, 0);
+y += 5;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL);
+doc.text("Kenyataan Utama Pemaju (Key Developer Statement):", mL + 4, y);
+y += 6;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.SMALL);
+const keyStmt = "\"...misalignment 15mm yang dimaksudkan masih lagi dalam kelonggaran binaan bangunan yang ditetapkan.\"";
+const ksLines = doc.splitTextToSize(keyStmt, cW - 8);
+for (const l of ksLines) { doc.text(l, mL + 4, y); y += 5; }
+y += 10;
+
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE);
-const fnote = `*Tangkap layar (screenshot) ini diambil daripada perbualan WhatsApp bertarikh ${data.tarikhKenyataanPemaju} sebagai bukti kenyataan rasmi pihak pemaju.`;
+bk();
+const fnote = `*Transkrip di atas disalin secara verbatim daripada perbualan WhatsApp bertarikh ${data.tarikhKenyataanPemaju} antara pemilik unit dan wakil pemaju (En Faqeh, Faire Development Sdn. Bhd.) sebagai bukti kenyataan rasmi pihak pemaju.`;
 const fnLines = doc.splitTextToSize(fnote, cW);
 for (const f of fnLines) { doc.text(f, mL, y); y += 4.5; }
 
