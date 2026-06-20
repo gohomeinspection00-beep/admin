@@ -36,6 +36,7 @@ const data = {
 
   tarikhSurat: "19 Jun 2026",
   tempohMaklumBalas: "14",
+  tarikhKenyataanPemaju: "12 Jun 2026",
 
   defectTag: "100",
   defectLokasi: "Tangga (Staircase)",
@@ -195,7 +196,7 @@ y += 4;
 
 // ── PERENGGAN 2 ──
 numPara(2,
-  `Dalam laporan tersebut, antara kecacatan yang dilaporkan termasuk ketidakselarasan tangga (staircase misalignment) sebanyak 15mm yang ditandakan sebagai Tag ${data.defectTag}. Saya merujuk kepada kenyataan maklum balas pihak tuan yang menyatakan bahawa:`
+  `Dalam laporan tersebut, antara kecacatan yang dilaporkan termasuk ketidakselarasan tangga (staircase misalignment) sebanyak 15mm yang ditandakan sebagai Tag ${data.defectTag}. Saya merujuk kepada kenyataan maklum balas pihak tuan bertarikh ${data.tarikhKenyataanPemaju} melalui aplikasi WhatsApp (sebagaimana dilampirkan di Lampiran A) yang menyatakan bahawa:`
 );
 y += 3;
 
@@ -304,6 +305,68 @@ doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL);
 doc.text("s.k.:", mL, y); y += LH_S;
 doc.setFont("helvetica", "normal");
 for (const cc of data.salinanKepada) { doc.text(`•  ${cc}`, mL + 5, y); y += LH_S; }
+
+// ============================================================
+// LAMPIRAN A — Screenshot WhatsApp
+// ============================================================
+newPage();
+y = 25;
+
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lamT = "LAMPIRAN A";
+doc.text(lamT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lamT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lamT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Kenyataan Pemaju Melalui WhatsApp", pageW / 2, y, { align: "center" });
+y += 6;
+doc.text("(Evidence of Developer's Statement via WhatsApp)", pageW / 2, y, { align: "center" });
+y += 10;
+
+doc.setFontSize(SZ.SMALL); bk();
+doc.text(`Tarikh Perbualan: ${data.tarikhKenyataanPemaju}`, mL, y); y += LH_S;
+doc.text("Platform: WhatsApp (En Faqeh - Faire Development)", mL, y); y += LH_S;
+doc.text(`Berkaitan: Tag ${data.defectTag} — ${data.defectDescription}`, mL, y); y += 10;
+
+// Try to load screenshot image if exists
+const screenshotPath = "/home/user/admin/screenshot_whatsapp_faire.png";
+let hasImage = false;
+try {
+  if (fs.existsSync(screenshotPath)) {
+    const imgData = fs.readFileSync(screenshotPath);
+    const base64 = imgData.toString("base64");
+    const imgW = 90;
+    const imgH = 160;
+    const imgX = (pageW - imgW) / 2;
+    doc.addImage("data:image/png;base64," + base64, "PNG", imgX, y, imgW, imgH);
+    y += imgH + 5;
+    hasImage = true;
+  }
+} catch (e) {}
+
+if (!hasImage) {
+  const boxW = 100;
+  const boxH = 170;
+  const boxX = (pageW - boxW) / 2;
+  doc.setLineWidth(0.3); bk();
+  doc.rect(boxX, y, boxW, boxH);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(14);
+  doc.setTextColor(180, 180, 180);
+  doc.text("[SCREENSHOT WHATSAPP]", pageW / 2, y + boxH / 2 - 10, { align: "center" });
+  doc.setFontSize(SZ.SMALL);
+  doc.setTextColor(150, 150, 150);
+  doc.text("Perbualan WhatsApp bertarikh", pageW / 2, y + boxH / 2 + 2, { align: "center" });
+  doc.text(`${data.tarikhKenyataanPemaju}`, pageW / 2, y + boxH / 2 + 8, { align: "center" });
+  doc.text("dengan En Faqeh (Faire Development)", pageW / 2, y + boxH / 2 + 14, { align: "center" });
+  y += boxH + 5;
+}
+
+bk();
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE);
+const fnote = `*Tangkap layar (screenshot) ini diambil daripada perbualan WhatsApp bertarikh ${data.tarikhKenyataanPemaju} sebagai bukti kenyataan rasmi pihak pemaju.`;
+const fnLines = doc.splitTextToSize(fnote, cW);
+for (const f of fnLines) { doc.text(f, mL, y); y += 4.5; }
 
 // ============================================================
 // FOOTER
