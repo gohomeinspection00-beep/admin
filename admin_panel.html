@@ -6535,18 +6535,25 @@ async function doLogin(e) {
   btn.disabled = true;
   
   try {
-    // Check if admin email (super admin or from admins collection)
+    // SECURITY (rules): reading admins/{email} requires auth, so sign in to Firebase
+    // Auth FIRST, then verify admin status (the post-auth read is permitted). A
+    // non-admin (or a normal user) is signed out and rejected.
+    await auth.signInWithEmailAndPassword(email, password);
     const isAdmin = await isAdminUser(email);
     if (!isAdmin) {
+      try { await auth.signOut(); } catch (e) {}
       throw new Error('Access denied. Admin only.');
     }
-    
-    await auth.signInWithEmailAndPassword(email, password);
-    // onAuthStateChanged will handle the rest
-    
+    // onAuthStateChanged will handle showing the panel.
+
   } catch (error) {
     console.error('Login error:', error);
-    errorDiv.textContent = error.message || 'Login failed';
+    let msg = error && error.message ? error.message : 'Login failed';
+    const c = error && error.code;
+    if (c === 'auth/wrong-password' || c === 'auth/invalid-credential') msg = 'Password salah.';
+    else if (c === 'auth/user-not-found') msg = 'Akaun tidak dijumpai.';
+    else if (c === 'auth/too-many-requests') msg = 'Terlalu banyak cubaan. Cuba lagi nanti.';
+    errorDiv.textContent = msg;
     errorDiv.style.display = 'block';
     btn.textContent = 'Login';
     btn.disabled = false;
