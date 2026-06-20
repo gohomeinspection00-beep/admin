@@ -9813,7 +9813,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'phase4-aiproxy-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'phase4-aiproxy-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -40209,7 +40209,7 @@ async function mp_autoPlanWithAI(avail, plan, proj, skipped) {
 
   // Determine provider order: try providers with valid API keys
   const providerOrder = [];
-  if (AI_PROVIDERS.gemini.apiKey) providerOrder.push('gemini');
+  if (AI_PROXY_ENABLED || AI_PROVIDERS.gemini.apiKey) providerOrder.push('gemini');
   if (AI_PROVIDERS.groq.apiKey) providerOrder.push('groq');
 
   if (!providerOrder.length) {
@@ -40634,7 +40634,7 @@ async function mp_autoPlanWithAI_Budget(avail, plan, proj, skipped, budget, mode
   }
 
   const providerOrder = [];
-  if (AI_PROVIDERS.gemini.apiKey) providerOrder.push('gemini');
+  if (AI_PROXY_ENABLED || AI_PROVIDERS.gemini.apiKey) providerOrder.push('gemini');
   if (AI_PROVIDERS.groq.apiKey) providerOrder.push('groq');
 
   if (!providerOrder.length) {
@@ -41514,7 +41514,7 @@ async function ayie_sendMessage() {
   if (!text && !image) return;
 
   // Check API key
-  if (!ayie_apiKey) {
+  if (!AI_PROXY_ENABLED && !ayie_apiKey) {
     ayie_showKeyNotSetMsg();
     return;
   }
@@ -41734,7 +41734,7 @@ function ayieFloat_closeAll() {
 function ayieFloat_openTalk() {
   ayieMenu_hide();
   if (!ayie_featureTalkEnabled) { ayie_showDisabledMsg('Ayie Talk'); return; }
-  if (!ayie_apiKey) { ayie_showKeyNotSetMsg(); return; }
+  if (!AI_PROXY_ENABLED && !ayie_apiKey) { ayie_showKeyNotSetMsg(); return; }
   document.getElementById('ayieFloatOverlay').style.display = 'block';
   const talkEl = document.getElementById('ayieFloatTalk');
   talkEl.style.display = 'flex';
@@ -41845,7 +41845,7 @@ async function ayieFloat_talkSend(userText) {
     const activePrompt = atalk_talkPrompt || ATALK_DEFAULT_PROMPT;
     // FIX (#9): guard against missing API key (otherwise key=undefined 400s and the
     // real cause is hidden behind the generic fallback message).
-    if (!ayie_apiKey) {
+    if (!AI_PROXY_ENABLED && !ayie_apiKey) {
       const m = 'AI belum disetkan. Sila setup Ayie dahulu.';
       atalk_messages.push({ role: 'model', content: m });
       atalk_showText(m); atalk_speak(m);
@@ -41882,7 +41882,7 @@ async function ayieFloat_talkSend(userText) {
 function ayieFloat_openChat() {
   ayieMenu_hide();
   if (!ayie_featureChatEnabled) { ayie_showDisabledMsg('Ayie Chat'); return; }
-  if (!ayie_apiKey) { ayie_showKeyNotSetMsg(); return; }
+  if (!AI_PROXY_ENABLED && !ayie_apiKey) { ayie_showKeyNotSetMsg(); return; }
   const chatEl = document.getElementById('ayieFloatChat');
   chatEl.style.display = 'flex';
   // Load history from Firebase if not yet loaded
@@ -42412,7 +42412,7 @@ async function atalk_sendToAyie(userText) {
     const activePrompt = atalk_talkPrompt || ATALK_DEFAULT_PROMPT;
     // FIX (#9): guard against missing API key (otherwise key=undefined 400s and the
     // real cause is hidden behind the generic fallback message).
-    if (!ayie_apiKey) {
+    if (!AI_PROXY_ENABLED && !ayie_apiKey) {
       const m = 'AI belum disetkan. Sila setup Ayie dahulu.';
       atalk_messages.push({ role: 'model', content: m });
       atalk_showText(m); atalk_speak(m);
@@ -43722,7 +43722,7 @@ function sv_parseAiJson(text){
 async function sv_callAI(prompt){
   if(!window.ayie_apiKey){try{const doc=await firebase.firestore().collection('settings').doc('ayieConfig').get();if(doc.exists){window.ayie_apiKey=doc.data().apiKey||'';window.ayie_model=doc.data().model||'gemini-2.0-flash'}}catch(e){}}
   const key=window.ayie_apiKey,model=window.ayie_model||'gemini-2.0-flash';
-  if(!key){alert('AI not configured. Setup Ayie first.');return null}
+  if(!AI_PROXY_ENABLED && !key){alert('AI not configured. Setup Ayie first.');return null}
   if(!navigator.onLine){alert('Internet required.');return null}
   const res=await aiGeminiFetch(model,{systemInstruction:{parts:[{text:'You are a Malaysian property inspection expert. Use RM. Be realistic with costs. Respond in exact JSON format requested.'}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.3,maxOutputTokens:2048}});
   if(!res.ok)throw new Error('AI error: '+res.status);
