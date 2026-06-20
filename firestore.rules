@@ -94,7 +94,10 @@ service cloud.firestore {
 
     // ---- backups/{projectId} : inspection projects (userEmail + sharedWith[]) ----
     match /backups/{projectId} {
-      allow read:   if ownsByEmailField() || isSharedWithMe() || isAdmin();
+      // A NON-EXISTENT doc (resource == null) has no userEmail to own-check, so a fresh
+      // project's pre-sync existence read would be denied. Allow signed-in users to read a
+      // missing doc (returns "not exists" — no data leak) so first-time sync works.
+      allow read:   if (resource == null && isSignedIn()) || ownsByEmailField() || isSharedWithMe() || isAdmin();
       allow create: if creatingOwnByEmailField() || isAdmin();
       // owner, a shared collaborator, or admin may sync/edit. (A non-owner who is
       // neither shared nor admin fails ownsByEmailField/isSharedWithMe -> denied,
@@ -105,7 +108,7 @@ service cloud.firestore {
 
     // ---- trackInspections/{id} : repair-tracking docs (userEmail) ----
     match /trackInspections/{id} {
-      allow read:   if ownsByEmailField() || isAdmin();
+      allow read:   if (resource == null && isSignedIn()) || ownsByEmailField() || isAdmin();
       allow create: if creatingOwnByEmailField() || isAdmin();
       allow update: if ownsByEmailField() || isAdmin();
       allow delete: if ownsByEmailField() || isAdmin();
