@@ -94,10 +94,27 @@ service cloud.firestore {
 
     // ---- backups/{projectId} : inspection projects (userEmail + sharedWith[]) ----
     match /backups/{projectId} {
-      // A NON-EXISTENT doc (resource == null) has no userEmail to own-check, so a fresh
-      // project's pre-sync existence read would be denied. Allow signed-in users to read a
-      // missing doc (returns "not exists" — no data leak) so first-time sync works.
-      allow read:   if (resource == null && isSignedIn()) || ownsByEmailField() || isSharedWithMe() || isAdmin();
+      // SINGLE-DOC reads (get). A NOT-YET-CREATED project's pre-sync existence read
+      // hits a missing doc (resource == null) — allow signed-in users to see "not
+      // exists" (no data leak) so first-time sync works. The type-guards inside
+      // isSharedWithMe() are safe here because get() evaluates against the real doc.
+      allow get: if (resource == null && isSignedIn())
+                    || ownsByEmailField() || isSharedWithMe() || isAdmin();
+      // QUERIES (list). Firestore authorises a query ONLY if its where-clauses
+      // guarantee every result satisfies the rule — it cannot prove the 'is list' /
+      // 'in resource.data' type-guards from a query, so those guards make it deny the
+      // whole array-contains query ("Check cloud" / "Sync All Files" failed). Keep the
+      // list predicates MINIMAL. The app/admin only ever run:
+      //   where('userEmail','==', me)               -> owner branch (field always set)
+      //   where('sharedWith','array-contains', me)  -> shared branch (Firebase's
+      //                                                documented array-membership rule)
+      //   unconstrained scan (admin maintenance)    -> isAdmin() (true regardless of
+      //                                                resource, authorises full scan)
+      // Security is preserved: a query for someone else's docs fails the owner/shared
+      // branch and a non-admin can't pass isAdmin(), so no over-listing is possible.
+      allow list: if (isSignedIn() && resource.data.userEmail == myEmail())
+                     || (isSignedIn() && myEmail() in resource.data.sharedWith)
+                     || isAdmin();
       allow create: if creatingOwnByEmailField() || isAdmin();
       // owner, a shared collaborator, or admin may sync/edit. (A non-owner who is
       // neither shared nor admin fails ownsByEmailField/isSharedWithMe -> denied,
