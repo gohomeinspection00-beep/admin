@@ -6,7 +6,9 @@ rules_version = '2';
 // Replaces wide-open test mode WITHOUT breaking uploads. Covers every prefix the
 // app/admin upload to: inspections/, surveys/, trackInspections/ (per-user), and
 // assignments/ (admin-only, no email in the path). Reads stay public because the
-// app shares tokenized download URLs across devices. Everything else denied.
+// app shares tokenized download URLs across devices. OTHER apps sharing this same
+// bucket (contractor_jobs/, ss_documents/) are preserved as-is so they don't break.
+// Everything else denied.
 //
 // DEPLOY SAFELY (instant + reversible; rules never touch the stored bytes):
 //   1. Firebase Console > Storage > Rules > paste this.
@@ -77,6 +79,18 @@ service firebase.storage {
       allow read:  if true;
       allow write: if isAdmin();
     }
+
+    // =========================================================================
+    // OTHER APPS sharing this same Storage bucket (NOT part of GoInspect). Their
+    // files are PRESERVED as currently-open so deploying this file does NOT break
+    // them. Confirmed present in Storage > Files: contractor_jobs/, ss_documents/.
+    // (These mirror the contractorJobs / ssDocuments Firestore collections that
+    // firestore.rules also preserves.) Without these explicit blocks the
+    // default-deny below would lock them out. TODO: tighten once each app's code
+    // is reviewed.
+    // =========================================================================
+    match /contractor_jobs/{allPaths=**} { allow read, write: if true; }
+    match /ss_documents/{allPaths=**}    { allow read, write: if true; }
 
     // Everything else: deny.
     match /{allPaths=**} {
