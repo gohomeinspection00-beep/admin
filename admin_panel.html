@@ -10416,8 +10416,15 @@ function ayieAdmin_toggleKey() {
 async function ayieAdmin_loadConfig() {
   try {
     const doc = await db.collection('settings').doc('ayieConfig').get();
+    // Phase 4: secret keys now live in settings/ayieSecrets (admin-only). Overlay them
+    // so the form still shows/saves the keys after migration.
+    let _aiSecrets = {};
+    try { const _s = await db.collection('settings').doc('ayieSecrets').get(); if (_s.exists) _aiSecrets = _s.data() || {}; } catch (e) {}
     if (doc.exists) {
       const data = doc.data();
+      if (_aiSecrets.apiKey)  data.apiKey  = _aiSecrets.apiKey;
+      if (_aiSecrets.groqKey) data.groqKey = _aiSecrets.groqKey;
+      if (_aiSecrets.ttsKey)  data.ttsKey  = _aiSecrets.ttsKey;
       const keyInput = document.getElementById('ayieApiKeyInput');
       const modelSelect = document.getElementById('ayieModelSelect');
       const statusKey = document.getElementById('ayieStatusKey');
@@ -10542,22 +10549,33 @@ async function ayieAdmin_saveConfig() {
   saveBtn.disabled = true;
   
   try {
-    const configData = {
+    // Phase 4: secret API keys go to settings/ayieSecrets (admin-only; read by the
+    // Cloud Function proxy server-side). Non-secret config stays in settings/ayieConfig
+    // (the app reads it). We also STRIP any keys previously stored in ayieConfig so
+    // they stop being readable by signed-in clients. NOTE: only do this once the AI
+    // proxy is live in the app (AI_PROXY_ENABLED=true) — see the Phase 4 deploy guide.
+    const _del = firebase.firestore.FieldValue.delete();
+    const secretData = {
       apiKey: apiKey,
-      model: model,
       groqKey: groqKey,
+      ttsKey: ttsKey,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    const configData = {
+      model: model,
       groqModel: groqModel,
       autoPlanModel: autoPlanModel,
       useGoogleTTS: useGoogleTTS,
-      ttsKey: ttsKey,
       featureChat: featureChat,
       featureTalk: featureTalk,
       featureAutoPlan: featureAutoPlan,
       adminWhatsApp: adminWhatsApp,
       chatCleanupDays: chatCleanupDays,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      apiKey: _del, groqKey: _del, ttsKey: _del
     };
 
+    await db.collection('settings').doc('ayieSecrets').set(secretData, { merge: true });
     await db.collection('settings').doc('ayieConfig').set(configData, { merge: true });
     
     saveBtn.innerHTML = '✅ Berjaya Disimpan!';

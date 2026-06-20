@@ -40126,6 +40126,64 @@ const AI_PROVIDERS = {
   }
 };
 
+// ===== Phase 4: AI proxy switch =====================================================
+// When AI_PROXY_ENABLED is true, AI calls go through our Cloud Function proxy (the API
+// keys live server-side, no longer readable by the client). When false, calls go straight
+// to Google with the client key (legacy behaviour). The proxy returns Google's response +
+// HTTP status VERBATIM, so every caller keeps using response.ok / response.status /
+// response.json() with no logic change. There is always a fallback: if the proxy ever
+// fails you can flip this back to false and redeploy and AI works exactly as before.
+let AI_PROXY_ENABLED = false;
+const AI_PROXY_BASE = 'https://asia-southeast1-go-inspect---home-owner.cloudfunctions.net';
+async function _aiAuthHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  try {
+    const u = firebase.auth().currentUser;
+    if (u) { const t = await u.getIdToken(); if (t) h['Authorization'] = 'Bearer ' + t; }
+  } catch (e) {}
+  return h;
+}
+// Gemini generateContent. model = e.g. 'gemini-2.5-flash'; payload = the full request body.
+async function aiGeminiFetch(model, payload) {
+  if (AI_PROXY_ENABLED) {
+    return fetch(AI_PROXY_BASE + '/aiGenerate', {
+      method: 'POST', headers: await _aiAuthHeaders(),
+      body: JSON.stringify({ provider: 'gemini', model: model, payload: payload })
+    });
+  }
+  const key = (typeof ayie_apiKey !== 'undefined' && ayie_apiKey)
+    || (typeof window !== 'undefined' && window.ayie_apiKey)
+    || (AI_PROVIDERS && AI_PROVIDERS.gemini && AI_PROVIDERS.gemini.apiKey) || '';
+  return fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  });
+}
+// Groq chat completions. payload = OpenAI-style body (already contains the model).
+async function aiGroqFetch(payload) {
+  if (AI_PROXY_ENABLED) {
+    return fetch(AI_PROXY_BASE + '/aiGenerate', {
+      method: 'POST', headers: await _aiAuthHeaders(),
+      body: JSON.stringify({ provider: 'groq', payload: payload })
+    });
+  }
+  const key = (AI_PROVIDERS && AI_PROVIDERS.groq && AI_PROVIDERS.groq.apiKey) || '';
+  return fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }, body: JSON.stringify(payload)
+  });
+}
+// Google Cloud Text-to-Speech. payload = { input, voice, audioConfig }.
+async function aiTtsFetch(payload) {
+  if (AI_PROXY_ENABLED) {
+    return fetch(AI_PROXY_BASE + '/ttsSynthesize', {
+      method: 'POST', headers: await _aiAuthHeaders(),
+      body: JSON.stringify({ payload: payload })
+    });
+  }
+  return fetch('https://texttospeech.googleapis.com/v1/text:synthesize?key=' + GCLOUD_TTS_KEY, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  });
+}
+
 // AI-powered auto-plan with multi-provider fallback: Gemini → Groq → Rule-based
 async function mp_autoPlanWithAI(avail, plan, proj, skipped) {
   const BATCH_SIZE = 40;
@@ -40215,11 +40273,9 @@ Respond ONLY with a valid JSON array, no markdown, no backticks, no explanation.
               ? provider.buildHeaders(provider.apiKey)
               : { 'Content-Type': 'application/json' };
 
-            response = await fetch(provider.url(provider.apiKey), {
-              method: 'POST',
-              headers: headers,
-              body: JSON.stringify(provider.buildBody(prompt))
-            });
+            response = (provider.name === 'Groq')
+              ? await aiGroqFetch(provider.buildBody(prompt))
+              : await aiGeminiFetch(provider.model, provider.buildBody(prompt));
 
             if (response.status === 429 && retry < MAX_RETRIES) {
               const waitSec = 15 * (retry + 1); // 15s, 30s (shorter waits before switching provider)
@@ -40673,11 +40729,9 @@ Respond ONLY with a valid JSON array:
               ? provider.buildHeaders(provider.apiKey)
               : { 'Content-Type': 'application/json' };
 
-            response = await fetch(provider.url(provider.apiKey), {
-              method: 'POST',
-              headers: headers,
-              body: JSON.stringify(provider.buildBody(prompt))
-            });
+            response = (provider.name === 'Groq')
+              ? await aiGroqFetch(provider.buildBody(prompt))
+              : await aiGeminiFetch(provider.model, provider.buildBody(prompt));
 
             if (response.status === 429 && retry < MAX_RETRIES) {
               const waitSec = 15 * (retry + 1);
@@ -41518,14 +41572,10 @@ async function ayie_sendMessage() {
       }
     });
 
-    // Call Gemini API
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${ayie_model}:generateContent?key=${ayie_apiKey}`;
+    // Call Gemini API (via proxy when AI_PROXY_ENABLED)
     const activePrompt = ayie_customPrompt || AYIE_SYSTEM_PROMPT;
-    
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+
+    const response = await aiGeminiFetch(ayie_model, {
         systemInstruction: {
           parts: [{ text: activePrompt }]
         },
@@ -41540,7 +41590,6 @@ async function ayie_sendMessage() {
           { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
           { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
         ]
-      })
     });
 
     if (!response.ok) {
@@ -41803,15 +41852,10 @@ async function ayieFloat_talkSend(userText) {
       if (thinkEl) thinkEl.style.display = 'none';
       return;
     }
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${ayie_model}:generateContent?key=${ayie_apiKey}`;
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const response = await aiGeminiFetch(ayie_model, {
         systemInstruction: { parts: [{ text: activePrompt }] },
         contents: contents,
         generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
-      })
     });
     // FIX (#9): surface real API errors (rate-limit / bad key) instead of silently
     // falling back, so the user knows why Talk isn't responding.
@@ -42027,15 +42071,10 @@ async function ayieFloat_chatSend() {
     });
     
     const systemPrompt = ayie_customPrompt || AYIE_SYSTEM_PROMPT;
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${ayie_model}:generateContent?key=${ayie_apiKey}`;
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const response = await aiGeminiFetch(ayie_model, {
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents: contents,
         generationConfig: { temperature: 0.7, maxOutputTokens: 4096 }
-      })
     });
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
@@ -42227,10 +42266,7 @@ async function atalk_speak(text) {
       if (hdrFloat) hdrFloat.textContent = 'Ayie sedang bercakap...';
       atalk_isSpeaking = true;
 
-      const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${GCLOUD_TTS_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const response = await aiTtsFetch({
           input: { text: text },
           voice: {
             languageCode: 'ms-MY',
@@ -42243,7 +42279,6 @@ async function atalk_speak(text) {
             pitch: 0.0,
             effectsProfileId: ['small-bluetooth-speaker-class-device']
           }
-        })
       });
 
       if (!response.ok) {
@@ -42384,15 +42419,10 @@ async function atalk_sendToAyie(userText) {
       if (thinking) thinking.style.display = 'none';
       return;
     }
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${ayie_model}:generateContent?key=${ayie_apiKey}`;
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const response = await aiGeminiFetch(ayie_model, {
         systemInstruction: { parts: [{ text: activePrompt }] },
         contents: contents,
         generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
-      })
     });
     // FIX (#9): surface real API errors (rate-limit / bad key) instead of silently
     // falling back, so the user knows why Talk isn't responding.
@@ -43694,7 +43724,7 @@ async function sv_callAI(prompt){
   const key=window.ayie_apiKey,model=window.ayie_model||'gemini-2.0-flash';
   if(!key){alert('AI not configured. Setup Ayie first.');return null}
   if(!navigator.onLine){alert('Internet required.');return null}
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:'You are a Malaysian property inspection expert. Use RM. Be realistic with costs. Respond in exact JSON format requested.'}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.3,maxOutputTokens:2048}})});
+  const res=await aiGeminiFetch(model,{systemInstruction:{parts:[{text:'You are a Malaysian property inspection expert. Use RM. Be realistic with costs. Respond in exact JSON format requested.'}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.3,maxOutputTokens:2048}});
   if(!res.ok)throw new Error('AI error: '+res.status);
   return(await res.json()).candidates?.[0]?.content?.parts?.[0]?.text||null;
 }
