@@ -9813,7 +9813,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'phase2-loginfix-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'phase4-aiproxy-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -40133,7 +40133,7 @@ const AI_PROVIDERS = {
 // HTTP status VERBATIM, so every caller keeps using response.ok / response.status /
 // response.json() with no logic change. There is always a fallback: if the proxy ever
 // fails you can flip this back to false and redeploy and AI works exactly as before.
-let AI_PROXY_ENABLED = false;
+let AI_PROXY_ENABLED = true;
 const AI_PROXY_BASE = 'https://asia-southeast1-go-inspect---home-owner.cloudfunctions.net';
 async function _aiAuthHeaders() {
   const h = { 'Content-Type': 'application/json' };
