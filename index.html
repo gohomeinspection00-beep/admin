@@ -9813,7 +9813,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'phase4-aiproxy-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'audit-fixA1-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -15579,7 +15579,8 @@ window.saveAllSafe = (projectId = null) => {
     if (_canAutoUpload() && typeof autoBackupPending === 'function' && !_reInspOpen) {
       setTimeout(autoBackupPending, 1000);
     }
-    
+    return true;
+
   } catch (e) {
     console.error('Storage error:', e);
     
@@ -15594,7 +15595,7 @@ window.saveAllSafe = (projectId = null) => {
           localStorage.setItem(LS_KEY, JSON.stringify(projects));
           window.projects = projects;
           console.log('Save successful after cleanup');
-          return;
+          return true;
         } catch (retryError) {
           console.error('Save failed even after cleanup:', retryError);
         }
@@ -15612,7 +15613,8 @@ window.saveAllSafe = (projectId = null) => {
     } else {
       alert('Failed to save data: ' + e.message);
     }
-  } 
+    return false;
+  }
 };
 const saveAllSafe = window.saveAllSafe;
 const getProject = () => projects.find(p => p.id === currentId);
@@ -15648,13 +15650,23 @@ lastOpenedAt: Date.now()
     },
     defects: []
   };
-  projects.unshift(p); saveAllSafe(); currentId = id;
-  
-  // Increment inspection count in Firebase
+  projects.unshift(p);
+  // A1: only consume paid quota if the project actually persisted. On storage-full
+  // saveAllSafe() returns false -> roll back the in-memory project and abort so we
+  // never spend an inspection on a project that vanishes on reload.
+  if (saveAllSafe() === false) {
+    const _idx = projects.findIndex(x => x.id === id);
+    if (_idx >= 0) projects.splice(_idx, 1);
+    alert('Tidak dapat simpan projek baru — storage peranti penuh.\nSila eksport/padam projek lama dahulu, kemudian cuba lagi.');
+    return null;
+  }
+  currentId = id;
+
+  // Increment inspection count in Firebase (only after a verified successful save)
   if (typeof window.incrementInspectionCount === 'function') {
     window.incrementInspectionCount();
   }
-  
+
   return p;
 };
 
