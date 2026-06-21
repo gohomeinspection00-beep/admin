@@ -80,12 +80,26 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0f3c3a">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="app-192.png">
 
+<!-- E1/E2: global error safety net + CDN load-failure notice (self-contained) -->
+<script>
+(function(){
+  var _last=0;
+  function _toast(msg,bg){ try{ if(!document.body){return;} var t=document.getElementById('goErrToast'); if(!t){ t=document.createElement('div'); t.id='goErrToast'; t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:90%;padding:12px 18px;color:#fff;border-radius:10px;font:13px/1.4 system-ui,sans-serif;z-index:2147483647;box-shadow:0 6px 20px rgba(0,0,0,.25);text-align:center'; document.body.appendChild(t);} t.style.background=bg||'#7f1d1d'; t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(function(){t.style.display='none';},6000);}catch(e){} }
+  window._cdnFail=function(n){ var a=window._cdnErrors=(window._cdnErrors||[]); if(a.indexOf(n)<0){a.push(n);} };
+  function _report(detail){ var msg=''+((detail&&detail.message)||detail||''); if(/ResizeObserver|^Script error\.?$/i.test(msg)){return;} var now=Date.now(); if(now-_last<4000){return;} _last=now; _toast('Ada masalah teknikal — kerja anda disimpan di peranti. Cuba lagi atau muat semula.'); try{console.error('[GoInspect uncaught]',detail);}catch(e){} }
+  window.addEventListener('error',function(e){ _report(e&&(e.error||e.message)); });
+  window.addEventListener('unhandledrejection',function(e){ _report(e&&e.reason); });
+  window.addEventListener('DOMContentLoaded',function(){ if(window._cdnErrors&&window._cdnErrors.length){ _toast('Komponen perlu ('+window._cdnErrors.join(', ')+') gagal dimuat — semak sambungan internet & muat semula halaman.','#92400e'); } });
+})();
+</script>
+
 <!-- PDF Generation Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" onerror="window._cdnFail&&window._cdnFail('html2canvas')"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onerror="window._cdnFail&&window._cdnFail('jspdf')"></script>
 
 <style>
 /*
@@ -9813,7 +9827,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'audit-fixB-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'audit-fixE-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -34474,10 +34488,10 @@ await new Promise(r => setTimeout(r, 10));
 </div> <!-- end mainApp -->
 
 <!-- Firebase SDK (Compat version) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
 
 <script>
 /*

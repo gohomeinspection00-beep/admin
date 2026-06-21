@@ -4,6 +4,18 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Go Inspect — Admin Panel</title>
+<!-- E1/E2: global error safety net + CDN load-failure notice (self-contained) -->
+<script>
+(function(){
+  var _last=0;
+  function _toast(msg,bg){ try{ if(!document.body){return;} var t=document.getElementById('goErrToast'); if(!t){ t=document.createElement('div'); t.id='goErrToast'; t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:90%;padding:12px 18px;color:#fff;border-radius:10px;font:13px/1.4 system-ui,sans-serif;z-index:2147483647;box-shadow:0 6px 20px rgba(0,0,0,.25);text-align:center'; document.body.appendChild(t);} t.style.background=bg||'#7f1d1d'; t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(function(){t.style.display='none';},6000);}catch(e){} }
+  window._cdnFail=function(n){ var a=window._cdnErrors=(window._cdnErrors||[]); if(a.indexOf(n)<0){a.push(n);} };
+  function _report(detail){ var msg=''+((detail&&detail.message)||detail||''); if(/ResizeObserver|^Script error\.?$/i.test(msg)){return;} var now=Date.now(); if(now-_last<4000){return;} _last=now; _toast('Ada masalah teknikal. Cuba lagi atau muat semula halaman.'); try{console.error('[GoInspect admin uncaught]',detail);}catch(e){} }
+  window.addEventListener('error',function(e){ _report(e&&(e.error||e.message)); });
+  window.addEventListener('unhandledrejection',function(e){ _report(e&&e.reason); });
+  window.addEventListener('DOMContentLoaded',function(){ if(window._cdnErrors&&window._cdnErrors.length){ _toast('Komponen perlu ('+window._cdnErrors.join(', ')+') gagal dimuat — semak sambungan internet & muat semula halaman.','#92400e'); } });
+})();
+</script>
 <style>
 :root {
   --bg: #f1f5f9;
@@ -5438,11 +5450,11 @@ tr:hover td {
 </dialog>
 
 <!-- Firebase -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js" onerror="window._cdnFail&&window._cdnFail('Firebase')"></script>
 
 <script>
 // Firebase Config
