@@ -10377,7 +10377,7 @@ createAssignment = async function() {
   const dialog = document.getElementById('assignInspectionDialog');
   const createBtn = dialog.querySelector('.btn-primary');
   const originalText = createBtn.innerHTML;
-  createBtn.innerHTML = 'Creating...ared...';
+  createBtn.innerHTML = 'Creating...';
   createBtn.disabled = true;
   
   try {
@@ -11026,6 +11026,9 @@ async function editAdminAccount(email) {
 }
 
 async function saveEditAdmin(email) {
+  // Defense-in-depth: editing an admin account (incl. role/password) is super-admin
+  // only. The edit modal is already super-admin gated; this guards a direct call too.
+  if (currentAdminRole !== 'superadmin') { alert('Super admin sahaja boleh edit akaun admin.'); return; }
   const updates = {
     name: document.getElementById('editAdminName').value.trim(),
     role: document.getElementById('editAdminRole').value,
