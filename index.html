@@ -9813,7 +9813,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'audit-fixA3-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'audit-fixB-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -14933,10 +14933,13 @@ const pullFromCloud = async () => {
       }
     }
     
+    // B2 (cost/correctness): mark this cloud version as SEEN even if the merge made no
+    // local change. Otherwise _lastCloudSync stays stale and every later merge re-runs
+    // on the same version. A genuinely newer cloud version has a higher backupAt and is
+    // still detected — real multi-device updates are unaffected.
+    p._lastCloudSync = cloudBackupTime;
+
     if (hasChanges) {
-      // Update local timestamp
-      p._lastCloudSync = cloudBackupTime;
-      
       // Save to localStorage (without triggering sync back)
       localStorage.setItem(LS_KEY, JSON.stringify(projects));
       
@@ -15346,8 +15349,12 @@ const startCloudSync = () => {
   }, CLOUD_SYNC_INTERVAL);
   
   // FIX: Set up pull interval (every 30 seconds) for multi-device sync
+  // B2 (cost): only poll while the tab is actually VISIBLE. A backgrounded tab left
+  // open all day would otherwise read the cloud every 30s for no one. When the user
+  // returns, the visibilitychange handler below pulls immediately, so active
+  // multi-device collaboration is unaffected.
   cloudPullTimer = setInterval(() => {
-    if (isOnline && window.currentUserEmail) {
+    if (isOnline && window.currentUserEmail && document.visibilityState === 'visible') {
       pullFromCloud();
     }
   }, CLOUD_PULL_INTERVAL);
@@ -36092,12 +36099,20 @@ window.twoWaySyncProject = async function(project) {
 };
 
 // Check cloud for new defects (called periodically or on history load)
+let _lastDefectCheck = 0; // B1: throttle the whole-collection scan (cost control)
 window.checkCloudForNewDefects = async function() {
   if (!window.currentUserData || !navigator.onLine) return;
 
   // AUTH GATE (security rollout): inert until AUTH_ENFORCED; when enforced and no auth
   // session, skip the cloud queries silently and stay on local data.
   if (!(await authGateOk())) return;
+
+  // B1 (cost): this reads the user's WHOLE backups collection. It runs on every
+  // History visit; throttle to once / 60s so rapid navigation doesn't re-fetch
+  // everything. The 30s pullFromCloud keeps the OPEN project fresh; this is the
+  // secondary cross-project check. renderHistory still runs via the caller's .then().
+  if (Date.now() - _lastDefectCheck < 60000) return;
+  _lastDefectCheck = Date.now();
 
   const userEmail = window.currentUserData.email.toLowerCase();
   let totalMerged = 0;
