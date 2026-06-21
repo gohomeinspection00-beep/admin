@@ -9813,7 +9813,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'audit-fixA1-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'audit-fixA2-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -28493,12 +28493,23 @@ const importJSON = async (f) => {
     
     // Also generate new _syncId for all defects to prevent conflicts
     if (Array.isArray(data.defects)) {
+      const _syncIdMap = {}; // old -> new, so the maintenance plan stays linked after import
       data.defects.forEach((d, idx) => {
         const oldSyncId = d._syncId;
         d._syncId = generateSecureId('def');
+        if (oldSyncId) _syncIdMap[oldSyncId] = d._syncId;
         if (idx < 3) console.log('Import: New defect _syncId:', d._syncId, '(old:', oldSyncId, ')');
       });
       console.log('Import: Regenerated _syncId for', data.defects.length, 'defects');
+      // A2: remap the Maintenance Plan's defect references through old->new so plan items
+      // aren't orphaned (mp_getDefect would otherwise return null and the whole plan
+      // disappears from the imported project). Unknown ids are left untouched.
+      if (data.maintenancePlan && Array.isArray(data.maintenancePlan.items)) {
+        data.maintenancePlan.items.forEach(item => {
+          if (item.defectSyncId && _syncIdMap[item.defectSyncId]) item.defectSyncId = _syncIdMap[item.defectSyncId];
+          if (Array.isArray(item.linkedDefects)) item.linkedDefects = item.linkedDefects.map(sid => _syncIdMap[sid] || sid);
+        });
+      }
     }
     
     // Clear any cloud-related metadata to start fresh
