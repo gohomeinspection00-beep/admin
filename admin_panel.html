@@ -5544,6 +5544,7 @@ window.cleanupTimeSyncDocs = cleanupTimeSyncDocs;
 // failure leaves that doc 100% untouched (still base64) and is reported for re-run.
 // SAFETY: only touches `data:` values; http (already migrated) is skipped; never deletes.
 async function migrateTrackPhotos() {
+  if (!canWrite()) return;
   const btn = document.getElementById('btnMigrateTrackPhotos');
   const out = document.getElementById('trackMigrateResult');
   if (!currentAdminEmail) { alert('Sila login sebagai admin dahulu.'); return; }
@@ -5740,6 +5741,13 @@ async function loadAdminRole(email) {
     currentAdminRole = 'admin';
     currentAdminAccess = [];
   }
+}
+
+// C2: viewers are read-only. Only admin/superadmin may mutate data.
+function canWrite() {
+  if (currentAdminRole === 'superadmin' || currentAdminRole === 'admin') return true;
+  alert('Akaun anda (Viewer / Read-Only) tidak dibenarkan membuat perubahan.');
+  return false;
 }
 
 // Apply sidebar visibility based on admin role
@@ -6282,6 +6290,7 @@ function toggleUMUserDetail(userId) {
 
 // Delete User from Section
 async function deleteUserFromSection(email, name) {
+  if (!canWrite()) return;
   if (!confirm(`Delete user "${name}"?\n\nEmail: ${email}\n\nThis will permanently delete the user account.`)) return;
   if (!confirm(`WARNING: This action CANNOT BE UNDONE!\n\nClick OK to confirm delete.`)) return;
   
@@ -6378,7 +6387,8 @@ function showAddUserModal() {
 
 async function addUserFromSection(e) {
   e.preventDefault();
-  
+  if (!canWrite()) return;
+
   const name = document.getElementById('mdlUserName').value.trim();
   const email = document.getElementById('mdlUserEmail').value.trim().toLowerCase();
   const phone = document.getElementById('mdlUserPhone').value.trim();
@@ -6515,6 +6525,7 @@ function viewUserDetails(email) {
 }
 
 async function toggleFreezeFromSection(email, freeze) {
+  if (!canWrite()) return;
   try {
     await db.collection('users').doc(email).update({
       frozen: freeze
@@ -6783,6 +6794,7 @@ document.addEventListener('click', function(e) {
 
 // Toggle freeze status
 async function toggleFreeze(email, freeze) {
+  if (!canWrite()) return;
   const action = freeze ? 'freeze' : 'unfreeze';
   if (!confirm(`Are you sure you want to ${action} this user?`)) return;
   
@@ -6863,7 +6875,8 @@ async function loadStats() {
 // Add User
 async function addUser(e) {
   e.preventDefault();
-  
+  if (!canWrite()) return;
+
   const name = document.getElementById('userName').value.trim();
   const email = document.getElementById('userEmailInput').value.trim().toLowerCase();
   const phone = document.getElementById('userPhone').value.trim();
@@ -6926,7 +6939,8 @@ async function addUser(e) {
 // Add User from User Management Section
 async function addUserFromUM(e) {
   e.preventDefault();
-  
+  if (!canWrite()) return;
+
   const name = document.getElementById('umUserName').value.trim();
   const email = document.getElementById('umUserEmail').value.trim().toLowerCase();
   const phone = document.getElementById('umUserPhone').value.trim();
@@ -7083,7 +7097,8 @@ async function editUser(email) {
   // Handle form submit
   document.getElementById('editForm').onsubmit = async function(e) {
     e.preventDefault();
-    
+    if (!canWrite()) return;
+
     const updateData = {
       name: document.getElementById('editName').value.trim(),
       phone: document.getElementById('editPhone').value.trim(),
@@ -7123,6 +7138,7 @@ async function editUser(email) {
 
 // Delete User - 2x confirmation
 async function deleteUser(email, name) {
+  if (!canWrite()) return;
   if (!confirm(`Adakah anda pasti mahu delete user "${name}"?\n\nEmail: ${email}`)) return;
   if (!confirm(`AMARAN: Tindakan ini TIDAK BOLEH DIBATALKAN!\n\nSemua data backup user ini juga akan dipadam.\n\nTekan OK untuk confirm delete.`)) return;
   
@@ -7415,7 +7431,8 @@ function updateOrderTypePreview() {
 // Create new order
 async function createOrder(e) {
   e.preventDefault();
-  
+  if (!canWrite()) return;
+
   const userEmail = document.getElementById('orderUserSelect').value;
   const orderType = document.getElementById('orderType').value;
   const itemName = document.getElementById('orderItemName').value.trim();
@@ -7639,6 +7656,7 @@ function renderOrders() {
 
 // Update order progress
 async function updateOrderProgress(orderId, newStep) {
+  if (!canWrite()) return;
   newStep = parseInt(newStep);
   
   try {
@@ -7670,6 +7688,7 @@ async function updateOrderProgress(orderId, newStep) {
 
 // Update order estimate
 async function updateOrderEstimate(orderId, step, estimate) {
+  if (!canWrite()) return;
   try {
     const orderRef = db.collection('orders').doc(orderId);
     const doc = await orderRef.get();
@@ -7692,6 +7711,7 @@ async function updateOrderEstimate(orderId, step, estimate) {
 
 // Update order remark
 async function updateOrderRemark(orderId, step, remark) {
+  if (!canWrite()) return;
   try {
     const orderRef = db.collection('orders').doc(orderId);
     const doc = await orderRef.get();
@@ -7780,6 +7800,7 @@ async function viewOrderHistory(orderId) {
 
 // Delete order
 async function deleteOrder(orderId, itemName) {
+  if (!canWrite()) return;
   if (!confirm(`Delete order "${itemName}"?\n\nOrder ID: ${orderId}`)) return;
   if (!confirm(`WARNING: This action CANNOT BE UNDONE!\n\nClick OK to confirm delete.`)) return;
   
@@ -8081,6 +8102,7 @@ function toggleOMOrderDetail(orderId) {
 
 // Update OM Order Progress
 async function updateOMOrderProgress(orderId, newStep) {
+  if (!canWrite()) return;
   newStep = parseInt(newStep);
   
   try {
@@ -8114,6 +8136,7 @@ async function updateOMOrderProgress(orderId, newStep) {
 
 // Update OM Order Remark
 async function updateOMOrderRemark(orderId, step, remark) {
+  if (!canWrite()) return;
   try {
     const orderDoc = await db.collection('orders').doc(orderId).get();
     const order = orderDoc.data();
@@ -8137,6 +8160,7 @@ async function updateOMOrderRemark(orderId, step, remark) {
 
 // Update OM Order Estimate
 async function updateOMOrderEstimate(orderId, step, estimate) {
+  if (!canWrite()) return;
   try {
     const orderDoc = await db.collection('orders').doc(orderId).get();
     const order = orderDoc.data();
@@ -8214,6 +8238,7 @@ function viewOMOrderHistory(orderId) {
 
 // Delete OM Order
 async function deleteOMOrder(orderId, itemName) {
+  if (!canWrite()) return;
   if (!confirm(`Delete order "${itemName}"?\n\nOrder ID: ${orderId}`)) return;
   if (!confirm(`WARNING: This action CANNOT BE UNDONE!\n\nClick OK to confirm delete.`)) return;
   
@@ -8281,7 +8306,8 @@ function updateOMOrderTypePreview() {
 // Create Order from OM Section
 async function createOrderFromOM(e) {
   e.preventDefault();
-  
+  if (!canWrite()) return;
+
   const userEmail = document.getElementById('omOrderUserSelect').value;
   const orderType = document.getElementById('omOrderType').value;
   const itemName = document.getElementById('omOrderItemName').value.trim();
@@ -8484,6 +8510,7 @@ async function getImageUrl(userEmail, projectId, fileName) {
 
 // Repair a single backup's image URLs
 async function repairBackupImages(projectId, userEmail) {
+  if (!canWrite()) return;
   const statusEl = document.getElementById('repairStatus');
   const errorEl = document.getElementById('repairError');
   
@@ -9031,6 +9058,7 @@ function openEditTrackDialog(trackId) {
 }
 
 async function saveTrackEdit() {
+  if (!canWrite()) return;
   const trackId = document.getElementById('editTrackId').value;
   const track = allTrackInspections.find(t => t.id === trackId);
   
@@ -9085,6 +9113,7 @@ async function saveTrackEdit() {
 }
 
 async function deleteTrackInspection(trackId) {
+  if (!canWrite()) return;
   if (!confirm('Delete this track inspection? This cannot be undone.')) return;
   try {
     await db.collection('trackInspections').doc(trackId).delete();
@@ -9412,6 +9441,7 @@ function toggleTSTrackDetail(trackId) {
 
 // Mark track complete/reopen
 async function markTSComplete(trackId, markComplete) {
+  if (!canWrite()) return;
   try {
     const updates = {
       status: markComplete ? 'complete' : 'repairing'
@@ -9430,6 +9460,7 @@ async function markTSComplete(trackId, markComplete) {
 
 // Delete track
 async function deleteTSTrack(trackId) {
+  if (!canWrite()) return;
   if (!confirm('Delete this track inspection?\n\nThis action cannot be undone.')) return;
   
   try {
@@ -9460,6 +9491,7 @@ async function loadTSSettings() {
 
 // Save settings
 async function saveTSSettings() {
+  if (!canWrite()) return;
   const settings = {
     repairDays: parseInt(document.getElementById('tsSettingRepairDays').value) || 30,
     delay1Days: parseInt(document.getElementById('tsSettingDelay1Days').value) || 45,
@@ -9997,6 +10029,7 @@ async function viewAssignment(id) {
 
 // Update assignment status
 async function updateAssignmentStatus(id, currentStatus) {
+  if (!canWrite()) return;
   const statuses = ['pending', 'in-progress', 'completed'];
   const currentIndex = statuses.indexOf(currentStatus);
   const nextStatus = statuses[(currentIndex + 1) % statuses.length];
@@ -10032,6 +10065,7 @@ async function updateAssignmentStatus(id, currentStatus) {
 
 // Delete assignment
 async function deleteAssignment(id) {
+  if (!canWrite()) return;
   // First confirmation
   if (!confirm('DELETE INSPECTION?\n\nThis will permanently delete:\n• All defect data\n• All photos from cloud storage\n• Assignment record\n\nUser\'s local data will NOT be affected.')) return;
   
@@ -10189,6 +10223,7 @@ async function loadAppLinksSettings() {
 
 // Save App Links Settings
 async function saveAppLinksSettings() {
+  if (!canWrite()) return;
   const updates = {};
   
   const ttpr = document.getElementById('settingTTPRUrl').value.trim();
@@ -10223,6 +10258,7 @@ async function saveAppLinksSettings() {
 
 // Save App URL setting
 async function saveAppUrlSetting() {
+  if (!canWrite()) return;
   const appUrl = document.getElementById('settingAppUrl').value.trim();
   
   if (!appUrl) {
@@ -10283,6 +10319,7 @@ async function openInApp(projectId, mode) {
 
 // Toggle shared mode UI
 function toggleSharedMode() {
+  if (!canWrite()) return;
   const isShared = document.getElementById('assignSharedMode').checked;
   const hint = document.getElementById('assignUserHint');
   
@@ -10298,6 +10335,7 @@ function toggleSharedMode() {
 // Update createAssignment to support shared mode
 const originalCreateAssignment = createAssignment;
 createAssignment = async function() {
+  if (!canWrite()) return;
   const isShared = document.getElementById('assignSharedMode').checked;
   
   if (!isShared) {
@@ -10544,6 +10582,7 @@ async function ayieAdmin_loadConfig() {
 
 // Save Ayie config to Firebase
 async function ayieAdmin_saveConfig() {
+  if (!canWrite()) return;
   const keyInput = document.getElementById('ayieApiKeyInput');
   const modelSelect = document.getElementById('ayieModelSelect');
   const saveBtn = document.getElementById('ayieSaveConfigBtn');
@@ -10732,6 +10771,7 @@ async function loadAppLinksPage() {
 }
 
 async function saveAppLinksPage() {
+  if (!canWrite()) return;
   const updates = {
     ttpr: document.getElementById('alSettingTTPR').value.trim(),
     semakPemaju: document.getElementById('alSettingSemakPemaju').value.trim(),
@@ -11092,6 +11132,7 @@ async function vc_load() {
 }
 
 async function vc_save() {
+  if (!canWrite()) return;
   const textarea = document.getElementById('vcEditorTextarea');
   const text = (textarea?.value || '').trim();
   const status = document.getElementById('vcStatus');
@@ -11138,6 +11179,7 @@ async function ayieTalk_load() {
 }
 
 async function ayieTalk_savePrompt() {
+  if (!canWrite()) return;
   const textarea = document.getElementById('ayieTalkPromptInput');
   const text = (textarea?.value || '').trim();
   const status = document.getElementById('ayieTalkStatus');
@@ -11183,6 +11225,7 @@ async function ayieAdmin_loadPrompt() {
 }
 
 async function ayieAdmin_savePrompt() {
+  if (!canWrite()) return;
   const textarea = document.getElementById('ayieCustomPrompt');
   const prompt = (textarea?.value || '').trim();
   const status = document.getElementById('ayiePromptStatus');
@@ -11608,6 +11651,7 @@ function ugSelectColor(el, color) {
 
 // Save group (create or update)
 async function ugSaveGroup() {
+  if (!canWrite()) return;
   const name = document.getElementById('ugGroupName').value.trim();
   if (!name) return alert('Sila masukkan nama group');
   
@@ -11664,6 +11708,7 @@ function rgbToHex(rgb) {
 
 // Delete group
 async function ugDeleteGroup(groupId, groupName) {
+  if (!canWrite()) return;
   if (!confirm('Delete group "' + groupName + '"?\n\nUsers in this group will be unassigned from it.')) return;
   
   try {
@@ -11743,6 +11788,7 @@ async function ugShowMembers(groupId, groupName, groupColor) {
 
 // Remove member from group
 async function ugRemoveMember(email, groupId, groupName, groupColor) {
+  if (!canWrite()) return;
   if (!confirm('Remove this user from "' + groupName + '"?')) return;
   try {
     const userDoc = await db.collection('users').doc(email).get();
@@ -11861,6 +11907,7 @@ function ugDeselectGroup(groupId, dropdownId, chipsId, selectedArrayName) {
 
 // Quick create group from dropdown
 async function ugQuickCreateGroup(name, dropdownId, chipsId, selectedArrayName) {
+  if (!canWrite()) return;
   const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('group-' + Date.now());
   const color = UG_COLORS[Math.floor(Math.random() * UG_COLORS.length)];
   
