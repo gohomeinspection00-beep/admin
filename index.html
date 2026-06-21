@@ -9813,7 +9813,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'audit-fixA2-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'audit-fixA3-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -30399,12 +30399,13 @@ const renderHistoryCard = (p, container) => {
           if (typeof cleanupOrphanedImages === 'function') {
             setTimeout(() => cleanupOrphanedImages(), 2000);
           }
-          
-          // Decrement inspection count if was counting
-          if (window.decrementInspectionCount) {
-            window.decrementInspectionCount();
-          }
-          
+
+          // A3: do NOT decrement the inspection quota here. This delete removes the
+          // project from THIS DEVICE only (the cloud copy survives), so refunding the
+          // lifetime quota would desync the counter and let users bypass the paid cap
+          // via create -> delete -> create. Quota is a lifetime count of inspections
+          // created; device-side deletion never refunds it.
+
           renderHistory();
         }
       };
