@@ -3465,7 +3465,7 @@ tr:hover td {
           <input type="number" id="settingReInspDays" value="15" min="1" />
         </div>
       </div>
-      <button class="btn btn-primary" style="width:auto" onclick="saveTrackSettings()">Save Settings</button>
+      <button class="btn btn-primary" style="width:auto" onclick="saveTrackSettings()">Manage in Track section</button>
     </div>
     
     <!-- App URL Settings -->
@@ -3952,32 +3952,32 @@ tr:hover td {
             <div class="form-row">
               <div class="form-group">
                 <label>Full Name <span class="required">*</span></label>
-                <input type="text" id="umUserName" required placeholder="Ahmad bin Ali" />
+                <input type="text" id="mdlUserName" required placeholder="Ahmad bin Ali" />
               </div>
               <div class="form-group">
                 <label>Email <span class="required">*</span></label>
-                <input type="email" id="umUserEmail" required placeholder="user@email.com" />
+                <input type="email" id="mdlUserEmail" required placeholder="user@email.com" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Phone Number</label>
-                <input type="tel" id="umUserPhone" placeholder="012-3456789" />
+                <input type="tel" id="mdlUserPhone" placeholder="012-3456789" />
               </div>
               <div class="form-group">
                 <label>Password <span class="required">*</span></label>
-                <input type="text" id="umUserPassword" required placeholder="password123" />
+                <input type="text" id="mdlUserPassword" required placeholder="password123" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Inspection Limit <span class="required">*</span></label>
-                <input type="number" id="umUserLimit" value="10" min="1" required />
+                <input type="number" id="mdlUserLimit" value="10" min="1" required />
                 <span class="form-hint">Number of inspections allowed</span>
               </div>
               <div class="form-group">
                 <label>Active Days <span class="required">*</span></label>
-                <input type="number" id="umUserActiveDays" value="30" min="1" required />
+                <input type="number" id="mdlUserActiveDays" value="30" min="1" required />
                 <span class="form-hint">Account validity period</span>
               </div>
             </div>
@@ -5983,19 +5983,14 @@ async function loadDashboardData() {
     
     document.getElementById('dashRecentUsers').innerHTML = recentUsersHtml || '<div class="loading-placeholder">No users found</div>';
     
-    // Generate activity bars (simulated based on user count)
+    // Real activity: user signups by weekday (Mon..Sun) from createdAt
     const activityBars = document.getElementById('dashActivityBars');
-    const dayValues = [
-      Math.floor(Math.random() * 30) + 10,
-      Math.floor(Math.random() * 30) + 10,
-      Math.floor(Math.random() * 30) + 10,
-      Math.floor(Math.random() * 30) + 10,
-      Math.floor(Math.random() * 30) + 10,
-      Math.floor(Math.random() * 20) + 5,
-      Math.floor(Math.random() * 20) + 5
-    ];
-    const maxVal = Math.max(...dayValues);
-    
+    const dayValues = [0,0,0,0,0,0,0]; // 0=Mon .. 6=Sun
+    recentUsers.forEach(u => {
+      const d = u.createdAt?.toDate ? u.createdAt.toDate() : (u.createdAt ? new Date(u.createdAt) : null);
+      if (d && !isNaN(d)) dayValues[(d.getDay()+6)%7]++;
+    });
+    const maxVal = Math.max(...dayValues, 1);
     activityBars.innerHTML = dayValues.map(val => {
       const height = Math.round((val / maxVal) * 100);
       return `<div class="activity-bar" style="height:${height}%" data-value="${val}"></div>`;
@@ -6384,12 +6379,12 @@ function showAddUserModal() {
 async function addUserFromSection(e) {
   e.preventDefault();
   
-  const name = document.getElementById('umUserName').value.trim();
-  const email = document.getElementById('umUserEmail').value.trim().toLowerCase();
-  const phone = document.getElementById('umUserPhone').value.trim();
-  const password = document.getElementById('umUserPassword').value;
-  const limit = parseInt(document.getElementById('umUserLimit').value) || 10;
-  const activeDays = parseInt(document.getElementById('umUserActiveDays').value) || 30;
+  const name = document.getElementById('mdlUserName').value.trim();
+  const email = document.getElementById('mdlUserEmail').value.trim().toLowerCase();
+  const phone = document.getElementById('mdlUserPhone').value.trim();
+  const password = document.getElementById('mdlUserPassword').value;
+  const limit = parseInt(document.getElementById('mdlUserLimit').value) || 10;
+  const activeDays = parseInt(document.getElementById('mdlUserActiveDays').value) || 30;
   
   const btn = document.getElementById('umAddUserBtn');
   const errorDiv = document.getElementById('addUserError');
@@ -6898,6 +6893,7 @@ async function addUser(e) {
       inspectionUsed: 0,
       activeDays: activeDays,
       frozen: false,
+      groups: [],
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
@@ -6960,6 +6956,7 @@ async function addUserFromUM(e) {
       inspectionUsed: 0,
       activeDays: activeDays,
       frozen: false,
+      groups: [],
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
@@ -9471,7 +9468,7 @@ async function saveTSSettings() {
   };
   
   try {
-    await db.collection('settings').doc('trackTimeline').set(settings);
+    await db.collection('settings').doc('trackTimeline').set(settings, { merge: true });
     alert('Settings saved successfully!');
   } catch (error) {
     alert('Error: ' + error.message);
@@ -9479,19 +9476,8 @@ async function saveTSSettings() {
 }
 
 async function saveTrackSettings() {
-  const settings = {
-    repairDays: parseInt(document.getElementById('settingRepairDays').value) || 30,
-    delay1Days: parseInt(document.getElementById('settingDelay1Days').value) || 45,
-    delay2Days: parseInt(document.getElementById('settingDelay2Days').value) || 60,
-    reInspDays: parseInt(document.getElementById('settingReInspDays').value) || 15
-  };
-  
-  try {
-    await db.collection('settings').doc('trackTimeline').set(settings);
-    alert('Settings saved!');
-  } catch (error) {
-    alert('Error: ' + error.message);
-  }
+  // Deprecated duplicate — Track Timeline settings are managed in the Track section.
+  showSection('track');
 }
 
 // =============== ASSIGN INSPECTION FUNCTIONS ===============
@@ -10025,19 +10011,18 @@ async function updateAssignmentStatus(id, currentStatus) {
   }
   
   try {
-    await db.collection('assignedInspections').doc(id).update({
-      status: newStatus.toLowerCase()
-    });
-    
-    // Also update in backups collection
-    const assignDoc = await db.collection('assignedInspections').doc(id).get();
-    if (assignDoc.exists) {
-      const projectId = assignDoc.data().projectId;
-      await db.collection('backups').doc(projectId).update({
-        assignmentStatus: newStatus.toLowerCase()
-      });
+    const status = newStatus.toLowerCase();
+    const assignRef = db.collection('assignedInspections').doc(id);
+    const assignSnap = await assignRef.get();
+    if (!assignSnap.exists) { alert('Assignment not found.'); return; }
+    const projectId = assignSnap.data().projectId;
+    const batch = db.batch();
+    batch.update(assignRef, { status: status });
+    if (projectId) {
+      const backupSnap = await db.collection('backups').doc(projectId).get();
+      if (backupSnap.exists) batch.update(db.collection('backups').doc(projectId), { assignmentStatus: status });
     }
-    
+    await batch.commit();
     alert('Status updated!');
     loadAssignedInspections();
   } catch (error) {
@@ -11411,10 +11396,10 @@ const FA_FEATURES = [
   { key: 'printReport', label: 'Print Report' },
   { key: 'ayieChat', label: 'Ayie AI Chat' },
   { key: 'trackInspection', label: 'Track Inspection' },
-  { key: 'developerCheck', label: 'Developer Check (Semak Pemaju)' },
-  { key: 'conditionRating', label: 'Condition Rating', defaultOff: true },
-  { key: 'subSaleMode', label: 'Sub-Sale Mode', defaultOff: true },
-  { key: 'subSaleOnly', label: 'Sub-Sale Only (Lock to Sub-Sale)', defaultOff: true }
+  { key: 'developerCheck', label: 'Developer Check (Semak Pemaju) (belum aktif / not enforced)' },
+  { key: 'conditionRating', label: 'Condition Rating (belum aktif / not enforced)', defaultOff: true },
+  { key: 'subSaleMode', label: 'Sub-Sale Mode (belum aktif / not enforced)', defaultOff: true },
+  { key: 'subSaleOnly', label: 'Sub-Sale Only (Lock to Sub-Sale) (belum aktif / not enforced)', defaultOff: true }
 ];
 
 // Get feature access value (default true if not set, unless feature has defaultOff)
