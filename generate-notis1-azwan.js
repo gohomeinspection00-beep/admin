@@ -261,7 +261,7 @@ bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal 
 y += 4;
 
 numPara(5,
-  `Notis ini dihantar melalui ${data.kaedahPenghantaranNotis}. Sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
+  `Merujuk kepada klausa Service of Documents di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui ${data.kaedahPenghantaranNotis}.`
 );
 y += 4;
 
