@@ -234,7 +234,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas, dengan harga belian sebanyak ${data.hargaBelian} sebagaimana termaktub di dalam Perjanjian Jual Beli bertarikh ${data.tarikhSPA} (No. Rujukan SPA: ${data.noSPA}) mengikut ${data.jenisSPA}, telah mengemukakan Laporan Pemeriksaan Kecacatan (Defect Inspection Report) secara rasmi kepada pihak tuan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas, sebagaimana termaktub di dalam Perjanjian Jual Beli bertarikh ${data.tarikhSPA} (No. Rujukan SPA: ${data.noSPA}) mengikut ${data.jenisSPA}, telah mengemukakan Laporan Pemeriksaan Kecacatan (Defect Inspection Report) secara rasmi kepada pihak tuan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
 );
 y += 4;
 
@@ -280,7 +280,7 @@ bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal 
 y += 4;
 
 numPara(6,
-  `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui ${data.kaedahPenghantaranNotis}.`
+  `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
 
@@ -387,55 +387,6 @@ function drawAkuanTerima(copyLabel) {
 
 drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
-
-// ============================================================
-// LAMPIRAN A
-// ============================================================
-newPage();
-y = 25;
-
-doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
-const lamT = "LAMPIRAN A";
-doc.text(lamT, pageW / 2, y, { align: "center" });
-doc.setLineWidth(0.4);
-doc.line(pageW / 2 - doc.getTextWidth(lamT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lamT) / 2, y + 1);
-y += 6;
-doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-doc.text("Gambar Bukti Kecacatan (Defect Evidence Photos)", pageW / 2, y, { align: "center" });
-y += 10;
-
-doc.setFontSize(SZ.SMALL); bk();
-doc.text(`Tarikh Pemerhatian Pemilik: ${data.tarikhPemerhatian}`, mL, y); y += 8;
-
-const pw = (cW - 10) / 2;
-const ph = 55;
-const pg = 10;
-
-for (let i = 0; i < data.kecacatan.length; i++) {
-  const col = i % 2;
-  if (col === 0) checkBreak(ph + 20);
-  const px = mL + col * (pw + pg);
-  const py = y;
-
-  doc.setLineWidth(0.3); bk();
-  doc.rect(px, py, pw, ph);
-
-  doc.setFont("helvetica", "normal"); doc.setFontSize(14);
-  doc.setTextColor(180, 180, 180);
-  doc.text("[FOTO]", px + pw / 2, py + ph / 2 - 2, { align: "center" });
-  doc.setFontSize(SZ.FOOTNOTE);
-  doc.setTextColor(150, 150, 150);
-  doc.text(`Tag #${data.kecacatan[i].tag}`, px + pw / 2, py + ph / 2 + 6, { align: "center" });
-
-  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.CAPTION); doc.setTextColor(0, 0, 0);
-  doc.text(`Tag ${data.kecacatan[i].tag} — ${data.kecacatan[i].lokasi}`, px + 2, py + ph + 5);
-  doc.setFont("helvetica", "normal");
-  const cl = doc.splitTextToSize(data.kecacatan[i].kecacatan, pw - 4);
-  doc.text(cl[0], px + 2, py + ph + 10);
-
-  if (col === 1) y += ph + 18;
-}
-if (data.kecacatan.length % 2 === 1) y += ph + 18;
 
 // ============================================================
 // FOOTER
