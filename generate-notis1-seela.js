@@ -12,6 +12,8 @@ const data = {
     "Johor.",
   ],
   noKP: "S8755622J",
+  telefonPembeli: "012-7669002",
+  emailPembeli: "seelapanir@yahoo.com.sg",
 
   namaPemaju: "NASA LAND SDN. BHD.",
   noSyarikat: "(457736-W)",
@@ -180,6 +182,10 @@ y += LH;
 
 doc.setFont("helvetica", "normal");
 for (const line of data.alamatPengirim) { doc.text(line, mL, y); y += LH_S; }
+y += 1;
+doc.setFontSize(SZ.SMALL);
+doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
+doc.text(`Tel: ${data.telefonPembeli}`, mL, y); y += LH_S;
 
 y += 3;
 
@@ -307,6 +313,8 @@ doc.text(`(${data.namaPembeli})`, mL, y);
 y += 8;
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
 doc.text(`No. K/P: ${data.noKP}`, mL, y); y += LH_S;
+doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
+doc.text(`Telefon: ${data.telefonPembeli}`, mL, y); y += 8;
 
 // ============================================================
 // KRONOLOGI
