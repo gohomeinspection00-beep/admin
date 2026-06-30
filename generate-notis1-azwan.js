@@ -4,7 +4,7 @@ const fs = require("fs");
 const data = {
   noRujukan: "NOTIS-1/2026/007",
 
-  namaPembeli: "AZWAN MOHAMAD",
+  namaPembeli: "AZWAN BIN MOHAMAD",
   alamatPengirim: [
     "No 7, Jalan Perjiranan 14/8,",
     "Perjiranan 14, Bandar Dato Onn,",
@@ -13,7 +13,7 @@ const data = {
   ],
   emailPembeli: "ain_nabilah151294@yahoo.com",
   telefonPembeli: "011-10902477",
-  noKP: "001014-03-0660",
+  noKP: "920330015777",
 
   namaPemaju: "JLG LAND BERHAD",
   alamatPenerima: [
