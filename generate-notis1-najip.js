@@ -33,7 +33,8 @@ const data = {
   klausaSerahan: "29(1)",
   tempohDLP: "24",
 
-  tarikhPemeriksaan: "10 April 2026",
+  tarikhPemeriksaan1: "10 April 2026",
+  tarikhPemeriksaan2: "30 Jun 2026",
   tarikhSerahanLaporan: "13 April 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy)",
 
@@ -54,11 +55,12 @@ const data = {
 
   kronologi: [
     { tarikh: "29 Februari 2024", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
-    { tarikh: "10 April 2026", peristiwa: "Pemeriksaan Kecacatan (Defect Inspection) dijalankan ke atas hartanah" },
+    { tarikh: "10 April 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "13 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui serahan tangan (hardcopy)" },
-    { tarikh: "13 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan diambil" },
+    { tarikh: "13 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan" },
+    { tarikh: "30 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
     { tarikh: "7 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "27 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari bekerja dari Notis Pertama)" },
+    { tarikh: "27 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -234,7 +236,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan langsung oleh pihak tuan. Berdasarkan pemeriksaan pada ${data.tarikhPemeriksaan}, kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan sepenuhnya oleh pihak tuan. Berdasarkan pemeriksaan kali kedua pada ${data.tarikhPemeriksaan2}, kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
