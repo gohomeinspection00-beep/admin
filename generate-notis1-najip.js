@@ -51,6 +51,11 @@ const data = {
     { tag: "253", lokasi: "Water Tank Area — Floor", kecacatan: "Possible water stagnant on floor slab", status: "Belum Dibaiki" },
     { tag: "250", lokasi: "Ceiling Area (Bedroom 2 & 3)", kecacatan: "Opening on partition wall", status: "Belum Dibaiki" },
     { tag: "256", lokasi: "Water Tank Area — Wall", kecacatan: "Damage on wall surface", status: "Belum Dibaiki" },
+    { tag: "18", lokasi: "Car Porch — Ceiling", kecacatan: "Leaking on ceiling when raining", status: "Belum Dibaiki" },
+    { tag: "19", lokasi: "Car Porch — Ceiling", kecacatan: "Water mark on ceiling", status: "Belum Dibaiki" },
+    { tag: "28", lokasi: "Car Porch — Drainage", kecacatan: "Construction leftover inside U-drain", status: "Belum Dibaiki" },
+    { tag: "57", lokasi: "Living and Dining — M&E", kecacatan: "Neutral and earth cable terminated in incorrect slot (reverse)", status: "Belum Dibaiki" },
+    { tag: "117", lokasi: "Yard", kecacatan: "Mould growth and sign of moisture (Possible leaking from PVC down pipe)", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
