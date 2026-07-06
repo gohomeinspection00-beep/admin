@@ -39,7 +39,7 @@ const data = {
   kaedahSerahanLaporan: "serahan tangan (hardcopy)",
 
   tarikhNotis: "7 Julai 2026",
-  tarikhDeadline: "27 Julai 2026",
+  tarikhDeadline: "22 Julai 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -60,7 +60,7 @@ const data = {
     { tarikh: "13 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan" },
     { tarikh: "30 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
     { tarikh: "7 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "27 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "22 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
