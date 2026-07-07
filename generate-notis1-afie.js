@@ -40,28 +40,47 @@ const data = {
   tarikhSerahanLaporan: "27 April 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy)",
 
-  tarikhNotis: "11 Julai 2026",
-  tarikhDeadline: "26 Julai 2026",
+  tarikhNotis: "8 Julai 2026",
+  tarikhDeadline: "23 Julai 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
   kaedahPenghantaranNotis: "serahan tangan",
 
   kecacatan: [
+    { tag: "165", lokasi: "Master Bedroom", kecacatan: "Sliding door cannot lock (misaligned installation)", status: "Belum Dibaiki" },
+    { tag: "200", lokasi: "Bedroom 2", kecacatan: "Hollow sound on floor tiles (hollowness on floor skirting still observed)", status: "Pembaikan Tidak Sempurna" },
+    { tag: "248", lokasi: "Ceiling Area (Bedroom 2 & 3)", kecacatan: "Hole/opening on partition wall", status: "Belum Dibaiki" },
+    { tag: "249", lokasi: "Ceiling Area (Bedroom 2 & 3)", kecacatan: "Opening around pipe", status: "Belum Dibaiki" },
+    { tag: "251", lokasi: "Ceiling Area (Bathroom 2 & Master)", kecacatan: "Brick wall loose", status: "Belum Dibaiki" },
+    { tag: "252", lokasi: "Family Hall", kecacatan: "Leaking on ceiling (lubang around pipe belum repair)", status: "Belum Dibaiki" },
+    { tag: "254", lokasi: "Ceiling Area (Master Bedroom)", kecacatan: "Leaking on wall", status: "Belum Dibaiki" },
+    { tag: "256", lokasi: "Water Tank Area", kecacatan: "Water stagnant on slab", status: "Belum Dibaiki" },
+    { tag: "257", lokasi: "Water Tank Area", kecacatan: "Moldy on floor slab", status: "Belum Dibaiki" },
+    { tag: "258", lokasi: "Water Tank Area", kecacatan: "Crack on slab (all floor area)", status: "Belum Dibaiki" },
+    { tag: "259", lokasi: "Water Tank Area", kecacatan: "Crack and peeling paint on all wall surface", status: "Belum Dibaiki" },
+    { tag: "260", lokasi: "Water Tank Area", kecacatan: "Rusty on window frame", status: "Belum Dibaiki" },
+    { tag: "261", lokasi: "Water Tank Area", kecacatan: "Water tank moldy and should be clean", status: "Belum Dibaiki" },
+    { tag: "262", lokasi: "Water Tank Area", kecacatan: "Gap around pipe", status: "Belum Dibaiki" },
+    { tag: "263", lokasi: "Water Tank Area", kecacatan: "Missing proper support for distribution pipe", status: "Pembaikan Tidak Sempurna" },
+    { tag: "264", lokasi: "Water Tank Area", kecacatan: "Float valve handle too much dented", status: "Belum Dibaiki" },
+    { tag: "265", lokasi: "Water Tank Area", kecacatan: "Dented water tank cover", status: "Belum Dibaiki" },
+    { tag: "267", lokasi: "Top Roof", kecacatan: "Rusty roof flashing", status: "Belum Dibaiki" },
+    { tag: "268", lokasi: "Top Roof", kecacatan: "Damage on roof tiles", status: "Belum Dibaiki" },
+    { tag: "269", lokasi: "Top Roof", kecacatan: "Opening on roof tiles", status: "Belum Dibaiki" },
+    { tag: "270", lokasi: "Top Roof", kecacatan: "Water stagnant on rear gutter", status: "Belum Dibaiki" },
     { tag: "271", lokasi: "Top Roof", kecacatan: "Water stagnant on front gutter", status: "Belum Dibaiki" },
     { tag: "272", lokasi: "Top Roof", kecacatan: "Rear gutter leaking", status: "Belum Dibaiki" },
-    { tag: "265", lokasi: "Water Tank Area", kecacatan: "Dented water tank cover", status: "Belum Dibaiki" },
-    { tag: "263", lokasi: "Water Tank Area", kecacatan: "Missing proper support for distribution pipe", status: "Pembaikan Tidak Sempurna" },
   ],
 
   kronologi: [
     { tarikh: "7 Mac 2024", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
     { tarikh: "8 April 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "27 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui serahan tangan (hardcopy)" },
-    { tarikh: "27 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan" },
+    { tarikh: "27 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan / tidak sempurna" },
     { tarikh: "30 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
-    { tarikh: "11 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "26 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "8 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "23 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -255,7 +274,7 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
+const fn = `*Senarai kecacatan di atas merujuk kepada penemuan terkini dalam Laporan Pemeriksaan Kecacatan Kali Kedua pada ${data.tarikhPemeriksaan2}. Senarai lengkap kecacatan juga terkandung dalam Laporan Pemeriksaan Kecacatan Pertama yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
