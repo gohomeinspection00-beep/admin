@@ -54,6 +54,7 @@ const data = {
     { tag: "249", lokasi: "Ceiling Area (Bedroom 2 & 3)", kecacatan: "Opening around pipe", status: "Belum Dibaiki" },
     { tag: "251", lokasi: "Ceiling Area (Bathroom 2 & Master)", kecacatan: "Brick wall loose", status: "Belum Dibaiki" },
     { tag: "252", lokasi: "Family Hall", kecacatan: "Leaking on ceiling (lubang around pipe belum repair)", status: "Belum Dibaiki" },
+    { tag: "253", lokasi: "Ceiling Area (Master Bedroom)", kecacatan: "Exposed RC on wall column", status: "Belum Dibaiki" },
     { tag: "254", lokasi: "Ceiling Area (Master Bedroom)", kecacatan: "Leaking on wall", status: "Belum Dibaiki" },
     { tag: "256", lokasi: "Water Tank Area", kecacatan: "Water stagnant on slab", status: "Belum Dibaiki" },
     { tag: "257", lokasi: "Water Tank Area", kecacatan: "Moldy on floor slab", status: "Belum Dibaiki" },
