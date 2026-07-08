@@ -41,8 +41,8 @@ const data = {
   kaedahSerahanLaporan: "aplikasi ProFix App",
   tarikhSerahanLaporan2: "10 Jun 2026",
 
-  tarikhNotis: "9 Julai 2026",
-  tarikhDeadline: "24 Julai 2026",
+  tarikhNotis: "10 Julai 2026",
+  tarikhDeadline: "25 Julai 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -63,8 +63,8 @@ const data = {
     { tarikh: "11 Februari 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan / tidak sempurna" },
     { tarikh: "5 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
     { tarikh: "10 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju melalui aplikasi ProFix App" },
-    { tarikh: "9 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "24 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "10 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "25 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
