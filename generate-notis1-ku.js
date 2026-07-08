@@ -39,7 +39,8 @@ const data = {
   tarikhPemeriksaan2: "5 Jun 2026",
   tarikhSerahanLaporan: "12 Januari 2026",
   kaedahSerahanLaporan: "aplikasi ProFix App",
-  tarikhSerahanLaporan2: "10 Jun 2026",
+  tarikhSerahanLaporan2: "11 Jun 2026",
+  kaedahSerahanLaporan2: "aplikasi IJM Connect",
 
   tarikhNotis: "10 Julai 2026",
   tarikhDeadline: "25 Julai 2026",
@@ -62,7 +63,7 @@ const data = {
     { tarikh: "12 Januari 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi ProFix App" },
     { tarikh: "11 Februari 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan / tidak sempurna" },
     { tarikh: "5 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
-    { tarikh: "10 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju melalui aplikasi ProFix App" },
+    { tarikh: "11 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju melalui aplikasi IJM Connect" },
     { tarikh: "10 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "25 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
@@ -257,7 +258,7 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai kecacatan di atas merujuk kepada penemuan terkini dalam Laporan Pemeriksaan Kecacatan Kali Kedua pada ${data.tarikhPemeriksaan2}. Senarai lengkap kecacatan juga terkandung dalam Laporan Pemeriksaan Kecacatan Pertama yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
+const fn = `*Senarai kecacatan di atas merujuk kepada penemuan terkini dalam Laporan Pemeriksaan Kecacatan Kali Kedua pada ${data.tarikhPemeriksaan2}. Laporan Kali Kedua telah diserahkan kepada pemaju melalui ${data.kaedahSerahanLaporan2} pada ${data.tarikhSerahanLaporan2}. Senarai lengkap kecacatan juga terkandung dalam Laporan Pemeriksaan Kecacatan Pertama yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
