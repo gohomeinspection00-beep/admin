@@ -53,6 +53,9 @@ const data = {
     { tag: "76", lokasi: "Bathroom 3", kecacatan: "Rusty on screw for water faucet holder", status: "Belum Dibaiki" },
     { tag: "20", lokasi: "Carporch — Ceiling", kecacatan: "Crack and dented on ceiling surface", status: "Belum Dibaiki" },
     { tag: "206", lokasi: "Flat Roof — Floor", kecacatan: "Crack and chipping on RC flat roof surface", status: "Belum Dibaiki" },
+    { tag: "-", lokasi: "Flat Roof (Master Bedroom)", kecacatan: "Crack on flat roof causing water leaking during heavy rain", status: "Belum Dibaiki" },
+    { tag: "-", lokasi: "Car Porch — Floor", kecacatan: "Crack on floor slab", status: "Belum Dibaiki" },
+    { tag: "-", lokasi: "Car Porch — Ceiling (Light Point)", kecacatan: "Crack on ceiling near light point area", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
@@ -261,6 +264,11 @@ const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam La
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
+
+numPara("2A",
+  `Selain daripada kecacatan yang dinyatakan di atas, pemilik juga mendapati bahawa mainhole di bahagian belakang rumah masih tersumbat. Pihak pemaju telah datang untuk membuat pembaikan, namun selepas pembaikan dilakukan, pemilik mendapati apabila flushing dilakukan pada master toilet, banyak pasir keluar. Pada keesokan harinya, flushing masih tersumbat. Pemeriksaan lanjut oleh pemilik pada 12 Jun 2026 mengesahkan mainhole masih tersumbat. Flushing pada semua tandas turut mengeluarkan batu-batu besar, menunjukkan kerja pembinaan dan sistem saliran yang tidak sempurna.`
+);
+y += 4;
 
 numPara(3,
   `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
