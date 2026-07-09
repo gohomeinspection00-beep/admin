@@ -37,7 +37,7 @@ const data = {
 
   tarikhPemeriksaan1: "6 April 2026",
   tarikhPemeriksaan2: "4 Julai 2026",
-  tarikhSerahanLaporan: "11 April 2026",
+  tarikhSerahanLaporan: "9 April 2026",
   kaedahSerahanLaporan: "aplikasi IOI",
 
   tarikhNotis: "10 Julai 2026",
@@ -59,8 +59,8 @@ const data = {
   kronologi: [
     { tarikh: "19 Julai 2024", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
     { tarikh: "6 April 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
-    { tarikh: "11 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi IOI" },
-    { tarikh: "11 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan / tidak sempurna" },
+    { tarikh: "9 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi IOI" },
+    { tarikh: "9 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan / tidak sempurna" },
     { tarikh: "4 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
     { tarikh: "10 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "25 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
