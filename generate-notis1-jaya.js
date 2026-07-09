@@ -18,10 +18,10 @@ const data = {
   namaPemaju: "NICE FRONTIER SDN. BHD.",
   noSyarikat: "(199401014059 / 299739-U)",
   alamatPenerima: [
+    "IOI Galleria @ Bandar Putra Kulai,",
     "Jalan Putra 4,",
     "Bandar Putra Kulai,",
-    "81000 Kulai,",
-    "Johor.",
+    "81000 Kulai, Johor.",
   ],
 
   alamatHartanah: "850, Jalan Bayan 2, Bandar Putra, 81000 Kulai, Johor",
