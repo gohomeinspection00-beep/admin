@@ -16961,9 +16961,13 @@ function calculateTrackStatus(track) {
   if (track.status === 'complete') {
     return { label: 'Complete', class: 'complete', phase: 'complete' };
   }
-  
-  if (track.reInspection) {
-    const reInspDays = daysSince(track.reInspection.submissionDate);
+
+  const latestReInsp = (track.reInspections && track.reInspections.length > 0)
+    ? track.reInspections[track.reInspections.length - 1]
+    : track.reInspection;
+
+  if (latestReInsp) {
+    const reInspDays = daysSince(latestReInsp.submissionDate);
     if (reInspDays > REINSPECTION_DELAY_2) {
       return { label: `Re-Inspection Delay 2 (${reInspDays} hari)`, class: 'delay', phase: 'reinspection_delay_2' };
     }
@@ -17063,7 +17067,8 @@ function renderTrackDetail(track) {
   
   // Show Add Re-Inspection button only if no re-inspection yet
   const reInspBtn = q('#btnAddReInspectionFromDetail');
-  if (!track.reInspection) {
+  const hasReInsp = track.reInspection || (track.reInspections && track.reInspections.length > 0);
+  if (!hasReInsp) {
     reInspBtn.style.display = 'block';
   } else {
     reInspBtn.style.display = 'none';
@@ -17493,36 +17498,48 @@ function buildTimeline(track, status) {
   
   // 5.6 Delay Actions (if any - show in timeline)
   const actions = track.delayActions || {};
-  const delayActionKeys = ['call', 'message', 'notis1', 'followUpCall', 'notis2'];
-  const delayTitles = { 
-    call: 'Called Developer', 
-    message: 'Messaged Developer', 
-    notis1: 'Notice 1 Sent', 
+  const delayTitles = {
+    call: 'Called Developer',
+    message: 'Messaged Developer',
+    notis1: 'Notice 1 Sent',
     followUpCall: 'Follow Up Call',
-    notis2: 'Notice 2 Sent' 
+    notis2: 'Notice 2 Sent'
   };
-  
-  delayActionKeys.forEach(key => {
-    if (actions[key]?.done) {
-      html += `
-        <div class="timeline-item">
-          <div class="timeline-dot" style="background:#dc2626;color:white">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
-          </div>
-          <div class="timeline-content" style="border-color:#dc2626;background:#fef2f2">
-            <div class="timeline-title" style="color:#dc2626">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
-              ${delayTitles[key]}
-            </div>
-            <div class="timeline-desc">
-              Date: ${formatDate(actions[key].date)}
-              ${actions[key].method ? '<br>Method: ' + actions[key].method : ''}
-              ${actions[key].note ? '<br>Note: ' + escapeHtml(actions[key].note) : ''}
-            </div>
-            ${actions[key].photo ? `<div style="margin-top:8px"><img src="${actions[key].photo}" style="max-width:100px;border-radius:8px;cursor:pointer" onclick="viewImage(this.src)" /></div>` : ''}
-          </div>
+
+  function renderDelayTimelineEntry(entry, title) {
+    return `
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:#dc2626;color:white">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
         </div>
-      `;
+        <div class="timeline-content" style="border-color:#dc2626;background:#fef2f2">
+          <div class="timeline-title" style="color:#dc2626">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
+            ${title}
+          </div>
+          <div class="timeline-desc">
+            Date: ${formatDate(entry.date)}
+            ${entry.method ? '<br>Method: ' + entry.method : ''}
+            ${entry.note ? '<br>Note: ' + escapeHtml(entry.note) : ''}
+          </div>
+          ${entry.photo ? `<div style="margin-top:8px"><img src="${entry.photo}" style="max-width:100px;border-radius:8px;cursor:pointer" onclick="viewImage(this.src)" /></div>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  // Calls — array (new) or singular (legacy)
+  const callEntries = actions.calls || (actions.call?.done ? [actions.call] : []);
+  callEntries.forEach(entry => { html += renderDelayTimelineEntry(entry, delayTitles.call); });
+
+  // Messages — array (new) or singular (legacy)
+  const msgEntries = actions.messages || (actions.message?.done ? [actions.message] : []);
+  msgEntries.forEach(entry => { html += renderDelayTimelineEntry(entry, delayTitles.message); });
+
+  // Notis1, followUpCall, notis2 — singular only
+  ['notis1', 'followUpCall', 'notis2'].forEach(key => {
+    if (actions[key]?.done) {
+      html += renderDelayTimelineEntry(actions[key], delayTitles[key]);
     }
   });
   
