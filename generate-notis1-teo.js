@@ -275,6 +275,7 @@ numPara(2,
 );
 y += 5;
 
+checkBreak(45);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Senarai Kecacatan yang Masih Belum Diselesaikan:", mL, y);
 y += 6;
@@ -332,45 +333,40 @@ y += 4;
 para("Kami berharap pihak tuan mengambil tindakan segera terhadap Notis Pertama ini. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.");
 y += 4;
 para("Sekian.");
-y += 10;
+y += 4;
 
-checkBreak(60);
+checkBreak(46);
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Yang benar,", mL, y);
-y += 20;
+y += 12;
+const sigCol2 = mL + 85;
 doc.setLineWidth(0.3);
 doc.line(mL, y, mL + 60, y);
+doc.line(sigCol2, y, sigCol2 + 60, y);
 y += 5;
 doc.setFont("helvetica", "bold");
 doc.text(`(${data.namaPembeli})`, mL, y);
+doc.text(`(${data.namaPembeli2})`, sigCol2, y);
 y += 5;
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
 doc.text(`No. K/P: ${data.noKP}`, mL, y);
-y += 15;
-doc.setLineWidth(0.3);
-doc.line(mL, y, mL + 60, y);
-y += 5;
-doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY);
-doc.text(`(${data.namaPembeli2})`, mL, y);
-y += 5;
-doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-doc.text(`No. K/P: ${data.noKP2}`, mL, y); y += LH_S;
+doc.text(`No. K/P: ${data.noKP2}`, sigCol2, y);
+y += 4;
 doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
-doc.text(`Telefon: ${data.telefonPembeli}`, mL, y); y += 8;
+doc.text(`Telefon: ${data.telefonPembeli}`, mL, y); y += 7;
 
 // CC section
 if (data.salinanKepada.length > 0) {
-  y += 4;
-  checkBreak(35);
+  checkBreak(18);
   doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL); bk();
   doc.text("s.k. (CC):", mL, y);
   y += LH_S;
   for (const cc of data.salinanKepada) {
     doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL); bk();
-    doc.text(`${cc.nama}`, mL + 5, y); y += LH_S;
+    doc.text(`${cc.nama} ${cc.keterangan}`, mL + 5, y); y += LH_S;
     doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-    doc.text(cc.keterangan, mL + 5, y); y += LH_S;
-    for (const al of cc.alamat) { doc.text(al, mL + 5, y); y += LH_S; }
+    const ccLines = doc.splitTextToSize(cc.alamat.join(" "), cW - 5);
+    for (const al of ccLines) { doc.text(al, mL + 5, y); y += LH_S; }
     y += 2;
   }
 }
