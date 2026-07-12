@@ -63,7 +63,7 @@ const data = {
     { tarikh: "22 Mei 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "29 Mei 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi IOI Properties (No. kes: C93062, C93066)" },
     { tarikh: "3 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi IOI Properties (No. kes: C93083, C93216)" },
-    { tarikh: "2 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan" },
+    { tarikh: "2 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan telah dilakukan tetapi sebahagian kecacatan masih belum disiapkan sepenuhnya" },
     { tarikh: "10 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
     { tarikh: "13 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "28 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
@@ -255,7 +255,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan sepenuhnya oleh pihak tuan. Berdasarkan pemeriksaan kali kedua pada ${data.tarikhPemeriksaan2}, kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun pihak tuan telah melaksanakan sebahagian kerja pembaikan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disiapkan sepenuhnya. Berdasarkan pemeriksaan kali kedua pada ${data.tarikhPemeriksaan2}, kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
