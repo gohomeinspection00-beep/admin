@@ -9845,7 +9845,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'dfm-status-filter-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'dfm-status-filter-v3'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -33844,7 +33844,7 @@ await new Promise(r => setTimeout(r, 10));
 
   body.appendChild(badgeRow);
 
-  if (RE_INSPECTION_MODE) {
+  if (RE_INSPECTION_MODE || _dfmLvl) {
     // Simple list - ikut turutan area, warna ikut status
     const getStatusColor = (statusName) => {
       const found = reInspectionStatuses.find(s => s.name === statusName);
@@ -33861,11 +33861,11 @@ await new Promise(r => setTimeout(r, 10));
     
     // Build items list from allDefectsSorted (already in correct order with new defects mixed in)
     const items = allDefectsSorted.map(({ d, displayNum, isNew }) => {
-      // Get status based on mode: Third > Second > First
+      // Get status based on mode: Third > Second > First (or the Defect Form level)
       let status;
-      if (THIRD_REINSPECTION_MODE) {
+      if (THIRD_REINSPECTION_MODE || _dfmLvl === 'third') {
         status = (d.thirdReInspection && d.thirdReInspection.status) || 'No Status';
-      } else if (SECOND_REINSPECTION_MODE) {
+      } else if (SECOND_REINSPECTION_MODE || _dfmLvl === 'second') {
         status = (d.secondReInspection && d.secondReInspection.status) || 'No Status';
       } else {
         status = (d.reInspection && d.reInspection.status) || 'No Status';
