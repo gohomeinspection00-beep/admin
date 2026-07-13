@@ -4664,6 +4664,18 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
             <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:400;line-height:1.3;">Filter by defect type</div>
           </div>
         </button>
+        <button class="btn" id="btnFilterByStatus" style="padding:16px;text-align:left;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#16a34a,#15803d);width:100%;">
+          <div style="width:48px;height:48px;min-width:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:16px;color:#fff;line-height:1.3;">By Status (Re-Inspection)</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:400;line-height:1.3;">Filter by re-inspection status (e.g. Not Complete only)</div>
+          </div>
+        </button>
         <button class="btn" id="btnFilterByDefect" style="padding:16px;text-align:left;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#dc2626,#b91c1c);width:100%;">
           <div style="width:48px;height:48px;min-width:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
@@ -9833,7 +9845,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'reinsp-copy-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'dfm-status-filter-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -31406,10 +31418,22 @@ function resetByNeedState() {
 }
 
 // Get items with defects based on filter type
+// Re-inspection status of a defect at the CURRENT Defect Form inspection level.
+// Blank/missing status groups under 'No Status' (same label the report summary uses).
+// 'fourth' is supported for future-proofing even though DFM buttons stop at Third today.
+function dfmStatusOf(d) {
+  let s = '';
+  if (DEFECT_FORM_INSPECTION_LEVEL === 'first')       s = d.reInspection?.status || '';
+  else if (DEFECT_FORM_INSPECTION_LEVEL === 'second') s = d.secondReInspection?.status || '';
+  else if (DEFECT_FORM_INSPECTION_LEVEL === 'third')  s = d.thirdReInspection?.status || '';
+  else if (DEFECT_FORM_INSPECTION_LEVEL === 'fourth') s = d.fourthReInspection?.status || '';
+  return s || 'No Status';
+}
+
 function getItemsWithDefectsForByNeed() {
   const defects = getFilteredDefectsForDefectForm();
   const counts = {};
-  
+
   defects.forEach(d => {
     let key = '';
     if (byNeedFilterType === 'location') {
@@ -31418,6 +31442,8 @@ function getItemsWithDefectsForByNeed() {
       key = d.element || 'Unknown';
     } else if (byNeedFilterType === 'type') {
       key = d.type || 'Unknown';
+    } else if (byNeedFilterType === 'status') {
+      key = dfmStatusOf(d);
     }
     if (key) {
       counts[key] = (counts[key] || 0) + 1;
@@ -31548,7 +31574,8 @@ function openByNeedSetup(filterType) {
   const titles = {
     'location': { title: 'Select Location', desc: 'Choose locations to include in the report', label: 'Add Location' },
     'element': { title: 'Select Element', desc: 'Choose elements to include in the report', label: 'Add Element' },
-    'type': { title: 'Select Type of Defect', desc: 'Choose defect types to include in the report', label: 'Add Type' }
+    'type': { title: 'Select Type of Defect', desc: 'Choose defect types to include in the report', label: 'Add Type' },
+    'status': { title: 'Select Re-Inspection Status', desc: 'Choose which re-inspection statuses to include in the report', label: 'Add Status' }
   };
   
   const config = titles[filterType] || titles['location'];
@@ -31585,7 +31612,8 @@ async function previewByNeedReport() {
   const typeLabels = {
     'location': 'Location',
     'element': 'Element',
-    'type': 'Type of Defect'
+    'type': 'Type of Defect',
+    'status': 'Status'
   };
   
   if (byNeedSelectedItems.length === 1) {
@@ -31915,6 +31943,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnFilterByType = q('#btnFilterByType');
   if (btnFilterByType) {
     btnFilterByType.addEventListener('click', () => openByNeedSetup('type'));
+  }
+
+  // By Status (re-inspection) — statuses only exist at re-inspection levels, so
+  // block it politely when the Original level is selected.
+  const btnFilterByStatus = q('#btnFilterByStatus');
+  if (btnFilterByStatus) {
+    btnFilterByStatus.addEventListener('click', () => {
+      if (!DEFECT_FORM_MODE || DEFECT_FORM_INSPECTION_LEVEL === 'original') {
+        alert('Filter status hanya untuk laporan re-inspection.\nSila pilih First/Second/Third Inspection di History dahulu.');
+        return;
+      }
+      openByNeedSetup('status');
+    });
   }
   
   // By Defect button
@@ -33392,6 +33433,10 @@ const buildReport = async () => {
         return byNeedItems.includes(d.element);
       } else if (byNeedFilterType === 'type') {
         return byNeedItems.includes(d.type);
+      } else if (byNeedFilterType === 'status') {
+        // By Status (re-inspection): keep only defects whose status at the current
+        // Defect Form level is among the selected statuses.
+        return byNeedItems.includes(dfmStatusOf(d));
       }
       return true;
     });
