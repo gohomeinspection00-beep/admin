@@ -9845,7 +9845,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'dfm-status-filter-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'dfm-status-filter-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -33306,6 +33306,14 @@ const buildReport = async () => {
   window.currentByNeedFilter = null;
   window.currentByDefectFilter = null;
 
+  // Defect Form re-inspection level ('first'/'second'/'third') or null. When set, the
+  // report uses the RE-INSPECTION format (Before/Info/After findings table, status-
+  // coloured floor-plan tags, Re-Inspection Analysis page) with that level's data.
+  // Deliberately null while RE_INSPECTION_MODE is active so genuine re-inspection
+  // sessions are untouched; null in every other mode too (no behaviour change).
+  const _dfmLvl = (!RE_INSPECTION_MODE && DEFECT_FORM_MODE && DEFECT_FORM_INSPECTION_LEVEL !== 'original')
+    ? DEFECT_FORM_INSPECTION_LEVEL : null;
+
   const rootEl = q('#reportRoot');
   rootEl.innerHTML = '';
   rootEl.style.visibility = 'hidden';
@@ -33667,13 +33675,13 @@ for (let pi = 0; pi < (p.meta.planRefs || []).length; pi++) {
 
     // Determine tag color based on current mode's status
     let tagColor = '#0f3c3a'; // Default teal
-    if (RE_INSPECTION_MODE) {
+    if (RE_INSPECTION_MODE || _dfmLvl) {
       let statusData = null;
-      if (THIRD_REINSPECTION_MODE && d.thirdReInspection && d.thirdReInspection.status) {
+      if ((THIRD_REINSPECTION_MODE || _dfmLvl === 'third') && d.thirdReInspection && d.thirdReInspection.status) {
         statusData = d.thirdReInspection;
-      } else if (SECOND_REINSPECTION_MODE && d.secondReInspection && d.secondReInspection.status) {
+      } else if ((SECOND_REINSPECTION_MODE || _dfmLvl === 'second') && d.secondReInspection && d.secondReInspection.status) {
         statusData = d.secondReInspection;
-      } else if (!SECOND_REINSPECTION_MODE && !THIRD_REINSPECTION_MODE && d.reInspection && d.reInspection.status) {
+      } else if (!SECOND_REINSPECTION_MODE && !THIRD_REINSPECTION_MODE && _dfmLvl !== 'second' && _dfmLvl !== 'third' && d.reInspection && d.reInspection.status) {
         statusData = d.reInspection;
       }
       
@@ -33723,8 +33731,8 @@ for (let pi = 0; pi < (p.meta.planRefs || []).length; pi++) {
 
 
 
-/* ---- RE-INSPECTION ANALYSIS (hanya jika RE_INSPECTION_MODE) ---- */
-if (RE_INSPECTION_MODE) {
+/* ---- RE-INSPECTION ANALYSIS (RE_INSPECTION_MODE atau Defect Form level re-inspection) ---- */
+if (RE_INSPECTION_MODE || _dfmLvl) {
   let { body } = addPage();
   addHeading(body, 'Re-Inspection Analysis');
   
@@ -33737,11 +33745,11 @@ if (RE_INSPECTION_MODE) {
   
   (filteredDefects).forEach(d => {
     stats.total++;
-    // Get status based on mode: Third > Second > First
+    // Get status based on mode: Third > Second > First (or the Defect Form level)
     let status;
-    if (THIRD_REINSPECTION_MODE) {
+    if (THIRD_REINSPECTION_MODE || _dfmLvl === 'third') {
       status = (d.thirdReInspection && d.thirdReInspection.status) || 'No Status';
-    } else if (SECOND_REINSPECTION_MODE) {
+    } else if (SECOND_REINSPECTION_MODE || _dfmLvl === 'second') {
       status = (d.secondReInspection && d.secondReInspection.status) || 'No Status';
     } else {
       status = (d.reInspection && d.reInspection.status) || 'No Status';
@@ -34220,7 +34228,7 @@ await new Promise(r => setTimeout(r, 10));
       // Different table format for RE_INSPECTION_MODE
       const mkTableShell = () => {
         const t = document.createElement('table');
-        if (RE_INSPECTION_MODE) {
+        if (RE_INSPECTION_MODE || _dfmLvl) {
           // Adjust column widths: Information kecil, After besar
           t.innerHTML = '<thead><tr><th style="width:5%">Nbr</th><th style="width:25%">Before</th><th style="width:28%">Information</th><th style="width:42%">After</th></tr></thead>';
         } else {
@@ -34294,25 +34302,25 @@ await new Promise(r => setTimeout(r, 10));
         
         const { d, displayNum, isNew } = defectsToRender[i];
 
-        if (RE_INSPECTION_MODE) {
+        if (RE_INSPECTION_MODE || _dfmLvl) {
           // Re-Inspection format: Nbr | Before | Information | After
-          // Get data based on mode: Third > Second > First
+          // Get data based on mode: Third > Second > First (or the Defect Form level)
           let status, notes, beforePhotos, afterPhotos;
-          
-          if (THIRD_REINSPECTION_MODE) {
+
+          if (THIRD_REINSPECTION_MODE || _dfmLvl === 'third') {
             // Third Re-Inspection: before = secondReInspection.afterPhotos, after = thirdReInspection.afterPhotos
             status = (d.thirdReInspection && d.thirdReInspection.status) || 'No Status';
             notes = (d.thirdReInspection && d.thirdReInspection.notes) || '';
             beforePhotos = (d.secondReInspection && d.secondReInspection.afterPhotos) || [];
             afterPhotos = (d.thirdReInspection && d.thirdReInspection.afterPhotos) || [];
-          } else if (SECOND_REINSPECTION_MODE) {
+          } else if (SECOND_REINSPECTION_MODE || _dfmLvl === 'second') {
             // Second Re-Inspection: before = first reInspection.afterPhotos, after = secondReInspection.afterPhotos
             status = (d.secondReInspection && d.secondReInspection.status) || 'No Status';
             notes = (d.secondReInspection && d.secondReInspection.notes) || '';
             beforePhotos = (d.reInspection && d.reInspection.afterPhotos) || [];
             afterPhotos = (d.secondReInspection && d.secondReInspection.afterPhotos) || [];
           } else {
-            // First Re-Inspection: normal behavior
+            // First Re-Inspection (or Defect Form 'first'): normal behavior
             status = (d.reInspection && d.reInspection.status) || 'No Status';
             notes = (d.reInspection && d.reInspection.notes) || '';
             beforePhotos = d.photos || [];
@@ -34371,7 +34379,7 @@ await new Promise(r => setTimeout(r, 10));
           
           // Description based on mode: Third uses secondReInspection, Second uses reInspection, First uses original
           let displayDescription = d.description || '-';
-          if (THIRD_REINSPECTION_MODE && d.secondReInspection) {
+          if ((THIRD_REINSPECTION_MODE || _dfmLvl === 'third') && d.secondReInspection) {
             const prevStatus = d.secondReInspection.status || '';
             const prevNotes = d.secondReInspection.notes || '';
             if (prevStatus && prevNotes) {
@@ -34381,7 +34389,7 @@ await new Promise(r => setTimeout(r, 10));
             } else if (prevNotes) {
               displayDescription = prevNotes;
             }
-          } else if (SECOND_REINSPECTION_MODE && d.reInspection) {
+          } else if ((SECOND_REINSPECTION_MODE || _dfmLvl === 'second') && d.reInspection) {
             const firstStatus = d.reInspection.status || '';
             const firstNotes = d.reInspection.notes || '';
             if (firstStatus && firstNotes) {
