@@ -7670,7 +7670,13 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
         <label>Defect Type</label>
         <div id="reViewType" style="padding:12px; background:#f8fafc; border:1px solid var(--line); border-radius:12px; color:#0f1629; font-weight:600;">-</div>
         
-        <label>Description</label>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <label style="margin:0;">Description</label>
+          <button type="button" class="btn ghost" onclick="copyReViewDescription(this)" style="padding:4px 10px; font-size:12px; min-height:0; display:inline-flex; align-items:center; gap:5px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Salin
+          </button>
+        </div>
         <div id="reViewDescription" style="padding:12px; background:#f8fafc; border:1px solid var(--line); border-radius:12px; color:#0f1629; min-height:60px; white-space:pre-wrap;">-</div>
         
         <label>Location</label>
@@ -9827,7 +9833,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'audit-fixE-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'reinsp-copy-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -20585,6 +20591,40 @@ let currentReInspectDefectIdx = null;
 // Photos are now saved directly to defect object (not via temp arrays)
 
 // Open Re-Inspection View Dialog
+// Copy the currently displayed (old) description in the Re-Inspection View dialog.
+// Read-only helper: it reads the visible text at click time, so it works for every
+// re-inspection level (1/2/3/4) without touching the level/population logic.
+async function copyReViewDescription(btn) {
+  try {
+    const el = document.getElementById('reViewDescription');
+    const text = ((el && el.textContent) || '').trim();
+    if (!text || text === '-') return;
+    let ok = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      }
+    } catch (e) { ok = false; }
+    if (!ok) {
+      // Fallback for older WebViews without the async clipboard API.
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+    }
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = ok ? 'Disalin!' : 'Gagal salin';
+      btn.disabled = true;
+      setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 1500);
+    }
+  } catch (e) { console.warn('copyReViewDescription:', e); }
+}
+
 function openReInspectionView(defectIdx) {
   const proj = getProject();
   if (!proj || !proj.defects || !proj.defects[defectIdx]) {
