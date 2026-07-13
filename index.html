@@ -9845,7 +9845,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'dfm-status-filter-v3'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'dfm-status-filter-v4'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -33373,23 +33373,25 @@ const buildReport = async () => {
   
   // Helper function to check defect visibility based on current mode
   const isDefectVisibleInCurrentMode = (d) => {
-    // isNewInReInspection: visible in RE_INSPECTION_MODE or SECOND/THIRD/FOURTH_INSPECTION_SUBMISSION
+    // isNewInReInspection: visible in RE_INSPECTION_MODE or SECOND/THIRD/FOURTH_INSPECTION_SUBMISSION,
+    // or ANY Defect Form re-inspection level (carried forward like the RE modes; without this,
+    // defects added during a re-inspection — status 'New Defect' etc — never reach DFM reports).
     if (d.isNewInReInspection) {
-      if (!RE_INSPECTION_MODE && !SECOND_INSPECTION_SUBMISSION && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
+      if (!RE_INSPECTION_MODE && !SECOND_INSPECTION_SUBMISSION && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION && !_dfmLvl) return false;
     }
-    
+
     // isNewInSecondReInspection: visible in SECOND_REINSPECTION_MODE, THIRD_REINSPECTION_MODE
     // (FIX H1: carry forward — a defect added at the 2nd re-inspection must still be visible/
-    // re-inspectable at the 3rd level), or THIRD/FOURTH_INSPECTION_SUBMISSION.
+    // re-inspectable at the 3rd level), THIRD/FOURTH_INSPECTION_SUBMISSION, or DFM second/third.
     if (d.isNewInSecondReInspection) {
-      if (!SECOND_REINSPECTION_MODE && !THIRD_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
+      if (!SECOND_REINSPECTION_MODE && !THIRD_REINSPECTION_MODE && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION && _dfmLvl !== 'second' && _dfmLvl !== 'third') return false;
     }
-    
-    // isNewInThirdReInspection: visible only in THIRD_REINSPECTION_MODE or FOURTH_INSPECTION_SUBMISSION
+
+    // isNewInThirdReInspection: visible only in THIRD_REINSPECTION_MODE, FOURTH_INSPECTION_SUBMISSION, or DFM third
     if (d.isNewInThirdReInspection) {
-      if (!THIRD_REINSPECTION_MODE && !FOURTH_INSPECTION_SUBMISSION) return false;
+      if (!THIRD_REINSPECTION_MODE && !FOURTH_INSPECTION_SUBMISSION && _dfmLvl !== 'third') return false;
     }
-    
+
     return true;
   };
   
