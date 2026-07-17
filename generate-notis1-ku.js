@@ -12,8 +12,8 @@ const data = {
     "Johor.",
   ],
   noKP: "",
-  telefonPembeli: "010-335 8154 / 013-634 9249",
-  emailPembeli: "ahmarreme3922@gmail.com",
+  telefonPembeli: "011-1073 2768",
+  emailPembeli: "vuifattlim3@gmail.com",
 
   namaPemaju: "HUA YANG BERHAD",
   noSyarikat: "",
