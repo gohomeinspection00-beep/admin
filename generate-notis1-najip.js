@@ -64,7 +64,7 @@ const data = {
     { tarikh: "13 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui serahan tangan (hardcopy)" },
     { tarikh: "13 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan" },
     { tarikh: "30 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
-    { tarikh: "Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju" },
+    { tarikh: "8 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju" },
     { tarikh: "17 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "1 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
