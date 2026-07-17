@@ -40,8 +40,8 @@ const data = {
   tarikhSerahanLaporan: "27 April 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy)",
 
-  tarikhNotis: "8 Julai 2026",
-  tarikhDeadline: "23 Julai 2026",
+  tarikhNotis: "17 Julai 2026",
+  tarikhDeadline: "1 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -80,8 +80,9 @@ const data = {
     { tarikh: "27 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui serahan tangan (hardcopy)" },
     { tarikh: "27 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan / tidak sempurna" },
     { tarikh: "30 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
-    { tarikh: "8 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "23 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "8 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju secara serahan tangan. Pemilik turut cuba menyerahkan Notis Pertama pada masa yang sama, namun pihak pemaju enggan mengecop akuan terima notis tersebut — pihak pemaju hanya mengecop akuan terima bagi laporan sahaja" },
+    { tarikh: "17 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan semula secara rasmi" },
+    { tarikh: "1 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
