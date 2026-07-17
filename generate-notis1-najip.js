@@ -38,8 +38,8 @@ const data = {
   tarikhSerahanLaporan: "13 April 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy)",
 
-  tarikhNotis: "7 Julai 2026",
-  tarikhDeadline: "22 Julai 2026",
+  tarikhNotis: "17 Julai 2026",
+  tarikhDeadline: "1 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -64,8 +64,9 @@ const data = {
     { tarikh: "13 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui serahan tangan (hardcopy)" },
     { tarikh: "13 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan" },
     { tarikh: "30 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
-    { tarikh: "7 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "22 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju" },
+    { tarikh: "17 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "1 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -241,7 +242,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan sepenuhnya oleh pihak tuan. Berdasarkan pemeriksaan kali kedua pada ${data.tarikhPemeriksaan2}, kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan sepenuhnya oleh pihak tuan. Berdasarkan pemeriksaan kali kedua pada ${data.tarikhPemeriksaan2}, yang laporannya juga telah diserahkan kepada pihak tuan, kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
@@ -258,7 +259,7 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan selepas pemeriksaan kali kedua pada ${data.tarikhPemeriksaan2}.`;
+const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan Kali Kedua selepas pemeriksaan pada ${data.tarikhPemeriksaan2}, yang telah diserahkan kepada pihak tuan.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
