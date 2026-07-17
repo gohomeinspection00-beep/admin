@@ -42,8 +42,8 @@ const data = {
   tarikhSerahanLaporan2: "11 Jun 2026",
   kaedahSerahanLaporan2: "aplikasi IJM Connect",
 
-  tarikhNotis: "10 Julai 2026",
-  tarikhDeadline: "25 Julai 2026",
+  tarikhNotis: "17 Julai 2026",
+  tarikhDeadline: "1 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -64,8 +64,8 @@ const data = {
     { tarikh: "11 Februari 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan pembaikan yang memuaskan / tidak sempurna" },
     { tarikh: "5 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
     { tarikh: "11 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Kali Kedua diserahkan kepada pemaju melalui aplikasi IJM Connect" },
-    { tarikh: "10 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "25 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "17 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "1 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
