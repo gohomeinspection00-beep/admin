@@ -409,6 +409,40 @@ drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
 
 // ============================================================
+// LAMPIRAN — BUKTI PENERIMAAN
+// ============================================================
+newPage();
+y = 25;
+
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN — BUKTI PENERIMAAN";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("(Appendix — Proof of Receipt)", pageW / 2, y, { align: "center" });
+y += 10;
+
+const img1 = fs.readFileSync("/home/user/admin/afie-bukti-1.jpg").toString("base64");
+const img2 = fs.readFileSync("/home/user/admin/afie-bukti-2.jpg").toString("base64");
+// 608x1080 → ratio 1.776; width 72mm → height ~128mm
+const imW = 72, imH = 128;
+const gap = (cW - imW * 2) ;
+doc.addImage("data:image/jpeg;base64," + img1, "JPEG", mL, y, imW, imH);
+doc.addImage("data:image/jpeg;base64," + img2, "JPEG", mL + imW + gap, y, imW, imH);
+y += imH + 5;
+
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.CAPTION); bk();
+const cap1 = doc.splitTextToSize("Gambar 1: Laporan Pemeriksaan Semula (Re-Inspection Defect Report) yang diserahkan kepada pemaju — dicop \"Received\" pada 8 Julai 2026.", (cW - gap) / 2 + 10);
+const cap2 = doc.splitTextToSize("Gambar 2: Borang Defect Feedback (Scientex) bertarikh 8 Julai 2026 — pemaju hanya mengecop akuan terima bagi laporan sahaja.", (cW - gap) / 2 + 10);
+let cy = y;
+for (const l of cap1) { doc.text(l, mL, cy); cy += 4; }
+let cy2 = y;
+for (const l of cap2) { doc.text(l, mL + imW + gap, cy2); cy2 += 4; }
+
+
+// ============================================================
 // FOOTER
 // ============================================================
 const totalPages = pageNum;
