@@ -65,7 +65,8 @@ const data = {
     { tarikh: "3 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi IOI Properties (No. kes: C93083, C93216)" },
     { tarikh: "2 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan telah dilakukan tetapi sebahagian kecacatan masih belum disiapkan sepenuhnya" },
     { tarikh: "10 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
-    { tarikh: "13 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "Julai 2026", peristiwa: "Cubaan menghantar Laporan Re-Inspection melalui aplikasi IOI Properties tidak berjaya — kesemua 4 tiket kes masih belum ditutup oleh pihak pengurusan dan sistem tidak membenarkan penghantaran baharu" },
+    { tarikh: "13 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — dihantar bersama Laporan Re-Inspection (hardcopy) melalui Pos Berdaftar Akuan Terima (AR)" },
     { tarikh: "28 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
@@ -225,6 +226,8 @@ y += 3;
 
 doc.setFontSize(SZ.SMALL);
 doc.text(`Ruj. Kami: ${data.noRujukan}`, mL, y);
+y += 3;
+doc.text("Melalui: Pos Berdaftar Akuan Terima (AR Registered Post)", mL, y);
 y += 8;
 
 doc.setFontSize(SZ.BODY);
@@ -278,16 +281,21 @@ for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+  `Untuk makluman pihak tuan, saya telah cuba mengemukakan Laporan Pemeriksaan Kali Kedua (Re-Inspection Report) melalui aplikasi IOI Properties, namun tidak dapat berbuat demikian kerana kesemua empat (4) tiket kes sedia ada (No. kes: ${data.noKesSerahan}) masih belum ditutup (closed) oleh pihak pengurusan, dan sistem tidak membenarkan penghantaran kecacatan baharu. Oleh yang demikian, Laporan Re-Inspection tersebut disertakan bersama-sama notis ini secara hardcopy dan dihantar melalui Pos Berdaftar Akuan Terima (AR Registered Post).`
 );
 y += 4;
 
 numPara(4,
+  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+);
+y += 4;
+
+numPara(5,
   `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan.`
 );
 y += 4;
 
-numPara(5, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+numPara(6, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -295,7 +303,7 @@ bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak t
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
-numPara(6,
+numPara(7,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -308,7 +316,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(7,
+numPara(8,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
@@ -330,7 +338,14 @@ y += 8;
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
 doc.text(`No. K/P: ${data.noKP}`, mL, y); y += LH_S;
 doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
-doc.text(`Telefon: ${data.telefonPembeli}`, mL, y); y += 8;
+doc.text(`Telefon: ${data.telefonPembeli}`, mL, y); y += 7;
+
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL); bk();
+doc.text("Lampiran:", mL, y);
+y += LH_S;
+doc.setFont("helvetica", "normal");
+doc.text("1. Laporan Pemeriksaan Kecacatan Kali Kedua (Re-Inspection Report) — hardcopy", mL + 5, y);
+y += 7;
 
 // CC section
 if (data.salinanKepada.length > 0) {
