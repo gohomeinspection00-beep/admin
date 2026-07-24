@@ -41,8 +41,8 @@ const data = {
   kaedahSerahanLaporan: "aplikasi IOI Properties",
   noKesSerahan: "C93062, C93066, C93083, C93216",
 
-  tarikhNotis: "13 Julai 2026",
-  tarikhDeadline: "28 Julai 2026",
+  tarikhNotis: "24 Julai 2026",
+  tarikhDeadline: "8 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -66,8 +66,8 @@ const data = {
     { tarikh: "2 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan telah dilakukan tetapi sebahagian kecacatan masih belum disiapkan sepenuhnya" },
     { tarikh: "10 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
     { tarikh: "Julai 2026", peristiwa: "Cubaan menghantar Laporan Re-Inspection melalui aplikasi IOI Properties tidak berjaya — kesemua 4 tiket kes masih belum ditutup oleh pihak pengurusan dan sistem tidak membenarkan penghantaran baharu" },
-    { tarikh: "13 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — dihantar bersama Laporan Re-Inspection (hardcopy) melalui Pos Berdaftar Akuan Terima (AR)" },
-    { tarikh: "28 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "24 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — dihantar bersama Laporan Re-Inspection (hardcopy) melalui Pos Berdaftar Akuan Terima (AR)" },
+    { tarikh: "8 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [
