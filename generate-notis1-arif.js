@@ -327,7 +327,10 @@ para("Sekian.");
 y += 10;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
+checkBreak(75);
 doc.text("Yang benar,", mL, y);
+const sigImg = fs.readFileSync("/home/user/admin/arif-signature.png").toString("base64");
+doc.addImage("data:image/png;base64," + sigImg, "PNG", mL + 5, y + 3, 44, 11.5);
 y += 20;
 doc.setLineWidth(0.3);
 doc.line(mL, y, mL + 60, y);
