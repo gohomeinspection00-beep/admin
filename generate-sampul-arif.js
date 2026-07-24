@@ -39,6 +39,7 @@ drawBlock(20, 25, 105, 55, "DARIPADA / PENGIRIM:", [
   "Taman Scientex Senai,",
   "81400 Senai,",
   "Johor.",
+  "Tel: 013-654 3211",
 ], { nameSize: 12, addrSize: 11 });
 
 // PENERIMA (center, bigger)
@@ -48,6 +49,7 @@ drawBlock(45, 130, 145, 70, "KEPADA / PENERIMA:", [
   "Lebuh IRC, IOI Resort City,",
   "62502 Putrajaya,",
   "WP Putrajaya.",
+  "Tel: +607-5959 222",
 ], { nameSize: 13, addrSize: 13 });
 
 // Footer note
