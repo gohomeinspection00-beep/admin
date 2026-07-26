@@ -9845,7 +9845,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'dfm-status-filter-v4'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'mp-report-paginate-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -39618,7 +39618,96 @@ async function mp_downloadPdf() {
 
 function mp_generateReport() { show('mpReport'); }
 
+// Loading overlay for report view/generate (the build is a heavy synchronous HTML
+// string + repagination; without deferring, the user sees a frozen screen).
+function mp_showReportLoading() {
+  let d = document.getElementById('mpReportLoading');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'mpReportLoading';
+    d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff';
+    d.innerHTML = '<div style="width:44px;height:44px;border:4px solid rgba(255,255,255,0.25);border-top-color:#14b8a6;border-radius:50%;animation:mpRptSpin 0.9s linear infinite"></div><div style="margin-top:14px;font-size:15px;font-weight:700">Preparing report...</div><style>@keyframes mpRptSpin{to{transform:rotate(360deg)}}</style>';
+    document.body.appendChild(d);
+  }
+  d.style.display = 'flex';
+}
+function mp_hideReportLoading() { const d = document.getElementById('mpReportLoading'); if (d) d.remove(); }
+
+// Measured repagination: the first pass builds pages by fixed row/item counts, but
+// real rows vary in height (multi-line cost breakdowns, long grouped-defect labels,
+// notes), so a "page" div can exceed A4 -> in print the browser pushes the whole
+// oversized div to the next sheet (blank pages) and content runs past the footer.
+// This walks every .page and, while its content would reach the footer zone, moves
+// the trailing block to a new page inserted right after (tables split by ROWS with
+// the header cloned). Cascades: an inserted page is processed next. Photo/image
+// boxes have fixed CSS heights, so measuring before photos load is stable.
+function mp_repaginate(root) {
+  const rpt = root.querySelector('.mp-rpt');
+  if (!rpt) return;
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;visibility:hidden;height:297mm;width:10px;padding:0;border:0;margin:0;';
+  rpt.appendChild(probe);
+  const pagePx = probe.offsetHeight;
+  probe.remove();
+  if (!pagePx) return; // not measurable (hidden) -> leave as-is
+  const mmPx = pagePx / 297;
+  const contentLimit = pagePx - 26 * mmPx; // content must end above the footer zone
+  const isFooter = (el) => el.classList && el.classList.contains('footer');
+  const contentKids = (pg) => [...pg.children].filter(el => !isFooter(el) && el.tagName !== 'STYLE');
+  const overflows = (pg) => {
+    const kids = contentKids(pg);
+    if (!kids.length) return false;
+    const last = kids[kids.length - 1];
+    return (last.getBoundingClientRect().bottom - pg.getBoundingClientRect().top) > contentLimit;
+  };
+  const pages = [...rpt.children].filter(el => el.classList && el.classList.contains('page'));
+  let guard = 0;
+  for (let i = 0; i < pages.length && guard < 600; i++) {
+    const pg = pages[i];
+    let np = null, contTable = null;
+    const mkOverflowPage = () => {
+      const n = document.createElement('div'); n.className = 'page';
+      const f = [...pg.children].find(isFooter); if (f) n.appendChild(f.cloneNode(true));
+      pg.after(n); pages.splice(i + 1, 0, n);
+      return n;
+    };
+    while (overflows(pg) && guard++ < 600) {
+      const kids = contentKids(pg);
+      const last = kids[kids.length - 1];
+      if (!last) break;
+      const tb = (last.tagName === 'TABLE' && last.tBodies) ? last.tBodies[0] : null;
+      if (tb && tb.rows.length > 1) {
+        // split the table: move its last row to a continuation table on the new page
+        if (!np) np = mkOverflowPage();
+        if (!contTable) {
+          contTable = last.cloneNode(false);
+          if (last.tHead) contTable.appendChild(last.tHead.cloneNode(true));
+          contTable.appendChild(document.createElement('tbody'));
+          np.insertBefore(contTable, np.firstChild);
+        }
+        contTable.tBodies[contTable.tBodies.length - 1].insertBefore(tb.rows[tb.rows.length - 1], contTable.tBodies[contTable.tBodies.length - 1].firstChild);
+      } else if (kids.length > 1) {
+        // move the whole trailing block
+        if (!np) np = mkOverflowPage();
+        np.insertBefore(last, np.firstChild);
+        contTable = null; // blocks above a previously split table must land before it
+      } else {
+        break; // a single unsplittable block taller than one page — leave as-is
+      }
+    }
+  }
+}
+
 function mp_renderReport() {
+  // Show the loading overlay, then defer the heavy build so the spinner paints.
+  mp_showReportLoading();
+  setTimeout(() => {
+    try { mp_renderReportCore(); }
+    finally { mp_hideReportLoading(); }
+  }, 50);
+}
+
+function mp_renderReportCore() {
   const proj=getProject(), plan=mp_getPlan(); if(!proj||!plan){show('mpDashboard');return;}
   const stats=mp_calcStats(plan, proj), phases=(plan.phases||[]).sort((a,b)=>a.order-b.order);
   const activeItems = mp_getActiveItems(plan, proj);
@@ -40135,6 +40224,9 @@ function mp_renderReport() {
 
   root.innerHTML = S + '<div class="mp-rpt">' + R + '</div>';
   mp_zoomMpReport(0);
+  // Split any page whose content would reach the footer (defensive: an error here
+  // must never blank the report — worst case we keep the old fixed-count layout).
+  try { mp_repaginate(root); } catch (e) { console.warn('mp_repaginate:', e); }
 
   // Async resolve all photo refs in report
   const photoEls = root.querySelectorAll('.mp-rpt-photo');
