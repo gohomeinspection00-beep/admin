@@ -9845,7 +9845,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'mp-report-paginate-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'mp-report-paginate-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -39651,7 +39651,9 @@ function mp_repaginate(root) {
   probe.remove();
   if (!pagePx) return; // not measurable (hidden) -> leave as-is
   const mmPx = pagePx / 297;
-  const contentLimit = pagePx - 26 * mmPx; // content must end above the footer zone
+  // 32mm reserve: 10mm footer + ~6mm footer height + slack for print-engine fonts
+  // rendering slightly taller than screen (prevents 1-page divs spilling onto 2 sheets).
+  const contentLimit = pagePx - 32 * mmPx; // content must end above the footer zone
   const isFooter = (el) => el.classList && el.classList.contains('footer');
   const contentKids = (pg) => [...pg.children].filter(el => !isFooter(el) && el.tagName !== 'STYLE');
   const overflows = (pg) => {
@@ -39763,6 +39765,22 @@ function mp_renderReportCore() {
     .mp-rpt .action-box li{font-size:11px;margin:3px 0;color:#334155}
     .mp-rpt .cost-detail{font-size:10px;color:#64748b;line-height:1.4}
     .mp-rpt .footer{position:absolute;bottom:10mm;left:15mm;right:15mm;font-size:9px;color:#94a3b8;display:flex;justify-content:space-between;border-top:1px solid #e2e8f0;padding-top:6px}
+    /* PRINT (MP report only, id-scoped so other reports are untouched):
+       - the shared print CSS strips .page padding -> header stuck to the top edge; restore margins
+       - min-height exactly 297mm + printer DPI rounding made some pages spill by ~1px -> blank
+         sheets; use auto height with slack (content is already <= one sheet via mp_repaginate)
+       - clear the doubled/inside break rules that pushed oversized pages -> extra blanks */
+    @media print{
+      #mpReportRoot .page{min-height:280mm !important;height:auto !important;padding:10mm 14mm 20mm 14mm !important;page-break-before:auto !important;page-break-after:always !important;page-break-inside:auto !important;break-inside:auto !important;}
+      #mpReportRoot .page:last-child{page-break-after:auto !important;}
+      #mpReportRoot .footer{left:14mm !important;right:14mm !important;bottom:8mm !important;}
+      /* If print-engine font metrics make a page run past one sheet, let it continue on
+         the next sheet at a ROW boundary (never cut a table row / photo block mid-way);
+         thead repeats automatically on the continued sheet. */
+      #mpReportRoot tr{page-break-inside:avoid !important;break-inside:avoid !important;}
+      #mpReportRoot thead{display:table-header-group;}
+      #mpReportRoot .photo-card{page-break-inside:avoid !important;break-inside:avoid !important;}
+    }
     .mp-rpt .progress-bar{background:#e2e8f0;border-radius:8px;height:14px;overflow:hidden;margin:6px 0}
     .mp-rpt .progress-fill{height:100%;border-radius:8px}
     .mp-rpt .stat-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid #f1f5f9}
