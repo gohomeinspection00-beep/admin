@@ -59,7 +59,7 @@ const data = {
   ],
 
   kronologi: [
-    { tarikh: "10 Jun 2026", peristiwa: "Penyerahan kunci (key handover) unit kepada pemilik" },
+    { tarikh: "10 Jun 2026", peristiwa: "Pemilik menyerahkan kunci unit kepada pihak pengurusan lebih awal bagi membolehkan kerja pembaikan kecacatan dijalankan" },
     { tarikh: "13 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "16 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui Aplikasi IOI (No. tiket: C93838, C93847, C93892)" },
     { tarikh: "16 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan — pihak pengurusan pemaju memohon tempoh tambahan 14 hari (menjadikan keseluruhan 44 hari)" },
@@ -238,7 +238,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas, sebagaimana termaktub di dalam Perjanjian Jual Beli mengikut ${data.jenisSPA}, telah menerima kunci unit pada ${data.tarikhSerahKunci} dan menjalankan Pemeriksaan Kecacatan (Defect Inspection) pada ${data.tarikhPemeriksaan1}. Laporan Pemeriksaan Kecacatan (Defect Inspection Report) telah dikemukakan secara rasmi kepada pihak tuan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} dengan nombor tiket ${data.noKesSerahan}. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas, sebagaimana termaktub di dalam Perjanjian Jual Beli mengikut ${data.jenisSPA}, telah menjalankan Pemeriksaan Kecacatan (Defect Inspection) pada ${data.tarikhPemeriksaan1} dan telah menyerahkan kunci unit kepada pihak pengurusan tuan pada ${data.tarikhSerahKunci} lebih awal bagi membolehkan kerja pembaikan kecacatan dijalankan. Laporan Pemeriksaan Kecacatan (Defect Inspection Report) telah dikemukakan secara rasmi kepada pihak tuan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} dengan nombor tiket ${data.noKesSerahan}. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
 );
 y += 4;
 
