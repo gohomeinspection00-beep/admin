@@ -39,8 +39,8 @@ const data = {
   kaedahSerahanLaporan: "Aplikasi IOI",
   noKesSerahan: "C93838, C93847, C93892",
 
-  tarikhNotis: "25 Julai 2026",
-  tarikhDeadline: "9 Ogos 2026",
+  tarikhNotis: "31 Julai 2026",
+  tarikhDeadline: "15 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -62,9 +62,10 @@ const data = {
     { tarikh: "10 Jun 2026", peristiwa: "Penyerahan kunci (key handover) unit kepada pemilik" },
     { tarikh: "13 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "16 Jun 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui Aplikasi IOI (No. tiket: C93838, C93847, C93892)" },
-    { tarikh: "16 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada pembaikan dilaksanakan" },
-    { tarikh: "25 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "9 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "16 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan — pihak pengurusan pemaju memohon tempoh tambahan 14 hari (menjadikan keseluruhan 44 hari)" },
+    { tarikh: "30 Julai 2026", peristiwa: "Tamat tempoh lanjutan 44 hari yang diminta oleh pihak pengurusan — kecacatan masih tidak disiapkan" },
+    { tarikh: "31 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "15 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -242,7 +243,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa tiada sebarang kerja pembaikan dilaksanakan oleh pihak tuan terhadap kecacatan yang telah dilaporkan, walaupun tempoh tiga puluh (30) hari telah lama tamat pada 16 Julai 2026. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang dilaporkan masih belum dilaksanakan oleh pihak tuan. Tempoh tiga puluh (30) hari pembaikan telah tamat pada 16 Julai 2026, dan pihak pengurusan tuan sendiri telah memohon tempoh tambahan empat belas (14) hari, menjadikan keseluruhan tempoh empat puluh empat (44) hari, di mana semua kecacatan dijangka siap dibaiki selewat-lewatnya pada 30 Julai 2026. Walau bagaimanapun, sehingga kini kecacatan tersebut masih tidak disiapkan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
