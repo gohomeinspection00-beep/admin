@@ -4732,6 +4732,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
         <button class="btn ghost" onclick="closeDlg(q('#selectDefectsDialog'))" style="padding:4px 8px;">✕</button>
       </div>
       <p style="margin:8px 0;color:var(--muted);font-size:13px;">Tap defects to add them to your selection</p>
+      <input id="defectSearchInput" type="text" placeholder="Cari defect... (element / location / type / status)" oninput="filterSelectDefectsList(this.value)" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;box-sizing:border-box;">
       <div id="availableDefectsList" class="stack" style="gap:8px;margin-top:8px;"></div>
       <p id="noAvailableDefectsMsg" style="color:var(--muted);font-size:13px;display:none;">All defects have been selected</p>
     </div>
@@ -9845,7 +9846,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'mp-report-paginate-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'bydefect-picker-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -31747,6 +31748,14 @@ function renderByDefectSelectedList() {
   });
 }
 
+// Live filter for the Select Defects dialog search box.
+function filterSelectDefectsList(qstr) {
+  const qq = (qstr || '').trim().toLowerCase();
+  document.querySelectorAll('#availableDefectsList > div').forEach(el => {
+    el.style.display = (!qq || (el.dataset.search || '').includes(qq)) ? '' : 'none';
+  });
+}
+
 function openSelectDefectsDialog() {
   const p = getProject();
   if (!p || !p.defects || p.defects.length === 0) {
@@ -31760,9 +31769,16 @@ function openSelectDefectsDialog() {
   
   container.innerHTML = '';
   
-  // Get available defects (not already selected) - list one by one
+  // Reset the search box each open
+  const searchInp = q('#defectSearchInput');
+  if (searchInp) searchInp.value = '';
+
+  // Get available defects (not already selected) - list one by one.
+  // Skip deleted defects: they must never be pickable (and the report mapping
+  // now looks up raw indices, dropping deleted ones defensively too).
   const availableDefects = [];
   p.defects.forEach((defect, idx) => {
+    if (defect && defect._deleted) return;
     if (!byDefectSelectedDefects.includes(idx)) {
       availableDefects.push({ defect, idx });
     }
@@ -31793,15 +31809,31 @@ function openSelectDefectsDialog() {
       const elementText = defect.element || 'No Element';
       const typeText = defect.type || 'No Type';
       const descText = defect.description ? defect.description.substring(0, 50) + (defect.description.length > 50 ? '...' : '') : '';
-      
+
+      // Re-inspection context: level-aware status chip (same source as the By Status
+      // filter) + a NEW badge for defects added during a re-inspection.
+      let statusName = '';
+      let statusChip = '';
+      if (DEFECT_FORM_MODE && DEFECT_FORM_INSPECTION_LEVEL !== 'original' && typeof dfmStatusOf === 'function') {
+        statusName = dfmStatusOf(defect);
+        const si = (typeof reInspectionStatuses !== 'undefined') ? reInspectionStatuses.find(s => s.name === statusName) : null;
+        statusChip = `<span style="background:${si ? si.color : '#94a3b8'};color:#fff;padding:2px 6px;border-radius:4px;font-weight:600;">${escapeHtml(statusName)}</span>`;
+      }
+      const isNewDef = defect.isNewInReInspection || defect.isNewInSecondReInspection || defect.isNewInThirdReInspection;
+      const newBadge = isNewDef ? '<span style="background:#f97316;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;">NEW</span>' : '';
+
       info.innerHTML = `
         <div style="font-weight:600;font-size:14px;color:#1e293b;margin-bottom:2px;">${escapeHtml(elementText)}</div>
         <div style="font-size:12px;color:#64748b;margin-bottom:2px;">
           <span style="background:#f1f5f9;padding:2px 6px;border-radius:4px;margin-right:4px;">${escapeHtml(locationText)}</span>
           <span style="background:#fef3c7;padding:2px 6px;border-radius:4px;">${escapeHtml(typeText)}</span>
+          ${statusChip ? '<span style="margin-left:4px;">' + statusChip + '</span>' : ''}${newBadge}
         </div>
         ${descText ? `<div style="font-size:11px;color:#94a3b8;font-style:italic;margin-top:4px;">${escapeHtml(descText)}</div>` : ''}
       `;
+
+      // Search index for the filter box
+      item.dataset.search = (elementText + ' ' + locationText + ' ' + typeText + ' ' + (defect.description || '') + ' ' + statusName + (isNewDef ? ' new' : '')).toLowerCase();
       
       // Add icon
       const addIcon = document.createElement('div');
@@ -33430,7 +33462,10 @@ const buildReport = async () => {
   
   if (byDefectIndices.length > 0) {
     // By Defect filter active - use selected defect indices in order
-    filteredDefects = byDefectIndices.map(idx => allDefects[idx]).filter(d => d);
+    // By Defect indices are RAW p.defects positions (what the picker stored). Mapping
+    // them into the deleted-filtered allDefects shifted everything after a deleted
+    // defect -> the WRONG defect landed in the report. Look up raw, then drop deleted.
+    filteredDefects = byDefectIndices.map(idx => (p.defects || [])[idx]).filter(d => d && !d._deleted);
   } else if (filterElements.length > 0) {
     // Contractor filter active - filter by elements (already excludes new defects via baseDefects)
     filteredDefects = baseDefects.filter(d => filterElements.includes(d.element));
