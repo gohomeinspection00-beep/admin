@@ -9846,7 +9846,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'bydefect-picker-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'dfm-fixes-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -16407,6 +16407,11 @@ document.body.addEventListener('click', e => {
       if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
       reInspectionAtFinding = false;
       document.body.classList.remove('reinspection-mode');
+      // M2: also clear Defect Form Mode — previously only show('home') reset it, so
+      // leaving DFM via the bottom-nav left the flag stuck (history cards kept DFM
+      // buttons; a later '#report' navigation skipped buildReport -> stale/blank page).
+      DEFECT_FORM_MODE = false;
+      DEFECT_FORM_INSPECTION_LEVEL = 'original';
     }
     show(navTarget);
   }
@@ -20385,6 +20390,10 @@ if (reInspectHistoryBtn) {
     SECOND_REINSPECTION_MODE = false; // Reset - user will choose when opening project
     THIRD_REINSPECTION_MODE = false;
     reInspectionAtFinding = false; // FIX: Reset flag bila mula re-inspection mode
+    // M2: entering re-inspection must clear any lingering Defect Form Mode, else both
+    // flags coexist and the report page can render stale/blank (buildReport skipped).
+    DEFECT_FORM_MODE = false;
+    DEFECT_FORM_INSPECTION_LEVEL = 'original';
     document.body.classList.add('reinspection-mode');
     show('history');
   });
@@ -31101,14 +31110,30 @@ function getFilteredDefectsForDefectForm() {
   if (!p) return [];
   
   const allDefects = (p.defects || []).filter(d => !d._deleted);
-  
-  // Only filter for DEFECT_FORM_MODE with 'original' level
+
   if (DEFECT_FORM_MODE && DEFECT_FORM_INSPECTION_LEVEL === 'original') {
-    // Exclude ALL new defects (from any re-inspection level)
-    return allDefects.filter(d => !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection);
+    // Exclude ALL new defects (from any re-inspection level) AND originals whose
+    // first-level status is a treatAsNew status — mirrors the report's
+    // isNewDefectForReport exclusion, so picker counts always match the report (M1).
+    return allDefects.filter(d => {
+      if (d.isNewInReInspection || d.isNewInSecondReInspection || d.isNewInThirdReInspection) return false;
+      const st = d.reInspection?.status || '';
+      const si = (typeof reInspectionStatuses !== 'undefined') ? reInspectionStatuses.find(s => s.name === st) : null;
+      return !(si && si.treatAsNew);
+    });
   }
-  
-  // For first/second/third or non-DEFECT_FORM_MODE, return all
+
+  // H1: mirror the report's level visibility (isDefectVisibleInCurrentMode) so the
+  // By Need pickers/counts never include defects the report will hide — a defect
+  // added at a HIGHER re-inspection level doesn't exist at this level yet.
+  if (DEFECT_FORM_MODE && DEFECT_FORM_INSPECTION_LEVEL === 'first') {
+    return allDefects.filter(d => !d.isNewInSecondReInspection && !d.isNewInThirdReInspection);
+  }
+  if (DEFECT_FORM_MODE && DEFECT_FORM_INSPECTION_LEVEL === 'second') {
+    return allDefects.filter(d => !d.isNewInThirdReInspection);
+  }
+
+  // 'third' or non-DEFECT_FORM_MODE: everything is visible
   return allDefects;
 }
 
@@ -31916,17 +31941,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const defectFormHistoryBtn = q('#defectFormFromHistory');
   if (defectFormHistoryBtn) {
     defectFormHistoryBtn.addEventListener('click', () => {
+      // M4: frozen accounts must not reach history through the Defect Form side door
+      // (consistent with reInspectFromHistory and the bottom-nav History gate).
+      if (typeof isAccountFrozen === 'function' && isAccountFrozen()) { showFreezePopup(); return; }
       DEFECT_FORM_MODE = true;
       show('history');
     });
   }
-  
+
   // Import JSON
   const defectFormImportInput = q('#defectFormImport');
   if (defectFormImportInput) {
     defectFormImportInput.addEventListener('change', async e => {
       const f = e.target.files?.[0];
       if (!f) return;
+      if (typeof isAccountFrozen === 'function' && isAccountFrozen()) { showFreezePopup(); e.target.value = ''; return; }
       DEFECT_FORM_MODE = true;
       await importJSON(f);
       show('defectFormTypeSelect');
@@ -36848,6 +36877,18 @@ document.getElementById('btnSyncAllFiles')?.addEventListener('click', async func
             isNewInReInspection: d.isNewInReInspection || false,
             isNewInSecondReInspection: d.isNewInSecondReInspection || false,
             isNewInThirdReInspection: d.isNewInThirdReInspection || false,
+            // M5: carry deletion state + merge timestamps (the selected-files sync path
+            // already does). Without _deleted, restoring onto a fresh device RESURRECTED
+            // soft-deleted defects, inflating every list/report until the next merge.
+            _lastModified: d._lastModified || 0,
+            _deletedPhotoIds: d._deletedPhotoIds || [],
+            _deleted: d._deleted || false,
+            _deletedAt: d._deletedAt || null,
+            _photosModified: d._photosModified || 0,
+            _tagModified: d._tagModified || 0,
+            _flagModified: d._flagModified || 0,
+            _submittedModified: d._submittedModified || 0,
+            wasDeletedWithArea: d.wasDeletedWithArea || false,
             reInspection: d.reInspection ? {
               status: d.reInspection.status || '',
               notes: d.reInspection.notes || '',
