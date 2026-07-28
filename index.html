@@ -4536,16 +4536,92 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
   <section id="submissionMenu" hidden>
     <div class="card stack">
       <h2 style="margin:0">Submission Mode</h2>
-      <p style="margin:0;color:var(--muted)">Open a project to review and submit defects</p>
-      <div class="stack">
+
+      <!-- STEP 1: choose submission flow -->
+      <div id="subModeStepChoose" class="stack">
+        <p style="margin:0;color:var(--muted)">Pilih cara submission</p>
+        <div class="stack" style="gap:12px;margin-top:8px">
+          <button class="btn" id="btnSubFlowAutoAll" style="padding:16px;text-align:left;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#059669,#047857);width:100%;">
+            <div style="width:48px;height:48px;min-width:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:16px;color:#fff;line-height:1.3;">Automation Submit All</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:400;line-height:1.3;">Set sekali — submit semua defect secara automatik</div>
+            </div>
+          </button>
+          <button class="btn" id="btnSubFlowAutoArea" style="padding:16px;text-align:left;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#0284c7,#0369a1);width:100%;">
+            <div style="width:48px;height:48px;min-width:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:16px;color:#fff;line-height:1.3;">Automation Submit by Area</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:400;line-height:1.3;">Ikut area — dengan kalibrasi tap floor plan</div>
+            </div>
+          </button>
+          <button class="btn" id="btnSubFlowManual" style="padding:16px;text-align:left;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#475569,#334155);width:100%;">
+            <div style="width:48px;height:48px;min-width:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:16px;color:#fff;line-height:1.3;">Manual Submission</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:400;line-height:1.3;">Semak dan tanda defect satu-satu (cara biasa)</div>
+            </div>
+          </button>
+        </div>
+        <button class="btn ghost" data-nav="home">Cancel</button>
+      </div>
+
+      <!-- STEP 2: pick target developer app (automation flows only) -->
+      <div id="subModeStepApps" class="stack" style="display:none">
+        <p style="margin:0;color:var(--muted)">Pilih app pemaju (sasaran submission)</p>
+        <div id="subModeAppList" class="stack" style="gap:10px;margin-top:8px"></div>
+        <button class="btn ghost" id="btnSubModeAppsBack">← Back</button>
+      </div>
+
+      <!-- STEP 3: open project (existing behaviour, untouched ids/handlers) -->
+      <div id="subModeStepSource" class="stack" style="display:none">
+        <div id="subModeFlowBadge" style="font-size:13px;"></div>
+        <p style="margin:0;color:var(--muted)">Open a project to review and submit defects</p>
         <button class="btn" id="submissionOpenHistory">Open from History</button>
         <label class="btn secondary" style="position:relative">Import JSON
           <input id="submissionImport" type="file" accept="application/json" style="opacity:0;position:absolute;inset:0" />
         </label>
-        <button class="btn ghost" data-nav="home">Cancel</button>
+        <button class="btn ghost" id="btnSubModeSourceBack">← Back</button>
       </div>
     </div>
   </section>
+
+  <!-- DIALOG: Auto-Submit job export (interface for the PC runner) -->
+  <dialog id="autoSubmitExportDialog">
+    <div class="card stack" style="max-width:560px;max-height:85vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="margin:0;">Auto Submit — Export Job</h3>
+        <button class="btn ghost" onclick="closeDlg(q('#autoSubmitExportDialog'))" style="padding:4px 8px;" type="button">✕</button>
+      </div>
+      <div id="autoSubExpInfo" style="font-size:13px;color:var(--muted);"></div>
+      <div id="autoSubExpAreaWrap" style="display:none">
+        <label style="font-weight:600;">Pilih Area</label>
+        <div id="autoSubExpAreas" class="stack" style="gap:6px;margin-top:6px;max-height:220px;overflow-y:auto;"></div>
+      </div>
+      <div id="autoSubExpRangeWrap" style="display:none">
+        <label style="font-weight:600;">Julat defect (ikut susunan report)</label>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
+          <span style="font-size:13px;">Dari</span>
+          <input id="autoSubExpFrom" type="number" min="1" style="width:90px;padding:8px;border:1px solid var(--line);border-radius:8px;">
+          <span style="font-size:13px;">hingga</span>
+          <input id="autoSubExpTo" type="number" min="1" style="width:90px;padding:8px;border:1px solid var(--line);border-radius:8px;">
+        </div>
+      </div>
+      <div id="autoSubExpCount" style="font-weight:600;font-size:14px;"></div>
+      <div id="autoSubExpProgress" style="display:none;font-size:13px;color:var(--muted);"></div>
+      <p style="margin:0;font-size:12px;color:var(--muted);">Fail ZIP ini dibaca oleh GoInspect Runner di PC untuk submit automatik ke app pemaju. Simpan / pindahkan ke PC anda.</p>
+      <div class="row-wrap">
+        <button class="btn" id="btnAutoSubExportGo" type="button" style="background:linear-gradient(135deg,#059669,#047857);">Export Job (ZIP)</button>
+        <button class="btn ghost" onclick="closeDlg(q('#autoSubmitExportDialog'))" type="button">Tutup</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- RE-INSPECTION MENU -->
   <section id="reInspectionMenu" hidden>
@@ -9846,7 +9922,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'dfm-fixes-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'autosubmit-ui-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -15813,9 +15889,10 @@ const show = (section, push=true) => {
     currentOfflineMode = null;
     if (typeof updateOfflineModeIndicator === 'function') updateOfflineModeIndicator();
   }
-  if (section === 'home') { 
-    SUBMISSION_MODE = false; 
-    SECOND_INSPECTION_SUBMISSION = false; 
+  if (section === 'home') {
+    SUBMISSION_MODE = false;
+    if (typeof SUBMISSION_FLOW !== 'undefined') { SUBMISSION_FLOW = 'manual'; SUBMISSION_TARGET_APP = null; }
+    SECOND_INSPECTION_SUBMISSION = false;
     THIRD_INSPECTION_SUBMISSION = false; 
     FOURTH_INSPECTION_SUBMISSION = false; 
     RE_INSPECTION_MODE = false;
@@ -20344,7 +20421,12 @@ function formatDate(dateStr) {
 }
 
 /* ========= SUBMISSION MODE ========= */
-q('#submissionModeBtn').addEventListener('click', () => { show('submissionMenu'); });
+q('#submissionModeBtn').addEventListener('click', () => {
+  // Fresh entry: default to the mode chooser (manual keeps today's behaviour).
+  if (typeof SUBMISSION_FLOW !== 'undefined') { SUBMISSION_FLOW = 'manual'; SUBMISSION_TARGET_APP = null; }
+  show('submissionMenu');
+  if (typeof subModeGoto === 'function') subModeGoto('choose');
+});
 
 q('#submissionOpenHistory').addEventListener('click', () => {
   SUBMISSION_MODE = true;
@@ -20376,6 +20458,254 @@ q('#submissionImport').addEventListener('change', async e => {
   if (typeof FOURTH_REINSPECTION_MODE !== 'undefined') FOURTH_REINSPECTION_MODE = false;
   document.body.classList.remove('reinspection-mode');
   e.target.value = '';
+});
+
+/* ========= AUTO-SUBMIT (interface for the PC runner) ========= */
+// Flow state. 'manual' keeps today's behaviour exactly; the automation flows only add
+// an Export Job button in the submission screens. Nothing here touches sync/report code.
+let SUBMISSION_FLOW = 'manual'; // 'manual' | 'auto-all' | 'auto-area'
+let SUBMISSION_TARGET_APP = null;
+const AUTOMATION_APPS = [
+  { key: 'profix',   name: 'Profix',   status: 'pending' }, // status 'ready' once its runner adapter exists
+  { key: 'novade',   name: 'Novade',   status: 'pending' },
+  { key: 'propkita', name: 'PropKita', status: 'pending' },
+];
+
+function subModeGoto(step) {
+  const s1 = q('#subModeStepChoose'), s2 = q('#subModeStepApps'), s3 = q('#subModeStepSource');
+  if (s1) s1.style.display = step === 'choose' ? '' : 'none';
+  if (s2) s2.style.display = step === 'apps' ? '' : 'none';
+  if (s3) s3.style.display = step === 'source' ? '' : 'none';
+  if (step === 'apps') subModeRenderApps();
+  if (step === 'source') {
+    const badge = q('#subModeFlowBadge');
+    if (badge) {
+      if (SUBMISSION_FLOW === 'manual') badge.innerHTML = '';
+      else {
+        const app = AUTOMATION_APPS.find(a => a.key === SUBMISSION_TARGET_APP);
+        const label = SUBMISSION_FLOW === 'auto-all' ? 'Automation Submit All' : 'Automation Submit by Area';
+        badge.innerHTML = `<span class="badge" style="background:#dcfce7;color:#166534;">${label}</span> <span class="badge" style="background:#e0f2fe;color:#0369a1;">${escapeHtml(app ? app.name : '-')}</span>`;
+      }
+    }
+  }
+}
+function subModeRenderApps() {
+  const wrap = q('#subModeAppList');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  AUTOMATION_APPS.forEach(app => {
+    const b = document.createElement('button');
+    b.className = 'btn secondary';
+    b.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px;text-align:left;';
+    const ready = app.status === 'ready';
+    b.innerHTML = `<span style="font-weight:700;">${escapeHtml(app.name)}</span>` +
+      `<span class="badge" style="${ready ? 'background:#dcfce7;color:#166534' : 'background:#f1f5f9;color:#64748b'};">${ready ? 'Skrip sedia' : 'Skrip belum sedia'}</span>`;
+    b.onclick = () => { SUBMISSION_TARGET_APP = app.key; subModeGoto('source'); };
+    wrap.appendChild(b);
+  });
+}
+q('#btnSubFlowManual')?.addEventListener('click', () => { SUBMISSION_FLOW = 'manual'; SUBMISSION_TARGET_APP = null; subModeGoto('source'); });
+q('#btnSubFlowAutoAll')?.addEventListener('click', () => { SUBMISSION_FLOW = 'auto-all'; subModeGoto('apps'); });
+q('#btnSubFlowAutoArea')?.addEventListener('click', () => { SUBMISSION_FLOW = 'auto-area'; subModeGoto('apps'); });
+q('#btnSubModeAppsBack')?.addEventListener('click', () => subModeGoto('choose'));
+q('#btnSubModeSourceBack')?.addEventListener('click', () => subModeGoto(SUBMISSION_FLOW === 'manual' ? 'choose' : 'apps'));
+
+// The current submission LEVEL as a manifest key.
+function submissionLevelKey() {
+  if (FOURTH_INSPECTION_SUBMISSION) return 'fourth';
+  if (THIRD_INSPECTION_SUBMISSION) return 'third';
+  if (SECOND_INSPECTION_SUBMISSION) return 'second';
+  return 'first';
+}
+// Level-visible defects (same rules as the submission area cards) in REPORT order.
+function submissionOrderedDefects(p) {
+  const visible = (p.defects || []).filter(d => {
+    if (!d || d._deleted) return false;
+    if (d.isNewInReInspection && !SECOND_INSPECTION_SUBMISSION && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
+    if (d.isNewInSecondReInspection && !THIRD_INSPECTION_SUBMISSION && !FOURTH_INSPECTION_SUBMISSION) return false;
+    if (d.isNewInThirdReInspection && !FOURTH_INSPECTION_SUBMISSION) return false;
+    return true;
+  });
+  const order = (typeof getReportOrder === 'function' ? getReportOrder() : (p.meta?.areas || [])).slice();
+  visible.forEach(d => { if (!order.includes(d.location)) order.push(d.location); });
+  const out = [];
+  order.forEach(area => visible.forEach(d => { if (d.location === area) out.push(d); }));
+  return { defects: out, areas: order };
+}
+
+// ---- Minimal store-only ZIP writer (no compression; photos are already JPEG) ----
+const _zipCrcTable = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+  return t;
+})();
+function _zipCrc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) c = _zipCrcTable[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function buildStoreZip(entries) { // entries: [{name, bytes(Uint8Array)}] -> Blob
+  const enc = new TextEncoder();
+  const parts = [], central = [];
+  let offset = 0;
+  const u16 = v => new Uint8Array([v & 255, (v >>> 8) & 255]);
+  const u32 = v => new Uint8Array([v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]);
+  entries.forEach(e => {
+    const nameB = enc.encode(e.name);
+    const crc = _zipCrc32(e.bytes);
+    const local = [u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+      u32(crc), u32(e.bytes.length), u32(e.bytes.length), u16(nameB.length), u16(0)];
+    local.forEach(b => parts.push(b)); parts.push(nameB, e.bytes);
+    central.push({ nameB, crc, size: e.bytes.length, offset });
+    offset += 30 + nameB.length + e.bytes.length;
+  });
+  const cdStart = offset;
+  central.forEach(c => {
+    const rec = [u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+      u32(c.crc), u32(c.size), u32(c.size), u16(c.nameB.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(c.offset)];
+    rec.forEach(b => parts.push(b)); parts.push(c.nameB);
+    offset += 46 + c.nameB.length;
+  });
+  // End-of-central-directory: 22 bytes incl. the trailing comment-length u16.
+  parts.push(u32(0x06054b50), u16(0), u16(0), u16(central.length), u16(central.length), u32(offset - cdStart), u32(cdStart), u16(0));
+  return new Blob(parts, { type: 'application/zip' });
+}
+
+// ---- Export dialog ----
+let _autoSubOrdered = null;
+function openAutoSubmitDialog() {
+  const p = getProject();
+  if (!p) { alert('Tiada projek dibuka'); return; }
+  _autoSubOrdered = submissionOrderedDefects(p);
+  const app = AUTOMATION_APPS.find(a => a.key === SUBMISSION_TARGET_APP);
+  const info = q('#autoSubExpInfo');
+  if (info) info.innerHTML =
+    `Projek: <strong>${escapeHtml(p.meta.owner || '-')}</strong> · Level: <strong>${submissionLevelKey()}</strong> · ` +
+    `Mod: <strong>${SUBMISSION_FLOW === 'auto-all' ? 'Submit All' : 'Submit by Area'}</strong> · App: <strong>${escapeHtml(app ? app.name : '-')}</strong>`;
+  const areaWrap = q('#autoSubExpAreaWrap'), rangeWrap = q('#autoSubExpRangeWrap');
+  if (SUBMISSION_FLOW === 'auto-area') {
+    if (areaWrap) areaWrap.style.display = '';
+    if (rangeWrap) rangeWrap.style.display = 'none';
+    const list = q('#autoSubExpAreas');
+    if (list) {
+      list.innerHTML = '';
+      _autoSubOrdered.areas.forEach(area => {
+        const count = _autoSubOrdered.defects.filter(d => d.location === area).length;
+        if (!count) return;
+        const lab = document.createElement('label');
+        lab.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14px;';
+        lab.innerHTML = `<input type="checkbox" class="autoSubAreaCb" value="${escapeHtml(area)}" checked> <span style="flex:1">${escapeHtml(area)}</span> <span class="badge" style="background:#e0f2fe;color:#0369a1;">${count}</span>`;
+        lab.querySelector('input').addEventListener('change', updateAutoSubCount);
+        list.appendChild(lab);
+      });
+    }
+  } else {
+    if (areaWrap) areaWrap.style.display = 'none';
+    if (rangeWrap) rangeWrap.style.display = '';
+    const total = _autoSubOrdered.defects.length;
+    const from = q('#autoSubExpFrom'), to = q('#autoSubExpTo');
+    if (from) { from.value = 1; from.max = total; from.oninput = updateAutoSubCount; }
+    if (to) { to.value = total; to.max = total; to.oninput = updateAutoSubCount; }
+  }
+  const prog = q('#autoSubExpProgress'); if (prog) { prog.style.display = 'none'; prog.textContent = ''; }
+  updateAutoSubCount();
+  openDlg(q('#autoSubmitExportDialog'));
+}
+function selectedAutoSubDefects() {
+  if (!_autoSubOrdered) return [];
+  if (SUBMISSION_FLOW === 'auto-area') {
+    const chosen = new Set([...document.querySelectorAll('.autoSubAreaCb:checked')].map(c => c.value));
+    return _autoSubOrdered.defects.filter(d => chosen.has(d.location));
+  }
+  const from = parseInt(q('#autoSubExpFrom')?.value) || 1;
+  const to = parseInt(q('#autoSubExpTo')?.value) || _autoSubOrdered.defects.length;
+  return _autoSubOrdered.defects.slice(Math.max(0, from - 1), Math.max(0, to));
+}
+function updateAutoSubCount() {
+  const el = q('#autoSubExpCount');
+  if (el) el.textContent = `${selectedAutoSubDefects().length} defect akan diexport`;
+}
+q('#btnAutoSubExportGo')?.addEventListener('click', async () => {
+  const p = getProject();
+  const picked = selectedAutoSubDefects();
+  if (!p || !picked.length) { alert('Tiada defect dipilih.'); return; }
+  const btn = q('#btnAutoSubExportGo'); if (btn) btn.disabled = true;
+  const prog = q('#autoSubExpProgress'); if (prog) { prog.style.display = ''; prog.textContent = 'Menyediakan...'; }
+  try {
+    const level = submissionLevelKey();
+    const levelAfter = (d) => level === 'second' ? (d.reInspection?.afterPhotos || [])
+      : level === 'third' ? (d.secondReInspection?.afterPhotos || [])
+      : level === 'fourth' ? (d.thirdReInspection?.afterPhotos || []) : [];
+    const levelData = (d) => level === 'second' ? d.reInspection : level === 'third' ? d.secondReInspection
+      : level === 'fourth' ? d.thirdReInspection : null;
+    const entries = [];
+    const manifest = {
+      format: 'goinspect-submit-job/1',
+      exportedAt: new Date().toISOString(),
+      app: SUBMISSION_TARGET_APP, mode: SUBMISSION_FLOW, level: level,
+      project: { id: p.id, owner: p.meta.owner || '', address: p.meta.address || '' },
+      areas: _autoSubOrdered.areas.filter(a => picked.some(d => d.location === a)),
+      missingPhotos: 0,
+      defects: []
+    };
+    for (let i = 0; i < picked.length; i++) {
+      const d = picked[i];
+      if (prog) prog.textContent = `Memproses defect ${i + 1}/${picked.length}...`;
+      await new Promise(r => setTimeout(r, 0));
+      const rec = {
+        idx: i + 1,
+        syncId: d._syncId || ('pos_' + i),
+        area: d.location || '', element: d.element || '', type: d.type || '',
+        description: d.description || '', note: d.note || '',
+        submitted: !!d.submitted,
+        levelStatus: levelData(d)?.status || '', levelNotes: levelData(d)?.notes || '',
+        photos: [], afterPhotos: []
+      };
+      const addPhotos = async (refs, listKey, tag) => {
+        for (let n = 0; n < (refs || []).length; n++) {
+          try {
+            const dataUrl = await resolveRefForExport(refs[n]);
+            if (dataUrl && dataUrl.startsWith('data:')) {
+              const { bytes, ext } = dataURLToUint8(dataUrl);
+              if (bytes) {
+                const name = `photos/d${String(i + 1).padStart(3, '0')}_${tag}${n + 1}.${ext}`;
+                entries.push({ name, bytes });
+                rec[listKey].push(name.slice(7));
+                continue;
+              }
+            }
+            manifest.missingPhotos++;
+          } catch (e) { manifest.missingPhotos++; }
+        }
+      };
+      await addPhotos(d.photos, 'photos', 'p');
+      await addPhotos(levelAfter(d), 'afterPhotos', 'a');
+      manifest.defects.push(rec);
+    }
+    if (prog) prog.textContent = 'Membina fail ZIP...';
+    entries.unshift({ name: 'manifest.json', bytes: new TextEncoder().encode(JSON.stringify(manifest, null, 1)) });
+    const blob = buildStoreZip(entries);
+    const fileName = `GoInspect_Job_${(p.meta.owner || 'Projek').replace(/[^a-zA-Z0-9]/g, '_')}_${SUBMISSION_TARGET_APP || 'app'}.zip`;
+    try {
+      const file = new File([blob], fileName, { type: 'application/zip' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'GoInspect Auto-Submit Job', text: fileName });
+        if (prog) prog.textContent = `Siap. ${picked.length} defect diexport.` + (manifest.missingPhotos ? ` (${manifest.missingPhotos} gambar gagal)` : '');
+        return;
+      }
+    } catch (e) { /* user cancel / unsupported -> fallback download */ }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    if (prog) prog.textContent = `Siap. ${picked.length} defect diexport.` + (manifest.missingPhotos ? ` (${manifest.missingPhotos} gambar gagal — semak sambungan)` : '');
+  } catch (err) {
+    console.error('Auto-submit export error:', err);
+    if (prog) prog.textContent = 'Ralat semasa export: ' + (err && err.message || err);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 });
 
 /* ========= RE-INSPECTION MODE ========= */
@@ -23590,6 +23920,13 @@ const renderFinding = async () => {
         badgeColor = 'background:#fff3e0;color:#f97316'; // Orange
       }
       findingTitle.innerHTML = `${modeLabel} <span class="badge" style="${badgeColor};margin-left:8px">Submit: ${submittedCount} / ${totalDefects}</span><span id="flagCountWrapFinding" class="no-print" style="display:none"> — <span id="flagCountFinding" class="badge" style="background:#fee2e2;color:#b91c1c">Flags: 0</span></span><span id="viewReportBtnWrap" class="no-print" style="display:none"> — <button id="btnViewReport" class="btn view" type="button">View Report</button></span><span id="updateBtnWrap" class="no-print" style="margin-left:8px;"><button id="btnSyncUpdate" class="btn ghost" type="button" style="padding:6px 12px;font-size:13px;display:inline-flex;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>Update</button></span>`;
+      // Auto-Submit flows: add the Export Job button (must run right after the innerHTML
+      // assignment, before other buttons in this title get their handlers wired).
+      if (typeof SUBMISSION_FLOW !== 'undefined' && SUBMISSION_FLOW !== 'manual') {
+        findingTitle.innerHTML += `<span class="no-print" style="margin-left:8px;"><button id="btnAutoSubmitExport" class="btn" type="button" style="padding:6px 12px;font-size:13px;background:linear-gradient(135deg,#059669,#047857);color:#fff;display:inline-flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Auto Submit</button></span>`;
+        const _asb = q('#btnAutoSubmitExport');
+        if (_asb && typeof openAutoSubmitDialog === 'function') _asb.onclick = openAutoSubmitDialog;
+      }
     } else if (RE_INSPECTION_MODE) {
       // Show different label for Second/Third Re-Inspection
       let modeLabel = 'Re-Inspection Mode';
