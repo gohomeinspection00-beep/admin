@@ -29,27 +29,37 @@ const data = {
   tarikhSerahanLaporan: "2 Mac 2026",
   kaedahSerahanLaporan: "aplikasi pemaju (KITA APPS)",
 
-  tarikhNotis: "1 Julai 2026",
-  tarikhDeadline: "16 Julai 2026",
+  tarikhNotis: "3 Ogos 2026",
+  tarikhDeadline: "18 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
   kaedahPenghantaranNotis: "serahan tangan",
 
   kecacatan: [
-    { tag: "32", lokasi: "Family Hall (Ground Floor) — M&E", kecacatan: "Kerosakan fungsi — Butang ujian RCCB 0.03A tidak berfungsi (tidak dapat trip apabila ditekan)", status: "Tiada Tindakan" },
-    { tag: "66", lokasi: "Kitchen (Ground Floor) — Lantai", kecacatan: "Masalah penjajaran — Lippage pada jubin lantai", status: "Tiada Tindakan" },
-    { tag: "135", lokasi: "Master Bedroom — Dinding", kecacatan: "Kecacatan besar — Pertumbuhan kulat dan tanda kerosakan air pada dinding bercat", status: "Tiada Tindakan" },
-    { tag: "168", lokasi: "Bedroom 2 — Lantai", kecacatan: "Kecacatan kecil — Retak pada jubin lantai", status: "Tiada Tindakan" },
-    { tag: "174", lokasi: "Bedroom 2 — Tingkap", kecacatan: "Masalah sambungan — Jurang kelihatan dan pengedap tidak sempurna antara bingkai tingkap dan dinding", status: "Tiada Tindakan" },
+    { tag: "5", lokasi: "Bathroom 3 — Plumbing & Sanitary", kecacatan: "Simen terkumpul di dalam floor trap (Accumulation of cement inside floor trap) — masih ada", status: "Belum Dibaiki" },
+    { tag: "7", lokasi: "Yard — Door", kecacatan: "Pintu tidak dapat ditutup dan tersekat dengan paip air — water tap hilang dan lokasi water tap point perlu disemak semula", status: "Belum Dibaiki" },
+    { tag: "9", lokasi: "Staircase — Wall", kecacatan: "Keretakan dan kemek pada dinding bercat — masih terdapat keretakan pada permukaan dinding", status: "Belum Dibaiki" },
+    { tag: "11", lokasi: "Master Bedroom — Wall", kecacatan: "Pertumbuhan kulat dan tanda kerosakan air pada dinding bercat — kelembapan masih tinggi pada dinding (Major defect)", status: "Belum Dibaiki" },
+    { tag: "12", lokasi: "Master Bedroom — Window", kecacatan: "Jurang kelihatan dan pengedap tidak sempurna antara bingkai tingkap dan dinding — masih ada jurang + pertumbuhan kulat", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "15", lokasi: "Master Bathroom — Plumbing & Sanitary", kecacatan: "Kebocoran pada sambungan antara bottle trap dan paip sink — masih bocor", status: "Belum Dibaiki" },
+    { tag: "16", lokasi: "Master Bathroom — Plumbing & Sanitary", kecacatan: "Sisa binaan di dalam floor trap — masih ada", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "18", lokasi: "Bedroom 2 — Floor", kecacatan: "Keretakan pada jubin lantai — masih retak", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "19", lokasi: "Bedroom 2 — Wall", kecacatan: "Kemek dan keretakan pada dinding bercat — masih retak", status: "Belum Dibaiki" },
+    { tag: "21", lokasi: "Bathroom 2 — Plumbing & Sanitary", kecacatan: "Floor trap tidak sejajar dengan paip dalaman", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "24", lokasi: "Ceiling Area — M&E", kecacatan: "Flexible conduit terlalu pendek dan penutup junction box hilang (kabel elektrik terdedah) — penutup masih hilang", status: "Belum Dibaiki" },
+    { tag: "25", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Tiada sokongan yang sempurna untuk sistem paip/distribution pipe — masih hilang", status: "Belum Dibaiki" },
+    { tag: "26", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air dalam keadaan kotor (perlu dibersihkan) — masih kotor", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
-    { tarikh: "26 Februari 2026", peristiwa: "Pemeriksaan Kecacatan (Defect Inspection) dijalankan" },
+    { tarikh: "26 Februari 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan" },
     { tarikh: "2 Mac 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi pemaju (KITA APPS)" },
-    { tarikh: "1 April 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan diambil" },
-    { tarikh: "1 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "16 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "1 April 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
+    { tarikh: "23 Jun 2026", peristiwa: "Pemilik mengemukakan aduan keretakan dinding tangga melalui aplikasi KITA (Ref: F-NH14-P2-[PTD208412]07,JALANPERJIRANAN14/8-N12336). Tiket tersebut kemudiannya ditutup (closed) oleh pihak kontraktor/pengurusan dengan status seolah-olah telah dibaiki" },
+    { tarikh: "30 Julai 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) oleh Building Surveyor bertauliah — 30 kecacatan direkodkan: 13 kecacatan asal masih belum dibaiki (termasuk keretakan dinding tangga yang tiketnya telah ditutup), 2 kecacatan baru dan 15 kecacatan baru akibat kerja pembaikan" },
+    { tarikh: "3 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "18 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -225,7 +235,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan langsung oleh pihak tuan. Berikut adalah senarai kecacatan yang masih belum diselesaikan:`
+  `Namun, walaupun sebahagian kerja pembaikan telah dijalankan, Pemeriksaan Semula (Re-Inspection) oleh Building Surveyor bertauliah pada 30 Julai 2026 mendapati pembaikan masih belum disiapkan sepenuhnya. Berikut adalah senarai kecacatan yang masih belum diselesaikan (nombor merujuk kepada Laporan Re-Inspection bertarikh 30 Julai 2026):`
 );
 y += 5;
 
@@ -242,17 +252,22 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
+const fn = `*Selain 13 kecacatan di atas, Laporan Re-Inspection bertarikh 30 Julai 2026 turut merekodkan 2 kecacatan baru dan 15 kecacatan baru akibat kerja pembaikan (New Defect from Rectification Work), menjadikan jumlah keseluruhan 30 kecacatan. Senarai penuh adalah sebagaimana terkandung dalam Laporan Re-Inspection tersebut dan Laporan Pemeriksaan Kecacatan Pertama yang dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
+  `Untuk makluman pihak tuan, pemilik telah mengemukakan aduan keretakan pada dinding tangga melalui aplikasi KITA pada 23 Jun 2026 (Ref: F-NH14-P2-[PTD208412]07,JALANPERJIRANAN14/8-N12336). Bagaimanapun, tiket aduan tersebut telah ditutup (closed) oleh pihak kontraktor/pengurusan dengan status seolah-olah pembaikan telah disempurnakan, sedangkan Pemeriksaan Semula (Re-Inspection) oleh Building Surveyor bertauliah pada 30 Julai 2026 mengesahkan keretakan tersebut masih wujud dan tidak dibaiki. Tindakan menutup tiket tanpa pembaikan sebenar adalah tidak boleh diterima dan merupakan salah nyata status pembaikan. Saya menuntut agar semua tiket yang telah ditutup disemak semula, dan sebarang penutupan tiket selepas ini hendaklah disahkan oleh pemilik terlebih dahulu.`
+);
+y += 4;
+
+numPara(4,
   `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan.`
 );
 y += 4;
 
-numPara(4, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+numPara(5, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan kali kedua (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -260,7 +275,7 @@ bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak t
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
-numPara(5,
+numPara(6,
   `Merujuk kepada klausa Service of Documents di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui ${data.kaedahPenghantaranNotis}.`
 );
 y += 4;
@@ -273,7 +288,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(6,
+numPara(7,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
@@ -386,7 +401,7 @@ doc.text("Gambar Bukti Kecacatan (Defect Evidence Photos)", pageW / 2, y, { alig
 y += 10;
 
 doc.setFontSize(SZ.SMALL); bk();
-doc.text(`Tarikh Pemeriksaan: 26 Februari 2026`, mL, y); y += 8;
+doc.text(`Tarikh Pemeriksaan Semula (Re-Inspection): 30 Julai 2026`, mL, y); y += 8;
 
 const pw = (cW - 10) / 2;
 const ph = 55;
