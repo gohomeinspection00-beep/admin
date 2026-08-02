@@ -254,7 +254,7 @@ y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const fn = `*Selain 13 kecacatan di atas, Laporan Re-Inspection bertarikh 30 Julai 2026 turut merekodkan 2 kecacatan baru dan 15 kecacatan baru akibat kerja pembaikan (New Defect from Rectification Work), menjadikan jumlah keseluruhan 30 kecacatan. Senarai penuh adalah sebagaimana terkandung dalam Laporan Re-Inspection tersebut dan Laporan Pemeriksaan Kecacatan Pertama yang dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
 const fnL = doc.splitTextToSize(fn, cW);
-for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
+for (const f of fnL) { checkBreak(6); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
@@ -269,14 +269,14 @@ y += 4;
 
 numPara(5, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
 y += 2;
-bullet("Melaksanakan pemeriksaan kali kedua (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
+bullet("Melaksanakan pemeriksaan kali ketiga bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
 bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan dan pihak berkepentingan (stakeholders); dan");
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
 numPara(6,
-  `Merujuk kepada klausa Service of Documents di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan, pos berdaftar atau e-mel adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui ${data.kaedahPenghantaranNotis}.`
+  `Merujuk kepada klausa Service of Documents di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui ${data.kaedahPenghantaranNotis}.`
 );
 y += 4;
 
@@ -383,55 +383,6 @@ function drawAkuanTerima(copyLabel) {
 
 drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
-
-// ============================================================
-// LAMPIRAN A
-// ============================================================
-newPage();
-y = 25;
-
-doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
-const lamT = "LAMPIRAN A";
-doc.text(lamT, pageW / 2, y, { align: "center" });
-doc.setLineWidth(0.4);
-doc.line(pageW / 2 - doc.getTextWidth(lamT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lamT) / 2, y + 1);
-y += 6;
-doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-doc.text("Gambar Bukti Kecacatan (Defect Evidence Photos)", pageW / 2, y, { align: "center" });
-y += 10;
-
-doc.setFontSize(SZ.SMALL); bk();
-doc.text(`Tarikh Pemeriksaan Semula (Re-Inspection): 30 Julai 2026`, mL, y); y += 8;
-
-const pw = (cW - 10) / 2;
-const ph = 55;
-const pg = 10;
-
-for (let i = 0; i < data.kecacatan.length; i++) {
-  const col = i % 2;
-  if (col === 0) checkBreak(ph + 20);
-  const px = mL + col * (pw + pg);
-  const py = y;
-
-  doc.setLineWidth(0.3); bk();
-  doc.rect(px, py, pw, ph);
-
-  doc.setFont("helvetica", "normal"); doc.setFontSize(14);
-  doc.setTextColor(180, 180, 180);
-  doc.text("[FOTO]", px + pw / 2, py + ph / 2 - 2, { align: "center" });
-  doc.setFontSize(SZ.FOOTNOTE);
-  doc.setTextColor(150, 150, 150);
-  doc.text(`Tag #${data.kecacatan[i].tag}`, px + pw / 2, py + ph / 2 + 6, { align: "center" });
-
-  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.CAPTION); doc.setTextColor(0, 0, 0);
-  doc.text(`Tag ${data.kecacatan[i].tag} — ${data.kecacatan[i].lokasi}`, px + 2, py + ph + 5);
-  doc.setFont("helvetica", "normal");
-  const cl = doc.splitTextToSize(data.kecacatan[i].kecacatan, pw - 4);
-  doc.text(cl[0], px + 2, py + ph + 10);
-
-  if (col === 1) y += ph + 18;
-}
-if (data.kecacatan.length % 2 === 1) y += ph + 18;
 
 // ============================================================
 // FOOTER
