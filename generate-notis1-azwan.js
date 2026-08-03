@@ -29,8 +29,8 @@ const data = {
   tarikhSerahanLaporan: "2 Mac 2026",
   kaedahSerahanLaporan: "aplikasi pemaju (KITA APPS)",
 
-  tarikhNotis: "3 Ogos 2026",
-  tarikhDeadline: "18 Ogos 2026",
+  tarikhNotis: "4 Ogos 2026",
+  tarikhDeadline: "19 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -58,8 +58,8 @@ const data = {
     { tarikh: "1 April 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "23 Jun 2026", peristiwa: "Pemilik mengemukakan aduan keretakan dinding tangga melalui aplikasi KITA (Ref: F-NH14-P2-[PTD208412]07,JALANPERJIRANAN14/8-N12336). Tiket tersebut kemudiannya ditutup (closed) oleh pihak kontraktor/pengurusan dengan status seolah-olah telah dibaiki" },
     { tarikh: "30 Julai 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) oleh Building Surveyor bertauliah — 30 kecacatan direkodkan: 13 kecacatan asal masih belum dibaiki (termasuk keretakan dinding tangga yang tiketnya telah ditutup), 2 kecacatan baru dan 15 kecacatan baru akibat kerja pembaikan" },
-    { tarikh: "3 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "18 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "4 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "19 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
