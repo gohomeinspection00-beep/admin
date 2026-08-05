@@ -39,8 +39,8 @@ const data = {
   tarikhSerahanLaporan: "20 April 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy) kepada pejabat pengurusan (management office)",
 
-  tarikhNotis: "24 Julai 2026",
-  tarikhDeadline: "8 Ogos 2026",
+  tarikhNotis: "11 Ogos 2026",
+  tarikhDeadline: "26 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -60,8 +60,8 @@ const data = {
     { tarikh: "20 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "2 Julai 2026", peristiwa: "Susulan (follow-up) oleh pemilik melalui WhatsApp kepada wakil pemaju — wakil pemaju mengesahkan kecacatan (crack) masih belum dibaiki ('rumah masih pending defect crack')" },
     { tarikh: "19 Julai 2026", peristiwa: "Susulan terakhir oleh pemilik melalui WhatsApp — tiada maklum balas daripada pemaju" },
-    { tarikh: "24 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "8 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "11 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "26 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
