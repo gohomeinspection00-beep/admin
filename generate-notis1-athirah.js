@@ -39,8 +39,8 @@ const data = {
   kaedahSerahanLaporan: "Aplikasi Marvis",
   noDefectForm: "PTD44839-DF-1",
 
-  tarikhNotis: "4 Ogos 2026",
-  tarikhDeadline: "19 Ogos 2026",
+  tarikhNotis: "5 Ogos 2026",
+  tarikhDeadline: "20 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -60,8 +60,8 @@ const data = {
     { tarikh: "14 Jun 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "Julai 2026", peristiwa: "Pemaju melalui e-mel (The VP Team) mendakwa pembaikan kecacatan unit telah 'successfully completed' (Defect Form No: PTD44839-DF-1) dan meminta pemilik mengambil kunci serta menandatangani pengesahan (sign off) kecacatan" },
     { tarikh: "28 Julai 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) oleh Building Surveyor bertauliah — kecacatan masih belum disiapkan sepenuhnya, bertentangan dengan dakwaan pemaju" },
-    { tarikh: "4 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "19 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "5 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "20 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
