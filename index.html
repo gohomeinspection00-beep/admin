@@ -9960,7 +9960,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'annotate-select-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'annotate-select-v3'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -28742,9 +28742,13 @@ function drawShape(s){
   const fill20 = color.length === 7 ? (color + '33') : color;
 
   if (s.tool==='rect') {
-    const x=s.start.x, y=s.start.y, w=s.end.x-s.start.x, h=s.end.y-s.start.y;
-    ctx.strokeRect(x,y,w,h);
-    if (isFilled){ ctx.fillStyle = fill20; ctx.fillRect(x,y,w,h); }
+    // Drawn about the centre so an optional rotation (Select tool) is supported;
+    // with rotation 0 this is visually identical to the old corner-based draw.
+    const rcx=(s.start.x+s.end.x)/2, rcy=(s.start.y+s.end.y)/2;
+    const w=Math.abs(s.end.x-s.start.x), h=Math.abs(s.end.y-s.start.y);
+    ctx.translate(rcx, rcy); ctx.rotate(s.rotation || 0);
+    ctx.strokeRect(-w/2, -h/2, w, h);
+    if (isFilled){ ctx.fillStyle = fill20; ctx.fillRect(-w/2, -h/2, w, h); }
   }
   else if (s.tool==='circle') {
     const dx=s.end.x-s.start.x, dy=s.end.y-s.start.y, r=Math.hypot(dx,dy);
@@ -28832,9 +28836,11 @@ function annDistToSeg(p, a, b){
 function shapeHit(s, p){
   const tol = Math.max(10, (s.width || 3) + 7);
   if (s.tool === 'rect') {
-    const x1 = Math.min(s.start.x, s.end.x) - tol, x2 = Math.max(s.start.x, s.end.x) + tol;
-    const y1 = Math.min(s.start.y, s.end.y) - tol, y2 = Math.max(s.start.y, s.end.y) + tol;
-    return p.x >= x1 && p.x <= x2 && p.y >= y1 && p.y <= y2;
+    // account for optional rotation: transform the point into the rect's local space
+    const c = { x: (s.start.x + s.end.x) / 2, y: (s.start.y + s.end.y) / 2 };
+    const lp = annRotPt(p, c, -(s.rotation || 0));
+    const hw = Math.abs(s.end.x - s.start.x) / 2, hh = Math.abs(s.end.y - s.start.y) / 2;
+    return lp.x >= c.x - hw - tol && lp.x <= c.x + hw + tol && lp.y >= c.y - hh - tol && lp.y <= c.y + hh + tol;
   }
   if (s.tool === 'circle') {
     const r = Math.hypot(s.end.x - s.start.x, s.end.y - s.start.y);
@@ -28854,23 +28860,61 @@ function shapeIndexAt(p){
   return -1;
 }
 // Scale/rotate handles exist for TEXT only (v1); other shapes are move-only.
+function annShapeCenter(s){
+  if (s.tool === 'freehand') {
+    const pts = s.points || [];
+    if (!pts.length) return { x: s.start.x, y: s.start.y };
+    const x1 = Math.min(...pts.map(p => p.x)), x2 = Math.max(...pts.map(p => p.x));
+    const y1 = Math.min(...pts.map(p => p.y)), y2 = Math.max(...pts.map(p => p.y));
+    return { x: (x1 + x2) / 2, y: (y1 + y2) / 2, x1, x2, y1, y2 };
+  }
+  return { x: (s.start.x + s.end.x) / 2, y: (s.start.y + s.end.y) / 2 };
+}
+// Handles per shape type. modes: scale | rotate | p1/p2 (arrow ends)
 function selHandles(s){
-  if (s.tool !== 'text') return null;
-  const b = annTextBox(s), ang = s.rotation || 0;
-  // Text near the top edge: put the rotate handle BELOW the box so it stays reachable.
-  const flip = s.start.y < 64;
-  return {
-    scale:  annRotPt({ x: s.start.x + b.w,     y: s.start.y + b.h }, s.start, ang),
-    rotate: annRotPt({ x: s.start.x + b.w / 2, y: flip ? (s.start.y + b.h + 32) : (s.start.y - 32) }, s.start, ang),
-    flip, box: b
-  };
+  const ang = s.rotation || 0;
+  if (s.tool === 'text') {
+    const b = annTextBox(s);
+    const flip = s.start.y < 64; // near the top edge -> rotate handle below
+    return {
+      scale:  annRotPt({ x: s.start.x + b.w,     y: s.start.y + b.h }, s.start, ang),
+      rotate: annRotPt({ x: s.start.x + b.w / 2, y: flip ? (s.start.y + b.h + 32) : (s.start.y - 32) }, s.start, ang),
+      flip, box: b
+    };
+  }
+  if (s.tool === 'rect') {
+    const c = annShapeCenter(s);
+    const hw = Math.abs(s.end.x - s.start.x) / 2, hh = Math.abs(s.end.y - s.start.y) / 2;
+    const flip = (c.y - hh) < 64;
+    return {
+      scale:  annRotPt({ x: c.x + hw, y: c.y + hh }, c, ang),
+      rotate: annRotPt({ x: c.x, y: flip ? (c.y + hh + 32) : (c.y - hh - 32) }, c, ang),
+      flip, center: c
+    };
+  }
+  if (s.tool === 'circle') {
+    // radius handle = the shape's own radius point
+    return { scale: { x: s.end.x, y: s.end.y } };
+  }
+  if (s.tool === 'arrow') {
+    return { p1: { x: s.start.x, y: s.start.y }, p2: { x: s.end.x, y: s.end.y } };
+  }
+  if (s.tool === 'freehand') {
+    const c = annShapeCenter(s);
+    if (c.x1 === undefined) return null;
+    const flip = c.y1 < 64;
+    return { scale: { x: c.x2 + 10, y: c.y2 + 10 }, rotate: { x: c.x, y: flip ? (c.y2 + 34) : (c.y1 - 34) }, flip, center: c };
+  }
+  return null;
 }
 function selHandleAt(s, p){
   const h = selHandles(s);
   if (!h) return null;
-  // generous 24px touch radius for fingers on small screens
-  if (Math.hypot(p.x - h.scale.x,  p.y - h.scale.y)  <= 24) return 'scale';
-  if (Math.hypot(p.x - h.rotate.x, p.y - h.rotate.y) <= 24) return 'rotate';
+  const R = 24; // generous touch radius
+  if (h.p1 && Math.hypot(p.x - h.p1.x, p.y - h.p1.y) <= R) return 'p1';
+  if (h.p2 && Math.hypot(p.x - h.p2.x, p.y - h.p2.y) <= R) return 'p2';
+  if (h.scale  && Math.hypot(p.x - h.scale.x,  p.y - h.scale.y)  <= R) return 'scale';
+  if (h.rotate && Math.hypot(p.x - h.rotate.x, p.y - h.rotate.y) <= R) return 'rotate';
   return null;
 }
 function applySelTransform(s, mode, dd, p){
@@ -28880,14 +28924,57 @@ function applySelTransform(s, mode, dd, p){
     s.start = { x: o.start.x + dx, y: o.start.y + dy };
     s.end   = { x: o.end.x + dx,   y: o.end.y + dy };
     if (s.tool === 'freehand') s.points = (o.points || []).map(pt => ({ x: pt.x + dx, y: pt.y + dy }));
-  } else if (mode === 'scale' && s.tool === 'text') {
-    const d0 = Math.max(8, Math.hypot(dd.start.x - o.start.x, dd.start.y - o.start.y));
-    const d1 = Math.hypot(p.x - o.start.x, p.y - o.start.y);
-    s.scale = Math.max(0.4, Math.min(6, (o.scale || 1) * (d1 / d0)));
-  } else if (mode === 'rotate' && s.tool === 'text') {
-    const a0 = Math.atan2(dd.start.y - o.start.y, dd.start.x - o.start.x);
-    const a1 = Math.atan2(p.y - o.start.y, p.x - o.start.x);
-    s.rotation = (o.rotation || 0) + (a1 - a0);
+    return;
+  }
+  if (mode === 'p1' && s.tool === 'arrow') { s.start = { x: p.x, y: p.y }; return; }
+  if (mode === 'p2' && s.tool === 'arrow') { s.end   = { x: p.x, y: p.y }; return; }
+  if (s.tool === 'text') {
+    if (mode === 'scale') {
+      const d0 = Math.max(8, Math.hypot(dd.start.x - o.start.x, dd.start.y - o.start.y));
+      const d1 = Math.hypot(p.x - o.start.x, p.y - o.start.y);
+      s.scale = Math.max(0.4, Math.min(6, (o.scale || 1) * (d1 / d0)));
+    } else if (mode === 'rotate') {
+      const a0 = Math.atan2(dd.start.y - o.start.y, dd.start.x - o.start.x);
+      const a1 = Math.atan2(p.y - o.start.y, p.x - o.start.x);
+      s.rotation = (o.rotation || 0) + (a1 - a0);
+    }
+    return;
+  }
+  if (s.tool === 'rect') {
+    const c = { x: (o.start.x + o.end.x) / 2, y: (o.start.y + o.end.y) / 2 };
+    if (mode === 'scale') {
+      // drag the corner in the rect's LOCAL space; centre stays fixed
+      const lp = annRotPt(p, c, -(o.rotation || 0));
+      const hw = Math.max(6, Math.abs(lp.x - c.x)), hh = Math.max(6, Math.abs(lp.y - c.y));
+      s.start = { x: c.x - hw, y: c.y - hh };
+      s.end   = { x: c.x + hw, y: c.y + hh };
+    } else if (mode === 'rotate') {
+      const a0 = Math.atan2(dd.start.y - c.y, dd.start.x - c.x);
+      const a1 = Math.atan2(p.y - c.y, p.x - c.x);
+      s.rotation = (o.rotation || 0) + (a1 - a0);
+    }
+    return;
+  }
+  if (s.tool === 'circle' && mode === 'scale') { s.end = { x: p.x, y: p.y }; return; }
+  if (s.tool === 'freehand') {
+    const pts = o.points || [];
+    const x1 = Math.min(...pts.map(pt => pt.x)), x2 = Math.max(...pts.map(pt => pt.x));
+    const y1 = Math.min(...pts.map(pt => pt.y)), y2 = Math.max(...pts.map(pt => pt.y));
+    const c = { x: (x1 + x2) / 2, y: (y1 + y2) / 2 };
+    if (mode === 'scale') {
+      const d0 = Math.max(8, Math.hypot(dd.start.x - c.x, dd.start.y - c.y));
+      const f = Math.max(0.2, Math.min(8, Math.hypot(p.x - c.x, p.y - c.y) / d0));
+      s.points = pts.map(pt => ({ x: c.x + (pt.x - c.x) * f, y: c.y + (pt.y - c.y) * f }));
+    } else if (mode === 'rotate') {
+      const a0 = Math.atan2(dd.start.y - c.y, dd.start.x - c.x);
+      const a1 = Math.atan2(p.y - c.y, p.x - c.x);
+      const da = a1 - a0;
+      s.points = pts.map(pt => annRotPt(pt, c, da));
+    }
+    if (s.points && s.points.length) {
+      s.start = { x: s.points[0].x, y: s.points[0].y };
+      s.end = { x: s.points[s.points.length - 1].x, y: s.points[s.points.length - 1].y };
+    }
   }
 }
 function updateDeleteSelBtn(){
@@ -28913,19 +29000,37 @@ function drawSelectionOverlay(s){
     // scale handle: bigger square at the bottom-right corner (finger-friendly)
     ctx.fillRect(b.w - 11, b.h - 11, 22, 22);
   } else {
-    let x1, y1, x2, y2;
-    if (s.tool === 'freehand') {
-      const pts = s.points || [];
-      x1 = Math.min(...pts.map(p => p.x)); x2 = Math.max(...pts.map(p => p.x));
-      y1 = Math.min(...pts.map(p => p.y)); y2 = Math.max(...pts.map(p => p.y));
+    const h = selHandles(s);
+    const knob = (x, y) => { ctx.beginPath(); ctx.arc(x, y, 11, 0, Math.PI * 2); ctx.fillStyle = '#0284c7'; ctx.fill(); };
+    const sq = (x, y) => { ctx.fillStyle = '#0284c7'; ctx.fillRect(x - 11, y - 11, 22, 22); };
+    if (s.tool === 'rect') {
+      const c = annShapeCenter(s);
+      const hw = Math.abs(s.end.x - s.start.x) / 2, hh = Math.abs(s.end.y - s.start.y) / 2;
+      ctx.save();
+      ctx.translate(c.x, c.y); ctx.rotate(s.rotation || 0);
+      ctx.strokeRect(-hw - 6, -hh - 6, hw * 2 + 12, hh * 2 + 12);
+      ctx.setLineDash([]);
+      const ry = (h && h.flip) ? (hh + 32) : (-hh - 32);
+      ctx.beginPath(); ctx.moveTo(0, (h && h.flip) ? (hh + 6) : (-hh - 6)); ctx.lineTo(0, ry); ctx.stroke();
+      ctx.restore();
+      ctx.setLineDash([]);
+      if (h) { knob(h.rotate.x, h.rotate.y); sq(h.scale.x, h.scale.y); }
     } else if (s.tool === 'circle') {
       const r = Math.hypot(s.end.x - s.start.x, s.end.y - s.start.y);
-      x1 = s.start.x - r; x2 = s.start.x + r; y1 = s.start.y - r; y2 = s.start.y + r;
-    } else {
-      x1 = Math.min(s.start.x, s.end.x); x2 = Math.max(s.start.x, s.end.x);
-      y1 = Math.min(s.start.y, s.end.y); y2 = Math.max(s.start.y, s.end.y);
+      ctx.beginPath(); ctx.arc(s.start.x, s.start.y, r + 6, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      if (h) sq(h.scale.x, h.scale.y); // radius handle
+    } else if (s.tool === 'arrow') {
+      ctx.setLineDash([]);
+      if (h) { sq(h.p1.x, h.p1.y); sq(h.p2.x, h.p2.y); } // drag either end (re-aim = rotate)
+    } else { // freehand
+      const c = annShapeCenter(s);
+      if (c.x1 !== undefined) {
+        ctx.strokeRect(c.x1 - 6, c.y1 - 6, (c.x2 - c.x1) + 12, (c.y2 - c.y1) + 12);
+        ctx.setLineDash([]);
+        if (h) { sq(h.scale.x, h.scale.y); knob(h.rotate.x, h.rotate.y); }
+      }
     }
-    ctx.strokeRect(x1 - 6, y1 - 6, (x2 - x1) + 12, (y2 - y1) + 12);
   }
   ctx.restore();
 }
