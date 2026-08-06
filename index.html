@@ -9944,7 +9944,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'ai-check-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'ai-check-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -20513,21 +20513,32 @@ function aic_open(fromSection) {
   const last = parseInt(localStorage.getItem('goinspect.aiCheckLastRun') || '0');
   const waitMs = 60000 - (Date.now() - last);
   if (waitMs > 0) { alert('Sila tunggu ' + Math.ceil(waitMs / 1000) + ' saat sebelum semakan seterusnya.'); return; }
-  let cands = (p.defects || []).filter(d => d && !d._deleted
-    && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection
-    && (d.description || '').trim());
-  if (!cands.length) { alert('Tiada description untuk disemak.'); return; }
+  const eligible = (p.defects || []).filter(d => d && !d._deleted
+    && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection);
+  // Empty-description check (local, no AI needed). Legitimately-empty defects are
+  // excluded: type 'General Photos' and element 'View' are photo-only by design.
+  const emptyItems = eligible
+    .filter(d => !(d.description || '').trim()
+      && (d.type || '').trim().toLowerCase() !== 'general photos'
+      && (d.element || '').trim().toLowerCase() !== 'view')
+    .map(d => {
+      if (!d._syncId) d._syncId = generateSecureId('def');
+      return { syncId: d._syncId, area: d.location || '-', element: d.element || '-', type: d.type || '-',
+        originalDescription: '', fix: null, sugg: null, mismatch: null, empty: true, status: 'pending' };
+    });
+  let cands = eligible.filter(d => (d.description || '').trim());
+  if (!cands.length && !emptyItems.length) { alert('Tiada description untuk disemak.'); return; }
   let capped = false;
   if (cands.length > 100) { cands = cands.slice(0, 100); capped = true; }
   aic_returnTo = fromSection || 'finding';
-  aic_run(p, cands, capped);
+  aic_run(p, cands, capped, emptyItems);
 }
 
-async function aic_run(p, cands, capped) {
+async function aic_run(p, cands, capped, emptyItems) {
   localStorage.setItem('goinspect.aiCheckLastRun', String(Date.now()));
   cands.forEach(d => { if (!d._syncId) d._syncId = generateSecureId('def'); });
   aic_showOverlay('Memeriksa 0/' + cands.length + '...');
-  const items = [];
+  const items = (emptyItems || []).slice(); // empty-description findings go first
   const BATCH = 20; // small batches: big ones overflow the output-token limit
   try {
     for (let off = 0; off < cands.length; off += BATCH) {
@@ -20568,7 +20579,8 @@ Respond ONLY with a valid JSON array (no markdown), containing ONLY items that h
       });
       if (off + BATCH < cands.length) await new Promise(r => setTimeout(r, 800));
     }
-    aic_results = { projectId: p.id, checkedAt: Date.now(), total: cands.length, capped, items };
+    aic_results = { projectId: p.id, checkedAt: Date.now(), total: cands.length + (emptyItems || []).length, capped, items };
+    aic_filter = 'all';
     aic_render();
     show('aiCheck');
   } catch (err) {
@@ -20596,6 +20608,16 @@ function aic_validate(d, r) {
     originalDescription: orig, fix, sugg, mismatch: mism, status: 'pending' };
 }
 
+let aic_filter = 'all'; // 'all' | 'fix' | 'sugg' | 'mism' | 'empty'
+window.aic_setFilter = (f) => { aic_filter = (aic_filter === f) ? 'all' : f; aic_render(); };
+function aic_matchFilter(it) {
+  if (aic_filter === 'all') return true;
+  if (aic_filter === 'fix') return !!it.fix;
+  if (aic_filter === 'sugg') return !!it.sugg;
+  if (aic_filter === 'mism') return !!it.mismatch;
+  if (aic_filter === 'empty') return !!it.empty;
+  return true;
+}
 function aic_render() {
   const list = q('#aicList'), sum = q('#aicSummary'), empty = q('#aicEmpty'), bulkBtn = q('#btnAicBulk');
   if (!aic_results || !list) return;
@@ -20603,16 +20625,26 @@ function aic_render() {
   const nFix = items.filter(i => i.fix).length;
   const nSugg = items.filter(i => i.sugg).length;
   const nMism = items.filter(i => i.mismatch).length;
+  const nEmpty = items.filter(i => i.empty).length;
   const nOk = aic_results.total - items.length;
+  // Tappable filter chips — tap to show only that category, tap again for all.
+  const chip = (key, label, bg, fg) => {
+    const active = aic_filter === key;
+    return `<button type="button" class="badge" onclick="aic_setFilter('${key}')" style="background:${bg};color:${fg};margin-right:6px;margin-bottom:4px;border:${active ? '2px solid ' + fg : '2px solid transparent'};cursor:pointer;font-size:12.5px;">${label}</button>`;
+  };
   if (sum) sum.innerHTML =
-    `<span class="badge" style="background:#fee2e2;color:#b91c1c;margin-right:6px;">Ejaan: ${nFix}</span>` +
-    `<span class="badge" style="background:#e0f2fe;color:#0369a1;margin-right:6px;">Cadangan: ${nSugg}</span>` +
-    `<span class="badge" style="background:#fef3c7;color:#b45309;margin-right:6px;">Tak padan: ${nMism}</span>` +
+    (nEmpty ? chip('empty', 'Kosong: ' + nEmpty, '#fee2e2', '#991b1b') : '') +
+    chip('fix', 'Ejaan: ' + nFix, '#fee2e2', '#b91c1c') +
+    chip('sugg', 'Cadangan: ' + nSugg, '#e0f2fe', '#0369a1') +
+    chip('mism', 'Tak padan: ' + nMism, '#fef3c7', '#b45309') +
     `<span class="badge" style="background:#dcfce7;color:#166534;">OK: ${nOk}</span>` +
+    (aic_filter !== 'all' ? `<button type="button" class="badge" onclick="aic_setFilter('all')" style="background:#f1f5f9;color:#334155;margin-left:6px;cursor:pointer;">Tunjuk semua</button>` : '') +
     (aic_results.capped ? `<div style="font-size:12px;color:#b45309;margin-top:6px;">Nota: hanya 100 defect pertama disemak.</div>` : '');
   list.innerHTML = '';
-  if (empty) empty.style.display = items.length ? 'none' : 'block';
+  const shown = items.filter(aic_matchFilter).length;
+  if (empty) empty.style.display = (items.length && shown) ? 'none' : 'block';
   items.forEach((it, i) => {
+    if (!aic_matchFilter(it)) return;
     const card = document.createElement('div');
     card.style.cssText = 'background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;';
     const statusBadge = it.status === 'applied' ? '<span class="badge" style="background:#dcfce7;color:#166534;">Digunakan</span>'
@@ -20620,7 +20652,10 @@ function aic_render() {
       : it.status === 'skipped' ? '<span class="badge" style="background:#f1f5f9;color:#64748b;">Dilangkau</span>' : '';
     let inner = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
       <div style="font-weight:700;font-size:14px;">${escapeHtml(it.area)} — ${escapeHtml(it.element)} <span style="font-weight:400;color:#64748b;font-size:12px;">(${escapeHtml(it.type)})</span></div>${statusBadge}</div>
-      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:13px;margin-top:8px;"><div style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Asal</div>${escapeHtml(it.originalDescription)}</div>`;
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:13px;margin-top:8px;"><div style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Asal</div>${it.originalDescription ? escapeHtml(it.originalDescription) : '<span style="color:#94a3b8;font-style:italic;">(kosong)</span>'}</div>`;
+    if (it.empty && it.status === 'pending') {
+      inner += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px;font-size:12.5px;color:#991b1b;margin-top:6px;"><strong>Description kosong</strong> — sila isi menggunakan butang "Edit sendiri" di bawah.</div>`;
+    }
     if (it.status === 'pending') {
       if (it.fix) inner += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px;font-size:13px;margin-top:6px;"><div style="font-size:10px;font-weight:800;color:#b91c1c;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Pembetulan ejaan</div>${escapeHtml(it.fix)}<div style="margin-top:6px;"><button class="btn" style="padding:6px 12px;font-size:12px;background:#059669;" onclick="aic_useText(${i},'fix')" type="button">Guna pembetulan</button></div></div>`;
       if (it.sugg) inner += `<div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:8px;font-size:13px;margin-top:6px;"><div style="font-size:10px;font-weight:800;color:#0f766e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Cadangan teknikal</div>${escapeHtml(it.sugg)}<div style="margin-top:6px;"><button class="btn" style="padding:6px 12px;font-size:12px;background:#0284c7;" onclick="aic_useText(${i},'sugg')" type="button">Guna cadangan</button></div></div>`;
