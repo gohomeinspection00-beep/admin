@@ -14,7 +14,7 @@ const clients = [
     penerima: [
       {
         nama: "NICE FRONTIER SDN. BHD. (199401014059 / 299739-U)",
-        alamat: ["Level 29, IOI City Tower 2,", "Lebuh IRC, IOI Resort City,", "62502 Putrajaya, WP Putrajaya.", "Tel: +607-5959 222"],
+        alamat: ["Level 29, IOI City Tower 2,", "Lebuh IRC, IOI Resort City,", "62502 Putrajaya, WP Putrajaya.", "Tel: +607-5959 222 / Fax: +607-5959 226", "E-mel: sa.ku@ioigroup.com"],
         nota: "Alamat utama (SPA)",
       },
       {
@@ -39,7 +39,7 @@ const clients = [
     penerima: [
       {
         nama: "TH TEBRAU LAND SDN. BHD. (985928-D)",
-        alamat: ["PTD 209290, Jalan Kunyit,", "Taman Sri Amar,", "81100 Johor Bahru, Johor."],
+        alamat: ["PTD 209290, Jalan Kunyit,", "Taman Sri Amar,", "81100 Johor Bahru, Johor.", "Tel: 07-338 1188 / 012-713 1119", "E-mel: frederick.ngkf@thtebrau.com.my"],
         nota: "Alamat pemaju",
       },
     ],
@@ -59,7 +59,7 @@ const clients = [
     penerima: [
       {
         nama: "INTACT CORPORATE APPROACH SDN BHD (201301019840 / 1049670-K)",
-        alamat: ["Level 18, Ho Hup Tower,", "1, Persiaran Jalil 1, Bandar Bukit Jalil,", "57000 Kuala Lumpur."],
+        alamat: ["Level 18, Ho Hup Tower,", "1, Persiaran Jalil 1, Bandar Bukit Jalil,", "57000 Kuala Lumpur.", "Tel: 07-661 5166 / 018-951 5166", "E-mel: brendansoh@hohupgroup.com.my"],
         nota: "Surat 1 — Ibu Pejabat (HQ)",
       },
       {
