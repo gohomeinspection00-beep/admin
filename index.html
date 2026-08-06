@@ -7444,6 +7444,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
   <button class="wbtn" data-tool="circle" type="button">Circle</button>
   <button class="wbtn" data-tool="arrow" type="button">Arrow</button>
   <button class="wbtn" data-tool="freehand" type="button">Freehand</button>
+  <button class="wbtn" data-tool="text" type="button">Text</button>
 
   <div style="border-left:1px solid var(--line);height:24px;margin:0 4px"></div>
 
@@ -9944,7 +9945,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'voice-fix-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'annotate-text-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -28577,6 +28578,16 @@ if (fillSel) {
     e.preventDefault();
     annCanvas.setPointerCapture?.(e.pointerId);
     const p = getPos(e);
+    // Text tool: tap the spot -> type the label -> placed immediately (no drag).
+    // Wrong spot? Undo and tap again.
+    if (annTool === 'text') {
+      const t = (window.prompt('Taip teks untuk diletakkan:') || '').trim();
+      if (t) {
+        annShapes.push({ tool: 'text', start: p, end: p, text: t, color: strokeColor, width: strokeWidth, filled: false, points: [] });
+      }
+      requestRedraw();
+      return;
+    }
     drawing = true;
     curShape = mkShape(annTool, p, p, strokeColor, strokeWidth, (annFillMode === 'fill'));
     if (annTool==='freehand') curShape.points=[p];
@@ -28703,6 +28714,25 @@ function drawShape(s){
     }
     ctx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
     ctx.stroke();
+  }
+  else if (s.tool==='text') {
+    const t = s.text || '';
+    if (t) {
+      // Font size follows the Width slider, scaled to the photo so the exported JPEG
+      // keeps the same proportion the user saw. White outline keeps it readable on
+      // any photo background; fill uses the chosen swatch colour.
+      const dpr = (typeof CANVAS_DPR !== 'undefined' && CANVAS_DPR) ? CANVAS_DPR : 1;
+      const cssW = (annCanvas ? annCanvas.width : 800) / dpr;
+      const fs = Math.max(14, Math.round(cssW * (0.030 + (width - 3) * 0.009)));
+      ctx.font = '700 ' + fs + 'px "Segoe UI", Arial, sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = Math.max(2, Math.round(fs / 8));
+      ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+      ctx.strokeText(t, s.start.x, s.start.y);
+      ctx.fillStyle = color;
+      ctx.fillText(t, s.start.x, s.start.y);
+    }
   }
   ctx.restore();
 }
