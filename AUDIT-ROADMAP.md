@@ -95,3 +95,18 @@ Firebase/AI network-only, cache berversi (`GOINSPECT_BUILD`) + auto-buang cache 
 ## Cadangan urutan
 **A → B → C → D → E → F.** Fasa A & B paling penting (duit & data). F terakhir masa publish.
 Setiap fasa diverify & commit berasingan; awak boleh uji antara fasa.
+
+
+---
+
+## SENARAI SEMAK PRA-PUBLISH (ingatkan owner sebelum deploy/publish akhir)
+
+1. **Obfuscate/minify kod deploy** — bina saluran minify+obfuscate untuk index.html &
+   admin_panel.html supaya Inspect/View-Source tidak dedahkan kod sumber boleh-baca
+   (perlindungan IP). Versi sumber kekal dalam repo; hanya salinan deploy diserabutkan.
+   Uji headless penuh sebelum guna. (Diminta owner: buat BILA nak publish, bukan sekarang.)
+2. **Fasa F — PWA offline** (manifest.webmanifest + sw.js + ikon 192/512, cache berversi
+   ikut GOINSPECT_BUILD, HTML network-first) — buang 404 console & boleh guna offline.
+3. (Pilihan) Bungkus ke Play Store (TWA/Capacitor) selepas PWA siap.
+4. Budget cap Google Cloud (kalau belum diset).
+5. Semak semula Fasa D (report edge cases) & baki isu LOW jika mahu.
