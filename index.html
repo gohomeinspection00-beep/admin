@@ -7461,6 +7461,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
   <div id="colorRow" class="row-wrap"></div>
 </div>
 
+    <div id="annSelectHint" style="display:none;font-size:12px;color:#0369a1;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:6px 10px;">Tap shape/teks untuk pilih · Seret untuk gerak · Teks: petak biru = saiz, bulatan = pusing</div>
     <canvas id="annotateCanvas" style="border:1px solid var(--line);border-radius:8px;max-width:100%"></canvas>
     <div class="row-wrap">
       <button class="btn ghost" id="annUndo" type="button">Undo</button>
@@ -9959,7 +9960,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'annotate-select-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'annotate-select-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -28455,6 +28456,8 @@ function setToolActive(tool){
   qa('#annotateToolbar [data-tool]').forEach(b => b.setAttribute('aria-pressed', b.getAttribute('data-tool')===tool ? 'true' : 'false'));
   // Leaving Select clears the selection so drawing tools behave exactly as before.
   if (tool !== 'select') { annSelected = -1; annDragMode = null; annDragData = null; }
+  const hint = q('#annSelectHint');
+  if (hint) hint.style.display = (tool === 'select') ? '' : 'none';
   if (typeof updateDeleteSelBtn === 'function') updateDeleteSelBtn();
   if (annCtx) requestRedraw();
 }
@@ -28854,17 +28857,20 @@ function shapeIndexAt(p){
 function selHandles(s){
   if (s.tool !== 'text') return null;
   const b = annTextBox(s), ang = s.rotation || 0;
+  // Text near the top edge: put the rotate handle BELOW the box so it stays reachable.
+  const flip = s.start.y < 64;
   return {
     scale:  annRotPt({ x: s.start.x + b.w,     y: s.start.y + b.h }, s.start, ang),
-    rotate: annRotPt({ x: s.start.x + b.w / 2, y: s.start.y - 28 }, s.start, ang),
-    box: b
+    rotate: annRotPt({ x: s.start.x + b.w / 2, y: flip ? (s.start.y + b.h + 32) : (s.start.y - 32) }, s.start, ang),
+    flip, box: b
   };
 }
 function selHandleAt(s, p){
   const h = selHandles(s);
   if (!h) return null;
-  if (Math.hypot(p.x - h.scale.x,  p.y - h.scale.y)  <= 16) return 'scale';
-  if (Math.hypot(p.x - h.rotate.x, p.y - h.rotate.y) <= 16) return 'rotate';
+  // generous 24px touch radius for fingers on small screens
+  if (Math.hypot(p.x - h.scale.x,  p.y - h.scale.y)  <= 24) return 'scale';
+  if (Math.hypot(p.x - h.rotate.x, p.y - h.rotate.y) <= 24) return 'rotate';
   return null;
 }
 function applySelTransform(s, mode, dd, p){
@@ -28894,15 +28900,18 @@ function drawSelectionOverlay(s){
   ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
   if (s.tool === 'text') {
     const b = annTextBox(s);
+    const flip = s.start.y < 64; // must match selHandles
     ctx.translate(s.start.x, s.start.y);
     ctx.rotate(s.rotation || 0);
     ctx.strokeRect(-4, -4, b.w + 8, b.h + 8);
     ctx.setLineDash([]);
-    // rotate handle: stem + circle above the box
-    ctx.beginPath(); ctx.moveTo(b.w / 2, -4); ctx.lineTo(b.w / 2, -28); ctx.stroke();
-    ctx.beginPath(); ctx.arc(b.w / 2, -28, 8, 0, Math.PI * 2); ctx.fillStyle = '#0284c7'; ctx.fill();
-    // scale handle: square at the bottom-right corner
-    ctx.fillRect(b.w - 8, b.h - 8, 16, 16);
+    // rotate handle: stem + circle (above the box, or below when near the top edge)
+    const ry = flip ? (b.h + 32) : -32;
+    const edge = flip ? (b.h + 4) : -4;
+    ctx.beginPath(); ctx.moveTo(b.w / 2, edge); ctx.lineTo(b.w / 2, ry); ctx.stroke();
+    ctx.beginPath(); ctx.arc(b.w / 2, ry, 11, 0, Math.PI * 2); ctx.fillStyle = '#0284c7'; ctx.fill();
+    // scale handle: bigger square at the bottom-right corner (finger-friendly)
+    ctx.fillRect(b.w - 11, b.h - 11, 22, 22);
   } else {
     let x1, y1, x2, y2;
     if (s.tool === 'freehand') {
