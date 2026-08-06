@@ -9976,7 +9976,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'front-crop-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'ai-check-v3'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -20561,7 +20561,9 @@ function aic_open(fromSection) {
   let cands = eligible.filter(d => (d.description || '').trim());
   if (!cands.length && !emptyItems.length) { alert('Tiada description untuk disemak.'); return; }
   let capped = false;
-  if (cands.length > 100) { cands = cands.slice(0, 100); capped = true; }
+  // Check ALL defects; 500 is a safety ceiling only (cost stays tiny — ~RM0.15 per
+  // 300 defects — and the 60s cooldown still guards against spam).
+  if (cands.length > 500) { cands = cands.slice(0, 500); capped = true; }
   aic_returnTo = fromSection || 'finding';
   aic_run(p, cands, capped, emptyItems);
 }
@@ -20671,7 +20673,7 @@ function aic_render() {
     chip('mism', 'Tak padan: ' + nMism, '#fef3c7', '#b45309') +
     `<span class="badge" style="background:#dcfce7;color:#166534;">OK: ${nOk}</span>` +
     (aic_filter !== 'all' ? `<button type="button" class="badge" onclick="aic_setFilter('all')" style="background:#f1f5f9;color:#334155;margin-left:6px;cursor:pointer;">Tunjuk semua</button>` : '') +
-    (aic_results.capped ? `<div style="font-size:12px;color:#b45309;margin-top:6px;">Nota: hanya 100 defect pertama disemak.</div>` : '');
+    (aic_results.capped ? `<div style="font-size:12px;color:#b45309;margin-top:6px;">Nota: hanya 500 defect pertama disemak.</div>` : '');
   list.innerHTML = '';
   const shown = items.filter(aic_matchFilter).length;
   if (empty) empty.style.display = (items.length && shown) ? 'none' : 'block';
