@@ -9944,7 +9944,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'ai-check-v2'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'voice-fix-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -42153,6 +42153,7 @@ let ayie_featureChatEnabled = true;
 let ayie_featureTalkEnabled = true;
 let ayie_featureAutoPlanEnabled = true;
 let ayie_featureAiCheckEnabled = true; // AI description check (remote kill-switch: ayieConfig.featureAiCheck)
+let ayie_featureVoiceAiEnabled = true; // AI dictation cleaner (remote kill-switch: ayieConfig.featureVoiceAI)
 let ayie_adminWhatsApp = '';
 let ayie_chatCleanupDays = 0; // 0 = no auto-cleanup
 
@@ -42186,6 +42187,7 @@ async function ayie_loadConfig() {
       if (typeof data.featureTalk === 'boolean') ayie_featureTalkEnabled = data.featureTalk;
       if (typeof data.featureAutoPlan === 'boolean') ayie_featureAutoPlanEnabled = data.featureAutoPlan;
       if (typeof data.featureAiCheck === 'boolean') ayie_featureAiCheckEnabled = data.featureAiCheck;
+      if (typeof data.featureVoiceAI === 'boolean') ayie_featureVoiceAiEnabled = data.featureVoiceAI;
       // Hide the AI-check entry buttons when remotely disabled
       try {
         const _aicBtns = [document.getElementById('btnAiCheckSettings'), document.getElementById('btnAiCheckSetup')];
@@ -43724,7 +43726,72 @@ async function voice_loadCorrections() {
     console.log('Voice: No corrections loaded');
   }
 }
-setTimeout(() => voice_loadCorrections(), 2000);
+// FIX (mic): the corrections doc read requires a signed-in user (security rules), but
+// this used to fire ONCE at t+2s — before Firebase restored the session — so the list
+// silently stayed empty forever and admin corrections never applied. Retry with backoff
+// until signed-in + loaded (or give up after ~2 minutes); also lazy-loaded on mic use.
+(function voice_correctionsBoot(attempt = 0) {
+  setTimeout(async () => {
+    try {
+      if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+        await voice_loadCorrections();
+        if (Object.keys(voice_corrections).length > 0) return; // loaded — done
+      }
+    } catch (e) {}
+    if (attempt < 12) voice_correctionsBoot(attempt + 1);
+  }, attempt === 0 ? 2000 : 10000);
+})();
+
+// AI transcript cleaner (Fix B): fixes speech-recognition errors in the dictated note
+// (Malay/English mix, technical terms) via the existing Gemini proxy. Returns the
+// improved text, or null when: disabled, offline, proxy error, output suspicious
+// (changed numbers / far too long) or unchanged. NEVER throws.
+async function voice_aiClean(text) {
+  try {
+    if (typeof ayie_featureVoiceAiEnabled !== 'undefined' && !ayie_featureVoiceAiEnabled) return null;
+    if (!navigator.onLine || !text || !text.trim()) return null;
+    const resp = await aiGeminiFetch(ayie_model || 'gemini-2.5-flash', {
+      contents: [{ parts: [{ text:
+`Dictated property-inspection defect note (Malay/English mix, produced by speech-to-text, may contain misrecognized words):
+"${text}"
+Return ONLY the corrected sentence: fix obvious speech-recognition mistakes and mangled technical terms (crack, skirting, hollow, touch-up, etc.), keep the same language mix, keep the meaning and ALL numbers exactly, add nothing. No quotes, no explanations.` }] }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 200 }
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    let out = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+    out = out.replace(/^["'`]+|["'`]+$/g, '').trim();
+    if (!out || out === text) return null;
+    if (out.length > text.length * 3 + 40) return null; // suspiciously long -> reject
+    const nums = s => (((s || '').match(/\d+(?:\.\d+)?/g)) || []).join(',');
+    if (nums(out) !== nums(text)) return null; // must not change measurements
+    return out;
+  } catch (e) { return null; }
+}
+
+// Insert a dictated transcript into the target textarea (corrections first, immediate),
+// then asynchronously replace the inserted segment with the AI-cleaned version — but
+// ONLY if the user hasn't touched that segment meanwhile. Testable standalone.
+function voice_applyTranscript(textarea, targetId, transcript) {
+  const corrected = voice_autoCorrect(transcript);
+  const existing = textarea.value;
+  const separator = existing && !existing.endsWith(' ') && !existing.endsWith('\n') ? ' ' : '';
+  const insertStart = (existing + separator).length;
+  textarea.value = existing + separator + corrected;
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  const status = document.getElementById('voice_status_' + targetId);
+  if (status) { status.textContent = 'Selesai: ' + corrected; }
+  voice_aiClean(corrected).then(better => {
+    if (!better) return;
+    const cur = textarea.value;
+    if (cur.substring(insertStart) !== corrected) return; // user edited — leave it alone
+    textarea.value = cur.substring(0, insertStart) + better;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    const st = document.getElementById('voice_status_' + targetId);
+    if (st) { st.textContent = 'AI perbaiki: ' + better; st.classList.add('voice_show'); setTimeout(() => st.classList.remove('voice_show'), 2500); }
+  });
+  return corrected;
+}
 
 // ---- Auto-Correct Function ----
 function voice_autoCorrect(text) {
@@ -43832,6 +43899,10 @@ function voice_start(targetId, btn) {
   const textarea = document.getElementById(targetId);
   if (!textarea) return;
 
+  // Lazy safety net for the corrections list (see voice_correctionsBoot): if it is
+  // still empty and we're signed in now, load it — ready by the time speech ends.
+  try { if (Object.keys(voice_corrections).length === 0 && firebase.auth().currentUser) voice_loadCorrections(); } catch (e) {}
+
   try {
     voice_recognition = new voice_SpeechRecognition();
     voice_recognition.lang = 'ms-MY';
@@ -43851,17 +43922,9 @@ function voice_start(targetId, btn) {
       if (event.results.length === 0) return;
       const transcript = event.results[0][0].transcript;
       if (!transcript) return;
-
-      const corrected = voice_autoCorrect(transcript);
-
-      // Append to existing text
-      const existing = textarea.value;
-      const separator = existing && !existing.endsWith(' ') && !existing.endsWith('\n') ? ' ' : '';
-      textarea.value = existing + separator + corrected;
-      textarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-      const status = document.getElementById('voice_status_' + targetId);
-      if (status) { status.textContent = 'Selesai: ' + corrected; }
+      // Corrections applied immediately; AI polish replaces the inserted segment
+      // asynchronously (only if the user hasn't edited it) — see voice_applyTranscript.
+      voice_applyTranscript(textarea, targetId, transcript);
     };
 
     voice_recognition.onerror = function(event) {
