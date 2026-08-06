@@ -117,7 +117,7 @@
   *{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html,body,.a4{ background:#fff !important; margin:0 !important; padding:0 !important; }
   .report-tag, .tag{ color:#fff !important; border:2px solid #fff !important; }
-  .header,.no-print,#home,#about,#areas,#finding,#history,#compile,#reportSetup,.zoom-controls,.bottom-nav,#profile,#orders,.fab,#bottomNav,#loginPage,#trackInspectionList,#trackInspectionAdd,#trackInspectionDetail,#mpSelectProject,#mpDashboard,#mpPhaseDetail,#mpItemEdit,#mpTradeManager,#aiChat,#aiTalk,#svUnitList,#svUnitAdd,#svUnitDetail{display:none !important; height:0 !important; overflow:hidden !important;}
+  .header,.no-print,#home,#about,#areas,#finding,#history,#compile,#reportSetup,#aiCheck,.zoom-controls,.bottom-nav,#profile,#orders,.fab,#bottomNav,#loginPage,#trackInspectionList,#trackInspectionAdd,#trackInspectionDetail,#mpSelectProject,#mpDashboard,#mpPhaseDetail,#mpItemEdit,#mpTradeManager,#aiChat,#aiTalk,#svUnitList,#svUnitAdd,#svUnitDetail{display:none !important; height:0 !important; overflow:hidden !important;}
   #report,#trackReportPreview,#mpReport,#svReport{display:block !important;}
   @page{size:A4; margin:0;}
   #reportRoot,#trackReportRoot,#mpReportRoot,#svReportRoot{margin:0 !important; transform: none !important; padding:0 !important; width:100% !important;}
@@ -4592,6 +4592,23 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
     </div>
   </section>
 
+  <!-- AI CHECK RESULTS -->
+  <section id="aiCheck" hidden>
+    <div class="card stack">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2 style="margin:0">Semak AI</h2>
+        <button class="btn ghost" onclick="show(typeof aic_returnTo !== 'undefined' ? aic_returnTo : 'finding')">← Back</button>
+      </div>
+      <p style="margin:0;color:var(--muted);font-size:13px;">Keputusan tidak disimpan — selesaikan semakan sebelum tutup. AI tidak mengubah apa-apa tanpa tekanan anda.</p>
+      <div id="aicSummary"></div>
+      <div id="aicList" class="stack" style="gap:10px"></div>
+      <div id="aicEmpty" style="display:none;color:var(--muted);font-size:14px;padding:20px;text-align:center;">Semua description OK — tiada isu dijumpai.</div>
+      <div id="aicBulkBar" style="position:sticky;bottom:8px;background:var(--card,#fff);padding-top:8px;">
+        <button class="btn" id="btnAicBulk" onclick="aic_bulkFixes()" style="width:100%;background:linear-gradient(135deg,#059669,#047857);">Guna semua pembetulan ejaan</button>
+      </div>
+    </div>
+  </section>
+
   <!-- DIALOG: Auto-Submit job export (interface for the PC runner) -->
   <dialog id="autoSubmitExportDialog">
     <div class="card stack" style="max-width:560px;max-height:85vh;overflow-y:auto;">
@@ -6214,6 +6231,7 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
         <button class="btn ghost" style="width:100%; text-align:left; border-radius:0 0 8px 8px;" onclick="exportInspectionFormat()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>Inspection Format</button>
       </div>
     </div>
+    <button class="btn ghost" id="btnAiCheckSetup" onclick="aic_open('reportSetup')" style="display:inline-flex;align-items:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 2l1.9 5.8L20 9.7l-5.1 3.6L16.2 20 12 16.9 7.8 20l1.3-6.7L4 9.7l6.1-1.9z"/></svg>Semak AI</button>
     <button class="btn ghost" data-nav="about">Project</button>
     <button class="btn ghost" data-nav="areas">Areas</button>
     <button class="btn ghost" data-nav="finding">Findings</button>
@@ -7569,6 +7587,10 @@ body.reinspection-mode .export-reinspection { display: inline-block !important; 
       <button class="settings-menu-btn" onclick="closeSettingsPopup();fnr_open()">
         <span class="settings-menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
         <span>Find &amp; Replace</span>
+      </button>
+      <button class="settings-menu-btn" id="btnAiCheckSettings" onclick="closeSettingsPopup();aic_open('finding')">
+        <span class="settings-menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 2l1.9 5.8L20 9.7l-5.1 3.6L16.2 20 12 16.9 7.8 20l1.3-6.7L4 9.7l6.1-1.9z"/></svg></span>
+        <span>Semak AI (Ejaan &amp; Kualiti)</span>
       </button>
       <!-- Re-Inspection Status Option - hanya show bila RE_INSPECTION_MODE -->
       <button class="settings-menu-btn" id="btnReInspectStatusSettings" onclick="openReInspectStatusSettings()" style="display:none; background:linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); border:2px solid var(--accent);">
@@ -9922,7 +9944,7 @@ const getUserSession = async () => {
 // AUTH_ENFORCED = true and authGateOk() returns false on no-auth, so callers
 // skip-and-stay-local instead of hitting a denied write. Never throws / shows UI.
 let AUTH_ENFORCED = true; // Phase 2: ON. Deploy this app FIRST, then deploy firestore.rules. Set back to false to instantly disable enforcement if needed.
-window.GOINSPECT_BUILD = 'autosubmit-ui-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
+window.GOINSPECT_BUILD = 'ai-check-v1'; // version marker — verify in DevTools console: GOINSPECT_BUILD
 let _lastAuthAttempt = 0;
 const _AUTH_RETRY_MS = 30000; // cooldown so a failing silent re-auth isn't retried every call
 
@@ -15998,6 +16020,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'finding': 'areas',
           'areaDetail': 'finding',
           'reportSetup': 'finding',
+          'aiCheck': 'finding',
           'report': 'reportSetup',
           'reInspectionMenu': 'home',
           'defectFormMenu': 'home',
@@ -20459,6 +20482,231 @@ q('#submissionImport').addEventListener('change', async e => {
   document.body.classList.remove('reinspection-mode');
   e.target.value = '';
 });
+
+/* ========= AI CHECK REPORT (spelling / phrasing / mismatch) ========= */
+// Batch-checks defect descriptions via the existing Gemini proxy. READ-ONLY until the
+// user taps apply; every apply resolves the defect by _syncId and skips if the text
+// changed since the check (multi-device safety). Normal mode only.
+let aic_results = null; // { projectId, checkedAt, total, items: [...] }
+let aic_returnTo = 'finding';
+
+function aic_showOverlay(msg) {
+  let d = document.getElementById('aicOverlay');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'aicOverlay';
+    d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff';
+    d.innerHTML = '<div style="width:44px;height:44px;border:4px solid rgba(255,255,255,0.25);border-top-color:#7c3aed;border-radius:50%;animation:aicSpin 0.9s linear infinite"></div><div id="aicOverlayMsg" style="margin-top:14px;font-size:15px;font-weight:700"></div><style>@keyframes aicSpin{to{transform:rotate(360deg)}}</style>';
+    document.body.appendChild(d);
+  }
+  d.style.display = 'flex';
+  const m = document.getElementById('aicOverlayMsg'); if (m) m.textContent = msg;
+}
+function aic_hideOverlay() { document.getElementById('aicOverlay')?.remove(); }
+
+function aic_open(fromSection) {
+  if (!ayie_featureAiCheckEnabled) { alert('Ciri Semak AI dimatikan.'); return; }
+  if (RE_INSPECTION_MODE || SUBMISSION_MODE || DEFECT_FORM_MODE) { alert('Semak AI hanya untuk mod normal (bukan re-inspection/submission).'); return; }
+  if (!navigator.onLine) { alert('Semak AI perlukan sambungan internet.'); return; }
+  const p = getProject();
+  if (!p) { alert('Tiada projek dibuka.'); return; }
+  const last = parseInt(localStorage.getItem('goinspect.aiCheckLastRun') || '0');
+  const waitMs = 60000 - (Date.now() - last);
+  if (waitMs > 0) { alert('Sila tunggu ' + Math.ceil(waitMs / 1000) + ' saat sebelum semakan seterusnya.'); return; }
+  let cands = (p.defects || []).filter(d => d && !d._deleted
+    && !d.isNewInReInspection && !d.isNewInSecondReInspection && !d.isNewInThirdReInspection
+    && (d.description || '').trim());
+  if (!cands.length) { alert('Tiada description untuk disemak.'); return; }
+  let capped = false;
+  if (cands.length > 100) { cands = cands.slice(0, 100); capped = true; }
+  aic_returnTo = fromSection || 'finding';
+  aic_run(p, cands, capped);
+}
+
+async function aic_run(p, cands, capped) {
+  localStorage.setItem('goinspect.aiCheckLastRun', String(Date.now()));
+  cands.forEach(d => { if (!d._syncId) d._syncId = generateSecureId('def'); });
+  aic_showOverlay('Memeriksa 0/' + cands.length + '...');
+  const items = [];
+  const BATCH = 20; // small batches: big ones overflow the output-token limit
+  try {
+    for (let off = 0; off < cands.length; off += BATCH) {
+      const batch = cands.slice(off, off + BATCH);
+      aic_showOverlay('Memeriksa ' + Math.min(off + BATCH, cands.length) + '/' + cands.length + '...');
+      const rows = batch.map((d, i) => `[${i}] Area: ${d.location || '-'} | Element: ${d.element || '-'} | Type: ${d.type || '-'} | Description: ${d.description}`).join('\n');
+      const prompt = `You are checking property-inspection defect descriptions. They may be written in Malay, English, or a mix — ALWAYS keep each description's original language; never translate technical terms.
+For EACH item check:
+1. "fix": the description with spelling/typo errors corrected ONLY (same language, keep ALL numbers/measurements EXACTLY, meaning identical). null if no spelling errors.
+2. "sugg": a clearer, more professional phrasing (same language as the original, concise, max 200 characters, do NOT invent details, locations or numbers that are not in the original). null if the original is already clear.
+3. "mismatch": if the description clearly does NOT match the given Element or Type, a short reason (in the description's language). null if it matches.
+
+Items:
+${rows}
+
+Respond ONLY with a valid JSON array (no markdown), containing ONLY items that have at least one non-null finding:
+[{"idx":0,"fix":null,"sugg":"...","mismatch":null}]`;
+      const resp = await aiGeminiFetch(ayie_model || 'gemini-2.5-flash', {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.2, maxOutputTokens: 8192, responseMimeType: 'application/json' }
+      });
+      if (!resp.ok) throw new Error('AI error ' + resp.status);
+      const data = await resp.json();
+      if (data.candidates?.[0]?.finishReason === 'MAX_TOKENS') console.warn('AI check: batch output truncated');
+      let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+      text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+      let arr = [];
+      try { arr = JSON.parse(text); } catch (e) {
+        const m = text.match(/\[[\s\S]*\]/);
+        if (m) { try { arr = JSON.parse(m[0]); } catch (e2) {} }
+      }
+      if (!Array.isArray(arr)) arr = [];
+      arr.forEach(r => {
+        const d = batch[r && r.idx];
+        if (!d) return;
+        const item = aic_validate(d, r);
+        if (item) items.push(item);
+      });
+      if (off + BATCH < cands.length) await new Promise(r => setTimeout(r, 800));
+    }
+    aic_results = { projectId: p.id, checkedAt: Date.now(), total: cands.length, capped, items };
+    aic_render();
+    show('aiCheck');
+  } catch (err) {
+    console.error('AI check error:', err);
+    alert('Semakan AI gagal: ' + ((err && err.message) || err) + '\nCuba lagi sebentar.');
+  } finally { aic_hideOverlay(); }
+}
+
+// Guard-rails: corrections must not change numbers/measurements; suggestions must not
+// introduce numbers absent from the original; sane length caps.
+function aic_numTokens(s) { return (((s || '').match(/\d+(?:\.\d+)?/g)) || []).join(','); }
+function aic_validate(d, r) {
+  const orig = d.description || '';
+  let fix = (typeof r.fix === 'string' && r.fix.trim() && r.fix.trim() !== orig.trim()) ? r.fix.trim() : null;
+  let sugg = (typeof r.sugg === 'string' && r.sugg.trim() && r.sugg.trim() !== orig.trim()) ? r.sugg.trim() : null;
+  const mism = (typeof r.mismatch === 'string' && r.mismatch.trim()) ? r.mismatch.trim() : null;
+  if (fix && (aic_numTokens(fix) !== aic_numTokens(orig) || fix.length > orig.length * 2 + 30)) fix = null;
+  if (sugg) {
+    const origNums = new Set(((orig.match(/\d+(?:\.\d+)?/g)) || []));
+    const suggNums = ((sugg.match(/\d+(?:\.\d+)?/g)) || []);
+    if (suggNums.some(n => !origNums.has(n)) || sugg.length > 300) sugg = null;
+  }
+  if (!fix && !sugg && !mism) return null;
+  return { syncId: d._syncId, area: d.location || '-', element: d.element || '-', type: d.type || '-',
+    originalDescription: orig, fix, sugg, mismatch: mism, status: 'pending' };
+}
+
+function aic_render() {
+  const list = q('#aicList'), sum = q('#aicSummary'), empty = q('#aicEmpty'), bulkBtn = q('#btnAicBulk');
+  if (!aic_results || !list) return;
+  const items = aic_results.items;
+  const nFix = items.filter(i => i.fix).length;
+  const nSugg = items.filter(i => i.sugg).length;
+  const nMism = items.filter(i => i.mismatch).length;
+  const nOk = aic_results.total - items.length;
+  if (sum) sum.innerHTML =
+    `<span class="badge" style="background:#fee2e2;color:#b91c1c;margin-right:6px;">Ejaan: ${nFix}</span>` +
+    `<span class="badge" style="background:#e0f2fe;color:#0369a1;margin-right:6px;">Cadangan: ${nSugg}</span>` +
+    `<span class="badge" style="background:#fef3c7;color:#b45309;margin-right:6px;">Tak padan: ${nMism}</span>` +
+    `<span class="badge" style="background:#dcfce7;color:#166534;">OK: ${nOk}</span>` +
+    (aic_results.capped ? `<div style="font-size:12px;color:#b45309;margin-top:6px;">Nota: hanya 100 defect pertama disemak.</div>` : '');
+  list.innerHTML = '';
+  if (empty) empty.style.display = items.length ? 'none' : 'block';
+  items.forEach((it, i) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;';
+    const statusBadge = it.status === 'applied' ? '<span class="badge" style="background:#dcfce7;color:#166534;">Digunakan</span>'
+      : it.status === 'changed' ? '<span class="badge" style="background:#fef3c7;color:#b45309;">Berubah — semak semula</span>'
+      : it.status === 'skipped' ? '<span class="badge" style="background:#f1f5f9;color:#64748b;">Dilangkau</span>' : '';
+    let inner = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <div style="font-weight:700;font-size:14px;">${escapeHtml(it.area)} — ${escapeHtml(it.element)} <span style="font-weight:400;color:#64748b;font-size:12px;">(${escapeHtml(it.type)})</span></div>${statusBadge}</div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:13px;margin-top:8px;"><div style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Asal</div>${escapeHtml(it.originalDescription)}</div>`;
+    if (it.status === 'pending') {
+      if (it.fix) inner += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px;font-size:13px;margin-top:6px;"><div style="font-size:10px;font-weight:800;color:#b91c1c;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Pembetulan ejaan</div>${escapeHtml(it.fix)}<div style="margin-top:6px;"><button class="btn" style="padding:6px 12px;font-size:12px;background:#059669;" onclick="aic_useText(${i},'fix')" type="button">Guna pembetulan</button></div></div>`;
+      if (it.sugg) inner += `<div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:8px;font-size:13px;margin-top:6px;"><div style="font-size:10px;font-weight:800;color:#0f766e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Cadangan teknikal</div>${escapeHtml(it.sugg)}<div style="margin-top:6px;"><button class="btn" style="padding:6px 12px;font-size:12px;background:#0284c7;" onclick="aic_useText(${i},'sugg')" type="button">Guna cadangan</button></div></div>`;
+    }
+    if (it.mismatch) inner += `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px;font-size:12.5px;color:#92400e;margin-top:6px;"><strong>Tak padan:</strong> ${escapeHtml(it.mismatch)}</div>`;
+    inner += `<div style="margin-top:8px;display:flex;gap:8px;">
+      <button class="btn ghost" style="padding:6px 12px;font-size:12px;" onclick="aic_editSelf(${i})" type="button">Edit sendiri</button>
+    </div>
+    <div id="aicEdit_${i}" style="display:none;margin-top:8px;">
+      <textarea id="aicEditTa_${i}" rows="3" style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:13px;"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button class="btn" style="padding:6px 12px;font-size:12px;background:#059669;" onclick="aic_saveSelf(${i})" type="button">Simpan</button>
+        <button class="btn ghost" style="padding:6px 12px;font-size:12px;" onclick="q('#aicEdit_${i}').style.display='none'" type="button">Batal</button>
+      </div>
+    </div>`;
+    card.innerHTML = inner;
+    list.appendChild(card);
+  });
+  const pendingFixes = items.filter(i => i.fix && i.status === 'pending').length;
+  if (bulkBtn) {
+    bulkBtn.textContent = 'Guna semua pembetulan ejaan (' + pendingFixes + ')';
+    bulkBtn.disabled = pendingFixes === 0;
+    bulkBtn.style.opacity = pendingFixes === 0 ? '0.5' : '1';
+  }
+}
+
+// Apply with multi-device safety: resolve by _syncId; skip if deleted or if the text
+// changed since the check; stamp _lastModified only on the defect actually mutated.
+function aic_apply(item, newText, save = true) {
+  const p = getProject();
+  if (!p || !aic_results || p.id !== aic_results.projectId) { alert('Projek telah bertukar — sila jalankan semakan semula.'); return false; }
+  const d = (p.defects || []).find(x => x._syncId === item.syncId);
+  if (!d || d._deleted) { item.status = 'skipped'; return false; }
+  if ((d.description || '') !== item.originalDescription) { item.status = 'changed'; return false; }
+  d.description = newText;
+  d._lastModified = (typeof getCalibratedTimestamp === 'function') ? getCalibratedTimestamp() : Date.now();
+  item.originalDescription = newText;
+  item.status = 'applied';
+  if (save) {
+    saveAllSafe();
+    try { if (firebase.auth().currentUser && typeof debouncedSync === 'function') debouncedSync(p.id); } catch (e) {}
+  }
+  return true;
+}
+window.aic_useText = (i, kind) => {
+  const item = aic_results?.items?.[i];
+  if (!item || item.status !== 'pending') return;
+  const text = kind === 'fix' ? item.fix : item.sugg;
+  if (!text) return;
+  aic_apply(item, text, true);
+  aic_render();
+};
+window.aic_editSelf = (i) => {
+  const item = aic_results?.items?.[i];
+  const wrap = q('#aicEdit_' + i), ta = q('#aicEditTa_' + i);
+  if (!item || !wrap || !ta) return;
+  const p = getProject();
+  const d = p && (p.defects || []).find(x => x._syncId === item.syncId);
+  // Refresh the baseline to the CURRENT text so a manual edit always starts from live data.
+  if (d && !d._deleted) item.originalDescription = d.description || '';
+  ta.value = item.originalDescription;
+  wrap.style.display = 'block';
+  ta.focus();
+};
+window.aic_saveSelf = (i) => {
+  const item = aic_results?.items?.[i];
+  const ta = q('#aicEditTa_' + i);
+  if (!item || !ta) return;
+  const text = ta.value.trim();
+  if (!text) { alert('Description tidak boleh kosong.'); return; }
+  if (aic_apply(item, text, true)) { const w = q('#aicEdit_' + i); if (w) w.style.display = 'none'; }
+  aic_render();
+};
+window.aic_bulkFixes = () => {
+  const items = (aic_results?.items || []).filter(i => i.fix && i.status === 'pending');
+  if (!items.length) return;
+  if (!confirm('Guna ' + items.length + ' pembetulan ejaan sekali gus?\n\n(Hanya pembetulan ejaan — maksud tidak berubah.)')) return;
+  let ok = 0, skip = 0;
+  items.forEach(it => { aic_apply(it, it.fix, false) ? ok++ : skip++; });
+  if (ok) {
+    saveAllSafe();
+    try { const p = getProject(); if (p && firebase.auth().currentUser && typeof debouncedSync === 'function') debouncedSync(p.id); } catch (e) {}
+  }
+  alert(ok + ' description dikemaskini.' + (skip ? '\n' + skip + ' dilangkau (berubah di peranti lain / dipadam).' : ''));
+  aic_render();
+};
 
 /* ========= AUTO-SUBMIT (interface for the PC runner) ========= */
 // Flow state. 'manual' keeps today's behaviour exactly; the automation flows only add
@@ -41869,6 +42117,7 @@ let ayie_customPrompt = '';
 let ayie_featureChatEnabled = true;
 let ayie_featureTalkEnabled = true;
 let ayie_featureAutoPlanEnabled = true;
+let ayie_featureAiCheckEnabled = true; // AI description check (remote kill-switch: ayieConfig.featureAiCheck)
 let ayie_adminWhatsApp = '';
 let ayie_chatCleanupDays = 0; // 0 = no auto-cleanup
 
@@ -41901,6 +42150,12 @@ async function ayie_loadConfig() {
       if (typeof data.featureChat === 'boolean') ayie_featureChatEnabled = data.featureChat;
       if (typeof data.featureTalk === 'boolean') ayie_featureTalkEnabled = data.featureTalk;
       if (typeof data.featureAutoPlan === 'boolean') ayie_featureAutoPlanEnabled = data.featureAutoPlan;
+      if (typeof data.featureAiCheck === 'boolean') ayie_featureAiCheckEnabled = data.featureAiCheck;
+      // Hide the AI-check entry buttons when remotely disabled
+      try {
+        const _aicBtns = [document.getElementById('btnAiCheckSettings'), document.getElementById('btnAiCheckSetup')];
+        _aicBtns.forEach(b => { if (b) b.style.display = ayie_featureAiCheckEnabled ? '' : 'none'; });
+      } catch (e) {}
 
       // Admin WhatsApp for support
       if (data.adminWhatsApp) ayie_adminWhatsApp = data.adminWhatsApp;
@@ -43305,6 +43560,9 @@ function fnr_replaceAll() {
     const newValue = oldValue.replace(findRegex, replaceText);
     if (newValue !== oldValue) {
       fnr_setFieldValue(d, target, newValue);
+      // FIX: stamp _lastModified so the replacement wins in cloud merge (without this
+      // the edit could silently lose to an older cloud copy on the next sync).
+      d._lastModified = (typeof getCalibratedTimestamp === 'function') ? getCalibratedTimestamp() : Date.now();
       replaced++;
     }
   });
