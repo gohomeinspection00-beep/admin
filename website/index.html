@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Go Home Inspection — Pemeriksaan Hartanah Profesional</title>
+<meta name="description" content="Pemeriksaan hartanah profesional di Lembah Klang. Laporan bergambar penuh, pemeriksaan semula dan sokongan sehingga kecacatan selesai dibaiki.">
+<meta name="theme-color" content="#0f766e">
+
+<!-- Open Graph / kongsi di WhatsApp & Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Go Home Inspection — Pemeriksaan Hartanah Profesional">
+<meta property="og:description" content="Pemeriksaan hartanah profesional di Lembah Klang. Laporan bergambar penuh dan pemeriksaan semula.">
+<meta property="og:image" content="assets/img/og-image.jpg">
+
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Terus ke kandungan</a>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">
+      <img src="assets/img/logo.png" alt="" class="brand-logo" onerror="this.style.display='none'">
+      <span class="brand-text" data-bind="companyName">Go Home Inspection</span>
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="#services" data-i18n="nav.services">Perkhidmatan</a>
+      <a href="#process" data-i18n="nav.process">Proses</a>
+      <a href="#packages" data-i18n="nav.packages">Pakej</a>
+      <a href="#about" data-i18n="nav.about">Tentang</a>
+      <a href="#faq" data-i18n="nav.faq">Soalan Lazim</a>
+      <a href="#contact" data-i18n="nav.contact">Hubungi</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="lang-toggle" id="langToggle" type="button" aria-label="Tukar bahasa">EN</button>
+      <a class="btn btn-primary btn-sm" data-cta href="#contact" data-i18n="nav.book">Tempah</a>
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <div class="wrap hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow" data-i18n="hero.eyebrow">Pemeriksa hartanah bertauliah</p>
+        <h1 data-i18n="hero.title">Jangan terima kunci sebelum rumah anda diperiksa.</h1>
+        <p class="lead" data-bind="tagline">Pemeriksaan hartanah profesional sebelum anda serah kunci.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" data-cta href="#contact" data-i18n="hero.cta1">Tempah pemeriksaan</a>
+          <a class="btn btn-ghost" href="#services" data-i18n="hero.cta2">Lihat perkhidmatan</a>
+        </div>
+        <ul class="hero-points">
+          <li data-i18n="hero.p1">Laporan PDF bergambar penuh</li>
+          <li data-i18n="hero.p2">Setiap kecacatan direkod &amp; dijejak</li>
+          <li data-i18n="hero.p3">Pemeriksaan semula selepas pembaikan</li>
+        </ul>
+      </div>
+      <div class="hero-media">
+        <img src="assets/img/hero.jpg" alt="" onerror="this.closest('.hero-media').classList.add('is-empty')">
+        <div class="hero-placeholder">
+          <span>📷</span>
+          <p>Letak gambar di <code>assets/img/hero.jpg</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="section" id="services">
+    <div class="wrap">
+      <h2 class="section-title" data-i18n="services.title">Perkhidmatan kami</h2>
+      <p class="section-sub" data-i18n="services.sub">Skop pemeriksaan yang kami sediakan untuk pemilik dan pembeli hartanah.</p>
+      <div class="grid grid-4" id="servicesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="section section-alt" id="process">
+    <div class="wrap">
+      <h2 class="section-title" data-i18n="process.title">Bagaimana ia berfungsi</h2>
+      <p class="section-sub" data-i18n="process.sub">Empat langkah mudah dari tempahan hingga kecacatan selesai.</p>
+      <ol class="steps" id="stepsList"></ol>
+    </div>
+  </section>
+
+  <!-- ============ PACKAGES ============ -->
+  <section class="section" id="packages">
+    <div class="wrap">
+      <h2 class="section-title" data-i18n="packages.title">Pakej</h2>
+      <p class="section-sub" data-i18n="packages.sub">Harga akhir bergantung saiz dan jenis hartanah. Hubungi kami untuk sebut harga tepat.</p>
+      <div class="grid grid-3" id="packagesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="section section-alt" id="about">
+    <div class="wrap about-inner">
+      <div>
+        <h2 class="section-title" data-i18n="about.title">Tentang kami</h2>
+        <p data-i18n="about.p1">Go Home Inspection ialah pasukan pemeriksa hartanah yang membantu pemilik rumah di Malaysia memastikan unit mereka diserahkan dalam keadaan yang sepatutnya.</p>
+        <p data-i18n="about.p2">Setiap pemeriksaan direkod menggunakan sistem GoInspect kami sendiri — setiap kecacatan bergambar, berlokasi dan boleh dijejak sehingga pemaju menyelesaikannya.</p>
+        <div class="stats">
+          <div class="stat"><strong>—</strong><span data-i18n="about.s1">Unit diperiksa</span></div>
+          <div class="stat"><strong>—</strong><span data-i18n="about.s2">Kecacatan direkod</span></div>
+          <div class="stat"><strong>—</strong><span data-i18n="about.s3">Tahun pengalaman</span></div>
+        </div>
+      </div>
+      <div class="about-media">
+        <img src="assets/img/team.jpg" alt="" onerror="this.closest('.about-media').classList.add('is-empty')">
+        <div class="hero-placeholder">
+          <span>👷</span>
+          <p>Letak gambar pasukan di <code>assets/img/team.jpg</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="section" id="testimonials">
+    <div class="wrap">
+      <h2 class="section-title" data-i18n="testi.title">Kata pelanggan</h2>
+      <div class="grid grid-3" id="testimonialsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section section-alt" id="faq">
+    <div class="wrap wrap-narrow">
+      <h2 class="section-title" data-i18n="faq.title">Soalan lazim</h2>
+      <div class="faq" id="faqList"></div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section" id="contact">
+    <div class="wrap contact-inner">
+      <div>
+        <h2 class="section-title" data-i18n="contact.title">Hubungi kami</h2>
+        <p class="section-sub" data-i18n="contact.sub">Beritahu kami jenis hartanah dan tarikh yang anda mahukan. Kami balas secepat mungkin.</p>
+        <ul class="contact-list" id="contactList"></ul>
+        <div class="contact-social" id="socialList"></div>
+      </div>
+
+      <form class="contact-form" id="contactForm" novalidate>
+        <label>
+          <span data-i18n="form.name">Nama</span>
+          <input type="text" name="name" required autocomplete="name">
+        </label>
+        <label>
+          <span data-i18n="form.phone">No. telefon</span>
+          <input type="tel" name="phone" required autocomplete="tel" inputmode="tel">
+        </label>
+        <label>
+          <span data-i18n="form.type">Jenis hartanah</span>
+          <select name="type">
+            <option data-i18n="form.t1">Apartmen / Kondominium</option>
+            <option data-i18n="form.t2">Rumah teres</option>
+            <option data-i18n="form.t3">Semi-D / Banglo</option>
+            <option data-i18n="form.t4">Komersial / Pejabat</option>
+            <option data-i18n="form.t5">Lain-lain</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="form.msg">Butiran ringkas</span>
+          <textarea name="message" rows="4" placeholder="Contoh: Kondo 950 kaki persegi di Kajang, mahu periksa minggu depan."></textarea>
+        </label>
+        <button class="btn btn-primary btn-block" type="submit" data-i18n="form.send">Hantar melalui WhatsApp</button>
+        <p class="form-note" data-i18n="form.note">Butang ini akan membuka WhatsApp dengan mesej yang sudah siap ditaip.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div>
+      <strong data-bind="companyName">Go Home Inspection</strong>
+      <p class="muted" data-bind="legalLine"></p>
+    </div>
+    <p class="muted">&copy; <span id="year"></span> <span data-bind="legalName">GoXpert Solutions</span>. <span data-i18n="footer.rights">Hak cipta terpelihara.</span></p>
+  </div>
+</footer>
+
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M12.04 2A9.9 9.9 0 0 0 2.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 0 0 4.74 1.2h.01a9.9 9.9 0 0 0 9.94-9.9A9.9 9.9 0 0 0 12.04 2m0 18.05h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.11.81.83-3.03-.2-.31a8.2 8.2 0 0 1-1.26-4.38 8.24 8.24 0 1 1 8.24 8.24m4.52-6.16c-.25-.13-1.47-.72-1.69-.8-.23-.09-.39-.13-.56.12s-.64.8-.79.97-.29.19-.54.06a6.7 6.7 0 0 1-1.98-1.22 7.4 7.4 0 0 1-1.37-1.7c-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44s.17-.25.25-.42a.46.46 0 0 0-.02-.44c-.07-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.47a.9.9 0 0 0-.66.31 2.76 2.76 0 0 0-.86 2.05c0 1.21.88 2.38 1 2.54s1.73 2.65 4.2 3.71c.59.26 1.04.41 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.18s.21-1.08.14-1.19-.22-.17-.47-.29"/></svg>
+</a>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
