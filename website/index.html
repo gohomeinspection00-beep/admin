@@ -453,9 +453,7 @@ section { padding: 5rem 2rem; }
 }
 .proj-loc svg { width: 13px; height: 13px; flex-shrink: 0; }
 .proj-desc { font-size: 0.88rem; color: var(--text-body); }
-.proj-note {
-    text-align: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted);
-}
+.proj-more { text-align: center; margin-top: 2.5rem; }
 @media (hover: none) {
     .proj-zoom { opacity: 1; transform: none; }
 }
@@ -922,6 +920,12 @@ section { padding: 5rem 2rem; }
         </div>
         <div class="proj-filters reveal" id="projFilters"><!-- dijana oleh JS --></div>
         <div class="proj-grid reveal" id="projGrid"><!-- dijana oleh JS --></div>
+        <div class="proj-more reveal">
+            <a class="btn btn-primary" href="projects.html">
+                <span data-i18n="proj.more">Show More Projects</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
     </div>
 </section>
 
@@ -1184,8 +1188,12 @@ var GALLERY = {
 };
 
 /* =========================================================
-   PROJEK YANG PERNAH DIKENDALIKAN — seksyen "Projects".
-   Isi/ganti senarai ini dengan projek sebenar tuan:
+   PROJEK "FEATURED" DI HOME PAGE — maksimum 6 dipaparkan.
+   Letak 6 projek TERBAIK tuan di sini. Senarai PENUH semua
+   projek diselenggara dalam fail projects.html (butang
+   "Show More Projects" membawa pelawat ke sana).
+
+   Format:
    - img: nama fail di imgBase ("projek-abc.jpg") ATAU URL penuh.
      Biar "" jika gambar belum ada — placeholder kemas dipaparkan.
    - cat: "residential" | "commercial" | "technical"
@@ -1237,6 +1245,7 @@ var I18N = {
         "proj.tag": "Our Portfolio", "proj.title": "Projects We Have Handled",
         "proj.sub": "A selection of inspection and surveying work completed across Malaysia.",
         "proj.all": "All", "proj.res": "Residential", "proj.com": "Commercial", "proj.tech": "Technical",
+        "proj.more": "Show More Projects",
         "p2.title": "Commercial & Asset", "p2.sub": "For corporations, JMB/MC & developers",
         "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
         "p2.s3": "Building Monitoring", "p2.s4": "Commercial Building Inspection", "p2.s5": "Maintenance Report / Condition Audit",
@@ -1289,6 +1298,7 @@ var I18N = {
         "proj.tag": "Portfolio Kami", "proj.title": "Projek Yang Pernah Kami Kendalikan",
         "proj.sub": "Sebahagian kerja inspection dan ukur bangunan yang telah disiapkan di seluruh Malaysia.",
         "proj.all": "Semua", "proj.res": "Kediaman", "proj.com": "Komersial", "proj.tech": "Teknikal",
+        "proj.more": "Lihat Lagi Projek",
         "p2.title": "Komersial & Aset", "p2.sub": "Untuk korporat, JMB/MC & pemaju",
         "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
         "p2.s3": "Building Monitoring", "p2.s4": "Inspection Bangunan Komersial", "p2.s5": "Maintenance Report / Condition Audit",
@@ -1771,7 +1781,7 @@ var FAQS = [
         });
 
         gridEl.innerHTML = "";
-        var list = visibleProjects();
+        var list = visibleProjects().slice(0, 6);   // home: papar 6 sahaja — senarai penuh di projects.html
         list.forEach(function (p, idx) {
             var card = document.createElement("button");
             card.type = "button";
