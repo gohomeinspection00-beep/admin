@@ -1,202 +1,1432 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Go Home Inspection — Pemeriksaan Hartanah Profesional</title>
-<meta name="description" content="Pemeriksaan hartanah profesional di Lembah Klang. Laporan bergambar penuh, pemeriksaan semula dan sokongan sehingga kecacatan selesai dibaiki.">
-<meta name="theme-color" content="#0f766e">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoXpert — Building Surveying & Inspection Malaysia</title>
+<meta name="description" content="RISM-registered Building Surveyors with SIRIM-calibrated equipment. Home inspection, BCA, dilapidation survey, tribunal support — Johor, Melaka, Negeri Sembilan & Selangor.">
+<meta name="theme-color" content="#1565C0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   GOXPERT — TEMA
+   Tukar warna di sini sahaja untuk ubah keseluruhan laman.
+   ========================================================= */
+:root {
+    --primary: #1565C0;
+    --primary-light: #1976D2;
+    --primary-dark: #0D47A1;
+    --accent: #2196F3;
+    --accent-light: #64B5F6;
+    --orange: #FF6B35;
+    --bg: #FAFBFC;
+    --bg-white: #FFFFFF;
+    --text-dark: #1A1A1A;
+    --text-body: #4A4A4A;
+    --text-muted: #717171;
+    --border: #E5E7EB;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-lg: 0 15px 50px rgba(0,0,0,0.12);
+}
 
-<!-- Open Graph / kongsi di WhatsApp & Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="Go Home Inspection — Pemeriksaan Hartanah Profesional">
-<meta property="og:description" content="Pemeriksaan hartanah profesional di Lembah Klang. Laporan bergambar penuh dan pemeriksaan semula.">
-<meta property="og:image" content="assets/img/og-image.jpg">
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-body);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+img { max-width: 100%; }
 
-<link rel="icon" href="assets/img/favicon.png">
-<link rel="stylesheet" href="css/style.css">
+/* ==================== SCROLL PROGRESS ==================== */
+.scroll-progress {
+    position: fixed; top: 0; left: 0; height: 4px; width: 0;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    z-index: 10000; transition: width 0.1s ease;
+}
+
+/* ==================== NAVBAR ==================== */
+.navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow 0.3s ease;
+}
+.navbar.scrolled { box-shadow: var(--shadow); }
+.nav-container {
+    max-width: 1200px; margin: 0 auto; padding: 0.75rem 2rem;
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+}
+.logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+.logo img { height: 40px; transition: transform 0.3s ease; }
+.logo:hover img { transform: scale(1.02); }
+.logo-text { font-weight: 800; font-size: 1.25rem; color: var(--primary-dark); letter-spacing: -0.02em; display: none; }
+.logo.no-img .logo-text { display: block; }
+.logo.no-img img { display: none; }
+
+.nav-links { display: flex; gap: 1.75rem; list-style: none; align-items: center; }
+.nav-links a {
+    color: var(--text-body); text-decoration: none; font-weight: 500;
+    font-size: 0.95rem; position: relative; padding: 0.5rem 0; transition: color 0.3s ease;
+}
+.nav-links a::after {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px;
+    background: var(--primary); transition: width 0.3s ease;
+}
+.nav-links a:hover { color: var(--primary); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.lang-toggle {
+    border: 1px solid var(--border); background: white; color: var(--text-muted);
+    border-radius: 50px; padding: 0.4rem 0.9rem; font-family: inherit;
+    font-size: 0.8rem; font-weight: 700; cursor: pointer; letter-spacing: 0.04em;
+    transition: all 0.3s ease;
+}
+.lang-toggle:hover { border-color: var(--primary); color: var(--primary); }
+.nav-cta {
+    background: var(--primary); color: white; padding: 0.7rem 1.25rem;
+    border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease;
+}
+.nav-cta:hover {
+    background: var(--primary-dark); transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+}
+.nav-cta svg { width: 18px; height: 18px; }
+
+.menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; border: none; background: none; }
+.menu-toggle span { width: 24px; height: 2px; background: var(--text-dark); transition: all 0.3s ease; }
+
+/* ==================== BUTTONS ==================== */
+.btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 1rem 1.75rem; border-radius: 10px; font-weight: 600; font-size: 1rem;
+    text-decoration: none; transition: all 0.3s ease; cursor: pointer; border: none;
+    position: relative; overflow: hidden; font-family: inherit;
+}
+.btn::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+.btn:hover::before { left: 100%; }
+.btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E); color: white;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+.btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); }
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.3);
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(21, 101, 192, 0.4); }
+.btn-secondary { background: white; border: 2px solid var(--border); color: var(--text-dark); }
+.btn-secondary:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-3px); }
+.btn svg { width: 20px; height: 20px; }
+
+/* ==================== HERO ==================== */
+.hero {
+    min-height: 100vh; display: flex; align-items: center;
+    padding: 7rem 2rem 4rem;
+    background: linear-gradient(135deg, #F0F7FF 0%, #E3F2FD 50%, #fff 100%);
+    position: relative; overflow: hidden;
+}
+.hero-bg-shapes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.shape { position: absolute; border-radius: 50%; opacity: 0.5; }
+.shape-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(33,150,243,0.12) 0%, transparent 70%);
+    top: -150px; right: -150px; animation: float 8s ease-in-out infinite;
+}
+.shape-2 {
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(13,71,161,0.1) 0%, transparent 70%);
+    bottom: -100px; left: -100px; animation: float 10s ease-in-out infinite reverse;
+}
+@keyframes float {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(20px,-20px) scale(1.05); }
+}
+.hero-container {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 4rem; align-items: center;
+    position: relative; z-index: 1;
+}
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: white; border: 1px solid var(--border);
+    padding: 0.5rem 1rem; border-radius: 50px;
+    font-size: 0.85rem; font-weight: 600; color: var(--primary);
+    margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.hero-badge .pulse-dot {
+    width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+}
+.hero h1 {
+    font-size: clamp(2.25rem, 4.5vw, 3.4rem); font-weight: 800;
+    color: var(--text-dark); line-height: 1.1; margin-bottom: 1.5rem;
+}
+.hero h1 .highlight { color: var(--primary); position: relative; display: inline-block; }
+.hero h1 .highlight::after {
+    content: ''; position: absolute; bottom: 5px; left: 0; width: 100%; height: 12px;
+    background: rgba(33, 150, 243, 0.18); z-index: -1; transform: skewX(-5deg);
+}
+.hero-text { font-size: 1.1rem; color: var(--text-body); margin-bottom: 2rem; max-width: 520px; }
+.hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.trust-badges { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.trust-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+.trust-badge svg { width: 20px; height: 20px; color: var(--accent); flex-shrink: 0; }
+
+/* Hero stats card */
+.stats-card {
+    background: white; border-radius: 24px; padding: 2rem;
+    box-shadow: var(--shadow-lg); position: relative;
+}
+.stats-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+    border-radius: 24px 24px 0 0;
+}
+.stats-header { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.stats-header h3 { font-size: 1.15rem; color: var(--text-dark); font-weight: 700; margin-bottom: 0.25rem; }
+.stats-header p { font-size: 0.9rem; color: var(--text-muted); }
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.stat-item {
+    text-align: center; padding: 1.25rem 1rem; background: var(--bg);
+    border-radius: 16px; transition: all 0.3s ease; border: 1px solid transparent;
+}
+.stat-item:hover {
+    transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background: white; border-color: var(--primary);
+}
+.stat-number { font-size: 2.4rem; font-weight: 800; color: var(--primary); display: block; line-height: 1; }
+.stat-number .suffix { font-size: 1.5rem; }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+.stats-badges { display: flex; justify-content: center; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+.stats-badges span {
+    font-size: 0.75rem; font-weight: 700; color: var(--primary-dark);
+    background: #E3F2FD; padding: 0.35rem 0.85rem; border-radius: 50px;
+}
+
+/* ==================== SECTION SHARED ==================== */
+section { padding: 5rem 2rem; }
+.section-container { max-width: 1200px; margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 3rem; }
+.section-tag {
+    display: inline-block; background: #E3F2FD; color: var(--primary);
+    padding: 0.4rem 1rem; border-radius: 50px;
+    font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;
+}
+.section-header h2 {
+    font-size: clamp(1.75rem, 3vw, 2.25rem); color: var(--text-dark);
+    margin-bottom: 0.75rem; font-weight: 700;
+}
+.section-header p { color: var(--text-muted); max-width: 640px; margin: 0 auto; }
+
+/* Reveal on scroll */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ==================== TRUST BAR ==================== */
+.trust-bar { padding: 1.5rem 2rem; background: white; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.trust-bar-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap;
+}
+.trust-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; font-weight: 600; color: var(--text-body); }
+.trust-item svg { width: 22px; height: 22px; color: var(--primary); flex-shrink: 0; }
+
+/* ==================== PILLARS ==================== */
+.pillars { background: var(--bg); }
+.pillar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.pillar-card {
+    background: white; border-radius: 20px; padding: 2.25rem 1.75rem;
+    border: 1px solid var(--border); transition: all 0.4s ease;
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
+}
+.pillar-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transform: scaleX(0); transition: transform 0.4s ease;
+}
+.pillar-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
+.pillar-card:hover::before { transform: scaleX(1); }
+.pillar-icon {
+    width: 60px; height: 60px; background: #E3F2FD; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;
+    transition: all 0.4s ease;
+}
+.pillar-card:hover .pillar-icon { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+.pillar-icon svg { width: 30px; height: 30px; color: var(--primary); transition: color 0.4s ease; }
+.pillar-card:hover .pillar-icon svg { color: white; }
+.pillar-card h3 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 0.35rem; font-weight: 700; }
+.pillar-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+.pillar-card ul { list-style: none; margin-top: 0.25rem; }
+.pillar-card li {
+    display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0;
+    font-size: 0.92rem; color: var(--text-body);
+}
+.pillar-card li svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
+
+/* ==================== AUDIENCE ==================== */
+.audience-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+.audience-card {
+    background: var(--bg); border-radius: 16px; padding: 1.5rem 1.25rem; text-align: center;
+    border: 1px solid transparent; transition: all 0.3s ease;
+}
+.audience-card:hover { background: white; border-color: var(--border); box-shadow: var(--shadow); transform: translateY(-4px); }
+.audience-icon {
+    width: 48px; height: 48px; margin: 0 auto 0.9rem; background: white; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+.audience-icon svg { width: 24px; height: 24px; color: var(--primary); }
+.audience-card h4 { font-size: 0.98rem; color: var(--text-dark); font-weight: 600; margin-bottom: 0.25rem; }
+.audience-card p { font-size: 0.82rem; color: var(--text-muted); }
+
+/* ==================== WHY US ==================== */
+.why-us { background: var(--bg); }
+.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.why-card {
+    background: white; border-radius: 20px; padding: 2rem 1.75rem;
+    border: 1px solid var(--border); transition: all 0.3s ease;
+}
+.why-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: var(--accent-light); }
+.why-icon {
+    width: 52px; height: 52px; background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;
+}
+.why-icon svg { width: 26px; height: 26px; color: white; }
+.why-card h4 { font-size: 1.08rem; color: var(--text-dark); margin-bottom: 0.5rem; font-weight: 600; }
+.why-card p { font-size: 0.92rem; color: var(--text-muted); }
+
+/* ==================== EQUIPMENT ==================== */
+.equipment { background: linear-gradient(180deg, white 0%, #E8F4FC 100%); }
+.equip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+.equip-card {
+    background: white; border-radius: 16px; padding: 1.5rem 1rem; text-align: center;
+    border: 1px solid var(--border); transition: all 0.3s ease;
+}
+.equip-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--accent-light); }
+.equip-card img {
+    width: 80px; height: 80px; object-fit: contain; margin-bottom: 0.75rem;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.12)); transition: transform 0.3s ease;
+}
+.equip-card:hover img { transform: scale(1.12); }
+.equip-card .equip-fallback {
+    width: 80px; height: 80px; margin: 0 auto 0.75rem; background: #E3F2FD; border-radius: 12px;
+    display: none; align-items: center; justify-content: center; font-size: 2rem;
+}
+.equip-card.img-missing img { display: none; }
+.equip-card.img-missing .equip-fallback { display: flex; }
+.equip-card span { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text-dark); }
+.equip-note {
+    text-align: center; margin-top: 2rem; font-size: 0.95rem; color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;
+}
+.equip-note strong { color: var(--primary-dark); }
+.equip-note svg { width: 20px; height: 20px; color: var(--primary); }
+
+/* ==================== PROCESS ==================== */
+.process-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.25rem; }
+.process-step { text-align: center; position: relative; padding: 0 0.5rem; }
+.process-num {
+    width: 48px; height: 48px; margin: 0 auto 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.15rem; box-shadow: 0 6px 20px rgba(21,101,192,0.3);
+}
+.process-step h4 { font-size: 1rem; color: var(--text-dark); font-weight: 600; margin-bottom: 0.4rem; }
+.process-step p { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ==================== REVIEWS ==================== */
+.reviews-section { background: white; overflow: hidden; }
+.reviews-carousel { margin-top: 2.5rem; position: relative; max-width: 450px; margin-left: auto; margin-right: auto; }
+.reviews-track { display: flex; transition: transform 0.5s ease; cursor: grab; }
+.reviews-track:active { cursor: grabbing; }
+.review-slide { flex: 0 0 100%; padding: 0 1rem; }
+.review-slide img { width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+.review-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 45px; height: 45px; border-radius: 50%; background: white; border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10;
+}
+.review-nav:hover { background: var(--primary); transform: translateY(-50%) scale(1.1); }
+.review-nav:hover svg { color: white; }
+.review-nav svg { width: 22px; height: 22px; color: var(--text-dark); transition: color 0.3s ease; }
+.review-prev { left: -60px; }
+.review-next { right: -60px; }
+.review-dots { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+.review-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--border);
+    cursor: pointer; transition: all 0.3s ease;
+}
+.review-dot:hover { background: var(--accent-light); }
+.review-dot.active { background: var(--primary); width: 30px; border-radius: 5px; }
+
+/* ==================== COVERAGE ==================== */
+.coverage { background: var(--bg); }
+.coverage-states { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+.state-card {
+    background: white; border-radius: 16px; padding: 1.75rem 1rem; text-align: center;
+    border: 1px solid var(--border); transition: all 0.3s ease;
+}
+.state-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--primary); }
+.state-card svg { width: 30px; height: 30px; color: var(--primary); margin-bottom: 0.6rem; }
+.state-card h4 { font-size: 1.05rem; color: var(--text-dark); font-weight: 700; }
+.coverage-note {
+    text-align: center; color: var(--text-muted); font-size: 0.95rem;
+    max-width: 560px; margin: 0 auto;
+}
+
+/* ==================== FAQ ==================== */
+.faq-list { max-width: 780px; margin: 0 auto; }
+.faq-item {
+    background: white; border: 1px solid var(--border); border-radius: 14px;
+    margin-bottom: 0.9rem; overflow: hidden; transition: box-shadow 0.3s ease;
+}
+.faq-item.open { box-shadow: var(--shadow); }
+.faq-q {
+    width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+    padding: 1.1rem 1.4rem; font-family: inherit; font-size: 1rem; font-weight: 600;
+    color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+}
+.faq-q .faq-arrow { transition: transform 0.3s ease; flex-shrink: 0; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-q svg { width: 20px; height: 20px; color: var(--primary); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+.faq-a-inner { padding: 0 1.4rem 1.2rem; font-size: 0.95rem; color: var(--text-body); }
+
+/* ==================== CONTACT / QUOTE ==================== */
+.contact { background: white; }
+.contact-wrapper { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 3rem; align-items: start; }
+.contact-info-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 24px; padding: 2.5rem; color: white; position: sticky; top: 100px; overflow: hidden;
+}
+.contact-info-card::before {
+    content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;
+}
+.contact-info-card h3 { font-size: 1.5rem; margin-bottom: 0.75rem; font-weight: 700; position: relative; }
+.contact-info-card > p { opacity: 0.9; margin-bottom: 1.75rem; position: relative; }
+.contact-rows { display: grid; gap: 1.1rem; position: relative; }
+.contact-row { display: flex; gap: 0.9rem; align-items: flex-start; }
+.contact-row svg { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; }
+.contact-row .label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.75; display: block; }
+.contact-row a { color: white; text-decoration: none; font-weight: 600; }
+.contact-row a:hover { text-decoration: underline; }
+
+.quote-form {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 24px; padding: 2.25rem;
+}
+.quote-form h3 { font-size: 1.3rem; color: var(--text-dark); font-weight: 700; margin-bottom: 0.35rem; }
+.quote-form .form-sub { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); }
+.form-group input, .form-group select, .form-group textarea {
+    font-family: inherit; font-size: 0.95rem; color: var(--text-dark);
+    padding: 0.8rem 1rem; border: 1px solid var(--border); border-radius: 10px;
+    background: white; transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
+}
+.form-group textarea { resize: vertical; }
+.quote-form .btn { width: 100%; justify-content: center; margin-top: 1.25rem; }
+
+/* ==================== FINAL CTA ==================== */
+.final-cta {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    text-align: center; color: white;
+}
+.final-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin-bottom: 0.75rem; }
+.final-cta p { opacity: 0.9; max-width: 560px; margin: 0 auto 1.75rem; }
+
+/* ==================== FOOTER ==================== */
+.footer { background: #0F172A; color: #CBD5E1; padding: 3rem 2rem 2rem; }
+.footer-inner { max-width: 1200px; margin: 0 auto; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 2.5rem; margin-bottom: 2rem; }
+.footer h4 { color: white; font-size: 1rem; margin-bottom: 0.9rem; font-weight: 700; }
+.footer p, .footer li { font-size: 0.9rem; color: #94A3B8; }
+.footer ul { list-style: none; }
+.footer li { padding: 0.25rem 0; }
+.footer a { color: #94A3B8; text-decoration: none; transition: color 0.3s ease; }
+.footer a:hover { color: white; }
+.footer-brand { font-weight: 800; font-size: 1.2rem; color: white; margin-bottom: 0.5rem; }
+.footer-bottom {
+    border-top: 1px solid #1E293B; padding-top: 1.5rem; text-align: center;
+    font-size: 0.85rem; color: #64748B;
+}
+
+/* ==================== WHATSAPP FLOAT ==================== */
+.whatsapp-float {
+    position: fixed; right: 20px; bottom: 20px; z-index: 900;
+    width: 58px; height: 58px; border-radius: 50%;
+    background: linear-gradient(135deg, #25D366, #128C7E); color: white;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+    transition: transform 0.3s ease;
+}
+.whatsapp-float:hover { transform: scale(1.1); }
+.whatsapp-float svg { width: 30px; height: 30px; }
+
+/* ==================== SCROLL TOP ==================== */
+.scroll-top {
+    position: fixed; right: 24px; bottom: 92px; z-index: 900;
+    width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+    background: white; color: var(--primary); box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+.scroll-top.visible { opacity: 1; visibility: visible; }
+.scroll-top:hover { background: var(--primary); color: white; }
+.scroll-top svg { width: 20px; height: 20px; }
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+    .pillar-grid, .why-grid { grid-template-columns: repeat(2, 1fr); }
+    .process-grid { grid-template-columns: repeat(3, 1fr); row-gap: 2rem; }
+    .review-prev { left: -50px; }
+    .review-next { right: -50px; }
+}
+@media (max-width: 768px) {
+    section { padding: 3.5rem 1.25rem; }
+    .nav-links {
+        position: fixed; top: 64px; left: 0; right: 0;
+        background: white; border-bottom: 1px solid var(--border);
+        flex-direction: column; gap: 0; padding: 0.5rem 1.5rem 1rem;
+        display: none; align-items: stretch;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links li { border-bottom: 1px solid var(--border); }
+    .nav-links li:last-child { border-bottom: none; }
+    .nav-links a { display: block; padding: 0.9rem 0; }
+    .menu-toggle { display: flex; }
+    .nav-cta span { display: none; }
+    .hero { padding: 6.5rem 1.25rem 3rem; min-height: auto; }
+    .hero-container { grid-template-columns: 1fr; gap: 2.5rem; }
+    .pillar-grid, .why-grid { grid-template-columns: 1fr; }
+    .audience-grid { grid-template-columns: repeat(2, 1fr); }
+    .equip-grid { grid-template-columns: repeat(2, 1fr); }
+    .process-grid { grid-template-columns: 1fr 1fr; }
+    .coverage-states { grid-template-columns: repeat(2, 1fr); }
+    .contact-wrapper { grid-template-columns: 1fr; }
+    .contact-info-card { position: static; }
+    .form-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+    .reviews-carousel { max-width: 100%; }
+    .review-prev { left: 5px; }
+    .review-next { right: 5px; }
+    .review-nav { width: 40px; height: 40px; }
+    .review-slide { padding: 0 0.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+}
+</style>
 </head>
 <body>
 
-<a class="skip-link" href="#main">Terus ke kandungan</a>
+<div class="scroll-progress" id="scrollProgress"></div>
 
-<header class="site-header" id="siteHeader">
-  <div class="wrap header-inner">
-    <a class="brand" href="#top">
-      <img src="assets/img/logo.png" alt="" class="brand-logo" onerror="this.style.display='none'">
-      <span class="brand-text" data-bind="companyName">Go Home Inspection</span>
-    </a>
-
-    <nav class="nav" id="nav">
-      <a href="#services" data-i18n="nav.services">Perkhidmatan</a>
-      <a href="#process" data-i18n="nav.process">Proses</a>
-      <a href="#packages" data-i18n="nav.packages">Pakej</a>
-      <a href="#about" data-i18n="nav.about">Tentang</a>
-      <a href="#faq" data-i18n="nav.faq">Soalan Lazim</a>
-      <a href="#contact" data-i18n="nav.contact">Hubungi</a>
-    </nav>
-
-    <div class="header-actions">
-      <button class="lang-toggle" id="langToggle" type="button" aria-label="Tukar bahasa">EN</button>
-      <a class="btn btn-primary btn-sm" data-cta href="#contact" data-i18n="nav.book">Tempah</a>
-      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<main id="main">
-
-  <!-- ============ HERO ============ -->
-  <section class="hero" id="top">
-    <div class="wrap hero-inner">
-      <div class="hero-copy">
-        <p class="eyebrow" data-i18n="hero.eyebrow">Pemeriksa hartanah bertauliah</p>
-        <h1 data-i18n="hero.title">Jangan terima kunci sebelum rumah anda diperiksa.</h1>
-        <p class="lead" data-bind="tagline">Pemeriksaan hartanah profesional sebelum anda serah kunci.</p>
-        <div class="hero-cta">
-          <a class="btn btn-primary" data-cta href="#contact" data-i18n="hero.cta1">Tempah pemeriksaan</a>
-          <a class="btn btn-ghost" href="#services" data-i18n="hero.cta2">Lihat perkhidmatan</a>
-        </div>
-        <ul class="hero-points">
-          <li data-i18n="hero.p1">Laporan PDF bergambar penuh</li>
-          <li data-i18n="hero.p2">Setiap kecacatan direkod &amp; dijejak</li>
-          <li data-i18n="hero.p3">Pemeriksaan semula selepas pembaikan</li>
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="#" class="logo" id="logoLink">
+            <img src="https://arleta.site/interactivelink/1453/Logo-Go-Expert-Panjang.png" alt="GoXpert"
+                 onerror="this.closest('.logo').classList.add('no-img')">
+            <span class="logo-text">GoXpert</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#services" data-i18n="nav.services">Services</a></li>
+            <li><a href="#why-us" data-i18n="nav.why">Why Us</a></li>
+            <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
+            <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
+            <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
-      </div>
-      <div class="hero-media">
-        <img src="assets/img/hero.jpg" alt="" onerror="this.closest('.hero-media').classList.add('is-empty')">
-        <div class="hero-placeholder">
-          <span>📷</span>
-          <p>Letak gambar di <code>assets/img/hero.jpg</code></p>
+        <div class="nav-right">
+            <button class="lang-toggle" id="langToggle" type="button">BM</button>
+            <a class="nav-cta" id="navCta" href="#contact">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                <span data-i18n="nav.cta">Get a Quote</span>
+            </a>
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
-      </div>
     </div>
-  </section>
+</nav>
 
-  <!-- ============ SERVICES ============ -->
-  <section class="section" id="services">
-    <div class="wrap">
-      <h2 class="section-title" data-i18n="services.title">Perkhidmatan kami</h2>
-      <p class="section-sub" data-i18n="services.sub">Skop pemeriksaan yang kami sediakan untuk pemilik dan pembeli hartanah.</p>
-      <div class="grid grid-4" id="servicesGrid"></div>
-    </div>
-  </section>
-
-  <!-- ============ PROCESS ============ -->
-  <section class="section section-alt" id="process">
-    <div class="wrap">
-      <h2 class="section-title" data-i18n="process.title">Bagaimana ia berfungsi</h2>
-      <p class="section-sub" data-i18n="process.sub">Empat langkah mudah dari tempahan hingga kecacatan selesai.</p>
-      <ol class="steps" id="stepsList"></ol>
-    </div>
-  </section>
-
-  <!-- ============ PACKAGES ============ -->
-  <section class="section" id="packages">
-    <div class="wrap">
-      <h2 class="section-title" data-i18n="packages.title">Pakej</h2>
-      <p class="section-sub" data-i18n="packages.sub">Harga akhir bergantung saiz dan jenis hartanah. Hubungi kami untuk sebut harga tepat.</p>
-      <div class="grid grid-3" id="packagesGrid"></div>
-    </div>
-  </section>
-
-  <!-- ============ ABOUT ============ -->
-  <section class="section section-alt" id="about">
-    <div class="wrap about-inner">
-      <div>
-        <h2 class="section-title" data-i18n="about.title">Tentang kami</h2>
-        <p data-i18n="about.p1">Go Home Inspection ialah pasukan pemeriksa hartanah yang membantu pemilik rumah di Malaysia memastikan unit mereka diserahkan dalam keadaan yang sepatutnya.</p>
-        <p data-i18n="about.p2">Setiap pemeriksaan direkod menggunakan sistem GoInspect kami sendiri — setiap kecacatan bergambar, berlokasi dan boleh dijejak sehingga pemaju menyelesaikannya.</p>
-        <div class="stats">
-          <div class="stat"><strong>—</strong><span data-i18n="about.s1">Unit diperiksa</span></div>
-          <div class="stat"><strong>—</strong><span data-i18n="about.s2">Kecacatan direkod</span></div>
-          <div class="stat"><strong>—</strong><span data-i18n="about.s3">Tahun pengalaman</span></div>
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="top">
+    <div class="hero-bg-shapes"><div class="shape shape-1"></div><div class="shape shape-2"></div></div>
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                <span data-i18n="hero.badge">RISM-Registered Building Surveyors</span>
+            </div>
+            <h1 id="heroTitle">Building Surveying &amp; Inspection <span class="highlight">You Can Trust</span></h1>
+            <p class="hero-text" data-i18n="hero.text">From home defect inspection to Building Condition Assessment and tribunal documentation — registered Building Surveyors with SIRIM-calibrated equipment. Inspection with integrity.</p>
+            <div class="hero-buttons">
+                <a class="btn btn-whatsapp" id="heroWa" href="#" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2m0 18.05h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.11.81.83-3.03-.2-.31a8.2 8.2 0 01-1.26-4.38 8.24 8.24 0 118.24 8.24"/></svg>
+                    <span data-i18n="hero.cta1">Get a Free Quote</span>
+                </a>
+                <a class="btn btn-secondary" href="#services" data-i18n="hero.cta2">View Our Services</a>
+            </div>
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    <span data-i18n="hero.t1">SIRIM-Calibrated Equipment</span>
+                </div>
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span data-i18n="hero.t2">Registered with RISM</span>
+                </div>
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+                    <span data-i18n="hero.t3">Tribunal Support</span>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="about-media">
-        <img src="assets/img/team.jpg" alt="" onerror="this.closest('.about-media').classList.add('is-empty')">
-        <div class="hero-placeholder">
-          <span>👷</span>
-          <p>Letak gambar pasukan di <code>assets/img/team.jpg</code></p>
+        <div class="hero-visual">
+            <div class="stats-card">
+                <div class="stats-header">
+                    <h3 data-i18n="stats.title">Our Track Record</h3>
+                    <p data-i18n="stats.sub">Trusted by property owners across Malaysia</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number"><span class="counter" data-target="5000">0</span><span class="suffix">+</span></span>
+                        <span class="stat-label" data-i18n="stats.units">Units Inspected</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number"><span class="counter" data-target="300">0</span><span class="suffix">+</span></span>
+                        <span class="stat-label" data-i18n="stats.projects">Projects</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number"><span class="counter" data-target="10">0</span><span class="suffix">+</span></span>
+                        <span class="stat-label" data-i18n="stats.inspectors">Inspectors</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number"><span class="counter" data-target="4">0</span></span>
+                        <span class="stat-label" data-i18n="stats.states">States Covered</span>
+                    </div>
+                </div>
+                <div class="stats-badges">
+                    <span>SIRIM Calibrated</span>
+                    <span>RISM Registered</span>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </section>
+</section>
 
-  <!-- ============ TESTIMONIALS ============ -->
-  <section class="section" id="testimonials">
-    <div class="wrap">
-      <h2 class="section-title" data-i18n="testi.title">Kata pelanggan</h2>
-      <div class="grid grid-3" id="testimonialsGrid"></div>
+<!-- ==================== TRUST BAR ==================== -->
+<div class="trust-bar">
+    <div class="trust-bar-inner">
+        <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span data-i18n="tbar.1">Registered Building Surveyors (RISM)</span>
+        </div>
+        <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            <span data-i18n="tbar.2">SIRIM-Calibrated Equipment</span>
+        </div>
+        <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span data-i18n="tbar.3">5,000+ Units Inspected</span>
+        </div>
+        <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span data-i18n="tbar.4">4 States &amp; Beyond</span>
+        </div>
+        <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span data-i18n="tbar.5">Response Within 1 Working Hour</span>
+        </div>
     </div>
-  </section>
+</div>
 
-  <!-- ============ FAQ ============ -->
-  <section class="section section-alt" id="faq">
-    <div class="wrap wrap-narrow">
-      <h2 class="section-title" data-i18n="faq.title">Soalan lazim</h2>
-      <div class="faq" id="faqList"></div>
+<!-- ==================== 3 PILLARS ==================== -->
+<section class="pillars" id="services">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="pillars.tag">Our Services</span>
+            <h2 data-i18n="pillars.title">One Firm. Every Building Survey Need.</h2>
+            <p data-i18n="pillars.sub">We are more than home inspection — a full building surveying practice serving homeowners, corporations and legal proceedings.</p>
+        </div>
+        <div class="pillar-grid">
+            <div class="pillar-card reveal">
+                <div class="pillar-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg>
+                </div>
+                <h3 data-i18n="p1.title">Residential</h3>
+                <p class="pillar-sub" data-i18n="p1.sub">For homeowners &amp; buyers</p>
+                <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s1">Home Defect Inspection (DLP)</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s2">Pre-Purchase / Sub-Sale Inspection</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s3">Re-Inspection</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s4">After-Renovation Inspection</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s5">Joint Inspection with Developer</span></li>
+                </ul>
+            </div>
+            <div class="pillar-card reveal">
+                <div class="pillar-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01M12 6h.01M12 10h.01M12 14h.01"/></svg>
+                </div>
+                <h3 data-i18n="p2.title">Commercial &amp; Asset</h3>
+                <p class="pillar-sub" data-i18n="p2.sub">For corporations, JMB/MC &amp; developers</p>
+                <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s1">Building Condition Assessment (BCA)</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s2">Dilapidation Survey</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s3">Building Monitoring</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s4">Commercial Building Inspection</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s5">Maintenance Report / Condition Audit</span></li>
+                </ul>
+            </div>
+            <div class="pillar-card reveal">
+                <div class="pillar-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l7-5 7 5M4 14h5a3 3 0 010 6H4zM15 14h5a3 3 0 01-3 6h-2z"/></svg>
+                </div>
+                <h3 data-i18n="p3.title">Technical &amp; Legal</h3>
+                <p class="pillar-sub" data-i18n="p3.sub">Specialist testing &amp; tribunal support</p>
+                <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s1">Electrical Inspection</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s2">Leak Detection &amp; Moisture Survey</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s3">Thermal Imaging</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s4">Rectification Defect</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s5">Tribunal Consultation &amp; Documentation</span></li>
+                </ul>
+            </div>
+        </div>
     </div>
-  </section>
+</section>
 
-  <!-- ============ CONTACT ============ -->
-  <section class="section" id="contact">
-    <div class="wrap contact-inner">
-      <div>
-        <h2 class="section-title" data-i18n="contact.title">Hubungi kami</h2>
-        <p class="section-sub" data-i18n="contact.sub">Beritahu kami jenis hartanah dan tarikh yang anda mahukan. Kami balas secepat mungkin.</p>
-        <ul class="contact-list" id="contactList"></ul>
-        <div class="contact-social" id="socialList"></div>
-      </div>
-
-      <form class="contact-form" id="contactForm" novalidate>
-        <label>
-          <span data-i18n="form.name">Nama</span>
-          <input type="text" name="name" required autocomplete="name">
-        </label>
-        <label>
-          <span data-i18n="form.phone">No. telefon</span>
-          <input type="tel" name="phone" required autocomplete="tel" inputmode="tel">
-        </label>
-        <label>
-          <span data-i18n="form.type">Jenis hartanah</span>
-          <select name="type">
-            <option data-i18n="form.t1">Apartmen / Kondominium</option>
-            <option data-i18n="form.t2">Rumah teres</option>
-            <option data-i18n="form.t3">Semi-D / Banglo</option>
-            <option data-i18n="form.t4">Komersial / Pejabat</option>
-            <option data-i18n="form.t5">Lain-lain</option>
-          </select>
-        </label>
-        <label>
-          <span data-i18n="form.msg">Butiran ringkas</span>
-          <textarea name="message" rows="4" placeholder="Contoh: Kondo 950 kaki persegi di Kajang, mahu periksa minggu depan."></textarea>
-        </label>
-        <button class="btn btn-primary btn-block" type="submit" data-i18n="form.send">Hantar melalui WhatsApp</button>
-        <p class="form-note" data-i18n="form.note">Butang ini akan membuka WhatsApp dengan mesej yang sudah siap ditaip.</p>
-      </form>
+<!-- ==================== AUDIENCE ==================== -->
+<section class="audience">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="aud.tag">Who We Serve</span>
+            <h2 data-i18n="aud.title">Built for Every Property Stakeholder</h2>
+        </div>
+        <div class="audience-grid" id="audienceGrid"><!-- dijana oleh JS --></div>
     </div>
-  </section>
+</section>
 
-</main>
-
-<footer class="site-footer">
-  <div class="wrap footer-inner">
-    <div>
-      <strong data-bind="companyName">Go Home Inspection</strong>
-      <p class="muted" data-bind="legalLine"></p>
+<!-- ==================== WHY US ==================== -->
+<section class="why-us" id="why-us">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="why.tag">Why GoXpert</span>
+            <h2 data-i18n="why.title">The Advantages of Choosing Us</h2>
+        </div>
+        <div class="why-grid" id="whyGrid"><!-- dijana oleh JS --></div>
     </div>
-    <p class="muted">&copy; <span id="year"></span> <span data-bind="legalName">GoXpert Solutions</span>. <span data-i18n="footer.rights">Hak cipta terpelihara.</span></p>
-  </div>
+</section>
+
+<!-- ==================== EQUIPMENT ==================== -->
+<section class="equipment">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="equip.tag">Professional Equipment</span>
+            <h2 data-i18n="equip.title">Calibrated Tools. Accurate Results.</h2>
+            <p data-i18n="equip.sub">Most of our inspection equipment is calibrated by SIRIM Malaysia for valid, defensible findings.</p>
+        </div>
+        <div class="equip-grid" id="equipGrid"><!-- dijana oleh JS --></div>
+        <div class="equip-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            <span data-i18n="equip.note">Calibration certificates available upon request — <strong>SIRIM Calibrated</strong></span>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PROCESS ==================== -->
+<section class="process">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="proc.tag">How It Works</span>
+            <h2 data-i18n="proc.title">A Clear Process from Start to Finish</h2>
+        </div>
+        <div class="process-grid" id="processGrid"><!-- dijana oleh JS --></div>
+    </div>
+</section>
+
+<!-- ==================== REVIEWS ==================== -->
+<section class="reviews-section" id="reviews">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="rev.tag">Client Reviews</span>
+            <h2 data-i18n="rev.title">What Our Clients Say</h2>
+        </div>
+        <div class="reviews-carousel">
+            <div class="reviews-track" id="reviewsTrack"><!-- dijana oleh JS --></div>
+            <button class="review-nav review-prev" id="reviewPrev" aria-label="Previous">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="review-nav review-next" id="reviewNext" aria-label="Next">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+            <div class="review-dots" id="reviewDots"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== COVERAGE ==================== -->
+<section class="coverage" id="coverage">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="cov.tag">Coverage Area</span>
+            <h2 data-i18n="cov.title">Operating Across 4 Main States</h2>
+        </div>
+        <div class="coverage-states">
+            <div class="state-card reveal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <h4>Johor</h4>
+            </div>
+            <div class="state-card reveal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <h4>Melaka</h4>
+            </div>
+            <div class="state-card reveal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <h4>Negeri Sembilan</h4>
+            </div>
+            <div class="state-card reveal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <h4>Selangor</h4>
+            </div>
+        </div>
+        <p class="coverage-note reveal" data-i18n="cov.note">Property outside these areas? Contact us — we welcome requests from any location in Malaysia.</p>
+    </div>
+</section>
+
+<!-- ==================== FAQ ==================== -->
+<section class="faq" id="faq">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag">FAQ</span>
+            <h2 data-i18n="faq.title">Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-list" id="faqList"><!-- dijana oleh JS --></div>
+    </div>
+</section>
+
+<!-- ==================== CONTACT / QUOTE ==================== -->
+<section class="contact" id="contact">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="con.tag">Contact Us</span>
+            <h2 data-i18n="con.title">Get Your Quote Today</h2>
+        </div>
+        <div class="contact-wrapper">
+            <div class="contact-info-card reveal">
+                <h3 data-i18n="con.card.title">Let's Connect</h3>
+                <p data-i18n="con.card.sub">Questions or ready to book? We're here to help.</p>
+                <div class="contact-rows">
+                    <div class="contact-row">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+                        <div><span class="label">WhatsApp</span><a id="contactWa" href="#" target="_blank" rel="noopener">+6011-3144 6591</a></div>
+                    </div>
+                    <div class="contact-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                        <div><span class="label">Email</span><a href="mailto:official@goxpert.my">official@goxpert.my</a></div>
+                    </div>
+                    <div class="contact-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <div><span class="label" data-i18n="con.area">Coverage</span><span>Johor · Melaka · N9 · Selangor</span></div>
+                    </div>
+                    <div class="contact-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <div><span class="label" data-i18n="con.hours">Business Hours</span><span data-i18n="con.hours.v">Mon – Sat: 9:00 am – 6:00 pm</span></div>
+                    </div>
+                </div>
+            </div>
+            <form class="quote-form reveal" id="quoteForm">
+                <h3 data-i18n="form.title">Request a Quote</h3>
+                <p class="form-sub" data-i18n="form.sub">Fill in what you can — we'll handle the rest on WhatsApp.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label data-i18n="form.name">Full Name</label>
+                        <input type="text" name="name" autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="form.phone">Phone Number</label>
+                        <input type="tel" name="phone" autocomplete="tel" inputmode="tel">
+                    </div>
+                    <div class="form-group full">
+                        <label data-i18n="form.service">Type of Service</label>
+                        <select name="service" id="serviceSelect"><!-- dijana oleh JS --></select>
+                    </div>
+                    <div class="form-group full">
+                        <label data-i18n="form.location">Property Location</label>
+                        <input type="text" name="location">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="form.size">Built-up Size (sqft)</label>
+                        <input type="text" name="size" inputmode="numeric">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="form.storey">Storeys</label>
+                        <input type="text" name="storey" inputmode="numeric">
+                    </div>
+                    <div class="form-group full">
+                        <label data-i18n="form.notes">Additional Details</label>
+                        <textarea name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-whatsapp">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+                    <span data-i18n="form.send">Send via WhatsApp</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FINAL CTA ==================== -->
+<section class="final-cta">
+    <h2 data-i18n="cta.title">Protect Your Property Investment</h2>
+    <p data-i18n="cta.sub">One professional inspection can save you tens of thousands of ringgit. Talk to us today.</p>
+    <a class="btn btn-whatsapp" id="finalWa" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+        <span data-i18n="cta.btn">Get a Free Quote</span>
+    </a>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-brand">GoXpert</div>
+                <p data-i18n="foot.desc">Registered Building Surveyors providing inspection, assessment and tribunal support services across Malaysia.</p>
+                <p style="margin-top:0.75rem;" id="footSsm"><!-- SSM: isi di CONFIG --></p>
+            </div>
+            <div>
+                <h4 data-i18n="foot.links">Quick Links</h4>
+                <ul>
+                    <li><a href="#services" data-i18n="nav.services">Services</a></li>
+                    <li><a href="#why-us" data-i18n="nav.why">Why Us</a></li>
+                    <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
+                    <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 data-i18n="foot.contact">Contact</h4>
+                <ul>
+                    <li><a id="footWa" href="#" target="_blank" rel="noopener">WhatsApp: +6011-3144 6591</a></li>
+                    <li><a href="mailto:official@goxpert.my">official@goxpert.my</a></li>
+                    <li data-i18n="foot.area">Johor · Melaka · Negeri Sembilan · Selangor</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span id="footCopy">© 2026 GoXpert. </span><span data-i18n="foot.rights">All Rights Reserved.</span>
+        </div>
+    </div>
 </footer>
 
-<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
-  <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M12.04 2A9.9 9.9 0 0 0 2.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 0 0 4.74 1.2h.01a9.9 9.9 0 0 0 9.94-9.9A9.9 9.9 0 0 0 12.04 2m0 18.05h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.11.81.83-3.03-.2-.31a8.2 8.2 0 0 1-1.26-4.38 8.24 8.24 0 1 1 8.24 8.24m4.52-6.16c-.25-.13-1.47-.72-1.69-.8-.23-.09-.39-.13-.56.12s-.64.8-.79.97-.29.19-.54.06a6.7 6.7 0 0 1-1.98-1.22 7.4 7.4 0 0 1-1.37-1.7c-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44s.17-.25.25-.42a.46.46 0 0 0-.02-.44c-.07-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.47a.9.9 0 0 0-.66.31 2.76 2.76 0 0 0-.86 2.05c0 1.21.88 2.38 1 2.54s1.73 2.65 4.2 3.71c.59.26 1.04.41 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.18s.21-1.08.14-1.19-.22-.17-.47-.29"/></svg>
+<!-- ==================== FLOATING ==================== -->
+<a class="whatsapp-float" id="whatsappFloat" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2m0 18.05h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.11.81.83-3.03-.2-.31a8.2 8.2 0 01-1.26-4.38 8.24 8.24 0 118.24 8.24m4.52-6.16c-.25-.13-1.47-.72-1.69-.8-.23-.09-.39-.13-.56.12s-.64.8-.79.97-.29.19-.54.06a6.7 6.7 0 01-1.98-1.22 7.4 7.4 0 01-1.37-1.7c-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44s.17-.25.25-.42a.46.46 0 00-.02-.44c-.07-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.47a.9.9 0 00-.66.31 2.76 2.76 0 00-.86 2.05c0 1.21.88 2.38 1 2.54s1.73 2.65 4.2 3.71c.59.26 1.04.41 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.18s.21-1.08.14-1.19-.22-.17-.47-.29"/></svg>
 </a>
+<button class="scroll-top" id="scrollTop" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
 
-<script src="js/config.js"></script>
-<script src="js/main.js"></script>
+<script>
+/* =========================================================
+   CONFIG — TEMPAT EDIT MAKLUMAT SYARIKAT
+   ========================================================= */
+var CONFIG = {
+    companyName: "GoXpert",
+    legalName: "GoXpert",           // nama penuh SSM, cth: "GoXpert Solutions"
+    ssm: "",                        // cth: "202301234567 (003123456-X)" — akan papar di footer bila diisi
+    phoneDisplay: "+6011-3144 6591",
+    phoneRaw: "601131446591",
+    email: "official@goxpert.my",
+    year: new Date().getFullYear(),
+    // Base URL gambar. Bila tuan dah download gambar sendiri, tukar ke "assets/img/"
+    imgBase: "https://arleta.site/interactivelink/1453/",
+    reviewCount: 9                  // Review-1.png ... Review-9.png
+};
+
+/* =========================================================
+   KAMUS BAHASA (EN utama, BM terjemahan)
+   ========================================================= */
+var I18N = {
+    en: {
+        "nav.services": "Services", "nav.why": "Why Us", "nav.coverage": "Coverage",
+        "nav.faq": "FAQ", "nav.contact": "Contact", "nav.cta": "Get a Quote",
+        "hero.badge": "RISM-Registered Building Surveyors",
+        "hero.title.pre": "Building Surveying & Inspection ", "hero.title.hl": "You Can Trust",
+        "hero.text": "From home defect inspection to Building Condition Assessment and tribunal documentation — registered Building Surveyors with SIRIM-calibrated equipment. Inspection with integrity.",
+        "hero.cta1": "Get a Free Quote", "hero.cta2": "View Our Services",
+        "hero.t1": "SIRIM-Calibrated Equipment", "hero.t2": "Registered with RISM", "hero.t3": "Tribunal Support",
+        "stats.title": "Our Track Record", "stats.sub": "Trusted by property owners across Malaysia",
+        "stats.units": "Units Inspected", "stats.projects": "Projects", "stats.inspectors": "Inspectors", "stats.states": "States Covered",
+        "tbar.1": "Registered Building Surveyors (RISM)", "tbar.2": "SIRIM-Calibrated Equipment",
+        "tbar.3": "5,000+ Units Inspected", "tbar.4": "4 States & Beyond", "tbar.5": "Response Within 1 Working Hour",
+        "pillars.tag": "Our Services", "pillars.title": "One Firm. Every Building Survey Need.",
+        "pillars.sub": "We are more than home inspection — a full building surveying practice serving homeowners, corporations and legal proceedings.",
+        "p1.title": "Residential", "p1.sub": "For homeowners & buyers",
+        "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
+        "p1.s3": "Re-Inspection", "p1.s4": "After-Renovation Inspection", "p1.s5": "Joint Inspection with Developer",
+        "p2.title": "Commercial & Asset", "p2.sub": "For corporations, JMB/MC & developers",
+        "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
+        "p2.s3": "Building Monitoring", "p2.s4": "Commercial Building Inspection", "p2.s5": "Maintenance Report / Condition Audit",
+        "p3.title": "Technical & Legal", "p3.sub": "Specialist testing & tribunal support",
+        "p3.s1": "Electrical Inspection", "p3.s2": "Leak Detection & Moisture Survey",
+        "p3.s3": "Thermal Imaging", "p3.s4": "Rectification Defect", "p3.s5": "Tribunal Consultation & Documentation",
+        "aud.tag": "Who We Serve", "aud.title": "Built for Every Property Stakeholder",
+        "why.tag": "Why GoXpert", "why.title": "The Advantages of Choosing Us",
+        "equip.tag": "Professional Equipment", "equip.title": "Calibrated Tools. Accurate Results.",
+        "equip.sub": "Most of our inspection equipment is calibrated by SIRIM Malaysia for valid, defensible findings.",
+        "equip.note": "Calibration certificates available upon request — SIRIM Calibrated",
+        "proc.tag": "How It Works", "proc.title": "A Clear Process from Start to Finish",
+        "rev.tag": "Client Reviews", "rev.title": "What Our Clients Say",
+        "cov.tag": "Coverage Area", "cov.title": "Operating Across 4 Main States",
+        "cov.note": "Property outside these areas? Contact us — we welcome requests from any location in Malaysia.",
+        "faq.title": "Frequently Asked Questions",
+        "con.tag": "Contact Us", "con.title": "Get Your Quote Today",
+        "con.card.title": "Let's Connect", "con.card.sub": "Questions or ready to book? We're here to help.",
+        "con.area": "Coverage", "con.hours": "Business Hours", "con.hours.v": "Mon – Sat: 9:00 am – 6:00 pm",
+        "form.title": "Request a Quote", "form.sub": "Fill in what you can — we'll handle the rest on WhatsApp.",
+        "form.name": "Full Name", "form.phone": "Phone Number", "form.service": "Type of Service",
+        "form.location": "Property Location", "form.size": "Built-up Size (sqft)", "form.storey": "Storeys",
+        "form.notes": "Additional Details", "form.send": "Send via WhatsApp",
+        "cta.title": "Protect Your Property Investment",
+        "cta.sub": "One professional inspection can save you tens of thousands of ringgit. Talk to us today.",
+        "cta.btn": "Get a Free Quote",
+        "foot.desc": "Registered Building Surveyors providing inspection, assessment and tribunal support services across Malaysia.",
+        "foot.links": "Quick Links", "foot.contact": "Contact",
+        "foot.area": "Johor · Melaka · Negeri Sembilan · Selangor", "foot.rights": "All Rights Reserved.",
+        "wa.default": "Hi, I would like to get a quote for a building inspection.",
+        "form.selectPlaceholder": "Select a service"
+    },
+    bm: {
+        "nav.services": "Servis", "nav.why": "Kenapa Kami", "nav.coverage": "Kawasan",
+        "nav.faq": "Soalan Lazim", "nav.contact": "Hubungi", "nav.cta": "Sebut Harga",
+        "hero.badge": "Building Surveyor Berdaftar RISM",
+        "hero.title.pre": "Ukur Bangunan & Inspection ", "hero.title.hl": "Yang Anda Boleh Percaya",
+        "hero.text": "Dari inspection rumah hingga Building Condition Assessment dan dokumentasi tribunal — Building Surveyor berdaftar dengan peralatan dikalibrasi SIRIM. Inspection Dengan Integriti.",
+        "hero.cta1": "Dapatkan Sebut Harga Percuma", "hero.cta2": "Lihat Servis Kami",
+        "hero.t1": "Peralatan Dikalibrasi SIRIM", "hero.t2": "Berdaftar Dengan RISM", "hero.t3": "Sokongan Tribunal",
+        "stats.title": "Pengalaman Kami", "stats.sub": "Dipercayai ramai pemilik hartanah",
+        "stats.units": "Unit Diperiksa", "stats.projects": "Projek", "stats.inspectors": "Inspector", "stats.states": "Negeri Diliputi",
+        "tbar.1": "Building Surveyor Berdaftar (RISM)", "tbar.2": "Peralatan Dikalibrasi SIRIM",
+        "tbar.3": "5,000+ Unit Diperiksa", "tbar.4": "4 Negeri & Sekitarnya", "tbar.5": "Respons Dalam 1 Jam Bekerja",
+        "pillars.tag": "Servis Kami", "pillars.title": "Satu Firma. Semua Keperluan Ukur Bangunan.",
+        "pillars.sub": "Kami bukan sekadar home inspection — firma ukur bangunan lengkap untuk pemilik rumah, korporat dan keperluan perundangan.",
+        "p1.title": "Kediaman", "p1.sub": "Untuk pemilik & pembeli rumah",
+        "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
+        "p1.s3": "Re-Inspection", "p1.s4": "Inspection Selepas Renovation", "p1.s5": "Joint Inspection Bersama Pemaju",
+        "p2.title": "Komersial & Aset", "p2.sub": "Untuk korporat, JMB/MC & pemaju",
+        "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
+        "p2.s3": "Building Monitoring", "p2.s4": "Inspection Bangunan Komersial", "p2.s5": "Maintenance Report / Condition Audit",
+        "p3.title": "Teknikal & Perundangan", "p3.sub": "Ujian khusus & sokongan tribunal",
+        "p3.s1": "Inspection Elektrikal", "p3.s2": "Leak Detection & Moisture Survey",
+        "p3.s3": "Thermal Imaging", "p3.s4": "Rectification Defect", "p3.s5": "Konsultasi & Dokumentasi Tribunal",
+        "aud.tag": "Untuk Siapa", "aud.title": "Untuk Semua Pihak Hartanah",
+        "why.tag": "Kenapa GoXpert", "why.title": "Kelebihan Memilih Kami",
+        "equip.tag": "Peralatan Profesional", "equip.title": "Alat Dikalibrasi. Keputusan Tepat.",
+        "equip.sub": "Kebanyakan peralatan inspection kami dikalibrasi oleh SIRIM Malaysia untuk keputusan yang tepat dan sahih.",
+        "equip.note": "Sijil kalibrasi boleh dimohon — SIRIM Calibrated",
+        "proc.tag": "Cara Ia Berfungsi", "proc.title": "Proses Jelas Dari Mula Hingga Akhir",
+        "rev.tag": "Review Pelanggan", "rev.title": "Apa Kata Pelanggan Kami",
+        "cov.tag": "Kawasan Liputan", "cov.title": "Beroperasi di 4 Negeri Utama",
+        "cov.note": "Hartanah di luar kawasan? Hubungi kami — kami mengalu-alukan permintaan dari mana-mana lokasi di Malaysia.",
+        "faq.title": "Soalan Lazim",
+        "con.tag": "Hubungi Kami", "con.title": "Dapatkan Sebut Harga Hari Ini",
+        "con.card.title": "Jom Berhubung", "con.card.sub": "Ada soalan atau ingin membuat tempahan? Kami sedia membantu.",
+        "con.area": "Kawasan", "con.hours": "Waktu Operasi", "con.hours.v": "Isnin – Sabtu: 9:00 pagi – 6:00 petang",
+        "form.title": "Isi Borang Pertanyaan", "form.sub": "Isi mana yang boleh — selebihnya kita sambung di WhatsApp.",
+        "form.name": "Nama Penuh", "form.phone": "No. Telefon", "form.service": "Jenis Servis",
+        "form.location": "Lokasi Hartanah", "form.size": "Keluasan (sqft)", "form.storey": "Tingkat",
+        "form.notes": "Maklumat Tambahan", "form.send": "Hantar via WhatsApp",
+        "cta.title": "Lindungi Pelaburan Hartanah Anda",
+        "cta.sub": "Satu inspection profesional boleh menjimatkan berpuluh ribu ringgit. Hubungi kami hari ini.",
+        "cta.btn": "Dapatkan Sebut Harga Percuma",
+        "foot.desc": "Building Surveyor berdaftar menyediakan servis inspection, penilaian dan sokongan tribunal di seluruh Malaysia.",
+        "foot.links": "Pautan Pantas", "foot.contact": "Hubungi",
+        "foot.area": "Johor · Melaka · Negeri Sembilan · Selangor", "foot.rights": "Hak Cipta Terpelihara.",
+        "wa.default": "Salam, saya ingin dapatkan sebut harga untuk inspection.",
+        "form.selectPlaceholder": "Pilih servis"
+    }
+};
+
+/* ===== Data kandungan (dwibahasa) ===== */
+var AUDIENCES = [
+    { icon: "M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1z M9 22V12h6v10",
+      en: ["Homeowners", "New home & DLP claims"], bm: ["Pemilik Rumah", "Rumah baru & tuntutan DLP"] },
+    { icon: "M9 12l2 2 4-4 M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+      en: ["Property Buyers", "Pre-purchase & sub-sale"], bm: ["Pembeli Hartanah", "Pre-purchase & sub-sale"] },
+    { icon: "M4 2h16v20H4z M9 22v-4h6v4 M8 6h.01M16 6h.01M8 10h.01M16 10h.01M12 6h.01M12 10h.01",
+      en: ["Developers", "Joint inspection & handover"], bm: ["Pemaju", "Joint inspection & serahan"] },
+    { icon: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2 M12 11a4 4 0 100-8 4 4 0 000 8z",
+      en: ["JMB / MC", "BCA & maintenance audit"], bm: ["JMB / MC", "BCA & audit penyelenggaraan"] },
+    { icon: "M2 20h20 M5 20V8l7-5 7 5v12 M9 20v-6h6v6",
+      en: ["Corporations", "Asset & facility condition"], bm: ["Korporat", "Kondisi aset & fasiliti"] },
+    { icon: "M12 3v18 M5 8l7-5 7 5 M4 14h5a3 3 0 010 6H4z M15 14h5a3 3 0 01-3 6h-2z",
+      en: ["Law Firms", "Expert reports for tribunal"], bm: ["Firma Guaman", "Laporan pakar untuk tribunal"] },
+    { icon: "M3 21h18 M5 21V7a2 2 0 012-2h10a2 2 0 012 2v14 M9 9h.01M15 9h.01M9 13h.01M15 13h.01M9 17h.01M15 17h.01",
+      en: ["Government & Agencies", "Building condition programmes"], bm: ["Kerajaan & Agensi", "Program kondisi bangunan"] },
+    { icon: "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z M12 13a3 3 0 100-6 3 3 0 000 6z",
+      en: ["Property Managers", "Portfolio-wide surveys"], bm: ["Pengurus Hartanah", "Survey seluruh portfolio"] }
+];
+
+var WHYUS = [
+    { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+      en: ["Registered Building Surveyors", "All surveyors are RISM-registered and hold degrees in Building Surveying."],
+      bm: ["Building Surveyor Berdaftar", "Semua surveyor berdaftar di bawah RISM dan memiliki ijazah dalam bidang Building Surveying."] },
+    { icon: "M9 12l2 2 4-4 M22 12A10 10 0 112 12a10 10 0 0120 0z",
+      en: ["SIRIM-Calibrated Equipment", "Inspection equipment calibrated by SIRIM Malaysia for accurate, valid results."],
+      bm: ["Peralatan Dikalibrasi SIRIM", "Peralatan inspection dikalibrasi oleh SIRIM Malaysia untuk keputusan tepat dan sahih."] },
+    { icon: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8",
+      en: ["Detailed Reports", "Complete reports with photos, defect explanations, locations and full analysis."],
+      bm: ["Laporan Terperinci", "Laporan lengkap dengan gambar, penjelasan masalah, lokasi dan analisis penuh."] },
+    { icon: "M12 3v18 M5 8l7-5 7 5 M4 14h5a3 3 0 010 6H4z M15 14h5a3 3 0 01-3 6h-2z",
+      en: ["Tribunal Support", "Consultation and documentation for tribunal cases against developers or sellers."],
+      bm: ["Sokongan Tribunal", "Konsultasi dan dokumentasi untuk kes tribunal terhadap pemaju atau penjual."] },
+    { icon: "M22 12A10 10 0 112 12a10 10 0 0120 0z M12 6v6l4 2",
+      en: ["Fast Response", "Reach us and get a response within 1 hour during working hours."],
+      bm: ["Respons Pantas", "Hubungi kami dan dapatkan respons dalam masa 1 jam pada waktu bekerja."] },
+    { icon: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2 M12 11a4 4 0 100-8 4 4 0 000 8z",
+      en: ["Trusted Track Record", "Over 5,000 units inspected with a high client satisfaction rate."],
+      bm: ["Dipercayai", "Lebih 5,000 unit telah diperiksa dengan kadar kepuasan pelanggan yang tinggi."] }
+];
+
+var EQUIPMENT = [
+    { img: "Thermal-Filter.png",   emoji: "🌡️", en: "Thermal Camera",    bm: "Kamera Thermal" },
+    { img: "Spirit-Level.png",     emoji: "📏", en: "Spirit Level",      bm: "Spirit Level" },
+    { img: "Measure-tape.png",     emoji: "📐", en: "Measuring Tape",    bm: "Pita Pengukur" },
+    { img: "Lsquare.png",          emoji: "📐", en: "L Square",          bm: "L Square" },
+    { img: "Laser-Distance-2.png", emoji: "🔦", en: "Laser Distance",    bm: "Laser Distance" },
+    { img: "Insulation-test.png",  emoji: "⚡", en: "Insulation Tester", bm: "Insulation Tester" },
+    { img: "Earth-Tester.png",     emoji: "🔌", en: "Earth Tester",      bm: "Earth Tester" },
+    { img: "Clamp-Meter.png",      emoji: "🔧", en: "Clamp Meter",       bm: "Clamp Meter" }
+];
+
+var PROCESS = [
+    { en: ["Enquire", "WhatsApp or form — free consultation on the right service."],
+      bm: ["Hubungi", "WhatsApp atau borang — konsultasi percuma pilih servis sesuai."] },
+    { en: ["Quotation", "Clear, itemised quote based on property type and size."],
+      bm: ["Sebut Harga", "Sebut harga jelas mengikut jenis dan saiz hartanah."] },
+    { en: ["Inspection", "Registered surveyors on site with calibrated equipment."],
+      bm: ["Inspection", "Surveyor berdaftar di tapak dengan peralatan dikalibrasi."] },
+    { en: ["Report", "Detailed photo report with findings, locations and analysis."],
+      bm: ["Laporan", "Laporan bergambar lengkap dengan penemuan, lokasi dan analisis."] },
+    { en: ["Follow-Up", "Re-inspection and tribunal support if you need to claim."],
+      bm: ["Susulan", "Re-inspection dan sokongan tribunal jika perlu menuntut."] }
+];
+
+var SERVICES_LIST = [
+    "Home Defect Inspection", "Pre-Purchase Inspection", "Sub-Sale Inspection", "Re-Inspection",
+    "Commercial Building Inspection", "Electrical Inspection", "After Renovation Inspection",
+    "Joint Inspection", "Maintenance Report", "Building Condition Assessment (BCA)",
+    "Dilapidation Survey", "Building Monitoring", "Leak Detection", "Rectification Defect",
+    "Tribunal Consultation"
+];
+
+var FAQS = [
+    { en: ["What is the difference between home inspection and BCA?",
+           "Home inspection focuses on defects in an individual unit (usually during DLP). A Building Condition Assessment (BCA) evaluates the overall condition of an entire building — structure, services and finishes — typically for JMB/MC, corporations or asset owners."],
+      bm: ["Apa beza home inspection dengan BCA?",
+           "Home inspection fokus pada kecacatan satu unit (biasanya semasa DLP). Building Condition Assessment (BCA) menilai kondisi keseluruhan bangunan — struktur, servis dan kemasan — biasanya untuk JMB/MC, korporat atau pemilik aset."] },
+    { en: ["When should I do a home defect inspection?",
+           "As soon as you receive your keys — before the Defect Liability Period (DLP) expires. This preserves your right to have the developer rectify defects free of charge."],
+      bm: ["Bila patut buat home defect inspection?",
+           "Sebaik sahaja terima kunci — sebelum tempoh Defect Liability Period (DLP) tamat. Ini menjaga hak anda untuk pemaju membaiki kecacatan secara percuma."] },
+    { en: ["Can your report be used for tribunal claims?",
+           "Yes. Our reports are prepared by registered Building Surveyors using calibrated equipment, and we provide consultation and documentation support for tribunal cases."],
+      bm: ["Boleh guna laporan untuk tuntutan tribunal?",
+           "Boleh. Laporan kami disediakan oleh Building Surveyor berdaftar menggunakan peralatan dikalibrasi, dan kami sediakan konsultasi serta dokumentasi untuk kes tribunal."] },
+    { en: ["How long does an inspection take and when do I get the report?",
+           "Depending on property size, an inspection typically takes 2–4 hours for a standard unit. The full report follows within a few working days — we will confirm the timeline in your quotation."],
+      bm: ["Berapa lama inspection dan bila dapat laporan?",
+           "Bergantung saiz hartanah, inspection biasanya 2–4 jam untuk unit standard. Laporan penuh menyusul dalam beberapa hari bekerja — kami sahkan tempoh dalam sebut harga."] },
+    { en: ["Which areas do you cover?",
+           "We operate across Johor, Melaka, Negeri Sembilan and Selangor — and we are flexible for other locations. Contact us to check availability."],
+      bm: ["Kawasan mana yang anda liputi?",
+           "Kami beroperasi di Johor, Melaka, Negeri Sembilan dan Selangor — dan fleksibel untuk lokasi lain. Hubungi kami untuk semakan."] }
+];
+
+/* =========================================================
+   LOGIK LAMAN — jarang perlu diubah
+   ========================================================= */
+(function () {
+    "use strict";
+    var lang = localStorage.getItem("gx_lang") || "en";
+
+    function t(key) {
+        return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || "";
+    }
+    function waLink(msg) {
+        return "https://wa.me/" + CONFIG.phoneRaw + "?text=" + encodeURIComponent(msg);
+    }
+    function svgIcon(path, cls) {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"' +
+               (cls ? ' class="' + cls + '"' : '') + '><path d="' + path + '"/></svg>';
+    }
+
+    /* ---------- Terjemahan teks statik ---------- */
+    function applyI18n() {
+        document.documentElement.lang = lang === "bm" ? "ms" : "en";
+        document.querySelectorAll("[data-i18n]").forEach(function (el) {
+            var val = t(el.getAttribute("data-i18n"));
+            if (val) {
+                // equip.note ada <strong> di dalam
+                if (el.getAttribute("data-i18n") === "equip.note") {
+                    el.innerHTML = val.replace("SIRIM Calibrated", "<strong>SIRIM Calibrated</strong>");
+                } else {
+                    el.textContent = val;
+                }
+            }
+        });
+        document.getElementById("heroTitle").innerHTML =
+            t("hero.title.pre") + '<span class="highlight">' + t("hero.title.hl") + "</span>";
+        document.getElementById("langToggle").textContent = lang === "en" ? "BM" : "EN";
+    }
+
+    /* ---------- Render kandungan dinamik ---------- */
+    function renderAudience() {
+        var grid = document.getElementById("audienceGrid");
+        grid.innerHTML = AUDIENCES.map(function (a) {
+            var d = a[lang] || a.en;
+            return '<div class="audience-card reveal"><div class="audience-icon">' + svgIcon(a.icon) +
+                   "</div><h4>" + d[0] + "</h4><p>" + d[1] + "</p></div>";
+        }).join("");
+    }
+
+    function renderWhy() {
+        var grid = document.getElementById("whyGrid");
+        grid.innerHTML = WHYUS.map(function (w) {
+            var d = w[lang] || w.en;
+            return '<div class="why-card reveal"><div class="why-icon">' + svgIcon(w.icon) +
+                   "</div><h4>" + d[0] + "</h4><p>" + d[1] + "</p></div>";
+        }).join("");
+    }
+
+    function renderEquipment() {
+        var grid = document.getElementById("equipGrid");
+        grid.innerHTML = EQUIPMENT.map(function (e) {
+            return '<div class="equip-card reveal">' +
+                   '<img src="' + CONFIG.imgBase + e.img + '" alt="' + e.en + '" loading="lazy" ' +
+                   'onerror="this.closest(\'.equip-card\').classList.add(\'img-missing\')">' +
+                   '<div class="equip-fallback">' + e.emoji + "</div>" +
+                   "<span>" + (e[lang] || e.en) + "</span></div>";
+        }).join("");
+    }
+
+    function renderProcess() {
+        var grid = document.getElementById("processGrid");
+        grid.innerHTML = PROCESS.map(function (p, i) {
+            var d = p[lang] || p.en;
+            return '<div class="process-step reveal"><div class="process-num">' + (i + 1) +
+                   "</div><h4>" + d[0] + "</h4><p>" + d[1] + "</p></div>";
+        }).join("");
+    }
+
+    function renderFaq() {
+        var list = document.getElementById("faqList");
+        list.innerHTML = FAQS.map(function (f, i) {
+            var d = f[lang] || f.en;
+            return '<div class="faq-item' + (i === 0 ? " open" : "") + '">' +
+                   '<button class="faq-q" type="button">' + d[0] +
+                   '<span class="faq-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></button>' +
+                   '<div class="faq-a"><div class="faq-a-inner">' + d[1] + "</div></div></div>";
+        }).join("");
+        list.querySelectorAll(".faq-item").forEach(function (item) {
+            var a = item.querySelector(".faq-a");
+            if (item.classList.contains("open")) a.style.maxHeight = a.scrollHeight + "px";
+            item.querySelector(".faq-q").addEventListener("click", function () {
+                var open = item.classList.toggle("open");
+                a.style.maxHeight = open ? a.scrollHeight + "px" : "0";
+            });
+        });
+    }
+
+    function renderServiceSelect() {
+        var sel = document.getElementById("serviceSelect");
+        sel.innerHTML = "<option value=''>" + t("form.selectPlaceholder") + "</option>" +
+            SERVICES_LIST.map(function (s) { return "<option>" + s + "</option>"; }).join("") +
+            "<option>" + (lang === "bm" ? "Tidak pasti / Lain-lain" : "Not sure / Other") + "</option>";
+    }
+
+    function renderReviews() {
+        var track = document.getElementById("reviewsTrack");
+        var dots = document.getElementById("reviewDots");
+        var html = "", dotsHtml = "";
+        for (var i = 1; i <= CONFIG.reviewCount; i++) {
+            html += '<div class="review-slide"><img src="' + CONFIG.imgBase + "Review-" + i +
+                    '.png" alt="Client review ' + i + '" loading="lazy"></div>';
+            dotsHtml += '<span class="review-dot' + (i === 1 ? " active" : "") + '" data-i="' + (i - 1) + '"></span>';
+        }
+        track.innerHTML = html;
+        dots.innerHTML = dotsHtml;
+    }
+
+    /* ---------- Pautan WhatsApp ---------- */
+    function applyWaLinks() {
+        var link = waLink(t("wa.default"));
+        ["heroWa", "finalWa", "whatsappFloat", "contactWa", "footWa"].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.href = link;
+        });
+    }
+
+    /* ---------- Render semua ---------- */
+    function renderAll() {
+        applyI18n();
+        renderAudience();
+        renderWhy();
+        renderEquipment();
+        renderProcess();
+        renderFaq();
+        renderServiceSelect();
+        applyWaLinks();
+        initReveal();
+    }
+
+    /* ---------- Footer info ---------- */
+    document.getElementById("footCopy").textContent = "© " + CONFIG.year + " " + CONFIG.legalName + ". ";
+    if (CONFIG.ssm) document.getElementById("footSsm").textContent = "SSM: " + CONFIG.ssm;
+
+    /* ---------- Menu mudah alih ---------- */
+    var navLinks = document.getElementById("navLinks");
+    document.getElementById("menuToggle").addEventListener("click", function () {
+        navLinks.classList.toggle("open");
+    });
+    navLinks.addEventListener("click", function (e) {
+        if (e.target.tagName === "A") navLinks.classList.remove("open");
+    });
+
+    /* ---------- Tukar bahasa ---------- */
+    document.getElementById("langToggle").addEventListener("click", function () {
+        lang = lang === "en" ? "bm" : "en";
+        localStorage.setItem("gx_lang", lang);
+        renderAll();
+    });
+
+    /* ---------- Scroll: progress + navbar + scroll-top ---------- */
+    var navbar = document.getElementById("navbar");
+    var scrollTopBtn = document.getElementById("scrollTop");
+    window.addEventListener("scroll", function () {
+        var top = window.scrollY;
+        var docH = document.documentElement.scrollHeight - window.innerHeight;
+        document.getElementById("scrollProgress").style.width = (docH ? (top / docH) * 100 : 0) + "%";
+        navbar.classList.toggle("scrolled", top > 50);
+        scrollTopBtn.classList.toggle("visible", top > 500);
+    }, { passive: true });
+    scrollTopBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+    /* ---------- Reveal on scroll ---------- */
+    var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+            if (en.isIntersecting) { en.target.classList.add("visible"); revealObserver.unobserve(en.target); }
+        });
+    }, { threshold: 0.12 });
+    function initReveal() {
+        document.querySelectorAll(".reveal:not(.visible)").forEach(function (el) { revealObserver.observe(el); });
+    }
+
+    /* ---------- Counter animasi ---------- */
+    function animateCounter(el) {
+        var target = parseInt(el.getAttribute("data-target"), 10);
+        var dur = 1600, start = null;
+        function step(ts) {
+            if (!start) start = ts;
+            var p = Math.min((ts - start) / dur, 1);
+            el.textContent = Math.floor(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
+            if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+    var counterObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+            if (en.isIntersecting) { animateCounter(en.target); counterObserver.unobserve(en.target); }
+        });
+    }, { threshold: 0.4 });
+    document.querySelectorAll(".counter").forEach(function (el) { counterObserver.observe(el); });
+
+    /* ---------- Reviews carousel (swipe + arrow + dots + auto) ---------- */
+    var current = 0, total = CONFIG.reviewCount, autoTimer = null;
+    var track = document.getElementById("reviewsTrack");
+    function goToSlide(i) {
+        current = (i + total) % total;
+        track.style.transform = "translateX(-" + current * 100 + "%)";
+        document.querySelectorAll(".review-dot").forEach(function (d, j) {
+            d.classList.toggle("active", j === current);
+        });
+    }
+    function startAuto() { stopAuto(); autoTimer = setInterval(function () { goToSlide(current + 1); }, 5000); }
+    function stopAuto() { if (autoTimer) clearInterval(autoTimer); }
+    renderReviews();
+    document.getElementById("reviewPrev").addEventListener("click", function () { goToSlide(current - 1); startAuto(); });
+    document.getElementById("reviewNext").addEventListener("click", function () { goToSlide(current + 1); startAuto(); });
+    document.getElementById("reviewDots").addEventListener("click", function (e) {
+        var d = e.target.closest(".review-dot");
+        if (d) { goToSlide(parseInt(d.getAttribute("data-i"), 10)); startAuto(); }
+    });
+    // Swipe (sentuh & tetikus)
+    var dragStartX = null;
+    function dragStart(x) { dragStartX = x; stopAuto(); }
+    function dragEnd(x) {
+        if (dragStartX === null) return;
+        var dx = x - dragStartX;
+        if (Math.abs(dx) > 50) goToSlide(current + (dx < 0 ? 1 : -1));
+        dragStartX = null; startAuto();
+    }
+    track.addEventListener("touchstart", function (e) { dragStart(e.touches[0].clientX); }, { passive: true });
+    track.addEventListener("touchend", function (e) { dragEnd(e.changedTouches[0].clientX); });
+    track.addEventListener("mousedown", function (e) { e.preventDefault(); dragStart(e.clientX); });
+    window.addEventListener("mouseup", function (e) { dragEnd(e.clientX); });
+    startAuto();
+
+    /* ---------- Borang → WhatsApp ---------- */
+    document.getElementById("quoteForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var f = new FormData(e.target);
+        var isBm = lang === "bm";
+        var lines = [isBm ? "Salam, saya ingin dapatkan sebut harga untuk inspection." :
+                            "Hi, I would like to get a quote for a building inspection.", ""];
+        var fields = [
+            [isBm ? "Nama" : "Name", f.get("name")],
+            [isBm ? "Telefon" : "Phone", f.get("phone")],
+            [isBm ? "Servis" : "Service", f.get("service")],
+            [isBm ? "Lokasi" : "Location", f.get("location")],
+            [isBm ? "Keluasan" : "Size", f.get("size") ? f.get("size") + " sqft" : ""],
+            [isBm ? "Tingkat" : "Storeys", f.get("storey")],
+            [isBm ? "Nota" : "Notes", f.get("notes")]
+        ];
+        fields.forEach(function (p) {
+            var v = (p[1] || "").toString().trim();
+            if (v) lines.push(p[0] + ": " + v);
+        });
+        window.open(waLink(lines.join("\n")), "_blank", "noopener");
+    });
+
+    /* ---------- Mula ---------- */
+    renderAll();
+})();
+</script>
 </body>
 </html>

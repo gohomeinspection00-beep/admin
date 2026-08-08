@@ -1,95 +1,41 @@
-# Laman Web Syarikat — Go Home Inspection
+# Laman Web GoXpert — Building Surveying & Inspection
 
-Folder ini ialah **tempat untuk laman web syarikat**, berasingan sepenuhnya
-daripada aplikasi GoInspect (`index.html` dan `admin_panel.html` di root repo).
-Apa-apa perubahan di sini tidak menyentuh app.
+**Satu fail sahaja:** `website/index.html` — download, klik dua kali, terus jalan.
+Berasingan sepenuhnya daripada app GoInspect di root repo.
 
-## Struktur
+## Status
 
-```
-website/
-├── index.html          # Halaman utama (struktur & susunan seksyen)
-├── css/style.css       # Semua gaya. Tukar warna di :root
-├── js/config.js        # ← EDIT DI SINI: nama, telefon, e-mel, servis, pakej, FAQ
-├── js/main.js          # Logik (bahasa BM/EN, borang WhatsApp, menu). Jarang perlu diubah
-└── assets/img/         # Gambar: logo, hero, team, favicon, og-image
-```
-
-## Cara edit (paling kerap)
-
-Buka `js/config.js` sahaja. Semua teks laman diambil dari fail itu:
-
-| Mahu ubah | Edit bahagian |
+| Page | Status |
 |---|---|
-| Nama syarikat, no. SSM | `companyName`, `legalName`, `ssm` |
-| Telefon / WhatsApp | `phone` dan `phoneRaw` (nombor sahaja, cth `601131446591`) |
-| E-mel, alamat, waktu operasi | `email`, `address`, `hours` |
-| Senarai perkhidmatan | `services[]` |
-| Langkah proses kerja | `steps[]` |
-| Harga pakej | `packages[]` — set `packages: []` untuk sembunyikan seksyen harga |
-| Testimoni | `testimonials[]` — set `[]` untuk sembunyikan |
-| Soalan lazim | `faqs[]` |
-| Media sosial | `social` — biarkan kosong `""` jika tiada |
+| Home page | ✅ Siap |
+| Tentang Kami, Servis (detail), Sample Report, dll. | ⏳ Akan ditambah satu-satu ikut arahan |
 
-Setiap teks boleh ditulis dua bahasa: `{ bm: "...", en: "..." }`.
-Butang **EN / BM** di header menukar bahasa dan pilihan itu disimpan dalam browser.
+## Keputusan reka bentuk (dipersetujui)
 
-## Gambar yang perlu dimasukkan
+- **Positioning:** Firma Building Surveyor (bukan home inspection sahaja) — 3 tiang servis: Residential / Commercial & Asset / Technical & Legal
+- **GoInspect:** laman berasingan (tidak dicampur di sini)
+- **Bahasa:** English utama, butang tukar ke BM (pilihan disimpan dalam browser)
+- **Tiada** intro screen, **tiada** lagu latar
+- Tema: biru `#1565C0`, font DM Sans
 
-Letakkan fail-fail ini dalam `assets/img/` (nama mesti sama):
+## Cara edit
 
-| Fail | Guna | Saiz cadangan |
-|---|---|---|
-| `logo.png` | Logo di header | tinggi 64px, latar telus |
-| `hero.jpg` | Gambar besar di atas | 1200 × 900 px |
-| `team.jpg` | Gambar pasukan (seksyen Tentang) | 1000 × 800 px |
-| `favicon.png` | Ikon tab browser | 64 × 64 px |
-| `og-image.jpg` | Pratonton bila dikongsi di WhatsApp/FB | 1200 × 630 px |
+Buka `index.html`, cari bahagian atas `<script>`:
 
-Selagi gambar belum ada, laman tetap berfungsi — kotak bergaris putus-putus
-akan tunjuk di mana gambar patut diletak.
+- **`CONFIG`** — nama syarikat, SSM, telefon, email, base URL gambar
+- **`I18N`** — semua teks EN/BM
+- **`AUDIENCES` / `WHYUS` / `EQUIPMENT` / `PROCESS` / `SERVICES_LIST` / `FAQS`** — kandungan seksyen
+- Warna: blok `:root` di bahagian atas `<style>`
 
-## Lihat laman di komputer
+## Gambar
 
-```bash
-cd website
-python3 -m http.server 8080
-# buka http://localhost:8080
-```
+Semua gambar masih guna hosting lama `https://arleta.site/interactivelink/1453/`.
+Jika gambar gagal load, fallback (emoji/teks) akan dipaparkan secara automatik.
 
-Boleh juga buka `website/index.html` terus dalam browser.
+**Penting:** bila bersedia, download semua gambar, letak dalam folder `img/`
+di sebelah `index.html`, kemudian tukar `imgBase` dalam CONFIG kepada `"img/"`.
 
-## Cara terbitkan (deploy)
+## Rujukan penuh extract design lama
 
-### Pilihan A — Firebase Hosting (repo ini sudah guna Firebase)
-
-Tambah blok `hosting` dalam `firebase.json` di root:
-
-```json
-"hosting": {
-  "public": "website",
-  "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
-}
-```
-
-Kemudian:
-
-```bash
-firebase deploy --only hosting
-```
-
-> Nota: `firebase.json` di root belum ada blok `hosting` — sengaja dibiarkan
-> supaya deploy tidak berlaku tanpa kebenaran anda. Tambah bila anda sudah bersedia.
-
-### Pilihan B — Netlify / Vercel / Cloudflare Pages
-
-Sambung repo, set **publish directory** kepada `website`, tiada build command.
-
-### Pilihan C — GitHub Pages
-
-Settings → Pages → pilih branch, folder `/website`.
-
-## Domain sendiri
-
-Selepas deploy, sambungkan domain (cth `gohomeinspection.com`) melalui panel
-hosting yang dipilih, kemudian kemas kini rekod DNS mengikut arahan yang diberi.
+Senarai penuh warna, gambar, link & struktur dari 2 fail HTML asal ada dalam
+perbualan Claude (sesi `claude/company-website-lnp12i`).
