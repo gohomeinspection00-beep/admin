@@ -391,6 +391,74 @@ section { padding: 5rem 2rem; }
 /* ==================== WHY US ==================== */
 .why-us { background: var(--bg); }
 .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+
+/* ==================== PROJECTS ==================== */
+.projects { background: white; }
+.proj-filters { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2.25rem; }
+.proj-filter {
+    font-family: inherit; font-size: 0.88rem; font-weight: 600;
+    background: var(--bg); color: var(--text-body);
+    border: 1px solid var(--border); border-radius: 50px;
+    padding: 0.55rem 1.3rem; cursor: pointer; transition: all 0.25s ease;
+}
+.proj-filter:hover { border-color: var(--primary); color: var(--primary); }
+.proj-filter.active { background: var(--primary); border-color: var(--primary); color: white; }
+.proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.proj-card {
+    border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    background: white; cursor: pointer; text-align: left; padding: 0; font-family: inherit;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.3s ease;
+    display: flex; flex-direction: column;
+}
+.proj-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.proj-card.hide { display: none; }
+.proj-media { position: relative; aspect-ratio: 4/3; overflow: hidden; background: #E8F1FB; }
+.proj-media img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+}
+.proj-card:hover .proj-media img { transform: scale(1.06); }
+/* placeholder bila gambar belum ada / gagal load */
+.proj-media.ph img { display: none; }
+.proj-media.ph::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, #E8F1FB 0%, #D6E7F8 100%);
+}
+.proj-media.ph::after {
+    content: '⌂'; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; color: rgba(21, 101, 192, 0.35);
+}
+.proj-badge {
+    position: absolute; top: 12px; left: 12px; z-index: 1;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    background: rgba(255,255,255,0.94); color: var(--primary-dark);
+    padding: 0.32rem 0.65rem; border-radius: 4px;
+}
+.proj-zoom {
+    position: absolute; right: 12px; bottom: 12px; z-index: 1;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,0.94); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateY(6px); transition: all 0.3s ease;
+}
+.proj-card:hover .proj-zoom { opacity: 1; transform: none; }
+.proj-zoom svg { width: 16px; height: 16px; }
+.proj-info { padding: 1.1rem 1.2rem 1.25rem; }
+.proj-info h3 { font-size: 1.02rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.15rem; }
+.proj-loc {
+    display: flex; align-items: center; gap: 0.35rem;
+    font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.55rem;
+}
+.proj-loc svg { width: 13px; height: 13px; flex-shrink: 0; }
+.proj-desc { font-size: 0.88rem; color: var(--text-body); }
+.proj-note {
+    text-align: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted);
+}
+@media (hover: none) {
+    .proj-zoom { opacity: 1; transform: none; }
+}
 .why-card {
     background: white; border-radius: 20px; padding: 2rem 1.75rem;
     border: 1px solid var(--border); transition: all 0.3s ease;
@@ -592,7 +660,7 @@ section { padding: 5rem 2rem; }
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 1024px) {
-    .pillar-grid, .why-grid { grid-template-columns: repeat(2, 1fr); }
+    .pillar-grid, .why-grid, .proj-grid { grid-template-columns: repeat(2, 1fr); }
     .process-grid { grid-template-columns: repeat(3, 1fr); row-gap: 2rem; }
     .review-prev { left: -50px; }
     .review-next { right: -50px; }
@@ -617,7 +685,7 @@ section { padding: 5rem 2rem; }
     .stat-item { padding: 1.4rem 1rem; }
     .stat-item:nth-child(odd) { border-left: none; padding-left: 0; }
     .stat-number { font-size: 2rem; }
-    .pillar-grid, .why-grid { grid-template-columns: 1fr; }
+    .pillar-grid, .why-grid, .proj-grid { grid-template-columns: 1fr; }
     .audience-grid { grid-template-columns: repeat(2, 1fr); }
     .equip-grid { grid-template-columns: repeat(2, 1fr); }
     .process-grid { grid-template-columns: 1fr 1fr; }
@@ -654,6 +722,7 @@ section { padding: 5rem 2rem; }
         <ul class="nav-links" id="navLinks">
             <li><a href="#services" data-i18n="nav.services">Services</a></li>
             <li><a href="#why-us" data-i18n="nav.why">Why Us</a></li>
+            <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
             <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
             <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
             <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
@@ -840,6 +909,19 @@ section { padding: 5rem 2rem; }
             <h2 data-i18n="why.title">The Advantages of Choosing Us</h2>
         </div>
         <div class="why-grid" id="whyGrid"><!-- dijana oleh JS --></div>
+    </div>
+</section>
+
+<!-- ==================== PROJECTS ==================== -->
+<section class="projects" id="projects">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="proj.tag">Our Portfolio</span>
+            <h2 data-i18n="proj.title">Projects We Have Handled</h2>
+            <p data-i18n="proj.sub">A selection of inspection and surveying work completed across Malaysia.</p>
+        </div>
+        <div class="proj-filters reveal" id="projFilters"><!-- dijana oleh JS --></div>
+        <div class="proj-grid reveal" id="projGrid"><!-- dijana oleh JS --></div>
     </div>
 </section>
 
@@ -1102,6 +1184,36 @@ var GALLERY = {
 };
 
 /* =========================================================
+   PROJEK YANG PERNAH DIKENDALIKAN — seksyen "Projects".
+   Isi/ganti senarai ini dengan projek sebenar tuan:
+   - img: nama fail di imgBase ("projek-abc.jpg") ATAU URL penuh.
+     Biar "" jika gambar belum ada — placeholder kemas dipaparkan.
+   - cat: "residential" | "commercial" | "technical"
+   - name / loc: nama projek & lokasi
+   - desc: 1 baris ringkas apa yang dibuat (EN & BM)
+   ========================================================= */
+var PROJECTS = [
+    { img: "", cat: "residential",
+      name: "Residensi Idaman", loc: "Johor Bahru, Johor",
+      desc: { en: "Home defect inspection (DLP) — 480 units", bm: "Home defect inspection (DLP) — 480 unit" } },
+    { img: "", cat: "residential",
+      name: "Taman Sri Aman", loc: "Seremban, Negeri Sembilan",
+      desc: { en: "Pre-purchase inspection, double-storey terrace", bm: "Pre-purchase inspection, teres 2 tingkat" } },
+    { img: "", cat: "commercial",
+      name: "Menara Perdagangan", loc: "Shah Alam, Selangor",
+      desc: { en: "Building Condition Assessment (BCA), 18 floors", bm: "Building Condition Assessment (BCA), 18 tingkat" } },
+    { img: "", cat: "commercial",
+      name: "Kompleks Niaga Melaka", loc: "Melaka Tengah, Melaka",
+      desc: { en: "Dilapidation survey before adjacent construction", bm: "Dilapidation survey sebelum pembinaan bersebelahan" } },
+    { img: "ThermalOkey.png", cat: "technical",
+      name: "Kondominium Vista", loc: "Kajang, Selangor",
+      desc: { en: "Thermal imaging & leak detection, tower block", bm: "Thermal imaging & leak detection, blok menara" } },
+    { img: "Crack-2.png", cat: "technical",
+      name: "Bangunan Pejabat Utama", loc: "Nilai, Negeri Sembilan",
+      desc: { en: "Structural crack monitoring & tribunal documentation", bm: "Pemantauan retak struktur & dokumentasi tribunal" } }
+];
+
+/* =========================================================
    KAMUS BAHASA (EN utama, BM terjemahan)
    ========================================================= */
 var I18N = {
@@ -1121,6 +1233,10 @@ var I18N = {
         "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
         "p1.s3": "Re-Inspection", "p1.s4": "After-Renovation Inspection", "p1.s5": "Joint Inspection with Developer",
         "p1.view": "View project photos",
+        "nav.projects": "Projects",
+        "proj.tag": "Our Portfolio", "proj.title": "Projects We Have Handled",
+        "proj.sub": "A selection of inspection and surveying work completed across Malaysia.",
+        "proj.all": "All", "proj.res": "Residential", "proj.com": "Commercial", "proj.tech": "Technical",
         "p2.title": "Commercial & Asset", "p2.sub": "For corporations, JMB/MC & developers",
         "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
         "p2.s3": "Building Monitoring", "p2.s4": "Commercial Building Inspection", "p2.s5": "Maintenance Report / Condition Audit",
@@ -1169,6 +1285,10 @@ var I18N = {
         "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
         "p1.s3": "Re-Inspection", "p1.s4": "Inspection Selepas Renovation", "p1.s5": "Joint Inspection Bersama Pemaju",
         "p1.view": "Lihat gambar projek",
+        "nav.projects": "Projek",
+        "proj.tag": "Portfolio Kami", "proj.title": "Projek Yang Pernah Kami Kendalikan",
+        "proj.sub": "Sebahagian kerja inspection dan ukur bangunan yang telah disiapkan di seluruh Malaysia.",
+        "proj.all": "Semua", "proj.res": "Kediaman", "proj.com": "Komersial", "proj.tech": "Teknikal",
         "p2.title": "Komersial & Aset", "p2.sub": "Untuk korporat, JMB/MC & pemaju",
         "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
         "p2.s3": "Building Monitoring", "p2.s4": "Inspection Bangunan Komersial", "p2.s5": "Maintenance Report / Condition Audit",
@@ -1430,6 +1550,7 @@ var FAQS = [
         renderWhy();
         renderEquipment();
         renderProcess();
+        renderProjects();
         renderFaq();
         renderServiceSelect();
         applyWaLinks();
@@ -1554,26 +1675,31 @@ var FAQS = [
         window.open(waLink(lines.join("\n")), "_blank", "noopener");
     });
 
-    /* ---------- Galeri projek: intai di sebalik kad + lightbox ---------- */
+    /* ---------- Lightbox umum (galeri servis + projek) ---------- */
     var lb = document.getElementById("lightbox");
     var lbImg = document.getElementById("lbImg");
-    var lbKey = null, lbIdx = 0;
+    var lbItems = [], lbIdx = 0;   // lbItems: [{src, label}]
 
     function lbShow(i) {
-        var g = GALLERY[lbKey];
-        if (!g || !g.photos.length) return;
-        lbIdx = (i + g.photos.length) % g.photos.length;
-        lbImg.src = g.photos[lbIdx];
-        document.getElementById("lbTitle").textContent = (g.title[lang] || g.title.en).toUpperCase();
+        if (!lbItems.length) return;
+        lbIdx = (i + lbItems.length) % lbItems.length;
+        lbImg.src = lbItems[lbIdx].src;
+        document.getElementById("lbTitle").textContent = (lbItems[lbIdx].label || "").toUpperCase();
         document.getElementById("lbNow").textContent = lbIdx + 1;
-        document.getElementById("lbTotal").textContent = g.photos.length;
+        document.getElementById("lbTotal").textContent = lbItems.length;
     }
-    function lbOpen(key) {
-        if (!GALLERY[key]) return;
-        lbKey = key;
-        lbShow(0);
+    function lbOpenItems(items, start) {
+        if (!items.length) return;
+        lbItems = items;
+        lbShow(start || 0);
         lb.classList.add("active");
         document.body.style.overflow = "hidden";
+    }
+    function lbOpen(key) {
+        var g = GALLERY[key];
+        if (!g) return;
+        var label = g.title[lang] || g.title.en;
+        lbOpenItems(g.photos.map(function (src) { return { src: src, label: label }; }), 0);
     }
     function lbClose() {
         lb.classList.remove("active");
@@ -1610,6 +1736,90 @@ var FAQS = [
             if (e.key === "Enter" || e.key === " ") { e.preventDefault(); lbOpen(key); }
         });
     });
+
+    /* ---------- Seksyen Projects: grid + penapis + lightbox ---------- */
+    var projFilter = "all";
+    var FILTERS = [
+        { key: "all", i18n: "proj.all" },
+        { key: "residential", i18n: "proj.res" },
+        { key: "commercial", i18n: "proj.com" },
+        { key: "technical", i18n: "proj.tech" }
+    ];
+    function projSrc(p) {
+        if (!p.img) return "";
+        return /^https?:\/\//.test(p.img) ? p.img : CONFIG.imgBase + p.img;
+    }
+    function visibleProjects() {
+        return PROJECTS.filter(function (p) { return projFilter === "all" || p.cat === projFilter; });
+    }
+    function renderProjects() {
+        var filtersEl = document.getElementById("projFilters");
+        var gridEl = document.getElementById("projGrid");
+        if (!filtersEl || !gridEl) return;
+
+        filtersEl.innerHTML = "";
+        FILTERS.forEach(function (f) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "proj-filter" + (projFilter === f.key ? " active" : "");
+            b.textContent = t(f.i18n);
+            b.addEventListener("click", function () {
+                projFilter = f.key;
+                renderProjects();
+            });
+            filtersEl.appendChild(b);
+        });
+
+        gridEl.innerHTML = "";
+        var list = visibleProjects();
+        list.forEach(function (p, idx) {
+            var card = document.createElement("button");
+            card.type = "button";
+            card.className = "proj-card";
+
+            var media = document.createElement("div");
+            media.className = "proj-media" + (p.img ? "" : " ph");
+            var badge = document.createElement("span");
+            badge.className = "proj-badge";
+            badge.textContent = t(p.cat === "residential" ? "proj.res" : p.cat === "commercial" ? "proj.com" : "proj.tech");
+            media.appendChild(badge);
+            if (p.img) {
+                var im = document.createElement("img");
+                im.src = projSrc(p); im.alt = p.name; im.loading = "lazy";
+                im.onerror = function () { media.classList.add("ph"); };
+                media.appendChild(im);
+                var zoom = document.createElement("span");
+                zoom.className = "proj-zoom";
+                zoom.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg>';
+                media.appendChild(zoom);
+            }
+            card.appendChild(media);
+
+            var info = document.createElement("div");
+            info.className = "proj-info";
+            var h = document.createElement("h3"); h.textContent = p.name;
+            var loc = document.createElement("p"); loc.className = "proj-loc";
+            loc.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+            loc.appendChild(document.createTextNode(p.loc));
+            var d = document.createElement("p"); d.className = "proj-desc";
+            d.textContent = p.desc[lang] || p.desc.en;
+            info.appendChild(h); info.appendChild(loc); info.appendChild(d);
+            card.appendChild(info);
+
+            // klik: buka lightbox semua projek bergambar dalam penapis semasa
+            card.addEventListener("click", function () {
+                if (!p.img) return;
+                var withImg = list.filter(function (x) { return x.img; });
+                var start = withImg.indexOf(p);
+                lbOpenItems(withImg.map(function (x) {
+                    return { src: projSrc(x), label: x.name + " — " + x.loc };
+                }), Math.max(start, 0));
+            });
+            if (!p.img) card.style.cursor = "default";
+
+            gridEl.appendChild(card);
+        });
+    }
 
     /* ---------- Mula ---------- */
     renderAll();
