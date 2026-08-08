@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoXpert — Building Surveying & Inspection Malaysia</title>
+<meta name="description" content="RISM-registered Building Surveyors with SIRIM-calibrated equipment. Defect inspection, BCA, dilapidation surveys and tribunal documentation across Malaysia.">
+<meta name="theme-color" content="#0D47A1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   GOXPERT HOME V2 — GAYA EDITORIAL
+   Bersih, profesional, interaksi halus. Tukar warna di :root.
+   ========================================================= */
+:root {
+    --paper: #FBFBF9;          /* latar putih suam, bukan putih skrin */
+    --paper-2: #F4F4F0;
+    --ink: #12161C;
+    --ink-2: #4C555F;
+    --ink-3: #8A939D;
+    --hair: #E3E1DA;           /* garis halus */
+    --navy: #0D47A1;
+    --blue: #1565C0;
+    --sky: #64B5F6;
+    --warm: #FF6B35;           /* aksen amaran — guna sedikit sahaja */
+    --mono: 'JetBrains Mono', monospace;
+    --max: 1200px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink-2);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 2rem; }
+
+/* label mono kecil — identiti laman ini */
+.tag {
+    font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-3);
+}
+.tag b { color: var(--navy); font-weight: 600; }
+
+/* reveal halus */
+.rv { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.rv.on { opacity: 1; transform: none; }
+
+/* ==================== HEADER ==================== */
+.hd {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(251,251,249,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent; transition: border-color 0.3s ease;
+}
+.hd.stuck { border-bottom-color: var(--hair); }
+.hd-in {
+    max-width: var(--max); margin: 0 auto; padding: 1rem 2rem;
+    display: flex; align-items: center; gap: 2rem;
+}
+.wordmark { text-decoration: none; display: flex; align-items: baseline; gap: 0.6rem; }
+.wordmark strong { font-size: 1.2rem; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.wordmark span { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--navy); }
+.hd-nav { display: flex; gap: 1.6rem; margin-left: auto; }
+.hd-nav a {
+    text-decoration: none; color: var(--ink-2); font-size: 0.9rem; font-weight: 500;
+    border-bottom: 1px solid transparent; padding-bottom: 2px; transition: all 0.25s ease;
+}
+.hd-nav a:hover { color: var(--navy); border-bottom-color: var(--navy); }
+.hd-right { display: flex; align-items: center; gap: 0.7rem; }
+.lang {
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em;
+    background: none; border: 1px solid var(--hair); color: var(--ink-2);
+    padding: 0.42rem 0.8rem; border-radius: 3px; cursor: pointer; transition: all 0.25s ease;
+}
+.lang:hover { border-color: var(--navy); color: var(--navy); }
+.hd-cta {
+    text-decoration: none; background: var(--ink); color: var(--paper);
+    font-size: 0.85rem; font-weight: 700; padding: 0.55rem 1.1rem; border-radius: 3px;
+    transition: background 0.25s ease;
+}
+.hd-cta:hover { background: var(--navy); }
+.burger { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+.burger span { display: block; width: 22px; height: 2px; background: var(--ink); margin: 5px 0; }
+
+/* ==================== HERO ==================== */
+.hero { padding: 9.5rem 0 0; }
+.hero-grid {
+    display: grid; grid-template-columns: 1.02fr 0.98fr; gap: 3rem; align-items: center;
+}
+.hero .tag { display: block; margin-bottom: 1.4rem; }
+.hero h1 {
+    font-size: clamp(2.6rem, 5.4vw, 4.4rem); font-weight: 800; color: var(--ink);
+    line-height: 1.02; letter-spacing: -0.035em; margin-bottom: 1.5rem;
+}
+.hero h1 em { font-style: normal; color: var(--navy); }
+.hero-lede { font-size: 1.06rem; max-width: 48ch; margin-bottom: 2.2rem; }
+.hero-cta { display: flex; align-items: center; gap: 1.6rem; flex-wrap: wrap; }
+.btn {
+    display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none;
+    font-weight: 700; font-size: 0.95rem; padding: 1rem 1.7rem; border-radius: 3px;
+    transition: all 0.25s ease; border: none; cursor: pointer; font-family: inherit;
+}
+.btn-ink { background: var(--ink); color: var(--paper); }
+.btn-ink:hover { background: var(--navy); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(13,71,161,0.18); }
+.btn-wa { background: #1FAF54; color: #fff; }
+.btn-wa:hover { background: #178A42; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(31,175,84,0.25); }
+.btn svg { width: 17px; height: 17px; }
+.link-arrow {
+    text-decoration: none; color: var(--ink); font-weight: 600; font-size: 0.95rem;
+    display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.25s ease;
+}
+.link-arrow::after { content: '→'; transition: transform 0.25s ease; }
+.link-arrow:hover { color: var(--navy); }
+.link-arrow:hover::after { transform: translateX(4px); }
+
+/* lukisan blueprint — kemas, statik selepas draw-in */
+.hero-fig { position: relative; }
+.hero-fig svg { width: 100%; height: auto; display: block; }
+.hero-fig .draw {
+    stroke-dasharray: 1; stroke-dashoffset: 1;
+    animation: draw 1.5s ease forwards;
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.fig-cap {
+    margin-top: 0.9rem; display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-3);
+}
+/* penanda defect halus */
+.pin { position: absolute; width: 10px; height: 10px; transform: translate(-50%, -50%); }
+.pin i {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: var(--warm); font-style: normal;
+}
+.pin::before {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    border: 1px solid var(--warm); opacity: 0.6; animation: ping 2.4s ease-out infinite;
+}
+@keyframes ping { 0% { transform: scale(0.5); opacity: 0.8; } 100% { transform: scale(1.7); opacity: 0; } }
+.pin span {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
+    color: var(--ink-2); background: var(--paper); border: 1px solid var(--hair);
+    padding: 0.2rem 0.5rem; white-space: nowrap; border-radius: 2px;
+}
+
+/* ---------- jalur statistik ---------- */
+.stats {
+    margin-top: 4.5rem;
+    border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair);
+}
+.stats-in {
+    max-width: var(--max); margin: 0 auto; padding: 0 2rem;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.stat { padding: 1.9rem 1.5rem; border-left: 1px solid var(--hair); }
+.stat:first-child { border-left: none; padding-left: 0; }
+.stat b {
+    display: flex; align-items: flex-start; gap: 2px;
+    font-size: 2.4rem; font-weight: 800; color: var(--ink);
+    letter-spacing: -0.03em; line-height: 1;
+}
+.stat b sup { font-size: 1.2rem; color: var(--navy); line-height: 1.4; }
+.stat span {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-3); display: block; margin-top: 0.5rem;
+}
+
+/* ---------- ticker servis ---------- */
+.ticker {
+    overflow: hidden; border-bottom: 1px solid var(--hair); padding: 0.85rem 0;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+.ticker-track { display: flex; width: max-content; animation: tick 36s linear infinite; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+@keyframes tick { to { transform: translateX(-50%); } }
+.ticker-track span {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--ink-3); padding: 0 1.3rem; white-space: nowrap;
+}
+.ticker-track span::after { content: '·'; color: var(--warm); margin-left: 2.6rem; }
+
+/* ==================== KERANGKA SEKSYEN ==================== */
+.sec { padding: 5.5rem 0 0; }
+.sec-head {
+    display: grid; grid-template-columns: 200px 1fr; gap: 2rem;
+    padding-bottom: 2.6rem; align-items: start;
+}
+.sec-head h2 {
+    font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 800; color: var(--ink);
+    letter-spacing: -0.03em; line-height: 1.15; max-width: 22ch;
+}
+.sec-head p { max-width: 56ch; margin-top: 0.7rem; }
+.sec-rule { border-top: 1px solid var(--hair); }
+
+/* ==================== 01 SERVIS ==================== */
+.pillars { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--hair); }
+.pillar { border-left: 1px solid var(--hair); padding: 2.2rem 1.8rem 2.6rem; transition: background 0.3s ease; }
+.pillar:first-child { border-left: none; padding-left: 0; }
+.pillar:hover { background: var(--paper-2); }
+.pillar .tag { display: block; margin-bottom: 1rem; }
+.pillar h3 { font-size: 1.25rem; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+.pillar .sub { font-size: 0.88rem; color: var(--ink-3); margin-bottom: 1.4rem; }
+.pillar ul { list-style: none; }
+.pillar li {
+    padding: 0.62rem 0; border-top: 1px solid var(--hair);
+    font-size: 0.92rem; color: var(--ink-2); display: flex; gap: 0.7rem; align-items: baseline;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+}
+.pillar li::before { content: '—'; color: var(--sky); flex-shrink: 0; }
+.pillar li:hover { color: var(--navy); padding-left: 4px; }
+
+/* ==================== 02 KREDIBILITI (baris bernombor) ==================== */
+.cred-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 3rem; align-items: start; }
+.cred-side { position: sticky; top: 100px; }
+.cred-side p { max-width: 40ch; margin-top: 0.8rem; }
+.cred-rows { border-top: 1px solid var(--hair); }
+.cred-row {
+    display: grid; grid-template-columns: 64px 1fr; gap: 1.2rem;
+    padding: 1.5rem 0.6rem 1.5rem 0; border-bottom: 1px solid var(--hair);
+    transition: background 0.25s ease;
+}
+.cred-row:hover { background: var(--paper-2); }
+.cred-row .no {
+    font-family: var(--mono); font-size: 0.78rem; color: var(--ink-3); padding-top: 0.3rem;
+}
+.cred-row h4 { font-size: 1.05rem; font-weight: 700; color: var(--ink); margin-bottom: 0.25rem; }
+.cred-row p { font-size: 0.92rem; }
+
+/* ==================== 03 PERALATAN + THERMAL ==================== */
+.equip-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: start; }
+
+/* slider banding thermal */
+.ba {
+    position: relative; overflow: hidden; border: 1px solid var(--hair);
+    border-radius: 4px; aspect-ratio: 4/3; cursor: ew-resize; touch-action: none;
+    background: var(--paper-2);
+}
+.ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.ba .after { clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0); }
+.ba-handle {
+    position: absolute; top: 0; bottom: 0; left: var(--pos, 50%); width: 1px;
+    background: #fff; box-shadow: 0 0 0 0.5px rgba(0,0,0,0.3); pointer-events: none;
+}
+.ba-handle::after {
+    content: '⇔'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 40px; height: 40px; background: #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: var(--ink); box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.ba-label {
+    position: absolute; bottom: 10px; font-family: var(--mono); font-size: 0.6rem;
+    letter-spacing: 0.16em; text-transform: uppercase; padding: 0.3rem 0.6rem;
+    background: rgba(18,22,28,0.72); color: #fff; border-radius: 2px; pointer-events: none;
+}
+.ba-label.l { left: 10px; }
+.ba-label.r { right: 10px; background: rgba(255,107,53,0.88); }
+/* fallback bila gambar tiada */
+.ba.img-missing img { display: none; }
+.ba.img-missing::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, var(--paper-2) 0 12px, #ECEAE4 12px 24px);
+}
+.ba-cap { margin-top: 0.8rem; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+
+.equip-list { border-top: 1px solid var(--hair); }
+.equip-row {
+    display: grid; grid-template-columns: 54px 1fr auto; gap: 1.1rem; align-items: center;
+    padding: 0.85rem 0.4rem 0.85rem 0; border-bottom: 1px solid var(--hair);
+    transition: background 0.25s ease;
+}
+.equip-row:hover { background: var(--paper-2); }
+.equip-row img { width: 44px; height: 44px; object-fit: contain; }
+.equip-row.img-missing img { display: none; }
+.equip-row.img-missing::before {
+    content: 'IMG'; width: 44px; height: 44px; border: 1px dashed var(--hair); border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.55rem; color: var(--ink-3);
+}
+.equip-row b { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+.equip-row .cal {
+    font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em;
+    color: var(--navy); border: 1px solid var(--sky); border-radius: 2px; padding: 0.18rem 0.5rem;
+}
+
+/* ==================== 04 PROSES ==================== */
+.proc { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--hair); }
+.proc-step { border-left: 1px solid var(--hair); padding: 2rem 1.4rem 2.4rem; position: relative; }
+.proc-step:first-child { border-left: none; padding-left: 0; }
+.proc-step .no {
+    font-family: var(--mono); font-size: 2rem; font-weight: 400; color: var(--hair);
+    display: block; line-height: 1; margin-bottom: 1.1rem;
+    transition: color 0.3s ease;
+}
+.proc-step:hover .no { color: var(--navy); }
+.proc-step h4 { font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.35rem; }
+.proc-step p { font-size: 0.85rem; }
+
+/* ==================== 05 REVIEW ==================== */
+.rev-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 3rem; align-items: start; }
+.rev-side { position: sticky; top: 100px; }
+.rev-counter { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-3); letter-spacing: 0.15em; margin: 1.6rem 0 0.9rem; }
+.rev-counter b { color: var(--ink); }
+.rev-btns { display: flex; gap: 0.6rem; }
+.rev-btn {
+    font-family: var(--mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.16em;
+    background: none; border: 1px solid var(--hair); color: var(--ink-2);
+    padding: 0.55rem 1rem; border-radius: 3px; cursor: pointer; transition: all 0.25s ease;
+}
+.rev-btn:hover { border-color: var(--ink); color: var(--ink); }
+.rev-window { overflow: hidden; border-radius: 4px; }
+.rev-track { display: flex; transition: transform 0.5s cubic-bezier(0.6,0,0.2,1); cursor: grab; }
+.rev-track:active { cursor: grabbing; }
+.rev-slide { flex: 0 0 100%; }
+.rev-slide img { width: 100%; border: 1px solid var(--hair); border-radius: 4px; }
+
+/* ==================== 06 KAWASAN ==================== */
+.states { border-top: 1px solid var(--hair); }
+.state {
+    display: grid; grid-template-columns: 64px 1fr auto; gap: 1.2rem; align-items: center;
+    padding: 1.1rem 0.4rem 1.1rem 0; border-bottom: 1px solid var(--hair);
+    text-decoration: none; transition: background 0.25s ease;
+}
+.state:hover { background: var(--paper-2); }
+.state .no { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); }
+.state b {
+    font-size: clamp(1.5rem, 3.4vw, 2.3rem); font-weight: 800; letter-spacing: -0.02em;
+    color: transparent; -webkit-text-stroke: 1px #B9C2CC;
+    transition: all 0.3s ease;
+}
+.state:hover b { color: var(--navy); -webkit-text-stroke-color: var(--navy); }
+.state span { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+.cov-note { margin-top: 1.4rem; font-size: 0.92rem; max-width: 60ch; }
+
+/* ==================== 07 FAQ ==================== */
+.faq { border-top: 1px solid var(--hair); max-width: 860px; }
+.faq-it { border-bottom: 1px solid var(--hair); }
+.faq-q {
+    width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 1.02rem; font-weight: 700; color: var(--ink);
+    padding: 1.3rem 0.4rem 1.3rem 0; display: flex; justify-content: space-between; gap: 1.5rem;
+}
+.faq-q .pm { font-family: var(--mono); font-size: 1rem; color: var(--navy); flex-shrink: 0; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+.faq-a p { padding: 0 3rem 1.4rem 0; font-size: 0.95rem; }
+
+/* ==================== 08 HUBUNGI ==================== */
+.contact-wrap { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 3.5rem; align-items: start; padding-bottom: 5.5rem; }
+.c-rows { border-top: 1px solid var(--hair); margin-top: 1.6rem; }
+.c-row {
+    display: grid; grid-template-columns: 130px 1fr; gap: 1rem;
+    padding: 1rem 0; border-bottom: 1px solid var(--hair); font-size: 0.95rem;
+}
+.c-row .k { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); padding-top: 0.35rem; }
+.c-row a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.c-row a:hover { color: var(--navy); }
+
+.qform { border: 1px solid var(--hair); border-radius: 4px; padding: 2.2rem; background: #fff; }
+.qform h3 { font-size: 1.15rem; font-weight: 800; color: var(--ink); margin-bottom: 0.3rem; }
+.qform .fs { font-size: 0.85rem; color: var(--ink-3); margin-bottom: 1.6rem; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem 1.6rem; }
+.fg { display: flex; flex-direction: column; gap: 0.3rem; }
+.fg.full { grid-column: 1 / -1; }
+.fg label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+.fg input, .fg select, .fg textarea {
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--ink);
+    border: none; border-bottom: 1px solid var(--hair); background: none;
+    padding: 0.55rem 0.1rem; transition: border-color 0.25s ease;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { outline: none; border-bottom-color: var(--navy); }
+.fg textarea { resize: vertical; }
+.qform .btn { width: 100%; justify-content: center; margin-top: 1.8rem; }
+
+/* ==================== FOOTER ==================== */
+.ft { background: var(--ink); color: #A8B0BA; }
+.ft-in { max-width: var(--max); margin: 0 auto; padding: 3.2rem 2rem 2rem; }
+.ft-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 2.5rem; padding-bottom: 2.4rem; }
+.ft .wordmark strong { color: #fff; }
+.ft .wordmark span { color: var(--sky); }
+.ft p, .ft li { font-size: 0.88rem; }
+.ft ul { list-style: none; }
+.ft li { padding: 0.22rem 0; }
+.ft a { color: #A8B0BA; text-decoration: none; transition: color 0.2s ease; }
+.ft a:hover { color: #fff; }
+.ft h5 { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: #6B7480; margin-bottom: 0.9rem; }
+.ft-btm {
+    border-top: 1px solid #232A33; padding-top: 1.4rem;
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; color: #6B7480;
+}
+
+/* ==================== WHATSAPP TERAPUNG ==================== */
+.waf {
+    position: fixed; right: 20px; bottom: 20px; z-index: 90;
+    width: 54px; height: 54px; border-radius: 50%;
+    background: #1FAF54; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(31,175,84,0.35); transition: transform 0.25s ease;
+}
+.waf:hover { transform: scale(1.08); }
+.waf svg { width: 27px; height: 27px; }
+
+/* ==================== RESPONSIF ==================== */
+@media (max-width: 1023px) {
+    .hero-grid, .cred-grid, .equip-grid, .rev-grid, .contact-wrap { grid-template-columns: 1fr; }
+    .cred-side, .rev-side { position: static; }
+    .proc { grid-template-columns: repeat(2, 1fr); }
+    .proc-step:nth-child(odd) { border-left: none; padding-left: 0; }
+    .stats-in { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(odd) { border-left: none; padding-left: 0; }
+    .sec-head { grid-template-columns: 1fr; gap: 0.6rem; }
+}
+@media (max-width: 760px) {
+    .wrap, .hd-in, .stats-in, .ft-in { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .hd-nav {
+        position: fixed; top: 62px; left: 0; right: 0; background: var(--paper);
+        border-bottom: 1px solid var(--hair); flex-direction: column; gap: 0;
+        padding: 0.4rem 1.25rem 1rem; display: none;
+    }
+    .hd-nav.open { display: flex; }
+    .hd-nav a { padding: 0.85rem 0; border-bottom: 1px solid var(--hair); }
+    .hd-nav a:last-child { border-bottom: none; }
+    .burger { display: block; }
+    .hd-cta { display: none; }
+    .hero { padding-top: 7.5rem; }
+    .pillars { grid-template-columns: 1fr; }
+    .pillar { border-left: none; padding-left: 0; }
+    .proc { grid-template-columns: 1fr; }
+    .proc-step { border-left: none; padding-left: 0; }
+    .ft-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .fgrid { grid-template-columns: 1fr; }
+    .c-row { grid-template-columns: 1fr; gap: 0.2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .rv { opacity: 1; transform: none; }
+    .hero-fig .draw { stroke-dashoffset: 0; }
+    html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header class="hd" id="hd">
+    <div class="hd-in">
+        <a class="wordmark" href="#top">
+            <strong>GoXpert</strong><span data-i18n="wm">Building Surveyors</span>
+        </a>
+        <nav class="hd-nav" id="hdNav">
+            <a href="#services" data-i18n="nav.services">Services</a>
+            <a href="#credentials" data-i18n="nav.cred">Credentials</a>
+            <a href="#equipment" data-i18n="nav.equip">Equipment</a>
+            <a href="#coverage" data-i18n="nav.coverage">Coverage</a>
+            <a href="#contact" data-i18n="nav.contact">Contact</a>
+        </nav>
+        <div class="hd-right">
+            <button class="lang" id="langToggle" type="button">BM</button>
+            <a class="hd-cta" href="#contact" data-i18n="nav.cta">Request a Quote</a>
+            <button class="burger" id="burger" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
+        </div>
+    </div>
+</header>
+
+<main id="top">
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+    <div class="wrap hero-grid">
+        <div>
+            <span class="tag" data-i18n="hero.tag">RISM Registered · SIRIM-Calibrated Instruments</span>
+            <h1 id="heroH1">We find what others <em>miss.</em></h1>
+            <p class="hero-lede" data-i18n="hero.lede">GoXpert is a firm of registered Building Surveyors. Defect inspection, Building Condition Assessment, dilapidation surveys and tribunal documentation — measured, photographed and reported to a professional standard.</p>
+            <div class="hero-cta">
+                <a class="btn btn-ink" href="#contact" data-i18n="hero.cta1">Request a Quote</a>
+                <a class="link-arrow" href="#services" data-i18n="hero.cta2">Explore our services</a>
+            </div>
+        </div>
+        <figure class="hero-fig" aria-hidden="true">
+            <svg viewBox="0 0 640 460" fill="none">
+                <g stroke="#0D47A1" stroke-width="1.3" opacity="0.85">
+                    <path class="draw" pathLength="1" d="M20 430H620" style="animation-delay:.15s"/>
+                    <path class="draw" pathLength="1" d="M95 430V85H265V430" style="animation-delay:.3s"/>
+                    <path class="draw" pathLength="1" d="M95 85L112 62H248L265 85M180 62V34" style="animation-delay:.5s"/>
+                    <path class="draw" pathLength="1" d="M95 132H265M95 180H265M95 228H265M95 276H265M95 324H265M95 372H265" style="animation-delay:.7s"/>
+                    <path class="draw" pathLength="1" d="M130 85V430M180 85V430M230 85V430" style="animation-delay:.85s" opacity="0.5" stroke-width="1"/>
+                    <path class="draw" pathLength="1" d="M330 430V280H560V430" style="animation-delay:.75s"/>
+                    <path class="draw" pathLength="1" d="M318 280L445 200L572 280" style="animation-delay:.95s"/>
+                    <path class="draw" pathLength="1" d="M500 230V200H522V244" style="animation-delay:1.05s"/>
+                    <path class="draw" pathLength="1" d="M362 430V352H404V430" style="animation-delay:1.1s"/>
+                    <path class="draw" pathLength="1" d="M440 318H528V378H440ZM484 318V378M440 348H528" style="animation-delay:1.2s"/>
+                    <g stroke-width="0.8" opacity="0.45">
+                        <path class="draw" pathLength="1" d="M95 22H265M95 16V28M265 16V28" style="animation-delay:1.35s"/>
+                        <path class="draw" pathLength="1" d="M600 280V430M594 280H606M594 430H606" style="animation-delay:1.45s"/>
+                    </g>
+                </g>
+                <g fill="#8A939D" font-family="'JetBrains Mono',monospace" font-size="10" letter-spacing="1.5">
+                    <text x="140" y="14">H 42.600</text>
+                    <text x="588" y="360" transform="rotate(90 588 360)">8.150</text>
+                </g>
+            </svg>
+            <span class="pin" style="left:26%; top:42%"><i></i><span data-i18n="pin.1">Crack 2.4 mm</span></span>
+            <span class="pin" style="left:70%; top:56%"><i></i><span data-i18n="pin.2">Moisture 78%</span></span>
+            <span class="pin" style="left:33%; top:79%"><i></i><span data-i18n="pin.3">Hollow ×12</span></span>
+            <figcaption class="fig-cap">
+                <span>FIG. 01 — SITE SURVEY</span>
+                <span>GRID 1 : 100</span>
+            </figcaption>
+        </figure>
+    </div>
+
+    <!-- jalur statistik -->
+    <div class="stats">
+        <div class="stats-in">
+            <div class="stat"><b><span class="counter" data-target="5000">0</span><sup>+</sup></b><span data-i18n="st.1">Units inspected</span></div>
+            <div class="stat"><b><span class="counter" data-target="300">0</span><sup>+</sup></b><span data-i18n="st.2">Projects completed</span></div>
+            <div class="stat"><b><span class="counter" data-target="10">0</span><sup>+</sup></b><span data-i18n="st.3">Registered inspectors</span></div>
+            <div class="stat"><b><span class="counter" data-target="4">0</span></b><span data-i18n="st.4">States covered</span></div>
+        </div>
+    </div>
+
+    <!-- ticker servis -->
+    <div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+</section>
+
+<!-- ==================== 01 SERVIS ==================== -->
+<section class="sec" id="services">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>01</b> — <span data-i18n="s1.tag">Services</span></span>
+            <div>
+                <h2 data-i18n="s1.h">One firm for every building survey need.</h2>
+                <p data-i18n="s1.p">More than home inspection — a full building surveying practice serving homeowners, corporations, JMB/MC and legal proceedings.</p>
+            </div>
+        </div>
+        <div class="pillars rv" id="pillars"><!-- dijana oleh JS --></div>
+    </div>
+</section>
+
+<!-- ==================== 02 KREDIBILITI ==================== -->
+<section class="sec" id="credentials">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>02</b> — <span data-i18n="s2.tag">Credentials</span></span>
+            <div><h2 data-i18n="s2.h">Why our reports carry weight.</h2></div>
+        </div>
+        <div class="cred-grid">
+            <div class="cred-side rv">
+                <p data-i18n="s2.p">Every report is prepared by registered surveyors using calibrated instruments — evidence you can rely on when negotiating with a developer, or in front of the tribunal.</p>
+            </div>
+            <div class="cred-rows rv" id="credRows"><!-- dijana oleh JS --></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 03 PERALATAN ==================== -->
+<section class="sec" id="equipment">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>03</b> — <span data-i18n="s3.tag">Equipment</span></span>
+            <div>
+                <h2 data-i18n="s3.h">Calibrated instruments. Verifiable readings.</h2>
+                <p data-i18n="s3.p">Most of our equipment is calibrated by SIRIM Malaysia. Drag the slider to see how thermal imaging reveals what the eye cannot.</p>
+            </div>
+        </div>
+        <div class="equip-grid">
+            <div class="rv">
+                <div class="ba" id="baSlider">
+                    <img class="before" src="https://arleta.site/interactivelink/1453/Oroginal-Picture.png" alt="Normal photo"
+                         onerror="this.closest('.ba').classList.add('img-missing')">
+                    <img class="after" src="https://arleta.site/interactivelink/1453/ThermalOkey.png" alt="Thermal view">
+                    <div class="ba-handle"></div>
+                    <span class="ba-label l" data-i18n="ba.l">Visual</span>
+                    <span class="ba-label r" data-i18n="ba.r">Thermal</span>
+                </div>
+                <p class="ba-cap" data-i18n="ba.cap">FIG. 02 — Thermal imaging: hidden moisture behind finished surfaces</p>
+            </div>
+            <div class="equip-list rv" id="equipList"><!-- dijana oleh JS --></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 04 PROSES ==================== -->
+<section class="sec" id="process">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>04</b> — <span data-i18n="s4.tag">Process</span></span>
+            <div><h2 data-i18n="s4.h">Clear from first call to final report.</h2></div>
+        </div>
+        <div class="proc rv" id="procGrid"><!-- dijana oleh JS --></div>
+    </div>
+</section>
+
+<!-- ==================== 05 REVIEW ==================== -->
+<section class="sec" id="reviews">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>05</b> — <span data-i18n="s5.tag">Clients</span></span>
+            <div><h2 data-i18n="s5.h">What our clients say.</h2></div>
+        </div>
+        <div class="rev-grid">
+            <div class="rev-side rv">
+                <p data-i18n="s5.p">Real messages from homeowners and property managers we have worked with.</p>
+                <p class="rev-counter"><b id="revNow">01</b> / <span id="revTotal">09</span></p>
+                <div class="rev-btns">
+                    <button class="rev-btn" id="revPrev" type="button">← PREV</button>
+                    <button class="rev-btn" id="revNext" type="button">NEXT →</button>
+                </div>
+            </div>
+            <div class="rev-window rv">
+                <div class="rev-track" id="revTrack"><!-- dijana oleh JS --></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 06 KAWASAN ==================== -->
+<section class="sec" id="coverage">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>06</b> — <span data-i18n="s6.tag">Coverage</span></span>
+            <div><h2 data-i18n="s6.h">Four states. Flexible beyond.</h2></div>
+        </div>
+        <div class="states rv" id="states"><!-- dijana oleh JS --></div>
+        <p class="cov-note rv" data-i18n="s6.p">Property outside these areas? Contact us — we welcome requests from any location in Malaysia.</p>
+    </div>
+</section>
+
+<!-- ==================== 07 FAQ ==================== -->
+<section class="sec" id="faqSec">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>07</b> — FAQ</span>
+            <div><h2 data-i18n="s7.h">Frequently asked questions.</h2></div>
+        </div>
+        <div class="faq rv" id="faqList"><!-- dijana oleh JS --></div>
+    </div>
+</section>
+
+<!-- ==================== 08 HUBUNGI ==================== -->
+<section class="sec" id="contact">
+    <div class="wrap">
+        <div class="sec-head rv">
+            <span class="tag"><b>08</b> — <span data-i18n="s8.tag">Contact</span></span>
+            <div><h2 data-i18n="s8.h">Request a quote.</h2></div>
+        </div>
+        <div class="contact-wrap">
+            <div class="rv">
+                <p data-i18n="s8.p">Tell us about the property — we usually respond within one working hour.</p>
+                <div class="c-rows">
+                    <div class="c-row"><span class="k">WhatsApp</span><a id="cWa" href="#" target="_blank" rel="noopener">+6011-3144 6591</a></div>
+                    <div class="c-row"><span class="k">Email</span><a href="mailto:official@goxpert.my">official@goxpert.my</a></div>
+                    <div class="c-row"><span class="k" data-i18n="c.area">Coverage</span><span>Johor · Melaka · Negeri Sembilan · Selangor</span></div>
+                    <div class="c-row"><span class="k" data-i18n="c.hours">Hours</span><span data-i18n="c.hours.v">Mon – Sat, 9:00 am – 6:00 pm</span></div>
+                </div>
+            </div>
+            <form class="qform rv" id="qForm">
+                <h3 data-i18n="f.h">Project details</h3>
+                <p class="fs" data-i18n="f.s">Fill in what you can — we'll pick it up on WhatsApp.</p>
+                <div class="fgrid">
+                    <div class="fg"><label data-i18n="f.name">Full name</label><input type="text" name="name" autocomplete="name"></div>
+                    <div class="fg"><label data-i18n="f.phone">Phone</label><input type="tel" name="phone" autocomplete="tel" inputmode="tel"></div>
+                    <div class="fg full"><label data-i18n="f.service">Service</label><select name="service" id="serviceSelect"></select></div>
+                    <div class="fg full"><label data-i18n="f.loc">Property location</label><input type="text" name="location"></div>
+                    <div class="fg"><label data-i18n="f.size">Built-up (sqft)</label><input type="text" name="size" inputmode="numeric"></div>
+                    <div class="fg"><label data-i18n="f.storey">Storeys</label><input type="text" name="storey" inputmode="numeric"></div>
+                    <div class="fg full"><label data-i18n="f.notes">Notes</label><textarea name="notes" rows="3"></textarea></div>
+                </div>
+                <button class="btn btn-wa" type="submit">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+                    <span data-i18n="f.send">Send via WhatsApp</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="ft">
+    <div class="ft-in">
+        <div class="ft-grid">
+            <div>
+                <a class="wordmark" href="#top" style="margin-bottom:0.8rem; display:inline-flex;">
+                    <strong>GoXpert</strong><span data-i18n="wm">Building Surveyors</span>
+                </a>
+                <p data-i18n="ft.desc">Registered Building Surveyors providing inspection, assessment and tribunal support services across Malaysia.</p>
+                <p id="ftSsm" style="margin-top:0.6rem;"></p>
+            </div>
+            <div>
+                <h5 data-i18n="ft.nav">Navigate</h5>
+                <ul>
+                    <li><a href="#services" data-i18n="nav.services">Services</a></li>
+                    <li><a href="#credentials" data-i18n="nav.cred">Credentials</a></li>
+                    <li><a href="#equipment" data-i18n="nav.equip">Equipment</a></li>
+                    <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 data-i18n="ft.contact">Contact</h5>
+                <ul>
+                    <li><a id="ftWa" href="#" target="_blank" rel="noopener">+6011-3144 6591</a></li>
+                    <li><a href="mailto:official@goxpert.my">official@goxpert.my</a></li>
+                    <li data-i18n="ft.area">Johor · Melaka · N. Sembilan · Selangor</li>
+                </ul>
+            </div>
+        </div>
+        <div class="ft-btm">
+            <span id="ftCopy">© 2026 GOXPERT</span>
+            <span data-i18n="ft.rights">ALL RIGHTS RESERVED</span>
+        </div>
+    </div>
+</footer>
+
+<a class="waf" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2m0 18.05h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.11.81.83-3.03-.2-.31a8.2 8.2 0 01-1.26-4.38 8.24 8.24 0 118.24 8.24m4.52-6.16c-.25-.13-1.47-.72-1.69-.8-.23-.09-.39-.13-.56.12s-.64.8-.79.97-.29.19-.54.06a6.7 6.7 0 01-1.98-1.22 7.4 7.4 0 01-1.37-1.7c-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44s.17-.25.25-.42a.46.46 0 00-.02-.44c-.07-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.47a.9.9 0 00-.66.31 2.76 2.76 0 00-.86 2.05c0 1.21.88 2.38 1 2.54s1.73 2.65 4.2 3.71c.59.26 1.04.41 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.18s.21-1.08.14-1.19-.22-.17-.47-.29"/></svg>
+</a>
+
+<script>
+/* =========================================================
+   CONFIG — tempat edit maklumat syarikat
+   ========================================================= */
+var CONFIG = {
+    legalName: "GoXpert",
+    ssm: "",                     // cth: "202301234567 (003123456-X)"
+    phoneRaw: "601131446591",
+    imgBase: "https://arleta.site/interactivelink/1453/",  // tukar ke "img/" bila gambar dipindah
+    reviewCount: 9
+};
+
+var I18N = {
+    en: {
+        "wm": "Building Surveyors",
+        "nav.services": "Services", "nav.cred": "Credentials", "nav.equip": "Equipment",
+        "nav.coverage": "Coverage", "nav.contact": "Contact", "nav.cta": "Request a Quote",
+        "hero.tag": "RISM Registered · SIRIM-Calibrated Instruments",
+        "hero.h1": 'We find what others <em>miss.</em>',
+        "hero.lede": "GoXpert is a firm of registered Building Surveyors. Defect inspection, Building Condition Assessment, dilapidation surveys and tribunal documentation — measured, photographed and reported to a professional standard.",
+        "hero.cta1": "Request a Quote", "hero.cta2": "Explore our services",
+        "pin.1": "Crack 2.4 mm", "pin.2": "Moisture 78%", "pin.3": "Hollow ×12",
+        "st.1": "Units inspected", "st.2": "Projects completed", "st.3": "Registered inspectors", "st.4": "States covered",
+        "s1.tag": "Services", "s1.h": "One firm for every building survey need.",
+        "s1.p": "More than home inspection — a full building surveying practice serving homeowners, corporations, JMB/MC and legal proceedings.",
+        "s2.tag": "Credentials", "s2.h": "Why our reports carry weight.",
+        "s2.p": "Every report is prepared by registered surveyors using calibrated instruments — evidence you can rely on when negotiating with a developer, or in front of the tribunal.",
+        "s3.tag": "Equipment", "s3.h": "Calibrated instruments. Verifiable readings.",
+        "s3.p": "Most of our equipment is calibrated by SIRIM Malaysia. Drag the slider to see how thermal imaging reveals what the eye cannot.",
+        "ba.l": "Visual", "ba.r": "Thermal",
+        "ba.cap": "FIG. 02 — Thermal imaging: hidden moisture behind finished surfaces",
+        "s4.tag": "Process", "s4.h": "Clear from first call to final report.",
+        "s5.tag": "Clients", "s5.h": "What our clients say.",
+        "s5.p": "Real messages from homeowners and property managers we have worked with.",
+        "s6.tag": "Coverage", "s6.h": "Four states. Flexible beyond.",
+        "s6.p": "Property outside these areas? Contact us — we welcome requests from any location in Malaysia.",
+        "s7.h": "Frequently asked questions.",
+        "s8.tag": "Contact", "s8.h": "Request a quote.",
+        "s8.p": "Tell us about the property — we usually respond within one working hour.",
+        "c.area": "Coverage", "c.hours": "Hours", "c.hours.v": "Mon – Sat, 9:00 am – 6:00 pm",
+        "f.h": "Project details", "f.s": "Fill in what you can — we'll pick it up on WhatsApp.",
+        "f.name": "Full name", "f.phone": "Phone", "f.service": "Service", "f.loc": "Property location",
+        "f.size": "Built-up (sqft)", "f.storey": "Storeys", "f.notes": "Notes", "f.send": "Send via WhatsApp",
+        "f.ph": "Select a service", "f.other": "Not sure / Other",
+        "ft.desc": "Registered Building Surveyors providing inspection, assessment and tribunal support services across Malaysia.",
+        "ft.nav": "Navigate", "ft.contact": "Contact",
+        "ft.area": "Johor · Melaka · N. Sembilan · Selangor", "ft.rights": "ALL RIGHTS RESERVED",
+        "wa.default": "Hi, I would like to get a quote for a building inspection."
+    },
+    bm: {
+        "wm": "Building Surveyor",
+        "nav.services": "Servis", "nav.cred": "Kelayakan", "nav.equip": "Peralatan",
+        "nav.coverage": "Kawasan", "nav.contact": "Hubungi", "nav.cta": "Minta Sebut Harga",
+        "hero.tag": "Berdaftar RISM · Alat Dikalibrasi SIRIM",
+        "hero.h1": 'Kami jumpa apa yang orang lain <em>terlepas.</em>',
+        "hero.lede": "GoXpert ialah firma Building Surveyor berdaftar. Defect inspection, Building Condition Assessment, dilapidation survey dan dokumentasi tribunal — diukur, digambar dan dilaporkan mengikut standard profesional.",
+        "hero.cta1": "Minta Sebut Harga", "hero.cta2": "Lihat servis kami",
+        "pin.1": "Retak 2.4 mm", "pin.2": "Lembapan 78%", "pin.3": "Hollow ×12",
+        "st.1": "Unit diperiksa", "st.2": "Projek selesai", "st.3": "Inspector berdaftar", "st.4": "Negeri diliputi",
+        "s1.tag": "Servis", "s1.h": "Satu firma untuk semua keperluan ukur bangunan.",
+        "s1.p": "Lebih daripada home inspection — amalan ukur bangunan lengkap untuk pemilik rumah, korporat, JMB/MC dan prosiding undang-undang.",
+        "s2.tag": "Kelayakan", "s2.h": "Kenapa laporan kami diiktiraf.",
+        "s2.p": "Setiap laporan disediakan oleh surveyor berdaftar menggunakan alat dikalibrasi — bukti yang boleh diharap semasa berunding dengan pemaju, atau di hadapan tribunal.",
+        "s3.tag": "Peralatan", "s3.h": "Alat dikalibrasi. Bacaan boleh disahkan.",
+        "s3.p": "Kebanyakan peralatan kami dikalibrasi oleh SIRIM Malaysia. Seret slider untuk lihat bagaimana imej thermal mendedahkan apa yang mata tak nampak.",
+        "ba.l": "Visual", "ba.r": "Thermal",
+        "ba.cap": "RAJAH 02 — Imej thermal: lembapan tersembunyi di sebalik permukaan siap",
+        "s4.tag": "Proses", "s4.h": "Jelas dari panggilan pertama hingga laporan akhir.",
+        "s5.tag": "Pelanggan", "s5.h": "Apa kata pelanggan kami.",
+        "s5.p": "Mesej sebenar daripada pemilik rumah dan pengurus hartanah yang pernah bekerjasama dengan kami.",
+        "s6.tag": "Kawasan", "s6.h": "Empat negeri. Fleksibel ke lokasi lain.",
+        "s6.p": "Hartanah di luar kawasan? Hubungi kami — kami mengalu-alukan permintaan dari mana-mana lokasi di Malaysia.",
+        "s7.h": "Soalan lazim.",
+        "s8.tag": "Hubungi", "s8.h": "Minta sebut harga.",
+        "s8.p": "Ceritakan tentang hartanah anda — kami biasanya membalas dalam satu jam bekerja.",
+        "c.area": "Kawasan", "c.hours": "Waktu", "c.hours.v": "Isnin – Sabtu, 9:00 pagi – 6:00 petang",
+        "f.h": "Butiran projek", "f.s": "Isi mana yang boleh — selebihnya kita sambung di WhatsApp.",
+        "f.name": "Nama penuh", "f.phone": "Telefon", "f.service": "Servis", "f.loc": "Lokasi hartanah",
+        "f.size": "Keluasan (sqft)", "f.storey": "Tingkat", "f.notes": "Nota", "f.send": "Hantar via WhatsApp",
+        "f.ph": "Pilih servis", "f.other": "Tidak pasti / Lain-lain",
+        "ft.desc": "Building Surveyor berdaftar menyediakan servis inspection, penilaian dan sokongan tribunal di seluruh Malaysia.",
+        "ft.nav": "Navigasi", "ft.contact": "Hubungi",
+        "ft.area": "Johor · Melaka · N. Sembilan · Selangor", "ft.rights": "HAK CIPTA TERPELIHARA",
+        "wa.default": "Salam, saya ingin dapatkan sebut harga untuk inspection."
+    }
+};
+
+/* ---------- kandungan dwibahasa ---------- */
+var PILLARS = [
+    { no: "A", en: { t: "Residential", s: "Homeowners & buyers",
+        li: ["Home Defect Inspection (DLP)", "Pre-Purchase / Sub-Sale", "Re-Inspection", "After-Renovation Inspection", "Joint Inspection with Developer"] },
+      bm: { t: "Kediaman", s: "Pemilik & pembeli rumah",
+        li: ["Home Defect Inspection (DLP)", "Pre-Purchase / Sub-Sale", "Re-Inspection", "Inspection Selepas Renovation", "Joint Inspection Bersama Pemaju"] } },
+    { no: "B", en: { t: "Commercial & Asset", s: "Corporations, JMB/MC & developers",
+        li: ["Building Condition Assessment", "Dilapidation Survey", "Building Monitoring", "Commercial Inspection", "Maintenance / Condition Audit"] },
+      bm: { t: "Komersial & Aset", s: "Korporat, JMB/MC & pemaju",
+        li: ["Building Condition Assessment", "Dilapidation Survey", "Building Monitoring", "Inspection Komersial", "Maintenance / Condition Audit"] } },
+    { no: "C", en: { t: "Technical & Legal", s: "Specialist testing & tribunal",
+        li: ["Electrical Inspection", "Leak Detection & Moisture Survey", "Thermal Imaging", "Rectification Defect", "Tribunal Consultation & Docs"] },
+      bm: { t: "Teknikal & Perundangan", s: "Ujian khusus & tribunal",
+        li: ["Inspection Elektrikal", "Leak Detection & Moisture Survey", "Thermal Imaging", "Rectification Defect", "Konsultasi & Dokumen Tribunal"] } }
+];
+
+var CREDS = [
+    { en: ["Registered Building Surveyors", "All surveyors are RISM-registered and hold degrees in Building Surveying."],
+      bm: ["Building Surveyor Berdaftar", "Semua surveyor berdaftar di bawah RISM dan memiliki ijazah dalam bidang Building Surveying."] },
+    { en: ["SIRIM-calibrated equipment", "Instruments calibrated by SIRIM Malaysia — certificates available on request."],
+      bm: ["Peralatan dikalibrasi SIRIM", "Alat dikalibrasi oleh SIRIM Malaysia — sijil boleh dimohon."] },
+    { en: ["Detailed, defensible reports", "Photos, defect locations, measurements and full analysis in every report."],
+      bm: ["Laporan terperinci & kukuh", "Gambar, lokasi kecacatan, ukuran dan analisis penuh dalam setiap laporan."] },
+    { en: ["Tribunal support", "Consultation and documentation for claims against developers or sellers."],
+      bm: ["Sokongan tribunal", "Konsultasi dan dokumentasi untuk tuntutan terhadap pemaju atau penjual."] },
+    { en: ["Response within 1 working hour", "Reach us on WhatsApp during business hours and we reply fast."],
+      bm: ["Respons dalam 1 jam bekerja", "Hubungi kami di WhatsApp pada waktu pejabat dan kami balas segera."] },
+    { en: ["5,000+ units inspected", "A track record trusted by homeowners and property managers alike."],
+      bm: ["5,000+ unit diperiksa", "Rekod yang dipercayai oleh pemilik rumah dan pengurus hartanah."] }
+];
+
+var EQUIPMENT = [
+    { img: "Thermal-Filter.png",   en: "Thermal Camera",    bm: "Kamera Thermal", cal: true },
+    { img: "Laser-Distance-2.png", en: "Laser Distance",    bm: "Laser Distance", cal: true },
+    { img: "Insulation-test.png",  en: "Insulation Tester", bm: "Insulation Tester", cal: true },
+    { img: "Earth-Tester.png",     en: "Earth Tester",      bm: "Earth Tester", cal: true },
+    { img: "Clamp-Meter.png",      en: "Clamp Meter",       bm: "Clamp Meter", cal: true },
+    { img: "Spirit-Level.png",     en: "Spirit Level",      bm: "Spirit Level", cal: false },
+    { img: "Measure-tape.png",     en: "Measuring Tape",    bm: "Pita Pengukur", cal: false },
+    { img: "Lsquare.png",          en: "L Square",          bm: "L Square", cal: false }
+];
+
+var PROCESS = [
+    { en: ["Enquire", "WhatsApp or the form — free advice on the right service."], bm: ["Hubungi", "WhatsApp atau borang — nasihat percuma pilih servis sesuai."] },
+    { en: ["Quotation", "Clear, itemised pricing by property type and size."], bm: ["Sebut Harga", "Harga jelas mengikut jenis dan saiz hartanah."] },
+    { en: ["Inspection", "Registered surveyors on site with calibrated instruments."], bm: ["Inspection", "Surveyor berdaftar di tapak dengan alat dikalibrasi."] },
+    { en: ["Report", "Photo-documented findings, locations and analysis."], bm: ["Laporan", "Penemuan bergambar, lokasi dan analisis."] },
+    { en: ["Follow-up", "Re-inspection and tribunal support if you claim."], bm: ["Susulan", "Re-inspection dan sokongan tribunal jika menuntut."] }
+];
+
+var STATES = [
+    { no: "01", n: "Johor",            en: "Johor Bahru · Iskandar · Kluang", bm: "Johor Bahru · Iskandar · Kluang" },
+    { no: "02", n: "Melaka",           en: "Melaka Tengah · Alor Gajah",      bm: "Melaka Tengah · Alor Gajah" },
+    { no: "03", n: "Negeri Sembilan",  en: "Seremban · Nilai · Port Dickson", bm: "Seremban · Nilai · Port Dickson" },
+    { no: "04", n: "Selangor",         en: "Klang Valley & surrounds",        bm: "Lembah Klang & sekitar" }
+];
+
+var SERVICES_LIST = [
+    "Home Defect Inspection", "Pre-Purchase Inspection", "Sub-Sale Inspection", "Re-Inspection",
+    "Commercial Building Inspection", "Electrical Inspection", "After Renovation Inspection",
+    "Joint Inspection", "Maintenance Report", "Building Condition Assessment (BCA)",
+    "Dilapidation Survey", "Building Monitoring", "Leak Detection", "Rectification Defect",
+    "Tribunal Consultation"
+];
+
+var FAQS = [
+    { en: ["What is the difference between home inspection and BCA?",
+           "Home inspection focuses on defects in an individual unit (usually during DLP). A Building Condition Assessment evaluates the overall condition of an entire building — structure, services and finishes — typically for JMB/MC, corporations or asset owners."],
+      bm: ["Apa beza home inspection dengan BCA?",
+           "Home inspection fokus pada kecacatan satu unit (biasanya semasa DLP). Building Condition Assessment menilai kondisi keseluruhan bangunan — struktur, servis dan kemasan — biasanya untuk JMB/MC, korporat atau pemilik aset."] },
+    { en: ["When should I do a home defect inspection?",
+           "As soon as you receive your keys — before the Defect Liability Period (DLP) expires. This preserves your right to have the developer rectify defects free of charge."],
+      bm: ["Bila patut buat home defect inspection?",
+           "Sebaik sahaja terima kunci — sebelum tempoh Defect Liability Period (DLP) tamat. Ini menjaga hak anda untuk pemaju membaiki kecacatan secara percuma."] },
+    { en: ["Can your report be used for tribunal claims?",
+           "Yes. Our reports are prepared by registered Building Surveyors using calibrated equipment, and we provide consultation and documentation support for tribunal cases."],
+      bm: ["Boleh guna laporan untuk tuntutan tribunal?",
+           "Boleh. Laporan kami disediakan oleh Building Surveyor berdaftar menggunakan peralatan dikalibrasi, dan kami sediakan konsultasi serta dokumentasi untuk kes tribunal."] },
+    { en: ["How long does an inspection take and when do I get the report?",
+           "Depending on property size, an inspection typically takes 2–4 hours for a standard unit. The full report follows within a few working days — we confirm the timeline in your quotation."],
+      bm: ["Berapa lama inspection dan bila dapat laporan?",
+           "Bergantung saiz hartanah, inspection biasanya 2–4 jam untuk unit standard. Laporan penuh menyusul dalam beberapa hari bekerja — kami sahkan tempoh dalam sebut harga."] },
+    { en: ["Which areas do you cover?",
+           "Johor, Melaka, Negeri Sembilan and Selangor — and we are flexible for other locations. Contact us to check availability."],
+      bm: ["Kawasan mana yang anda liputi?",
+           "Johor, Melaka, Negeri Sembilan dan Selangor — dan fleksibel untuk lokasi lain. Hubungi kami untuk semakan."] }
+];
+
+/* =========================================================
+   LOGIK LAMAN
+   ========================================================= */
+(function () {
+    "use strict";
+    var lang = localStorage.getItem("gx_lang") || "en";
+    function t(k) { return (I18N[lang] && I18N[lang][k]) || I18N.en[k] || ""; }
+    function waLink(msg) { return "https://wa.me/" + CONFIG.phoneRaw + "?text=" + encodeURIComponent(msg); }
+
+    /* ---------- i18n statik ---------- */
+    function applyI18n() {
+        document.documentElement.lang = lang === "bm" ? "ms" : "en";
+        document.querySelectorAll("[data-i18n]").forEach(function (el) {
+            var v = t(el.getAttribute("data-i18n"));
+            if (v) el.textContent = v;
+        });
+        document.getElementById("heroH1").innerHTML = t("hero.h1");
+        document.getElementById("langToggle").textContent = lang === "en" ? "BM" : "EN";
+        var wa = waLink(t("wa.default"));
+        ["cWa", "ftWa", "waFloat"].forEach(function (id) {
+            var el = document.getElementById(id); if (el) el.href = wa;
+        });
+    }
+
+    /* ---------- render dinamik ---------- */
+    function renderPillars() {
+        document.getElementById("pillars").innerHTML = PILLARS.map(function (p) {
+            var d = p[lang] || p.en;
+            return '<div class="pillar"><span class="tag"><b>' + p.no + '</b></span>' +
+                   "<h3>" + d.t + '</h3><p class="sub">' + d.s + "</p><ul>" +
+                   d.li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul></div>";
+        }).join("");
+    }
+    function renderCreds() {
+        document.getElementById("credRows").innerHTML = CREDS.map(function (c, i) {
+            var d = c[lang] || c.en;
+            return '<div class="cred-row"><span class="no">' + String(i + 1).padStart(2, "0") +
+                   "</span><div><h4>" + d[0] + "</h4><p>" + d[1] + "</p></div></div>";
+        }).join("");
+    }
+    function renderEquip() {
+        document.getElementById("equipList").innerHTML = EQUIPMENT.map(function (e) {
+            return '<div class="equip-row">' +
+                   '<img src="' + CONFIG.imgBase + e.img + '" alt="' + e.en + '" loading="lazy" ' +
+                   'onerror="this.closest(\'.equip-row\').classList.add(\'img-missing\')">' +
+                   "<b>" + (e[lang] || e.en) + "</b>" +
+                   (e.cal ? '<span class="cal">SIRIM</span>' : "<span></span>") + "</div>";
+        }).join("");
+    }
+    function renderProc() {
+        document.getElementById("procGrid").innerHTML = PROCESS.map(function (p, i) {
+            var d = p[lang] || p.en;
+            return '<div class="proc-step"><span class="no">' + String(i + 1).padStart(2, "0") +
+                   "</span><h4>" + d[0] + "</h4><p>" + d[1] + "</p></div>";
+        }).join("");
+    }
+    function renderStates() {
+        document.getElementById("states").innerHTML = STATES.map(function (s) {
+            return '<div class="state"><span class="no">' + s.no + "</span><b>" + s.n +
+                   "</b><span>" + (s[lang] || s.en) + "</span></div>";
+        }).join("");
+    }
+    function renderFaq() {
+        var list = document.getElementById("faqList");
+        list.innerHTML = FAQS.map(function (f, i) {
+            var d = f[lang] || f.en;
+            return '<div class="faq-it' + (i === 0 ? " open" : "") + '">' +
+                   '<button class="faq-q" type="button">' + d[0] + '<span class="pm">' + (i === 0 ? "−" : "+") + "</span></button>" +
+                   '<div class="faq-a"><p>' + d[1] + "</p></div></div>";
+        }).join("");
+        list.querySelectorAll(".faq-it").forEach(function (item) {
+            var a = item.querySelector(".faq-a");
+            var pm = item.querySelector(".pm");
+            if (item.classList.contains("open")) a.style.maxHeight = a.scrollHeight + "px";
+            item.querySelector(".faq-q").addEventListener("click", function () {
+                var open = item.classList.toggle("open");
+                a.style.maxHeight = open ? a.scrollHeight + "px" : "0";
+                pm.textContent = open ? "−" : "+";
+            });
+        });
+    }
+    function renderSelect() {
+        document.getElementById("serviceSelect").innerHTML =
+            "<option value=''>" + t("f.ph") + "</option>" +
+            SERVICES_LIST.map(function (s) { return "<option>" + s + "</option>"; }).join("") +
+            "<option>" + t("f.other") + "</option>";
+    }
+    function renderTicker() {
+        var items = SERVICES_LIST.map(function (s) { return "<span>" + s + "</span>"; }).join("");
+        document.getElementById("tickerTrack").innerHTML = items + items;
+    }
+    function renderReviews() {
+        var html = "";
+        for (var i = 1; i <= CONFIG.reviewCount; i++) {
+            html += '<div class="rev-slide"><img src="' + CONFIG.imgBase + "Review-" + i +
+                    '.png" alt="Client review ' + i + '" loading="lazy"></div>';
+        }
+        document.getElementById("revTrack").innerHTML = html;
+        document.getElementById("revTotal").textContent = String(CONFIG.reviewCount).padStart(2, "0");
+    }
+
+    function renderAll() {
+        applyI18n();
+        renderPillars(); renderCreds(); renderEquip(); renderProc();
+        renderStates(); renderFaq(); renderSelect();
+        initReveal();
+    }
+
+    /* ---------- header, menu, bahasa ---------- */
+    var hd = document.getElementById("hd");
+    window.addEventListener("scroll", function () {
+        hd.classList.toggle("stuck", window.scrollY > 30);
+    }, { passive: true });
+
+    var nav = document.getElementById("hdNav");
+    document.getElementById("burger").addEventListener("click", function () { nav.classList.toggle("open"); });
+    nav.addEventListener("click", function (e) { if (e.target.tagName === "A") nav.classList.remove("open"); });
+
+    document.getElementById("langToggle").addEventListener("click", function () {
+        lang = lang === "en" ? "bm" : "en";
+        localStorage.setItem("gx_lang", lang);
+        renderAll();
+    });
+
+    /* ---------- reveal halus ---------- */
+    var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    function initReveal() {
+        document.querySelectorAll(".rv:not(.on)").forEach(function (el) { io.observe(el); });
+    }
+
+    /* ---------- counter ---------- */
+    function count(el) {
+        var target = parseInt(el.getAttribute("data-target"), 10), start = null;
+        function step(ts) {
+            if (!start) start = ts;
+            var p = Math.min((ts - start) / 1500, 1);
+            el.textContent = Math.floor(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
+            if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+    var cio = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { count(e.target); cio.unobserve(e.target); } });
+    }, { threshold: 0.5 });
+    document.querySelectorAll(".counter").forEach(function (el) { cio.observe(el); });
+
+    /* ---------- slider banding thermal ---------- */
+    var ba = document.getElementById("baSlider");
+    function setBa(clientX) {
+        var r = ba.getBoundingClientRect();
+        var p = Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100));
+        ba.style.setProperty("--pos", p + "%");
+    }
+    var dragging = false;
+    ba.addEventListener("pointerdown", function (e) { dragging = true; setBa(e.clientX); });
+    window.addEventListener("pointermove", function (e) { if (dragging) setBa(e.clientX); });
+    window.addEventListener("pointerup", function () { dragging = false; });
+
+    /* ---------- review carousel ---------- */
+    renderReviews();
+    var cur = 0, total = CONFIG.reviewCount;
+    var track = document.getElementById("revTrack");
+    function go(i) {
+        cur = (i + total) % total;
+        track.style.transform = "translateX(-" + cur * 100 + "%)";
+        document.getElementById("revNow").textContent = String(cur + 1).padStart(2, "0");
+    }
+    document.getElementById("revPrev").addEventListener("click", function () { go(cur - 1); });
+    document.getElementById("revNext").addEventListener("click", function () { go(cur + 1); });
+    var sx = null;
+    track.addEventListener("touchstart", function (e) { sx = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener("touchend", function (e) {
+        if (sx === null) return;
+        var dx = e.changedTouches[0].clientX - sx;
+        if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
+        sx = null;
+    });
+
+    /* ---------- borang → WhatsApp ---------- */
+    document.getElementById("qForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var f = new FormData(e.target), isBm = lang === "bm";
+        var lines = [t("wa.default"), ""];
+        [[isBm ? "Nama" : "Name", f.get("name")],
+         [isBm ? "Telefon" : "Phone", f.get("phone")],
+         [isBm ? "Servis" : "Service", f.get("service")],
+         [isBm ? "Lokasi" : "Location", f.get("location")],
+         [isBm ? "Keluasan" : "Size", f.get("size") ? f.get("size") + " sqft" : ""],
+         [isBm ? "Tingkat" : "Storeys", f.get("storey")],
+         [isBm ? "Nota" : "Notes", f.get("notes")]
+        ].forEach(function (p) {
+            var v = (p[1] || "").toString().trim();
+            if (v) lines.push(p[0] + ": " + v);
+        });
+        window.open(waLink(lines.join("\n")), "_blank", "noopener");
+    });
+
+    /* ---------- footer ---------- */
+    document.getElementById("ftCopy").textContent = "© " + new Date().getFullYear() + " " + CONFIG.legalName.toUpperCase();
+    if (CONFIG.ssm) document.getElementById("ftSsm").textContent = "SSM: " + CONFIG.ssm;
+
+    /* ---------- mula ---------- */
+    renderTicker();
+    renderAll();
+})();
+</script>
+</body>
+</html>
