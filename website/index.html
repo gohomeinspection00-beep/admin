@@ -1254,7 +1254,7 @@ section { padding: 5rem 2rem; }
             <li><a href="#/about" data-nav="about" data-i18n="nav.about">About</a></li>
             <li><a href="#/projects" data-nav="projects" data-i18n="nav.projects">Projects</a></li>
             <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
-            <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
+            <li><a href="#/faq" data-nav="faq" data-i18n="nav.faq">FAQ</a></li>
             <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
         <div class="nav-right">
@@ -1548,6 +1548,12 @@ section { padding: 5rem 2rem; }
             <h2 data-i18n="faq.title">Frequently Asked Questions</h2>
         </div>
         <div class="faq-list" id="faqList"><!-- dijana oleh JS --></div>
+        <div class="proj-more reveal">
+            <a class="btn btn-primary" href="#/faq">
+                <span data-i18n="faq.more">More Questions &amp; Answers</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
     </div>
 </section>
 
@@ -1681,6 +1687,37 @@ section { padding: 5rem 2rem; }
 <!-- ############ PAGE: ABOUT (#/about) ############ -->
 <main id="page-about" class="vpage" hidden>
     <div id="aboutBody"><!-- dijana oleh JS --></div>
+</main>
+
+<!-- ############ PAGE: FAQ (#/faq) ############ -->
+<main id="page-faq" class="vpage" hidden>
+    <header class="page-head">
+        <div class="section-container">
+            <a class="back-link" href="#" data-i18n="pg.back">Back to Home</a>
+            <div class="section-header page-head-header">
+                <span class="section-tag" data-i18n="faqp.tag">Questions &amp; Answers</span>
+                <h2 data-i18n="faqp.title">Everything You Might Be Wondering</h2>
+                <p data-i18n="faqp.sub">If your question is not here, message us on WhatsApp — we answer within one working hour.</p>
+            </div>
+        </div>
+    </header>
+    <section class="vpage-body">
+        <div class="section-container">
+            <div class="proj-filters" id="faqFilters"><!-- dijana oleh JS --></div>
+            <p class="proj-count"><span id="faqCount">0</span> <span data-i18n="faqp.count">Questions</span></p>
+            <div class="faq-list" id="faqPageList"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+    <section class="final-cta">
+        <div class="section-container">
+            <h2 data-i18n="faqp.ctaTitle">Still Have a Question?</h2>
+            <p data-i18n="faqp.ctaSub">Ask us directly — no obligation, no sales pressure.</p>
+            <a class="btn btn-whatsapp" id="faqWa" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+                <span data-i18n="faqp.ctaBtn">Ask on WhatsApp</span>
+            </a>
+        </div>
+    </section>
 </main>
 
 <!-- ==================== FOOTER ==================== -->
@@ -3279,6 +3316,12 @@ var I18N = {
         "p1.s3": "Re-Inspection", "p1.s4": "After-Renovation Inspection", "p1.s5": "Joint Inspection with Developer",
         "pillar.more": "Explore all services",
         "nav.projects": "Projects", "nav.about": "About",
+        "faq.more": "More Questions & Answers",
+        "faqp.tag": "Questions & Answers", "faqp.title": "Everything You Might Be Wondering",
+        "faqp.sub": "If your question is not here, message us on WhatsApp — we answer within one working hour.",
+        "faqp.count": "Questions", "faqp.ctaTitle": "Still Have a Question?",
+        "faqp.ctaSub": "Ask us directly — no obligation, no sales pressure.",
+        "faqp.ctaBtn": "Ask on WhatsApp",
         "proj.tag": "Our Portfolio", "proj.title": "Projects We Have Handled",
         "proj.sub": "A selection of inspection and surveying work completed across Malaysia.",
         "proj.subfull": "The full list of inspection and surveying work completed by our team across Malaysia.",
@@ -3343,6 +3386,12 @@ var I18N = {
         "p1.s3": "Re-Inspection", "p1.s4": "Inspection Selepas Renovation", "p1.s5": "Joint Inspection Bersama Pemaju",
         "pillar.more": "Terokai semua servis",
         "nav.projects": "Projek", "nav.about": "Tentang Kami",
+        "faq.more": "Lagi Soalan & Jawapan",
+        "faqp.tag": "Soalan & Jawapan", "faqp.title": "Semua Yang Mungkin Anda Terfikir",
+        "faqp.sub": "Jika soalan anda tiada di sini, mesej kami di WhatsApp — kami jawab dalam satu jam bekerja.",
+        "faqp.count": "Soalan", "faqp.ctaTitle": "Masih Ada Soalan?",
+        "faqp.ctaSub": "Tanya kami terus — tiada obligasi, tiada desakan jualan.",
+        "faqp.ctaBtn": "Tanya di WhatsApp",
         "proj.tag": "Portfolio Kami", "proj.title": "Projek Yang Pernah Kami Kendalikan",
         "proj.sub": "Sebahagian kerja inspection dan ukur bangunan yang telah disiapkan di seluruh Malaysia.",
         "proj.subfull": "Senarai penuh kerja inspection dan ukur bangunan yang telah disiapkan oleh pasukan kami di seluruh Malaysia.",
@@ -3465,27 +3514,231 @@ var SERVICES_LIST = [
     "Tribunal Consultation"
 ];
 
-var FAQS = [
-    { en: ["What is the difference between home inspection and BCA?",
-           "Home inspection focuses on defects in an individual unit (usually during DLP). A Building Condition Assessment (BCA) evaluates the overall condition of an entire building — structure, services and finishes — typically for JMB/MC, corporations or asset owners."],
-      bm: ["Apa beza home inspection dengan BCA?",
-           "Home inspection fokus pada kecacatan satu unit (biasanya semasa DLP). Building Condition Assessment (BCA) menilai kondisi keseluruhan bangunan — struktur, servis dan kemasan — biasanya untuk JMB/MC, korporat atau pemilik aset."] },
-    { en: ["When should I do a home defect inspection?",
-           "As soon as you receive your keys — before the Defect Liability Period (DLP) expires. This preserves your right to have the developer rectify defects free of charge."],
-      bm: ["Bila patut buat home defect inspection?",
-           "Sebaik sahaja terima kunci — sebelum tempoh Defect Liability Period (DLP) tamat. Ini menjaga hak anda untuk pemaju membaiki kecacatan secara percuma."] },
-    { en: ["Can your report be used for tribunal claims?",
-           "Yes. Our reports are prepared by registered Building Surveyors using calibrated equipment, and we provide consultation and documentation support for tribunal cases."],
-      bm: ["Boleh guna laporan untuk tuntutan tribunal?",
-           "Boleh. Laporan kami disediakan oleh Building Surveyor berdaftar menggunakan peralatan dikalibrasi, dan kami sediakan konsultasi serta dokumentasi untuk kes tribunal."] },
-    { en: ["How long does an inspection take and when do I get the report?",
-           "Depending on property size, an inspection typically takes 2–4 hours for a standard unit. The full report follows within a few working days — we will confirm the timeline in your quotation."],
-      bm: ["Berapa lama inspection dan bila dapat laporan?",
-           "Bergantung saiz hartanah, inspection biasanya 2–4 jam untuk unit standard. Laporan penuh menyusul dalam beberapa hari bekerja — kami sahkan tempoh dalam sebut harga."] },
-    { en: ["Which areas do you cover?",
-           "We operate across Johor, Melaka, Negeri Sembilan and Selangor — and we are flexible for other locations. Contact us to check availability."],
+/* =========================================================
+   FAQ PENUH (page #/faq) — dikumpul mengikut kategori.
+   `home: true` = soalan ini juga dipapar di home page.
+   Tambah soalan baru: salin mana-mana blok dan ubah teksnya.
+   ========================================================= */
+var FAQ_CATS = [
+    { key: "all",        label: { en: "All", bm: "Semua" } },
+    { key: "general",    label: { en: "General", bm: "Umum" } },
+    { key: "dlp",        label: { en: "New Home & DLP", bm: "Rumah Baru & DLP" } },
+    { key: "subsale",    label: { en: "Buying a Property", bm: "Membeli Hartanah" } },
+    { key: "commercial", label: { en: "Commercial & Asset", bm: "Komersial & Aset" } },
+    { key: "technical",  label: { en: "Testing & Technical", bm: "Ujian & Teknikal" } },
+    { key: "process",    label: { en: "Booking & Reports", bm: "Tempahan & Laporan" } },
+    { key: "claims",     label: { en: "Claims & Tribunal", bm: "Tuntutan & Tribunal" } }
+];
+
+var FAQ_ALL = [
+    /* ---------- UMUM ---------- */
+    { cat: "general",
+      en: ["What is a Building Surveyor, and how is that different from a contractor?",
+           "A Building Surveyor is a qualified professional who assesses the condition of buildings — we inspect, measure and report, but we do not carry out repairs. A contractor does the repair work. Because we do not sell repairs, we have no reason to exaggerate or downplay what we find."],
+      bm: ["Apa itu Building Surveyor, dan apa bezanya dengan kontraktor?",
+           "Building Surveyor ialah profesional bertauliah yang menilai keadaan bangunan — kami memeriksa, mengukur dan melapor, tetapi kami tidak menjalankan kerja pembaikian. Kontraktor yang buat kerja baiki. Kerana kami tidak menjual pembaikian, kami tiada sebab untuk membesar-besarkan atau memperkecilkan apa yang kami temui."] },
+    { cat: "general", home: true,
+      en: ["My house is brand new. Why would it need an inspection?",
+           "New does not mean defect-free. Most new units have dozens of defects — hollow tiles, poor alignment, leaking joints, electrical faults — that are difficult to spot without training and instruments. The developer is obliged to fix them during the DLP, but only if they are properly identified and reported."],
+      bm: ["Rumah saya baru. Kenapa perlu inspection?",
+           "Baru tidak bermakna bebas kecacatan. Kebanyakan unit baru ada berpuluh defect — jubin hollow, alignment tak tepat, sambungan bocor, kerosakan elektrik — yang sukar dikesan tanpa latihan dan peralatan. Pemaju wajib membaikinya dalam tempoh DLP, tetapi hanya jika ia dikenal pasti dan dilaporkan dengan betul."] },
+    { cat: "general",
+      en: ["Do I need to be present during the inspection?",
+           "It is not compulsory, but we encourage it. Being there means we can point out findings on the spot and explain what matters most. If you cannot attend, we will walk you through the report afterwards."],
+      bm: ["Perlukah saya hadir semasa inspection?",
+           "Tidak wajib, tetapi kami galakkan. Dengan hadir, kami boleh tunjukkan penemuan di tempat kejadian dan terangkan apa yang paling penting. Jika anda tak dapat hadir, kami akan terangkan laporan selepas itu."] },
+    { cat: "general", home: true,
+      en: ["Which areas do you cover?",
+           "We operate across Johor, Melaka, Negeri Sembilan and Selangor — and we are flexible for other locations. Contact us to check availability for your area."],
       bm: ["Kawasan mana yang anda liputi?",
-           "Kami beroperasi di Johor, Melaka, Negeri Sembilan dan Selangor — dan fleksibel untuk lokasi lain. Hubungi kami untuk semakan."] }
+           "Kami beroperasi di Johor, Melaka, Negeri Sembilan dan Selangor — dan fleksibel untuk lokasi lain. Hubungi kami untuk semak kawasan anda."] },
+    { cat: "general",
+      en: ["Are your surveyors registered?",
+           "Yes. Every inspector is registered under the Royal Institution of Surveyors Malaysia (RISM) and holds a degree in Building Surveying. Inspections are never subcontracted out to unqualified personnel."],
+      bm: ["Adakah surveyor anda berdaftar?",
+           "Ya. Setiap inspector berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM) dan memiliki ijazah dalam Building Surveying. Pemeriksaan tidak pernah disubkontrak kepada orang tidak bertauliah."] },
+    { cat: "general",
+      en: ["What is the difference between a home inspection and a BCA?",
+           "A home inspection focuses on defects in an individual unit, usually during the DLP. A Building Condition Assessment (BCA) evaluates the overall condition of an entire building — structure, services and finishes — and is typically commissioned by JMB/MC, corporations or asset owners."],
+      bm: ["Apa beza home inspection dengan BCA?",
+           "Home inspection fokus pada kecacatan satu unit, biasanya semasa DLP. Building Condition Assessment (BCA) menilai keadaan keseluruhan bangunan — struktur, servis dan kemasan — biasanya ditugaskan oleh JMB/MC, korporat atau pemilik aset."] },
+
+    /* ---------- RUMAH BARU & DLP ---------- */
+    { cat: "dlp", home: true,
+      en: ["When should I do a home defect inspection?",
+           "As soon as you receive your keys, and well before the Defect Liability Period (DLP) expires. During the DLP the developer is obliged to rectify defects at no cost to you — once it lapses, every repair becomes your expense."],
+      bm: ["Bila patut buat home defect inspection?",
+           "Sebaik sahaja terima kunci, dan jauh sebelum tempoh Defect Liability Period (DLP) tamat. Dalam tempoh DLP pemaju wajib membaiki kecacatan tanpa kos kepada anda — sebaik ia luput, setiap pembaikian menjadi perbelanjaan anda."] },
+    { cat: "dlp",
+      en: ["What exactly is the DLP?",
+           "The Defect Liability Period is the warranty period after handover during which the developer must rectify defects in your unit. The length is stated in your Sale and Purchase Agreement — check your S&P for the exact period that applies to your property."],
+      bm: ["Apa sebenarnya DLP itu?",
+           "Defect Liability Period ialah tempoh jaminan selepas penyerahan di mana pemaju wajib membaiki kecacatan dalam unit anda. Tempohnya dinyatakan dalam Perjanjian Jual Beli — semak S&P anda untuk tempoh tepat yang terpakai."] },
+    { cat: "dlp",
+      en: ["My DLP is expiring soon. Is it too late?",
+           "Not necessarily, but you should act immediately. Contact us and tell us your DLP expiry date — we will prioritise the booking so your defect list can be submitted while your entitlement is still valid."],
+      bm: ["DLP saya hampir tamat. Adakah sudah terlambat?",
+           "Belum tentu, tetapi anda perlu bertindak segera. Hubungi kami dan beritahu tarikh tamat DLP anda — kami akan utamakan tempahan supaya senarai defect boleh dihantar semasa hak anda masih sah."] },
+    { cat: "dlp",
+      en: ["Can the developer reject items on my defect list?",
+           "They can dispute items, and some will. That is exactly why instrument readings matter — a recorded moisture value or a failed earth test is far harder to dismiss than a written complaint. If items are disputed, we can attend a joint inspection with you."],
+      bm: ["Boleh ke pemaju tolak item dalam senarai defect saya?",
+           "Mereka boleh pertikaikan item, dan ada yang akan buat begitu. Itulah sebabnya bacaan alat penting — nilai lembapan yang direkod atau ujian earth yang gagal jauh lebih sukar ditolak berbanding aduan bertulis. Jika item dipertikai, kami boleh hadir joint inspection bersama anda."] },
+    { cat: "dlp",
+      en: ["The developer says they have fixed everything. Should I just sign?",
+           "Not before it is verified. A re-inspection checks each item against your original list and confirms whether the repair was actually done to standard. Cosmetic patch-ups are common, and once you sign off, the item is closed."],
+      bm: ["Pemaju kata semua dah dibaiki. Patut saya tandatangan terus?",
+           "Jangan sebelum ia disahkan. Re-inspection menyemak setiap item berbanding senarai asal anda dan mengesahkan sama ada pembaikian benar-benar mengikut standard. Tampalan kosmetik memang biasa, dan sebaik anda tandatangan, item itu ditutup."] },
+    { cat: "dlp",
+      en: ["The repair work created new damage. Is that covered?",
+           "Yes, and we record it as a distinct category — \"New Defect from Rectification Work\". Damage caused during rectification is still the developer's responsibility, and separating it from the original defects makes that clear."],
+      bm: ["Kerja pembaikian menyebabkan kerosakan baru. Adakah ia dilindungi?",
+           "Ya, dan kami rekodkannya sebagai kategori berasingan — \"New Defect from Rectification Work\". Kerosakan akibat kerja pembaikian tetap tanggungjawab pemaju, dan mengasingkannya daripada defect asal menjadikannya jelas."] },
+
+    /* ---------- MEMBELI HARTANAH ---------- */
+    { cat: "subsale", home: true,
+      en: ["Is an inspection worth it for a sub-sale house?",
+           "Usually it is the best money you will spend. Hidden defects — waterproofing failure, wiring problems, structural cracks — can cost tens of thousands after you move in. Knowing beforehand lets you negotiate, plan repairs, or walk away."],
+      bm: ["Berbaloikah inspection untuk rumah sub-sale?",
+           "Biasanya ia wang paling berbaloi yang anda belanjakan. Kecacatan tersembunyi — kegagalan kalis air, masalah wiring, retak struktur — boleh menelan puluhan ribu selepas anda masuk. Mengetahuinya lebih awal membolehkan anda berunding, merancang pembaikian, atau menarik diri."] },
+    { cat: "subsale",
+      en: ["Can I use the report to negotiate the price?",
+           "Yes, and many clients do. Our pre-purchase report includes repair cost estimates and a negotiation points list, so you are discussing figures backed by a professional assessment instead of arguing over impressions."],
+      bm: ["Boleh saya guna laporan untuk berunding harga?",
+           "Boleh, dan ramai pelanggan buat begitu. Laporan pre-purchase kami merangkumi anggaran kos pembaikian dan senarai point negotiation, jadi anda berbincang dengan angka yang disokong penilaian profesional, bukan bertekak berdasarkan tanggapan."] },
+    { cat: "subsale",
+      en: ["Can you inspect before I sign the S&P?",
+           "Yes — that is exactly when a pre-purchase inspection is most useful. Arrange viewing access with the seller or agent, and we will inspect within the agreed scope. Tell us your decision deadline and we will work to it."],
+      bm: ["Boleh periksa sebelum saya tandatangan S&P?",
+           "Boleh — itulah masa pre-purchase inspection paling berguna. Uruskan akses untuk viewing dengan penjual atau ejen, dan kami akan periksa dalam skop yang dipersetujui. Beritahu tarikh akhir keputusan anda dan kami akan sesuaikan."] },
+    { cat: "subsale",
+      en: ["Do you provide repair cost estimates?",
+           "Yes. For pre-purchase and sub-sale inspections we provide an estimated cost to rectify each defect found, plus a repair priority list separating what is urgent from what can be deferred."],
+      bm: ["Adakah anda beri anggaran kos pembaikian?",
+           "Ya. Untuk pre-purchase dan sub-sale inspection kami sediakan anggaran kos membaiki setiap defect yang ditemui, serta senarai keutamaan pembaikian yang mengasingkan apa yang mendesak daripada yang boleh ditangguh."] },
+    { cat: "subsale",
+      en: ["What if the seller does not allow full access?",
+           "We inspect within whatever access is permitted and state clearly in the report which areas could not be assessed. A limited inspection is still far better than none — but we will never imply we checked something we did not."],
+      bm: ["Bagaimana jika penjual tak benarkan akses penuh?",
+           "Kami periksa dalam akses yang dibenarkan dan nyatakan dengan jelas dalam laporan kawasan mana yang tak dapat dinilai. Pemeriksaan terhad tetap jauh lebih baik daripada tiada — tetapi kami tidak akan sesekali menyatakan kami menyemak sesuatu yang tidak kami semak."] },
+
+    /* ---------- KOMERSIAL & ASET ---------- */
+    { cat: "commercial",
+      en: ["What is a Building Condition Assessment used for?",
+           "A BCA gives JMB/MC, corporations and asset owners a systematic picture of a building's condition: every element rated, defects prioritised, and maintenance budgeting supported by evidence rather than guesswork."],
+      bm: ["Building Condition Assessment digunakan untuk apa?",
+           "BCA memberi JMB/MC, korporat dan pemilik aset gambaran sistematik keadaan bangunan: setiap elemen digred, defect disusun ikut keutamaan, dan bajet penyelenggaraan disokong bukti, bukan agakan."] },
+    { cat: "commercial",
+      en: ["Who needs a dilapidation survey?",
+           "Anyone whose property sits near upcoming construction, demolition or piling works — and also contractors who want protection against false damage claims. The survey must be done before the works begin to be of any use."],
+      bm: ["Siapa yang perlukan dilapidation survey?",
+           "Sesiapa yang hartanahnya berhampiran kerja pembinaan, perobohan atau cerucuk yang akan datang — dan juga kontraktor yang mahu perlindungan daripada dakwaan kerosakan palsu. Tinjauan mesti dibuat sebelum kerja bermula barulah ia berguna."] },
+    { cat: "commercial",
+      en: ["Can a BCA help with sinking fund planning?",
+           "That is one of its main purposes. Once every element is rated and prioritised, you can see which repairs are due now and which can be scheduled — which makes contribution planning far easier to justify to owners."],
+      bm: ["Bolehkah BCA membantu perancangan sinking fund?",
+           "Itu salah satu tujuan utamanya. Sebaik setiap elemen digred dan disusun keutamaan, anda dapat lihat pembaikian mana perlu sekarang dan mana boleh dijadualkan — menjadikan perancangan sumbangan lebih mudah dijustifikasi kepada pemilik."] },
+    { cat: "commercial",
+      en: ["Do you inspect factories, shoplots and offices?",
+           "Yes. Commercial inspections are scoped to your objective — buying, leasing or auditing — and we coordinate site attendance around your operating hours where possible."],
+      bm: ["Adakah anda periksa kilang, lot kedai dan pejabat?",
+           "Ya. Inspection komersial diskopkan mengikut objektif anda — membeli, menyewa atau mengaudit — dan kami selaraskan kehadiran di tapak mengikut waktu operasi anda jika boleh."] },
+    { cat: "commercial",
+      en: ["Can you inspect the same property again later?",
+           "Yes, and it is often valuable. A re-assessment compared against an earlier documented baseline shows exactly how conditions have changed and whether past repairs held up."],
+      bm: ["Boleh periksa semula hartanah sama kemudian?",
+           "Boleh, dan selalunya bernilai. Penilaian semula yang dibandingkan dengan asas berdokumentasi terdahulu menunjukkan dengan tepat bagaimana keadaan berubah dan sama ada pembaikian lepas bertahan."] },
+
+    /* ---------- UJIAN & TEKNIKAL ---------- */
+    { cat: "technical",
+      en: ["Do you need to hack walls to find a leak?",
+           "No. We trace leaks non-destructively using moisture meters and thermal imaging, which detect water through finished surfaces. Hacking only happens afterwards, by your contractor, at the exact point we identify."],
+      bm: ["Perlukah pecah dinding untuk cari kebocoran?",
+           "Tidak. Kami jejak kebocoran tanpa musnah menggunakan meter lembapan dan imej thermal, yang mengesan air menembusi permukaan siap. Pecah dinding hanya berlaku selepas itu, oleh kontraktor anda, di titik tepat yang kami kenal pasti."] },
+    { cat: "technical",
+      en: ["What is thermal imaging actually used for?",
+           "It reveals what is behind finished surfaces: hidden moisture, overheating electrical connections, missing insulation, concealed pipe routes and voids behind tiles. It is non-destructive and produces evidence that is difficult to dispute."],
+      bm: ["Thermal imaging sebenarnya digunakan untuk apa?",
+           "Ia mendedahkan apa yang di sebalik permukaan siap: lembapan tersembunyi, sambungan elektrik terlampau panas, penebat yang hilang, laluan paip tersembunyi dan rongga di sebalik jubin. Ia tanpa musnah dan menghasilkan bukti yang sukar dipertikai."] },
+    { cat: "technical",
+      en: ["What electrical tests do you carry out?",
+           "Earth resistance, insulation resistance, polarity and wiring checks, RCCB trip testing, socket and point functionality, clamp meter load readings, and a thermal scan of the distribution board. Every value is recorded in your report."],
+      bm: ["Ujian elektrik apa yang anda jalankan?",
+           "Rintangan pembumian, rintangan penebatan, semakan polariti dan pendawaian, ujian trip RCCB, fungsi soket dan punca, bacaan beban clamp meter, dan imbasan thermal papan agihan. Setiap nilai direkod dalam laporan anda."] },
+    { cat: "technical",
+      en: ["Are your instruments calibrated?",
+           "Yes — most of our testing equipment is calibrated by SIRIM Malaysia. Calibration is what turns a reading into evidence, and certificates are available on request."],
+      bm: ["Adakah alat anda dikalibrasi?",
+           "Ya — kebanyakan peralatan ujian kami dikalibrasi oleh SIRIM Malaysia. Kalibrasi itulah yang menjadikan satu bacaan sebagai bukti, dan sijil boleh dimohon."] },
+    { cat: "technical",
+      en: ["Can you inspect the roof if it is not accessible?",
+           "In many cases yes — we can survey roofs visually and, where appropriate, with drone assistance. If any area genuinely cannot be assessed safely, we say so in the report rather than leaving it ambiguous."],
+      bm: ["Boleh periksa bumbung jika tak dapat dinaiki?",
+           "Dalam banyak kes boleh — kami boleh tinjau bumbung secara visual dan, jika sesuai, dengan bantuan drone. Jika ada kawasan yang benar-benar tak dapat dinilai dengan selamat, kami nyatakan dalam laporan dan bukan membiarkannya kabur."] },
+    { cat: "technical",
+      en: ["Is every crack a serious problem?",
+           "No, and we will tell you when it is not. Many hairline cracks are cosmetic and within tolerance. What matters is the width, pattern, location and whether it is moving — which is why some cracks warrant monitoring rather than immediate repair."],
+      bm: ["Adakah setiap retak itu masalah serius?",
+           "Tidak, dan kami akan beritahu bila ia bukan. Banyak retak halus adalah kosmetik dan dalam toleransi. Yang penting ialah lebar, corak, lokasi dan sama ada ia bergerak — sebab itu sesetengah retak wajar dipantau dahulu, bukan terus dibaiki."] },
+
+    /* ---------- TEMPAHAN & LAPORAN ---------- */
+    { cat: "process", home: true,
+      en: ["How long does an inspection take, and when do I get the report?",
+           "For a standard unit an inspection typically takes 2 to 4 hours; landed and commercial properties take longer. The full report follows within a few working days — we confirm the exact timeline in your quotation."],
+      bm: ["Berapa lama inspection, dan bila saya dapat laporan?",
+           "Untuk unit standard, inspection biasanya 2 hingga 4 jam; rumah teres dan hartanah komersial mengambil masa lebih lama. Laporan penuh menyusul dalam beberapa hari bekerja — kami sahkan tempoh tepat dalam sebut harga anda."] },
+    { cat: "process", home: true,
+      en: ["How much does an inspection cost?",
+           "It depends on property type, size and the scope you need, so we quote per property rather than publishing a flat rate. Send us the property type, built-up area and location on WhatsApp and you will get a clear quotation — usually within one working hour."],
+      bm: ["Berapa kos inspection?",
+           "Ia bergantung jenis hartanah, saiz dan skop yang anda perlukan, jadi kami beri sebut harga ikut hartanah dan bukan kadar tetap. Hantar jenis hartanah, keluasan binaan dan lokasi melalui WhatsApp dan anda akan dapat sebut harga jelas — biasanya dalam satu jam bekerja."] },
+    { cat: "process",
+      en: ["How do I book an inspection?",
+           "Message us on WhatsApp or fill in the quotation form on this site. Tell us the property type, location, size and your preferred date — we confirm availability and price before anything is committed."],
+      bm: ["Bagaimana cara tempah inspection?",
+           "Mesej kami di WhatsApp atau isi borang sebut harga di laman ini. Beritahu jenis hartanah, lokasi, saiz dan tarikh pilihan anda — kami sahkan ketersediaan dan harga sebelum apa-apa dikomitkan."] },
+    { cat: "process",
+      en: ["What is included in the report?",
+           "Every defect found, with photographs, its location, category and severity, together with instrument readings where tests were carried out. Depending on the service, the report also includes repair recommendations, cost estimates or condition ratings."],
+      bm: ["Apa yang termasuk dalam laporan?",
+           "Setiap defect yang ditemui, berserta gambar, lokasi, kategori dan tahap keterukan, bersama bacaan alat di mana ujian dijalankan. Bergantung servis, laporan turut merangkumi cadangan pembaikian, anggaran kos atau gred keadaan."] },
+    { cat: "process",
+      en: ["Do you offer re-inspection after repairs?",
+           "Yes. Re-inspection verifies each item on your original defect list and records whether it is properly closed, still incomplete, or has produced a new defect. Whether it is bundled into your package or quoted separately depends on the service you take."],
+      bm: ["Adakah anda tawarkan re-inspection selepas pembaikian?",
+           "Ya. Re-inspection mengesahkan setiap item dalam senarai defect asal anda dan merekod sama ada ia ditutup dengan betul, masih belum selesai, atau telah menghasilkan defect baru. Sama ada ia termasuk dalam pakej atau disebut harga berasingan bergantung servis yang anda ambil."] },
+    { cat: "process",
+      en: ["Can more than one property be inspected on the same day?",
+           "Often yes, if they are in the same area and the scope allows. Tell us all the addresses when requesting your quotation and we will plan the schedule around them."],
+      bm: ["Boleh periksa lebih daripada satu hartanah pada hari sama?",
+           "Selalunya boleh, jika ia di kawasan sama dan skopnya mengizinkan. Beritahu semua alamat semasa meminta sebut harga dan kami akan rancang jadual mengikutnya."] },
+
+    /* ---------- TUNTUTAN & TRIBUNAL ---------- */
+    { cat: "claims",
+      en: ["Can your report be used for a tribunal claim?",
+           "Yes. Our reports are prepared by registered Building Surveyors using calibrated instruments and are structured for submission. We also provide consultation and documentation support for tribunal cases."],
+      bm: ["Boleh laporan anda digunakan untuk tuntutan tribunal?",
+           "Boleh. Laporan kami disediakan oleh Building Surveyor berdaftar menggunakan alat dikalibrasi dan distrukturkan untuk penyerahan. Kami juga sediakan konsultasi dan sokongan dokumentasi untuk kes tribunal."] },
+    { cat: "claims",
+      en: ["What if the developer simply refuses to rectify?",
+           "First, we document the refusal along with the technical evidence for each disputed defect. If the matter proceeds, that documented record — readings, dated photos and correspondence chronology — becomes the backbone of your claim."],
+      bm: ["Bagaimana jika pemaju terus enggan membaiki?",
+           "Pertama, kami dokumenkan penolakan itu bersama bukti teknikal bagi setiap defect yang dipertikai. Jika perkara ini diteruskan, rekod berdokumentasi itu — bacaan, gambar bertarikh dan kronologi surat-menyurat — menjadi tulang belakang tuntutan anda."] },
+    { cat: "claims",
+      en: ["Do you provide legal advice?",
+           "No — we are Building Surveyors, not legal advisers. What we provide is the technical evidence, documentation and consultation on the condition of the property. For legal advice on your claim, consult a qualified legal professional."],
+      bm: ["Adakah anda beri nasihat guaman?",
+           "Tidak — kami Building Surveyor, bukan penasihat guaman. Apa yang kami sediakan ialah bukti teknikal, dokumentasi dan konsultasi tentang keadaan hartanah. Untuk nasihat guaman berkaitan tuntutan anda, rujuk profesional undang-undang bertauliah."] },
+    { cat: "claims",
+      en: ["What documents should I keep for a potential claim?",
+           "Your S&P agreement, the handover documentation, every defect list you submitted with its date, all correspondence with the developer, and each inspection or re-inspection report. The chronology matters as much as the defects themselves."],
+      bm: ["Dokumen apa patut saya simpan untuk kemungkinan tuntutan?",
+           "Perjanjian S&P anda, dokumentasi penyerahan, setiap senarai defect yang anda hantar berserta tarikhnya, semua surat-menyurat dengan pemaju, dan setiap laporan inspection atau re-inspection. Kronologi sama pentingnya dengan defect itu sendiri."] },
+    { cat: "claims",
+      en: ["Will you attend the joint inspection with the developer?",
+           "Yes. If the developer is disputing your defects or has scheduled a session to close them, we can attend with you — defending each item with instrument evidence and verifying repairs before you agree to close anything."],
+      bm: ["Adakah anda hadir joint inspection bersama pemaju?",
+           "Ya. Jika pemaju mempertikaikan defect anda atau telah menetapkan sesi untuk menutupnya, kami boleh hadir bersama anda — mempertahankan setiap item dengan bukti alat dan mengesahkan pembaikian sebelum anda bersetuju menutup apa-apa."] }
 ];
 
 /* =========================================================
@@ -3564,16 +3817,17 @@ var FAQS = [
         }).join("");
     }
 
-    function renderFaq() {
-        var list = document.getElementById("faqList");
-        list.innerHTML = FAQS.map(function (f, i) {
+    /* Bina senarai accordion FAQ ke dalam mana-mana bekas */
+    function buildFaqList(el, items, openFirst) {
+        if (!el) return;
+        el.innerHTML = items.map(function (f, i) {
             var d = f[lang] || f.en;
-            return '<div class="faq-item' + (i === 0 ? " open" : "") + '">' +
+            return '<div class="faq-item' + (openFirst && i === 0 ? " open" : "") + '">' +
                    '<button class="faq-q" type="button">' + d[0] +
                    '<span class="faq-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></button>' +
                    '<div class="faq-a"><div class="faq-a-inner">' + d[1] + "</div></div></div>";
         }).join("");
-        list.querySelectorAll(".faq-item").forEach(function (item) {
+        el.querySelectorAll(".faq-item").forEach(function (item) {
             var a = item.querySelector(".faq-a");
             if (item.classList.contains("open")) a.style.maxHeight = a.scrollHeight + "px";
             item.querySelector(".faq-q").addEventListener("click", function () {
@@ -3581,6 +3835,38 @@ var FAQS = [
                 a.style.maxHeight = open ? a.scrollHeight + "px" : "0";
             });
         });
+    }
+
+    /* Home: papar soalan bertanda home:true sahaja */
+    function renderFaq() {
+        buildFaqList(document.getElementById("faqList"),
+                     FAQ_ALL.filter(function (f) { return f.home; }), true);
+    }
+
+    /* ---------- Page FAQ penuh (#/faq) ---------- */
+    var faqFilter = "all";
+    function renderFaqPage() {
+        var filtersEl = document.getElementById("faqFilters");
+        var listEl = document.getElementById("faqPageList");
+        var countEl = document.getElementById("faqCount");
+        if (!filtersEl || !listEl) return;
+
+        filtersEl.innerHTML = "";
+        FAQ_CATS.forEach(function (c) {
+            var n = c.key === "all" ? FAQ_ALL.length
+                                    : FAQ_ALL.filter(function (f) { return f.cat === c.key; }).length;
+            if (!n) return;
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "proj-filter" + (faqFilter === c.key ? " active" : "");
+            b.textContent = t2(c.label) + " (" + n + ")";
+            b.addEventListener("click", function () { faqFilter = c.key; renderFaqPage(); });
+            filtersEl.appendChild(b);
+        });
+
+        var items = FAQ_ALL.filter(function (f) { return faqFilter === "all" || f.cat === faqFilter; });
+        if (countEl) countEl.textContent = items.length;
+        buildFaqList(listEl, items, false);
     }
 
     function renderServiceSelect() {
@@ -3606,7 +3892,7 @@ var FAQS = [
     /* ---------- Pautan WhatsApp ---------- */
     function applyWaLinks() {
         var link = waLink(t("wa.default"));
-        ["heroWa", "finalWa", "whatsappFloat", "contactWa", "footWa"].forEach(function (id) {
+        ["heroWa", "finalWa", "whatsappFloat", "contactWa", "footWa", "faqWa"].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.href = link;
         });
@@ -4463,7 +4749,7 @@ var FAQS = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -4473,6 +4759,7 @@ var FAQS = [
             var parts = h.slice(2).split("/");
             if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
+            else if (parts[0] === "faq") pageKey = "faq";
             else if (parts[0] === "services" && parts[1] && SVC_BY_SLUG[parts[1]]) { pageKey = "service"; param = parts[1]; }
             else if (parts[0] === "services") pageKey = "services";
         } else if (h.length > 1) {
@@ -4488,6 +4775,7 @@ var FAQS = [
         if (pageKey === "services") renderServicesPage();
         if (pageKey === "service") renderServicePage(param);
         if (pageKey === "about") renderAboutPage();
+        if (pageKey === "faq") renderFaqPage();
 
         if (!skipScroll) {
             if (pageKey !== "home") {
@@ -4504,6 +4792,7 @@ var FAQS = [
             a.classList.toggle("active",
                 (key === "projects" && pageKey === "projects") ||
                 (key === "about" && pageKey === "about") ||
+                (key === "faq" && pageKey === "faq") ||
                 (key === "services" && (pageKey === "services" || pageKey === "service")));
         });
 
