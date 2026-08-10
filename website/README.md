@@ -29,7 +29,13 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Komersial | Building Monitoring | 6 kad nilai · 4 peringkat · 4 klasifikasi pergerakan · 4 jenis |
 | Komersial | Commercial Inspection | 6 kad nilai · 4 peringkat · 6 sistem |
 | Komersial | Maintenance Audit | 6 kad nilai · 4 peringkat · 4 tahap keutamaan · donut · 6 kawasan |
-| Teknikal | 5 servis | ⏳ Belum ada kandungan khas (page asas sahaja) |
+| Teknikal | Electrical Inspection | 6 kad nilai · 4 peringkat · 4 klasifikasi keputusan · donut · 7 ujian |
+| Teknikal | Leak Detection | 6 kad nilai · 4 peringkat · 4 klasifikasi lembapan · 6 punca bocor |
+| Teknikal | Thermal Imaging | 6 kad nilai · 4 peringkat · 5 aplikasi · thermal reveal |
+| Teknikal | Rectification Defect | 6 kad nilai · 4 peringkat · 6 "cara salah vs cara betul" |
+| Teknikal | Tribunal | 6 kad nilai · 4 peringkat · 5 elemen pek bukti |
+
+**Semua 16 servis kini ada kandungan penuh.**
 | Tentang Kami, Sample Report, dll. | — | ⏳ Ikut arahan |
 
 ## Keputusan reka bentuk (dipersetujui)

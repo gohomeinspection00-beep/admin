@@ -2721,6 +2721,364 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
         reports: base.reports,
         pdf: base.pdf
     };
+
+    /* ===================== TEKNIKAL & PERUNDANGAN ===================== */
+
+    /* --- Electrical Inspection --- */
+    SVC_EXTRAS["electrical"] = {
+        stats: [
+            { num: "7",    lbl: { en: "Standard Tests", bm: "Ujian Standard" } },
+            { num: "4",    lbl: { en: "Result Classifications", bm: "Klasifikasi Keputusan" } },
+            { num: "100%", lbl: { en: "Readings Recorded", bm: "Bacaan Direkod" } },
+            { num: "SIRIM", lbl: { en: "Calibrated Instruments", bm: "Alat Dikalibrasi" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Electrical Faults Stay Invisible Until They Don't", bm: "Kerosakan Elektrik Tak Kelihatan — Sehingga Terlambat" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of an Electrical Inspection", bm: "4 Peringkat Electrical Inspection" },
+            dmsSub:   { en: "Measured values, not opinions — every test recorded with its actual reading", bm: "Nilai yang diukur, bukan pendapat — setiap ujian direkod dengan bacaan sebenarnya" },
+            stTag:    { en: "Result Classification", bm: "Klasifikasi Keputusan" },
+            stTitle:  { en: "Every Test Result Classified", bm: "Setiap Keputusan Ujian Diklasifikasikan" },
+            stSub:    { en: "You will know exactly which findings are safe, which need work, and which cannot wait", bm: "Anda akan tahu dengan tepat penemuan mana selamat, mana perlu kerja, dan mana tidak boleh ditangguh" },
+            scopeTag:   { en: "Test Scope", bm: "Skop Ujian" },
+            scopeTitle: { en: "7 Tests We Carry Out", bm: "7 Ujian Yang Kami Jalankan" },
+            scopeSub:   { en: "Carried out with SIRIM-calibrated instruments — every reading recorded in your report", bm: "Dijalankan dengan alat dikalibrasi SIRIM — setiap bacaan direkod dalam laporan anda" },
+            lblDefect: { en: "What It Detects", bm: "Apa Yang Ia Kesan" },
+            lblTools:  { en: "Instrument", bm: "Alat" }
+        }),
+        values: [
+            { icon: VICONS.shield, t: { en: "Fire & Shock Risk Found Early", bm: "Risiko Kebakaran & Renjatan Dikesan Awal" }, d: { en: "Loose terminations and failed insulation are silent until they cause a fire", bm: "Sambungan longgar dan penebatan gagal senyap sehingga menyebabkan kebakaran" } },
+            { icon: VICONS.check,  t: { en: "Measured Values, Not Guesses", bm: "Nilai Diukur, Bukan Agakan" }, d: { en: "Earth, insulation and load values recorded — an electrician's \"looks fine\" is not a test", bm: "Nilai earth, penebatan dan beban direkod — \"nampak okey\" oleh pendawai bukan satu ujian" } },
+            { icon: VICONS.doc,    t: { en: "Readings in Your Report", bm: "Bacaan Dalam Laporan Anda" }, d: { en: "Every test result documented with its value — comparable at any future inspection", bm: "Setiap keputusan ujian didokumen dengan nilainya — boleh dibanding pada pemeriksaan akan datang" } },
+            { icon: VICONS.money,  t: { en: "Leverage With the Developer", bm: "Kuasa Rundingan Dengan Pemaju" }, d: { en: "A failed earth or insulation reading is not something a developer can argue away", bm: "Bacaan earth atau penebatan yang gagal bukan sesuatu yang pemaju boleh nafikan" } },
+            { icon: VICONS.grad,   t: { en: "Independent of the Wiring Contractor", bm: "Bebas Dari Kontraktor Pendawaian" }, d: { en: "We test the work; we do not sell the rewiring — no reason to inflate findings", bm: "Kami uji kerja itu; kami tidak menjual pendawaian semula — tiada sebab membesar-besarkan penemuan" } },
+            { icon: VICONS.plan,   t: { en: "Especially for Older Homes", bm: "Terutama Untuk Rumah Lama" }, d: { en: "Ageing installations and past DIY alterations are where most failures are found", bm: "Pemasangan uzur dan ubahsuai DIY lampau ialah tempat kebanyakan kegagalan ditemui" } }
+        ],
+        dms: [
+            { t: { en: "Distribution Board Review", bm: "Semakan Papan Agihan" }, d: { en: "DB condition, circuit labelling, protective devices and signs of overheating", bm: "Keadaan DB, pelabelan litar, peranti perlindungan dan tanda terlampau panas" } },
+            { t: { en: "Instrument Testing", bm: "Ujian Beralat" }, d: { en: "Earth resistance, insulation resistance and polarity measured and recorded", bm: "Rintangan pembumian, rintangan penebatan dan polariti diukur dan direkod" } },
+            { t: { en: "Load & Functionality", bm: "Beban & Fungsi" }, d: { en: "Clamp meter load readings, RCCB trip test and point-by-point functionality checks", bm: "Bacaan beban clamp meter, ujian trip RCCB dan semakan fungsi setiap punca" } },
+            { t: { en: "Report With Readings", bm: "Laporan Berserta Bacaan" }, d: { en: "Every value recorded, findings classified, rectification recommendations included", bm: "Setiap nilai direkod, penemuan diklasifikasi, cadangan pembaikian disertakan" } }
+        ],
+        statuses: [
+            { color: "#22A06B", label: { en: "Pass", bm: "Lulus" },
+              d: { en: "Reading within acceptable range — no action required", bm: "Bacaan dalam julat boleh diterima — tiada tindakan diperlukan" } },
+            { color: "#2196F3", label: { en: "Marginal", bm: "Sempadan" },
+              d: { en: "Acceptable but close to limit — monitor and re-test later", bm: "Boleh diterima tetapi hampir had — pantau dan uji semula kemudian" } },
+            { color: "#F5921B", label: { en: "Fail", bm: "Gagal" },
+              d: { en: "Outside acceptable range — rectification by a licensed electrician required", bm: "Di luar julat boleh diterima — pembaikian oleh pendawai berlesen diperlukan" } },
+            { color: "#E8590C", label: { en: "Immediate Danger", bm: "Bahaya Segera" },
+              d: { en: "Shock or fire risk present — isolate and rectify without delay", bm: "Risiko renjatan atau kebakaran wujud — asingkan dan baiki tanpa lengah" } }
+        ],
+        analysis: [
+            { color: "#22A06B", label: "Pass", count: 38 },
+            { color: "#2196F3", label: "Marginal", count: 7 },
+            { color: "#F5921B", label: "Fail", count: 5 },
+            { color: "#E8590C", label: "Immediate Danger", count: 1 }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 15h8M6 19h12M9 21h6"/></svg>',
+              t: { en: "Earth Resistance Test", bm: "Ujian Rintangan Pembumian" }, s: { en: "Your first line of safety", bm: "Barisan keselamatan pertama anda" },
+              defects: { en: ["Ineffective earthing", "High earth resistance", "Missing earth continuity", "Shock risk on appliances"], bm: ["Pembumian tidak berkesan", "Rintangan pembumian tinggi", "Kesinambungan earth terputus", "Risiko renjatan pada perkakas"] },
+              tools: { en: ["Earth Tester (SIRIM calibrated)"], bm: ["Earth Tester (dikalibrasi SIRIM)"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M8 8v8M16 8v8"/></svg>',
+              t: { en: "Insulation Resistance Test", bm: "Ujian Rintangan Penebatan" }, s: { en: "Detects hidden breakdown", bm: "Kesan kerosakan tersembunyi" },
+              defects: { en: ["Damaged cable insulation", "Moisture-affected wiring", "Rodent or nail damage", "Leakage current paths"], bm: ["Penebatan kabel rosak", "Wiring terjejas lembapan", "Kerosakan tikus atau paku", "Laluan arus bocor"] },
+              tools: { en: ["Insulation Tester (SIRIM calibrated)"], bm: ["Insulation Tester (dikalibrasi SIRIM)"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>',
+              t: { en: "Polarity & Wiring Check", bm: "Semakan Polariti & Pendawaian" }, s: { en: "Live, neutral, earth", bm: "Live, neutral, earth" },
+              defects: { en: ["Reversed polarity", "Neutral-earth swap", "Loose terminations", "Incorrect circuit wiring"], bm: ["Polariti terbalik", "Neutral-earth bertukar", "Sambungan longgar", "Pendawaian litar salah"] },
+              tools: { en: ["Socket tester", "Multimeter"], bm: ["Socket tester", "Multimeter"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><circle cx="12" cy="12" r="9"/></svg>',
+              t: { en: "RCCB Trip Test", bm: "Ujian Trip RCCB" }, s: { en: "The device that saves lives", bm: "Peranti yang menyelamatkan nyawa" },
+              defects: { en: ["RCCB fails to trip", "Trip time too slow", "Wrong rating installed", "RCCB missing entirely"], bm: ["RCCB gagal trip", "Masa trip terlalu perlahan", "Rating salah dipasang", "RCCB langsung tiada"] },
+              tools: { en: ["RCCB tester", "Stopwatch verification"], bm: ["RCCB tester", "Pengesahan jangka masa"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/></svg>',
+              t: { en: "Socket & Point Testing", bm: "Ujian Soket & Punca" }, s: { en: "13A, 15A, lights, fans, AC", bm: "13A, 15A, lampu, kipas, AC" },
+              defects: { en: ["Dead or intermittent points", "Loose socket fixings", "Non-functional switches", "Missing points vs plan"], bm: ["Punca mati atau tidak stabil", "Pengikat soket longgar", "Suis tidak berfungsi", "Punca hilang berbanding pelan"] },
+              tools: { en: ["Socket tester", "Function test"], bm: ["Socket tester", "Ujian fungsi"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><circle cx="12" cy="16" r="4"/></svg>',
+              t: { en: "Load / Clamp Test", bm: "Ujian Beban / Clamp" }, s: { en: "Real current draw", bm: "Arus sebenar ditarik" },
+              defects: { en: ["Overloaded circuits", "Unbalanced phase loading", "Unexpected standby current", "Undersized cabling"], bm: ["Litar terlebih beban", "Beban fasa tidak seimbang", "Arus siap sedia luar jangka", "Kabel bersaiz kecil"] },
+              tools: { en: ["Clamp Meter (SIRIM calibrated)"], bm: ["Clamp Meter (dikalibrasi SIRIM)"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>',
+              t: { en: "Thermal Scan of DB", bm: "Imbasan Thermal DB" }, s: { en: "Heat reveals what eyes miss", bm: "Haba dedah apa mata terlepas" },
+              defects: { en: ["Overheating terminations", "Hotspots under load", "Failing breakers", "Poor connection resistance"], bm: ["Sambungan terlampau panas", "Titik panas ketika berbeban", "Pemutus litar hampir gagal", "Rintangan sambungan lemah"] },
+              tools: { en: ["Thermal Camera (SIRIM calibrated)"], bm: ["Kamera Thermal (dikalibrasi SIRIM)"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Leak Detection & Moisture Survey --- */
+    SVC_EXTRAS["leak-detection"] = {
+        stats: [
+            { num: "0",    lbl: { en: "Hacking Required", bm: "Pecah Dinding Diperlukan" } },
+            { num: "6",    lbl: { en: "Common Leak Sources", bm: "Punca Bocor Biasa" } },
+            { num: "4",    lbl: { en: "Moisture Classifications", bm: "Klasifikasi Lembapan" } },
+            { num: "100%", lbl: { en: "Readings Mapped", bm: "Bacaan Dipetakan" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Repainting a Damp Patch Fixes Nothing", bm: "Mengecat Semula Tompok Lembap Tak Membaiki Apa-apa" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of a Leak Investigation", bm: "4 Peringkat Siasatan Kebocoran" },
+            dmsSub:   { en: "Non-destructive from start to finish — we find the source before anyone breaks a wall", bm: "Tanpa musnah dari mula hingga akhir — kami cari punca sebelum sesiapa pecahkan dinding" },
+            stTag:    { en: "Moisture Classification", bm: "Klasifikasi Lembapan" },
+            stTitle:  { en: "Every Reading Classified", bm: "Setiap Bacaan Diklasifikasikan" },
+            stSub:    { en: "Moisture readings mapped across the area so the wettest point leads us to the source", bm: "Bacaan lembapan dipetakan merentas kawasan supaya titik paling basah membawa kami ke puncanya" },
+            scopeTag:   { en: "Investigation Scope", bm: "Skop Siasatan" },
+            scopeTitle: { en: "6 Sources We Trace", bm: "6 Punca Yang Kami Jejak" },
+            scopeSub:   { en: "The same stain can come from six different places — we identify which one", bm: "Kesan yang sama boleh datang dari enam tempat berbeza — kami kenal pasti yang mana satu" },
+            lblDefect: { en: "Typical Signs", bm: "Tanda Biasa" },
+            lblTools:  { en: "How We Trace It", bm: "Cara Kami Jejak" }
+        }),
+        values: [
+            { icon: VICONS.check,  t: { en: "Find the Source, Not the Stain", bm: "Cari Punca, Bukan Kesan" }, d: { en: "Water travels — the wet patch is rarely where the leak actually is", bm: "Air merambat — tompok basah jarang berada di tempat kebocoran sebenar" } },
+            { icon: VICONS.shield, t: { en: "Non-Destructive Investigation", bm: "Siasatan Tanpa Musnah" }, d: { en: "No hacking, no demolition — instruments locate it through finished surfaces", bm: "Tiada pecah, tiada perobohan — alat mengesannya menembusi permukaan siap" } },
+            { icon: VICONS.money,  t: { en: "Repair Once, Correctly", bm: "Baiki Sekali, Dengan Betul" }, d: { en: "Guessing means paying for repeated repairs that never solve the problem", bm: "Meneka bermakna membayar pembaikian berulang yang tak pernah selesaikan masalah" } },
+            { icon: VICONS.doc,    t: { en: "Evidence for Neighbour Disputes", bm: "Bukti Untuk Pertikaian Jiran" }, d: { en: "Leaks from the unit above are a common dispute — readings settle it objectively", bm: "Bocor dari unit atas ialah pertikaian biasa — bacaan menyelesaikannya secara objektif" } },
+            { icon: VICONS.list,   t: { en: "Targeted Repair Recommendation", bm: "Cadangan Pembaikian Tepat Sasaran" }, d: { en: "Your contractor gets a precise location and method, not a vague complaint", bm: "Kontraktor anda dapat lokasi dan kaedah tepat, bukan aduan yang kabur" } },
+            { icon: VICONS.plan,   t: { en: "Stop Damage Spreading", bm: "Halang Kerosakan Merebak" }, d: { en: "Prolonged damp destroys finishes, plaster and eventually the structure itself", bm: "Lembap berpanjangan memusnahkan kemasan, plaster dan akhirnya struktur itu sendiri" } }
+        ],
+        dms: [
+            { t: { en: "Symptom Mapping", bm: "Pemetaan Simptom" }, d: { en: "We record where the damp appears, when it worsens, and its history", bm: "Kami rekod di mana lembap muncul, bila ia bertambah teruk, dan sejarahnya" } },
+            { t: { en: "Moisture Survey", bm: "Tinjauan Lembapan" }, d: { en: "Systematic moisture readings across the area to find the wettest concentration", bm: "Bacaan lembapan sistematik merentas kawasan untuk cari tumpuan paling basah" } },
+            { t: { en: "Thermal Tracing", bm: "Penjejakan Thermal" }, d: { en: "Thermal imaging follows the moisture path back through walls, ceilings and slabs", bm: "Imej thermal mengikut laluan lembapan menembusi dinding, siling dan papak" } },
+            { t: { en: "Source Report & Method", bm: "Laporan Punca & Kaedah" }, d: { en: "Identified source, supporting readings and the correct repair method to fix it", bm: "Punca dikenal pasti, bacaan sokongan dan kaedah pembaikian yang betul untuk membaikinya" } }
+        ],
+        statuses: [
+            { color: "#22A06B", label: { en: "Dry", bm: "Kering" },
+              d: { en: "Normal reading for the material — no moisture concern", bm: "Bacaan normal untuk bahan tersebut — tiada kebimbangan lembapan" } },
+            { color: "#2196F3", label: { en: "Elevated", bm: "Meningkat" },
+              d: { en: "Above normal — monitor, may be residual or seasonal", bm: "Melebihi normal — pantau, mungkin baki atau bermusim" } },
+            { color: "#F5921B", label: { en: "Wet", bm: "Basah" },
+              d: { en: "Active moisture present — a source exists and must be traced", bm: "Lembapan aktif hadir — punca wujud dan mesti dijejak" } },
+            { color: "#E8590C", label: { en: "Saturated", bm: "Tepu" },
+              d: { en: "Material fully wet — ongoing leak with damage already occurring", bm: "Bahan basah sepenuhnya — kebocoran berterusan dan kerosakan sudah berlaku" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/></svg>',
+              t: { en: "Bathroom Above", bm: "Bilik Air Di Atas" }, s: { en: "Most common in stratified homes", bm: "Paling biasa di rumah bertingkat" },
+              defects: { en: ["Ceiling stain below wet area", "Worsens after showering", "Peeling ceiling paint", "Musty smell"], bm: ["Kesan siling bawah kawasan basah", "Bertambah teruk selepas mandi", "Cat siling terkelupas", "Bau hapak"] },
+              tools: { en: ["Moisture mapping", "Thermal imaging", "Water ponding test"], bm: ["Pemetaan lembapan", "Imej thermal", "Ujian water ponding"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+              t: { en: "Roof & Valley Gutters", bm: "Bumbung & Talang Lurah" }, s: { en: "Worse after heavy rain", bm: "Lebih teruk selepas hujan lebat" },
+              defects: { en: ["Leak only during rain", "Stains near roof junctions", "Blocked valley gutters", "Failed flashing"], bm: ["Bocor hanya ketika hujan", "Kesan berhampiran sambungan bumbung", "Talang lurah tersumbat", "Flashing gagal"] },
+              tools: { en: ["Visual & drone survey", "Moisture mapping", "Rain simulation"], bm: ["Visual & tinjauan drone", "Pemetaan lembapan", "Simulasi hujan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18"/></svg>',
+              t: { en: "External Wall Seepage", bm: "Resapan Dinding Luar" }, s: { en: "Driven rain & wall cracks", bm: "Hujan bertiup & retak dinding" },
+              defects: { en: ["Damp on internal face of external wall", "Follows crack lines", "Efflorescence (white salt)", "Worse on the weather side"], bm: ["Lembap di muka dalam dinding luar", "Mengikut garisan retak", "Efflorescence (garam putih)", "Lebih teruk di sisi terdedah cuaca"] },
+              tools: { en: ["Moisture mapping", "Thermal imaging", "Crack survey"], bm: ["Pemetaan lembapan", "Imej thermal", "Tinjauan retak"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Concealed Pipe Leak", bm: "Kebocoran Paip Tersembunyi" }, s: { en: "Inside walls & floors", bm: "Dalam dinding & lantai" },
+              defects: { en: ["Damp present in dry weather", "Constant, not rain-related", "Unexplained water bill rise", "Warm patch (hot water line)"], bm: ["Lembap ada walaupun cuaca kering", "Berterusan, tiada kaitan hujan", "Bil air naik tanpa sebab", "Tompok suam (paip air panas)"] },
+              tools: { en: ["Thermal imaging", "Moisture mapping", "Pressure test"], bm: ["Imej thermal", "Pemetaan lembapan", "Ujian tekanan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.8c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S17.29 9.25 17 7.8c-.29 1.45-1.14 2.84-2.29 3.76S13 13.6 13 14.75c0 2.22 1.8 4.05 4 4.05z"/></svg>',
+              t: { en: "Waterproofing Failure", bm: "Kegagalan Kalis Air" }, s: { en: "Wet areas & balconies", bm: "Kawasan basah & balkoni" },
+              defects: { en: ["Damp at wet area perimeter", "Balcony leaking to unit below", "Failed membrane at upturns", "Water tracking under tiles"], bm: ["Lembap di keliling kawasan basah", "Balkoni bocor ke unit bawah", "Membran gagal di bahagian naik", "Air merambat bawah jubin"] },
+              tools: { en: ["Water ponding test", "Moisture mapping", "Thermal imaging"], bm: ["Ujian water ponding", "Pemetaan lembapan", "Imej thermal"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15a4 4 0 0 0 4 4h9a5 5 0 1 0-.7-9.96A6 6 0 1 0 3 15z"/></svg>',
+              t: { en: "Condensation (Not a Leak)", bm: "Kondensasi (Bukan Bocor)" }, s: { en: "Often misdiagnosed", bm: "Selalu tersalah diagnosis" },
+              defects: { en: ["Damp on cold surfaces", "Worse in air-conditioned rooms", "Mould on wardrobes & corners", "No source found upstream"], bm: ["Lembap pada permukaan sejuk", "Lebih teruk di bilik berhawa dingin", "Kulat pada almari & sudut", "Tiada punca ditemui di hulu" ] },
+              tools: { en: ["Moisture mapping", "Thermal imaging", "Ventilation assessment"], bm: ["Pemetaan lembapan", "Imej thermal", "Penilaian pengudaraan"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        thermal: base.thermal,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Thermal Imaging --- */
+    SVC_EXTRAS["thermal-imaging"] = {
+        stats: [
+            { num: "0",     lbl: { en: "Surfaces Damaged", bm: "Permukaan Dirosakkan" } },
+            { num: "5",     lbl: { en: "What It Reveals", bm: "Apa Yang Ia Dedahkan" } },
+            { num: "0.1°C", lbl: { en: "Thermal Sensitivity", bm: "Kepekaan Thermal" } },
+            { num: "SIRIM", lbl: { en: "Calibrated Camera", bm: "Kamera Dikalibrasi" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Evidence You Cannot Get Any Other Way", bm: "Bukti Yang Anda Tak Boleh Dapat Dengan Cara Lain" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of a Thermal Survey", bm: "4 Peringkat Tinjauan Thermal" },
+            dmsSub:   { en: "A thermal image is only as good as the person interpreting it — that is the real skill", bm: "Imej thermal hanya sebaik orang yang mentafsirnya — di situ kemahiran sebenarnya" },
+            scopeTag:   { en: "Applications", bm: "Aplikasi" },
+            scopeTitle: { en: "5 Things Thermal Imaging Reveals", bm: "5 Perkara Yang Thermal Imaging Dedahkan" },
+            scopeSub:   { en: "All of them invisible to the eye, all of them behind a finished surface", bm: "Semuanya tak kelihatan pada mata, semuanya di sebalik permukaan siap" },
+            lblDefect: { en: "What Appears", bm: "Apa Yang Muncul" },
+            lblTools:  { en: "Why It Matters", bm: "Kenapa Ia Penting" }
+        }),
+        values: [
+            { icon: VICONS.check,  t: { en: "See Behind Finished Surfaces", bm: "Lihat Di Sebalik Permukaan Siap" }, d: { en: "Moisture, heat and gaps show up through paint, plaster and tiles", bm: "Lembapan, haba dan jurang terpapar menembusi cat, plaster dan jubin" } },
+            { icon: VICONS.shield, t: { en: "Completely Non-Destructive", bm: "Tanpa Musnah Sepenuhnya" }, d: { en: "Nothing is opened, drilled or removed to obtain the evidence", bm: "Tiada apa dibuka, digerudi atau dibuang untuk mendapatkan bukti" } },
+            { icon: VICONS.doc,    t: { en: "Hard to Dispute", bm: "Sukar Dipertikai" }, d: { en: "A temperature-annotated image is objective evidence, not an opinion", bm: "Imej beranotasi suhu ialah bukti objektif, bukan pendapat" } },
+            { icon: VICONS.grad,   t: { en: "Interpretation, Not Just Pictures", bm: "Tafsiran, Bukan Sekadar Gambar" }, d: { en: "Anyone can take a thermal photo — reading it correctly is the professional part", bm: "Sesiapa boleh ambil gambar thermal — membacanya dengan betul itulah bahagian profesional" } },
+            { icon: VICONS.plan,   t: { en: "Targets the Repair", bm: "Menyasarkan Pembaikian" }, d: { en: "Knowing exactly where the problem sits keeps repair scope small and cheap", bm: "Mengetahui lokasi tepat masalah mengecilkan skop dan kos pembaikian" } },
+            { icon: VICONS.money,  t: { en: "Included in Our Inspections", bm: "Termasuk Dalam Inspection Kami" }, d: { en: "Thermal scanning is part of our standard inspection scope, not an upsell", bm: "Imbasan thermal ialah sebahagian skop standard inspection kami, bukan jualan tambahan" } }
+        ],
+        dms: [
+            { t: { en: "Condition Setup", bm: "Persediaan Keadaan" }, d: { en: "Timing and conditions matter — we survey when the temperature difference will show", bm: "Masa dan keadaan penting — kami tinjau bila perbezaan suhu akan terpapar" } },
+            { t: { en: "Systematic Scan", bm: "Imbasan Sistematik" }, d: { en: "Target areas scanned methodically, with reference images captured alongside", bm: "Kawasan sasaran diimbas secara teratur, dengan imej rujukan dirakam bersama" } },
+            { t: { en: "Interpretation", bm: "Tafsiran" }, d: { en: "Anomalies distinguished from harmless reflections and normal thermal patterns", bm: "Anomali dibezakan daripada pantulan tak berbahaya dan corak thermal biasa" } },
+            { t: { en: "Annotated Report", bm: "Laporan Beranotasi" }, d: { en: "Thermal and normal images side by side, with temperature data and findings", bm: "Imej thermal dan biasa sebelah-menyebelah, dengan data suhu dan penemuan" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.8c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S17.29 9.25 17 7.8c-.29 1.45-1.14 2.84-2.29 3.76S13 13.6 13 14.75c0 2.22 1.8 4.05 4 4.05z"/></svg>',
+              t: { en: "Hidden Moisture", bm: "Lembapan Tersembunyi" }, s: { en: "Behind walls & ceilings", bm: "Di sebalik dinding & siling" },
+              defects: { en: ["Cool patches where water evaporates", "Moisture path outlined", "Extent beyond the visible stain"], bm: ["Tompok sejuk tempat air menyejat", "Laluan lembapan terpapar", "Luas melebihi kesan yang kelihatan"] },
+              tools: { en: ["Shows the true extent — repair scope is often larger than the stain suggests"], bm: ["Tunjuk luas sebenar — skop pembaikian selalunya lebih besar dari yang disangka"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+              t: { en: "Electrical Hotspots", bm: "Titik Panas Elektrik" }, s: { en: "DB & circuits under load", bm: "DB & litar ketika berbeban" },
+              defects: { en: ["Overheating terminations", "Failing breakers", "Overloaded cables", "Loose connections"], bm: ["Sambungan terlampau panas", "Pemutus litar hampir gagal", "Kabel terlebih beban", "Sambungan longgar"] },
+              tools: { en: ["Catches fire risk before failure — the most safety-critical use of thermal"], bm: ["Kesan risiko kebakaran sebelum kegagalan — kegunaan thermal paling kritikal keselamatan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+              t: { en: "Insulation & Air Gaps", bm: "Penebat & Jurang Udara" }, s: { en: "Roof & partition voids", bm: "Ruang bumbung & partisi" },
+              defects: { en: ["Missing insulation sections", "Air leakage paths", "Uneven roof heat gain", "Poorly sealed openings"], bm: ["Bahagian penebat hilang", "Laluan kebocoran udara", "Serapan haba bumbung tak sekata", "Bukaan tidak tertutup rapi"] },
+              tools: { en: ["Explains hot rooms and rising electricity bills"], bm: ["Jelaskan bilik panas dan bil elektrik yang meningkat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Concealed Pipe Routes", bm: "Laluan Paip Tersembunyi" }, s: { en: "Hot & cold water lines", bm: "Paip air panas & sejuk" },
+              defects: { en: ["Hot water pipe path traced", "Leak point along the run", "Blocked or dead legs", "Underfloor pipe damage"], bm: ["Laluan paip air panas dijejak", "Titik bocor sepanjang laluan", "Paip tersumbat atau mati", "Kerosakan paip bawah lantai"] },
+              tools: { en: ["Locates the pipe before anyone breaks the wall to find it"], bm: ["Kesan lokasi paip sebelum sesiapa pecahkan dinding untuk mencarinya"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18"/></svg>',
+              t: { en: "Debonded Tiles & Voids", bm: "Jubin Tertanggal & Rongga" }, s: { en: "Large tiled surfaces", bm: "Permukaan berjubin luas" },
+              defects: { en: ["Voids behind tiles", "Debonded render", "Pattern of hollow areas", "Screed separation"], bm: ["Rongga di sebalik jubin", "Render tertanggal", "Corak kawasan hollow", "Screed terpisah"] },
+              tools: { en: ["Complements tapping tests — maps hollow areas quickly across large surfaces"], bm: ["Melengkapi ujian ketuk — petakan kawasan hollow dengan pantas di permukaan luas"] } }
+        ],
+        thermal: base.thermal,
+        toolsShowcase: base.toolsShowcase,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Rectification Defect --- */
+    SVC_EXTRAS["rectification"] = {
+        stats: [
+            { num: "6",    lbl: { en: "Common Wrong Fixes", bm: "Cara Baiki Salah Biasa" } },
+            { num: "2×",   lbl: { en: "Cost of Repairing Twice", bm: "Kos Baiki Dua Kali" } },
+            { num: "100%", lbl: { en: "Root Cause First", bm: "Punca Dahulu" } },
+            { num: "15+",  lbl: { en: "Tests & Tools", bm: "Ujian & Alat" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "The Defect Came Back Because the Repair Was Wrong", bm: "Defect Kembali Kerana Cara Pembaikian Salah" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of Rectification Advisory", bm: "4 Peringkat Nasihat Pembaikian" },
+            dmsSub:   { en: "We do not carry out repairs — which is exactly why our recommendation is impartial", bm: "Kami tidak menjalankan pembaikian — itulah sebabnya cadangan kami tidak berpihak" },
+            scopeTag:   { en: "Wrong Fix vs Right Fix", bm: "Cara Salah vs Cara Betul" },
+            scopeTitle: { en: "6 Repairs That Almost Always Fail", bm: "6 Pembaikian Yang Hampir Selalu Gagal" },
+            scopeSub:   { en: "If any of these were done in your home, the defect will return — usually worse", bm: "Jika mana-mana ini dibuat di rumah anda, defect itu akan kembali — biasanya lebih teruk" },
+            lblDefect: { en: "The Wrong Fix", bm: "Cara Baiki Yang Salah" },
+            lblTools:  { en: "The Correct Approach", bm: "Pendekatan Yang Betul" }
+        }),
+        values: [
+            { icon: VICONS.check,  t: { en: "Root Cause Before Repair", bm: "Punca Sebelum Pembaikian" }, d: { en: "Treating the symptom guarantees the defect returns — we identify why it happened", bm: "Merawat simptom menjamin defect kembali — kami kenal pasti kenapa ia berlaku" } },
+            { icon: VICONS.doc,    t: { en: "Correct Method Specified", bm: "Kaedah Betul Ditetapkan" }, d: { en: "Your contractor is told what to do and how — not left to improvise", bm: "Kontraktor anda diberitahu apa nak buat dan bagaimana — bukan dibiarkan mereka-reka" } },
+            { icon: VICONS.shield, t: { en: "We Do Not Sell Repairs", bm: "Kami Tidak Menjual Pembaikian" }, d: { en: "No incentive to over-specify — the recommendation serves you, not our invoice", bm: "Tiada insentif untuk melebihkan skop — cadangan ini untuk anda, bukan untuk invois kami" } },
+            { icon: VICONS.money,  t: { en: "Scope of Work for Quotation", bm: "Skop Kerja Untuk Sebut Harga" }, d: { en: "A defined scope lets you compare contractor quotes on equal terms", bm: "Skop yang jelas membolehkan anda banding sebut harga kontraktor secara setara" } },
+            { icon: VICONS.chklist, t: { en: "Verification After the Work", bm: "Pengesahan Selepas Kerja" }, d: { en: "We re-inspect the completed repair before you sign it off (if included in your package)", bm: "Kami periksa semula pembaikian siap sebelum anda sahkan (jika termasuk pakej)" } },
+            { icon: VICONS.plan,   t: { en: "One Repair Instead of Three", bm: "Satu Pembaikian Ganti Tiga" }, d: { en: "The cheapest repair is the one done properly the first time", bm: "Pembaikian paling murah ialah yang dibuat dengan betul pada kali pertama" } }
+        ],
+        dms: [
+            { t: { en: "Defect & History Review", bm: "Semakan Defect & Sejarah" }, d: { en: "What was done before, what came back, and how quickly it returned", bm: "Apa yang dibuat sebelum ini, apa yang kembali, dan berapa cepat ia kembali" } },
+            { t: { en: "Root Cause Investigation", bm: "Siasatan Punca" }, d: { en: "Instruments used to confirm the actual cause instead of assuming it", bm: "Alat digunakan untuk sahkan punca sebenar, bukan sekadar mengandaikannya" } },
+            { t: { en: "Method & Scope Advisory", bm: "Nasihat Kaedah & Skop" }, d: { en: "Correct repair method, sequence and scope written out for your contractor", bm: "Kaedah, urutan dan skop pembaikian yang betul ditulis untuk kontraktor anda" } },
+            { t: { en: "Post-Repair Verification", bm: "Pengesahan Selepas Pembaikian" }, d: { en: "Completed work checked against the specified method before sign-off", bm: "Kerja siap disemak berbanding kaedah ditetapkan sebelum pengesahan" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/></svg>',
+              t: { en: "Painting Over Damp", bm: "Mengecat Atas Lembap" }, s: { en: "The most common of all", bm: "Paling biasa antara semua" },
+              defects: { en: ["Anti-damp paint applied over a wet wall", "Stain covered, source untouched", "Peels again within months", "Damp spreads behind the coating"], bm: ["Cat anti-lembap disapu atas dinding basah", "Kesan ditutup, punca tak disentuh", "Terkelupas semula dalam beberapa bulan", "Lembap merebak di sebalik lapisan"] },
+              tools: { en: ["Trace and stop the water source first", "Allow the substrate to dry fully", "Verify with moisture readings before finishing"], bm: ["Jejak dan hentikan punca air dahulu", "Biar substrat kering sepenuhnya", "Sahkan dengan bacaan lembapan sebelum kemasan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20 10 4l4 9 2-3 4 10"/></svg>',
+              t: { en: "Filling Cracks Cosmetically", bm: "Menampal Retak Secara Kosmetik" }, s: { en: "Hides the evidence", bm: "Menyembunyikan bukti" },
+              defects: { en: ["Crack filled and painted over", "No assessment of movement", "Reappears in the same line", "Monitoring opportunity lost"], bm: ["Retak ditampal dan dicat", "Tiada penilaian pergerakan", "Muncul semula pada garisan sama", "Peluang pemantauan hilang"] },
+              tools: { en: ["Classify the crack: structural or cosmetic", "Monitor first if movement is suspected", "Repair method matched to the cause"], bm: ["Klasifikasi retak: struktur atau kosmetik", "Pantau dahulu jika disyaki bergerak", "Kaedah pembaikian ikut punca"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+              t: { en: "Tiling Over Hollow Tiles", bm: "Menjubin Atas Jubin Hollow" }, s: { en: "Doubles the problem", bm: "Menggandakan masalah" },
+              defects: { en: ["New tiles laid over debonded ones", "Added weight on a failing bond", "Both layers lift later", "Twice the removal cost"], bm: ["Jubin baru dipasang atas yang tertanggal", "Berat tambahan pada ikatan yang gagal", "Kedua-dua lapisan terangkat kemudian", "Kos pembuangan berganda"] },
+              tools: { en: ["Tap-test to map the hollow extent", "Remove the debonded layer fully", "Re-lay with correct adhesive coverage"], bm: ["Ujian ketuk untuk peta luas hollow", "Buang lapisan tertanggal sepenuhnya", "Pasang semula dengan liputan pelekat betul"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.8c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S17.29 9.25 17 7.8c-.29 1.45-1.14 2.84-2.29 3.76S13 13.6 13 14.75c0 2.22 1.8 4.05 4 4.05z"/></svg>',
+              t: { en: "Sealant Over Failed Waterproofing", bm: "Sealant Atas Kalis Air Gagal" }, s: { en: "Buys a few months", bm: "Bertahan beberapa bulan" },
+              defects: { en: ["Silicone applied around a leaking area", "Membrane failure left in place", "Water finds another path", "Leak returns in the next season"], bm: ["Silikon disapu keliling kawasan bocor", "Kegagalan membran dibiarkan", "Air cari laluan lain", "Bocor kembali musim berikutnya"] },
+              tools: { en: ["Water ponding test to confirm failure", "Replace the membrane, not the surface seal", "Re-test before reinstating finishes"], bm: ["Ujian water ponding sahkan kegagalan", "Ganti membran, bukan sekadar seal permukaan", "Uji semula sebelum pasang balik kemasan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+              t: { en: "Replacing a Tripping Breaker", bm: "Menukar Pemutus Litar Yang Trip" }, s: { en: "Dangerous shortcut", bm: "Jalan pintas berbahaya" },
+              defects: { en: ["Breaker swapped or upsized", "Underlying fault never found", "Protection effectively removed", "Fire risk increased, not reduced"], bm: ["Pemutus ditukar atau dibesarkan", "Kerosakan asas tak pernah ditemui", "Perlindungan sebenarnya dihapuskan", "Risiko kebakaran meningkat, bukan berkurang"] },
+              tools: { en: ["Insulation and earth testing to find the fault", "Rectify the circuit, keep correct protection", "Re-test and record values after repair"], bm: ["Ujian penebatan dan earth untuk cari kerosakan", "Baiki litar, kekalkan perlindungan betul", "Uji semula dan rekod nilai selepas baiki"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+              t: { en: "Sealing the Roof From Below", bm: "Menutup Bumbung Dari Bawah" }, s: { en: "Wrong side entirely", bm: "Sebelah yang salah sama sekali" },
+              defects: { en: ["Ceiling patched where water appears", "Roof entry point never located", "Water pools in the ceiling void", "Timber and ceiling damage worsens"], bm: ["Siling ditampal di tempat air muncul", "Titik masuk bumbung tak pernah dikesan", "Air bertakung dalam ruang siling", "Kerosakan kayu dan siling bertambah teruk"] },
+              tools: { en: ["Trace the actual entry point on the roof", "Repair flashing, valley or covering above", "Confirm with a rain or hose test"], bm: ["Jejak titik masuk sebenar di bumbung", "Baiki flashing, lurah atau penutup di atas", "Sahkan dengan ujian hujan atau hos"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        thermal: base.thermal,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Tribunal Consultation & Documentation --- */
+    SVC_EXTRAS["tribunal"] = {
+        stats: [
+            { num: "5",    lbl: { en: "Elements of Strong Evidence", bm: "Elemen Bukti Yang Kukuh" } },
+            { num: "100%", lbl: { en: "Instrument-Backed", bm: "Disokong Alat" } },
+            { num: "RISM", lbl: { en: "Registered Surveyor", bm: "Surveyor Berdaftar" } },
+            { num: "5,000+", lbl: { en: "Units Inspected", bm: "Unit Diperiksa" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "A Claim Is Only as Strong as Its Evidence", bm: "Tuntutan Hanya Sekuat Buktinya" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of Tribunal Support", bm: "4 Peringkat Sokongan Tribunal" },
+            dmsSub:   { en: "We prepare the technical evidence and documentation — you present a case that stands up", bm: "Kami sediakan bukti teknikal dan dokumentasi — anda kemukakan kes yang kukuh" },
+            scopeTag:   { en: "Evidence Pack", bm: "Pek Bukti" },
+            scopeTitle: { en: "5 Things That Make Evidence Hold Up", bm: "5 Perkara Yang Menjadikan Bukti Kukuh" },
+            scopeSub:   { en: "A photo alone rarely settles anything — this is what turns it into evidence", bm: "Gambar semata-mata jarang menyelesaikan apa-apa — inilah yang menjadikannya bukti" },
+            lblDefect: { en: "What It Includes", bm: "Apa Yang Termasuk" },
+            lblTools:  { en: "Why It Counts", bm: "Kenapa Ia Penting" }
+        }),
+        values: [
+            { icon: VICONS.grad,   t: { en: "Prepared by a Registered Surveyor", bm: "Disediakan Surveyor Berdaftar" }, d: { en: "A RISM-registered professional's report carries far more weight than a homeowner's complaint", bm: "Laporan profesional berdaftar RISM jauh lebih bernilai daripada aduan pemilik rumah" } },
+            { icon: VICONS.check,  t: { en: "Instrument Readings, Not Adjectives", bm: "Bacaan Alat, Bukan Kata Sifat" }, d: { en: "\"Very damp\" is an opinion; a recorded moisture value is evidence", bm: "\"Sangat lembap\" ialah pendapat; nilai lembapan yang direkod ialah bukti" } },
+            { icon: VICONS.doc,    t: { en: "Organised Evidence Pack", bm: "Pek Bukti Tersusun" }, d: { en: "Defects, photos, readings and chronology arranged so your case is easy to follow", bm: "Defect, gambar, bacaan dan kronologi disusun supaya kes anda mudah difahami" } },
+            { icon: VICONS.list,   t: { en: "Chronology & Correspondence", bm: "Kronologi & Surat-Menyurat" }, d: { en: "Guidance on documenting what you reported, when, and how the developer responded", bm: "Panduan mendokumen apa anda laporkan, bila, dan bagaimana pemaju bertindak balas" } },
+            { icon: VICONS.shield, t: { en: "Honest About Your Position", bm: "Jujur Tentang Kedudukan Anda" }, d: { en: "If an item is weak or within tolerance, we say so — surprises in a hearing help nobody", bm: "Jika sesuatu item lemah atau dalam toleransi, kami beritahu — kejutan semasa perbicaraan tak membantu sesiapa" } },
+            { icon: VICONS.chat,   t: { en: "Consultation Before You File", bm: "Konsultasi Sebelum Anda Failkan" }, d: { en: "Understand what your report supports before you commit to a claim", bm: "Fahami apa yang laporan anda sokong sebelum anda komited pada tuntutan" } }
+        ],
+        dms: [
+            { t: { en: "Case & Document Review", bm: "Semakan Kes & Dokumen" }, d: { en: "We review your defect list, prior reports and correspondence with the developer", bm: "Kami semak senarai defect, laporan terdahulu dan surat-menyurat anda dengan pemaju" } },
+            { t: { en: "Evidence Inspection", bm: "Pemeriksaan Bukti" }, d: { en: "Re-inspection focused on the disputed items, with instrument readings recorded", bm: "Pemeriksaan semula tertumpu pada item yang dipertikai, dengan bacaan alat direkod" } },
+            { t: { en: "Documentation Pack", bm: "Pek Dokumentasi" }, d: { en: "Report formatted for submission — findings, evidence and chronology in order", bm: "Laporan diformat untuk penyerahan — penemuan, bukti dan kronologi tersusun" } },
+            { t: { en: "Consultation & Guidance", bm: "Konsultasi & Bimbingan" }, d: { en: "We walk you through the technical findings so you can present them clearly", bm: "Kami terangkan penemuan teknikal supaya anda boleh mengemukakannya dengan jelas" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8"/></svg>',
+              t: { en: "Professional Inspection Report", bm: "Laporan Pemeriksaan Profesional" }, s: { en: "The foundation", bm: "Asasnya" },
+              defects: { en: ["Every defect described and located", "Severity and category assigned", "Prepared by a registered surveyor"], bm: ["Setiap defect diperihal dan dilokasikan", "Tahap dan kategori diberikan", "Disediakan oleh surveyor berdaftar"] },
+              tools: { en: ["Turns a list of complaints into a professional technical document"], bm: ["Mengubah senarai aduan menjadi dokumen teknikal profesional"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
+              t: { en: "Dated Photographic Evidence", bm: "Bukti Bergambar Bertarikh" }, s: { en: "Location-tagged", bm: "Ditanda lokasi" },
+              defects: { en: ["Timestamped defect photos", "Location tagged to floor plan", "Before and after where applicable"], bm: ["Gambar defect bertarikh masa", "Lokasi ditanda pada pelan lantai", "Sebelum dan selepas jika berkenaan"] },
+              tools: { en: ["Removes any argument about where and when the defect existed"], bm: ["Menghapuskan pertikaian tentang di mana dan bila defect itu wujud"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M8 8v8M16 8v8"/></svg>',
+              t: { en: "Instrument Readings", bm: "Bacaan Alat" }, s: { en: "Objective values", bm: "Nilai objektif" },
+              defects: { en: ["Moisture percentages recorded", "Electrical test values", "Crack widths measured", "Calibration traceable to SIRIM"], bm: ["Peratusan lembapan direkod", "Nilai ujian elektrik", "Lebar retak diukur", "Kalibrasi boleh dijejak ke SIRIM"] },
+              tools: { en: ["Numbers are far harder to dispute than descriptions"], bm: ["Nombor jauh lebih sukar dipertikai daripada perihalan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+              t: { en: "Chronology of Events", bm: "Kronologi Kejadian" }, s: { en: "The timeline matters", bm: "Garis masa penting" },
+              defects: { en: ["Date of handover and DLP period", "When each defect was reported", "Developer's responses and delays", "Re-inspection outcomes"], bm: ["Tarikh serahan dan tempoh DLP", "Bila setiap defect dilaporkan", "Respons dan kelewatan pemaju", "Keputusan pemeriksaan semula"] },
+              tools: { en: ["Shows you acted within time and the developer did not respond adequately"], bm: ["Tunjuk anda bertindak dalam tempoh dan pemaju tidak bertindak balas dengan sewajarnya"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+              t: { en: "Reference to Standards", bm: "Rujukan Kepada Standard" }, s: { en: "Not just personal opinion", bm: "Bukan sekadar pendapat peribadi" },
+              defects: { en: ["Workmanship compared to accepted practice", "Tolerance limits referenced", "Distinguishes defect from tolerance"], bm: ["Mutu kerja dibanding amalan diterima", "Had toleransi dirujuk", "Bezakan defect daripada toleransi"] },
+              tools: { en: ["Anchors your claim to a recognised benchmark, not a preference"], bm: ["Mengaitkan tuntutan anda pada penanda aras diiktiraf, bukan citarasa"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        reports: base.reports,
+        pdf: base.pdf
+    };
 })();
 
 /* =========================================================
