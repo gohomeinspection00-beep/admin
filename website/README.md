@@ -62,6 +62,16 @@ Buka `index.html`, cari bahagian atas `<script>`:
 - **`AUDIENCES` / `WHYUS` / `EQUIPMENT` / `PROCESS` / `SERVICES_LIST` / `FAQS`** — kandungan seksyen
 - Warna: blok `:root` di bahagian atas `<style>`
 
+## SEO & kongsi (siap)
+
+- **Open Graph / Twitter** — pratonton kemas bila link dikongsi di WhatsApp/FB
+- **Favicon** — terbina dalam fail (SVG data URI), tiada fail luar
+- **JSON-LD** — `ProfessionalService` (telefon, kawasan, waktu, 16 servis) +
+  `FAQPage` (39 soalan) dijana automatik dari data
+
+**Bila deploy:** tukar `goxpert.my` dalam blok meta `<head>` kepada domain sebenar,
+dan ganti `og:image` dengan gambar 1200×630 px sendiri.
+
 ## Gambar
 
 Semua gambar masih guna hosting lama `https://arleta.site/interactivelink/1453/`.

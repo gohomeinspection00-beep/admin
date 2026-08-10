@@ -3,9 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoXpert — Building Surveying & Inspection Malaysia</title>
-<meta name="description" content="RISM-registered Building Surveyors with SIRIM-calibrated equipment. Home inspection, BCA, dilapidation survey, tribunal support — Johor, Melaka, Negeri Sembilan & Selangor.">
+<title>GoXpert — Building Surveying &amp; Inspection Malaysia</title>
+<meta name="description" content="RISM-registered Building Surveyors with SIRIM-calibrated equipment. Home inspection, BCA, dilapidation survey, tribunal support — Johor, Melaka, Negeri Sembilan &amp; Selangor.">
 <meta name="theme-color" content="#1565C0">
+<meta name="author" content="GoXpert">
+<meta name="robots" content="index, follow">
+
+<!-- =========================================================
+     PRATONTON KONGSI (WhatsApp / Facebook / Telegram)
+     BILA DEPLOY: tukar goxpert.my kepada domain sebenar, dan
+     ganti og:image dengan gambar 1200x630 px milik sendiri.
+     ========================================================= -->
+<link rel="canonical" href="https://goxpert.my/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GoXpert">
+<meta property="og:locale" content="ms_MY">
+<meta property="og:locale:alternate" content="en_MY">
+<meta property="og:url" content="https://goxpert.my/">
+<meta property="og:title" content="GoXpert — Building Surveying &amp; Inspection Malaysia">
+<meta property="og:description" content="Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Home inspection, BCA, dilapidation survey dan sokongan tribunal.">
+<meta property="og:image" content="https://arleta.site/interactivelink/1453/Logo-Go-Expert-Panjang.png">
+<meta property="og:image:alt" content="GoXpert Building Surveyors">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GoXpert — Building Surveying &amp; Inspection Malaysia">
+<meta name="twitter:description" content="Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM.">
+<meta name="twitter:image" content="https://arleta.site/interactivelink/1453/Logo-Go-Expert-Panjang.png">
+
+<!-- Favicon terbina dalam fail (tiada fail luar diperlukan) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231565C0'/%3E%3Cpath d='M14 50V26l18-12 18 12v24z' fill='none' stroke='white' stroke-width='4.5' stroke-linejoin='round'/%3E%3Cpath d='M26 50V36h12v14' fill='none' stroke='white' stroke-width='4.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231565C0'/%3E%3Cpath d='M14 50V26l18-12 18 12v24z' fill='none' stroke='white' stroke-width='4.5' stroke-linejoin='round'/%3E%3Cpath d='M26 50V36h12v14' fill='none' stroke='white' stroke-width='4.5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1093,6 +1119,8 @@ section { padding: 5rem 2rem; }
 }
 .form-group textarea { resize: vertical; }
 .quote-form .btn { width: 100%; justify-content: center; margin-top: 1.25rem; }
+.form-email-btn { margin-top: 0.7rem !important; font-size: 0.92rem; padding: 0.85rem 1.5rem; }
+.form-email-btn svg { width: 18px; height: 18px; }
 
 /* ==================== FINAL CTA ==================== */
 .final-cta {
@@ -1492,6 +1520,24 @@ section { padding: 5rem 2rem; }
 </section>
 
 <!-- ==================== REVIEWS ==================== -->
+<!-- ==================== SAMPLE REPORT ==================== -->
+<section class="svc-extra alt" id="sample-report">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <span class="section-tag" data-i18n="samp.tag">What You Receive</span>
+            <h2 data-i18n="samp.title">See an Actual Inspection Report</h2>
+            <p data-i18n="samp.sub">Not a brochure — this is the real document our clients receive, with photos, locations and findings.</p>
+        </div>
+        <div id="homeReportGallery"><!-- dijana oleh JS --></div>
+        <div class="rep-cta reveal">
+            <a class="btn btn-primary" id="sampleReportBtn" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+                <span data-i18n="samp.btn">Download Sample Report (PDF)</span>
+            </a>
+        </div>
+    </div>
+</section>
+
 <section class="reviews-section" id="reviews">
     <div class="section-container">
         <div class="section-header reveal">
@@ -1623,6 +1669,10 @@ section { padding: 5rem 2rem; }
                 <button type="submit" class="btn btn-whatsapp">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
                     <span data-i18n="form.send">Send via WhatsApp</span>
+                </button>
+                <button type="button" class="btn btn-secondary form-email-btn" id="emailBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+                    <span data-i18n="form.email">Send via Email instead</span>
                 </button>
             </form>
         </div>
@@ -1785,6 +1835,7 @@ var CONFIG = {
     phoneDisplay: "+6011-3144 6591",
     phoneRaw: "601131446591",
     email: "official@goxpert.my",
+    siteUrl: "https://goxpert.my/",   // untuk data Google — tukar bila domain sebenar sedia
     year: new Date().getFullYear(),
     // Base URL gambar. Bila tuan dah download gambar sendiri, tukar ke "assets/img/"
     imgBase: "https://arleta.site/interactivelink/1453/",
@@ -3317,6 +3368,10 @@ var I18N = {
         "pillar.more": "Explore all services",
         "nav.projects": "Projects", "nav.about": "About",
         "faq.more": "More Questions & Answers",
+        "form.email": "Send via Email instead",
+        "samp.tag": "What You Receive", "samp.title": "See an Actual Inspection Report",
+        "samp.sub": "Not a brochure — this is the real document our clients receive, with photos, locations and findings.",
+        "samp.btn": "Download Sample Report (PDF)",
         "faqp.tag": "Questions & Answers", "faqp.title": "Everything You Might Be Wondering",
         "faqp.sub": "If your question is not here, message us on WhatsApp — we answer within one working hour.",
         "faqp.count": "Questions", "faqp.ctaTitle": "Still Have a Question?",
@@ -3387,6 +3442,10 @@ var I18N = {
         "pillar.more": "Terokai semua servis",
         "nav.projects": "Projek", "nav.about": "Tentang Kami",
         "faq.more": "Lagi Soalan & Jawapan",
+        "form.email": "Hantar melalui E-mel",
+        "samp.tag": "Apa Yang Anda Terima", "samp.title": "Lihat Laporan Inspection Sebenar",
+        "samp.sub": "Bukan brosur — ini dokumen sebenar yang pelanggan kami terima, dengan gambar, lokasi dan penemuan.",
+        "samp.btn": "Muat Turun Sample Report (PDF)",
         "faqp.tag": "Soalan & Jawapan", "faqp.title": "Semua Yang Mungkin Anda Terfikir",
         "faqp.sub": "Jika soalan anda tiada di sini, mesej kami di WhatsApp — kami jawab dalam satu jam bekerja.",
         "faqp.count": "Soalan", "faqp.ctaTitle": "Masih Ada Soalan?",
@@ -3837,6 +3896,36 @@ var FAQ_ALL = [
         });
     }
 
+    /* ---------- Sample report di home ---------- */
+    function renderHomeReport() {
+        var wrap = document.getElementById("homeReportGallery");
+        var btn = document.getElementById("sampleReportBtn");
+        var ex = SVC_EXTRAS["home-defect"];
+        if (!wrap || !ex || !ex.reports) return;
+        var imgs = ex.reports;
+        var cell = function (i, cls) {
+            return '<button class="report-img ' + cls + '" type="button" data-hrep="' + i + '">' +
+                '<img src="' + CONFIG.imgBase + imgs[i] + '" alt="Sample report page ' + (i + 1) + '" loading="lazy" ' +
+                'onerror="this.parentElement.classList.add(\'img-missing\')"></button>';
+        };
+        wrap.innerHTML = '<div class="report-gallery">' +
+            '<div class="report-row">' + cell(0, "from-left") + cell(1, "from-right") + '</div>' +
+            '<div class="report-row" style="justify-content:center">' + cell(2, "center from-left") + '</div>' +
+            '<div class="report-row">' + cell(3, "from-left") + cell(4, "from-right") + '</div>' +
+            '</div>';
+        if (btn && ex.pdf) btn.href = ex.pdf;
+
+        wrap.querySelectorAll(".report-img").forEach(function (b) {
+            b.addEventListener("click", function () {
+                var start = parseInt(b.getAttribute("data-hrep"), 10) || 0;
+                lbOpenItems(imgs.map(function (r, i) {
+                    return { src: CONFIG.imgBase + r, label: (t("samp.title") || "Sample Report") + " " + (i + 1) + "/" + imgs.length };
+                }), start);
+            });
+        });
+        wrap.querySelectorAll(".report-img").forEach(function (el) { dlpObserver.observe(el); });
+    }
+
     /* Home: papar soalan bertanda home:true sahaja */
     function renderFaq() {
         buildFaqList(document.getElementById("faqList"),
@@ -3906,6 +3995,7 @@ var FAQ_ALL = [
         renderEquipment();
         renderProcess();
         renderProjects();
+        renderHomeReport();
         renderFaq();
         renderServiceSelect();
         applyWaLinks();
@@ -4009,13 +4099,13 @@ var FAQ_ALL = [
     startAuto();
 
     /* ---------- Borang → WhatsApp ---------- */
-    document.getElementById("quoteForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-        var f = new FormData(e.target);
+    /* Kumpul isi borang jadi teks — dikongsi WhatsApp & e-mel */
+    function quoteFormText() {
+        var f = new FormData(document.getElementById("quoteForm"));
         var isBm = lang === "bm";
         var lines = [isBm ? "Salam, saya ingin dapatkan sebut harga untuk inspection." :
                             "Hi, I would like to get a quote for a building inspection.", ""];
-        var fields = [
+        [
             [isBm ? "Nama" : "Name", f.get("name")],
             [isBm ? "Telefon" : "Phone", f.get("phone")],
             [isBm ? "Servis" : "Service", f.get("service")],
@@ -4023,12 +4113,24 @@ var FAQ_ALL = [
             [isBm ? "Keluasan" : "Size", f.get("size") ? f.get("size") + " sqft" : ""],
             [isBm ? "Tingkat" : "Storeys", f.get("storey")],
             [isBm ? "Nota" : "Notes", f.get("notes")]
-        ];
-        fields.forEach(function (p) {
+        ].forEach(function (p) {
             var v = (p[1] || "").toString().trim();
             if (v) lines.push(p[0] + ": " + v);
         });
-        window.open(waLink(lines.join("\n")), "_blank", "noopener");
+        return lines.join("\n");
+    }
+
+    document.getElementById("quoteForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        window.open(waLink(quoteFormText()), "_blank", "noopener");
+    });
+
+    /* Hantar melalui e-mel (untuk pelanggan korporat/JMB yang tak guna WhatsApp) */
+    document.getElementById("emailBtn").addEventListener("click", function () {
+        var subject = lang === "bm" ? "Permohonan Sebut Harga Inspection" : "Inspection Quotation Request";
+        window.location.href = "mailto:" + CONFIG.email +
+            "?subject=" + encodeURIComponent(subject) +
+            "&body=" + encodeURIComponent(quoteFormText());
     });
 
     /* ---------- Lightbox umum (galeri servis + projek) ---------- */
@@ -4801,7 +4903,57 @@ var FAQ_ALL = [
     }
     window.addEventListener("hashchange", function () { route(false); });
 
+    /* ---------- Data berstruktur untuk Google (JSON-LD) ---------- */
+    function injectSchema() {
+        var siteUrl = CONFIG.siteUrl || "https://goxpert.my/";
+        var business = {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "name": CONFIG.legalName || "GoXpert",
+            "description": "Registered Building Surveyors providing building inspection, Building Condition Assessment, dilapidation survey and tribunal documentation across Malaysia.",
+            "url": siteUrl,
+            "telephone": "+" + CONFIG.phoneRaw,
+            "email": CONFIG.email,
+            "image": CONFIG.imgBase + "Logo-Go-Expert-Panjang.png",
+            "priceRange": "$$",
+            "address": { "@type": "PostalAddress", "addressCountry": "MY", "addressRegion": "Selangor" },
+            "areaServed": ["Johor", "Melaka", "Negeri Sembilan", "Selangor"].map(function (a) {
+                return { "@type": "AdministrativeArea", "name": a };
+            }),
+            "openingHoursSpecification": [{
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                "opens": "09:00", "closes": "18:00"
+            }],
+            "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Inspection & Surveying Services",
+                "itemListElement": SVC.map(function (s) {
+                    return { "@type": "Offer", "itemOffered": { "@type": "Service", "name": s.name.en, "description": s.tag.en } };
+                })
+            }
+        };
+        var faqSchema = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": FAQ_ALL.map(function (f) {
+                return {
+                    "@type": "Question",
+                    "name": f.en[0],
+                    "acceptedAnswer": { "@type": "Answer", "text": f.en[1] }
+                };
+            })
+        };
+        [business, faqSchema].forEach(function (obj) {
+            var sc = document.createElement("script");
+            sc.type = "application/ld+json";
+            sc.textContent = JSON.stringify(obj);
+            document.head.appendChild(sc);
+        });
+    }
+
     /* ---------- Mula ---------- */
+    injectSchema();
     renderAll();
     route(false);   // sokong deep-link terus ke #/projects atau #/services/...
 })();
