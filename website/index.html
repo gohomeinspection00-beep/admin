@@ -606,7 +606,7 @@ section { padding: 5rem 2rem; }
 .svc-stat .lbl { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block; }
 
 /* ---- Seksyen ekstra dalam sub-page servis ---- */
-.svc-extra { padding: 4.5rem 2rem; background: white; }
+.svc-extra { padding: 4.5rem 2rem; background: white; overflow: hidden; }
 .svc-extra.alt { background: var(--bg); }
 
 /* ---- Kad 12 elemen pemeriksaan ---- */
@@ -755,6 +755,58 @@ section { padding: 5rem 2rem; }
 .sticker-item.from-left { transform: translateX(-60px); }
 .sticker-item.from-right { transform: translateX(60px); }
 .sticker-item.in-view { opacity: 1; transform: translateX(0); }
+
+/* ---- Kad nilai "Apa Yang Anda Dapat" ---- */
+.value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.value-card {
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    padding: 1.25rem; display: flex; gap: 0.85rem; align-items: flex-start;
+    transition: all 0.3s ease;
+}
+.value-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: #BBDEFB; }
+.v-icon {
+    width: 44px; height: 44px; background: #E3F2FD; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.v-icon svg { width: 22px; height: 22px; color: var(--primary); }
+.value-card h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.2rem; }
+.value-card p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+
+/* ---- Defect Management System (seksyen biru gelap) ---- */
+.dms-section {
+    padding: 4.5rem 2rem; color: white; overflow: hidden;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+.dms-header { text-align: center; margin-bottom: 2.5rem; }
+.dms-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; margin-bottom: 1rem;
+}
+.dms-header h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin-bottom: 0.6rem; }
+.dms-header p { opacity: 0.85; max-width: 600px; margin: 0 auto; font-size: 0.95rem; }
+.dms-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem; max-width: 1000px; margin: 0 auto;
+}
+.dms-card {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 1.25rem; display: flex; gap: 0.75rem; align-items: flex-start;
+    opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
+}
+.dms-card.in-view { opacity: 1; transform: translateY(0); }
+.dms-num {
+    width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
+}
+.dms-card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.15rem; }
+.dms-card p { font-size: 0.75rem; opacity: 0.8; line-height: 1.5; margin: 0; }
+
+/* ---- Galeri lebih besar (paparan sistem DMS) ---- */
+.gal-lg .report-gallery { max-width: 820px; }
+.gal-lg .report-img { width: 50%; max-width: 320px; }
+.gal-lg .report-img.center { width: 55%; max-width: 340px; }
 
 /* servis dalam kad pillar kini pautan */
 .pillar-card li a {
@@ -981,6 +1033,7 @@ section { padding: 5rem 2rem; }
     .review-prev { left: -50px; }
     .review-next { right: -50px; }
     .svc-list-grid { grid-template-columns: repeat(2, 1fr); }
+    .value-grid { grid-template-columns: repeat(2, 1fr); }
     .svc-detail-grid { grid-template-columns: 1fr; gap: 2rem; }
     .svc-side { position: static; }
     .page-head-grid { grid-template-columns: 1fr; gap: 1.75rem; }
@@ -1042,6 +1095,11 @@ section { padding: 5rem 2rem; }
     .report-img { width: 46%; max-width: 170px; }
     .report-img.center { width: 50%; max-width: 190px; }
     .report-row { margin-bottom: -24px; }
+    .value-grid { grid-template-columns: 1fr; }
+    .dms-section { padding: 3rem 1.25rem; }
+    .dms-grid { grid-template-columns: 1fr; }
+    .gal-lg .report-img { width: 46%; max-width: 180px; }
+    .gal-lg .report-img.center { width: 52%; max-width: 200px; }
 }
 @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -1172,7 +1230,8 @@ section { padding: 5rem 2rem; }
                 <p class="pillar-sub" data-i18n="p1.sub">For homeowners &amp; buyers</p>
                 <ul>
                     <li><a href="#/services/home-defect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s1">Home Defect Inspection (DLP)</span></a></li>
-                    <li><a href="#/services/pre-purchase"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s2">Pre-Purchase / Sub-Sale Inspection</span></a></li>
+                    <li><a href="#/services/pre-purchase"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s2">Pre-Purchase Inspection</span></a></li>
+                    <li><a href="#/services/sub-sale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s2b">Sub-Sale Inspection</span></a></li>
                     <li><a href="#/services/re-inspection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s3">Re-Inspection</span></a></li>
                     <li><a href="#/services/after-renovation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s4">After-Renovation Inspection</span></a></li>
                     <li><a href="#/services/joint-inspection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s5">Joint Inspection with Developer</span></a></li>
@@ -1592,16 +1651,28 @@ var SVC = [
               bm: ["Laporan kecacatan bergambar (PDF)", "Lokasi & tahap keterukan disenaraikan", "Sedia dihantar terus kepada pemaju"] } },
 
     { slug: "pre-purchase", cat: "residential", img: "Oroginal-Picture.png",
-      who:  { en: ["Subsale buyers", "Property investors"], bm: ["Pembeli subsale", "Pelabur hartanah"] },
+      who:  { en: ["Sub-sale buyers", "Before signing the S&P"], bm: ["Pembeli sub-sale", "Sebelum tandatangan S&P"] },
       tools: ["Moisture Meter", "Thermal Camera", "Laser Distance"],
-      name: { en: "Pre-Purchase / Sub-Sale Inspection", bm: "Pre-Purchase / Sub-Sale Inspection" },
-      tag:  { en: "Know the true condition before you sign anything.", bm: "Ketahui keadaan sebenar sebelum anda tandatangan apa-apa." },
-      desc: { en: "Buying a subsale property is a big commitment — hidden defects can cost tens of thousands after you move in. We assess the property's real condition so you can negotiate the price with facts, or walk away before it is too late.",
-              bm: "Membeli hartanah subsale adalah komitmen besar — kecacatan tersembunyi boleh menelan puluhan ribu selepas anda berpindah. Kami menilai keadaan sebenar hartanah supaya anda boleh berunding harga dengan fakta, atau menarik diri sebelum terlambat." },
-      inc:  { en: ["Structural condition & major crack assessment", "Signs of water ingress & past leakage", "Roof, ceiling & waterproofing condition", "Quick M&E assessment (electrical & plumbing)", "Estimated repair scope & priorities"],
-              bm: ["Penilaian struktur & retak besar", "Tanda resapan air & kebocoran lama", "Keadaan bumbung, siling & kalis air", "Penilaian ringkas M&E (elektrik & paip)", "Anggaran skop & keutamaan pembaikan"] },
-      get:  { en: ["Condition report with photos", "Repair priority summary", "Negotiation-ready findings"],
-              bm: ["Laporan keadaan bergambar", "Ringkasan keutamaan pembaikan", "Penemuan sedia untuk rundingan harga"] } },
+      name: { en: "Pre-Purchase Inspection", bm: "Pre-Purchase Inspection" },
+      tag:  { en: "Buying a sub-sale home? Know the true condition — before you sign.", bm: "Nak beli rumah sub-sale? Tahu keadaan sebenar — sebelum anda tandatangan." },
+      desc: { en: "Don't decide without knowing the home's true condition. We inspect every corner with SIRIM-calibrated equipment — complete with repair cost estimates, face-to-face consultation, negotiation points and a full defect management system if you proceed to buy.",
+              bm: "Jangan buat keputusan tanpa tahu keadaan sebenar rumah. Kami periksa setiap sudut dengan peralatan dikalibrasi SIRIM — siap dengan anggaran harga pembaikian, consultation bersemuka, point negotiation dan sistem pengurusan defect yang lengkap kalau anda jadi beli.",},
+      inc:  { en: ["Comprehensive inspection, floor to roof (as permitted)", "Repair cost estimate for every defect (PDF)", "Repair priority list — urgent to deferrable", "Negotiation points list for the seller", "Face-to-face consultation after the report"],
+              bm: ["Pemeriksaan menyeluruh, lantai hingga bumbung (setakat dibenarkan)", "Anggaran kos pembaikian setiap defect (PDF)", "Senarai keutamaan pembaikian — urgent hingga boleh tangguh", "Senarai point negotiation dengan penjual", "Consultation bersemuka selepas laporan siap"] },
+      get:  { en: ["Condition report + cost estimate (PDF)", "Negotiation points list", "Defect management system if you buy"],
+              bm: ["Laporan keadaan + anggaran kos (PDF)", "Senarai point negotiation", "Sistem pengurusan defect kalau jadi beli"] } },
+
+    { slug: "sub-sale", cat: "residential", img: "",
+      who:  { en: ["Pre-owned home owners", "After purchase / key handover"], bm: ["Pemilik rumah lama", "Selepas beli / terima kunci"] },
+      tools: ["Moisture Meter", "Thermal Camera", "Laser Distance"],
+      name: { en: "Sub-Sale Inspection", bm: "Sub-Sale Inspection" },
+      tag:  { en: "Bought an older home? Know its true condition and plan repairs right.", bm: "Beli rumah lama? Tahu keadaan sebenar dan rancang pembaikian dengan betul." },
+      desc: { en: "Bought a pre-owned home? Make sure you know its true condition. We inspect every corner with SIRIM-calibrated equipment — complete with repair cost estimates and a full defect management system to manage repairs from start to finish.",
+              bm: "Beli rumah lama? Pastikan anda tahu keadaan sebenar rumah. Kami periksa setiap sudut dengan peralatan dikalibrasi SIRIM, siap dengan anggaran harga pembaikian dan sistem pengurusan defect yang lengkap untuk urus pembaikian dari awal hingga habis." },
+      inc:  { en: ["Comprehensive inspection, floor to roof (as permitted)", "Repair cost estimate for every defect (PDF)", "Repair planning to save cost & time", "Defect management system access", "Consultation on condition & next steps"],
+              bm: ["Pemeriksaan menyeluruh, lantai hingga bumbung (setakat dibenarkan)", "Anggaran kos pembaikian setiap defect (PDF)", "Perancangan pembaikian jimat kos & masa", "Akses sistem pengurusan defect", "Consultation keadaan rumah & langkah seterusnya"] },
+      get:  { en: ["Condition report + cost estimate (PDF)", "Phased repair plan", "Defect management system access"],
+              bm: ["Laporan keadaan + anggaran kos (PDF)", "Pelan pembaikian berfasa", "Akses sistem pengurusan defect"] } },
 
     { slug: "re-inspection", cat: "residential", img: "",
       who:  { en: ["Owners after developer repairs", "DLP claimants"], bm: ["Pemilik selepas pembaikan pemaju", "Penuntut DLP"] },
@@ -1876,6 +1947,111 @@ var SVC_EXTRAS = {
 };
 
 /* =========================================================
+   EKSTRA PRE-PURCHASE (Sebelum Beli) & SUB-SALE (Selepas Beli)
+   — guna semula 12 elemen/tools/thermal/roof/report/sticker
+   dari DLP, tambah kad nilai + Defect Management System +
+   galeri paparan sistem (Sub-Sale-1..7-Website.png).
+   ========================================================= */
+var VICONS = {
+    grad:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+    home:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    doc:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+    money: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    list:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>',
+    chklist: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+    chat:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    system:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><circle cx="12" cy="10" r="3"/></svg>',
+    shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9.5 12l2 2 4-4"/></svg>',
+    app:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>',
+    plan:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>'
+};
+
+/* 11 ciri Defect Management System (sama untuk kedua-dua page) */
+var DMS_FEATURES = [
+    { t: { en: "Log In & Monitor", bm: "Log In & Monitor" }, d: { en: "Log in and monitor defect repair schedule in real-time", bm: "Log In dan monitor jadual pembaikian defect secara real-time" } },
+    { t: { en: "Print Specific Defects", bm: "Print Defect Spesifik" }, d: { en: "Print specific defects to send to the right contractor (e.g. plumbing to plumbing contractor)", bm: "Print defect spesifik untuk hantar kepada contractor yang tepat (cth: plumbing ke contractor plumbing)" } },
+    { t: { en: "Organize Repair Phases", bm: "Susun Fasa Pembaikian" }, d: { en: "Organize repair phases from urgent, before moving in, and other priorities", bm: "Susun fasa pembaikian dari urgent, sebelum masuk rumah, dan lain-lain keutamaan" } },
+    { t: { en: "Cost Estimate by Phase", bm: "Anggaran Harga Mengikut Fasa" }, d: { en: "We organize all defects and provide repair cost estimates by planned phases", bm: "Kami susun semua defect dan beri anggaran harga pembaikian mengikut fasa yang dirancang" } },
+    { t: { en: "Add Contractor Contact", bm: "Masukkan Contact Contractor" }, d: { en: "Add your contractor's contact, send defect details directly to them", bm: "Masukkan contact contractor anda, hantar detail defect terus kepada mereka" } },
+    { t: { en: "Track Contractor Costs", bm: "Letak Harga Contractor" }, d: { en: "Input contractor payment and see the total final cost breakdown", bm: "Letak harga bayaran contractor dan tengok jumlah kos final keseluruhan" } },
+    { t: { en: "Repair Progress Photos", bm: "Gambar Proses Pembaikian" }, d: { en: "Upload repair progress photos for documentation and reference", bm: "Upload gambar proses pembaikian defect untuk dokumentasi dan rujukan" } },
+    { t: { en: "Overall Planner Report", bm: "Report Planner Keseluruhan" }, d: { en: "View the overall planner report to monitor repair progress", bm: "Lihat report planner keseluruhan untuk pantau progress pembaikian" } },
+    { t: { en: "Monitoring Dashboard", bm: "Dashboard Monitoring" }, d: { en: "Complete dashboard to monitor the status of every defect and repair", bm: "Dashboard lengkap untuk monitor status setiap defect dan pembaikian" } },
+    { t: { en: "Download Checklist", bm: "Download Checklist" }, d: { en: "Download checklist for easy checking and reference", bm: "Muat turun checklist untuk semakan dan rujukan mudah" } },
+    { t: { en: "AI Assistant", bm: "AI Assistant" }, d: { en: "Access AI ready to answer questions about inspection or repair process", bm: "Access AI yang sedia membantu menjawab soalan berkaitan inspection atau proses pembaikian" } }
+];
+
+var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale-3-Website.png", "Sub-Sale-4-Website.png", "Sub-Sale-5-Website.png", "Sub-Sale-6-Website.png", "Sub-Sale-7-Website.png"];
+
+(function () {
+    var base = SVC_EXTRAS["home-defect"];
+    var sharedSec = {
+        valTag: { en: "What You Get", bm: "Apa Yang Anda Dapat" },
+        valTitle: { en: "Inspection Value We Provide", bm: "Nilai Pemeriksaan Sub-Sale Kami" },
+        dmsTitle: { en: "Defect Management System", bm: "Sistem Pengurusan Defect" },
+        dmsGalTag: { en: "Defect Management System", bm: "Sistem Pengurusan Defect" },
+        dmsGalTitle: { en: "System Preview", bm: "Paparan Sistem Pengurusan" },
+        dmsGalSub: { en: "See for yourself how our system helps you manage repairs easily", bm: "Lihat sendiri bagaimana sistem kami membantu anda urus pembaikian dengan mudah" },
+        scopeSub: { en: "Every element is checked visually, functionally, and with professional tools (as permitted)", bm: "Setiap elemen diperiksa secara visual, ujian fungsi dan dengan alat profesional (setakat dibenarkan)" }
+    };
+    var sharedBlocks = {
+        stats: base.stats,
+        elements: base.elements,
+        toolsShowcase: base.toolsShowcase,
+        thermal: base.thermal,
+        roof: base.roof,
+        reports: base.reports,
+        pdf: base.pdf,
+        stickers: base.stickers,
+        dms: DMS_FEATURES,
+        dmsGallery: DMS_GALLERY
+    };
+
+    /* --- Pre-Purchase (Sebelum Beli) --- */
+    SVC_EXTRAS["pre-purchase"] = Object.assign({}, sharedBlocks, {
+        sec: Object.assign({}, base.sec, sharedSec, {
+            dmsBadge: { en: "If You Buy — The Most POWERFUL", bm: "Kalau Jadi Beli — Yang Paling GEMPAK" },
+            dmsSub: { en: "If you proceed to buy — we help you manage the entire repair process from start to finish with a complete system", bm: "Kalau En/Pn jadi beli rumah tu — kami bantu anda urus proses pembaikian dari awal hingga habis dengan sistem yang lengkap" }
+        }),
+        values: [
+            { icon: VICONS.grad,   t: { en: "Registered Building Surveyor", bm: "Building Surveyor Berdaftar" }, d: { en: "RISM registered inspector with professional degree", bm: "Inspector berdaftar RISM dengan ijazah profesional" } },
+            { icon: VICONS.check,  t: { en: "SIRIM Calibrated Equipment", bm: "Peralatan SIRIM Calibrated" }, d: { en: "Thermal scanner, Spirit Level, and more — calibrated by SIRIM", bm: "Thermal scanner, Spirit Level, dan pelbagai alat lagi — dicalibrate oleh SIRIM" } },
+            { icon: VICONS.home,   t: { en: "Comprehensive Inspection", bm: "Pemeriksaan Menyeluruh" }, d: { en: "Floor to roof — including electrical & plumbing (as permitted)", bm: "Dari lantai hingga bumbung — termasuk elektrik & plumbing (setakat dibenarkan)" } },
+            { icon: VICONS.doc,    t: { en: "Detailed Report + Analysis", bm: "Laporan Detail + Analisis" }, d: { en: "Complete PDF with photos, floor plan tagging & analysis", bm: "PDF lengkap dengan photo, tagging atas floor plan & analisis" } },
+            { icon: VICONS.money,  t: { en: "Repair Cost Estimate", bm: "Anggaran Harga Pembaikian" }, d: { en: "Know the estimated cost to fix every defect found (PDF)", bm: "Tahu berapa anggaran kos untuk baiki setiap defect yang ditemui (PDF)" } },
+            { icon: VICONS.list,   t: { en: "Repair Priority List", bm: "List Keperluan Pembaikian" }, d: { en: "Repair requirement list — from urgent to deferrable (PDF)", bm: "Senarai keperluan pembaikian — dari urgent hingga yang boleh ditangguh (PDF)" } },
+            { icon: VICONS.chklist, t: { en: "Repair Checklist", bm: "Checklist Pembaikian" }, d: { en: "Repair checklist for easy checking and reference", bm: "Checklist pembaikian untuk semakan dan rujukan mudah" } },
+            { icon: VICONS.chat,   t: { en: "Face-to-Face Consultation", bm: "Consultation Bersemuka" }, d: { en: "Our in-charge will meet you after the report is ready to explain the home's condition and negotiation points", bm: "Incharge kami akan datang jumpa anda selepas report siap untuk explain condition rumah dan point negotiation" } },
+            { icon: VICONS.people, t: { en: "Negotiation Points List", bm: "List Point Negotiation" }, d: { en: "List of negotiation points you can use when negotiating with the seller", bm: "Senarai point negotiation yang boleh digunakan untuk berunding dengan penjual" } },
+            { icon: VICONS.system, t: { en: "Defect Management System", bm: "Sistem Pengurusan Defect" }, d: { en: "If you proceed to buy — complete defect management system to manage repairs from start to finish", bm: "Kalau jadi beli — sistem pengurusan defect lengkap untuk urus pembaikian dari awal hingga habis" } },
+            { icon: VICONS.shield, t: { en: "Avoid Buying Beyond Budget", bm: "Elak Beli Rumah Luar Budget" }, d: { en: "Avoid buying a home with repair costs beyond your budget — know early before it's too late", bm: "Elak beli rumah yang kos pembaikiannya luar dari budget anda — tahu awal sebelum terlambat" } }
+        ]
+    });
+
+    /* --- Sub-Sale (Selepas Beli / Rumah Lama) --- */
+    SVC_EXTRAS["sub-sale"] = Object.assign({}, sharedBlocks, {
+        sec: Object.assign({}, base.sec, sharedSec, {
+            dmsBadge: { en: "The Most POWERFUL", bm: "Yang Paling GEMPAK" },
+            dmsSub: { en: "We help you manage the entire repair process from start to finish with a complete system", bm: "Kami bantu anda urus proses pembaikian dari awal hingga habis dengan sistem yang lengkap" }
+        }),
+        values: [
+            { icon: VICONS.grad,   t: { en: "Registered Building Surveyor", bm: "Building Surveyor Berdaftar" }, d: { en: "RISM registered inspector with professional degree", bm: "Inspector berdaftar RISM dengan ijazah profesional" } },
+            { icon: VICONS.check,  t: { en: "SIRIM Calibrated Equipment", bm: "Peralatan SIRIM Calibrated" }, d: { en: "Thermal scanner, Spirit Level, and many more tools", bm: "Thermal scanner, Spirit Level, dan pelbagai alat lagi" } },
+            { icon: VICONS.home,   t: { en: "Comprehensive Inspection", bm: "Pemeriksaan Menyeluruh" }, d: { en: "Floor to roof — including electrical & plumbing", bm: "Dari lantai hingga bumbung — termasuk elektrik & plumbing" } },
+            { icon: VICONS.doc,    t: { en: "Detailed Report + Analysis", bm: "Laporan Detail + Analisis" }, d: { en: "Complete PDF with photos, floor plan tagging & analysis", bm: "PDF lengkap dengan photo, tagging atas floor plan & analisis" } },
+            { icon: VICONS.money,  t: { en: "Repair Cost Estimate", bm: "Anggaran Harga Pembaikian" }, d: { en: "Know the estimated cost to fix every defect found", bm: "Tahu berapa anggaran kos untuk baiki setiap defect yang ditemui" } },
+            { icon: VICONS.app,    t: { en: "Submission via Apps", bm: "Submission via Apps" }, d: { en: "Submit defects directly to developer via apps (if available)", bm: "Submission defect terus ke developer melalui apps (jika ada)" } },
+            { icon: VICONS.system, t: { en: "Defect Management System", bm: "Sistem Pengurusan Defect" }, d: { en: "Comes with a defect management system to manage and monitor every defect easily", bm: "Berserta sistem pengurusan defect untuk urus dan pantau setiap kecacatan dengan mudah" } },
+            { icon: VICONS.plan,   t: { en: "We Plan Your Repairs", bm: "Kami Rancang Pembaikian Anda" }, d: { en: "We plan your repairs to save cost, time and avoid wastage", bm: "Kami rancang pembaikian anda untuk jimat kos, masa dan elak pembaziran" } },
+            { icon: VICONS.shield, t: { en: "Reduce Overspend Risk", bm: "Kurangkan Risiko Over Spend" }, d: { en: "Reduce the risk of overspending on defect repairs with careful planning", bm: "Mengurangkan risiko over spend untuk baiki defect dengan perancangan yang teliti" } },
+            { icon: VICONS.chat,   t: { en: "Consultation Provided", bm: "Consultation Diberikan" }, d: { en: "Consultation provided to help you understand the home's condition and next steps", bm: "Consultation diberikan untuk bantu anda fahami keadaan rumah dan langkah seterusnya" } }
+        ]
+    });
+})();
+
+/* =========================================================
    PROJEK "FEATURED" DI HOME PAGE — maksimum 6 dipaparkan.
    Letak 6 projek TERBAIK tuan di sini. Senarai PENUH semua
    projek diselenggara dalam fail projects.html (butang
@@ -1926,7 +2102,7 @@ var I18N = {
         "pillars.tag": "Our Services", "pillars.title": "One Firm. Every Building Survey Need.",
         "pillars.sub": "We are more than home inspection — a full building surveying practice serving homeowners, corporations and legal proceedings.",
         "p1.title": "Residential", "p1.sub": "For homeowners & buyers",
-        "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
+        "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase Inspection", "p1.s2b": "Sub-Sale Inspection",
         "p1.s3": "Re-Inspection", "p1.s4": "After-Renovation Inspection", "p1.s5": "Joint Inspection with Developer",
         "pillar.more": "Explore all services",
         "nav.projects": "Projects",
@@ -1990,7 +2166,7 @@ var I18N = {
         "pillars.tag": "Servis Kami", "pillars.title": "Satu Firma. Semua Keperluan Ukur Bangunan.",
         "pillars.sub": "Kami bukan sekadar home inspection — firma ukur bangunan lengkap untuk pemilik rumah, korporat dan keperluan perundangan.",
         "p1.title": "Kediaman", "p1.sub": "Untuk pemilik & pembeli rumah",
-        "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
+        "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase Inspection", "p1.s2b": "Sub-Sale Inspection",
         "p1.s3": "Re-Inspection", "p1.s4": "Inspection Selepas Renovation", "p1.s5": "Joint Inspection Bersama Pemaju",
         "pillar.more": "Terokai semua servis",
         "nav.projects": "Projek",
@@ -2649,9 +2825,69 @@ var FAQS = [
                 '</aside>' +
             '</div></section>';
 
-        /* --- Seksyen ekstra (cth. DLP: 12 elemen, sticker, sample report) --- */
+        /* --- Seksyen ekstra (DLP / Pre-Purchase / Sub-Sale) --- */
         if (ex) {
             var xh = "";
+
+            /* pembina galeri gaya konsep: pasangan + tengah, meluncur dari tepi */
+            var galBtn = function (imgs, galKey, i, cls) {
+                return '<button class="report-img ' + cls + '" type="button" data-gal="' + galKey + '" data-idx="' + i + '">' +
+                    '<img src="' + CONFIG.imgBase + imgs[i] + '" alt="Page ' + (i + 1) + '" loading="lazy" ' +
+                    'onerror="this.parentElement.classList.add(\'img-missing\')"></button>';
+            };
+            var mkGal = function (imgs, galKey) {
+                var html = "", i = 0, r = 0, cc = 0;
+                while (i < imgs.length) {
+                    if ((r === 0 || r === 2) && i + 1 < imgs.length) {
+                        html += '<div class="report-row">' + galBtn(imgs, galKey, i, "from-left") + galBtn(imgs, galKey, i + 1, "from-right") + '</div>';
+                        i += 2;
+                    } else {
+                        var side = (cc % 2 === 0) ? "from-left" : "from-right";
+                        html += '<div class="report-row" style="justify-content:center">' + galBtn(imgs, galKey, i, "center " + side) + '</div>';
+                        i += 1; cc++;
+                    }
+                    r++;
+                }
+                return '<div class="report-gallery">' + html + '</div>';
+            };
+
+            if (ex.values) {
+                xh += '<section class="svc-extra alt"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.valTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.valTitle) + '</h2>' +
+                    '</div>' +
+                    '<div class="value-grid">' +
+                    ex.values.map(function (v) {
+                        return '<div class="value-card"><div class="v-icon">' + v.icon + '</div>' +
+                            '<div><h4>' + xt(v.t) + '</h4><p>' + xt(v.d) + '</p></div></div>';
+                    }).join("") +
+                    '</div></div></section>';
+            }
+            if (ex.values && ex.dms) {
+                xh += '<section class="dms-section"><div class="section-container">' +
+                    '<div class="dms-header">' +
+                        '<span class="dms-badge">' + xt(ex.sec.dmsBadge) + '</span>' +
+                        '<h2>' + xt(ex.sec.dmsTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.dmsSub) + '</p>' +
+                    '</div>' +
+                    '<div class="dms-grid">' +
+                    ex.dms.map(function (f, i) {
+                        return '<div class="dms-card"><span class="dms-num">' + (i + 1) + '</span>' +
+                            '<div><h4>' + xt(f.t) + '</h4><p>' + xt(f.d) + '</p></div></div>';
+                    }).join("") +
+                    '</div></div></section>';
+            }
+            if (ex.values && ex.dmsGallery) {
+                xh += '<section class="svc-extra gal-lg"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.dmsGalTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.dmsGalTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.dmsGalSub) + '</p>' +
+                    '</div>' +
+                    mkGal(ex.dmsGallery, "dms") +
+                    '</div></section>';
+            }
             if (ex.elements) {
                 xh += '<section class="svc-extra alt"><div class="section-container">' +
                     '<div class="section-header">' +
@@ -2721,22 +2957,13 @@ var FAQS = [
                     '</div></section>';
             }
             if (ex.reports) {
-                var repBtn = function (i, cls) {
-                    return '<button class="report-img ' + cls + '" type="button" data-rep="' + i + '">' +
-                        '<img src="' + CONFIG.imgBase + ex.reports[i] + '" alt="Sample report page ' + (i + 1) + '" loading="lazy" ' +
-                        'onerror="this.parentElement.classList.add(\'img-missing\')"></button>';
-                };
                 xh += '<section class="svc-extra alt"><div class="section-container">' +
                     '<div class="section-header">' +
                         '<span class="section-tag">' + xt(ex.sec.repTag) + '</span>' +
                         '<h2>' + xt(ex.sec.repTitle) + '</h2>' +
                         '<p>' + xt(ex.sec.repSub) + '</p>' +
                     '</div>' +
-                    '<div class="report-gallery">' +
-                        '<div class="report-row">' + repBtn(0, "from-left") + repBtn(1, "from-right") + '</div>' +
-                        '<div class="report-row" style="justify-content:center">' + repBtn(2, "center from-left") + '</div>' +
-                        '<div class="report-row">' + repBtn(3, "from-left") + repBtn(4, "from-right") + '</div>' +
-                    '</div>' +
+                    mkGal(ex.reports, "rep") +
                     (ex.pdf ?
                         '<div class="rep-cta"><a class="btn btn-primary" href="' + ex.pdf + '" target="_blank" rel="noopener">' +
                         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>' +
@@ -2762,19 +2989,25 @@ var FAQS = [
             }
             box.innerHTML += xh;
 
-            // klik report -> lightbox
+            // klik galeri -> lightbox (report / paparan sistem DMS)
+            var GALS = {
+                rep: { list: ex.reports, label: xt(ex.sec.repTitle) },
+                dms: { list: ex.dmsGallery, label: xt(ex.sec.dmsGalTitle) }
+            };
             box.querySelectorAll(".report-img").forEach(function (btn) {
                 btn.addEventListener("click", function () {
-                    var start = parseInt(btn.getAttribute("data-rep"), 10) || 0;
-                    lbOpenItems(ex.reports.map(function (r, i) {
-                        return { src: CONFIG.imgBase + r, label: xt(ex.sec.repTitle) + " " + (i + 1) + "/" + ex.reports.length };
+                    var g = GALS[btn.getAttribute("data-gal")];
+                    if (!g || !g.list) return;
+                    var start = parseInt(btn.getAttribute("data-idx"), 10) || 0;
+                    lbOpenItems(g.list.map(function (r, i) {
+                        return { src: CONFIG.imgBase + r, label: g.label + " " + (i + 1) + "/" + g.list.length };
                     }), start);
                 });
             });
 
             // animasi masuk skrin (macam konsep: aktif bila masuk, reset bila keluar)
             dlpObserver.disconnect();
-            box.querySelectorAll(".inspect-card, .tool-showcase-card, .tools-more, .sticker-item, .report-img")
+            box.querySelectorAll(".inspect-card, .tool-showcase-card, .tools-more, .sticker-item, .report-img, .dms-card")
                .forEach(function (el) { dlpObserver.observe(el); });
         }
     }
