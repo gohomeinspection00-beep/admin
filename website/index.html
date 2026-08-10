@@ -2146,10 +2146,12 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
                 notes: { en: "Notes", bm: "Nota" }, nophoto: { en: "No photo", bm: "Tiada gambar" }
             }
         },
-        /* 5 status — warna sama macam laporan sebenar */
+        /* 6 status — warna ikut laporan sebenar */
         statuses: [
             { color: "#22A06B", label: { en: "Complete", bm: "Complete" },
               d: { en: "Rectification done properly and verified by our surveyor", bm: "Pembaikian siap dengan betul dan disahkan oleh surveyor kami" } },
+            { color: "#2196F3", label: { en: "Tolerance", bm: "Tolerance" },
+              d: { en: "Minor variation within acceptable standard — no rectification required", bm: "Variasi kecil dalam standard yang boleh diterima — tiada pembaikian diperlukan" } },
             { color: "#F5921B", label: { en: "Not Fully Complete", bm: "Not Fully Complete" },
               d: { en: "Repaired, but not fully or not to acceptable standard", bm: "Dibaiki, tetapi tidak sepenuhnya atau tidak mengikut standard" } },
             { color: "#E6A817", label: { en: "Not Complete", bm: "Not Complete" },
@@ -2159,28 +2161,32 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
             { color: "#9B59F5", label: { en: "New Defect from Rectification Work", bm: "New Defect from Rectification Work" },
               d: { en: "Damage caused by the rectification work itself", bm: "Kerosakan yang berpunca daripada kerja pembaikian itu sendiri" } }
         ],
-        /* Data sampel dari laporan sebenar (89 defect) */
+        /* Data sampel (nombor contoh — % dikira automatik) */
         analysis: [
+            { color: "#22A06B", label: "Complete", count: 96 },
+            { color: "#2196F3", label: "Tolerance", count: 12 },
             { color: "#F5921B", label: "Not Fully Complete", count: 15 },
             { color: "#E6A817", label: "Not Complete", count: 55 },
             { color: "#E8590C", label: "New Defect", count: 6 },
             { color: "#9B59F5", label: "New Defect from Rectification Work", count: 13 }
         ],
-        /* Baris contoh dari laporan sebenar. img "" = kotak "Tiada gambar" */
+        /* Baris contoh dari laporan sebenar.
+           img "" = kotak "Tiada gambar". Nama fail "img/..." = fail
+           tempatan dalam folder img/ di sebelah index.html. */
         beforeAfter: [
-            { nbr: 11, before: "", after: "",
+            { nbr: 11, before: "img/ri-11-before.jpg", after: "img/ri-11-after.jpg",
               loc: "Car Porch", elem: "TNB Chamber Door",
               type: { en: "Finishing issues", bm: "Finishing issues" },
               desc: { en: "Construction left over inside TNB compartment", bm: "Sisa pembinaan tertinggal di dalam ruang TNB" },
               status: { color: "#E6A817", label: "Not Complete" },
               notes: { en: "Still have construction leftover", bm: "Masih ada sisa pembinaan" } },
-            { nbr: 12, before: "", after: "",
+            { nbr: 12, before: "img/ri-12-before.jpg", after: "img/ri-12-after.jpg",
               loc: "Car Porch", elem: "TNB Chamber Door",
               type: { en: "Accessories defects", bm: "Accessories defects" },
               desc: { en: "Rusty screw on TNB chamber door", bm: "Skru berkarat pada pintu ruang TNB" },
               status: { color: "#E6A817", label: "Not Complete" },
               notes: null },
-            { nbr: 40, before: "", after: "ThermalOkey.png",
+            { nbr: 40, before: "", after: "img/ri-40-after.jpg",
               loc: "Family Hall", elem: "M&E",
               type: { en: "Others", bm: "Lain-lain" },
               desc: { en: "-", bm: "-" },
@@ -3053,8 +3059,8 @@ var FAQS = [
                 var segs = ex.analysis.map(function (r) {
                     var p = pct(r.count);
                     var s = '<circle class="seg" cx="21" cy="21" r="15.915" pathLength="100" ' +
-                        'stroke="' + r.color + '" style="--len:' + p.toFixed(2) + '" ' +
-                        'stroke-dashoffset="' + (25 - cum).toFixed(2) + '"></circle>';
+                        'stroke="' + r.color + '" style="--len:' + p.toFixed(3) + '" ' +
+                        'stroke-dashoffset="' + (-cum).toFixed(3) + '"></circle>';
                     cum += p;
                     return s;
                 }).join("");
@@ -3078,7 +3084,7 @@ var FAQS = [
                         '<div class="ri-donut ri-chart">' +
                             '<svg viewBox="0 0 42 42" aria-hidden="true">' +
                                 '<circle cx="21" cy="21" r="15.915" fill="none" stroke="#EEF2F6" stroke-width="10"></circle>' +
-                                segs +
+                                '<g transform="rotate(-90 21 21)">' + segs + '</g>' +
                             '</svg>' +
                             '<div class="ri-legend">' +
                             ex.analysis.map(function (r) {
@@ -3093,8 +3099,10 @@ var FAQS = [
             if (ex.beforeAfter) {
                 var L2 = ex.sec.riLbl;
                 var baPhoto = function (img) {
+                    // "img/..." atau URL penuh = guna terus; selain itu tambah imgBase
+                    var src = img && (/^https?:\/\//.test(img) || img.indexOf("img/") === 0) ? img : (img ? CONFIG.imgBase + img : "");
                     return '<div class="ba-photo">' + xt(L2.nophoto) +
-                        (img ? '<img src="' + CONFIG.imgBase + img + '" alt="" loading="lazy" onerror="this.remove()">' : "") +
+                        (src ? '<img src="' + src + '" alt="" loading="lazy" onerror="this.remove()">' : "") +
                         '</div>';
                 };
                 xh += '<section class="svc-extra alt"><div class="section-container">' +
