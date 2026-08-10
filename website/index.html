@@ -1774,16 +1774,16 @@ var SVC = [
               bm: ["Laporan mutu kerja bergambar", "Senarai kecacatan untuk kontraktor", "Asas menahan bayaran akhir jika perlu"] } },
 
     { slug: "joint-inspection", cat: "residential", img: "",
-      who:  { en: ["New key collectors", "First-time buyers"], bm: ["Penerima kunci baru", "Pembeli kali pertama"] },
-      tools: [],
+      who:  { en: ["Owners with disputed defects", "During developer defect-closing"], bm: ["Pemilik yang defect dipertikai", "Semasa sesi tutup defect pemaju"] },
+      tools: ["Thermal Camera", "Moisture Meter", "Spirit Level"],
       name: { en: "Joint Inspection with Developer", bm: "Joint Inspection Bersama Pemaju" },
-      tag:  { en: "A professional by your side at key handover.", bm: "Profesional di sisi anda semasa penyerahan kunci." },
-      desc: { en: "During the official handover inspection with the developer, most owners miss defects under time pressure. We attend with you, tag defects on the spot, and make sure everything is recorded in the developer's form before you sign.",
-              bm: "Semasa pemeriksaan penyerahan rasmi bersama pemaju, kebanyakan pemilik terlepas kecacatan kerana tekanan masa. Kami hadir bersama anda, tanda kecacatan di tempat kejadian, dan pastikan semuanya direkod dalam borang pemaju sebelum anda tandatangan." },
-      inc:  { en: ["Surveyor attendance at official handover", "On-the-spot defect identification & tagging", "Defects recorded into developer's form", "Advice on what to accept or dispute", "Follow-up inspection plan if needed"],
-              bm: ["Kehadiran surveyor semasa penyerahan rasmi", "Pengecaman & penandaan kecacatan di tapak", "Kecacatan direkod dalam borang pemaju", "Nasihat perkara untuk terima atau pertikai", "Pelan pemeriksaan susulan jika perlu"] },
-      get:  { en: ["Professional advocacy on site", "Complete defect record same day", "Stronger position with the developer"],
-              bm: ["Sokongan profesional di tapak", "Rekod kecacatan lengkap hari sama", "Kedudukan lebih kukuh dengan pemaju"] } },
+      tag:  { en: "When the developer disputes your defects or comes to close them — we stand on your side.", bm: "Bila pemaju pertikai defect anda atau datang untuk tutup defect — kami berdiri di pihak anda." },
+      desc: { en: "Developers sometimes dispute your defect list, refuse to rectify, or send their team to pressure you into closing defects that are not properly fixed. We attend the joint inspection with you — defending every defect with calibrated instrument readings, and verifying every repair before you agree to close it.",
+              bm: "Ada pemaju yang mempertikaikan senarai defect anda, enggan membaiki, atau menghantar pasukan mereka untuk mendesak anda menutup defect yang belum dibaiki dengan sempurna. Kami hadir bersama anda semasa joint inspection — mempertahankan setiap defect dengan bacaan alat dikalibrasi, dan mengesahkan setiap pembaikian sebelum anda bersetuju menutupnya." },
+      inc:  { en: ["Surveyor attendance at the joint inspection session", "Every disputed defect defended with instrument evidence", "Each repair verified before you agree to close it", "Pressure-free advice on accept, dispute or escalate", "Session outcome documented per defect"],
+              bm: ["Kehadiran surveyor semasa sesi joint inspection", "Setiap defect yang dipertikai dipertahankan dengan bukti alat", "Setiap pembaikian disahkan sebelum anda setuju menutupnya", "Nasihat tanpa tekanan: terima, pertikai atau eskalasi", "Keputusan sesi didokumenkan bagi setiap defect"] },
+      get:  { en: ["Professional representation on site", "Evidence-backed defence for every defect", "Documented record of the session outcome"],
+              bm: ["Perwakilan profesional di tapak", "Pembelaan berasaskan bukti bagi setiap defect", "Rekod keputusan sesi yang didokumenkan"] } },
 
     { slug: "bca", cat: "commercial", img: "",
       who:  { en: ["JMB / MC", "Corporations", "Asset owners"], bm: ["JMB / MC", "Korporat", "Pemilik aset"] },
@@ -2217,7 +2217,7 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
             { icon: VICONS.money,  t: { en: "Inspect Before Final Payment", bm: "Periksa Sebelum Bayaran Akhir" }, d: { en: "Your strongest leverage is money not yet released — inspect while you still hold it", bm: "Kuasa terkuat anda ialah wang yang belum dilepaskan — periksa selagi ia di tangan anda" } },
             { icon: VICONS.doc,    t: { en: "Checked Against Scope & Quotation", bm: "Semakan Ikut Skop & Quotation" }, d: { en: "We verify the work against the contractor's agreed scope and quotation", bm: "Kami sahkan kerja berdasarkan skop dan quotation yang dipersetujui dengan kontraktor" } },
             { icon: VICONS.list,   t: { en: "Defect List for Your Contractor", bm: "Senarai Defect Untuk Kontraktor" }, d: { en: "Clear rectification list with photos and locations — no room for argument", bm: "Senarai pembaikian jelas dengan gambar dan lokasi — tiada ruang untuk berdolak-dalik" } },
-            { icon: VICONS.chklist, t: { en: "Verification After Repairs", bm: "Verification Selepas Pembaikian" }, d: { en: "We re-check the contractor's fixes before you sign off and release payment", bm: "Kami semak semula pembaikian kontraktor sebelum anda sahkan dan lepaskan bayaran" } },
+            { icon: VICONS.chklist, t: { en: "Verification After Repairs", bm: "Verification Selepas Pembaikian" }, d: { en: "We re-check the contractor's fixes before you sign off and release payment (if included in your package)", bm: "Kami semak semula pembaikian kontraktor sebelum anda sahkan dan lepaskan bayaran (jika termasuk pakej)" } },
             { icon: VICONS.shield, t: { en: "Avoid Paying to Repair Twice", bm: "Elak Kos Baiki Dua Kali" }, d: { en: "Hidden waterproofing and wiring failures cost far more once you've moved in", bm: "Kegagalan waterproofing dan wiring tersembunyi jauh lebih mahal selepas anda berpindah masuk" } },
             { icon: VICONS.grad,   t: { en: "Professional Photo Evidence", bm: "Bukti Bergambar Profesional" }, d: { en: "Registered surveyor's report — dispute-ready if things go wrong", bm: "Laporan surveyor berdaftar — sedia untuk pertikaian jika berlaku masalah" } }
         ],
@@ -2225,7 +2225,7 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
             { t: { en: "Renovation 'Completed'", bm: "Renovate 'Siap'" }, d: { en: "Contractor says the work is done and asks for final payment — hold it first", bm: "Kontraktor kata kerja dah siap dan minta bayaran akhir — tahan dulu" } },
             { t: { en: "Full Inspection", bm: "Inspection Menyeluruh" }, d: { en: "We inspect all 6 risk zones with SIRIM-calibrated instruments, against your scope", bm: "Kami periksa semua 6 zon risiko dengan alat dikalibrasi SIRIM, ikut skop anda" } },
             { t: { en: "Contractor Rectifies", bm: "Kontraktor Baiki" }, d: { en: "Send the photo-tagged defect list to your contractor for rectification", bm: "Hantar senarai defect bergambar kepada kontraktor untuk pembaikian" } },
-            { t: { en: "Re-Check & Release Payment", bm: "Re-Check & Lepaskan Bayaran" }, d: { en: "We verify every fix — then you release the final payment with confidence", bm: "Kami sahkan setiap pembaikian — barulah anda lepaskan bayaran akhir dengan yakin" } }
+            { t: { en: "Re-Check & Release Payment", bm: "Re-Check & Lepaskan Bayaran" }, d: { en: "We verify every fix (if included in your package) — then you release the final payment with confidence", bm: "Kami sahkan setiap pembaikian (jika termasuk pakej) — barulah anda lepaskan bayaran akhir dengan yakin" } }
         ],
         elements: [
             { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.8c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S17.29 9.25 17 7.8c-.29 1.45-1.14 2.84-2.29 3.76S13 13.6 13 14.75c0 2.22 1.8 4.05 4 4.05z"/></svg>',
@@ -2258,6 +2258,59 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
         roof: base.roof,
         reports: base.reports,
         pdf: base.pdf,
+        stickers: base.stickers
+    };
+
+    /* --- Joint Inspection: bila pemaju pertikai / datang tutup defect --- */
+    SVC_EXTRAS["joint-inspection"] = {
+        stats: [
+            { num: "2",      lbl: { en: "Situations We Attend", bm: "Situasi Kami Hadir" } },
+            { num: "100%",   lbl: { en: "On Your Side", bm: "Di Pihak Anda" } },
+            { num: "15+",    lbl: { en: "Tests & Tools", bm: "Ujian & Alat" } },
+            { num: "5,000+", lbl: { en: "Units Inspected", bm: "Unit Diperiksa" } }
+        ],
+        sec: Object.assign({}, base.sec, {
+            valTag:   { en: "Why Bring Us Along", bm: "Kenapa Bawa Kami Sekali" },
+            valTitle: { en: "Facts and Instruments, Not Arguments", bm: "Fakta dan Alat, Bukan Pertengkaran" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Steps of a Joint Inspection", bm: "4 Langkah Joint Inspection" },
+            dmsSub:   { en: "From the developer's dispute or closing notice, to a properly documented outcome", bm: "Dari pertikaian atau notis tutup defect pemaju, hingga keputusan yang didokumenkan dengan betul" },
+            scopeTag:   { en: "When You Need Us", bm: "Bila Anda Perlukan Kami" },
+            scopeTitle: { en: "2 Situations Where We Attend With You", bm: "2 Situasi Kami Hadir Bersama Anda" },
+            scopeSub:   { en: "Facing the developer's team alone puts you at a disadvantage — bring a registered surveyor", bm: "Berdepan pasukan pemaju seorang diri meletakkan anda di pihak yang lemah — bawa surveyor berdaftar" },
+            lblDefect: { en: "What Usually Happens", bm: "Apa Yang Selalu Berlaku" },
+            lblTools:  { en: "What We Do", bm: "Apa Kami Buat" }
+        }),
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
+              t: { en: "Developer Disputes / Refuses to Rectify", bm: "Pemaju Pertikai / Enggan Baiki" }, s: { en: "Situation 1", bm: "Situasi 1" },
+              defects: { en: ["\"This is not a defect\"", "\"It's within specification\"", "\"That's normal for all units\"", "Rectification refused or delayed"],
+                         bm: ["\"Ini bukan defect\"", "\"Ia ikut spesifikasi\"", "\"Semua unit memang macam ni\"", "Pembaikian ditolak atau ditangguh"] },
+              tools: { en: ["Attend the joint inspection with you", "Defend each defect with calibrated readings", "Reference construction standards", "Document the developer's response"],
+                       bm: ["Hadir joint inspection bersama anda", "Pertahan setiap defect dengan bacaan alat dikalibrasi", "Rujuk standard pembinaan", "Dokumen respons pemaju"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+              t: { en: "Developer Comes to Close Defects", bm: "Pemaju Datang Tutup Defect" }, s: { en: "Situation 2", bm: "Situasi 2" },
+              defects: { en: ["Owner pressured to sign off quickly", "Repairs claimed 'done' but not verified", "Cosmetic patch-ups passed off as fixes", "Defects closed without your agreement"],
+                         bm: ["Pemilik didesak tandatangan cepat", "Pembaikian kononnya 'siap' tanpa disahkan", "Tampalan kosmetik dianggap pembaikian", "Defect ditutup tanpa persetujuan anda"] },
+              tools: { en: ["Verify every repair before it is closed", "Re-test with instruments (moisture, hollowness, electrical)", "Reject closures that are not up to standard", "Record closure status per defect"],
+                       bm: ["Sahkan setiap pembaikian sebelum ditutup", "Uji semula dengan alat (lembapan, hollowness, elektrik)", "Tolak penutupan yang tidak mengikut standard", "Rekod status penutupan setiap defect"] } }
+        ],
+        values: [
+            { icon: VICONS.check,  t: { en: "Instrument Evidence, Not Opinions", bm: "Bukti Alat, Bukan Pendapat" }, d: { en: "Calibrated readings are hard to argue with — moisture %, hollowness, electrical values", bm: "Bacaan alat dikalibrasi sukar dipertikai — % lembapan, hollowness, nilai elektrik" } },
+            { icon: VICONS.grad,   t: { en: "Registered Building Surveyor", bm: "Building Surveyor Berdaftar" }, d: { en: "A RISM-registered professional speaks with authority the developer's team respects", bm: "Profesional berdaftar RISM bercakap dengan autoriti yang dihormati pasukan pemaju" } },
+            { icon: VICONS.shield, t: { en: "No Unfair Defect Closures", bm: "Tiada Penutupan Defect Tak Adil" }, d: { en: "Nothing gets closed until the repair is verified — you are never pressured to sign", bm: "Tiada apa ditutup selagi pembaikian belum disahkan — anda tidak akan didesak menandatangan" } },
+            { icon: VICONS.doc,    t: { en: "Session Fully Documented", bm: "Sesi Didokumen Sepenuhnya" }, d: { en: "Photos, readings and outcomes recorded per defect — useful if the case escalates", bm: "Gambar, bacaan dan keputusan direkod bagi setiap defect — berguna jika kes dieskalasi" } },
+            { icon: VICONS.chat,   t: { en: "On-the-Spot Advice", bm: "Nasihat Terus Di Tapak" }, d: { en: "Accept, dispute or escalate — we advise you before you commit to anything", bm: "Terima, pertikai atau eskalasi — kami nasihatkan sebelum anda bersetuju dengan apa-apa" } },
+            { icon: VICONS.people, t: { en: "Path to Tribunal if Needed", bm: "Laluan ke Tribunal Jika Perlu" }, d: { en: "If the developer still refuses, the documented session becomes evidence for your claim", bm: "Jika pemaju masih enggan, sesi yang didokumenkan menjadi bukti untuk tuntutan anda" } }
+        ],
+        dms: [
+            { t: { en: "Dispute or Closing Notice", bm: "Pertikaian / Notis Tutup" }, d: { en: "The developer disputes your defects, or schedules a session to close them", bm: "Pemaju mempertikaikan defect anda, atau menetapkan sesi untuk menutupnya" } },
+            { t: { en: "We Prepare the Evidence", bm: "Kami Sediakan Bukti" }, d: { en: "We review your defect list and prepare instrument evidence for every disputed item", bm: "Kami semak senarai defect anda dan sediakan bukti alat bagi setiap item yang dipertikai" } },
+            { t: { en: "Joint Inspection Session", bm: "Sesi Joint Inspection" }, d: { en: "We attend with you — defending defects and verifying repairs item by item", bm: "Kami hadir bersama anda — mempertahankan defect dan mengesahkan pembaikian satu persatu" } },
+            { t: { en: "Documented Outcome", bm: "Keputusan Didokumenkan" }, d: { en: "Each defect ends the session defended, properly closed, or escalated — on record", bm: "Setiap defect tamat sesi sama ada dipertahan, ditutup dengan sah, atau dieskalasi — semuanya direkod" } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        thermal: base.thermal,
         stickers: base.stickers
     };
 })();
