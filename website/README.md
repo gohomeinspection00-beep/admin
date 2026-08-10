@@ -5,10 +5,15 @@ Berasingan sepenuhnya daripada app GoInspect di root repo.
 
 ## Status
 
-| Page | Status |
-|---|---|
-| Home page | ✅ Siap |
-| Tentang Kami, Servis (detail), Sample Report, dll. | ⏳ Akan ditambah satu-satu ikut arahan |
+Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
+
+| Page | URL | Status |
+|---|---|---|
+| Home | `index.html` | ✅ Siap |
+| Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap |
+| Servis (semua 15, ikut kategori) | `index.html#/services` | ✅ Siap |
+| Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (15 servis) |
+| Tentang Kami, Sample Report, dll. | — | ⏳ Ikut arahan |
 
 ## Keputusan reka bentuk (dipersetujui)
 
@@ -24,6 +29,8 @@ Buka `index.html`, cari bahagian atas `<script>`:
 
 - **`CONFIG`** — nama syarikat, SSM, telefon, email, base URL gambar
 - **`I18N`** — semua teks EN/BM
+- **`SVC`** — 15 servis + kandungan sub-page setiap servis (nama, tagline, penerangan, apa termasuk, apa diterima)
+- **`PROJECTS`** — senarai projek (home papar 6 pertama, page `#/projects` papar semua)
 - **`AUDIENCES` / `WHYUS` / `EQUIPMENT` / `PROCESS` / `SERVICES_LIST` / `FAQS`** — kandungan seksyen
 - Warna: blok `:root` di bahagian atas `<style>`
 

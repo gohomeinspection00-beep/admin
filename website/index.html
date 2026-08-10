@@ -290,43 +290,6 @@ section { padding: 5rem 2rem; }
 }
 .pillar-card li svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
 
-/* ---- Galeri projek di sebalik kad (hover = intai, klik = lihat) ---- */
-.pillar-wrap { position: relative; }
-.pillar-wrap[data-gallery] { cursor: pointer; }
-.pillar-wrap .pillar-card { position: relative; z-index: 1; height: 100%; }
-.peek { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.peek img {
-    position: absolute; top: 0; left: 50%; width: 58%; aspect-ratio: 4/3; object-fit: cover;
-    border-radius: 12px; border: 4px solid white; box-shadow: 0 14px 34px rgba(0,0,0,0.2);
-    transform: translate(-50%, 6%) rotate(0deg) scale(0.88); opacity: 0;
-    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-}
-.pillar-wrap[data-gallery]:hover .peek img:nth-child(1),
-.pillar-wrap[data-gallery]:focus-visible .peek img:nth-child(1) {
-    transform: translate(-104%, -30%) rotate(-9deg) scale(1); opacity: 1;
-}
-.pillar-wrap[data-gallery]:hover .peek img:nth-child(2),
-.pillar-wrap[data-gallery]:focus-visible .peek img:nth-child(2) {
-    transform: translate(-50%, -44%) rotate(2deg) scale(1); opacity: 1; transition-delay: 0.06s;
-}
-.pillar-wrap[data-gallery]:hover .peek img:nth-child(3),
-.pillar-wrap[data-gallery]:focus-visible .peek img:nth-child(3) {
-    transform: translate(4%, -30%) rotate(9deg) scale(1); opacity: 1; transition-delay: 0.12s;
-}
-.pillar-view {
-    margin-top: auto; padding-top: 1rem;
-    font-size: 0.85rem; font-weight: 700; color: var(--primary);
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    opacity: 0; transform: translateY(4px); transition: all 0.3s ease;
-}
-.pillar-view::after { content: '→'; transition: transform 0.3s ease; }
-.pillar-wrap[data-gallery]:hover .pillar-view { opacity: 1; transform: none; }
-.pillar-wrap[data-gallery]:hover .pillar-view::after { transform: translateX(4px); }
-@media (hover: none) {
-    .peek { display: none; }
-    .pillar-view { opacity: 1; transform: none; }
-}
-
 /* ---- Lightbox galeri ---- */
 .lb {
     position: fixed; inset: 0; z-index: 10001;
@@ -454,6 +417,136 @@ section { padding: 5rem 2rem; }
 .proj-loc svg { width: 13px; height: 13px; flex-shrink: 0; }
 .proj-desc { font-size: 0.88rem; color: var(--text-body); }
 .proj-more { text-align: center; margin-top: 2.5rem; }
+.proj-count {
+    text-align: center; margin-bottom: 2.25rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.66rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted);
+}
+
+/* ==================== PAGE DALAMAN (#/...) ==================== */
+.nav-links a.active { color: var(--primary); }
+.nav-links a.active::after { width: 100%; }
+.page-head {
+    padding: 8.5rem 2rem 3rem;
+    background: linear-gradient(135deg, #F0F7FF 0%, #E3F2FD 50%, #fff 100%);
+}
+.page-head-header { text-align: left; margin-bottom: 0; }
+.page-head-header p { margin: 0; }
+.back-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.9rem; font-weight: 600; color: var(--text-muted);
+    text-decoration: none; margin-bottom: 1.25rem; transition: color 0.25s ease;
+}
+.back-link:hover { color: var(--primary); }
+.back-link::before { content: '←'; }
+.vpage-body { background: white; padding: 3.5rem 2rem 5rem; }
+
+/* ---- Page servis: senarai ikut kategori ---- */
+.svc-group { margin-bottom: 3rem; }
+.svc-group:last-child { margin-bottom: 0; }
+.svc-group-head { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 1.25rem; }
+.svc-group-head h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-dark); }
+.svc-group-head .line { flex: 1; height: 1px; background: var(--border); }
+.svc-group-head .tagc {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--primary);
+    background: #E3F2FD; padding: 0.3rem 0.7rem; border-radius: 4px;
+}
+.svc-list-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.svc-mini {
+    display: flex; flex-direction: column; gap: 0.3rem; text-decoration: none;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.25rem 1.3rem; transition: all 0.3s ease; position: relative;
+}
+.svc-mini:hover {
+    background: white; border-color: var(--primary);
+    transform: translateY(-4px); box-shadow: var(--shadow-lg);
+}
+.svc-mini h4 { font-size: 1rem; font-weight: 700; color: var(--text-dark); padding-right: 1.5rem; }
+.svc-mini p { font-size: 0.85rem; color: var(--text-muted); }
+.svc-mini::after {
+    content: '→'; position: absolute; top: 1.1rem; right: 1.2rem;
+    color: var(--primary); font-weight: 700; opacity: 0; transform: translateX(-4px);
+    transition: all 0.3s ease;
+}
+.svc-mini:hover::after { opacity: 1; transform: none; }
+
+/* ---- Sub-page servis (detail) ---- */
+.crumbs {
+    font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.1rem;
+    display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center;
+}
+.crumbs a { color: var(--text-muted); text-decoration: none; }
+.crumbs a:hover { color: var(--primary); }
+.crumbs .sep { opacity: 0.5; }
+.crumbs .here { color: var(--text-dark); font-weight: 600; }
+.svc-head-cat {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+    font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--primary); background: #E3F2FD; padding: 0.32rem 0.7rem;
+    border-radius: 4px; margin-bottom: 0.9rem;
+}
+.page-head h1 {
+    font-size: clamp(1.9rem, 3.6vw, 2.6rem); font-weight: 800;
+    color: var(--text-dark); line-height: 1.15; margin-bottom: 0.6rem;
+}
+.svc-tagline { font-size: 1.05rem; color: var(--text-muted); max-width: 60ch; }
+.svc-detail-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 3rem; align-items: start; }
+.svc-desc { font-size: 1rem; color: var(--text-body); margin-bottom: 2rem; }
+.svc-block-title {
+    font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.9rem;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.svc-inc { list-style: none; margin-bottom: 2rem; }
+.svc-inc li {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+    font-size: 0.95rem; color: var(--text-body);
+}
+.svc-inc li:last-child { border-bottom: none; }
+.svc-inc li svg { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; margin-top: 4px; }
+.svc-side { position: sticky; top: 96px; }
+.svc-side-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 20px; padding: 2rem; color: white;
+}
+.svc-side-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+.svc-get { list-style: none; margin-bottom: 1.5rem; }
+.svc-get li {
+    display: flex; gap: 0.6rem; align-items: flex-start;
+    padding: 0.4rem 0; font-size: 0.92rem; opacity: 0.95;
+}
+.svc-get li::before { content: '✓'; font-weight: 800; }
+.svc-side-card .btn { width: 100%; justify-content: center; background: white; color: var(--primary); }
+.svc-side-card .btn:hover { background: #f0f0f0; transform: translateY(-2px); }
+.svc-side-note {
+    display: flex; align-items: center; gap: 0.5rem; justify-content: center;
+    margin-top: 0.9rem; font-size: 0.82rem; opacity: 0.85;
+}
+.svc-related { margin-top: 1.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+.svc-related h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.75rem; }
+.svc-related a {
+    display: flex; justify-content: space-between; gap: 1rem; align-items: center;
+    padding: 0.55rem 0; border-bottom: 1px solid var(--border);
+    font-size: 0.9rem; color: var(--text-body); text-decoration: none; transition: color 0.25s ease;
+}
+.svc-related a:last-child { border-bottom: none; }
+.svc-related a:hover { color: var(--primary); }
+.svc-related a::after { content: '→'; color: var(--primary); }
+
+/* servis dalam kad pillar kini pautan */
+.pillar-card li a {
+    display: flex; align-items: center; gap: 0.6rem;
+    color: inherit; text-decoration: none; width: 100%; transition: color 0.25s ease;
+}
+.pillar-card li a:hover { color: var(--primary); }
+.pillar-more {
+    margin-top: auto; padding-top: 1.1rem;
+    font-size: 0.88rem; font-weight: 700; color: var(--primary);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;
+}
+.pillar-more::after { content: '→'; transition: transform 0.25s ease; }
+.pillar-more:hover::after { transform: translateX(4px); }
 @media (hover: none) {
     .proj-zoom { opacity: 1; transform: none; }
 }
@@ -718,9 +811,9 @@ section { padding: 5rem 2rem; }
             <span class="logo-text">GoXpert</span>
         </a>
         <ul class="nav-links" id="navLinks">
-            <li><a href="#services" data-i18n="nav.services">Services</a></li>
+            <li><a href="#/services" data-nav="services" data-i18n="nav.services">Services</a></li>
             <li><a href="#why-us" data-i18n="nav.why">Why Us</a></li>
-            <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
+            <li><a href="#/projects" data-nav="projects" data-i18n="nav.projects">Projects</a></li>
             <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
             <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
             <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
@@ -737,6 +830,9 @@ section { padding: 5rem 2rem; }
         </div>
     </div>
 </nav>
+
+<!-- ############ PAGE: HOME ############ -->
+<main id="page-home">
 
 <!-- ==================== HERO ==================== -->
 <section class="hero" id="top">
@@ -816,23 +912,20 @@ section { padding: 5rem 2rem; }
             <p data-i18n="pillars.sub">We are more than home inspection — a full building surveying practice serving homeowners, corporations and legal proceedings.</p>
         </div>
         <div class="pillar-grid">
-            <div class="pillar-wrap reveal" data-gallery="residential" tabindex="0" role="button" aria-label="View residential project photos">
-                <div class="peek" aria-hidden="true"></div>
-                <div class="pillar-card">
-                    <div class="pillar-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg>
-                    </div>
-                    <h3 data-i18n="p1.title">Residential</h3>
-                    <p class="pillar-sub" data-i18n="p1.sub">For homeowners &amp; buyers</p>
-                    <ul>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s1">Home Defect Inspection (DLP)</span></li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s2">Pre-Purchase / Sub-Sale Inspection</span></li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s3">Re-Inspection</span></li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s4">After-Renovation Inspection</span></li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s5">Joint Inspection with Developer</span></li>
-                    </ul>
-                    <span class="pillar-view" data-i18n="p1.view">View project photos</span>
+            <div class="pillar-card reveal">
+                <div class="pillar-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg>
                 </div>
+                <h3 data-i18n="p1.title">Residential</h3>
+                <p class="pillar-sub" data-i18n="p1.sub">For homeowners &amp; buyers</p>
+                <ul>
+                    <li><a href="#/services/home-defect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s1">Home Defect Inspection (DLP)</span></a></li>
+                    <li><a href="#/services/pre-purchase"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s2">Pre-Purchase / Sub-Sale Inspection</span></a></li>
+                    <li><a href="#/services/re-inspection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s3">Re-Inspection</span></a></li>
+                    <li><a href="#/services/after-renovation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s4">After-Renovation Inspection</span></a></li>
+                    <li><a href="#/services/joint-inspection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p1.s5">Joint Inspection with Developer</span></a></li>
+                </ul>
+                <a class="pillar-more" href="#/services" data-i18n="pillar.more">Explore all services</a>
             </div>
             <div class="pillar-card reveal">
                 <div class="pillar-icon">
@@ -841,12 +934,13 @@ section { padding: 5rem 2rem; }
                 <h3 data-i18n="p2.title">Commercial &amp; Asset</h3>
                 <p class="pillar-sub" data-i18n="p2.sub">For corporations, JMB/MC &amp; developers</p>
                 <ul>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s1">Building Condition Assessment (BCA)</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s2">Dilapidation Survey</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s3">Building Monitoring</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s4">Commercial Building Inspection</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s5">Maintenance Report / Condition Audit</span></li>
+                    <li><a href="#/services/bca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s1">Building Condition Assessment (BCA)</span></a></li>
+                    <li><a href="#/services/dilapidation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s2">Dilapidation Survey</span></a></li>
+                    <li><a href="#/services/monitoring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s3">Building Monitoring</span></a></li>
+                    <li><a href="#/services/commercial-inspection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s4">Commercial Building Inspection</span></a></li>
+                    <li><a href="#/services/maintenance-audit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p2.s5">Maintenance Report / Condition Audit</span></a></li>
                 </ul>
+                <a class="pillar-more" href="#/services" data-i18n="pillar.more">Explore all services</a>
             </div>
             <div class="pillar-card reveal">
                 <div class="pillar-icon">
@@ -855,12 +949,13 @@ section { padding: 5rem 2rem; }
                 <h3 data-i18n="p3.title">Technical &amp; Legal</h3>
                 <p class="pillar-sub" data-i18n="p3.sub">Specialist testing &amp; tribunal support</p>
                 <ul>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s1">Electrical Inspection</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s2">Leak Detection &amp; Moisture Survey</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s3">Thermal Imaging</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s4">Rectification Defect</span></li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s5">Tribunal Consultation &amp; Documentation</span></li>
+                    <li><a href="#/services/electrical"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s1">Electrical Inspection</span></a></li>
+                    <li><a href="#/services/leak-detection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s2">Leak Detection &amp; Moisture Survey</span></a></li>
+                    <li><a href="#/services/thermal-imaging"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s3">Thermal Imaging</span></a></li>
+                    <li><a href="#/services/rectification"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s4">Rectification Defect</span></a></li>
+                    <li><a href="#/services/tribunal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="p3.s5">Tribunal Consultation &amp; Documentation</span></a></li>
                 </ul>
+                <a class="pillar-more" href="#/services" data-i18n="pillar.more">Explore all services</a>
             </div>
         </div>
     </div>
@@ -921,7 +1016,7 @@ section { padding: 5rem 2rem; }
         <div class="proj-filters reveal" id="projFilters"><!-- dijana oleh JS --></div>
         <div class="proj-grid reveal" id="projGrid"><!-- dijana oleh JS --></div>
         <div class="proj-more reveal">
-            <a class="btn btn-primary" href="projects.html">
+            <a class="btn btn-primary" href="#/projects">
                 <span data-i18n="proj.more">Show More Projects</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
@@ -1098,6 +1193,51 @@ section { padding: 5rem 2rem; }
     </a>
 </section>
 
+</main><!-- /page-home -->
+
+<!-- ############ PAGE: PROJECTS (#/projects) ############ -->
+<main id="page-projects" class="vpage" hidden>
+    <header class="page-head">
+        <div class="section-container">
+            <a class="back-link" href="#" data-i18n="pg.back">Back to Home</a>
+            <div class="section-header page-head-header">
+                <span class="section-tag" data-i18n="proj.tag">Our Portfolio</span>
+                <h2 data-i18n="proj.title">Projects We Have Handled</h2>
+                <p data-i18n="proj.subfull">The full list of inspection and surveying work completed by our team across Malaysia.</p>
+            </div>
+        </div>
+    </header>
+    <section class="vpage-body">
+        <div class="section-container">
+            <div class="proj-filters" id="projFiltersFull"><!-- dijana oleh JS --></div>
+            <p class="proj-count"><span id="projCountFull">0</span> <span data-i18n="proj.count">Projects</span></p>
+            <div class="proj-grid" id="projGridFull"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+</main>
+
+<!-- ############ PAGE: SERVICES (#/services) ############ -->
+<main id="page-services" class="vpage" hidden>
+    <header class="page-head">
+        <div class="section-container">
+            <a class="back-link" href="#" data-i18n="pg.back">Back to Home</a>
+            <div class="section-header page-head-header">
+                <span class="section-tag" data-i18n="svc.tag">Our Services</span>
+                <h2 data-i18n="svc.title">All Inspection &amp; Surveying Services</h2>
+                <p data-i18n="svc.sub">Click any service to see what it covers, what you receive, and how to book.</p>
+            </div>
+        </div>
+    </header>
+    <section class="vpage-body">
+        <div class="section-container" id="svcGroups"><!-- dijana oleh JS --></div>
+    </section>
+</main>
+
+<!-- ############ PAGE: SERVICE DETAIL (#/services/<slug>) ############ -->
+<main id="page-service" class="vpage" hidden>
+    <div id="svcDetail"><!-- dijana oleh JS --></div>
+</main>
+
 <!-- ==================== FOOTER ==================== -->
 <footer class="footer">
     <div class="footer-inner">
@@ -1110,8 +1250,9 @@ section { padding: 5rem 2rem; }
             <div>
                 <h4 data-i18n="foot.links">Quick Links</h4>
                 <ul>
-                    <li><a href="#services" data-i18n="nav.services">Services</a></li>
+                    <li><a href="#/services" data-i18n="nav.services">Services</a></li>
                     <li><a href="#why-us" data-i18n="nav.why">Why Us</a></li>
+                    <li><a href="#/projects" data-i18n="nav.projects">Projects</a></li>
                     <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
                     <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
                 </ul>
@@ -1169,23 +1310,173 @@ var CONFIG = {
 };
 
 /* =========================================================
-   GALERI PROJEK — gambar yang keluar di sebalik kad servis.
-   GANTIKAN dengan gambar projek sebenar tuan (letak nama fail
-   di imgBase, atau URL penuh). Boleh tambah "commercial" dan
-   "technical" bila gambar dah sedia — kad akan aktif sendiri.
+   SERVIS — data untuk page #/services dan sub-page setiap
+   servis (#/services/<slug>). Edit teks di sini sahaja.
+   Setiap servis:
+   - slug: nama dalam URL (jangan ubah selepas live)
+   - cat : residential | commercial | technical
+   - name/tag : nama & tagline ringkas
+   - desc: perenggan penerangan
+   - inc : senarai "apa yang termasuk"
+   - get : senarai "apa yang anda terima"
    ========================================================= */
-var GALLERY = {
-    residential: {
-        title: { en: "Residential Projects", bm: "Projek Kediaman" },
-        photos: [
-            CONFIG.imgBase + "Crack-2.png",
-            CONFIG.imgBase + "Oroginal-Picture.png",
-            CONFIG.imgBase + "ThermalOkey.png"
-        ]
-    }
-    // commercial: { title: {en:"Commercial Projects", bm:"Projek Komersial"}, photos: [...] },
-    // technical:  { title: {en:"Technical Works",     bm:"Kerja Teknikal"},   photos: [...] }
+var SVC_CATS = {
+    residential: { en: "Residential", bm: "Kediaman" },
+    commercial:  { en: "Commercial & Asset", bm: "Komersial & Aset" },
+    technical:   { en: "Technical & Legal", bm: "Teknikal & Perundangan" }
 };
+
+var SVC = [
+    { slug: "home-defect", cat: "residential",
+      name: { en: "Home Defect Inspection (DLP)", bm: "Home Defect Inspection (DLP)" },
+      tag:  { en: "Catch every defect before your Defect Liability Period expires.", bm: "Kesan setiap kecacatan sebelum tempoh Defect Liability Period tamat." },
+      desc: { en: "After you collect your keys, the developer is obliged to rectify defects free of charge — but only during the DLP. Our registered surveyors inspect every room, surface and fitting, and document each defect with photos and exact locations so your claim cannot be disputed.",
+              bm: "Selepas anda terima kunci, pemaju wajib membaiki kecacatan secara percuma — tetapi hanya dalam tempoh DLP. Surveyor berdaftar kami memeriksa setiap bilik, permukaan dan kelengkapan, dan merekod setiap kecacatan dengan gambar serta lokasi tepat supaya tuntutan anda tidak boleh dipertikaikan." },
+      inc:  { en: ["Full visual inspection of all rooms, walls, floors & ceilings", "Hollow tile tapping test on all tiled surfaces", "Doors, windows & fittings operation check", "Plumbing, sanitary & drainage check", "Electrical point functionality test", "Moisture screening on wet areas"],
+              bm: ["Pemeriksaan visual penuh semua bilik, dinding, lantai & siling", "Ujian ketuk hollow tile pada semua permukaan berjubin", "Semakan operasi pintu, tingkap & kelengkapan", "Semakan paip, sanitari & saliran", "Ujian fungsi punca elektrik", "Saringan lembapan di kawasan basah"] },
+      get:  { en: ["Photo-tagged defect report (PDF)", "Defect locations & severity listed", "Submission-ready for your developer"],
+              bm: ["Laporan kecacatan bergambar (PDF)", "Lokasi & tahap keterukan disenaraikan", "Sedia dihantar terus kepada pemaju"] } },
+
+    { slug: "pre-purchase", cat: "residential",
+      name: { en: "Pre-Purchase / Sub-Sale Inspection", bm: "Pre-Purchase / Sub-Sale Inspection" },
+      tag:  { en: "Know the true condition before you sign anything.", bm: "Ketahui keadaan sebenar sebelum anda tandatangan apa-apa." },
+      desc: { en: "Buying a subsale property is a big commitment — hidden defects can cost tens of thousands after you move in. We assess the property's real condition so you can negotiate the price with facts, or walk away before it is too late.",
+              bm: "Membeli hartanah subsale adalah komitmen besar — kecacatan tersembunyi boleh menelan puluhan ribu selepas anda berpindah. Kami menilai keadaan sebenar hartanah supaya anda boleh berunding harga dengan fakta, atau menarik diri sebelum terlambat." },
+      inc:  { en: ["Structural condition & major crack assessment", "Signs of water ingress & past leakage", "Roof, ceiling & waterproofing condition", "Quick M&E assessment (electrical & plumbing)", "Estimated repair scope & priorities"],
+              bm: ["Penilaian struktur & retak besar", "Tanda resapan air & kebocoran lama", "Keadaan bumbung, siling & kalis air", "Penilaian ringkas M&E (elektrik & paip)", "Anggaran skop & keutamaan pembaikan"] },
+      get:  { en: ["Condition report with photos", "Repair priority summary", "Negotiation-ready findings"],
+              bm: ["Laporan keadaan bergambar", "Ringkasan keutamaan pembaikan", "Penemuan sedia untuk rundingan harga"] } },
+
+    { slug: "re-inspection", cat: "residential",
+      name: { en: "Re-Inspection", bm: "Re-Inspection" },
+      tag:  { en: "Verify the developer actually fixed what they promised.", bm: "Sahkan pemaju benar-benar baiki apa yang dijanjikan." },
+      desc: { en: "Developers often mark defects as 'rectified' when the work is incomplete or cosmetic. We re-visit with your original defect list, verify each item one by one, and record the closure status with before-and-after photos.",
+              bm: "Pemaju sering menanda kecacatan sebagai 'selesai' walaupun kerja tidak lengkap atau sekadar kosmetik. Kami datang semula dengan senarai kecacatan asal, sahkan setiap item satu persatu, dan rekod status penutupan dengan gambar sebelum-selepas." },
+      inc:  { en: ["Item-by-item verification against the original list", "Before & after photo comparison", "Workmanship quality check on repairs", "New defects arising from repair work flagged", "Outstanding items listed for follow-up"],
+              bm: ["Pengesahan item demi item berdasarkan senarai asal", "Perbandingan gambar sebelum & selepas", "Semakan kualiti kerja pembaikan", "Kecacatan baru akibat kerja pembaikan dikesan", "Item belum selesai disenaraikan untuk susulan"] },
+      get:  { en: ["Closure status report per defect", "Before/after photo evidence", "Outstanding defect list"],
+              bm: ["Laporan status setiap kecacatan", "Bukti gambar sebelum/selepas", "Senarai kecacatan belum selesai"] } },
+
+    { slug: "after-renovation", cat: "residential",
+      name: { en: "After-Renovation Inspection", bm: "After-Renovation Inspection" },
+      tag:  { en: "Make sure your contractor delivered what you paid for.", bm: "Pastikan kontraktor serahkan apa yang anda bayar." },
+      desc: { en: "Before you release the final payment to your renovation contractor, let us verify the workmanship — finishes, waterproofing, electrical alterations and more — against acceptable standards.",
+              bm: "Sebelum anda lepaskan bayaran akhir kepada kontraktor renovation, biar kami sahkan mutu kerja — kemasan, kalis air, ubahsuai elektrik dan banyak lagi — mengikut standard yang boleh diterima." },
+      inc:  { en: ["Finishes & workmanship quality check", "Wet area waterproofing verification", "Electrical alteration safety check", "Alignment, level & hollow tile tests", "Defect list for contractor rectification"],
+              bm: ["Semakan kualiti kemasan & mutu kerja", "Pengesahan kalis air kawasan basah", "Semakan keselamatan ubahsuai elektrik", "Ujian kelurusan, aras & hollow tile", "Senarai kecacatan untuk pembaikan kontraktor"] },
+      get:  { en: ["Workmanship report with photos", "Defect list for your contractor", "Basis to hold final payment if needed"],
+              bm: ["Laporan mutu kerja bergambar", "Senarai kecacatan untuk kontraktor", "Asas menahan bayaran akhir jika perlu"] } },
+
+    { slug: "joint-inspection", cat: "residential",
+      name: { en: "Joint Inspection with Developer", bm: "Joint Inspection Bersama Pemaju" },
+      tag:  { en: "A professional by your side at key handover.", bm: "Profesional di sisi anda semasa penyerahan kunci." },
+      desc: { en: "During the official handover inspection with the developer, most owners miss defects under time pressure. We attend with you, tag defects on the spot, and make sure everything is recorded in the developer's form before you sign.",
+              bm: "Semasa pemeriksaan penyerahan rasmi bersama pemaju, kebanyakan pemilik terlepas kecacatan kerana tekanan masa. Kami hadir bersama anda, tanda kecacatan di tempat kejadian, dan pastikan semuanya direkod dalam borang pemaju sebelum anda tandatangan." },
+      inc:  { en: ["Surveyor attendance at official handover", "On-the-spot defect identification & tagging", "Defects recorded into developer's form", "Advice on what to accept or dispute", "Follow-up inspection plan if needed"],
+              bm: ["Kehadiran surveyor semasa penyerahan rasmi", "Pengecaman & penandaan kecacatan di tapak", "Kecacatan direkod dalam borang pemaju", "Nasihat perkara untuk terima atau pertikai", "Pelan pemeriksaan susulan jika perlu"] },
+      get:  { en: ["Professional advocacy on site", "Complete defect record same day", "Stronger position with the developer"],
+              bm: ["Sokongan profesional di tapak", "Rekod kecacatan lengkap hari sama", "Kedudukan lebih kukuh dengan pemaju"] } },
+
+    { slug: "bca", cat: "commercial",
+      name: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
+      tag:  { en: "A systematic health check for your entire building.", bm: "Pemeriksaan kesihatan sistematik untuk keseluruhan bangunan." },
+      desc: { en: "For JMB/MC, corporations and asset owners: we assess and rate the condition of every building element — structure, fabric, services and finishes — producing a clear picture of current condition, defect priorities and maintenance budgeting.",
+              bm: "Untuk JMB/MC, korporat dan pemilik aset: kami menilai dan menggredkan keadaan setiap elemen bangunan — struktur, fabrik, servis dan kemasan — menghasilkan gambaran jelas keadaan semasa, keutamaan kecacatan dan bajet penyelenggaraan." },
+      inc:  { en: ["Element-by-element condition survey & rating", "Structural, fabric & M&E assessment", "Defect prioritisation matrix", "Maintenance & CAPEX budget guidance", "Compliance-oriented documentation"],
+              bm: ["Tinjauan & penggredan keadaan elemen demi elemen", "Penilaian struktur, fabrik & M&E", "Matriks keutamaan kecacatan", "Panduan bajet penyelenggaraan & CAPEX", "Dokumentasi berorientasikan pematuhan"] },
+      get:  { en: ["Full BCA report with condition ratings", "Prioritised defect register", "Maintenance planning input"],
+              bm: ["Laporan BCA penuh dengan gred keadaan", "Daftar kecacatan mengikut keutamaan", "Input perancangan penyelenggaraan"] } },
+
+    { slug: "dilapidation", cat: "commercial",
+      name: { en: "Dilapidation Survey", bm: "Dilapidation Survey" },
+      tag:  { en: "Protect yourself before construction starts next door.", bm: "Lindungi diri sebelum pembinaan bermula di sebelah." },
+      desc: { en: "Before construction or demolition works begin nearby, a dilapidation survey records the existing condition of your property. If damage occurs later, you have dated, professional evidence of the original condition — critical for claims.",
+              bm: "Sebelum kerja pembinaan atau perobohan bermula berhampiran, dilapidation survey merekod keadaan sedia ada hartanah anda. Jika kerosakan berlaku kemudian, anda ada bukti profesional bertarikh tentang keadaan asal — kritikal untuk tuntutan." },
+      inc:  { en: ["Pre-construction condition recording", "Existing crack & defect mapping with photos", "Dated documentation for legal reference", "Post-construction comparison survey (optional)", "Support for damage claims"],
+              bm: ["Rekod keadaan sebelum pembinaan", "Pemetaan retak & kecacatan sedia ada bergambar", "Dokumentasi bertarikh untuk rujukan undang-undang", "Tinjauan perbandingan selepas pembinaan (pilihan)", "Sokongan tuntutan kerosakan"] },
+      get:  { en: ["Dated condition report", "Photo-mapped crack register", "Evidence usable in disputes"],
+              bm: ["Laporan keadaan bertarikh", "Daftar retak berpeta gambar", "Bukti boleh guna dalam pertikaian"] } },
+
+    { slug: "monitoring", cat: "commercial",
+      name: { en: "Building Monitoring", bm: "Building Monitoring" },
+      tag:  { en: "Track movement and cracks before they become failures.", bm: "Pantau pergerakan dan retak sebelum menjadi kegagalan." },
+      desc: { en: "For buildings showing cracks or settlement, or those near active construction, we install monitoring points and take periodic readings — so you know whether movement is stable or worsening, backed by trend data.",
+              bm: "Untuk bangunan yang menunjukkan retak atau enapan, atau berhampiran pembinaan aktif, kami memasang titik pemantauan dan mengambil bacaan berkala — supaya anda tahu sama ada pergerakan stabil atau semakin teruk, disokong data trend." },
+      inc:  { en: ["Crack gauge / monitoring point installation", "Scheduled periodic readings", "Movement trend analysis", "Alert on significant changes", "Engineer referral if intervention needed"],
+              bm: ["Pemasangan tolok retak / titik pemantauan", "Bacaan berkala berjadual", "Analisis trend pergerakan", "Amaran jika perubahan ketara", "Rujukan jurutera jika intervensi diperlukan"] },
+      get:  { en: ["Periodic monitoring reports", "Trend charts & readings log", "Early warning of deterioration"],
+              bm: ["Laporan pemantauan berkala", "Carta trend & log bacaan", "Amaran awal kemerosotan"] } },
+
+    { slug: "commercial-inspection", cat: "commercial",
+      name: { en: "Commercial Building Inspection", bm: "Commercial Building Inspection" },
+      tag:  { en: "Offices, shoplots and factories — inspected to scope.", bm: "Pejabat, lot kedai dan kilang — diperiksa mengikut skop." },
+      desc: { en: "Whether you are purchasing, leasing or auditing a commercial property, we inspect to an agreed scope — from general condition to specific systems — and report findings your management or board can act on.",
+              bm: "Sama ada anda membeli, menyewa atau mengaudit hartanah komersial, kami memeriksa mengikut skop yang dipersetujui — dari keadaan umum hingga sistem khusus — dan melaporkan penemuan yang boleh diambil tindakan oleh pengurusan anda." },
+      inc:  { en: ["Scope agreed to your objective (buy / lease / audit)", "Structure & fabric condition check", "M&E systems overview", "Statutory & safety observations", "Executive summary for decision makers"],
+              bm: ["Skop dipersetujui ikut objektif (beli / sewa / audit)", "Semakan keadaan struktur & fabrik", "Tinjauan sistem M&E", "Pemerhatian statutori & keselamatan", "Ringkasan eksekutif untuk pembuat keputusan"] },
+      get:  { en: ["Scoped inspection report", "Executive summary", "Action & risk list"],
+              bm: ["Laporan pemeriksaan mengikut skop", "Ringkasan eksekutif", "Senarai tindakan & risiko"] } },
+
+    { slug: "maintenance-audit", cat: "commercial",
+      name: { en: "Maintenance Report / Condition Audit", bm: "Maintenance Report / Condition Audit" },
+      tag:  { en: "Know what needs fixing first — and what it will cost.", bm: "Tahu apa perlu dibaiki dulu — dan anggaran kosnya." },
+      desc: { en: "We audit the current state of your property or portfolio, list defects by priority, and help you plan maintenance budgets — so money goes to the right repairs at the right time.",
+              bm: "Kami mengaudit keadaan semasa hartanah atau portfolio anda, menyenaraikan kecacatan mengikut keutamaan, dan membantu merancang bajet penyelenggaraan — supaya wang pergi kepada pembaikan yang betul pada masa yang betul." },
+      inc:  { en: ["Current condition audit", "Defect priority matrix (urgent / soon / plan)", "Repair recommendation per defect", "Budget planning guidance", "Re-audit schedule proposal"],
+              bm: ["Audit keadaan semasa", "Matriks keutamaan kecacatan (segera / terdekat / rancang)", "Cadangan pembaikan setiap kecacatan", "Panduan perancangan bajet", "Cadangan jadual audit semula"] },
+      get:  { en: ["Condition audit report", "Prioritised repair list", "Maintenance budget input"],
+              bm: ["Laporan audit keadaan", "Senarai pembaikan mengikut keutamaan", "Input bajet penyelenggaraan"] } },
+
+    { slug: "electrical", cat: "technical",
+      name: { en: "Electrical Inspection", bm: "Electrical Inspection" },
+      tag:  { en: "Calibrated testing for a system you cannot see.", bm: "Ujian beralat dikalibrasi untuk sistem yang tak dapat dilihat." },
+      desc: { en: "Electrical faults are invisible until they fail — or cause fires. Using SIRIM-calibrated testers, we measure earthing, insulation and polarity, inspect the distribution board, and flag safety issues before they become dangerous.",
+              bm: "Kerosakan elektrik tidak kelihatan sehingga ia gagal — atau menyebabkan kebakaran. Menggunakan alat uji dikalibrasi SIRIM, kami mengukur pembumian, penebatan dan polariti, memeriksa papan agihan, dan mengesan isu keselamatan sebelum menjadi bahaya." },
+      inc:  { en: ["Earth resistance testing", "Insulation resistance testing", "Polarity & wiring check", "Distribution board (DB) inspection", "Socket & switch functionality test"],
+              bm: ["Ujian rintangan pembumian", "Ujian rintangan penebatan", "Semakan polariti & pendawaian", "Pemeriksaan papan agihan (DB)", "Ujian fungsi soket & suis"] },
+      get:  { en: ["Electrical test report with readings", "Safety issue list by severity", "Rectification recommendations"],
+              bm: ["Laporan ujian elektrik dengan bacaan", "Senarai isu keselamatan ikut tahap", "Cadangan pembaikan"] } },
+
+    { slug: "leak-detection", cat: "technical",
+      name: { en: "Leak Detection & Moisture Survey", bm: "Leak Detection & Moisture Survey" },
+      tag:  { en: "Find the source — not just the stain.", bm: "Cari punca — bukan sekadar kesan." },
+      desc: { en: "Repainting over a damp patch never fixes the leak. Using moisture meters and thermal imaging, we trace water back to its source non-destructively — no hacking required — so it can be repaired once, correctly.",
+              bm: "Mengecat semula tompok lembap tidak akan membaiki kebocoran. Menggunakan meter lembapan dan imej thermal, kami menjejak air ke puncanya secara tanpa musnah — tiada pecah dinding — supaya ia boleh dibaiki sekali sahaja, dengan betul." },
+      inc:  { en: ["Non-destructive moisture mapping", "Thermal imaging tracing", "Source identification (roof / pipe / seepage)", "Wet area waterproofing check", "Repair method recommendation"],
+              bm: ["Pemetaan lembapan tanpa musnah", "Penjejakan imej thermal", "Pengecaman punca (bumbung / paip / resapan)", "Semakan kalis air kawasan basah", "Cadangan kaedah pembaikan"] },
+      get:  { en: ["Leak source report with evidence", "Moisture readings map", "Targeted repair recommendation"],
+              bm: ["Laporan punca bocor berserta bukti", "Peta bacaan lembapan", "Cadangan pembaikan tepat sasaran"] } },
+
+    { slug: "thermal-imaging", cat: "technical",
+      name: { en: "Thermal Imaging", bm: "Thermal Imaging" },
+      tag:  { en: "See what the naked eye cannot.", bm: "Lihat apa yang mata kasar tak nampak." },
+      desc: { en: "A calibrated thermal camera reveals hidden moisture, missing insulation and overheating electrical circuits behind finished surfaces — evidence that is impossible to dispute and impossible to see otherwise.",
+              bm: "Kamera thermal dikalibrasi mendedahkan lembapan tersembunyi, penebat yang hilang dan litar elektrik terlampau panas di sebalik permukaan siap — bukti yang mustahil dipertikai dan mustahil dilihat dengan cara lain." },
+      inc:  { en: ["Full thermal scan of target areas", "Hidden moisture detection", "Electrical hotspot detection", "Insulation gap identification", "Annotated thermal report"],
+              bm: ["Imbasan thermal penuh kawasan sasaran", "Pengesanan lembapan tersembunyi", "Pengesanan titik panas elektrik", "Pengecaman jurang penebat", "Laporan thermal beranotasi"] },
+      get:  { en: ["Annotated thermal images", "Findings with temperature data", "Follow-up action list"],
+              bm: ["Imej thermal beranotasi", "Penemuan dengan data suhu", "Senarai tindakan susulan"] } },
+
+    { slug: "rectification", cat: "technical",
+      name: { en: "Rectification Defect", bm: "Rectification Defect" },
+      tag:  { en: "The right repair method, verified after the work.", bm: "Kaedah pembaikan yang betul, disahkan selepas kerja siap." },
+      desc: { en: "Wrong repair methods waste money and the defect returns. We advise the correct rectification approach for each defect, and can verify the contractor's completed work to confirm it was done properly.",
+              bm: "Kaedah pembaikan yang salah membazir wang dan kecacatan akan kembali. Kami menasihati pendekatan pembaikan yang betul untuk setiap kecacatan, dan boleh mengesahkan kerja kontraktor yang siap untuk pastikan ia dibuat dengan betul." },
+      inc:  { en: ["Defect root-cause assessment", "Correct repair method advisory", "Contractor scope-of-work input", "Post-repair verification inspection", "Sign-off recommendation"],
+              bm: ["Penilaian punca kecacatan", "Nasihat kaedah pembaikan betul", "Input skop kerja kontraktor", "Pemeriksaan pengesahan selepas baiki", "Cadangan pengesahan siap"] },
+      get:  { en: ["Repair method recommendations", "Verification report post-repair", "Confidence the fix will last"],
+              bm: ["Cadangan kaedah pembaikan", "Laporan pengesahan selepas baiki", "Keyakinan pembaikan tahan lama"] } },
+
+    { slug: "tribunal", cat: "technical",
+      name: { en: "Tribunal Consultation & Documentation", bm: "Tribunal Consultation & Documentation" },
+      tag:  { en: "Evidence strong enough for your claim.", bm: "Bukti cukup kukuh untuk tuntutan anda." },
+      desc: { en: "If the developer or seller refuses to rectify, you may bring the case to the tribunal. Our reports are prepared by registered Building Surveyors using calibrated instruments — and we guide you on documentation so your claim is presented properly.",
+              bm: "Jika pemaju atau penjual enggan membaiki, anda boleh membawa kes ke tribunal. Laporan kami disediakan oleh Building Surveyor berdaftar menggunakan peralatan dikalibrasi — dan kami membimbing anda tentang dokumentasi supaya tuntutan dikemukakan dengan betul." },
+      inc:  { en: ["Claim-oriented inspection & reporting", "Evidence documentation with photos & readings", "Chronology & correspondence guidance", "Report formatted for tribunal submission", "Consultation on claim presentation"],
+              bm: ["Pemeriksaan & laporan berorientasikan tuntutan", "Dokumentasi bukti dengan gambar & bacaan", "Panduan kronologi & surat-menyurat", "Laporan diformat untuk penyerahan tribunal", "Konsultasi penyampaian tuntutan"] },
+      get:  { en: ["Tribunal-ready report", "Organised evidence pack", "Guidance through the process"],
+              bm: ["Laporan sedia untuk tribunal", "Pek bukti tersusun", "Bimbingan sepanjang proses"] } }
+];
 
 /* =========================================================
    PROJEK "FEATURED" DI HOME PAGE — maksimum 6 dipaparkan.
@@ -1240,12 +1531,22 @@ var I18N = {
         "p1.title": "Residential", "p1.sub": "For homeowners & buyers",
         "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
         "p1.s3": "Re-Inspection", "p1.s4": "After-Renovation Inspection", "p1.s5": "Joint Inspection with Developer",
-        "p1.view": "View project photos",
+        "pillar.more": "Explore all services",
         "nav.projects": "Projects",
         "proj.tag": "Our Portfolio", "proj.title": "Projects We Have Handled",
         "proj.sub": "A selection of inspection and surveying work completed across Malaysia.",
+        "proj.subfull": "The full list of inspection and surveying work completed by our team across Malaysia.",
         "proj.all": "All", "proj.res": "Residential", "proj.com": "Commercial", "proj.tech": "Technical",
-        "proj.more": "Show More Projects",
+        "proj.more": "Show More Projects", "proj.count": "Projects",
+        "pg.back": "Back to Home",
+        "svc.tag": "Our Services", "svc.title": "All Inspection & Surveying Services",
+        "svc.sub": "Click any service to see what it covers, what you receive, and how to book.",
+        "svc.count": "Services",
+        "det.home": "Home", "det.svcs": "Services",
+        "det.inc": "What's included", "det.get": "What you receive",
+        "det.cta": "WhatsApp Us About This Service", "det.note": "Response within 1 working hour",
+        "det.rel": "Related services",
+        "wa.svc": "Hi, I would like to ask about this service:",
         "p2.title": "Commercial & Asset", "p2.sub": "For corporations, JMB/MC & developers",
         "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
         "p2.s3": "Building Monitoring", "p2.s4": "Commercial Building Inspection", "p2.s5": "Maintenance Report / Condition Audit",
@@ -1293,12 +1594,22 @@ var I18N = {
         "p1.title": "Kediaman", "p1.sub": "Untuk pemilik & pembeli rumah",
         "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase / Sub-Sale Inspection",
         "p1.s3": "Re-Inspection", "p1.s4": "Inspection Selepas Renovation", "p1.s5": "Joint Inspection Bersama Pemaju",
-        "p1.view": "Lihat gambar projek",
+        "pillar.more": "Terokai semua servis",
         "nav.projects": "Projek",
         "proj.tag": "Portfolio Kami", "proj.title": "Projek Yang Pernah Kami Kendalikan",
         "proj.sub": "Sebahagian kerja inspection dan ukur bangunan yang telah disiapkan di seluruh Malaysia.",
+        "proj.subfull": "Senarai penuh kerja inspection dan ukur bangunan yang telah disiapkan oleh pasukan kami di seluruh Malaysia.",
         "proj.all": "Semua", "proj.res": "Kediaman", "proj.com": "Komersial", "proj.tech": "Teknikal",
-        "proj.more": "Lihat Lagi Projek",
+        "proj.more": "Lihat Lagi Projek", "proj.count": "Projek",
+        "pg.back": "Kembali ke Laman Utama",
+        "svc.tag": "Servis Kami", "svc.title": "Semua Servis Inspection & Ukur Bangunan",
+        "svc.sub": "Klik mana-mana servis untuk lihat skop, apa yang anda terima, dan cara menempah.",
+        "svc.count": "Servis",
+        "det.home": "Laman Utama", "det.svcs": "Servis",
+        "det.inc": "Apa yang termasuk", "det.get": "Apa yang anda terima",
+        "det.cta": "WhatsApp Kami Tentang Servis Ini", "det.note": "Respons dalam 1 jam bekerja",
+        "det.rel": "Servis berkaitan",
+        "wa.svc": "Salam, saya berminat dengan servis ini:",
         "p2.title": "Komersial & Aset", "p2.sub": "Untuk korporat, JMB/MC & pemaju",
         "p2.s1": "Building Condition Assessment (BCA)", "p2.s2": "Dilapidation Survey",
         "p2.s3": "Building Monitoring", "p2.s4": "Inspection Bangunan Komersial", "p2.s5": "Maintenance Report / Condition Audit",
@@ -1565,6 +1876,7 @@ var FAQS = [
         renderServiceSelect();
         applyWaLinks();
         initReveal();
+        route(true);   // render semula page dalaman semasa (tanpa scroll)
     }
 
     /* ---------- Footer info ---------- */
@@ -1705,12 +2017,6 @@ var FAQS = [
         lb.classList.add("active");
         document.body.style.overflow = "hidden";
     }
-    function lbOpen(key) {
-        var g = GALLERY[key];
-        if (!g) return;
-        var label = g.title[lang] || g.title.en;
-        lbOpenItems(g.photos.map(function (src) { return { src: src, label: label }; }), 0);
-    }
     function lbClose() {
         lb.classList.remove("active");
         document.body.style.overflow = "";
@@ -1724,27 +2030,6 @@ var FAQS = [
         if (e.key === "Escape") lbClose();
         if (e.key === "ArrowLeft") lbShow(lbIdx - 1);
         if (e.key === "ArrowRight") lbShow(lbIdx + 1);
-    });
-
-    document.querySelectorAll("[data-gallery]").forEach(function (wrap) {
-        var key = wrap.getAttribute("data-gallery");
-        var g = GALLERY[key];
-        if (!g || !g.photos.length) return;
-        // isi 3 gambar intai di belakang kad
-        var peek = wrap.querySelector(".peek");
-        if (peek) {
-            peek.innerHTML = "";
-            g.photos.slice(0, 3).forEach(function (src) {
-                var im = document.createElement("img");
-                im.src = src; im.alt = ""; im.loading = "lazy";
-                im.onerror = function () { im.remove(); };
-                peek.appendChild(im);
-            });
-        }
-        wrap.addEventListener("click", function () { lbOpen(key); });
-        wrap.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); lbOpen(key); }
-        });
     });
 
     /* ---------- Seksyen Projects: grid + penapis + lightbox ---------- */
@@ -1762,9 +2047,10 @@ var FAQS = [
     function visibleProjects() {
         return PROJECTS.filter(function (p) { return projFilter === "all" || p.cat === projFilter; });
     }
-    function renderProjects() {
-        var filtersEl = document.getElementById("projFilters");
-        var gridEl = document.getElementById("projGrid");
+    /* Dikongsi: home (cap 6) & page #/projects (penuh). */
+    function renderProjectsInto(ids, cap) {
+        var filtersEl = document.getElementById(ids.filters);
+        var gridEl = document.getElementById(ids.grid);
         if (!filtersEl || !gridEl) return;
 
         filtersEl.innerHTML = "";
@@ -1775,13 +2061,19 @@ var FAQS = [
             b.textContent = t(f.i18n);
             b.addEventListener("click", function () {
                 projFilter = f.key;
-                renderProjects();
+                renderProjectsInto(ids, cap);
             });
             filtersEl.appendChild(b);
         });
 
+        var full = visibleProjects();
+        var list = cap ? full.slice(0, cap) : full;
+        if (ids.count) {
+            var c = document.getElementById(ids.count);
+            if (c) c.textContent = full.length;
+        }
+
         gridEl.innerHTML = "";
-        var list = visibleProjects().slice(0, 6);   // home: papar 6 sahaja — senarai penuh di projects.html
         list.forEach(function (p, idx) {
             var card = document.createElement("button");
             card.type = "button";
@@ -1830,9 +2122,147 @@ var FAQS = [
             gridEl.appendChild(card);
         });
     }
+    function renderProjects() {
+        renderProjectsInto({ filters: "projFilters", grid: "projGrid" }, 6);
+    }
+    function renderProjectsPage() {
+        renderProjectsInto({ filters: "projFiltersFull", grid: "projGridFull", count: "projCountFull" }, 0);
+    }
+
+    /* ---------- Page Servis (#/services) ---------- */
+    function svcName(s) { return s.name[lang] || s.name.en; }
+    var SVC_BY_SLUG = {};
+    SVC.forEach(function (s) { SVC_BY_SLUG[s.slug] = s; });
+
+    function renderServicesPage() {
+        var wrap = document.getElementById("svcGroups");
+        if (!wrap) return;
+        wrap.innerHTML = "";
+        ["residential", "commercial", "technical"].forEach(function (cat) {
+            var group = document.createElement("div");
+            group.className = "svc-group";
+            var head = document.createElement("div");
+            head.className = "svc-group-head";
+            var h3 = document.createElement("h3");
+            h3.textContent = SVC_CATS[cat][lang] || SVC_CATS[cat].en;
+            var line = document.createElement("span"); line.className = "line";
+            var tagc = document.createElement("span"); tagc.className = "tagc";
+            tagc.textContent = SVC.filter(function (s) { return s.cat === cat; }).length + " " + t("svc.count");
+            head.appendChild(h3); head.appendChild(line); head.appendChild(tagc);
+            group.appendChild(head);
+
+            var grid = document.createElement("div");
+            grid.className = "svc-list-grid";
+            SVC.filter(function (s) { return s.cat === cat; }).forEach(function (s) {
+                var a = document.createElement("a");
+                a.className = "svc-mini";
+                a.href = "#/services/" + s.slug;
+                var h4 = document.createElement("h4"); h4.textContent = svcName(s);
+                var p = document.createElement("p"); p.textContent = s.tag[lang] || s.tag.en;
+                a.appendChild(h4); a.appendChild(p);
+                grid.appendChild(a);
+            });
+            group.appendChild(grid);
+            wrap.appendChild(group);
+        });
+    }
+
+    /* ---------- Sub-page servis (#/services/<slug>) ---------- */
+    function renderServicePage(slug) {
+        var s = SVC_BY_SLUG[slug];
+        var box = document.getElementById("svcDetail");
+        if (!s || !box) return;
+        var check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+        var related = SVC.filter(function (x) { return x.cat === s.cat && x.slug !== s.slug; });
+        var waMsg = t("wa.svc") + " " + svcName(s);
+
+        box.innerHTML =
+            '<header class="page-head"><div class="section-container">' +
+                '<nav class="crumbs">' +
+                    '<a href="#">' + t("det.home") + '</a><span class="sep">/</span>' +
+                    '<a href="#/services">' + t("det.svcs") + '</a><span class="sep">/</span>' +
+                    '<span class="here">' + svcName(s) + '</span>' +
+                '</nav>' +
+                '<span class="svc-head-cat">' + (SVC_CATS[s.cat][lang] || SVC_CATS[s.cat].en) + '</span>' +
+                '<h1>' + svcName(s) + '</h1>' +
+                '<p class="svc-tagline">' + (s.tag[lang] || s.tag.en) + '</p>' +
+            '</div></header>' +
+            '<section class="vpage-body"><div class="section-container svc-detail-grid">' +
+                '<div>' +
+                    '<p class="svc-desc">' + (s.desc[lang] || s.desc.en) + '</p>' +
+                    '<h3 class="svc-block-title">' + t("det.inc") + '</h3>' +
+                    '<ul class="svc-inc">' +
+                        (s.inc[lang] || s.inc.en).map(function (x) { return "<li>" + check + "<span>" + x + "</span></li>"; }).join("") +
+                    '</ul>' +
+                '</div>' +
+                '<aside class="svc-side">' +
+                    '<div class="svc-side-card">' +
+                        '<h3>' + t("det.get") + '</h3>' +
+                        '<ul class="svc-get">' +
+                            (s.get[lang] || s.get.en).map(function (x) { return "<li>" + x + "</li>"; }).join("") +
+                        '</ul>' +
+                        '<a class="btn" href="' + waLink(waMsg) + '" target="_blank" rel="noopener">' + t("det.cta") + '</a>' +
+                        '<p class="svc-side-note">🕐 ' + t("det.note") + '</p>' +
+                    '</div>' +
+                    (related.length ?
+                        '<div class="svc-related"><h4>' + t("det.rel") + '</h4>' +
+                        related.map(function (x) {
+                            return '<a href="#/services/' + x.slug + '">' + svcName(x) + '</a>';
+                        }).join("") + '</div>' : "") +
+                '</aside>' +
+            '</div></section>';
+    }
+
+    /* ---------- Router page dalaman (#/...) ---------- */
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service" };
+    var currentPage = "home";
+
+    function route(skipScroll) {
+        var h = location.hash || "";
+        var pageKey = "home", param = null, anchor = null;
+        if (h.indexOf("#/") === 0) {
+            var parts = h.slice(2).split("/");
+            if (parts[0] === "projects") pageKey = "projects";
+            else if (parts[0] === "services" && parts[1] && SVC_BY_SLUG[parts[1]]) { pageKey = "service"; param = parts[1]; }
+            else if (parts[0] === "services") pageKey = "services";
+        } else if (h.length > 1) {
+            anchor = h.slice(1);
+        }
+
+        Object.keys(VPAGES).forEach(function (k) {
+            var el = document.getElementById(VPAGES[k]);
+            if (el) el.hidden = (k !== pageKey);
+        });
+
+        if (pageKey === "projects") renderProjectsPage();
+        if (pageKey === "services") renderServicesPage();
+        if (pageKey === "service") renderServicePage(param);
+
+        if (!skipScroll) {
+            if (pageKey !== "home") {
+                window.scrollTo(0, 0);
+            } else if (anchor) {
+                var target = document.getElementById(anchor);
+                if (target) setTimeout(function () { target.scrollIntoView({ behavior: "smooth" }); }, 40);
+            }
+        }
+
+        // nav aktif
+        document.querySelectorAll(".nav-links a[data-nav]").forEach(function (a) {
+            var key = a.getAttribute("data-nav");
+            a.classList.toggle("active",
+                (key === "projects" && pageKey === "projects") ||
+                (key === "services" && (pageKey === "services" || pageKey === "service")));
+        });
+
+        currentPage = pageKey;
+        initReveal();
+    }
+    window.addEventListener("hashchange", function () { route(false); });
 
     /* ---------- Mula ---------- */
     renderAll();
+    route(false);   // sokong deep-link terus ke #/projects atau #/services/...
 })();
 </script>
 </body>
