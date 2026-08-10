@@ -2194,6 +2194,72 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
               notes: { en: "Water heater RCBO and wire show high temperature. Clamp test with all MCB off reads 0.06A without load — needs review.", bm: "RCBO water heater dan wayar menunjukkan suhu tinggi. Ujian clamp dengan semua MCB ditutup membaca 0.06A tanpa beban — perlu semakan lanjut." } }
         ]
     };
+
+    /* --- After-Renovation: lindungi bayaran akhir dari kontraktor --- */
+    SVC_EXTRAS["after-renovation"] = {
+        stats: [
+            { num: "6",   lbl: { en: "Risk Zones Checked", bm: "Zon Risiko Diperiksa" } },
+            { num: "50+", lbl: { en: "Renovation Defect Types", bm: "Jenis Defect Renovation" } },
+            { num: "15+", lbl: { en: "Tests & Tools", bm: "Ujian & Alat" } },
+            { num: "2×",  lbl: { en: "Inspection & Verification", bm: "Pemeriksaan & Verifikasi" } }
+        ],
+        sec: Object.assign({}, base.sec, {
+            valTag:   { en: "Payment Protection", bm: "Perlindungan Bayaran" },
+            valTitle: { en: "Inspect Before You Release the Final Payment", bm: "Periksa Sebelum Lepaskan Bayaran Akhir" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Steps to Protect Your Payment", bm: "4 Langkah Lindungi Bayaran Anda" },
+            dmsSub:   { en: "Your final payment is your leverage — use it with evidence, not arguments", bm: "Bayaran akhir ialah kuasa rundingan anda — gunakannya dengan bukti, bukan pertengkaran" },
+            scopeTag:   { en: "Renovation Risk Zones", bm: "Zon Risiko Renovation" },
+            scopeTitle: { en: "6 High-Risk Zones After Renovation", bm: "6 Zon Berisiko Tinggi Selepas Renovation" },
+            scopeSub:   { en: "Renovation work fails most often in these areas — we test every single one", bm: "Kerja renovation paling kerap bermasalah di zon-zon ini — kami uji setiap satu" }
+        }),
+        values: [
+            { icon: VICONS.money,  t: { en: "Inspect Before Final Payment", bm: "Periksa Sebelum Bayaran Akhir" }, d: { en: "Your strongest leverage is money not yet released — inspect while you still hold it", bm: "Kuasa terkuat anda ialah wang yang belum dilepaskan — periksa selagi ia di tangan anda" } },
+            { icon: VICONS.doc,    t: { en: "Checked Against Scope & Quotation", bm: "Semakan Ikut Skop & Quotation" }, d: { en: "We verify the work against the contractor's agreed scope and quotation", bm: "Kami sahkan kerja berdasarkan skop dan quotation yang dipersetujui dengan kontraktor" } },
+            { icon: VICONS.list,   t: { en: "Defect List for Your Contractor", bm: "Senarai Defect Untuk Kontraktor" }, d: { en: "Clear rectification list with photos and locations — no room for argument", bm: "Senarai pembaikian jelas dengan gambar dan lokasi — tiada ruang untuk berdolak-dalik" } },
+            { icon: VICONS.chklist, t: { en: "Verification After Repairs", bm: "Verification Selepas Pembaikian" }, d: { en: "We re-check the contractor's fixes before you sign off and release payment", bm: "Kami semak semula pembaikian kontraktor sebelum anda sahkan dan lepaskan bayaran" } },
+            { icon: VICONS.shield, t: { en: "Avoid Paying to Repair Twice", bm: "Elak Kos Baiki Dua Kali" }, d: { en: "Hidden waterproofing and wiring failures cost far more once you've moved in", bm: "Kegagalan waterproofing dan wiring tersembunyi jauh lebih mahal selepas anda berpindah masuk" } },
+            { icon: VICONS.grad,   t: { en: "Professional Photo Evidence", bm: "Bukti Bergambar Profesional" }, d: { en: "Registered surveyor's report — dispute-ready if things go wrong", bm: "Laporan surveyor berdaftar — sedia untuk pertikaian jika berlaku masalah" } }
+        ],
+        dms: [
+            { t: { en: "Renovation 'Completed'", bm: "Renovate 'Siap'" }, d: { en: "Contractor says the work is done and asks for final payment — hold it first", bm: "Kontraktor kata kerja dah siap dan minta bayaran akhir — tahan dulu" } },
+            { t: { en: "Full Inspection", bm: "Inspection Menyeluruh" }, d: { en: "We inspect all 6 risk zones with SIRIM-calibrated instruments, against your scope", bm: "Kami periksa semua 6 zon risiko dengan alat dikalibrasi SIRIM, ikut skop anda" } },
+            { t: { en: "Contractor Rectifies", bm: "Kontraktor Baiki" }, d: { en: "Send the photo-tagged defect list to your contractor for rectification", bm: "Hantar senarai defect bergambar kepada kontraktor untuk pembaikian" } },
+            { t: { en: "Re-Check & Release Payment", bm: "Re-Check & Lepaskan Bayaran" }, d: { en: "We verify every fix — then you release the final payment with confidence", bm: "Kami sahkan setiap pembaikian — barulah anda lepaskan bayaran akhir dengan yakin" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.8c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S17.29 9.25 17 7.8c-.29 1.45-1.14 2.84-2.29 3.76S13 13.6 13 14.75c0 2.22 1.8 4.05 4 4.05z"/></svg>',
+              t: { en: "Waterproofing & Wet Areas", bm: "Waterproofing & Kawasan Basah" }, s: { en: "New bathrooms & wet kitchens", bm: "Bilik air & dapur basah baru" },
+              defects: { en: ["Inadequate waterproofing", "Leak to floor below", "Water ponding", "Wrong falls to drain"], bm: ["Waterproofing tak mencukupi", "Bocor ke aras bawah", "Air bertakung", "Kecerunan salah ke saliran"] },
+              tools: { en: ["Water ponding test", "Moisture detector", "Thermal camera"], bm: ["Ujian water ponding", "Pengesan lembapan", "Kamera thermal"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+              t: { en: "Electrical Alterations", bm: "Elektrik Tambahan / Ubahsuai" }, s: { en: "New wiring & added points", bm: "Wiring baru & punca tambahan" },
+              defects: { en: ["New circuits without RCCB", "Substandard wiring", "Overloaded DB", "Wrong polarity"], bm: ["Litar baru tanpa RCCB", "Wiring bawah standard", "DB terlebih beban", "Polariti salah"] },
+              tools: { en: ["RCCB test", "Earth & insulation test", "Clamp meter load test"], bm: ["Ujian RCCB", "Ujian earth & insulation", "Ujian beban clamp meter"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
+              t: { en: "Tiling & Finishes", bm: "Jubin & Kemasan" }, s: { en: "New floors, walls & paintwork", bm: "Lantai, dinding & cat baru" },
+              defects: { en: ["Hollow tiles from rushed work", "Poor alignment & lippage", "Cracked grout", "Uneven paint finish"], bm: ["Jubin hollow kerja tergesa", "Alignment & lippage teruk", "Grout retak", "Kemasan cat tak rata"] },
+              tools: { en: ["Hollowness tapping test", "Spirit level & L-square", "Visual & tools"], bm: ["Ujian ketuk hollowness", "Spirit level & L-square", "Visual & alat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Plumbing Modifications", bm: "Paip Ubahsuai" }, s: { en: "Relocated pipes & new fittings", bm: "Paip dipindah & kelengkapan baru" },
+              defects: { en: ["Leaking new joints", "Low water pressure", "Slow drainage", "Hidden pipe damage"], bm: ["Sambungan baru bocor", "Tekanan air rendah", "Saliran perlahan", "Kerosakan paip tersembunyi"] },
+              tools: { en: ["Pressure test", "Flushing test", "Thermal & moisture scan"], bm: ["Ujian tekanan", "Ujian flushing", "Imbasan thermal & lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/></svg>',
+              t: { en: "Structural / Hacking Works", bm: "Struktur / Kerja Hacking" }, s: { en: "Removed walls & added load", bm: "Dinding dirobohkan & beban tambahan" },
+              defects: { en: ["Cracks from hacking", "Beams or columns affected", "Overloaded slab (mezzanine)", "Vibration damage next door"], bm: ["Retak akibat hacking", "Rasuk atau tiang terjejas", "Papak terlebih beban (mezzanine)", "Kerosakan getaran unit sebelah"] },
+              tools: { en: ["Crack mapping", "Laser level survey", "Visual & tools"], bm: ["Pemetaan retak", "Tinjauan laser level", "Visual & alat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+              t: { en: "Roof, Awning & Extensions", bm: "Bumbung, Awning & Sambungan" }, s: { en: "New roofing & outdoor works", bm: "Bumbung baru & kerja luaran" },
+              defects: { en: ["Leaking roof joints", "Poor flashing installation", "Sagging awning structure", "Blocked new gutters"], bm: ["Sambungan bumbung bocor", "Pemasangan flashing lemah", "Struktur awning melendut", "Talang baru tersumbat"] },
+              tools: { en: ["Visual & drone survey", "Moisture detector", "Thermal camera"], bm: ["Visual & tinjauan drone", "Pengesan lembapan", "Kamera thermal"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        thermal: base.thermal,
+        roof: base.roof,
+        reports: base.reports,
+        pdf: base.pdf,
+        stickers: base.stickers
+    };
 })();
 
 /* =========================================================
