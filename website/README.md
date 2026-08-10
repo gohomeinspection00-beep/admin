@@ -11,8 +11,25 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 |---|---|---|
 | Home | `index.html` | ✅ Siap |
 | Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap |
-| Servis (semua 15, ikut kategori) | `index.html#/services` | ✅ Siap |
-| Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (15 servis) |
+| Servis (semua 16, ikut kategori) | `index.html#/services` | ✅ Siap |
+| Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (16 servis) |
+
+### Sub-page servis: kandungan penuh
+
+| Kategori | Servis | Kandungan khas |
+|---|---|---|
+| Kediaman | Home Defect (DLP) | 12 elemen · tools · thermal · drone · report · sticker |
+| Kediaman | Pre-Purchase | 11 kad nilai · DMS 11 ciri · galeri sistem |
+| Kediaman | Sub-Sale | 10 kad nilai · DMS · galeri sistem |
+| Kediaman | Re-Inspection | 6 status · analisis donut · jadual Before/After |
+| Kediaman | After-Renovation | 6 kad nilai · 4 langkah · 6 zon risiko |
+| Kediaman | Joint Inspection | 6 kad nilai · 4 langkah · 2 situasi (pemaju pertikai / tutup defect) |
+| Komersial | BCA | 6 kad nilai · 4 peringkat · 4 gred keadaan · donut · 7 sistem |
+| Komersial | Dilapidation | 6 kad nilai · 4 peringkat · jadual Sebelum/Selepas pembinaan · 6 kawasan |
+| Komersial | Building Monitoring | 6 kad nilai · 4 peringkat · 4 klasifikasi pergerakan · 4 jenis |
+| Komersial | Commercial Inspection | 6 kad nilai · 4 peringkat · 6 sistem |
+| Komersial | Maintenance Audit | 6 kad nilai · 4 peringkat · 4 tahap keutamaan · donut · 6 kawasan |
+| Teknikal | 5 servis | ⏳ Belum ada kandungan khas (page asas sahaja) |
 | Tentang Kami, Sample Report, dll. | — | ⏳ Ikut arahan |
 
 ## Keputusan reka bentuk (dipersetujui)

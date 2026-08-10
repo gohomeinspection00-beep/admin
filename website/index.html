@@ -2313,6 +2313,414 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
         thermal: base.thermal,
         stickers: base.stickers
     };
+
+    /* ===================== KOMERSIAL & ASET ===================== */
+    var riSec = SVC_EXTRAS["re-inspection"].sec;
+
+    /* --- Building Condition Assessment (BCA) --- */
+    SVC_EXTRAS["bca"] = {
+        stats: [
+            { num: "7",    lbl: { en: "Building Systems Assessed", bm: "Sistem Bangunan Dinilai" } },
+            { num: "4",    lbl: { en: "Condition Ratings", bm: "Gred Keadaan" } },
+            { num: "100%", lbl: { en: "Photo-Documented", bm: "Berdokumentasi Gambar" } },
+            { num: "300+", lbl: { en: "Projects Completed", bm: "Projek Selesai" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Know Your Building Before It Costs You", bm: "Kenali Bangunan Anda Sebelum Ia Membebankan" },
+            dmsBadge: { en: "Our Methodology", bm: "Metodologi Kami" },
+            dmsTitle: { en: "4 Stages of a Condition Assessment", bm: "4 Peringkat Building Condition Assessment" },
+            dmsSub:   { en: "A systematic, documented process — the same standard applied to every building we assess", bm: "Proses sistematik dan berdokumentasi — standard sama untuk setiap bangunan yang kami nilai" },
+            stTag:    { en: "Rating Scale", bm: "Skala Penggredan" },
+            stTitle:  { en: "Every Element Given a Condition Rating", bm: "Setiap Elemen Diberi Gred Keadaan" },
+            stSub:    { en: "No vague opinions — each element is rated on a consistent scale you can act on", bm: "Tiada pendapat kabur — setiap elemen digred pada skala konsisten yang boleh diambil tindakan" },
+            anTag:    { en: "Analysis", bm: "Analisis" },
+            anTitle:  { en: "Sample Condition Distribution", bm: "Contoh Taburan Keadaan" },
+            anSub:    { en: "Your report summarises the condition of every element assessed — see the building at a glance", bm: "Laporan anda merumuskan keadaan setiap elemen dinilai — lihat keseluruhan bangunan sekali pandang" },
+            scopeTag:   { en: "Assessment Scope", bm: "Skop Penilaian" },
+            scopeTitle: { en: "7 Building Systems We Assess", bm: "7 Sistem Bangunan Yang Kami Nilai" },
+            scopeSub:   { en: "From structure to services — every system inspected, rated and prioritised", bm: "Dari struktur hingga perkhidmatan — setiap sistem diperiksa, digred dan disusun keutamaan" },
+            lblDefect: { en: "What We Look For", bm: "Apa Yang Kami Cari" },
+            lblTools:  { en: "Testing / Tools", bm: "Ujian / Alat" }
+        }),
+        values: [
+            { icon: VICONS.money,  t: { en: "Sinking Fund Planning", bm: "Perancangan Sinking Fund" }, d: { en: "Know what needs funding and when — plan contributions on evidence, not guesswork", bm: "Tahu apa perlu dibiayai dan bila — rancang sumbangan berdasarkan bukti, bukan agakan" } },
+            { icon: VICONS.list,   t: { en: "Prioritised Defect Register", bm: "Daftar Defect Berkeutamaan" }, d: { en: "Every defect ranked urgent to planned — spend on what actually matters first", bm: "Setiap defect disusun dari urgent hingga terancang — belanja pada yang betul-betul penting dulu" } },
+            { icon: VICONS.shield, t: { en: "Independent & Impartial", bm: "Bebas & Tidak Berpihak" }, d: { en: "We are not tied to any contractor — our findings carry no commercial agenda", bm: "Kami tidak terikat dengan mana-mana kontraktor — penemuan kami tiada agenda komersial" } },
+            { icon: VICONS.doc,    t: { en: "Evidence for AGM or Board", bm: "Bukti Untuk AGM atau Lembaga" }, d: { en: "A defensible professional report to present to owners, committee or management", bm: "Laporan profesional yang kukuh untuk dibentangkan kepada pemilik, jawatankuasa atau pengurusan" } },
+            { icon: VICONS.check,  t: { en: "Statutory & Safety Observations", bm: "Pemerhatian Statutori & Keselamatan" }, d: { en: "Compliance and safety risks flagged before they become liabilities", bm: "Risiko pematuhan dan keselamatan dikesan sebelum menjadi liabiliti" } },
+            { icon: VICONS.plan,   t: { en: "Baseline for Future Comparison", bm: "Asas Perbandingan Masa Depan" }, d: { en: "Re-assess later and measure deterioration against a documented baseline", bm: "Nilai semula kemudian dan ukur kemerosotan berbanding asas yang didokumenkan" } }
+        ],
+        dms: [
+            { t: { en: "Scoping & Records Review", bm: "Penetapan Skop & Semakan Rekod" }, d: { en: "We agree the scope with you and review drawings, past reports and maintenance records", bm: "Kami tetapkan skop bersama anda dan semak lukisan, laporan lepas serta rekod penyelenggaraan" } },
+            { t: { en: "Systematic Site Survey", bm: "Tinjauan Tapak Sistematik" }, d: { en: "Element-by-element survey with calibrated instruments and full photo documentation", bm: "Tinjauan elemen demi elemen dengan alat dikalibrasi dan dokumentasi gambar penuh" } },
+            { t: { en: "Rating & Prioritisation", bm: "Penggredan & Keutamaan" }, d: { en: "Each element rated on our scale, then ranked by urgency and consequence of failure", bm: "Setiap elemen digred pada skala kami, kemudian disusun ikut urgensi dan kesan kegagalan" } },
+            { t: { en: "Report & Budget Guidance", bm: "Laporan & Panduan Bajet" }, d: { en: "Full report with the defect register, repair recommendations and maintenance budget input", bm: "Laporan penuh dengan daftar defect, cadangan pembaikian dan input bajet penyelenggaraan" } }
+        ],
+        statuses: [
+            { color: "#22A06B", label: { en: "Good", bm: "Baik" },
+              d: { en: "Sound condition — routine maintenance only", bm: "Keadaan baik — penyelenggaraan rutin sahaja" } },
+            { color: "#2196F3", label: { en: "Fair", bm: "Sederhana" },
+              d: { en: "Minor deterioration — monitor and plan ahead", bm: "Kemerosotan kecil — pantau dan rancang lebih awal" } },
+            { color: "#F5921B", label: { en: "Poor", bm: "Lemah" },
+              d: { en: "Significant defects — repair required within the near term", bm: "Defect ketara — pembaikian diperlukan dalam tempoh terdekat" } },
+            { color: "#E8590C", label: { en: "Critical", bm: "Kritikal" },
+              d: { en: "Immediate action — safety or structural risk present", bm: "Tindakan segera — wujud risiko keselamatan atau struktur" } }
+        ],
+        analysis: [
+            { color: "#22A06B", label: "Good", count: 42 },
+            { color: "#2196F3", label: "Fair", count: 28 },
+            { color: "#F5921B", label: "Poor", count: 19 },
+            { color: "#E8590C", label: "Critical", count: 6 }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l7-5 7 5M4 21h16"/></svg>',
+              t: { en: "Structure & Foundation", bm: "Struktur & Asas" }, s: { en: "Frame, slabs, columns", bm: "Kerangka, papak, tiang" },
+              defects: { en: ["Structural cracking", "Concrete spalling & rebar exposure", "Settlement signs", "Overloading indications"], bm: ["Retak struktur", "Konkrit terkelupas & besi terdedah", "Tanda enapan", "Petunjuk lebihan beban"] },
+              tools: { en: ["Crack mapping", "Laser level survey", "Visual & tools"], bm: ["Pemetaan retak", "Tinjauan laser level", "Visual & alat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01M12 6h.01M12 10h.01M12 14h.01"/></svg>',
+              t: { en: "External Fabric & Facade", bm: "Fabrik Luaran & Fasad" }, s: { en: "Walls, cladding, glazing", bm: "Dinding, cladding, kaca" },
+              defects: { en: ["Facade cracking & staining", "Loose or debonded cladding", "Failed sealant joints", "Water ingress through walls"], bm: ["Retak & kesan kotor fasad", "Cladding longgar atau tertanggal", "Sambungan sealant gagal", "Resapan air melalui dinding"] },
+              tools: { en: ["Visual & tools", "Thermal test", "Moisture detector"], bm: ["Visual & alat", "Ujian thermal", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+              t: { en: "Roof & Waterproofing", bm: "Bumbung & Kalis Air" }, s: { en: "Roofing, gutters, membranes", bm: "Bumbung, talang, membran" },
+              defects: { en: ["Roof leaks & ponding", "Failed waterproofing membrane", "Blocked or damaged gutters", "Corroded roof fixings"], bm: ["Bumbung bocor & air bertakung", "Membran kalis air gagal", "Talang tersumbat atau rosak", "Pengikat bumbung berkarat"] },
+              tools: { en: ["Visual & drone survey", "Thermal test", "Moisture detector"], bm: ["Visual & tinjauan drone", "Ujian thermal", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+              t: { en: "M&E Services", bm: "Perkhidmatan M&E" }, s: { en: "Electrical, plumbing, pumps", bm: "Elektrik, paip, pam" },
+              defects: { en: ["Ageing distribution boards", "Earthing & insulation issues", "Pump & tank condition", "Pipe corrosion & leaks"], bm: ["Papan agihan uzur", "Isu pembumian & penebatan", "Keadaan pam & tangki", "Karat & kebocoran paip"] },
+              tools: { en: ["Earth & insulation test", "Clamp meter", "Thermal test"], bm: ["Ujian earth & insulation", "Clamp meter", "Ujian thermal"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
+              t: { en: "Common Areas & Finishes", bm: "Kawasan Bersama & Kemasan" }, s: { en: "Lobbies, corridors, staircases", bm: "Lobi, koridor, tangga" },
+              defects: { en: ["Worn or damaged finishes", "Hollow & lifting tiles", "Damp staining", "Handrail & balustrade defects"], bm: ["Kemasan haus atau rosak", "Jubin hollow & terangkat", "Kesan lembap", "Defect pemegang & susur tangga"] },
+              tools: { en: ["Hollowness test", "Visual & tools", "Moisture detector"], bm: ["Ujian hollowness", "Visual & alat", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+              t: { en: "Fire Safety Provisions", bm: "Kelengkapan Keselamatan Kebakaran" }, s: { en: "Observational review", bm: "Semakan secara pemerhatian" },
+              defects: { en: ["Obstructed escape routes", "Missing or expired extinguishers", "Damaged fire doors", "Compromised compartmentation"], bm: ["Laluan keluar terhalang", "Alat pemadam hilang atau luput", "Pintu rintangan api rosak", "Pembahagian kompartmen terjejas"] },
+              tools: { en: ["Visual observation", "Records review"], bm: ["Pemerhatian visual", "Semakan rekod"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Drainage & External Works", bm: "Saliran & Kerja Luaran" }, s: { en: "Drains, carparks, boundaries", bm: "Longkang, tempat letak kereta, sempadan" },
+              defects: { en: ["Blocked or broken drains", "Ponding & poor falls", "Pavement cracking & settlement", "Boundary wall defects"], bm: ["Longkang tersumbat atau pecah", "Air bertakung & kecerunan lemah", "Retak & enapan turapan", "Defect dinding sempadan"] },
+              tools: { en: ["Visual & tools", "Laser level survey"], bm: ["Visual & alat", "Tinjauan laser level"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        thermal: base.thermal,
+        roof: base.roof,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Dilapidation Survey --- */
+    SVC_EXTRAS["dilapidation"] = {
+        stats: [
+            { num: "2",    lbl: { en: "Surveys: Before & After", bm: "Tinjauan: Sebelum & Selepas" } },
+            { num: "100%", lbl: { en: "Dated Photo Evidence", bm: "Bukti Gambar Bertarikh" } },
+            { num: "0.1mm", lbl: { en: "Crack Measurement", bm: "Ukuran Retak" } },
+            { num: "300+", lbl: { en: "Projects Completed", bm: "Projek Selesai" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Prove What Was Already There — and What Wasn't", bm: "Buktikan Apa Yang Sedia Ada — dan Apa Yang Tiada" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of a Dilapidation Survey", bm: "4 Peringkat Dilapidation Survey" },
+            dmsSub:   { en: "Timing is everything — the record must exist before the works begin", bm: "Masa adalah segalanya — rekod mesti wujud sebelum kerja bermula" },
+            baTag:    { en: "Comparison Format", bm: "Format Perbandingan" },
+            baTitle:  { en: "Before vs After Construction", bm: "Sebelum vs Selepas Pembinaan" },
+            baSub:    { en: "Each recorded item is compared side by side — changes are impossible to dispute", bm: "Setiap item direkod dibanding sebelah-menyebelah — perubahan mustahil dipertikai" },
+            scopeTag:   { en: "Survey Scope", bm: "Skop Tinjauan" },
+            scopeTitle: { en: "6 Areas We Record in Detail", bm: "6 Kawasan Yang Kami Rekod Secara Terperinci" },
+            scopeSub:   { en: "Everything that construction vibration and ground movement typically affects", bm: "Semua yang biasanya terjejas oleh getaran pembinaan dan pergerakan tanah" },
+            lblDefect: { en: "What We Record", bm: "Apa Yang Kami Rekod" },
+            lblTools:  { en: "Method / Tools", bm: "Kaedah / Alat" }
+        }),
+        values: [
+            { icon: VICONS.doc,    t: { en: "Dated Pre-Construction Record", bm: "Rekod Bertarikh Sebelum Pembinaan" }, d: { en: "Timestamped, professional evidence of exactly how your property was before works", bm: "Bukti profesional bertarikh tentang keadaan tepat hartanah anda sebelum kerja bermula" } },
+            { icon: VICONS.list,   t: { en: "Crack Mapping with Measurements", bm: "Pemetaan Retak Berukuran" }, d: { en: "Every existing crack located, measured and photographed — not just described", bm: "Setiap retak sedia ada dilokasikan, diukur dan digambarkan — bukan sekadar diperihalkan" } },
+            { icon: VICONS.shield, t: { en: "Protection for Both Sides", bm: "Perlindungan Untuk Kedua Pihak" }, d: { en: "Owners prove new damage; contractors disprove false claims — the record is neutral", bm: "Pemilik buktikan kerosakan baru; kontraktor tolak dakwaan palsu — rekodnya neutral" } },
+            { icon: VICONS.chklist, t: { en: "Post-Construction Comparison", bm: "Perbandingan Selepas Pembinaan" }, d: { en: "We return after works and compare item by item against the original record", bm: "Kami kembali selepas kerja dan banding item demi item dengan rekod asal" } },
+            { icon: VICONS.people, t: { en: "Support for Damage Claims", bm: "Sokongan Tuntutan Kerosakan" }, d: { en: "Clear before-and-after evidence to support a claim against the responsible party", bm: "Bukti sebelum-selepas jelas untuk menyokong tuntutan terhadap pihak bertanggungjawab" } },
+            { icon: VICONS.grad,   t: { en: "Prepared by a Registered Surveyor", bm: "Disediakan Surveyor Berdaftar" }, d: { en: "A RISM-registered professional's record carries weight in negotiation and proceedings", bm: "Rekod profesional berdaftar RISM mempunyai nilai dalam rundingan dan prosiding" } }
+        ],
+        dms: [
+            { t: { en: "Engaged Before Works Start", bm: "Dilantik Sebelum Kerja Bermula" }, d: { en: "Contact us as soon as you learn of nearby construction, demolition or piling", bm: "Hubungi kami sebaik anda tahu tentang pembinaan, perobohan atau cerucuk berhampiran" } },
+            { t: { en: "Pre-Construction Survey", bm: "Tinjauan Sebelum Pembinaan" }, d: { en: "We record the existing condition in full — every crack located, measured and dated", bm: "Kami rekod keadaan sedia ada sepenuhnya — setiap retak dilokasi, diukur dan bertarikh" } },
+            { t: { en: "Post-Construction Survey", bm: "Tinjauan Selepas Pembinaan" }, d: { en: "After the works, we re-survey the same items using the same method and positions", bm: "Selepas kerja siap, kami tinjau semula item sama menggunakan kaedah dan kedudukan sama" } },
+            { t: { en: "Comparison & Claim Support", bm: "Perbandingan & Sokongan Tuntutan" }, d: { en: "Side-by-side comparison identifies new damage — and supports your claim if there is any", bm: "Perbandingan sebelah-menyebelah mengenal pasti kerosakan baru — dan menyokong tuntutan anda jika ada" } }
+        ],
+        beforeAfter: [
+            { nbr: 1, before: "", after: "",
+              loc: "Boundary Wall", elem: "Masonry Wall",
+              type: { en: "Structural crack", bm: "Retak struktur" },
+              desc: { en: "Hairline crack 0.6 mm recorded before works", bm: "Retak halus 0.6 mm direkod sebelum kerja" },
+              status: { color: "#E8590C", label: "New Damage" },
+              notes: { en: "Widened to 2.1 mm after piling works — attributable to adjacent construction", bm: "Melebar ke 2.1 mm selepas kerja cerucuk — boleh dikaitkan dengan pembinaan bersebelahan" } },
+            { nbr: 2, before: "", after: "",
+              loc: "Living Hall", elem: "Ceiling",
+              type: { en: "Finishing crack", bm: "Retak kemasan" },
+              desc: { en: "No crack present at pre-construction survey", bm: "Tiada retak semasa tinjauan sebelum pembinaan" },
+              status: { color: "#E8590C", label: "New Damage" },
+              notes: { en: "New diagonal crack appeared across the ceiling slab junction", bm: "Retak pepenjuru baru muncul merentasi sambungan papak siling" } },
+            { nbr: 3, before: "", after: "",
+              loc: "Driveway", elem: "Concrete Apron",
+              type: { en: "Existing crack", bm: "Retak sedia ada" },
+              desc: { en: "Crack 1.2 mm recorded before works", bm: "Retak 1.2 mm direkod sebelum kerja" },
+              status: { color: "#22A06B", label: "No Change" },
+              notes: { en: "Measured again after works — unchanged at 1.2 mm, pre-existing condition confirmed", bm: "Diukur semula selepas kerja — kekal 1.2 mm, keadaan sedia ada disahkan" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l7-5 7 5M4 21h16"/></svg>',
+              t: { en: "Structural Cracks", bm: "Retak Struktur" }, s: { en: "Beams, columns, slabs", bm: "Rasuk, tiang, papak" },
+              defects: { en: ["Crack location & orientation", "Width measured to 0.1 mm", "Length & propagation", "Photographic reference"], bm: ["Lokasi & orientasi retak", "Lebar diukur hingga 0.1 mm", "Panjang & penyebaran", "Rujukan bergambar"] },
+              tools: { en: ["Crack gauge", "Laser distance", "Dated photography"], bm: ["Tolok retak", "Laser distance", "Fotografi bertarikh"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18"/></svg>',
+              t: { en: "Walls & Finishes", bm: "Dinding & Kemasan" }, s: { en: "Internal & external", bm: "Dalaman & luaran" },
+              defects: { en: ["Existing hairline cracks", "Plaster debonding", "Damp staining", "Paint condition"], bm: ["Retak halus sedia ada", "Plaster tertanggal", "Kesan lembap", "Keadaan cat"] },
+              tools: { en: ["Visual & tools", "Moisture detector", "Dated photography"], bm: ["Visual & alat", "Pengesan lembapan", "Fotografi bertarikh"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
+              t: { en: "Floors & Tiling", bm: "Lantai & Jubin" }, s: { en: "Internal floors", bm: "Lantai dalaman" },
+              defects: { en: ["Existing cracked tiles", "Hollow areas", "Level & falls", "Joint condition"], bm: ["Jubin retak sedia ada", "Kawasan hollow", "Aras & kecerunan", "Keadaan sambungan"] },
+              tools: { en: ["Hollowness test", "Spirit level", "Dated photography"], bm: ["Ujian hollowness", "Spirit level", "Fotografi bertarikh"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V8l8-5 8 5v13"/><path d="M4 13h16"/></svg>',
+              t: { en: "Boundary Walls & Fencing", bm: "Dinding Sempadan & Pagar" }, s: { en: "Closest to the works", bm: "Paling hampir dengan kerja" },
+              defects: { en: ["Existing cracks & lean", "Verticality recorded", "Foundation movement signs", "Gate alignment"], bm: ["Retak & kecondongan sedia ada", "Kelurusan menegak direkod", "Tanda pergerakan asas", "Kelurusan pintu pagar"] },
+              tools: { en: ["Crack gauge", "Laser level survey", "Dated photography"], bm: ["Tolok retak", "Tinjauan laser level", "Fotografi bertarikh"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Drainage & External Works", bm: "Saliran & Kerja Luaran" }, s: { en: "Drains, apron, pavement", bm: "Longkang, apron, turapan" },
+              defects: { en: ["Existing drain cracks", "Settlement of pavement", "Ponding areas", "Manhole condition"], bm: ["Retak longkang sedia ada", "Enapan turapan", "Kawasan air bertakung", "Keadaan manhole"] },
+              tools: { en: ["Visual & tools", "Laser level survey"], bm: ["Visual & alat", "Tinjauan laser level"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/><path d="M3 12h18"/></svg>',
+              t: { en: "Doors, Windows & Glazing", bm: "Pintu, Tingkap & Kaca" }, s: { en: "Movement-sensitive items", bm: "Item sensitif pergerakan" },
+              defects: { en: ["Frame alignment & squareness", "Existing glass cracks", "Operation condition", "Sealant condition"], bm: ["Kelurusan & kesegian bingkai", "Retak kaca sedia ada", "Keadaan operasi", "Keadaan sealant"] },
+              tools: { en: ["L-square & spirit level", "Function test", "Dated photography"], bm: ["L-square & spirit level", "Ujian fungsi", "Fotografi bertarikh"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Building Monitoring --- */
+    SVC_EXTRAS["monitoring"] = {
+        stats: [
+            { num: "0.1mm", lbl: { en: "Reading Precision", bm: "Ketepatan Bacaan" } },
+            { num: "4",     lbl: { en: "Monitoring Types", bm: "Jenis Pemantauan" } },
+            { num: "100%",  lbl: { en: "Trend Charted", bm: "Trend Dicartakan" } },
+            { num: "300+",  lbl: { en: "Projects Completed", bm: "Projek Selesai" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Is It Stable, or Getting Worse?", bm: "Ia Stabil, atau Semakin Teruk?" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of a Monitoring Programme", bm: "4 Peringkat Program Pemantauan" },
+            dmsSub:   { en: "One crack photo tells you nothing. A series of dated readings tells you everything", bm: "Satu gambar retak tak bermakna apa-apa. Siri bacaan bertarikh menceritakan segalanya" },
+            stTag:    { en: "Movement Classification", bm: "Klasifikasi Pergerakan" },
+            stTitle:  { en: "Every Reading Classified", bm: "Setiap Bacaan Diklasifikasikan" },
+            stSub:    { en: "You will always know which category your building falls into — and what it means", bm: "Anda sentiasa tahu kategori mana bangunan anda berada — dan apa maksudnya" },
+            scopeTag:   { en: "Monitoring Scope", bm: "Skop Pemantauan" },
+            scopeTitle: { en: "4 Types of Monitoring We Provide", bm: "4 Jenis Pemantauan Yang Kami Sediakan" },
+            scopeSub:   { en: "Selected based on what your building is showing and what is happening nearby", bm: "Dipilih berdasarkan apa yang bangunan anda tunjukkan dan apa yang berlaku berhampiran" },
+            lblDefect: { en: "What We Track", bm: "Apa Yang Kami Jejak" },
+            lblTools:  { en: "Method / Tools", bm: "Kaedah / Alat" }
+        }),
+        values: [
+            { icon: VICONS.shield, t: { en: "Early Warning Before Failure", bm: "Amaran Awal Sebelum Kegagalan" }, d: { en: "Catch accelerating movement while intervention is still affordable", bm: "Kesan pergerakan yang memburuk semasa tindakan masih mampu dibiayai" } },
+            { icon: VICONS.check,  t: { en: "Data, Not Guesswork", bm: "Data, Bukan Agakan" }, d: { en: "Dated readings and trend charts replace \"it looks worse to me\"", bm: "Bacaan bertarikh dan carta trend menggantikan \"nampak macam makin teruk\"" } },
+            { icon: VICONS.plan,   t: { en: "Know When to Act", bm: "Tahu Bila Perlu Bertindak" }, d: { en: "Stable movement can be monitored; active movement gets escalated immediately", bm: "Pergerakan stabil boleh dipantau; pergerakan aktif dieskalasi segera" } },
+            { icon: VICONS.doc,    t: { en: "Evidence During Nearby Works", bm: "Bukti Semasa Kerja Berhampiran" }, d: { en: "Readings taken through the construction period link damage to the works", bm: "Bacaan sepanjang tempoh pembinaan mengaitkan kerosakan dengan kerja tersebut" } },
+            { icon: VICONS.people, t: { en: "Engineer Referral If Needed", bm: "Rujukan Jurutera Jika Perlu" }, d: { en: "If readings indicate structural risk, we tell you plainly and refer you onward", bm: "Jika bacaan menunjukkan risiko struktur, kami beritahu terus terang dan rujuk anda seterusnya" } },
+            { icon: VICONS.list,   t: { en: "Scheduled Periodic Reports", bm: "Laporan Berkala Berjadual" }, d: { en: "You receive a report each cycle — no chasing, no surprises", bm: "Anda terima laporan setiap kitaran — tak perlu mengejar, tiada kejutan" } }
+        ],
+        dms: [
+            { t: { en: "Assessment & Point Selection", bm: "Penilaian & Pemilihan Titik" }, d: { en: "We assess the cracks and select monitoring positions that will actually show movement", bm: "Kami nilai retak dan pilih kedudukan pemantauan yang benar-benar akan menunjukkan pergerakan" } },
+            { t: { en: "Installation & Baseline", bm: "Pemasangan & Bacaan Asas" }, d: { en: "Gauges installed and the first baseline readings recorded and dated", bm: "Tolok dipasang dan bacaan asas pertama direkod serta bertarikh" } },
+            { t: { en: "Periodic Readings", bm: "Bacaan Berkala" }, d: { en: "Readings taken at agreed intervals — weekly, monthly or tied to the works programme", bm: "Bacaan diambil pada selang dipersetujui — mingguan, bulanan atau mengikut program kerja" } },
+            { t: { en: "Trend Analysis & Alert", bm: "Analisis Trend & Amaran" }, d: { en: "Movement charted over time; you are alerted immediately if readings accelerate", bm: "Pergerakan dicartakan mengikut masa; anda diberi amaran segera jika bacaan memburuk" } }
+        ],
+        statuses: [
+            { color: "#22A06B", label: { en: "Stable", bm: "Stabil" },
+              d: { en: "No measurable change across the monitoring period", bm: "Tiada perubahan boleh diukur sepanjang tempoh pemantauan" } },
+            { color: "#2196F3", label: { en: "Slight Movement", bm: "Pergerakan Kecil" },
+              d: { en: "Small variation consistent with thermal or seasonal effects", bm: "Variasi kecil selaras dengan kesan haba atau musim" } },
+            { color: "#F5921B", label: { en: "Active Movement", bm: "Pergerakan Aktif" },
+              d: { en: "Consistent directional movement — investigation recommended", bm: "Pergerakan berterusan satu arah — siasatan disyorkan" } },
+            { color: "#E8590C", label: { en: "Critical", bm: "Kritikal" },
+              d: { en: "Rapid movement — immediate engineer referral and action", bm: "Pergerakan pantas — rujukan jurutera dan tindakan segera" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20 10 4l4 9 2-3 4 10"/></svg>',
+              t: { en: "Crack Width Monitoring", bm: "Pemantauan Lebar Retak" }, s: { en: "Most common", bm: "Paling kerap" },
+              defects: { en: ["Width change over time", "Direction of movement", "Seasonal variation", "Rate of change"], bm: ["Perubahan lebar mengikut masa", "Arah pergerakan", "Variasi bermusim", "Kadar perubahan"] },
+              tools: { en: ["Crack gauge / tell-tale", "Dated readings log", "Photography"], bm: ["Tolok retak / tell-tale", "Log bacaan bertarikh", "Fotografi"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/><path d="M6 8v8M12 6v12M18 9v6"/></svg>',
+              t: { en: "Settlement / Level Monitoring", bm: "Pemantauan Enapan / Aras" }, s: { en: "Ground movement", bm: "Pergerakan tanah" },
+              defects: { en: ["Differential settlement", "Floor level change", "Sinking sections", "Rate of settlement"], bm: ["Enapan berbeza", "Perubahan aras lantai", "Bahagian tenggelam", "Kadar enapan"] },
+              tools: { en: ["Laser level survey", "Fixed reference points", "Dated readings log"], bm: ["Tinjauan laser level", "Titik rujukan tetap", "Log bacaan bertarikh"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18"/><path d="m7 21 5-18 5 18"/></svg>',
+              t: { en: "Tilt & Verticality", bm: "Kecondongan & Kelurusan Menegak" }, s: { en: "Walls & structures", bm: "Dinding & struktur" },
+              defects: { en: ["Out-of-plumb measurement", "Progressive leaning", "Boundary wall tilt", "Column verticality"], bm: ["Ukuran keluar dari tegak", "Kecondongan progresif", "Kecondongan dinding sempadan", "Kelurusan menegak tiang"] },
+              tools: { en: ["Spirit level & plumb", "Laser level survey", "Dated readings log"], bm: ["Spirit level & plumb", "Tinjauan laser level", "Log bacaan bertarikh"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h3l3-8 4 16 3-8h7"/></svg>',
+              t: { en: "Vibration Observation", bm: "Pemerhatian Getaran" }, s: { en: "During nearby works", bm: "Semasa kerja berhampiran" },
+              defects: { en: ["Impact of piling & demolition", "New crack appearance", "Correlation with works schedule", "Occupant-reported events"], bm: ["Kesan cerucuk & perobohan", "Kemunculan retak baru", "Kaitan dengan jadual kerja", "Kejadian dilaporkan penghuni"] },
+              tools: { en: ["Observation & records", "Dated photography", "Crack gauge readings"], bm: ["Pemerhatian & rekod", "Fotografi bertarikh", "Bacaan tolok retak"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Commercial Building Inspection --- */
+    SVC_EXTRAS["commercial-inspection"] = {
+        stats: [
+            { num: "3",    lbl: { en: "Purposes: Buy / Lease / Audit", bm: "Tujuan: Beli / Sewa / Audit" } },
+            { num: "6",    lbl: { en: "Systems Inspected", bm: "Sistem Diperiksa" } },
+            { num: "15+",  lbl: { en: "Tests & Tools", bm: "Ujian & Alat" } },
+            { num: "300+", lbl: { en: "Projects Completed", bm: "Projek Selesai" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "A Report Your Management Can Act On", bm: "Laporan Yang Pengurusan Anda Boleh Ambil Tindakan" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of a Commercial Inspection", bm: "4 Peringkat Inspection Komersial" },
+            dmsSub:   { en: "Scoped to your objective — buying, leasing or auditing a commercial property", bm: "Ikut objektif anda — membeli, menyewa atau mengaudit hartanah komersial" },
+            scopeTag:   { en: "Inspection Scope", bm: "Skop Pemeriksaan" },
+            scopeTitle: { en: "6 Systems We Inspect", bm: "6 Sistem Yang Kami Periksa" },
+            scopeSub:   { en: "Adjusted to the property type — shoplot, office, factory or retail unit", bm: "Disesuaikan dengan jenis hartanah — lot kedai, pejabat, kilang atau unit runcit" },
+            lblDefect: { en: "What We Look For", bm: "Apa Yang Kami Cari" },
+            lblTools:  { en: "Testing / Tools", bm: "Ujian / Alat" }
+        }),
+        values: [
+            { icon: VICONS.list,   t: { en: "Scoped to Your Objective", bm: "Ikut Objektif Anda" }, d: { en: "Buying, leasing or auditing — the scope is agreed before we start, not assumed", bm: "Membeli, menyewa atau mengaudit — skop dipersetujui sebelum kami mula, bukan diandaikan" } },
+            { icon: VICONS.doc,    t: { en: "Executive Summary Up Front", bm: "Ringkasan Eksekutif Di Hadapan" }, d: { en: "Decision makers get the key risks on page one — details follow behind", bm: "Pembuat keputusan dapat risiko utama di muka surat pertama — perincian menyusul" } },
+            { icon: VICONS.check,  t: { en: "M&E Systems Overview", bm: "Tinjauan Sistem M&E" }, d: { en: "Electrical, plumbing and services condition — where the expensive surprises hide", bm: "Keadaan elektrik, paip dan perkhidmatan — di situ kejutan mahal bersembunyi" } },
+            { icon: VICONS.shield, t: { en: "Statutory & Safety Observations", bm: "Pemerhatian Statutori & Keselamatan" }, d: { en: "Fire safety, escape routes and compliance risks flagged before you commit", bm: "Keselamatan kebakaran, laluan keluar dan risiko pematuhan dikesan sebelum anda komited" } },
+            { icon: VICONS.money,  t: { en: "Lease Handover Protection", bm: "Perlindungan Serah Sewa" }, d: { en: "Condition recorded at lease start and end — reinstatement disputes avoided", bm: "Keadaan direkod pada awal dan akhir sewa — pertikaian pemulihan dielakkan" } },
+            { icon: VICONS.system, t: { en: "Consistent Across Your Portfolio", bm: "Konsisten Merentas Portfolio" }, d: { en: "Same format for every property — compare assets on equal terms", bm: "Format sama untuk setiap hartanah — banding aset secara setara" } }
+        ],
+        dms: [
+            { t: { en: "Brief & Scope Agreement", bm: "Taklimat & Persetujuan Skop" }, d: { en: "We discuss your objective and agree exactly what will be inspected and reported", bm: "Kami bincang objektif anda dan persetujui dengan tepat apa yang akan diperiksa dan dilaporkan" } },
+            { t: { en: "Site Inspection", bm: "Pemeriksaan Tapak" }, d: { en: "Systematic inspection with calibrated instruments, coordinated with your operations", bm: "Pemeriksaan sistematik dengan alat dikalibrasi, diselaraskan dengan operasi anda" } },
+            { t: { en: "Findings & Risk Ranking", bm: "Penemuan & Susunan Risiko" }, d: { en: "Every finding ranked by cost and operational risk, not just listed", bm: "Setiap penemuan disusun ikut kos dan risiko operasi, bukan sekadar disenaraikan" } },
+            { t: { en: "Executive Report", bm: "Laporan Eksekutif" }, d: { en: "Summary for decision makers, full technical detail for your facility team", bm: "Ringkasan untuk pembuat keputusan, perincian teknikal penuh untuk pasukan fasiliti anda" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l7-5 7 5M4 21h16"/></svg>',
+              t: { en: "Structure & Building Fabric", bm: "Struktur & Fabrik Bangunan" }, s: { en: "Frame, walls, floors", bm: "Kerangka, dinding, lantai" },
+              defects: { en: ["Structural cracking", "Concrete spalling", "Floor loading concerns", "Facade condition"], bm: ["Retak struktur", "Konkrit terkelupas", "Kebimbangan beban lantai", "Keadaan fasad"] },
+              tools: { en: ["Crack mapping", "Laser level survey", "Visual & tools"], bm: ["Pemetaan retak", "Tinjauan laser level", "Visual & alat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+              t: { en: "Roof & Waterproofing", bm: "Bumbung & Kalis Air" }, s: { en: "Roofing & drainage", bm: "Bumbung & saliran" },
+              defects: { en: ["Leaks over operational areas", "Membrane failure", "Gutter & downpipe blockage", "Corroded metal roofing"], bm: ["Bocor atas kawasan operasi", "Kegagalan membran", "Talang & paip turun tersumbat", "Bumbung logam berkarat"] },
+              tools: { en: ["Visual & drone survey", "Thermal test", "Moisture detector"], bm: ["Visual & tinjauan drone", "Ujian thermal", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+              t: { en: "Electrical Systems", bm: "Sistem Elektrik" }, s: { en: "DB, wiring, capacity", bm: "DB, wiring, kapasiti" },
+              defects: { en: ["DB condition & labelling", "Earthing & insulation values", "Overloaded circuits", "Hotspots under load"], bm: ["Keadaan & pelabelan DB", "Nilai pembumian & penebatan", "Litar terlebih beban", "Titik panas ketika berbeban"] },
+              tools: { en: ["Earth & insulation test", "Clamp meter load test", "Thermal camera"], bm: ["Ujian earth & insulation", "Ujian beban clamp meter", "Kamera thermal"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Plumbing & Sanitary", bm: "Paip & Sanitari" }, s: { en: "Supply, waste, tanks", bm: "Bekalan, kumbahan, tangki" },
+              defects: { en: ["Leaks & pipe corrosion", "Water pressure issues", "Drainage performance", "Tank & pump condition"], bm: ["Kebocoran & karat paip", "Isu tekanan air", "Prestasi saliran", "Keadaan tangki & pam"] },
+              tools: { en: ["Pressure test", "Flushing test", "Moisture detector"], bm: ["Ujian tekanan", "Ujian flushing", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+              t: { en: "Fire Safety Provisions", bm: "Kelengkapan Keselamatan Kebakaran" }, s: { en: "Observational review", bm: "Semakan secara pemerhatian" },
+              defects: { en: ["Escape route obstruction", "Extinguisher & hose reel condition", "Fire door integrity", "Signage & emergency lighting"], bm: ["Halangan laluan keluar", "Keadaan pemadam & hose reel", "Integriti pintu rintangan api", "Papan tanda & lampu kecemasan"] },
+              tools: { en: ["Visual observation", "Records review"], bm: ["Pemerhatian visual", "Semakan rekod"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
+              t: { en: "Common & Back-of-House", bm: "Kawasan Bersama & Belakang" }, s: { en: "Where problems get ignored", bm: "Tempat masalah diabaikan" },
+              defects: { en: ["Loading bay & service area condition", "Staircase & handrail defects", "Ceiling void condition", "Damp & finishes deterioration"], bm: ["Keadaan ruang muatan & servis", "Defect tangga & pemegang", "Keadaan ruang atas siling", "Lembap & kemerosotan kemasan"] },
+              tools: { en: ["Visual & tools", "Moisture detector", "Thermal test"], bm: ["Visual & alat", "Pengesan lembapan", "Ujian thermal"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        thermal: base.thermal,
+        roof: base.roof,
+        reports: base.reports,
+        pdf: base.pdf
+    };
+
+    /* --- Maintenance Report / Condition Audit --- */
+    SVC_EXTRAS["maintenance-audit"] = {
+        stats: [
+            { num: "4",    lbl: { en: "Priority Tiers", bm: "Tahap Keutamaan" } },
+            { num: "100%", lbl: { en: "Photo-Documented", bm: "Berdokumentasi Gambar" } },
+            { num: "15+",  lbl: { en: "Tests & Tools", bm: "Ujian & Alat" } },
+            { num: "300+", lbl: { en: "Projects Completed", bm: "Projek Selesai" } }
+        ],
+        sec: Object.assign({}, base.sec, riSec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Stop Paying for Emergencies", bm: "Berhenti Membayar Untuk Kecemasan" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of a Condition Audit", bm: "4 Peringkat Condition Audit" },
+            dmsSub:   { en: "From an unclear list of complaints to a funded, prioritised maintenance plan", bm: "Dari senarai aduan yang kabur kepada pelan penyelenggaraan berkeutamaan yang berbajet" },
+            stTag:    { en: "Priority Tiers", bm: "Tahap Keutamaan" },
+            stTitle:  { en: "Every Defect Given a Priority", bm: "Setiap Defect Diberi Keutamaan" },
+            stSub:    { en: "So your budget goes to the right repairs, in the right order", bm: "Supaya bajet anda pergi kepada pembaikian yang betul, mengikut urutan yang betul" },
+            anTag:    { en: "Analysis", bm: "Analisis" },
+            anTitle:  { en: "Sample Priority Distribution", bm: "Contoh Taburan Keutamaan" },
+            anSub:    { en: "See at a glance how much of your building needs attention now versus later", bm: "Lihat sekali pandang berapa banyak bangunan anda perlukan perhatian sekarang berbanding kemudian" },
+            scopeTag:   { en: "Audit Scope", bm: "Skop Audit" },
+            scopeTitle: { en: "6 Areas We Audit", bm: "6 Kawasan Yang Kami Audit" },
+            scopeSub:   { en: "The areas that drive most of your maintenance spending", bm: "Kawasan yang memakan sebahagian besar perbelanjaan penyelenggaraan anda" },
+            lblDefect: { en: "What We Assess", bm: "Apa Yang Kami Nilai" },
+            lblTools:  { en: "Testing / Tools", bm: "Ujian / Alat" }
+        }),
+        values: [
+            { icon: VICONS.list,   t: { en: "Know What to Fix First", bm: "Tahu Apa Perlu Dibaiki Dulu" }, d: { en: "A ranked list ends the argument about which complaint gets the budget", bm: "Senarai berkeutamaan menamatkan pertengkaran tentang aduan mana dapat bajet" } },
+            { icon: VICONS.money,  t: { en: "Budget with Confidence", bm: "Bajet Dengan Yakin" }, d: { en: "Repair recommendations with cost guidance — plan the year, not the week", bm: "Cadangan pembaikian dengan panduan kos — rancang setahun, bukan seminggu" } },
+            { icon: VICONS.plan,   t: { en: "Stop Reactive Repairs", bm: "Berhenti Pembaikian Reaktif" }, d: { en: "Planned maintenance always costs less than emergency call-outs", bm: "Penyelenggaraan terancang sentiasa lebih murah daripada panggilan kecemasan" } },
+            { icon: VICONS.doc,    t: { en: "Defensible at AGM or Board", bm: "Kukuh Di AGM atau Lembaga" }, d: { en: "An independent professional report backs the spending you are proposing", bm: "Laporan profesional bebas menyokong perbelanjaan yang anda cadangkan" } },
+            { icon: VICONS.chklist, t: { en: "Re-Audit to Track Progress", bm: "Audit Semula Jejak Kemajuan" }, d: { en: "Compare against the last audit and show owners what their money achieved", bm: "Banding dengan audit lepas dan tunjukkan pemilik apa yang wang mereka capai" } },
+            { icon: VICONS.shield, t: { en: "Independent of Contractors", bm: "Bebas Daripada Kontraktor" }, d: { en: "We recommend repairs, we do not sell them — no conflict of interest", bm: "Kami cadangkan pembaikian, kami tidak menjualnya — tiada konflik kepentingan" } }
+        ],
+        dms: [
+            { t: { en: "Condition Audit", bm: "Audit Keadaan" }, d: { en: "We walk the property and record the current condition of every audited area", bm: "Kami tinjau hartanah dan rekod keadaan semasa setiap kawasan yang diaudit" } },
+            { t: { en: "Prioritisation", bm: "Penyusunan Keutamaan" }, d: { en: "Each defect assigned a priority tier based on safety, consequence and deterioration rate", bm: "Setiap defect diberi tahap keutamaan berdasarkan keselamatan, kesan dan kadar kemerosotan" } },
+            { t: { en: "Repair & Cost Guidance", bm: "Panduan Pembaikian & Kos" }, d: { en: "Recommended repair method and cost guidance for each item, grouped by phase", bm: "Kaedah pembaikian disyorkan dan panduan kos untuk setiap item, dikumpul mengikut fasa" } },
+            { t: { en: "Re-Audit Schedule", bm: "Jadual Audit Semula" }, d: { en: "We propose when to re-audit so deterioration is tracked, not discovered", bm: "Kami cadangkan bila perlu audit semula supaya kemerosotan dijejak, bukan ditemui" } }
+        ],
+        statuses: [
+            { color: "#E8590C", label: { en: "Urgent", bm: "Segera" },
+              d: { en: "Safety or structural risk — act now, before the next budget cycle", bm: "Risiko keselamatan atau struktur — bertindak sekarang, sebelum kitaran bajet seterusnya" } },
+            { color: "#F5921B", label: { en: "Soon", bm: "Terdekat" },
+              d: { en: "Deteriorating — address within 6 to 12 months", bm: "Semakin merosot — tangani dalam 6 hingga 12 bulan" } },
+            { color: "#2196F3", label: { en: "Planned", bm: "Terancang" },
+              d: { en: "Include in the normal maintenance cycle and budget", bm: "Masukkan dalam kitaran dan bajet penyelenggaraan biasa" } },
+            { color: "#22A06B", label: { en: "Monitor", bm: "Pantau" },
+              d: { en: "No action needed now — re-check at the next audit", bm: "Tiada tindakan diperlukan sekarang — semak semula pada audit berikutnya" } }
+        ],
+        analysis: [
+            { color: "#E8590C", label: "Urgent", count: 8 },
+            { color: "#F5921B", label: "Soon", count: 24 },
+            { color: "#2196F3", label: "Planned", count: 41 },
+            { color: "#22A06B", label: "Monitor", count: 33 }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l7-5 7 5M4 21h16"/></svg>',
+              t: { en: "Structure & Fabric", bm: "Struktur & Fabrik" }, s: { en: "The expensive category", bm: "Kategori paling mahal" },
+              defects: { en: ["Cracking & spalling", "Facade deterioration", "Waterproofing failure", "Deterioration rate"], bm: ["Retak & terkelupas", "Kemerosotan fasad", "Kegagalan kalis air", "Kadar kemerosotan"] },
+              tools: { en: ["Crack mapping", "Thermal test", "Moisture detector"], bm: ["Pemetaan retak", "Ujian thermal", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+              t: { en: "Roof & Drainage", bm: "Bumbung & Saliran" }, s: { en: "Highest leak risk", bm: "Risiko bocor tertinggi" },
+              defects: { en: ["Roof covering condition", "Gutter & downpipe blockage", "Ponding areas", "Flashing & joints"], bm: ["Keadaan penutup bumbung", "Talang & paip turun tersumbat", "Kawasan air bertakung", "Flashing & sambungan"] },
+              tools: { en: ["Visual & drone survey", "Moisture detector"], bm: ["Visual & tinjauan drone", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+              t: { en: "Electrical Installations", bm: "Pemasangan Elektrik" }, s: { en: "Safety critical", bm: "Kritikal keselamatan" },
+              defects: { en: ["Ageing DB & accessories", "Earthing & insulation values", "Overloading signs", "Emergency lighting"], bm: ["DB & aksesori uzur", "Nilai pembumian & penebatan", "Tanda lebihan beban", "Lampu kecemasan"] },
+              tools: { en: ["Earth & insulation test", "Clamp meter", "Thermal camera"], bm: ["Ujian earth & insulation", "Clamp meter", "Kamera thermal"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Water & Sanitary Systems", bm: "Sistem Air & Sanitari" }, s: { en: "Pumps, tanks, pipework", bm: "Pam, tangki, paip" },
+              defects: { en: ["Pump condition & duty cycle", "Tank cleanliness & leaks", "Pipe corrosion", "Drainage blockage history"], bm: ["Keadaan pam & kitaran tugas", "Kebersihan & kebocoran tangki", "Karat paip", "Sejarah saliran tersumbat"] },
+              tools: { en: ["Pressure test", "Visual & tools", "Records review"], bm: ["Ujian tekanan", "Visual & alat", "Semakan rekod"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
+              t: { en: "Common Areas & Finishes", bm: "Kawasan Bersama & Kemasan" }, s: { en: "What owners see daily", bm: "Apa pemilik lihat setiap hari" },
+              defects: { en: ["Finishes wear & damage", "Hollow & lifting tiles", "Damp staining", "Lighting & ventilation"], bm: ["Haus & rosak kemasan", "Jubin hollow & terangkat", "Kesan lembap", "Pencahayaan & pengudaraan"] },
+              tools: { en: ["Hollowness test", "Visual & tools", "Moisture detector"], bm: ["Ujian hollowness", "Visual & alat", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V8l8-5 8 5v13"/><path d="M4 13h16"/></svg>',
+              t: { en: "External Works & Grounds", bm: "Kerja Luaran & Kawasan Sekitar" }, s: { en: "Often forgotten", bm: "Selalu terlupa" },
+              defects: { en: ["Carpark surface condition", "Boundary walls & fencing", "External drains", "Signage & lighting"], bm: ["Keadaan permukaan tempat letak kereta", "Dinding sempadan & pagar", "Longkang luaran", "Papan tanda & lampu"] },
+              tools: { en: ["Visual & tools", "Laser level survey"], bm: ["Visual & alat", "Tinjauan laser level"] } }
+        ],
+        toolsShowcase: base.toolsShowcase,
+        reports: base.reports,
+        pdf: base.pdf
+    };
 })();
 
 /* =========================================================
