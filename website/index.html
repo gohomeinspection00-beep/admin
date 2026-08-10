@@ -600,6 +600,89 @@ section { padding: 5rem 2rem; }
 .svc-mini:hover .svc-mini-icon svg { color: white; }
 .svc-mini-body { display: block; min-width: 0; }
 
+/* ---- Ekstra sub-page DLP: statistik mini di header ---- */
+.svc-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.svc-stat .num { font-size: 1.7rem; font-weight: 800; color: var(--primary); display: block; line-height: 1; }
+.svc-stat .lbl { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block; }
+
+/* ---- Seksyen ekstra dalam sub-page servis ---- */
+.svc-extra { padding: 4.5rem 2rem; background: white; }
+.svc-extra.alt { background: var(--bg); }
+
+/* ---- Kad 12 elemen pemeriksaan ---- */
+.inspect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+.inspect-card {
+    background: var(--bg); border-radius: 20px; overflow: hidden;
+    border: 1px solid transparent; transition: all 0.35s ease;
+}
+.svc-extra.alt .inspect-card { background: white; border-color: var(--border); }
+.inspect-card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-5px); border-color: var(--border);
+}
+.ic-head { padding: 1.35rem 1.4rem; display: flex; gap: 1rem; align-items: flex-start; transition: all 0.35s ease; }
+.inspect-card:hover .ic-head { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+.ic-icon {
+    width: 48px; height: 48px; background: #E3F2FD; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all 0.35s ease;
+}
+.ic-icon svg { width: 24px; height: 24px; color: var(--primary); transition: color 0.35s ease; }
+.inspect-card:hover .ic-icon { background: rgba(255,255,255,0.22); }
+.inspect-card:hover .ic-icon svg { color: white; }
+.ic-head h3 { font-size: 1.02rem; color: var(--text-dark); font-weight: 700; margin-bottom: 0.1rem; transition: color 0.35s ease; }
+.ic-head p { font-size: 0.78rem; color: var(--text-muted); margin: 0; transition: color 0.35s ease; }
+.inspect-card:hover .ic-head h3 { color: white; }
+.inspect-card:hover .ic-head p { color: rgba(255,255,255,0.85); }
+.ic-body { padding: 0.2rem 1.4rem 1.4rem; }
+.ic-lbl {
+    font-size: 0.66rem; font-weight: 700; color: var(--primary);
+    text-transform: uppercase; letter-spacing: 0.6px; margin: 0.9rem 0 0.45rem;
+}
+.ic-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.ic-chip {
+    background: white; border: 1px solid var(--border); padding: 0.22rem 0.62rem;
+    border-radius: 50px; font-size: 0.72rem; color: var(--text-body);
+}
+.ic-tool {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: #E3F2FD; padding: 0.22rem 0.62rem; border-radius: 50px;
+    font-size: 0.7rem; font-weight: 600; color: var(--primary);
+}
+.ic-tool svg { width: 10px; height: 10px; }
+
+/* ---- Sticker penandaan ---- */
+.sticker-grid { display: flex; justify-content: center; gap: 1.4rem; flex-wrap: wrap; }
+.sticker-item { width: 96px; text-align: center; transition: transform 0.3s ease; }
+.sticker-item:hover { transform: scale(1.12); }
+.sticker-item img {
+    width: 76px; height: 76px; object-fit: contain; margin: 0 auto 0.4rem; display: block;
+    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.12));
+}
+.sticker-item.img-missing img { display: none; }
+.sticker-item.img-missing::before { content: '🏷'; font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+.sticker-item span { font-size: 0.72rem; font-weight: 600; color: var(--text-dark); }
+
+/* ---- Galeri sample report ---- */
+.rep-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+.rep-thumb {
+    border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
+    box-shadow: var(--shadow); cursor: pointer; padding: 0; background: white;
+    font-family: inherit; transition: all 0.3s ease;
+}
+.rep-thumb:nth-child(odd) { transform: rotate(-1.5deg); }
+.rep-thumb:nth-child(even) { transform: rotate(1.5deg); }
+.rep-thumb:hover { transform: rotate(0) translateY(-5px); box-shadow: var(--shadow-lg); }
+.rep-thumb img { width: 100%; display: block; }
+.rep-thumb.img-missing img { display: none; }
+.rep-thumb.img-missing::before {
+    content: 'PDF'; display: flex; aspect-ratio: 3/4; width: 100%;
+    align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #E8F1FB, #D6E7F8);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.16em; color: var(--primary);
+}
+.rep-cta { text-align: center; margin-top: 2.25rem; }
+
 /* servis dalam kad pillar kini pautan */
 .pillar-card li a {
     display: flex; align-items: center; gap: 0.6rem;
@@ -875,6 +958,12 @@ section { padding: 5rem 2rem; }
     .crumbs { font-size: 0.8rem; }
     .proj-filters { gap: 0.45rem; }
     .proj-filter { padding: 0.5rem 1.05rem; font-size: 0.84rem; }
+    .svc-extra { padding: 3rem 1.25rem; }
+    .svc-stats { gap: 1.4rem; }
+    .svc-stat .num { font-size: 1.45rem; }
+    .rep-grid { grid-template-columns: repeat(2, 1fr); }
+    .sticker-grid { gap: 1rem; }
+    .sticker-item { width: 84px; }
 }
 @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -1594,6 +1683,100 @@ var SVC = [
 ];
 
 /* =========================================================
+   KANDUNGAN EKSTRA SUB-PAGE SERVIS (ikut slug).
+   Buat masa ini untuk "home-defect" (DLP) sahaja:
+   - stats    : statistik mini di header
+   - elements : 12 elemen pemeriksaan (kad + chips)
+   - stickers : sistem sticker penandaan
+   - reports  : galeri sample report + pautan PDF
+   ========================================================= */
+var SVC_EXTRAS = {
+    "home-defect": {
+        stats: [
+            { num: "12",     lbl: { en: "Elements Checked", bm: "Elemen Diperiksa" } },
+            { num: "50+",    lbl: { en: "Defect Types", bm: "Jenis Kecacatan" } },
+            { num: "15+",    lbl: { en: "Tests & Tools", bm: "Ujian & Alat" } },
+            { num: "5,000+", lbl: { en: "Units Inspected", bm: "Unit Diperiksa" } }
+        ],
+        sec: {
+            scopeTag:   { en: "Inspection Scope", bm: "Skop Pemeriksaan" },
+            scopeTitle: { en: "12 Elements That We Inspect", bm: "12 Elemen Yang Kami Periksa" },
+            scopeSub:   { en: "Every element is checked visually, functionally, and with professional tools", bm: "Setiap elemen diperiksa secara visual, ujian fungsi dan dengan alat profesional" },
+            lblDefect:  { en: "Type of Defect", bm: "Jenis Kecacatan" },
+            lblTools:   { en: "Testing / Tools", bm: "Ujian / Alat" },
+            stickTag:   { en: "Marking System", bm: "Sistem Penandaan" },
+            stickTitle: { en: "Custom Defect Marking Stickers", bm: "Sticker Khas Penandaan Kecacatan" },
+            stickSub:   { en: "Custom stickers help homeowners identify the type of defect easily", bm: "Sticker khas digunakan bagi memudahkan pemilik rumah mengenal pasti jenis kecacatan" },
+            repTag:     { en: "Professional Report", bm: "Laporan Profesional" },
+            repTitle:   { en: "Sample Inspection Report", bm: "Contoh Laporan Pemeriksaan" },
+            repSub:     { en: "Detailed PDF report with photos, analysis and repair recommendations", bm: "Laporan PDF terperinci dengan gambar, analisis dan cadangan pembaikan" },
+            repBtn:     { en: "Download Sample Report (PDF)", bm: "Muat Turun Sample Report (PDF)" }
+        },
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
+              t: { en: "Floor", bm: "Lantai" }, s: { en: "Lantai", bm: "Floor" },
+              defects: { en: ["Finishing", "Hollowness", "Alignment", "Minor Damage", "Major Damage"], bm: ["Kemasan (Finishing)", "Kekosongan (Hollowness)", "Alignment", "Kerosakan Kecil", "Kerosakan Besar"] },
+              tools: { en: ["Visual & tools", "Hollowness test", "Alignment test"], bm: ["Visual & alat", "Ujian hollowness", "Ujian alignment"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18"/></svg>',
+              t: { en: "Wall", bm: "Dinding" }, s: { en: "Dinding", bm: "Wall" },
+              defects: { en: ["Finishing", "Hollowness", "Alignment", "Minor Damage", "Major Damage", "Moisture / Leak"], bm: ["Kemasan", "Kekosongan (Hollowness)", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Kelembapan / Kebocoran"] },
+              tools: { en: ["Visual & tools", "Alignment test", "Thermal test", "Moisture detector"], bm: ["Visual & alat", "Ujian alignment", "Ujian thermal", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/></svg>',
+              t: { en: "Ceiling", bm: "Siling" }, s: { en: "Siling", bm: "Ceiling" },
+              defects: { en: ["Finishing", "Alignment", "Minor Damage", "Major Damage", "Moisture / Leak"], bm: ["Kemasan", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Kelembapan / Kebocoran"] },
+              tools: { en: ["Visual & tools", "Thermal test", "Moisture detector"], bm: ["Visual & alat", "Ujian thermal", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/><path d="M3 12h18"/></svg>',
+              t: { en: "Openings (Doors / Windows)", bm: "Bukaan (Pintu / Tingkap)" }, s: { en: "Bukaan", bm: "Doors & Windows" },
+              defects: { en: ["Finishing", "Alignment", "Minor Damage", "Major Damage", "Functionality", "Missing Item", "Moisture Defect"], bm: ["Kemasan", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Fungsi", "Item Hilang", "Kecacatan Lembapan"] },
+              tools: { en: ["Visual & tools", "Thermal test", "Moisture detector", "Function tests"], bm: ["Visual & alat", "Ujian thermal", "Pengesan lembapan", "Ujian fungsi"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 5h5l3 3h4l3-3h5"/><path d="M7 19h10"/></svg>',
+              t: { en: "Plumbing", bm: "Perpaipan" }, s: { en: "Perpaipan", bm: "Plumbing" },
+              defects: { en: ["Finishing", "Alignment", "Minor Damage", "Major Damage", "Leak", "Functionality", "Missing Item"], bm: ["Kemasan", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Kebocoran", "Fungsi", "Item Hilang"] },
+              tools: { en: ["Visual & tools", "Flushing test", "Pressure test", "Thermal test", "Moisture detector"], bm: ["Visual & alat", "Ujian flushing", "Ujian tekanan", "Ujian thermal", "Pengesan lembapan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+              t: { en: "Electrical", bm: "Elektrikal" }, s: { en: "Elektrikal", bm: "Electrical" },
+              defects: { en: ["Finishing", "Alignment", "Minor Damage", "Major Damage", "Functionality", "Missing Item", "Standards & Regulations"], bm: ["Kemasan", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Fungsi", "Item Hilang", "Piawaian & Peraturan"] },
+              tools: { en: ["Voltage test (DB)", "RCCB test", "13A/15A socket test", "Light/Fan/AC test", "Earth test", "Insulation test", "Load test"], bm: ["Ujian voltan (DB)", "Ujian RCCB", "Ujian soket 13A/15A", "Ujian lampu/kipas/AC", "Earth test", "Insulation test", "Load test"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/></svg>',
+              t: { en: "Above Ceiling", bm: "Atas Siling" }, s: { en: "Atas Siling", bm: "Above Ceiling" },
+              defects: { en: ["Structure Issue", "Finishing", "Alignment", "Minor Damage", "Major Damage", "Functionality", "Missing Item", "Standards & Regulations"], bm: ["Isu Struktur", "Kemasan", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Fungsi", "Item Hilang", "Piawaian & Peraturan"] },
+              tools: { en: ["Visual & tools"], bm: ["Visual & alat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M17 18.8c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S17.29 9.25 17 7.8c-.29 1.45-1.14 2.84-2.29 3.76S13 13.6 13 14.75c0 2.22 1.8 4.05 4 4.05z"/></svg>',
+              t: { en: "Water Tank Area", bm: "Kawasan Tangki Air" }, s: { en: "Kawasan Tangki Air", bm: "Water Tank Area" },
+              defects: { en: ["Installation Guideline Requirement", "Finishing", "Alignment", "Minor Damage", "Major Damage", "Functionality", "Missing Item"], bm: ["Garis Panduan Pemasangan", "Kemasan", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Fungsi", "Item Hilang"] },
+              tools: { en: ["Visual & tools"], bm: ["Visual & alat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+              t: { en: "Roof", bm: "Bumbung" }, s: { en: "Bumbung", bm: "Roof" },
+              defects: { en: ["Finishing", "Alignment", "Minor Damage", "Major Damage", "Functionality", "Missing Item"], bm: ["Kemasan", "Alignment", "Kerosakan Kecil", "Kerosakan Besar", "Fungsi", "Item Hilang"] },
+              tools: { en: ["Visual & tools"], bm: ["Visual & alat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+              t: { en: "S&P Review", bm: "Semakan S&P" }, s: { en: "Semakan S&P", bm: "S&P Review" },
+              defects: { en: ["Review floor plan & design", "Building Specification"], bm: ["Semakan pelan lantai & reka bentuk", "Spesifikasi Bangunan"] },
+              tools: { en: ["Visual & measurement tools", "Document review"], bm: ["Visual & alat ukuran", "Semakan dokumen"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 14.06c1.326 0 2.44-1.1 2.44-2.41 0-.69-.34-1.36-1.02-1.91-.68-.55-1.26-1.22-1.42-2.04-.16.82-.74 1.49-1.42 2.04-.68.55-1.02 1.21-1.02 1.9 0 1.31 1.114 2.41 2.44 2.41z"/><path d="M17 18.8c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S17.29 9.25 17 7.8c-.29 1.45-1.14 2.84-2.29 3.76S13 13.6 13 14.75c0 2.22 1.8 4.05 4 4.05z"/></svg>',
+              t: { en: "Water Ponding Test", bm: "Ujian Kolam Air" }, s: { en: "Ujian Kolam Air", bm: "Water Ponding Test" },
+              defects: { en: ["Detect waterproofing leaks"], bm: ["Mengesan kebocoran waterproofing"] },
+              tools: { en: ["Water ponding setup & observation"], bm: ["Pemasangan & pemerhatian water ponding"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>',
+              t: { en: "Moisture Test", bm: "Ujian Kelembapan" }, s: { en: "Ujian Kelembapan", bm: "Moisture Test" },
+              defects: { en: ["Hidden moisture", "Internal leaks", "Water damage"], bm: ["Kelembapan tersembunyi", "Kebocoran dalaman", "Kerosakan air"] },
+              tools: { en: ["Thermal camera", "Moisture detector"], bm: ["Kamera thermal", "Pengesan lembapan"] } }
+        ],
+        stickers: [
+            { img: "Finishing-Transparent.png",  label: "Finishing" },
+            { img: "Hollow-Transparent.png",     label: "Hollow" },
+            { img: "Jointing-1-Transparent.png", label: "Jointing 1" },
+            { img: "Joinitng-2-Transparent.png", label: "Jointing 2" },
+            { img: "Major-Transparent.png",      label: "Major" },
+            { img: "Minor-Transparent.png",      label: "Minor" },
+            { img: "Spesifik-Transparent.png",   label: "Spesifik" }
+        ],
+        reports: ["Report-1-Website.png", "Report-2-Website.png", "Report-3-Website.png", "Report-4-Website.png", "Report-5-Website.png"],
+        pdf: "https://arleta.site/interactivelink/1453/SAMPLE-REPORT-FOR-LANDED-HOUSING-GO-XPERT-SOLUTION-HOME-INSPECTION_compressed-1.pdf"
+    }
+};
+
+/* =========================================================
    PROJEK "FEATURED" DI HOME PAGE — maksimum 6 dipaparkan.
    Letak 6 projek TERBAIK tuan di sini. Senarai PENUH semua
    projek diselenggara dalam fail projects.html (butang
@@ -2304,6 +2487,8 @@ var FAQS = [
         var imgSrc = s.img ? (/^https?:\/\//.test(s.img) ? s.img : CONFIG.imgBase + s.img) : "";
         var who = s.who ? (s.who[lang] || s.who.en) : [];
         var catLabel = SVC_CATS[s.cat][lang] || SVC_CATS[s.cat].en;
+        var ex = SVC_EXTRAS[slug];
+        function xt(o) { return o ? (o[lang] || o.en) : ""; }
 
         box.innerHTML =
             '<header class="page-head"><div class="section-container page-head-grid">' +
@@ -2320,6 +2505,11 @@ var FAQS = [
                         '<div class="svc-chips">' +
                         who.map(function (w) { return '<span class="svc-chip">' + w + '</span>'; }).join("") +
                         '</div>' : "") +
+                    (ex && ex.stats ?
+                        '<div class="svc-stats">' +
+                        ex.stats.map(function (st) {
+                            return '<div class="svc-stat"><span class="num">' + st.num + '</span><span class="lbl">' + xt(st.lbl) + '</span></div>';
+                        }).join("") + '</div>' : "") +
                 '</div>' +
                 '<div class="svc-media' + (s.imgFit === "tool" ? " tool" : "") + (imgSrc ? "" : " ph") + '">' +
                     (imgSrc ? '<img src="' + imgSrc + '" alt="' + svcName(s) + '" loading="lazy" ' +
@@ -2359,6 +2549,79 @@ var FAQS = [
                         }).join("") + '</div>' : "") +
                 '</aside>' +
             '</div></section>';
+
+        /* --- Seksyen ekstra (cth. DLP: 12 elemen, sticker, sample report) --- */
+        if (ex) {
+            var xh = "";
+            if (ex.elements) {
+                xh += '<section class="svc-extra alt"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.scopeTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.scopeTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.scopeSub) + '</p>' +
+                    '</div>' +
+                    '<div class="inspect-grid">' +
+                    ex.elements.map(function (el) {
+                        return '<div class="inspect-card">' +
+                            '<div class="ic-head"><div class="ic-icon">' + el.icon + '</div>' +
+                            '<div><h3>' + xt(el.t) + '</h3><p>' + xt(el.s) + '</p></div></div>' +
+                            '<div class="ic-body">' +
+                                '<div class="ic-lbl">' + xt(ex.sec.lblDefect) + '</div>' +
+                                '<div class="ic-chips">' + xt(el.defects).map(function (d) { return '<span class="ic-chip">' + d + '</span>'; }).join("") + '</div>' +
+                                '<div class="ic-lbl">' + xt(ex.sec.lblTools) + '</div>' +
+                                '<div class="ic-chips">' + xt(el.tools).map(function (tl) { return '<span class="ic-tool">' + check + tl + '</span>'; }).join("") + '</div>' +
+                            '</div></div>';
+                    }).join("") +
+                    '</div></div></section>';
+            }
+            if (ex.stickers) {
+                xh += '<section class="svc-extra"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.stickTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.stickTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.stickSub) + '</p>' +
+                    '</div>' +
+                    '<div class="sticker-grid">' +
+                    ex.stickers.map(function (st) {
+                        return '<div class="sticker-item">' +
+                            '<img src="' + CONFIG.imgBase + st.img + '" alt="' + st.label + '" loading="lazy" ' +
+                            'onerror="this.parentElement.classList.add(\'img-missing\')">' +
+                            '<span>' + st.label + '</span></div>';
+                    }).join("") +
+                    '</div></div></section>';
+            }
+            if (ex.reports) {
+                xh += '<section class="svc-extra alt"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.repTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.repTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.repSub) + '</p>' +
+                    '</div>' +
+                    '<div class="rep-grid">' +
+                    ex.reports.map(function (r, i) {
+                        return '<button class="rep-thumb" type="button" data-rep="' + i + '">' +
+                            '<img src="' + CONFIG.imgBase + r + '" alt="Sample report page ' + (i + 1) + '" loading="lazy" ' +
+                            'onerror="this.parentElement.classList.add(\'img-missing\')"></button>';
+                    }).join("") +
+                    '</div>' +
+                    (ex.pdf ?
+                        '<div class="rep-cta"><a class="btn btn-primary" href="' + ex.pdf + '" target="_blank" rel="noopener">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>' +
+                        '<span>' + xt(ex.sec.repBtn) + '</span></a></div>' : "") +
+                    '</div></section>';
+            }
+            box.innerHTML += xh;
+
+            // klik thumbnail report -> lightbox
+            box.querySelectorAll(".rep-thumb").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var start = parseInt(btn.getAttribute("data-rep"), 10) || 0;
+                    lbOpenItems(ex.reports.map(function (r, i) {
+                        return { src: CONFIG.imgBase + r, label: xt(ex.sec.repTitle) + " " + (i + 1) + "/" + ex.reports.length };
+                    }), start);
+                });
+            });
+        }
     }
 
     /* ---------- Router page dalaman (#/...) ---------- */
