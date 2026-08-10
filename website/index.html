@@ -808,6 +808,73 @@ section { padding: 5rem 2rem; }
 .gal-lg .report-img { width: 50%; max-width: 320px; }
 .gal-lg .report-img.center { width: 55%; max-width: 340px; }
 
+/* ---- Re-Inspection: kad klasifikasi status ---- */
+.ri-status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; max-width: 1100px; margin: 0 auto; }
+.ri-status {
+    background: white; border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.15rem 1.2rem; border-top: 4px solid var(--stc, var(--primary));
+    transition: all 0.3s ease;
+}
+.ri-status:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.ri-badge {
+    display: inline-block; padding: 0.32rem 0.8rem; border-radius: 8px;
+    color: white; font-size: 0.72rem; font-weight: 700;
+    background: var(--stc, var(--primary)); margin-bottom: 0.55rem;
+}
+.ri-status p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+
+/* ---- Re-Inspection: analisis (jadual + donut) ---- */
+.ri-analysis { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2.5rem; align-items: center; max-width: 1000px; margin: 0 auto; }
+.ri-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.ri-table th {
+    background: #E3F2FD; color: var(--text-dark); font-weight: 700;
+    padding: 0.75rem 1rem; text-align: left; font-size: 0.85rem;
+}
+.ri-table th:nth-child(2), .ri-table th:nth-child(3),
+.ri-table td:nth-child(2), .ri-table td:nth-child(3) { text-align: center; }
+.ri-table td { padding: 0.7rem 1rem; border-top: 1px solid var(--border); color: var(--text-body); }
+.ri-table td .dot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 0.5rem; vertical-align: -1px; }
+.ri-table tr.total td { font-weight: 800; color: var(--text-dark); background: var(--bg); }
+.ri-donut { text-align: center; }
+.ri-donut svg { max-width: 250px; width: 100%; height: auto; }
+.ri-donut circle.seg {
+    fill: none; stroke-width: 10;
+    stroke-dasharray: 0 100;
+    transition: stroke-dasharray 1s ease 0.2s;
+}
+.ri-chart.in-view circle.seg { stroke-dasharray: var(--len) 100; }
+.ri-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.1rem; margin-top: 1rem; }
+.ri-legend span { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-body); font-weight: 600; }
+.ri-legend i { width: 10px; height: 10px; border-radius: 3px; font-style: normal; }
+
+/* ---- Re-Inspection: jadual Before / After ---- */
+.ba-table { max-width: 1050px; margin: 0 auto; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: white; box-shadow: var(--shadow); }
+.ba-head, .ba-row { display: grid; grid-template-columns: 48px 1fr 1.35fr 1fr; }
+.ba-head { background: #E3F2FD; font-weight: 700; color: var(--text-dark); font-size: 0.88rem; }
+.ba-head > div { padding: 0.8rem 1rem; text-align: center; }
+.ba-row { border-top: 1px solid var(--border); }
+.ba-cell { padding: 1rem; }
+.ba-nbr { display: flex; align-items: flex-start; justify-content: center; font-weight: 800; color: var(--text-dark); padding-top: 1.2rem; }
+.ba-photo {
+    aspect-ratio: 4/3; border-radius: 10px; overflow: hidden;
+    background: var(--bg); border: 1px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 0.8rem; position: relative;
+}
+.ba-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ba-info p { font-size: 0.85rem; color: var(--text-body); margin: 0 0 0.3rem; }
+.ba-info p b { color: var(--text-dark); }
+.ba-status {
+    display: inline-block; padding: 0.45rem 1.1rem; border-radius: 8px;
+    color: white; font-size: 0.78rem; font-weight: 700;
+    background: var(--stc, var(--primary)); margin: 0.5rem 0; text-align: center;
+}
+.ba-notes {
+    background: var(--bg); border-radius: 8px; padding: 0.6rem 0.8rem;
+    font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;
+}
+.ba-notes b { color: var(--text-dark); }
+
 /* servis dalam kad pillar kini pautan */
 .pillar-card li a {
     display: flex; align-items: center; gap: 0.6rem;
@@ -1100,6 +1167,14 @@ section { padding: 5rem 2rem; }
     .dms-grid { grid-template-columns: 1fr; }
     .gal-lg .report-img { width: 46%; max-width: 180px; }
     .gal-lg .report-img.center { width: 52%; max-width: 200px; }
+    .ri-analysis { grid-template-columns: 1fr; gap: 1.75rem; }
+    .ri-table { font-size: 0.82rem; }
+    .ri-table th, .ri-table td { padding: 0.55rem 0.6rem; }
+    .ba-head { display: none; }
+    .ba-row { grid-template-columns: 1fr; }
+    .ba-nbr { justify-content: flex-start; padding: 1rem 1rem 0; }
+    .ba-cell { padding: 0.6rem 1rem; }
+    .ba-row .ba-cell:last-child { padding-bottom: 1.2rem; }
 }
 @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -2049,6 +2124,70 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
             { icon: VICONS.chat,   t: { en: "Consultation Provided", bm: "Consultation Diberikan" }, d: { en: "Consultation provided to help you understand the home's condition and next steps", bm: "Consultation diberikan untuk bantu anda fahami keadaan rumah dan langkah seterusnya" } }
         ]
     });
+
+    /* --- Re-Inspection: klasifikasi status + analisis + before/after --- */
+    SVC_EXTRAS["re-inspection"] = {
+        sec: {
+            stTag:   { en: "Status Classification", bm: "Klasifikasi Status" },
+            stTitle: { en: "Every Defect Verified & Classified", bm: "Setiap Defect Disemak & Diklasifikasikan" },
+            stSub:   { en: "We don't just take the developer's word — every item is re-checked and given an honest status", bm: "Kami tak ambil kata-kata pemaju sahaja — setiap item disemak semula dan diberi status yang jujur" },
+            anTag:   { en: "Analysis", bm: "Analisis" },
+            anTitle: { en: "Sample Re-Inspection Analysis", bm: "Contoh Analisis Re-Inspection" },
+            anSub:   { en: "Your report summarises the status of every defect — see clearly what the developer has not completed", bm: "Laporan anda merumuskan status semua defect — jelas nampak apa yang pemaju belum siapkan" },
+            baTag:   { en: "Report Format", bm: "Format Laporan" },
+            baTitle: { en: "Before & After Comparison", bm: "Perbandingan Before & After" },
+            baSub:   { en: "Every defect is recorded with its before photo, full information and after photo — real excerpt from our report", bm: "Setiap defect direkod dengan gambar sebelum, maklumat penuh dan gambar selepas — petikan sebenar dari laporan kami" },
+            riLbl: {
+                status: { en: "Status", bm: "Status" }, count: { en: "Count", bm: "Kiraan" },
+                total: { en: "TOTAL", bm: "JUMLAH" },
+                before: { en: "Before", bm: "Sebelum" }, info: { en: "Information", bm: "Maklumat" }, after: { en: "After", bm: "Selepas" },
+                loc: { en: "Location", bm: "Lokasi" }, elem: { en: "Element", bm: "Elemen" },
+                type: { en: "Defect Type", bm: "Jenis Defect" }, desc: { en: "Description", bm: "Keterangan" },
+                notes: { en: "Notes", bm: "Nota" }, nophoto: { en: "No photo", bm: "Tiada gambar" }
+            }
+        },
+        /* 5 status — warna sama macam laporan sebenar */
+        statuses: [
+            { color: "#22A06B", label: { en: "Complete", bm: "Complete" },
+              d: { en: "Rectification done properly and verified by our surveyor", bm: "Pembaikian siap dengan betul dan disahkan oleh surveyor kami" } },
+            { color: "#F5921B", label: { en: "Not Fully Complete", bm: "Not Fully Complete" },
+              d: { en: "Repaired, but not fully or not to acceptable standard", bm: "Dibaiki, tetapi tidak sepenuhnya atau tidak mengikut standard" } },
+            { color: "#E6A817", label: { en: "Not Complete", bm: "Not Complete" },
+              d: { en: "Not rectified at all since the first inspection", bm: "Langsung belum dibaiki sejak pemeriksaan pertama" } },
+            { color: "#E8590C", label: { en: "New Defect", bm: "New Defect" },
+              d: { en: "New defect discovered during the re-inspection", bm: "Defect baru ditemui semasa re-inspection dijalankan" } },
+            { color: "#9B59F5", label: { en: "New Defect from Rectification Work", bm: "New Defect from Rectification Work" },
+              d: { en: "Damage caused by the rectification work itself", bm: "Kerosakan yang berpunca daripada kerja pembaikian itu sendiri" } }
+        ],
+        /* Data sampel dari laporan sebenar (89 defect) */
+        analysis: [
+            { color: "#F5921B", label: "Not Fully Complete", count: 15 },
+            { color: "#E6A817", label: "Not Complete", count: 55 },
+            { color: "#E8590C", label: "New Defect", count: 6 },
+            { color: "#9B59F5", label: "New Defect from Rectification Work", count: 13 }
+        ],
+        /* Baris contoh dari laporan sebenar. img "" = kotak "Tiada gambar" */
+        beforeAfter: [
+            { nbr: 11, before: "", after: "",
+              loc: "Car Porch", elem: "TNB Chamber Door",
+              type: { en: "Finishing issues", bm: "Finishing issues" },
+              desc: { en: "Construction left over inside TNB compartment", bm: "Sisa pembinaan tertinggal di dalam ruang TNB" },
+              status: { color: "#E6A817", label: "Not Complete" },
+              notes: { en: "Still have construction leftover", bm: "Masih ada sisa pembinaan" } },
+            { nbr: 12, before: "", after: "",
+              loc: "Car Porch", elem: "TNB Chamber Door",
+              type: { en: "Accessories defects", bm: "Accessories defects" },
+              desc: { en: "Rusty screw on TNB chamber door", bm: "Skru berkarat pada pintu ruang TNB" },
+              status: { color: "#E6A817", label: "Not Complete" },
+              notes: null },
+            { nbr: 40, before: "", after: "ThermalOkey.png",
+              loc: "Family Hall", elem: "M&E",
+              type: { en: "Others", bm: "Lain-lain" },
+              desc: { en: "-", bm: "-" },
+              status: { color: "#9B59F5", label: "New Defect from Rectification Work" },
+              notes: { en: "Water heater RCBO and wire show high temperature. Clamp test with all MCB off reads 0.06A without load — needs review.", bm: "RCBO water heater dan wayar menunjukkan suhu tinggi. Ujian clamp dengan semua MCB ditutup membaca 0.06A tanpa beban — perlu semakan lanjut." } }
+        ]
+    };
 })();
 
 /* =========================================================
@@ -2888,6 +3027,101 @@ var FAQS = [
                     mkGal(ex.dmsGallery, "dms") +
                     '</div></section>';
             }
+
+            /* --- Re-Inspection: klasifikasi status --- */
+            if (ex.statuses) {
+                xh += '<section class="svc-extra alt"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.stTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.stTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.stSub) + '</p>' +
+                    '</div>' +
+                    '<div class="ri-status-grid">' +
+                    ex.statuses.map(function (st) {
+                        return '<div class="ri-status" style="--stc:' + st.color + '">' +
+                            '<span class="ri-badge">' + xt(st.label) + '</span>' +
+                            '<p>' + xt(st.d) + '</p></div>';
+                    }).join("") +
+                    '</div></div></section>';
+            }
+
+            /* --- Re-Inspection: jadual analisis + donut animasi --- */
+            if (ex.analysis) {
+                var totalCount = ex.analysis.reduce(function (a, r) { return a + r.count; }, 0);
+                var pct = function (c) { return (c / totalCount * 100); };
+                var cum = 0;
+                var segs = ex.analysis.map(function (r) {
+                    var p = pct(r.count);
+                    var s = '<circle class="seg" cx="21" cy="21" r="15.915" pathLength="100" ' +
+                        'stroke="' + r.color + '" style="--len:' + p.toFixed(2) + '" ' +
+                        'stroke-dashoffset="' + (25 - cum).toFixed(2) + '"></circle>';
+                    cum += p;
+                    return s;
+                }).join("");
+                var L = ex.sec.riLbl;
+                xh += '<section class="svc-extra"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.anTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.anTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.anSub) + '</p>' +
+                    '</div>' +
+                    '<div class="ri-analysis">' +
+                        '<table class="ri-table"><thead><tr>' +
+                            '<th>' + xt(L.status) + '</th><th>' + xt(L.count) + '</th><th>%</th>' +
+                        '</tr></thead><tbody>' +
+                        ex.analysis.map(function (r) {
+                            return '<tr><td><span class="dot" style="background:' + r.color + '"></span>' + r.label + '</td>' +
+                                '<td>' + r.count + '</td><td>' + pct(r.count).toFixed(1) + '%</td></tr>';
+                        }).join("") +
+                        '<tr class="total"><td>' + xt(L.total) + '</td><td>' + totalCount + '</td><td>100%</td></tr>' +
+                        '</tbody></table>' +
+                        '<div class="ri-donut ri-chart">' +
+                            '<svg viewBox="0 0 42 42" aria-hidden="true">' +
+                                '<circle cx="21" cy="21" r="15.915" fill="none" stroke="#EEF2F6" stroke-width="10"></circle>' +
+                                segs +
+                            '</svg>' +
+                            '<div class="ri-legend">' +
+                            ex.analysis.map(function (r) {
+                                return '<span><i style="background:' + r.color + '"></i>' + r.label + ' (' + r.count + ')</span>';
+                            }).join("") +
+                            '</div>' +
+                        '</div>' +
+                    '</div></div></section>';
+            }
+
+            /* --- Re-Inspection: jadual Before / After --- */
+            if (ex.beforeAfter) {
+                var L2 = ex.sec.riLbl;
+                var baPhoto = function (img) {
+                    return '<div class="ba-photo">' + xt(L2.nophoto) +
+                        (img ? '<img src="' + CONFIG.imgBase + img + '" alt="" loading="lazy" onerror="this.remove()">' : "") +
+                        '</div>';
+                };
+                xh += '<section class="svc-extra alt"><div class="section-container">' +
+                    '<div class="section-header">' +
+                        '<span class="section-tag">' + xt(ex.sec.baTag) + '</span>' +
+                        '<h2>' + xt(ex.sec.baTitle) + '</h2>' +
+                        '<p>' + xt(ex.sec.baSub) + '</p>' +
+                    '</div>' +
+                    '<div class="ba-table">' +
+                        '<div class="ba-head"><div>Nbr</div><div>' + xt(L2.before) + '</div><div>' + xt(L2.info) + '</div><div>' + xt(L2.after) + '</div></div>' +
+                    ex.beforeAfter.map(function (r) {
+                        return '<div class="ba-row">' +
+                            '<div class="ba-nbr">' + r.nbr + '</div>' +
+                            '<div class="ba-cell">' + baPhoto(r.before) + '</div>' +
+                            '<div class="ba-cell ba-info">' +
+                                '<p><b>' + xt(L2.loc) + ':</b> ' + r.loc + '</p>' +
+                                '<p><b>' + xt(L2.elem) + ':</b> ' + r.elem + '</p>' +
+                                '<p><b>' + xt(L2.type) + ':</b> ' + xt(r.type) + '</p>' +
+                                '<p><b>' + xt(L2.desc) + ':</b> ' + xt(r.desc) + '</p>' +
+                                '<span class="ba-status" style="--stc:' + r.status.color + '">' + r.status.label + '</span>' +
+                                (r.notes ? '<div class="ba-notes"><b>' + xt(L2.notes) + ':</b> ' + xt(r.notes) + '</div>' : "") +
+                            '</div>' +
+                            '<div class="ba-cell">' + baPhoto(r.after) + '</div>' +
+                        '</div>';
+                    }).join("") +
+                    '</div></div></section>';
+            }
             if (ex.elements) {
                 xh += '<section class="svc-extra alt"><div class="section-container">' +
                     '<div class="section-header">' +
@@ -3007,7 +3241,7 @@ var FAQS = [
 
             // animasi masuk skrin (macam konsep: aktif bila masuk, reset bila keluar)
             dlpObserver.disconnect();
-            box.querySelectorAll(".inspect-card, .tool-showcase-card, .tools-more, .sticker-item, .report-img, .dms-card")
+            box.querySelectorAll(".inspect-card, .tool-showcase-card, .tools-more, .sticker-item, .report-img, .dms-card, .ri-chart")
                .forEach(function (el) { dlpObserver.observe(el); });
         }
     }
