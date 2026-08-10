@@ -226,7 +226,6 @@ doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL); bk();
 doc.text("Lampiran:", mL, y); y += 5;
 doc.setFont("helvetica", "normal");
 doc.text("1. Laporan Kecacatan — Living & Dining, Staircase dan Backyard", mL + 5, y); y += 4.5;
-doc.text(`2. Salinan balasan bertulis wakil pemaju mengenai had sistem aplikasi ${data.namaApps}`, mL + 5, y); y += 4.5;
 
 // ============================================================
 // AKUAN TERIMA x 2
