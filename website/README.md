@@ -40,7 +40,6 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Teknikal | Tribunal | 6 kad nilai · 4 peringkat · 5 elemen pek bukti |
 
 **Semua 16 servis kini ada kandungan penuh.**
-| Tentang Kami, Sample Report, dll. | — | ⏳ Ikut arahan |
 
 ## Keputusan reka bentuk (dipersetujui)
 
