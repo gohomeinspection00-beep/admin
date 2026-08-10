@@ -861,6 +861,83 @@ section { padding: 5rem 2rem; }
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
 }
 
+/* ---- Blog: senarai artikel ---- */
+.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.blog-card {
+    display: flex; flex-direction: column; text-decoration: none;
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; transition: all 0.35s ease;
+}
+.blog-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: #BBDEFB; }
+.blog-cover {
+    aspect-ratio: 16/9; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    display: flex; align-items: center; justify-content: center;
+}
+.blog-cover::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.16), transparent 55%);
+}
+.blog-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.blog-cover svg { width: 44px; height: 44px; color: rgba(255,255,255,0.85); position: relative; }
+.blog-cat {
+    position: absolute; top: 12px; left: 12px; z-index: 2;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.56rem; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    background: rgba(255,255,255,0.94); color: var(--primary-dark);
+    padding: 0.3rem 0.6rem; border-radius: 4px;
+}
+.blog-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; flex: 1; }
+.blog-body h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); line-height: 1.35; margin-bottom: 0.5rem; }
+.blog-card:hover .blog-body h3 { color: var(--primary); }
+.blog-body p { font-size: 0.88rem; color: var(--text-muted); margin: 0 0 1rem; }
+.blog-meta {
+    margin-top: auto; display: flex; gap: 0.6rem; align-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
+}
+.blog-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border); }
+
+/* ---- Artikel: badan teks ---- */
+.article { max-width: 760px; margin: 0 auto; }
+.article h3 {
+    font-size: 1.25rem; font-weight: 700; color: var(--text-dark);
+    margin: 2.2rem 0 0.8rem; line-height: 1.3;
+}
+.article h3:first-child { margin-top: 0; }
+.article p { font-size: 1.02rem; line-height: 1.8; color: var(--text-body); margin-bottom: 1.1rem; }
+.article ul { margin: 0 0 1.3rem; padding-left: 0; list-style: none; }
+.article ul li {
+    position: relative; padding-left: 1.6rem; margin-bottom: 0.6rem;
+    font-size: 1rem; line-height: 1.7; color: var(--text-body);
+}
+.article ul li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+}
+.article-note {
+    background: #E3F2FD; border-left: 4px solid var(--primary);
+    border-radius: 0 12px 12px 0; padding: 1.1rem 1.4rem; margin: 1.6rem 0 1.8rem;
+    font-size: 1rem; line-height: 1.7; color: var(--primary-dark); font-weight: 500;
+}
+.article-meta {
+    display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.66rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+    margin-top: 0.9rem;
+}
+.article-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: #C6CDD6; }
+.article-next { max-width: 760px; margin: 3rem auto 0; border-top: 1px solid var(--border); padding-top: 1.75rem; }
+.article-next h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.9rem; }
+.article-next a {
+    display: flex; justify-content: space-between; gap: 1rem; align-items: center;
+    padding: 0.7rem 0; border-bottom: 1px solid var(--border);
+    font-size: 0.95rem; color: var(--text-body); text-decoration: none; transition: color 0.25s ease;
+}
+.article-next a:last-child { border-bottom: none; }
+.article-next a:hover { color: var(--primary); }
+.article-next a::after { content: '→'; color: var(--primary); }
+
 /* ---- Timeline pencapaian ---- */
 .tl { max-width: 760px; margin: 0 auto; position: relative; padding-left: 2rem; }
 .tl::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
@@ -1177,7 +1254,7 @@ section { padding: 5rem 2rem; }
     .review-prev { left: -50px; }
     .review-next { right: -50px; }
     .svc-list-grid { grid-template-columns: repeat(2, 1fr); }
-    .value-grid, .team-grid { grid-template-columns: repeat(2, 1fr); }
+    .value-grid, .team-grid, .blog-grid { grid-template-columns: repeat(2, 1fr); }
     .svc-detail-grid { grid-template-columns: 1fr; gap: 2rem; }
     .svc-side { position: static; }
     .page-head-grid { grid-template-columns: 1fr; gap: 1.75rem; }
@@ -1239,8 +1316,10 @@ section { padding: 5rem 2rem; }
     .report-img { width: 46%; max-width: 170px; }
     .report-img.center { width: 50%; max-width: 190px; }
     .report-row { margin-bottom: -24px; }
-    .value-grid { grid-template-columns: 1fr; }
+    .value-grid, .blog-grid { grid-template-columns: 1fr; }
     .team-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+    .article p { font-size: 0.98rem; }
+    .article h3 { font-size: 1.12rem; }
     .team-info { padding: 0.9rem 0.7rem 1.1rem; }
     .about-lede p { font-size: 0.98rem; }
     .about-quote { padding: 1.2rem 1.3rem; }
@@ -1281,7 +1360,7 @@ section { padding: 5rem 2rem; }
             <li><a href="#/services" data-nav="services" data-i18n="nav.services">Services</a></li>
             <li><a href="#/about" data-nav="about" data-i18n="nav.about">About</a></li>
             <li><a href="#/projects" data-nav="projects" data-i18n="nav.projects">Projects</a></li>
-            <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
+            <li><a href="#/blog" data-nav="blog" data-i18n="nav.blog">Articles</a></li>
             <li><a href="#/faq" data-nav="faq" data-i18n="nav.faq">FAQ</a></li>
             <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
@@ -1520,24 +1599,6 @@ section { padding: 5rem 2rem; }
 </section>
 
 <!-- ==================== REVIEWS ==================== -->
-<!-- ==================== SAMPLE REPORT ==================== -->
-<section class="svc-extra alt" id="sample-report">
-    <div class="section-container">
-        <div class="section-header reveal">
-            <span class="section-tag" data-i18n="samp.tag">What You Receive</span>
-            <h2 data-i18n="samp.title">See an Actual Inspection Report</h2>
-            <p data-i18n="samp.sub">Not a brochure — this is the real document our clients receive, with photos, locations and findings.</p>
-        </div>
-        <div id="homeReportGallery"><!-- dijana oleh JS --></div>
-        <div class="rep-cta reveal">
-            <a class="btn btn-primary" id="sampleReportBtn" href="#" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
-                <span data-i18n="samp.btn">Download Sample Report (PDF)</span>
-            </a>
-        </div>
-    </div>
-</section>
-
 <section class="reviews-section" id="reviews">
     <div class="section-container">
         <div class="section-header reveal">
@@ -1739,6 +1800,31 @@ section { padding: 5rem 2rem; }
     <div id="aboutBody"><!-- dijana oleh JS --></div>
 </main>
 
+<!-- ############ PAGE: BLOG (#/blog) ############ -->
+<main id="page-blog" class="vpage" hidden>
+    <header class="page-head">
+        <div class="section-container">
+            <a class="back-link" href="#" data-i18n="pg.back">Back to Home</a>
+            <div class="section-header page-head-header">
+                <span class="section-tag" data-i18n="blog.tag">Articles</span>
+                <h2 data-i18n="blog.title">Guides From the Field</h2>
+                <p data-i18n="blog.sub">What we learn on site, written up so property owners can use it — no jargon, no sales pitch.</p>
+            </div>
+        </div>
+    </header>
+    <section class="vpage-body">
+        <div class="section-container">
+            <div class="proj-filters" id="blogFilters"><!-- dijana oleh JS --></div>
+            <div class="blog-grid" id="blogGrid"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+</main>
+
+<!-- ############ PAGE: ARTIKEL (#/blog/<slug>) ############ -->
+<main id="page-article" class="vpage" hidden>
+    <div id="articleBody"><!-- dijana oleh JS --></div>
+</main>
+
 <!-- ############ PAGE: FAQ (#/faq) ############ -->
 <main id="page-faq" class="vpage" hidden>
     <header class="page-head">
@@ -1785,6 +1871,7 @@ section { padding: 5rem 2rem; }
                     <li><a href="#/services" data-i18n="nav.services">Services</a></li>
                     <li><a href="#/about" data-i18n="nav.about">About</a></li>
                     <li><a href="#/projects" data-i18n="nav.projects">Projects</a></li>
+                    <li><a href="#/blog" data-i18n="nav.blog">Articles</a></li>
                     <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
                     <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
                 </ul>
@@ -3229,6 +3316,349 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
 })();
 
 /* =========================================================
+   BLOG / ARTIKEL (#/blog dan #/blog/<slug>)
+
+   Cara tambah artikel baharu:
+   1. Salin mana-mana blok dalam BLOG di bawah
+   2. Tukar slug (nama dalam URL — jangan ubah selepas live)
+   3. Tukar cat, date (YYYY-MM-DD), read (minit), title, excerpt
+   4. Tulis body: setiap baris ialah ["jenis", kandungan]
+        ["h",  "Tajuk kecil"]
+        ["p",  "Perenggan biasa"]
+        ["ul", ["item 1", "item 2"]]
+        ["note", "Kotak nota penting"]
+   Artikel terbaru muncul di atas secara automatik (ikut tarikh).
+   ========================================================= */
+var BLOG_CATS = [
+    { key: "all",      label: { en: "All", bm: "Semua" } },
+    { key: "guide",    label: { en: "Guides", bm: "Panduan" } },
+    { key: "defect",   label: { en: "Defects Explained", bm: "Kecacatan Dijelaskan" } },
+    { key: "buying",   label: { en: "Buying Property", bm: "Membeli Hartanah" } },
+    { key: "owner",    label: { en: "For Owners & JMB", bm: "Pemilik & JMB" } }
+];
+
+var BLOG = [
+    {
+        slug: "dlp-guide", cat: "guide", date: "2026-07-28", read: 7,
+        title: { en: "DLP: What Every New Homeowner Must Know Before It Expires",
+                 bm: "DLP: Apa Setiap Pemilik Rumah Baru Wajib Tahu Sebelum Ia Tamat" },
+        excerpt: { en: "The Defect Liability Period is the only window where the developer must fix defects for free. Here is how to use it properly.",
+                   bm: "Defect Liability Period ialah satu-satunya tempoh di mana pemaju wajib membaiki kecacatan secara percuma. Ini cara menggunakannya dengan betul." },
+        body: {
+            en: [
+                ["p", "When you collect the keys to a new home, a clock starts running. During the Defect Liability Period (DLP), your developer is contractually obliged to rectify defects in your unit at no cost to you. Once that period lapses, every repair becomes your expense — permanently."],
+                ["p", "Most owners lose this entitlement not because the developer refused, but because they did not identify the defects in time, or could not describe them well enough to be actioned."],
+                ["h", "Check your S&P first"],
+                ["p", "The exact length of your DLP is stated in your Sale and Purchase Agreement. Do not rely on what a neighbour or a Facebook group tells you — read your own agreement and note the expiry date somewhere you will not forget it."],
+                ["h", "Do not wait until the last month"],
+                ["p", "This is the most common and most expensive mistake. A proper defect list often triggers several rounds: you submit, the developer rectifies, you verify, and some items come back incomplete. Each round takes weeks."],
+                ["p", "If you only start one month before expiry, there is no time for that cycle. Start as early as possible after handover."],
+                ["note", "Rule of thumb: inspect within the first month of receiving your keys, and re-inspect after the developer's rectification work — well before the DLP ends."],
+                ["h", "A vague complaint is easy to dismiss"],
+                ["p", "\"The bathroom is leaking\" can be argued with. A recorded moisture reading, a photograph, an exact location and a defect category cannot be brushed aside as easily."],
+                ["p", "This is the difference between a complaint and a defect report — and it is usually the difference between a repair happening and a repair being delayed until your DLP quietly expires."],
+                ["h", "Keep everything, dated"],
+                ["ul", [
+                    "Your S&P agreement and handover documents",
+                    "Every defect list you submitted, with the date it was submitted",
+                    "All correspondence with the developer — emails, letters, messages",
+                    "Every inspection and re-inspection report"
+                ]],
+                ["p", "If the matter ever escalates, this chronology matters as much as the defects themselves. It shows you acted within the period and that the developer did not respond adequately."],
+                ["h", "Verify before you sign anything off"],
+                ["p", "When the developer says the work is done, do not sign until it is verified. Cosmetic patch-ups are common: paint over a damp patch, silicone around a leaking joint, filler in a crack. Once you sign off, that item is closed and the entitlement is gone."]
+            ],
+            bm: [
+                ["p", "Bila anda mengambil kunci rumah baru, satu jam pasir mula berjalan. Dalam tempoh Defect Liability Period (DLP), pemaju terikat secara kontrak untuk membaiki kecacatan dalam unit anda tanpa sebarang kos. Sebaik tempoh itu luput, setiap pembaikian menjadi perbelanjaan anda — selamanya."],
+                ["p", "Kebanyakan pemilik hilang hak ini bukan kerana pemaju menolak, tetapi kerana mereka tidak mengenal pasti kecacatan pada masanya, atau tidak dapat memerihalkannya dengan cukup jelas untuk diambil tindakan."],
+                ["h", "Semak S&P anda dahulu"],
+                ["p", "Tempoh tepat DLP anda dinyatakan dalam Perjanjian Jual Beli. Jangan bergantung pada apa yang jiran atau kumpulan Facebook beritahu — baca perjanjian anda sendiri dan catat tarikh tamatnya di tempat yang anda tidak akan terlupa."],
+                ["h", "Jangan tunggu bulan terakhir"],
+                ["p", "Ini kesilapan paling biasa dan paling mahal. Senarai defect yang betul selalunya mencetuskan beberapa pusingan: anda hantar, pemaju baiki, anda sahkan, dan sebahagian item kembali tidak lengkap. Setiap pusingan mengambil masa berminggu."],
+                ["p", "Jika anda hanya mula sebulan sebelum tamat, tiada masa untuk kitaran itu. Mulakan seawal mungkin selepas penyerahan kunci."],
+                ["note", "Panduan mudah: periksa dalam bulan pertama selepas terima kunci, dan periksa semula selepas kerja pembaikian pemaju — jauh sebelum DLP tamat."],
+                ["h", "Aduan yang kabur mudah ditolak"],
+                ["p", "\"Bilik air bocor\" boleh dipertikaikan. Bacaan lembapan yang direkod, gambar, lokasi tepat dan kategori defect tidak semudah itu ditepis."],
+                ["p", "Inilah beza antara aduan dengan laporan defect — dan selalunya inilah beza antara pembaikian yang benar-benar berlaku dengan pembaikian yang ditangguh sehingga DLP anda diam-diam tamat."],
+                ["h", "Simpan semuanya, bertarikh"],
+                ["ul", [
+                    "Perjanjian S&P dan dokumen penyerahan anda",
+                    "Setiap senarai defect yang dihantar, berserta tarikh ia dihantar",
+                    "Semua surat-menyurat dengan pemaju — e-mel, surat, mesej",
+                    "Setiap laporan inspection dan re-inspection"
+                ]],
+                ["p", "Jika perkara ini pernah dieskalasi, kronologi ini sama pentingnya dengan kecacatan itu sendiri. Ia menunjukkan anda bertindak dalam tempoh dan pemaju tidak bertindak balas dengan sewajarnya."],
+                ["h", "Sahkan sebelum anda tandatangan apa-apa"],
+                ["p", "Bila pemaju kata kerja sudah siap, jangan tandatangan sebelum ia disahkan. Tampalan kosmetik memang biasa: cat atas tompok lembap, silikon keliling sambungan bocor, pengisi dalam retak. Sebaik anda tandatangan, item itu ditutup dan hak anda hilang."]
+            ]
+        }
+    },
+    {
+        slug: "common-defects", cat: "defect", date: "2026-07-10", read: 6,
+        title: { en: "10 Defects We Find in Almost Every New Home",
+                 bm: "10 Kecacatan Yang Kami Jumpa Dalam Hampir Setiap Rumah Baru" },
+        excerpt: { en: "After thousands of inspections, the same problems appear again and again. Here is what to look for in your own unit.",
+                   bm: "Selepas ribuan pemeriksaan, masalah yang sama muncul berulang kali. Ini yang perlu anda cari dalam unit sendiri." },
+        body: {
+            en: [
+                ["p", "New does not mean defect-free. Across thousands of units, a familiar set of problems shows up repeatedly — most of them fixable free of charge during your DLP, if you find them."],
+                ["h", "1. Hollow tiles"],
+                ["p", "Tiles that were laid without full adhesive coverage sound hollow when tapped. They will eventually crack or lift. This is one of the most common defects and one of the easiest to miss without tapping every tile."],
+                ["h", "2. Doors and windows out of alignment"],
+                ["p", "Doors that do not close cleanly, windows that jam, gaps that let in dust and rain. Often a frame alignment problem rather than the door itself."],
+                ["h", "3. Poor paint and plaster finishing"],
+                ["p", "Uneven surfaces, visible patching, roller marks, thin coverage at corners. Easy to see once you look at a wall from an angle, in daylight."],
+                ["h", "4. Water ponding in wet areas"],
+                ["p", "Floor falls that do not drain properly leave standing water in bathrooms, balconies and yards. Over time this leads to waterproofing failure and leaks to the unit below."],
+                ["h", "5. Leaking or slow drainage"],
+                ["p", "Loose pipe joints under sinks, slow floor traps, and drainage that gurgles or backs up. Simple to test — and simple to prove."],
+                ["h", "6. Electrical points that do not work"],
+                ["p", "Dead sockets, switches wired to nothing, lights that flicker, points missing compared with your floor plan. Some of these are wiring faults that instrument testing exposes immediately."],
+                ["h", "7. Missing or incorrect earthing"],
+                ["p", "Invisible without an earth tester, and genuinely dangerous. This is one of the reasons instrument testing matters more than a visual walkthrough."],
+                ["h", "8. Roof and ceiling leaks"],
+                ["p", "Often only visible after heavy rain — which is why stains near ceiling junctions deserve attention even if the ceiling looks dry when you view the unit."],
+                ["h", "9. Cracks at wall junctions"],
+                ["p", "Hairline cracks where different materials meet are often cosmetic. Wider or diagonal cracks are not. The difference matters, and it is worth having assessed rather than guessed."],
+                ["h", "10. Construction debris left behind"],
+                ["p", "Cement in drains, debris inside service compartments, rubbish above the ceiling. It seems minor until a blocked drain causes a leak two years later."],
+                ["note", "You can find several of these yourself with patience and daylight. The ones you cannot find without instruments — earthing, insulation, hidden moisture — are usually the expensive ones."]
+            ],
+            bm: [
+                ["p", "Baru tidak bermakna bebas kecacatan. Merentas ribuan unit, satu set masalah yang sama muncul berulang kali — kebanyakannya boleh dibaiki secara percuma dalam tempoh DLP anda, jika anda menemuinya."],
+                ["h", "1. Jubin hollow"],
+                ["p", "Jubin yang dipasang tanpa liputan pelekat penuh berbunyi kosong bila diketuk. Ia akhirnya akan retak atau terangkat. Ini antara defect paling biasa dan paling mudah terlepas tanpa mengetuk setiap jubin."],
+                ["h", "2. Pintu dan tingkap tidak sejajar"],
+                ["p", "Pintu yang tidak tertutup rapat, tingkap yang tersekat, celah yang membenarkan habuk dan hujan masuk. Selalunya masalah kelurusan bingkai, bukan pintu itu sendiri."],
+                ["h", "3. Kemasan cat dan plaster yang lemah"],
+                ["p", "Permukaan tidak rata, tampalan yang jelas kelihatan, kesan roller, liputan nipis di sudut. Mudah dilihat sebaik anda memandang dinding dari sudut condong, dalam cahaya siang."],
+                ["h", "4. Air bertakung di kawasan basah"],
+                ["p", "Kecerunan lantai yang tidak mengalir dengan betul meninggalkan air bertakung di bilik air, balkoni dan ruang jemuran. Lama-kelamaan ini membawa kepada kegagalan kalis air dan bocor ke unit bawah."],
+                ["h", "5. Kebocoran atau saliran perlahan"],
+                ["p", "Sambungan paip longgar bawah sinki, floor trap perlahan, dan saliran yang berbunyi atau melimpah balik. Mudah diuji — dan mudah dibuktikan."],
+                ["h", "6. Punca elektrik yang tidak berfungsi"],
+                ["p", "Soket mati, suis yang tidak bersambung ke mana-mana, lampu berkelip, punca yang hilang berbanding pelan lantai anda. Sebahagiannya kerosakan pendawaian yang ujian beralat dedahkan serta-merta."],
+                ["h", "7. Pembumian hilang atau salah"],
+                ["p", "Tidak kelihatan tanpa earth tester, dan benar-benar berbahaya. Inilah salah satu sebab ujian beralat lebih penting daripada tinjauan visual semata-mata."],
+                ["h", "8. Bocor bumbung dan siling"],
+                ["p", "Selalunya hanya kelihatan selepas hujan lebat — sebab itu kesan berhampiran sambungan siling wajar diberi perhatian walaupun siling nampak kering semasa anda melihat unit."],
+                ["h", "9. Retak di sambungan dinding"],
+                ["p", "Retak halus di tempat bahan berbeza bertemu selalunya kosmetik. Retak yang lebih lebar atau pepenjuru bukan begitu. Bezanya penting, dan lebih baik dinilai daripada diteka."],
+                ["h", "10. Sisa pembinaan yang ditinggalkan"],
+                ["p", "Simen dalam longkang, sampah dalam ruang servis, sisa di atas siling. Nampak remeh sehingga longkang tersumbat menyebabkan kebocoran dua tahun kemudian."],
+                ["note", "Beberapa daripada ini boleh anda cari sendiri dengan kesabaran dan cahaya siang. Yang anda tidak dapat cari tanpa alat — pembumian, penebatan, lembapan tersembunyi — biasanya yang paling mahal."]
+            ]
+        }
+    },
+    {
+        slug: "hollow-tiles", cat: "defect", date: "2026-06-18", read: 5,
+        title: { en: "Hollow Tiles: Why That Tapping Sound Matters",
+                 bm: "Jubin Hollow: Kenapa Bunyi Ketukan Itu Penting" },
+        excerpt: { en: "It is not a cosmetic complaint. Here is what causes hollow tiles, why they fail, and why patching over them makes it worse.",
+                   bm: "Ia bukan aduan kosmetik. Ini punca jubin hollow, kenapa ia gagal, dan kenapa menampal atasnya menjadikannya lebih teruk." },
+        body: {
+            en: [
+                ["p", "Tap across a tiled floor and most tiles return a solid, dull sound. Then some return a distinctly hollow one. That difference is not in your imagination — it means there is a void between the tile and the screed beneath it."],
+                ["h", "What causes it"],
+                ["ul", [
+                    "Adhesive applied in spots instead of full coverage",
+                    "Adhesive left too long before the tile was laid",
+                    "Dusty or poorly prepared screed surface",
+                    "Rushed work near the end of a construction programme"
+                ]],
+                ["h", "Why it fails eventually"],
+                ["p", "A tile bonded across its full area shares load with the screed. A tile sitting over a void does not — it flexes. Add furniture, foot traffic and thermal movement, and the tile cracks, lifts at the edges, or the grout line opens up."],
+                ["p", "In wet areas it is worse: water enters through the open grout, sits in the void, and eventually finds its way to the unit below."],
+                ["note", "A hollow tile is not a defect because of how it sounds. It is a defect because of what it will become."],
+                ["h", "The wrong fix"],
+                ["p", "Laying new tiles over debonded ones is one of the most expensive mistakes we see. It adds weight to a bond that is already failing, and when it lets go, both layers come up — doubling the removal cost."],
+                ["h", "The correct approach"],
+                ["ul", [
+                    "Tap-test to map the full extent of the hollow area, not just the tile you noticed",
+                    "Remove the debonded tiles completely",
+                    "Prepare the screed surface properly",
+                    "Re-lay with correct adhesive coverage across the whole tile"
+                ]],
+                ["p", "If your unit is still within its DLP, this is the developer's responsibility. Have the extent mapped and documented before you accept any partial repair."]
+            ],
+            bm: [
+                ["p", "Ketuk merentas lantai berjubin dan kebanyakan jubin memberi bunyi pejal dan tumpul. Kemudian ada yang memberi bunyi kosong yang jelas berbeza. Perbezaan itu bukan khayalan anda — ia bermakna wujud rongga antara jubin dan screed di bawahnya."],
+                ["h", "Apa puncanya"],
+                ["ul", [
+                    "Pelekat disapu bertompok, bukan liputan penuh",
+                    "Pelekat dibiarkan terlalu lama sebelum jubin dipasang",
+                    "Permukaan screed berhabuk atau tidak disediakan dengan baik",
+                    "Kerja tergesa-gesa menjelang akhir program pembinaan"
+                ]],
+                ["h", "Kenapa ia akhirnya gagal"],
+                ["p", "Jubin yang terikat pada seluruh permukaannya berkongsi beban dengan screed. Jubin yang berada di atas rongga tidak — ia melentur. Tambah perabot, lalu-lalang dan pergerakan haba, dan jubin akan retak, terangkat di tepi, atau garisan grout terbuka."],
+                ["p", "Di kawasan basah ia lebih teruk: air masuk melalui grout yang terbuka, bertakung dalam rongga, dan akhirnya mencari jalan ke unit di bawah."],
+                ["note", "Jubin hollow bukan defect kerana bunyinya. Ia defect kerana apa yang akan jadi kepadanya."],
+                ["h", "Cara baiki yang salah"],
+                ["p", "Memasang jubin baru atas jubin yang sudah tertanggal ialah antara kesilapan paling mahal yang kami lihat. Ia menambah berat pada ikatan yang sudah gagal, dan bila ia terlepas, kedua-dua lapisan terangkat — menggandakan kos pembuangan."],
+                ["h", "Pendekatan yang betul"],
+                ["ul", [
+                    "Ujian ketuk untuk memetakan seluruh kawasan hollow, bukan sekadar jubin yang anda perasan",
+                    "Buang jubin yang tertanggal sepenuhnya",
+                    "Sediakan permukaan screed dengan betul",
+                    "Pasang semula dengan liputan pelekat betul merentas seluruh jubin"
+                ]],
+                ["p", "Jika unit anda masih dalam tempoh DLP, ini tanggungjawab pemaju. Pastikan luasnya dipetakan dan didokumenkan sebelum anda menerima sebarang pembaikian separuh jalan."]
+            ]
+        }
+    },
+    {
+        slug: "subsale-checklist", cat: "buying", date: "2026-05-30", read: 6,
+        title: { en: "Before You Buy a Sub-Sale Home: What to Check",
+                 bm: "Sebelum Anda Beli Rumah Sub-Sale: Apa Yang Perlu Disemak" },
+        excerpt: { en: "A viewing takes twenty minutes. The consequences last decades. Here is what to look at — and what you cannot see without instruments.",
+                   bm: "Viewing mengambil dua puluh minit. Kesannya berdekad. Ini yang perlu anda lihat — dan apa yang anda tak dapat lihat tanpa alat." },
+        body: {
+            en: [
+                ["p", "Unlike a new unit, a sub-sale home comes with no defect liability period. Whatever is wrong on the day you sign becomes yours to fix. That makes the viewing — and what you do before signing — far more consequential."],
+                ["h", "Go during the day, and go twice if you can"],
+                ["p", "Daylight reveals uneven finishes, damp patches and staining that evening viewings hide. A second visit after heavy rain tells you more than any question you can ask the seller."],
+                ["h", "What to look at yourself"],
+                ["ul", [
+                    "Ceiling corners and junctions — old stains often mean past or current leaks",
+                    "Under sinks and around water heaters — look for corrosion and past drips",
+                    "Wall bases — efflorescence, that white powdery salt, indicates moisture movement",
+                    "Window and door operation — open and close every one",
+                    "Floor level — a marble or a ball will find slopes you cannot see",
+                    "The distribution board — is it labelled, does it look ageing or modified?"
+                ]],
+                ["h", "Ask about renovations"],
+                ["p", "Ask what was renovated and when. Hacked walls, relocated pipes and added electrical points are where problems concentrate — especially if the work was done without proper method."],
+                ["note", "A repainted wall is not always cosmetic. Fresh paint on one wall in an otherwise older house is worth asking about."],
+                ["h", "What you cannot see at a viewing"],
+                ["p", "This is where an inspection earns its cost. Moisture inside walls, failed earthing, hidden leaks, insulation and wiring condition — none of these are visible, and all of them are expensive."],
+                ["p", "Thermal imaging and moisture meters find them without opening anything. Electrical testing gives you measured values instead of assumptions."],
+                ["h", "Use the findings before you sign"],
+                ["p", "An inspection report with repair cost estimates changes the conversation with the seller. You are no longer negotiating on impressions — you are discussing specific defects with specific costs attached."],
+                ["p", "And occasionally the report tells you the most valuable thing of all: that this particular house is not worth the asking price."]
+            ],
+            bm: [
+                ["p", "Tidak seperti unit baru, rumah sub-sale tidak datang dengan tempoh liabiliti kecacatan. Apa sahaja yang rosak pada hari anda tandatangan menjadi tanggungjawab anda untuk baiki. Itu menjadikan viewing — dan apa yang anda buat sebelum tandatangan — jauh lebih penting."],
+                ["h", "Pergi waktu siang, dan pergi dua kali jika boleh"],
+                ["p", "Cahaya siang mendedahkan kemasan tidak rata, tompok lembap dan kesan kotor yang viewing waktu petang sembunyikan. Lawatan kedua selepas hujan lebat memberitahu anda lebih banyak daripada apa-apa soalan yang boleh anda tanya penjual."],
+                ["h", "Apa yang boleh anda lihat sendiri"],
+                ["ul", [
+                    "Sudut dan sambungan siling — kesan lama selalunya bermakna kebocoran lampau atau semasa",
+                    "Bawah sinki dan sekitar water heater — cari karat dan kesan titisan lama",
+                    "Bahagian bawah dinding — efflorescence, garam putih berdebu itu, menunjukkan pergerakan lembapan",
+                    "Operasi tingkap dan pintu — buka dan tutup setiap satu",
+                    "Aras lantai — guli atau bola akan jumpa kecerunan yang anda tak nampak",
+                    "Papan agihan — adakah ia berlabel, adakah ia nampak uzur atau diubahsuai?"
+                ]],
+                ["h", "Tanya tentang renovation"],
+                ["p", "Tanya apa yang telah direnovate dan bila. Dinding yang dipecah, paip yang dipindah dan punca elektrik tambahan ialah tempat masalah tertumpu — terutamanya jika kerja itu dibuat tanpa kaedah yang betul."],
+                ["note", "Dinding yang baru dicat tidak semestinya kosmetik. Cat baru pada satu dinding dalam rumah yang selebihnya lama wajar ditanya."],
+                ["h", "Apa yang anda tak dapat lihat semasa viewing"],
+                ["p", "Di sinilah inspection berbaloi dengan kosnya. Lembapan dalam dinding, pembumian yang gagal, kebocoran tersembunyi, keadaan penebat dan pendawaian — semua ini tidak kelihatan, dan semuanya mahal."],
+                ["p", "Imej thermal dan meter lembapan menemuinya tanpa membuka apa-apa. Ujian elektrik memberi anda nilai yang diukur, bukan andaian."],
+                ["h", "Guna penemuan itu sebelum anda tandatangan"],
+                ["p", "Laporan inspection dengan anggaran kos pembaikian mengubah perbualan dengan penjual. Anda bukan lagi berunding berdasarkan tanggapan — anda membincangkan defect tertentu dengan kos tertentu."],
+                ["p", "Dan kadangkala laporan itu memberitahu perkara paling bernilai: bahawa rumah ini tidak berbaloi dengan harga yang diminta."]
+            ]
+        }
+    },
+    {
+        slug: "damp-paint-myth", cat: "defect", date: "2026-05-12", read: 4,
+        title: { en: "Why Anti-Damp Paint Will Not Solve Your Leak",
+                 bm: "Kenapa Cat Anti-Lembap Tidak Akan Selesaikan Kebocoran Anda" },
+        excerpt: { en: "It is the most common repair we see, and the one that fails most reliably. Here is what is actually happening behind that wall.",
+                   bm: "Ia pembaikian paling biasa yang kami lihat, dan yang paling pasti gagal. Ini apa yang sebenarnya berlaku di sebalik dinding itu." },
+        body: {
+            en: [
+                ["p", "A damp patch appears on a wall. Someone recommends anti-damp paint. The patch disappears for a few months, then returns — usually larger, and now with peeling paint on top of the original problem."],
+                ["h", "Paint is a finish, not a barrier"],
+                ["p", "Water moving through a wall is under pressure from behind. A coating applied to the visible face does nothing to stop that movement — it only hides the evidence temporarily while the moisture continues to travel through the material."],
+                ["p", "Worse, sealing the surface can trap moisture inside the plaster, which accelerates its breakdown. The wall deteriorates faster than if nothing had been done."],
+                ["h", "The stain is rarely where the leak is"],
+                ["p", "Water travels along the path of least resistance — down pipes, across slabs, along beams — and emerges wherever it can. A stain in a bedroom might originate from a bathroom two rooms away, or from the roof above."],
+                ["note", "This is why tracing matters more than treating. If you fix where the water appears rather than where it enters, you will fix it again next year."],
+                ["h", "How the source is actually found"],
+                ["ul", [
+                    "Moisture readings mapped across the area to find the wettest concentration",
+                    "Thermal imaging to follow the moisture path through walls and slabs",
+                    "Water ponding tests where waterproofing failure is suspected",
+                    "Pressure testing where a concealed pipe is the likely cause"
+                ]],
+                ["p", "None of this requires hacking. The investigation is non-destructive — hacking only happens afterwards, by your contractor, at the exact point identified."],
+                ["h", "The right sequence"],
+                ["p", "Stop the water source. Let the substrate dry fully. Verify with moisture readings that it is actually dry. Only then reinstate the finishes."],
+                ["p", "Do it in that order and you repair once. Skip to the last step and you will be repainting the same wall every year."]
+            ],
+            bm: [
+                ["p", "Tompok lembap muncul pada dinding. Seseorang mencadangkan cat anti-lembap. Tompok itu hilang beberapa bulan, kemudian kembali — biasanya lebih besar, dan kini dengan cat terkelupas di atas masalah asal."],
+                ["h", "Cat ialah kemasan, bukan penghalang"],
+                ["p", "Air yang bergerak menembusi dinding berada di bawah tekanan dari belakang. Lapisan yang disapu pada muka yang kelihatan tidak menghentikan pergerakan itu — ia hanya menyembunyikan bukti buat sementara sementara lembapan terus merambat melalui bahan tersebut."],
+                ["p", "Lebih teruk, menutup permukaan boleh memerangkap lembapan dalam plaster, yang mempercepatkan kerosakannya. Dinding merosot lebih cepat berbanding jika tiada apa-apa dibuat."],
+                ["h", "Kesan itu jarang berada di tempat kebocoran"],
+                ["p", "Air merambat mengikut laluan paling mudah — turun paip, merentas papak, sepanjang rasuk — dan keluar di mana-mana yang ia mampu. Kesan di bilik tidur mungkin berpunca dari bilik air dua bilik jauhnya, atau dari bumbung di atas."],
+                ["note", "Sebab itulah menjejak lebih penting daripada merawat. Jika anda membaiki tempat air muncul dan bukan tempat ia masuk, anda akan membaikinya semula tahun depan."],
+                ["h", "Bagaimana punca sebenarnya ditemui"],
+                ["ul", [
+                    "Bacaan lembapan dipetakan merentas kawasan untuk cari tumpuan paling basah",
+                    "Imej thermal untuk mengikut laluan lembapan menembusi dinding dan papak",
+                    "Ujian water ponding di mana kegagalan kalis air disyaki",
+                    "Ujian tekanan di mana paip tersembunyi ialah punca berkemungkinan"
+                ]],
+                ["p", "Tiada satu pun daripada ini memerlukan pecah dinding. Siasatan ini tanpa musnah — pecah dinding hanya berlaku selepas itu, oleh kontraktor anda, di titik tepat yang dikenal pasti."],
+                ["h", "Urutan yang betul"],
+                ["p", "Hentikan punca air. Biarkan substrat kering sepenuhnya. Sahkan dengan bacaan lembapan bahawa ia benar-benar kering. Barulah pasang semula kemasan."],
+                ["p", "Buat mengikut urutan itu dan anda membaiki sekali sahaja. Terus melompat ke langkah terakhir dan anda akan mengecat semula dinding yang sama setiap tahun."]
+            ]
+        }
+    },
+    {
+        slug: "bca-for-jmb", cat: "owner", date: "2026-04-20", read: 6,
+        title: { en: "What JMB and MC Committees Should Know About Building Condition Assessment",
+                 bm: "Apa Jawatankuasa JMB dan MC Patut Tahu Tentang Building Condition Assessment" },
+        excerpt: { en: "If your maintenance budget is decided by whoever complains loudest, a condition assessment changes that conversation entirely.",
+                   bm: "Jika bajet penyelenggaraan anda ditentukan oleh siapa yang mengadu paling kuat, condition assessment mengubah perbualan itu sepenuhnya." },
+        body: {
+            en: [
+                ["p", "Most management committees face the same problem: a long list of complaints, a limited budget, and no objective way to decide which repairs come first. Decisions end up driven by whoever is most persistent at the AGM."],
+                ["h", "What a condition assessment actually produces"],
+                ["p", "A Building Condition Assessment surveys every element of the building — structure, external fabric, roof and waterproofing, M&E services, common areas, fire safety provisions and external works — and assigns each a condition rating on a consistent scale."],
+                ["p", "The output is not a description. It is a ranked register: what is critical, what is poor, what is fair, and what is simply fine and does not need this year's money."],
+                ["h", "Why it helps with the sinking fund"],
+                ["ul", [
+                    "Repairs are grouped by urgency, so spending follows condition rather than complaint volume",
+                    "Large future costs are visible years ahead instead of arriving as emergencies",
+                    "Contribution increases become far easier to justify when backed by an independent report",
+                    "A documented baseline lets you show owners what their money achieved at the next assessment"
+                ]],
+                ["note", "The strongest argument at an AGM is rarely the loudest one. It is usually the one with an independent professional report behind it."],
+                ["h", "Independence matters here"],
+                ["p", "An assessment carried out by a party that also sells the repair work carries an obvious conflict. A Building Surveyor who does not carry out repairs has no reason to over-specify — or to understate a problem that would be inconvenient to raise."],
+                ["h", "How often it should be repeated"],
+                ["p", "It depends on the age and condition of the building, but re-assessment against a documented baseline is where much of the long-term value sits. It shows deterioration rates, confirms whether past repairs held, and keeps the maintenance plan grounded in current fact rather than the last committee's assumptions."]
+            ],
+            bm: [
+                ["p", "Kebanyakan jawatankuasa pengurusan berdepan masalah sama: senarai aduan yang panjang, bajet terhad, dan tiada cara objektif untuk menentukan pembaikian mana didahulukan. Keputusan akhirnya dipandu oleh sesiapa yang paling gigih di AGM."],
+                ["h", "Apa yang condition assessment sebenarnya hasilkan"],
+                ["p", "Building Condition Assessment meninjau setiap elemen bangunan — struktur, fabrik luaran, bumbung dan kalis air, perkhidmatan M&E, kawasan bersama, kelengkapan keselamatan kebakaran dan kerja luaran — dan memberikan setiap satu gred keadaan pada skala yang konsisten."],
+                ["p", "Hasilnya bukan perihalan. Ia daftar berkeutamaan: apa yang kritikal, apa yang lemah, apa yang sederhana, dan apa yang sebenarnya elok dan tidak memerlukan wang tahun ini."],
+                ["h", "Kenapa ia membantu sinking fund"],
+                ["ul", [
+                    "Pembaikian dikumpul mengikut urgensi, jadi perbelanjaan mengikut keadaan dan bukan jumlah aduan",
+                    "Kos besar masa depan kelihatan bertahun lebih awal dan bukan tiba sebagai kecemasan",
+                    "Kenaikan sumbangan jauh lebih mudah dijustifikasi bila disokong laporan bebas",
+                    "Asas berdokumentasi membolehkan anda tunjuk pemilik apa yang wang mereka capai pada penilaian berikutnya"
+                ]],
+                ["note", "Hujah paling kuat di AGM jarang yang paling lantang. Biasanya ia yang mempunyai laporan profesional bebas di belakangnya."],
+                ["h", "Kebebasan penting di sini"],
+                ["p", "Penilaian yang dijalankan oleh pihak yang turut menjual kerja pembaikian membawa konflik yang jelas. Building Surveyor yang tidak menjalankan pembaikian tiada sebab untuk melebihkan skop — atau memperkecilkan masalah yang menyusahkan untuk dibangkitkan."],
+                ["h", "Berapa kerap ia patut diulang"],
+                ["p", "Ia bergantung pada usia dan keadaan bangunan, tetapi penilaian semula berbanding asas berdokumentasi ialah tempat sebahagian besar nilai jangka panjang berada. Ia menunjukkan kadar kemerosotan, mengesahkan sama ada pembaikian lepas bertahan, dan mengekalkan pelan penyelenggaraan berpaksikan fakta semasa dan bukan andaian jawatankuasa terdahulu."]
+            ]
+        }
+    }
+];
+
+/* =========================================================
    TENTANG KAMI (#/about)
    Edit teks, pasukan dan garis masa di sini.
    Untuk gambar pasukan: letak fail dalam img/ dan isi "photo".
@@ -3368,6 +3798,12 @@ var I18N = {
         "pillar.more": "Explore all services",
         "nav.projects": "Projects", "nav.about": "About",
         "faq.more": "More Questions & Answers",
+        "nav.blog": "Articles",
+        "blog.tag": "Articles", "blog.title": "Guides From the Field",
+        "blog.sub": "What we learn on site, written up so property owners can use it — no jargon, no sales pitch.",
+        "blog.read": "min read", "blog.next": "Read next",
+        "blog.ctaTitle": "Have a Property Question?",
+        "blog.ctaSub": "Ask a registered Building Surveyor — no obligation.",
         "form.email": "Send via Email instead",
         "samp.tag": "What You Receive", "samp.title": "See an Actual Inspection Report",
         "samp.sub": "Not a brochure — this is the real document our clients receive, with photos, locations and findings.",
@@ -3442,6 +3878,12 @@ var I18N = {
         "pillar.more": "Terokai semua servis",
         "nav.projects": "Projek", "nav.about": "Tentang Kami",
         "faq.more": "Lagi Soalan & Jawapan",
+        "nav.blog": "Artikel",
+        "blog.tag": "Artikel", "blog.title": "Panduan Dari Lapangan",
+        "blog.sub": "Apa yang kami pelajari di tapak, ditulis supaya pemilik hartanah boleh gunakannya — tiada jargon, tiada jualan.",
+        "blog.read": "min bacaan", "blog.next": "Baca seterusnya",
+        "blog.ctaTitle": "Ada Soalan Tentang Hartanah?",
+        "blog.ctaSub": "Tanya Building Surveyor berdaftar — tiada obligasi.",
         "form.email": "Hantar melalui E-mel",
         "samp.tag": "Apa Yang Anda Terima", "samp.title": "Lihat Laporan Inspection Sebenar",
         "samp.sub": "Bukan brosur — ini dokumen sebenar yang pelanggan kami terima, dengan gambar, lokasi dan penemuan.",
@@ -3896,40 +4338,104 @@ var FAQ_ALL = [
         });
     }
 
-    /* ---------- Sample report di home ---------- */
-    function renderHomeReport() {
-        var wrap = document.getElementById("homeReportGallery");
-        var btn = document.getElementById("sampleReportBtn");
-        var ex = SVC_EXTRAS["home-defect"];
-        if (!wrap || !ex || !ex.reports) return;
-        var imgs = ex.reports;
-        var cell = function (i, cls) {
-            return '<button class="report-img ' + cls + '" type="button" data-hrep="' + i + '">' +
-                '<img src="' + CONFIG.imgBase + imgs[i] + '" alt="Sample report page ' + (i + 1) + '" loading="lazy" ' +
-                'onerror="this.parentElement.classList.add(\'img-missing\')"></button>';
-        };
-        wrap.innerHTML = '<div class="report-gallery">' +
-            '<div class="report-row">' + cell(0, "from-left") + cell(1, "from-right") + '</div>' +
-            '<div class="report-row" style="justify-content:center">' + cell(2, "center from-left") + '</div>' +
-            '<div class="report-row">' + cell(3, "from-left") + cell(4, "from-right") + '</div>' +
-            '</div>';
-        if (btn && ex.pdf) btn.href = ex.pdf;
-
-        wrap.querySelectorAll(".report-img").forEach(function (b) {
-            b.addEventListener("click", function () {
-                var start = parseInt(b.getAttribute("data-hrep"), 10) || 0;
-                lbOpenItems(imgs.map(function (r, i) {
-                    return { src: CONFIG.imgBase + r, label: (t("samp.title") || "Sample Report") + " " + (i + 1) + "/" + imgs.length };
-                }), start);
-            });
-        });
-        wrap.querySelectorAll(".report-img").forEach(function (el) { dlpObserver.observe(el); });
-    }
-
     /* Home: papar soalan bertanda home:true sahaja */
     function renderFaq() {
         buildFaqList(document.getElementById("faqList"),
                      FAQ_ALL.filter(function (f) { return f.home; }), true);
+    }
+
+    /* ---------- Blog: senarai (#/blog) & artikel (#/blog/<slug>) ---------- */
+    var BLOG_BY_SLUG = {};
+    BLOG.forEach(function (b) { BLOG_BY_SLUG[b.slug] = b; });
+    var blogFilter = "all";
+
+    function blogSorted() {
+        return BLOG.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+    }
+    function fmtDate(d) {
+        var MON = { en: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                    bm: ["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogo","Sep","Okt","Nov","Dis"] };
+        var p = (d || "").split("-");
+        if (p.length !== 3) return d || "";
+        return parseInt(p[2], 10) + " " + (MON[lang] || MON.en)[parseInt(p[1], 10) - 1] + " " + p[0];
+    }
+    function blogCatLabel(key) {
+        var c = BLOG_CATS.filter(function (x) { return x.key === key; })[0];
+        return c ? t2(c.label) : key;
+    }
+    var BLOG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h7"/></svg>';
+
+    function renderBlogPage() {
+        var filtersEl = document.getElementById("blogFilters");
+        var grid = document.getElementById("blogGrid");
+        if (!filtersEl || !grid) return;
+
+        filtersEl.innerHTML = "";
+        BLOG_CATS.forEach(function (c) {
+            var n = c.key === "all" ? BLOG.length : BLOG.filter(function (b) { return b.cat === c.key; }).length;
+            if (!n) return;
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "proj-filter" + (blogFilter === c.key ? " active" : "");
+            btn.textContent = t2(c.label) + " (" + n + ")";
+            btn.addEventListener("click", function () { blogFilter = c.key; renderBlogPage(); });
+            filtersEl.appendChild(btn);
+        });
+
+        var list = blogSorted().filter(function (b) { return blogFilter === "all" || b.cat === blogFilter; });
+        grid.innerHTML = list.map(function (b) {
+            return '<a class="blog-card" href="#/blog/' + b.slug + '">' +
+                '<div class="blog-cover"><span class="blog-cat">' + blogCatLabel(b.cat) + '</span>' +
+                (b.cover ? '<img src="' + b.cover + '" alt="" loading="lazy" onerror="this.remove()">' : "") +
+                BLOG_ICON + '</div>' +
+                '<div class="blog-body"><h3>' + t2(b.title) + '</h3><p>' + t2(b.excerpt) + '</p>' +
+                '<div class="blog-meta"><span>' + fmtDate(b.date) + '</span><span class="dot"></span>' +
+                '<span>' + b.read + ' ' + t("blog.read") + '</span></div></div></a>';
+        }).join("");
+    }
+
+    function renderArticlePage(slug) {
+        var b = BLOG_BY_SLUG[slug];
+        var box = document.getElementById("articleBody");
+        if (!b || !box) return;
+
+        var blocks = (b.body[lang] || b.body.en).map(function (blk) {
+            var kind = blk[0], val = blk[1];
+            if (kind === "h") return "<h3>" + val + "</h3>";
+            if (kind === "ul") return "<ul>" + val.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+            if (kind === "note") return '<div class="article-note">' + val + "</div>";
+            return "<p>" + val + "</p>";
+        }).join("");
+
+        var others = blogSorted().filter(function (x) { return x.slug !== b.slug; }).slice(0, 3);
+
+        box.innerHTML =
+            '<header class="page-head"><div class="section-container">' +
+                '<nav class="crumbs"><a href="#">' + t("det.home") + '</a><span class="sep">/</span>' +
+                '<a href="#/blog">' + t("blog.tag") + '</a><span class="sep">/</span>' +
+                '<span class="here">' + t2(b.title) + '</span></nav>' +
+                '<span class="svc-head-cat">' + blogCatLabel(b.cat) + '</span>' +
+                '<h1>' + t2(b.title) + '</h1>' +
+                '<p class="svc-tagline">' + t2(b.excerpt) + '</p>' +
+                '<div class="article-meta"><span>' + fmtDate(b.date) + '</span><span class="dot"></span>' +
+                '<span>' + b.read + ' ' + t("blog.read") + '</span><span class="dot"></span>' +
+                '<span>' + (CONFIG.legalName || "GoXpert") + '</span></div>' +
+            '</div></header>' +
+            '<section class="vpage-body"><div class="section-container">' +
+                '<article class="article">' + blocks + '</article>' +
+                (others.length ?
+                    '<div class="article-next"><h4>' + t("blog.next") + '</h4>' +
+                    others.map(function (x) {
+                        return '<a href="#/blog/' + x.slug + '">' + t2(x.title) + '</a>';
+                    }).join("") + '</div>' : "") +
+            '</div></section>' +
+            '<section class="final-cta"><div class="section-container">' +
+                '<h2>' + t("blog.ctaTitle") + '</h2>' +
+                '<p>' + t("blog.ctaSub") + '</p>' +
+                '<a class="btn btn-whatsapp" href="' + waLink(t("wa.default")) + '" target="_blank" rel="noopener">' +
+                '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>' +
+                '<span>' + t("cta.btn") + '</span></a>' +
+            '</div></section>';
     }
 
     /* ---------- Page FAQ penuh (#/faq) ---------- */
@@ -3995,7 +4501,6 @@ var FAQ_ALL = [
         renderEquipment();
         renderProcess();
         renderProjects();
-        renderHomeReport();
         renderFaq();
         renderServiceSelect();
         applyWaLinks();
@@ -4851,7 +5356,7 @@ var FAQ_ALL = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -4862,6 +5367,8 @@ var FAQ_ALL = [
             if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
             else if (parts[0] === "faq") pageKey = "faq";
+            else if (parts[0] === "blog" && parts[1] && BLOG_BY_SLUG[parts[1]]) { pageKey = "article"; param = parts[1]; }
+            else if (parts[0] === "blog") pageKey = "blog";
             else if (parts[0] === "services" && parts[1] && SVC_BY_SLUG[parts[1]]) { pageKey = "service"; param = parts[1]; }
             else if (parts[0] === "services") pageKey = "services";
         } else if (h.length > 1) {
@@ -4878,6 +5385,8 @@ var FAQ_ALL = [
         if (pageKey === "service") renderServicePage(param);
         if (pageKey === "about") renderAboutPage();
         if (pageKey === "faq") renderFaqPage();
+        if (pageKey === "blog") renderBlogPage();
+        if (pageKey === "article") renderArticlePage(param);
 
         if (!skipScroll) {
             if (pageKey !== "home") {
@@ -4895,6 +5404,7 @@ var FAQ_ALL = [
                 (key === "projects" && pageKey === "projects") ||
                 (key === "about" && pageKey === "about") ||
                 (key === "faq" && pageKey === "faq") ||
+                (key === "blog" && (pageKey === "blog" || pageKey === "article")) ||
                 (key === "services" && (pageKey === "services" || pageKey === "service")));
         });
 

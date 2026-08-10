@@ -12,6 +12,8 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Home | `index.html` | ✅ Siap |
 | Tentang Kami | `index.html#/about` | ✅ Siap |
 | FAQ penuh (39 soalan, 7 kategori) | `index.html#/faq` | ✅ Siap |
+| Blog / Artikel | `index.html#/blog` | ✅ Siap (6 artikel) |
+| Artikel penuh | `index.html#/blog/<slug>` cth `#/blog/dlp-guide` | ✅ Siap |
 | Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap |
 | Servis (semua 16, ikut kategori) | `index.html#/services` | ✅ Siap |
 | Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (16 servis) |
@@ -56,6 +58,7 @@ Buka `index.html`, cari bahagian atas `<script>`:
 - **`I18N`** — semua teks EN/BM
 - **`SVC`** — 16 servis + kandungan sub-page setiap servis (nama, tagline, penerangan, apa termasuk, apa diterima)
 - **`SVC_EXTRAS`** — kandungan khas setiap sub-page servis (kad nilai, langkah, elemen, status, analisis)
+- **`BLOG`** — artikel (slug, kategori, tarikh, masa baca, tajuk, petikan, isi). Panduan tulis artikel baharu ada dalam komen di atas blok ini
 - **`FAQ_ALL`** — 39 soalan FAQ (`cat` = kategori, `home: true` = papar juga di home)
 - **`ABOUT`** — page Tentang Kami: cerita, prinsip, kelayakan, **pasukan** (isi nama + `photo`), **garis masa** (isi tahun)
 - **`PROJECTS`** — senarai projek (home papar 6 pertama, page `#/projects` papar semua)
