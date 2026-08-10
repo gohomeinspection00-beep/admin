@@ -3,9 +3,9 @@ const fs = require("fs");
 
 const sets = [
   {
-    label: "MOHD SUKRI — ke UDA LAND (SOUTH), Kuala Lumpur  [Ruj: NOTIS-1/2026/022]",
+    label: "MOHD SUKRI — ke UDA LAND (SOUTH), Johor Bahru  [Ruj: NOTIS-1/2026/022]",
     pengirim: ["MOHD SUKRI BIN MOHAMAD NOOR", "No. 18, Jalan Silat Lincah 19,", "Bandar Selesa Jaya,", "81300 Skudai, Johor Bahru, Johor.", "Tel: 011-1112 5646"],
-    penerima: ["UDA LAND (SOUTH) SDN. BHD. (197501001813 / 23298-K)", "Tingkat 15, Blok Menara,", "Kompleks Pertama,", "Jalan Tuanku Abdul Rahman,", "50100 Kuala Lumpur."],
+    penerima: ["UDA LAND (SOUTH) SDN. BHD. (197501001813 / 23298-K)", "No. 1, Jalan Padi Mahsuri 12,", "Bandar Baru Uda,", "81200 Johor Bahru, Johor.", "Tel: 07-237 4944"],
   },
 ];
 
