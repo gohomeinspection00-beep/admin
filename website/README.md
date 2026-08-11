@@ -56,7 +56,10 @@ Buka `index.html`, cari bahagian atas `<script>`:
 
 - **`CONFIG`** — nama syarikat, SSM, telefon, email, base URL gambar
 - **`I18N`** — semua teks EN/BM
-- **`SVC`** — 16 servis + kandungan sub-page setiap servis (nama, tagline, penerangan, apa termasuk, apa diterima)
+- **`SVC`** — 16 servis + kandungan sub-page setiap servis (nama, tagline, penerangan, apa termasuk, apa diterima).
+  `gal: [...]` = senarai gambar yang **auto-slide** di kepala sub-page
+  (tukar setiap 4 saat, ada dot, boleh leret di telefon, klik = lightbox).
+  Gambar pertama dalam `gal` juga jadi `img`
 - **`SVC_EXTRAS`** — kandungan khas setiap sub-page servis (kad nilai, langkah, elemen, status, analisis)
 - **`GALLERY`** — galeri gambar (`cat`: team/site/defect/project/equipment). Panduan tambah gambar ada dalam komen
 - **`BLOG`** — artikel (slug, kategori, tarikh, masa baca, tajuk, petikan, isi). Panduan tulis artikel baharu ada dalam komen di atas blok ini
@@ -65,7 +68,8 @@ Buka `index.html`, cari bahagian atas `<script>`:
 - **`PROJECTS`** — 58 projek (home papar 6 pertama, page `#/projects` papar semua).
   Setiap projek ada `photos: []` — gambar pertama jadi kad, klik kad buka
   semua gambar projek itu dalam lightbox. Kategori: `residential`,
-  `commercial`, `infrastructure`, `public`, `land`
+  `commercial`, `infrastructure`, `public`, `land`.
+  `name` dwibahasa — `{ en: "Temple 1", bm: "Kuil 1" }`
 - **`AUDIENCES` / `WHYUS` / `EQUIPMENT` / `PROCESS` / `SERVICES_LIST` / `FAQS`** — kandungan seksyen
 - Warna: blok `:root` di bahagian atas `<style>`
 
@@ -85,7 +89,7 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 
 | Folder | Isi |
 |---|---|
-| `img/svc/` | 12 gambar hero untuk sub-page servis |
+| `img/svc/<servis>/` | 54 gambar slideshow untuk 12 sub-page servis |
 | `img/proj/` | 143 gambar untuk 58 projek |
 | `img/gal/` | 20 gambar pasukan / di tapak / ACPIM / latihan |
 | `img/` (root) | 5 gambar re-inspection (before/after) |
