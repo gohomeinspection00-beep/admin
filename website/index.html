@@ -425,6 +425,13 @@ section { padding: 5rem 2rem; }
     background: rgba(255,255,255,0.94); color: var(--primary-dark);
     padding: 0.32rem 0.65rem; border-radius: 4px;
 }
+.proj-count {
+    position: absolute; top: 12px; right: 12px; z-index: 1;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.56rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: rgba(15,23,42,0.72); color: #fff;
+    padding: 0.3rem 0.55rem; border-radius: 4px;
+}
 .proj-zoom {
     position: absolute; right: 12px; bottom: 12px; z-index: 1;
     width: 34px; height: 34px; border-radius: 50%;
@@ -2018,7 +2025,7 @@ var SVC_CATS = {
 };
 
 var SVC = [
-    { slug: "home-defect", cat: "residential", img: "Crack-2.png",
+    { slug: "home-defect", cat: "residential", img: "img/proj/aurora-sentral-1.jpg",
       who:  { en: ["New home owners", "Units under DLP"], bm: ["Pemilik rumah baru", "Unit dalam tempoh DLP"] },
       tools: ["Thermal Camera", "Moisture Meter", "Spirit Level", "Laser Distance"],
       name: { en: "Home Defect Inspection (DLP)", bm: "Home Defect Inspection (DLP)" },
@@ -2030,7 +2037,7 @@ var SVC = [
       get:  { en: ["Photo-tagged defect report (PDF)", "Defect locations & severity listed", "Submission-ready for your developer"],
               bm: ["Laporan kecacatan bergambar (PDF)", "Lokasi & tahap keterukan disenaraikan", "Sedia dihantar terus kepada pemaju"] } },
 
-    { slug: "pre-purchase", cat: "residential", img: "Oroginal-Picture.png",
+    { slug: "pre-purchase", cat: "residential", img: "img/proj/taman-pulai-mutiara-3-1.jpg",
       who:  { en: ["Sub-sale buyers", "Before signing the S&P"], bm: ["Pembeli sub-sale", "Sebelum tandatangan S&P"] },
       tools: ["Moisture Meter", "Thermal Camera", "Laser Distance"],
       name: { en: "Pre-Purchase Inspection", bm: "Pre-Purchase Inspection" },
@@ -2042,7 +2049,7 @@ var SVC = [
       get:  { en: ["Condition report + cost estimate (PDF)", "Negotiation points list", "Defect management system if you buy"],
               bm: ["Laporan keadaan + anggaran kos (PDF)", "Senarai point negotiation", "Sistem pengurusan defect kalau jadi beli"] } },
 
-    { slug: "sub-sale", cat: "residential", img: "",
+    { slug: "sub-sale", cat: "residential", img: "img/svc/sub-sale.jpg",
       who:  { en: ["Pre-owned home owners", "After purchase / key handover"], bm: ["Pemilik rumah lama", "Selepas beli / terima kunci"] },
       tools: ["Moisture Meter", "Thermal Camera", "Laser Distance"],
       name: { en: "Sub-Sale Inspection", bm: "Sub-Sale Inspection" },
@@ -2054,7 +2061,7 @@ var SVC = [
       get:  { en: ["Condition report + cost estimate (PDF)", "Phased repair plan", "Defect management system access"],
               bm: ["Laporan keadaan + anggaran kos (PDF)", "Pelan pembaikian berfasa", "Akses sistem pengurusan defect"] } },
 
-    { slug: "re-inspection", cat: "residential", img: "",
+    { slug: "re-inspection", cat: "residential", img: "img/svc/re-inspection.jpg",
       who:  { en: ["Owners after developer repairs", "DLP claimants"], bm: ["Pemilik selepas pembaikan pemaju", "Penuntut DLP"] },
       tools: ["Thermal Camera", "Moisture Meter"],
       name: { en: "Re-Inspection", bm: "Re-Inspection" },
@@ -2066,7 +2073,7 @@ var SVC = [
       get:  { en: ["Closure status report per defect", "Before/after photo evidence", "Outstanding defect list"],
               bm: ["Laporan status setiap kecacatan", "Bukti gambar sebelum/selepas", "Senarai kecacatan belum selesai"] } },
 
-    { slug: "after-renovation", cat: "residential", img: "",
+    { slug: "after-renovation", cat: "residential", img: "img/svc/after-renovation.jpg",
       who:  { en: ["Renovating homeowners", "Landlords"], bm: ["Pemilik sedang renovate", "Tuan rumah sewa"] },
       tools: ["Spirit Level", "Laser Distance", "Moisture Meter"],
       name: { en: "After-Renovation Inspection", bm: "After-Renovation Inspection" },
@@ -2078,7 +2085,7 @@ var SVC = [
       get:  { en: ["Workmanship report with photos", "Defect list for your contractor", "Basis to hold final payment if needed"],
               bm: ["Laporan mutu kerja bergambar", "Senarai kecacatan untuk kontraktor", "Asas menahan bayaran akhir jika perlu"] } },
 
-    { slug: "joint-inspection", cat: "residential", img: "",
+    { slug: "joint-inspection", cat: "residential", img: "img/svc/joint-inspection.jpg",
       who:  { en: ["Owners with disputed defects", "During developer defect-closing"], bm: ["Pemilik yang defect dipertikai", "Semasa sesi tutup defect pemaju"] },
       tools: ["Thermal Camera", "Moisture Meter", "Spirit Level"],
       name: { en: "Joint Inspection with Developer", bm: "Joint Inspection Bersama Pemaju" },
@@ -2090,7 +2097,7 @@ var SVC = [
       get:  { en: ["Professional representation on site", "Evidence-backed defence for every defect", "Documented record of the session outcome"],
               bm: ["Perwakilan profesional di tapak", "Pembelaan berasaskan bukti bagi setiap defect", "Rekod keputusan sesi yang didokumenkan"] } },
 
-    { slug: "bca", cat: "commercial", img: "",
+    { slug: "bca", cat: "commercial", img: "img/proj/bangunan-pasar-1.png",
       who:  { en: ["JMB / MC", "Corporations", "Asset owners"], bm: ["JMB / MC", "Korporat", "Pemilik aset"] },
       tools: ["Thermal Camera", "Laser Distance", "Moisture Meter"],
       name: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
@@ -2102,7 +2109,7 @@ var SVC = [
       get:  { en: ["Full BCA report with condition ratings", "Prioritised defect register", "Maintenance planning input"],
               bm: ["Laporan BCA penuh dengan gred keadaan", "Daftar kecacatan mengikut keutamaan", "Input perancangan penyelenggaraan"] } },
 
-    { slug: "dilapidation", cat: "commercial", img: "",
+    { slug: "dilapidation", cat: "commercial", img: "img/svc/dilapidation.jpg",
       who:  { en: ["Owners near construction", "Contractors & developers"], bm: ["Pemilik berhampiran pembinaan", "Kontraktor & pemaju"] },
       tools: ["Crack Gauge", "Laser Distance"],
       name: { en: "Dilapidation Survey", bm: "Dilapidation Survey" },
@@ -2114,7 +2121,7 @@ var SVC = [
       get:  { en: ["Dated condition report", "Photo-mapped crack register", "Evidence usable in disputes"],
               bm: ["Laporan keadaan bertarikh", "Daftar retak berpeta gambar", "Bukti boleh guna dalam pertikaian"] } },
 
-    { slug: "monitoring", cat: "commercial", img: "Crack-2.png",
+    { slug: "monitoring", cat: "commercial", img: "img/svc/monitoring.jpg",
       who:  { en: ["Buildings with cracks", "Properties near earthworks"], bm: ["Bangunan ada retak", "Hartanah berhampiran kerja tanah"] },
       tools: ["Crack Gauge", "Laser Distance"],
       name: { en: "Building Monitoring", bm: "Building Monitoring" },
@@ -2126,7 +2133,7 @@ var SVC = [
       get:  { en: ["Periodic monitoring reports", "Trend charts & readings log", "Early warning of deterioration"],
               bm: ["Laporan pemantauan berkala", "Carta trend & log bacaan", "Amaran awal kemerosotan"] } },
 
-    { slug: "commercial-inspection", cat: "commercial", img: "",
+    { slug: "commercial-inspection", cat: "commercial", img: "img/proj/supermarket-1.jpg",
       who:  { en: ["Business owners", "Property managers"], bm: ["Pemilik perniagaan", "Pengurus hartanah"] },
       tools: ["Thermal Camera", "Earth Tester", "Laser Distance"],
       name: { en: "Commercial Building Inspection", bm: "Commercial Building Inspection" },
@@ -2138,7 +2145,7 @@ var SVC = [
       get:  { en: ["Scoped inspection report", "Executive summary", "Action & risk list"],
               bm: ["Laporan pemeriksaan mengikut skop", "Ringkasan eksekutif", "Senarai tindakan & risiko"] } },
 
-    { slug: "maintenance-audit", cat: "commercial", img: "",
+    { slug: "maintenance-audit", cat: "commercial", img: "img/svc/maintenance-audit.png",
       who:  { en: ["JMB / MC", "Facility managers"], bm: ["JMB / MC", "Pengurus fasiliti"] },
       tools: ["Thermal Camera", "Moisture Meter"],
       name: { en: "Maintenance Report / Condition Audit", bm: "Maintenance Report / Condition Audit" },
@@ -2150,7 +2157,7 @@ var SVC = [
       get:  { en: ["Condition audit report", "Prioritised repair list", "Maintenance budget input"],
               bm: ["Laporan audit keadaan", "Senarai pembaikan mengikut keutamaan", "Input bajet penyelenggaraan"] } },
 
-    { slug: "electrical", cat: "technical", img: "Earth-Tester.png", imgFit: "tool",
+    { slug: "electrical", cat: "technical", img: "img/svc/electrical.jpg",
       who:  { en: ["Older properties", "Pre-purchase buyers", "After renovation"], bm: ["Hartanah lama", "Pembeli sebelum beli", "Selepas renovation"] },
       tools: ["Earth Tester", "Insulation Tester", "Clamp Meter"],
       name: { en: "Electrical Inspection", bm: "Electrical Inspection" },
@@ -2162,7 +2169,7 @@ var SVC = [
       get:  { en: ["Electrical test report with readings", "Safety issue list by severity", "Rectification recommendations"],
               bm: ["Laporan ujian elektrik dengan bacaan", "Senarai isu keselamatan ikut tahap", "Cadangan pembaikan"] } },
 
-    { slug: "leak-detection", cat: "technical", img: "",
+    { slug: "leak-detection", cat: "technical", img: "img/svc/leak-detection.jpg",
       who:  { en: ["Homes with damp stains", "Recurring leak problems"], bm: ["Rumah ada kesan lembap", "Masalah bocor berulang"] },
       tools: ["Moisture Meter", "Thermal Camera"],
       name: { en: "Leak Detection & Moisture Survey", bm: "Leak Detection & Moisture Survey" },
@@ -2174,7 +2181,7 @@ var SVC = [
       get:  { en: ["Leak source report with evidence", "Moisture readings map", "Targeted repair recommendation"],
               bm: ["Laporan punca bocor berserta bukti", "Peta bacaan lembapan", "Cadangan pembaikan tepat sasaran"] } },
 
-    { slug: "thermal-imaging", cat: "technical", img: "ThermalOkey.png",
+    { slug: "thermal-imaging", cat: "technical", img: "img/svc/thermal-imaging.jpg",
       who:  { en: ["Hidden defect suspicion", "Evidence for claims"], bm: ["Syak kecacatan tersembunyi", "Bukti untuk tuntutan"] },
       tools: ["Thermal Camera"],
       name: { en: "Thermal Imaging", bm: "Thermal Imaging" },
@@ -2186,7 +2193,7 @@ var SVC = [
       get:  { en: ["Annotated thermal images", "Findings with temperature data", "Follow-up action list"],
               bm: ["Imej thermal beranotasi", "Penemuan dengan data suhu", "Senarai tindakan susulan"] } },
 
-    { slug: "rectification", cat: "technical", img: "",
+    { slug: "rectification", cat: "technical", img: "img/svc/rectification.jpg",
       who:  { en: ["Owners with a defect list", "Post-repair verification"], bm: ["Pemilik dengan senarai kecacatan", "Pengesahan selepas baiki"] },
       tools: ["Thermal Camera", "Moisture Meter", "Spirit Level"],
       name: { en: "Rectification Defect", bm: "Rectification Defect" },
@@ -2198,7 +2205,7 @@ var SVC = [
       get:  { en: ["Repair method recommendations", "Verification report post-repair", "Confidence the fix will last"],
               bm: ["Cadangan kaedah pembaikan", "Laporan pengesahan selepas baiki", "Keyakinan pembaikan tahan lama"] } },
 
-    { slug: "tribunal", cat: "technical", img: "",
+    { slug: "tribunal", cat: "technical", img: "img/svc/tribunal.jpg",
       who:  { en: ["Homeowners vs developers", "Tribunal claimants"], bm: ["Pemilik lawan pemaju", "Penuntut tribunal"] },
       tools: [],
       name: { en: "Tribunal Consultation & Documentation", bm: "Tribunal Consultation & Documentation" },
@@ -3403,13 +3410,96 @@ var GAL_CATS = [
     { key: "all",       label: { en: "All", bm: "Semua" } },
     { key: "team",      label: { en: "Our Team", bm: "Pasukan Kami" } },
     { key: "site",      label: { en: "On Site", bm: "Di Tapak" } },
+    { key: "event",     label: { en: "Training & Events", bm: "Latihan & Program" } },
     { key: "defect",    label: { en: "Defects Found", bm: "Kecacatan Ditemui" } },
     { key: "project",   label: { en: "Projects", bm: "Projek" } },
     { key: "equipment", label: { en: "Equipment", bm: "Peralatan" } }
 ];
 
 var GALLERY = [
-    /* --- Kecacatan sebenar (gambar sedia ada dalam img/) --- */
+    /* --- Pasukan, di tapak & program (gambar sebenar) --- */
+    { img: "img/gal/our-team-1.jpg", cat: "team",
+      title: { en: "Survey Team on Site", bm: "Pasukan Survey Di Tapak" },
+      caption: { en: "GoXpert inspectors on a live inspection", bm: "Pemeriksa GoXpert semasa pemeriksaan sebenar" } },
+    { img: "img/gal/our-team-2.jpg", cat: "team",
+      title: { en: "Recording Findings", bm: "Merekod Penemuan" },
+      caption: { en: "GoXpert inspectors on a live inspection", bm: "Pemeriksa GoXpert semasa pemeriksaan sebenar" } },
+    { img: "img/gal/our-team-3.jpg", cat: "team",
+      title: { en: "Team at Work", bm: "Pasukan Bertugas" },
+      caption: { en: "GoXpert inspectors on a live inspection", bm: "Pemeriksa GoXpert semasa pemeriksaan sebenar" } },
+    { img: "img/gal/our-team-4.jpg", cat: "team",
+      title: { en: "Site Coverage", bm: "Liputan Tapak" },
+      caption: { en: "GoXpert inspectors on a live inspection", bm: "Pemeriksa GoXpert semasa pemeriksaan sebenar" } },
+    { img: "img/gal/our-team-5.jpg", cat: "team",
+      title: { en: "Survey Team on Site", bm: "Pasukan Survey Di Tapak" },
+      caption: { en: "GoXpert inspectors on a live inspection", bm: "Pemeriksa GoXpert semasa pemeriksaan sebenar" } },
+    { img: "img/gal/our-team-6.jpg", cat: "team",
+      title: { en: "Recording Findings", bm: "Merekod Penemuan" },
+      caption: { en: "GoXpert inspectors on a live inspection", bm: "Pemeriksa GoXpert semasa pemeriksaan sebenar" } },
+    { img: "img/gal/our-team-7.jpg", cat: "team",
+      title: { en: "Team at Work", bm: "Pasukan Bertugas" },
+      caption: { en: "GoXpert inspectors on a live inspection", bm: "Pemeriksa GoXpert semasa pemeriksaan sebenar" } },
+    { img: "img/gal/on-site-1.jpg", cat: "site",
+      title: { en: "Inspection in Progress", bm: "Pemeriksaan Sedang Dijalankan" },
+      caption: { en: "Photographed during a real site visit", bm: "Dirakam semasa lawatan tapak sebenar" } },
+    { img: "img/gal/on-site-2.jpg", cat: "site",
+      title: { en: "On-Site Documentation", bm: "Dokumentasi Di Tapak" },
+      caption: { en: "Photographed during a real site visit", bm: "Dirakam semasa lawatan tapak sebenar" } },
+    { img: "img/gal/on-site-3.jpg", cat: "site",
+      title: { en: "Condition Survey", bm: "Tinjauan Keadaan" },
+      caption: { en: "Photographed during a real site visit", bm: "Dirakam semasa lawatan tapak sebenar" } },
+    { img: "img/gal/on-site-4.jpg", cat: "site",
+      title: { en: "Site Assessment", bm: "Penilaian Tapak" },
+      caption: { en: "Photographed during a real site visit", bm: "Dirakam semasa lawatan tapak sebenar" } },
+    { img: "img/gal/on-site-5.jpg", cat: "site",
+      title: { en: "Inspection in Progress", bm: "Pemeriksaan Sedang Dijalankan" },
+      caption: { en: "Photographed during a real site visit", bm: "Dirakam semasa lawatan tapak sebenar" } },
+    { img: "img/gal/on-site-6.jpg", cat: "site",
+      title: { en: "On-Site Documentation", bm: "Dokumentasi Di Tapak" },
+      caption: { en: "Photographed during a real site visit", bm: "Dirakam semasa lawatan tapak sebenar" } },
+    { img: "img/gal/training-1.jpg", cat: "event",
+      title: { en: "Internal Training", bm: "Latihan Dalaman" },
+      caption: { en: "Keeping the team's standards consistent", bm: "Memastikan standard pasukan konsisten" } },
+    { img: "img/gal/acpim-1.jpg", cat: "event",
+      title: { en: "ACPIM Session", bm: "Sesi ACPIM" },
+      caption: { en: "Meeting & discussion with the team", bm: "Mesyuarat & perbincangan bersama pasukan" } },
+    { img: "img/gal/acpim-2.jpg", cat: "event",
+      title: { en: "ACPIM Session", bm: "Sesi ACPIM" },
+      caption: { en: "Meeting & discussion with the team", bm: "Mesyuarat & perbincangan bersama pasukan" } },
+    { img: "img/gal/acpim-3.jpg", cat: "event",
+      title: { en: "ACPIM Session", bm: "Sesi ACPIM" },
+      caption: { en: "Meeting & discussion with the team", bm: "Mesyuarat & perbincangan bersama pasukan" } },
+    { img: "img/gal/acpim-4.jpg", cat: "event",
+      title: { en: "ACPIM Session", bm: "Sesi ACPIM" },
+      caption: { en: "Meeting & discussion with the team", bm: "Mesyuarat & perbincangan bersama pasukan" } },
+    { img: "img/gal/acpim-5.jpg", cat: "event",
+      title: { en: "ACPIM Session", bm: "Sesi ACPIM" },
+      caption: { en: "Meeting & discussion with the team", bm: "Mesyuarat & perbincangan bersama pasukan" } },
+    { img: "img/gal/acpim-6.jpg", cat: "event",
+      title: { en: "ACPIM Session", bm: "Sesi ACPIM" },
+      caption: { en: "Meeting & discussion with the team", bm: "Mesyuarat & perbincangan bersama pasukan" } },
+
+    /* --- Projek terpilih --- */
+    { img: "img/proj/pintasan-saloma-1.png", cat: "project",
+      title: { en: "Pintasan Saloma", bm: "Pintasan Saloma" },
+      caption: { en: "Bridge & walkway condition survey", bm: "Tinjauan keadaan jambatan & laluan" } },
+    { img: "img/proj/supermarket-1.jpg", cat: "project",
+      title: { en: "Supermarket", bm: "Supermarket" },
+      caption: { en: "Commercial premises condition assessment", bm: "Penilaian keadaan premis komersial" } },
+    { img: "img/proj/jambatan-labis-1.jpg", cat: "project",
+      title: { en: "Jambatan Labis", bm: "Jambatan Labis" },
+      caption: { en: "Bridge condition survey, Labis", bm: "Tinjauan keadaan jambatan, Labis" } },
+    { img: "img/proj/factory-1.jpg", cat: "project",
+      title: { en: "Factory", bm: "Factory" },
+      caption: { en: "Industrial building assessment", bm: "Penilaian bangunan industri" } },
+    { img: "img/proj/tadika-1.jpg", cat: "project",
+      title: { en: "Tadika", bm: "Tadika" },
+      caption: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" } },
+    { img: "img/proj/kebun-1-1.jpg", cat: "project",
+      title: { en: "Kebun", bm: "Kebun" },
+      caption: { en: "Land & site condition survey", bm: "Tinjauan keadaan tanah & tapak" } },
+
+    /* --- Kecacatan sebenar (dari laporan re-inspection) --- */
     { img: "img/ri-11-before.png", cat: "defect",
       title: { en: "Construction Debris in TNB Compartment", bm: "Sisa Pembinaan Dalam Ruang TNB" },
       caption: { en: "Car porch — recorded during re-inspection", bm: "Car porch — direkod semasa re-inspection" } },
@@ -3425,14 +3515,14 @@ var GALLERY = [
     { img: "img/ri-40-after.png", cat: "site",
       title: { en: "Clamp Meter Test at Distribution Board", bm: "Ujian Clamp Meter Di Papan Agihan" },
       caption: { en: "0.06A reading with all MCB off — flagged for review", bm: "Bacaan 0.06A dengan semua MCB ditutup — dikesan untuk semakan" } },
-
-    /* --- Teknologi & peralatan (dari hosting sedia ada) --- */
-    { img: "ARLETA:ThermalOkey.png", cat: "equipment",
-      title: { en: "Thermal Imaging in Use", bm: "Imej Thermal Digunakan" },
-      caption: { en: "Reveals moisture behind finished surfaces", bm: "Mendedahkan lembapan di sebalik permukaan siap" } },
     { img: "ARLETA:Crack-2.png", cat: "defect",
       title: { en: "Structural Crack", bm: "Retak Struktur" },
       caption: { en: "Width measured and monitored over time", bm: "Lebar diukur dan dipantau mengikut masa" } },
+
+    /* --- Peralatan (hosting sedia ada) --- */
+    { img: "ARLETA:ThermalOkey.png", cat: "equipment",
+      title: { en: "Thermal Imaging in Use", bm: "Imej Thermal Digunakan" },
+      caption: { en: "Reveals moisture behind finished surfaces", bm: "Mendedahkan lembapan di sebalik permukaan siap" } },
     { img: "ARLETA:Earth-Tester.png", cat: "equipment",
       title: { en: "Earth Tester", bm: "Earth Tester" },
       caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
@@ -3444,25 +3534,7 @@ var GALLERY = [
       caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
     { img: "ARLETA:Laser-Distance-2.png", cat: "equipment",
       title: { en: "Laser Distance Meter", bm: "Laser Distance Meter" },
-      caption: { en: "Measurement & level survey", bm: "Ukuran & tinjauan aras" } },
-
-    /* --- SLOT KOSONG: isi bila gambar sedia ---
-       Buang baris yang tak perlu, atau isi "img" untuk aktifkan. */
-    { img: "", cat: "team",
-      title: { en: "Our Surveyors", bm: "Surveyor Kami" },
-      caption: { en: "Add a team photo here", bm: "Letak gambar pasukan di sini" } },
-    { img: "", cat: "team",
-      title: { en: "Site Briefing", bm: "Taklimat Di Tapak" },
-      caption: { en: "Add a team photo here", bm: "Letak gambar pasukan di sini" } },
-    { img: "", cat: "site",
-      title: { en: "Inspection in Progress", bm: "Inspection Sedang Dijalankan" },
-      caption: { en: "Add an on-site photo here", bm: "Letak gambar di tapak di sini" } },
-    { img: "", cat: "project",
-      title: { en: "High-Rise Project", bm: "Projek Bangunan Tinggi" },
-      caption: { en: "Add a project photo here", bm: "Letak gambar projek di sini" } },
-    { img: "", cat: "project",
-      title: { en: "Landed Property", bm: "Rumah Bertanah" },
-      caption: { en: "Add a project photo here", bm: "Letak gambar projek di sini" } }
+      caption: { en: "Measurement & level survey", bm: "Ukuran & tinjauan aras" } }
 ];
 
 /* =========================================================
@@ -3893,37 +3965,251 @@ var ABOUT = {
 };
 
 /* =========================================================
-   PROJEK "FEATURED" DI HOME PAGE — maksimum 6 dipaparkan.
-   Letak 6 projek TERBAIK tuan di sini. Senarai PENUH semua
-   projek diselenggara dalam fail projects.html (butang
-   "Show More Projects" membawa pelawat ke sana).
+   PROJEK — senarai penuh (home papar 6 pertama, page
+   `#/projects` papar semua + penapis kategori).
 
    Format:
-   - img: nama fail di imgBase ("projek-abc.jpg") ATAU URL penuh.
-     Biar "" jika gambar belum ada — placeholder kemas dipaparkan.
-   - cat: "residential" | "commercial" | "technical"
-   - name / loc: nama projek & lokasi
-   - desc: 1 baris ringkas apa yang dibuat (EN & BM)
+   - slug   : id unik (huruf kecil, tanda sempang)
+   - cat    : "residential" | "commercial" | "infrastructure"
+              | "public" | "land"
+   - name   : nama projek        loc: lokasi ("" jika tak mahu papar)
+   - desc   : 1 baris ringkas apa yang dibuat (EN & BM)
+   - photos : senarai gambar. Yang PERTAMA jadi gambar kad.
+              Klik kad = buka semua gambar projek itu dalam lightbox.
    ========================================================= */
 var PROJECTS = [
-    { img: "", cat: "residential",
-      name: "Residensi Idaman", loc: "Johor Bahru, Johor",
-      desc: { en: "Home defect inspection (DLP) — 480 units", bm: "Home defect inspection (DLP) — 480 unit" } },
-    { img: "", cat: "residential",
-      name: "Taman Sri Aman", loc: "Seremban, Negeri Sembilan",
-      desc: { en: "Pre-purchase inspection, double-storey terrace", bm: "Pre-purchase inspection, teres 2 tingkat" } },
-    { img: "", cat: "commercial",
-      name: "Menara Perdagangan", loc: "Shah Alam, Selangor",
-      desc: { en: "Building Condition Assessment (BCA), 18 floors", bm: "Building Condition Assessment (BCA), 18 tingkat" } },
-    { img: "", cat: "commercial",
-      name: "Kompleks Niaga Melaka", loc: "Melaka Tengah, Melaka",
-      desc: { en: "Dilapidation survey before adjacent construction", bm: "Dilapidation survey sebelum pembinaan bersebelahan" } },
-    { img: "ThermalOkey.png", cat: "technical",
-      name: "Kondominium Vista", loc: "Kajang, Selangor",
-      desc: { en: "Thermal imaging & leak detection, tower block", bm: "Thermal imaging & leak detection, blok menara" } },
-    { img: "Crack-2.png", cat: "technical",
-      name: "Bangunan Pejabat Utama", loc: "Nilai, Negeri Sembilan",
-      desc: { en: "Structural crack monitoring & tribunal documentation", bm: "Pemantauan retak struktur & dokumentasi tribunal" } }
+    { slug: "pintasan-saloma", cat: "infrastructure",
+      name: "Pintasan Saloma", loc: "",
+      desc: { en: "Bridge & walkway condition survey", bm: "Tinjauan keadaan jambatan & laluan" },
+      photos: ["img/proj/pintasan-saloma-1.png", "img/proj/pintasan-saloma-2.jpg", "img/proj/pintasan-saloma-3.jpg", "img/proj/pintasan-saloma-4.jpg", "img/proj/pintasan-saloma-5.jpg", "img/proj/pintasan-saloma-6.jpg", "img/proj/pintasan-saloma-7.jpg", "img/proj/pintasan-saloma-8.jpg", "img/proj/pintasan-saloma-9.jpg", "img/proj/pintasan-saloma-10.jpg", "img/proj/pintasan-saloma-11.jpg", "img/proj/pintasan-saloma-12.jpg"] },
+    { slug: "supermarket", cat: "commercial",
+      name: "Supermarket", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/supermarket-1.jpg", "img/proj/supermarket-2.jpg", "img/proj/supermarket-3.jpg", "img/proj/supermarket-4.jpg", "img/proj/supermarket-5.jpg"] },
+    { slug: "aurora-sentral", cat: "residential",
+      name: "Aurora Sentral", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/aurora-sentral-1.jpg"] },
+    { slug: "tadika", cat: "public",
+      name: "Tadika", loc: "",
+      desc: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
+      photos: ["img/proj/tadika-1.jpg", "img/proj/tadika-2.jpg", "img/proj/tadika-3.jpg", "img/proj/tadika-4.jpg", "img/proj/tadika-5.jpg"] },
+    { slug: "factory", cat: "commercial",
+      name: "Factory", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/factory-1.jpg", "img/proj/factory-2.jpg", "img/proj/factory-3.jpg"] },
+    { slug: "jambatan-labis", cat: "infrastructure",
+      name: "Jambatan Labis", loc: "Labis, Johor",
+      desc: { en: "Bridge & walkway condition survey", bm: "Tinjauan keadaan jambatan & laluan" },
+      photos: ["img/proj/jambatan-labis-1.jpg", "img/proj/jambatan-labis-2.jpg", "img/proj/jambatan-labis-3.jpg"] },
+    { slug: "rumah-terbengkalai-1", cat: "residential",
+      name: "Rumah Terbengkalai 1", loc: "",
+      desc: { en: "Abandoned building condition assessment", bm: "Penilaian keadaan bangunan terbengkalai" },
+      photos: ["img/proj/rumah-terbengkalai-1-1.jpg", "img/proj/rumah-terbengkalai-1-2.jpg", "img/proj/rumah-terbengkalai-1-3.jpg", "img/proj/rumah-terbengkalai-1-4.jpg"] },
+    { slug: "rumah-terbengkalai-2", cat: "residential",
+      name: "Rumah Terbengkalai 2", loc: "",
+      desc: { en: "Abandoned building condition assessment", bm: "Penilaian keadaan bangunan terbengkalai" },
+      photos: ["img/proj/rumah-terbengkalai-2-1.jpg", "img/proj/rumah-terbengkalai-2-2.jpg", "img/proj/rumah-terbengkalai-2-3.jpg"] },
+    { slug: "erica-meridin-east", cat: "residential",
+      name: "Erica Meridin East", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/erica-meridin-east-1.jpg"] },
+    { slug: "midas-seri-alam-johor", cat: "residential",
+      name: "Midas Seri Alam Johor", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/midas-seri-alam-johor-1.jpg"] },
+    { slug: "pangsapuri-1-scientex", cat: "residential",
+      name: "Pangsapuri 1 Scientex", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/pangsapuri-1-scientex-1.jpg"] },
+    { slug: "persiaran-aliff-harmoni-utama", cat: "residential",
+      name: "Persiaran Aliff Harmoni Utama", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/persiaran-aliff-harmoni-utama-1.jpg"] },
+    { slug: "pisonia-ville-uda-utama-johor", cat: "residential",
+      name: "Pisonia Ville UDA Utama Johor", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/pisonia-ville-uda-utama-johor-1.jpg"] },
+    { slug: "residensi-saujana-johor", cat: "residential",
+      name: "Residensi Saujana Johor", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/residensi-saujana-johor-1.jpg"] },
+    { slug: "scientex-kota-tinggi", cat: "residential",
+      name: "Scientex Kota Tinggi", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/scientex-kota-tinggi-1.jpg"] },
+    { slug: "st-marco", cat: "residential",
+      name: "St Marco", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/st-marco-1.jpg"] },
+    { slug: "taman-pulai-mutiara-3", cat: "residential",
+      name: "Taman Pulai Mutiara 3", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/taman-pulai-mutiara-3-1.jpg"] },
+    { slug: "taman-sri-saujana-johor", cat: "residential",
+      name: "Taman Sri Saujana Johor", loc: "Johor",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/taman-sri-saujana-johor-1.jpg"] },
+    { slug: "taman-molek-residen", cat: "residential",
+      name: "Taman Molek Residen", loc: "Melaka",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/taman-molek-residen-1.jpg"] },
+    { slug: "taman-permata-duyung-2-melaka", cat: "residential",
+      name: "Taman Permata Duyung 2 Melaka", loc: "Melaka",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/taman-permata-duyung-2-melaka-1.jpg"] },
+    { slug: "taman-vista-belimbing-melaka", cat: "residential",
+      name: "Taman Vista Belimbing Melaka", loc: "Melaka",
+      desc: { en: "Home defect inspection (DLP)", bm: "Pemeriksaan kecacatan rumah (DLP)" },
+      photos: ["img/proj/taman-vista-belimbing-melaka-1.jpg"] },
+    { slug: "bangunan-sarang-burung", cat: "commercial",
+      name: "Bangunan Sarang Burung", loc: "",
+      desc: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
+      photos: ["img/proj/bangunan-sarang-burung-1.png", "img/proj/bangunan-sarang-burung-2.png"] },
+    { slug: "shoplot-1", cat: "commercial",
+      name: "Shoplot 1", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-1-1.jpg", "img/proj/shoplot-1-2.jpg", "img/proj/shoplot-1-3.jpg", "img/proj/shoplot-1-4.jpg"] },
+    { slug: "shoplot-2", cat: "commercial",
+      name: "Shoplot 2", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-2-1.jpg", "img/proj/shoplot-2-2.jpg", "img/proj/shoplot-2-3.jpg"] },
+    { slug: "shoplot-3", cat: "commercial",
+      name: "Shoplot 3", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-3-1.jpg", "img/proj/shoplot-3-2.jpg", "img/proj/shoplot-3-3.jpg"] },
+    { slug: "shoplot-4", cat: "commercial",
+      name: "Shoplot 4", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-4-1.jpg", "img/proj/shoplot-4-2.jpg", "img/proj/shoplot-4-3.jpg"] },
+    { slug: "shoplot-5", cat: "commercial",
+      name: "Shoplot 5", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-5-1.jpg", "img/proj/shoplot-5-2.jpg", "img/proj/shoplot-5-3.jpg"] },
+    { slug: "shoplot-6", cat: "commercial",
+      name: "Shoplot 6", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-6-1.jpg", "img/proj/shoplot-6-2.jpg", "img/proj/shoplot-6-3.jpg"] },
+    { slug: "shoplot-7", cat: "commercial",
+      name: "Shoplot 7", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-7-1.jpg", "img/proj/shoplot-7-2.jpg", "img/proj/shoplot-7-3.jpg"] },
+    { slug: "shoplot-8", cat: "commercial",
+      name: "Shoplot 8", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-8-1.jpg", "img/proj/shoplot-8-2.jpg"] },
+    { slug: "shoplot-9", cat: "commercial",
+      name: "Shoplot 9", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/shoplot-9-1.png", "img/proj/shoplot-9-2.png"] },
+    { slug: "warehouse", cat: "commercial",
+      name: "Warehouse", loc: "",
+      desc: { en: "Condition assessment — commercial premises", bm: "Penilaian keadaan — premis komersial" },
+      photos: ["img/proj/warehouse-1.jpg", "img/proj/warehouse-2.jpg", "img/proj/warehouse-3.jpg"] },
+    { slug: "road-condition-survey", cat: "infrastructure",
+      name: "Road Condition Survey", loc: "",
+      desc: { en: "Road condition survey", bm: "Tinjauan keadaan jalan" },
+      photos: ["img/proj/road-condition-survey-1.jpg", "img/proj/road-condition-survey-2.jpg", "img/proj/road-condition-survey-3.jpg", "img/proj/road-condition-survey-4.jpg"] },
+    { slug: "jalan-biru", cat: "infrastructure",
+      name: "Jalan Biru", loc: "Labis, Johor",
+      desc: { en: "Road condition survey", bm: "Tinjauan keadaan jalan" },
+      photos: ["img/proj/jalan-biru-1.png", "img/proj/jalan-biru-2.png"] },
+    { slug: "jalan-hijau", cat: "infrastructure",
+      name: "Jalan Hijau", loc: "Labis, Johor",
+      desc: { en: "Road condition survey", bm: "Tinjauan keadaan jalan" },
+      photos: ["img/proj/jalan-hijau-1.png", "img/proj/jalan-hijau-2.png"] },
+    { slug: "jalan-suratman", cat: "infrastructure",
+      name: "Jalan Suratman", loc: "Labis, Johor",
+      desc: { en: "Road condition survey", bm: "Tinjauan keadaan jalan" },
+      photos: ["img/proj/jalan-suratman-1.png", "img/proj/jalan-suratman-2.png"] },
+    { slug: "bridge-2", cat: "infrastructure",
+      name: "Bridge 2", loc: "",
+      desc: { en: "Bridge & walkway condition survey", bm: "Tinjauan keadaan jambatan & laluan" },
+      photos: ["img/proj/bridge-2-1.jpg", "img/proj/bridge-2-2.jpg"] },
+    { slug: "bridge-1", cat: "infrastructure",
+      name: "Bridge 1", loc: "",
+      desc: { en: "Bridge & walkway condition survey", bm: "Tinjauan keadaan jambatan & laluan" },
+      photos: ["img/proj/bridge-1-1.jpg", "img/proj/bridge-1-2.jpg"] },
+    { slug: "railway-structure", cat: "infrastructure",
+      name: "Railway Structure", loc: "",
+      desc: { en: "Railway structure condition survey", bm: "Tinjauan keadaan struktur landasan" },
+      photos: ["img/proj/railway-structure-1.jpg", "img/proj/railway-structure-2.jpg", "img/proj/railway-structure-3.jpg"] },
+    { slug: "stesen-bas-labis", cat: "infrastructure",
+      name: "Stesen Bas Labis", loc: "Labis, Johor",
+      desc: { en: "Bus station condition assessment", bm: "Penilaian keadaan stesen bas" },
+      photos: ["img/proj/stesen-bas-labis-1.png", "img/proj/stesen-bas-labis-2.png"] },
+    { slug: "tnb-substation-1", cat: "infrastructure",
+      name: "TNB Substation 1", loc: "",
+      desc: { en: "Substation building condition assessment", bm: "Penilaian keadaan bangunan pencawang" },
+      photos: ["img/proj/tnb-substation-1-1.jpg", "img/proj/tnb-substation-1-2.jpg", "img/proj/tnb-substation-1-3.jpg"] },
+    { slug: "tnb-substation-2", cat: "infrastructure",
+      name: "TNB Substation 2", loc: "",
+      desc: { en: "Substation building condition assessment", bm: "Penilaian keadaan bangunan pencawang" },
+      photos: ["img/proj/tnb-substation-2-1.png", "img/proj/tnb-substation-2-2.png"] },
+    { slug: "balai-raya-1", cat: "public",
+      name: "Balai Raya 1", loc: "",
+      desc: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
+      photos: ["img/proj/balai-raya-1-1.jpg", "img/proj/balai-raya-1-2.jpg", "img/proj/balai-raya-1-3.jpg"] },
+    { slug: "balai-raya-2", cat: "public",
+      name: "Balai Raya 2", loc: "",
+      desc: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
+      photos: ["img/proj/balai-raya-2-1.png", "img/proj/balai-raya-2-2.png"] },
+    { slug: "bangunan-pasar", cat: "public",
+      name: "Bangunan Pasar", loc: "",
+      desc: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
+      photos: ["img/proj/bangunan-pasar-1.png", "img/proj/bangunan-pasar-2.png"] },
+    { slug: "dewan-komuniti-labis-jaya", cat: "public",
+      name: "Dewan Komuniti Labis Jaya", loc: "Labis, Johor",
+      desc: { en: "Building Condition Assessment (BCA)", bm: "Building Condition Assessment (BCA)" },
+      photos: ["img/proj/dewan-komuniti-labis-jaya-1.png", "img/proj/dewan-komuniti-labis-jaya-2.png"] },
+    { slug: "balai-islam-taman-indah", cat: "public",
+      name: "Balai Islam Taman Indah", loc: "",
+      desc: { en: "Condition assessment — place of worship", bm: "Penilaian keadaan — rumah ibadat" },
+      photos: ["img/proj/balai-islam-taman-indah-1.png", "img/proj/balai-islam-taman-indah-2.png"] },
+    { slug: "gereja", cat: "public",
+      name: "Gereja", loc: "",
+      desc: { en: "Condition assessment — place of worship", bm: "Penilaian keadaan — rumah ibadat" },
+      photos: ["img/proj/gereja-1.jpg", "img/proj/gereja-2.jpg", "img/proj/gereja-3.jpg"] },
+    { slug: "kuil-1", cat: "public",
+      name: "Kuil 1", loc: "",
+      desc: { en: "Condition assessment — place of worship", bm: "Penilaian keadaan — rumah ibadat" },
+      photos: ["img/proj/kuil-1-1.jpg", "img/proj/kuil-1-2.jpg", "img/proj/kuil-1-3.jpg"] },
+    { slug: "kuil-2", cat: "public",
+      name: "Kuil 2", loc: "",
+      desc: { en: "Condition assessment — place of worship", bm: "Penilaian keadaan — rumah ibadat" },
+      photos: ["img/proj/kuil-2-1.jpg", "img/proj/kuil-2-2.jpg", "img/proj/kuil-2-3.jpg"] },
+    { slug: "kebun-1", cat: "land",
+      name: "Kebun 1", loc: "",
+      desc: { en: "Land & site condition survey", bm: "Tinjauan keadaan tanah & tapak" },
+      photos: ["img/proj/kebun-1-1.jpg", "img/proj/kebun-1-2.jpg", "img/proj/kebun-1-3.jpg"] },
+    { slug: "kebun-2", cat: "land",
+      name: "Kebun 2", loc: "",
+      desc: { en: "Land & site condition survey", bm: "Tinjauan keadaan tanah & tapak" },
+      photos: ["img/proj/kebun-2-1.jpg", "img/proj/kebun-2-2.jpg"] },
+    { slug: "river-1", cat: "land",
+      name: "River 1", loc: "",
+      desc: { en: "River & drainage condition survey", bm: "Tinjauan keadaan sungai & saliran" },
+      photos: ["img/proj/river-1-1.jpg", "img/proj/river-1-2.jpg", "img/proj/river-1-3.jpg"] },
+    { slug: "river-2", cat: "land",
+      name: "River 2", loc: "",
+      desc: { en: "River & drainage condition survey", bm: "Tinjauan keadaan sungai & saliran" },
+      photos: ["img/proj/river-2-1.jpg", "img/proj/river-2-2.jpg"] },
+    { slug: "river-3", cat: "land",
+      name: "River 3", loc: "",
+      desc: { en: "River & drainage condition survey", bm: "Tinjauan keadaan sungai & saliran" },
+      photos: ["img/proj/river-3-1.jpg", "img/proj/river-3-2.jpg"] },
+    { slug: "river-4", cat: "land",
+      name: "River 4", loc: "",
+      desc: { en: "River & drainage condition survey", bm: "Tinjauan keadaan sungai & saliran" },
+      photos: ["img/proj/river-4-1.jpg", "img/proj/river-4-2.jpg", "img/proj/river-4-3.jpg"] },
+    { slug: "river-5", cat: "land",
+      name: "River 5", loc: "",
+      desc: { en: "River & drainage condition survey", bm: "Tinjauan keadaan sungai & saliran" },
+      photos: ["img/proj/river-5-1.jpg", "img/proj/river-5-2.jpg"] },
+    { slug: "river-6", cat: "land",
+      name: "River 6", loc: "",
+      desc: { en: "River & drainage condition survey", bm: "Tinjauan keadaan sungai & saliran" },
+      photos: ["img/proj/river-6-1.jpg", "img/proj/river-6-2.jpg"] }
 ];
 
 /* =========================================================
@@ -3970,6 +4256,8 @@ var I18N = {
         "proj.sub": "A selection of inspection and surveying work completed across Malaysia.",
         "proj.subfull": "The full list of inspection and surveying work completed by our team across Malaysia.",
         "proj.all": "All", "proj.res": "Residential", "proj.com": "Commercial", "proj.tech": "Technical",
+        "proj.infra": "Infrastructure", "proj.pub": "Public & Institutional", "proj.land": "Land & River",
+        "proj.photos": "photos",
         "proj.more": "Show More Projects", "proj.count": "Projects",
         "pg.back": "Back to Home",
         "svc.tag": "Our Services", "svc.title": "All Inspection & Surveying Services",
@@ -4053,6 +4341,8 @@ var I18N = {
         "proj.sub": "Sebahagian kerja inspection dan ukur bangunan yang telah disiapkan di seluruh Malaysia.",
         "proj.subfull": "Senarai penuh kerja inspection dan ukur bangunan yang telah disiapkan oleh pasukan kami di seluruh Malaysia.",
         "proj.all": "Semua", "proj.res": "Kediaman", "proj.com": "Komersial", "proj.tech": "Teknikal",
+        "proj.infra": "Infrastruktur", "proj.pub": "Awam & Institusi", "proj.land": "Tanah & Sungai",
+        "proj.photos": "gambar",
         "proj.more": "Lihat Lagi Projek", "proj.count": "Projek",
         "pg.back": "Kembali ke Laman Utama",
         "svc.tag": "Servis Kami", "svc.title": "Semua Servis Inspection & Ukur Bangunan",
@@ -4894,11 +5184,20 @@ var FAQ_ALL = [
         { key: "all", i18n: "proj.all" },
         { key: "residential", i18n: "proj.res" },
         { key: "commercial", i18n: "proj.com" },
-        { key: "technical", i18n: "proj.tech" }
+        { key: "infrastructure", i18n: "proj.infra" },
+        { key: "public", i18n: "proj.pub" },
+        { key: "land", i18n: "proj.land" }
     ];
-    function projSrc(p) {
-        if (!p.img) return "";
-        return /^https?:\/\//.test(p.img) ? p.img : CONFIG.imgBase + p.img;
+    var PROJ_LABEL = {
+        residential: "proj.res", commercial: "proj.com", infrastructure: "proj.infra",
+        public: "proj.pub", land: "proj.land", technical: "proj.tech"
+    };
+    function projSrc(v) {
+        if (!v) return "";
+        return (/^https?:\/\//.test(v) || v.indexOf("img/") === 0) ? v : CONFIG.imgBase + v;
+    }
+    function projPhotos(p) {
+        return (p.photos || (p.img ? [p.img] : [])).map(projSrc).filter(Boolean);
     }
     function visibleProjects() {
         return PROJECTS.filter(function (p) { return projFilter === "all" || p.cat === projFilter; });
@@ -4930,22 +5229,30 @@ var FAQ_ALL = [
         }
 
         gridEl.innerHTML = "";
-        list.forEach(function (p, idx) {
+        list.forEach(function (p) {
+            var photos = projPhotos(p);
+            var cover = photos[0] || "";
             var card = document.createElement("button");
             card.type = "button";
             card.className = "proj-card";
 
             var media = document.createElement("div");
-            media.className = "proj-media" + (p.img ? "" : " ph");
+            media.className = "proj-media" + (cover ? "" : " ph");
             var badge = document.createElement("span");
             badge.className = "proj-badge";
-            badge.textContent = t(p.cat === "residential" ? "proj.res" : p.cat === "commercial" ? "proj.com" : "proj.tech");
+            badge.textContent = t(PROJ_LABEL[p.cat] || "proj.all");
             media.appendChild(badge);
-            if (p.img) {
+            if (cover) {
                 var im = document.createElement("img");
-                im.src = projSrc(p); im.alt = p.name; im.loading = "lazy";
+                im.src = cover; im.alt = p.name; im.loading = "lazy";
                 im.onerror = function () { media.classList.add("ph"); };
                 media.appendChild(im);
+                if (photos.length > 1) {
+                    var cnt = document.createElement("span");
+                    cnt.className = "proj-count";
+                    cnt.textContent = photos.length + " " + t("proj.photos");
+                    media.appendChild(cnt);
+                }
                 var zoom = document.createElement("span");
                 zoom.className = "proj-zoom";
                 zoom.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg>';
@@ -4956,24 +5263,26 @@ var FAQ_ALL = [
             var info = document.createElement("div");
             info.className = "proj-info";
             var h = document.createElement("h3"); h.textContent = p.name;
-            var loc = document.createElement("p"); loc.className = "proj-loc";
-            loc.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
-            loc.appendChild(document.createTextNode(p.loc));
+            info.appendChild(h);
+            if (p.loc) {
+                var loc = document.createElement("p"); loc.className = "proj-loc";
+                loc.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+                loc.appendChild(document.createTextNode(p.loc));
+                info.appendChild(loc);
+            }
             var d = document.createElement("p"); d.className = "proj-desc";
             d.textContent = p.desc[lang] || p.desc.en;
-            info.appendChild(h); info.appendChild(loc); info.appendChild(d);
+            info.appendChild(d);
             card.appendChild(info);
 
-            // klik: buka lightbox semua projek bergambar dalam penapis semasa
+            // klik: buka lightbox gambar projek ini sahaja
             card.addEventListener("click", function () {
-                if (!p.img) return;
-                var withImg = list.filter(function (x) { return x.img; });
-                var start = withImg.indexOf(p);
-                lbOpenItems(withImg.map(function (x) {
-                    return { src: projSrc(x), label: x.name + " — " + x.loc };
-                }), Math.max(start, 0));
+                if (!photos.length) return;
+                lbOpenItems(photos.map(function (u, i) {
+                    return { src: u, label: p.name + (photos.length > 1 ? " " + (i + 1) + "/" + photos.length : "") };
+                }), 0);
             });
-            if (!p.img) card.style.cursor = "default";
+            if (!photos.length) card.style.cursor = "default";
 
             gridEl.appendChild(card);
         });
@@ -5040,7 +5349,7 @@ var FAQ_ALL = [
         var related = SVC.filter(function (x) { return x.cat === s.cat && x.slug !== s.slug; });
         var waMsg = t("wa.svc") + " " + svcName(s);
 
-        var imgSrc = s.img ? (/^https?:\/\//.test(s.img) ? s.img : CONFIG.imgBase + s.img) : "";
+        var imgSrc = s.img ? ((/^https?:\/\//.test(s.img) || s.img.indexOf("img/") === 0) ? s.img : CONFIG.imgBase + s.img) : "";
         var who = s.who ? (s.who[lang] || s.who.en) : [];
         var catLabel = SVC_CATS[s.cat][lang] || SVC_CATS[s.cat].en;
         var ex = SVC_EXTRAS[slug];

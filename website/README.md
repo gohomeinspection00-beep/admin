@@ -12,10 +12,10 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Home | `index.html` | ✅ Siap |
 | Tentang Kami | `index.html#/about` | ✅ Siap |
 | FAQ penuh (39 soalan, 7 kategori) | `index.html#/faq` | ✅ Siap |
-| Galeri gambar | `index.html#/gallery` | ✅ Siap (16 slot, 5 kategori) |
+| Galeri gambar | `index.html#/gallery` | ✅ Siap (37 gambar, 6 kategori) |
 | Blog / Artikel | `index.html#/blog` | ✅ Siap (6 artikel) |
 | Artikel penuh | `index.html#/blog/<slug>` cth `#/blog/dlp-guide` | ✅ Siap |
-| Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap |
+| Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap (58 projek, 143 gambar) |
 | Servis (semua 16, ikut kategori) | `index.html#/services` | ✅ Siap |
 | Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (16 servis) |
 
@@ -62,7 +62,10 @@ Buka `index.html`, cari bahagian atas `<script>`:
 - **`BLOG`** — artikel (slug, kategori, tarikh, masa baca, tajuk, petikan, isi). Panduan tulis artikel baharu ada dalam komen di atas blok ini
 - **`FAQ_ALL`** — 39 soalan FAQ (`cat` = kategori, `home: true` = papar juga di home)
 - **`ABOUT`** — page Tentang Kami: cerita, prinsip, kelayakan, **pasukan** (isi nama + `photo`), **garis masa** (isi tahun)
-- **`PROJECTS`** — senarai projek (home papar 6 pertama, page `#/projects` papar semua)
+- **`PROJECTS`** — 58 projek (home papar 6 pertama, page `#/projects` papar semua).
+  Setiap projek ada `photos: []` — gambar pertama jadi kad, klik kad buka
+  semua gambar projek itu dalam lightbox. Kategori: `residential`,
+  `commercial`, `infrastructure`, `public`, `land`
 - **`AUDIENCES` / `WHYUS` / `EQUIPMENT` / `PROCESS` / `SERVICES_LIST` / `FAQS`** — kandungan seksyen
 - Warna: blok `:root` di bahagian atas `<style>`
 
@@ -78,11 +81,23 @@ dan ganti `og:image` dengan gambar 1200×630 px sendiri.
 
 ## Gambar
 
-Semua gambar masih guna hosting lama `https://arleta.site/interactivelink/1453/`.
-Jika gambar gagal load, fallback (emoji/teks) akan dipaparkan secara automatik.
+Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 
-**Penting:** bila bersedia, download semua gambar, letak dalam folder `img/`
-di sebelah `index.html`, kemudian tukar `imgBase` dalam CONFIG kepada `"img/"`.
+| Folder | Isi |
+|---|---|
+| `img/svc/` | 12 gambar hero untuk sub-page servis |
+| `img/proj/` | 143 gambar untuk 58 projek |
+| `img/gal/` | 20 gambar pasukan / di tapak / ACPIM / latihan |
+| `img/` (root) | 5 gambar re-inspection (before/after) |
+
+**Cara rujuk gambar dalam data:**
+- `"img/xxx.jpg"` — fail tempatan (guna terus)
+- `"ARLETA:Nama.png"` — hosting lama `https://arleta.site/interactivelink/1453/`
+  (hanya tinggal gambar peralatan & beberapa grafik teknikal)
+- `""` — placeholder kemas dipaparkan
+
+Jika mana-mana gambar gagal load, fallback (ikon/teks) dipaparkan automatik —
+layout tak pernah pecah.
 
 ## Rujukan penuh extract design lama
 
