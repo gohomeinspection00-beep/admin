@@ -485,22 +485,24 @@ section { padding: 5rem 2rem; }
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--primary);
     background: #E3F2FD; padding: 0.3rem 0.7rem; border-radius: 4px;
 }
-.svc-list-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.svc-list-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
 .svc-mini {
-    display: flex; flex-direction: column; gap: 0.3rem; text-decoration: none;
-    background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
-    padding: 1.25rem 1.3rem; transition: all 0.3s ease; position: relative;
+    display: block; text-decoration: none; overflow: hidden; position: relative;
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    transition: all 0.3s ease;
 }
 .svc-mini:hover {
-    background: white; border-color: var(--primary);
-    transform: translateY(-4px); box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+    transform: translateY(-5px); box-shadow: var(--shadow-lg);
 }
-.svc-mini h4 { font-size: 1rem; font-weight: 700; color: var(--text-dark); padding-right: 1.5rem; }
-.svc-mini p { font-size: 0.85rem; color: var(--text-muted); }
+.svc-mini h4 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.28rem; }
+.svc-mini p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.55; }
 .svc-mini::after {
-    content: '→'; position: absolute; top: 1.1rem; right: 1.2rem;
-    color: var(--primary); font-weight: 700; opacity: 0; transform: translateX(-4px);
-    transition: all 0.3s ease;
+    content: '→'; position: absolute; top: 11px; right: 12px; z-index: 3;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.95); color: var(--primary); font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateX(-5px); transition: all 0.3s ease;
 }
 .svc-mini:hover::after { opacity: 1; transform: none; }
 
@@ -649,15 +651,29 @@ section { padding: 5rem 2rem; }
 .svc-tool-chips span::before { content: '🛠'; font-size: 0.8rem; }
 
 /* ---- Ikon pada kad overview servis ---- */
-.svc-mini { display: grid; grid-template-columns: 44px 1fr; gap: 0.9rem; align-items: start; }
+.svc-mini-img {
+    display: block; position: relative; aspect-ratio: 16 / 10; overflow: hidden;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+.svc-mini-img img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.55s ease;
+}
+.svc-mini:hover .svc-mini-img img { transform: scale(1.06); }
+.svc-mini-img.ph img { display: none; }
+.svc-mini-img::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, rgba(15,23,42,0.38), transparent 58%);
+}
 .svc-mini-icon {
-    width: 44px; height: 44px; border-radius: 12px; background: #E3F2FD;
+    position: absolute; left: 11px; bottom: 11px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.95);
     display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
 }
-.svc-mini-icon svg { width: 22px; height: 22px; color: var(--primary); transition: color 0.3s ease; }
-.svc-mini:hover .svc-mini-icon { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+.svc-mini-icon svg { width: 19px; height: 19px; color: var(--primary); transition: color 0.3s ease; }
+.svc-mini:hover .svc-mini-icon { background: var(--primary); }
 .svc-mini:hover .svc-mini-icon svg { color: white; }
-.svc-mini-body { display: block; min-width: 0; }
+.svc-mini-body { display: block; min-width: 0; padding: 1.05rem 1.15rem 1.25rem; }
 
 /* ---- Ekstra sub-page DLP: statistik mini di header ---- */
 .svc-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem; }
@@ -1418,7 +1434,7 @@ section { padding: 5rem 2rem; }
     .page-head { padding: 6.5rem 1.25rem 2.25rem; }
     .vpage-body { padding: 2.5rem 1.25rem 3.5rem; }
     .svc-list-grid { grid-template-columns: 1fr; }
-    .svc-mini { padding: 1.1rem 1.15rem; }
+    .svc-mini-body { padding: 1rem 1.1rem 1.15rem; }
     .svc-tagline { font-size: 0.98rem; }
     .svc-side-card { padding: 1.6rem; }
     .svc-tools { padding: 1.2rem 1.25rem; }
@@ -2181,7 +2197,7 @@ var SVC_CATS = {
 
 var SVC = [
     { slug: "home-defect", cat: "residential", img: "img/proj/aurora-sentral-1.jpg",
-      gal: ["img/proj/aurora-sentral-1.jpg", "img/proj/erica-meridin-east-1.jpg", "img/proj/midas-seri-alam-johor-1.jpg", "img/proj/pangsapuri-1-scientex-1.jpg", "img/proj/persiaran-aliff-harmoni-utama-1.jpg", "img/proj/pisonia-ville-uda-utama-johor-1.jpg", "img/proj/residensi-saujana-johor-1.jpg", "img/proj/scientex-kota-tinggi-1.jpg", "img/proj/st-marco-1.jpg", "img/proj/taman-pulai-mutiara-3-1.jpg", "img/proj/taman-sri-saujana-johor-1.jpg", "img/proj/taman-molek-residen-1.jpg", "img/proj/taman-permata-duyung-2-melaka-1.jpg", "img/proj/taman-vista-belimbing-melaka-1.jpg"],
+      gal: ["img/proj/aurora-sentral-1.jpg", "img/proj/st-marco-1.jpg", "img/proj/erica-meridin-east-1.jpg", "img/proj/midas-seri-alam-johor-1.jpg", "img/proj/pangsapuri-1-scientex-1.jpg", "img/proj/persiaran-aliff-harmoni-utama-1.jpg", "img/proj/pisonia-ville-uda-utama-johor-1.jpg", "img/proj/residensi-saujana-johor-1.jpg", "img/proj/scientex-kota-tinggi-1.jpg", "img/proj/taman-pulai-mutiara-3-1.jpg", "img/proj/taman-sri-saujana-johor-1.jpg", "img/proj/taman-molek-residen-1.jpg", "img/proj/taman-permata-duyung-2-melaka-1.jpg", "img/proj/taman-vista-belimbing-melaka-1.jpg"],
       who:  { en: ["New home owners", "Units under DLP"], bm: ["Pemilik rumah baru", "Unit dalam tempoh DLP"] },
       tools: ["Thermal Camera", "Moisture Meter", "Spirit Level", "Laser Distance"],
       name: { en: "Home Defect Inspection (DLP)", bm: "Home Defect Inspection (DLP)" },
@@ -2193,8 +2209,8 @@ var SVC = [
       get:  { en: ["Photo-tagged defect report (PDF)", "Defect locations & severity listed", "Submission-ready for your developer"],
               bm: ["Laporan kecacatan bergambar (PDF)", "Lokasi & tahap keterukan disenaraikan", "Sedia dihantar terus kepada pemaju"] } },
 
-    { slug: "pre-purchase", cat: "residential", img: "img/proj/taman-pulai-mutiara-3-1.jpg",
-      gal: ["img/proj/taman-pulai-mutiara-3-1.jpg"],
+    { slug: "pre-purchase", cat: "residential", img: "img/svc/sub-sale/3.jpg",
+      gal: ["img/svc/sub-sale/3.jpg"],
       who:  { en: ["Sub-sale buyers", "Before signing the S&P"], bm: ["Pembeli sub-sale", "Sebelum tandatangan S&P"] },
       tools: ["Moisture Meter", "Thermal Camera", "Laser Distance"],
       name: { en: "Pre-Purchase Inspection", bm: "Pre-Purchase Inspection" },
@@ -5553,6 +5569,11 @@ var FAQ_ALL = [
 
     /* ---------- Page Servis (#/services) ---------- */
     function svcName(s) { return s.name[lang] || s.name.en; }
+    function svcImg(s) {
+        if (!s.img) return "";
+        return (/^https?:\/\//.test(s.img) || s.img.indexOf("img/") === 0)
+            ? s.img : CONFIG.imgBase + s.img;
+    }
     var SVC_BY_SLUG = {};
     SVC.forEach(function (s) { SVC_BY_SLUG[s.slug] = s; });
 
@@ -5585,8 +5606,13 @@ var FAQ_ALL = [
                 var a = document.createElement("a");
                 a.className = "svc-mini";
                 a.href = "#/services/" + s.slug;
+                var src = svcImg(s);
                 a.innerHTML =
-                    '<span class="svc-mini-icon">' + CAT_ICONS[s.cat] + '</span>' +
+                    '<span class="svc-mini-img' + (src ? "" : " ph") + '">' +
+                        (src ? '<img src="' + src + '" alt="" loading="lazy" ' +
+                               'onerror="this.parentElement.classList.add(\'ph\')">' : "") +
+                        '<span class="svc-mini-icon">' + CAT_ICONS[s.cat] + '</span>' +
+                    '</span>' +
                     '<span class="svc-mini-body"><h4></h4><p></p></span>';
                 a.querySelector("h4").textContent = svcName(s);
                 a.querySelector("p").textContent = s.tag[lang] || s.tag.en;
@@ -5607,7 +5633,7 @@ var FAQ_ALL = [
         var waMsg = t("wa.svc") + " " + svcName(s);
 
         var slides = (s.gal || []).slice();
-        var imgSrc = s.img ? ((/^https?:\/\//.test(s.img) || s.img.indexOf("img/") === 0) ? s.img : CONFIG.imgBase + s.img) : "";
+        var imgSrc = svcImg(s);
         var who = s.who ? (s.who[lang] || s.who.en) : [];
         var catLabel = SVC_CATS[s.cat][lang] || SVC_CATS[s.cat].en;
         var ex = SVC_EXTRAS[slug];

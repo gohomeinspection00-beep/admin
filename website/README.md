@@ -16,7 +16,7 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Blog / Artikel | `index.html#/blog` | ✅ Siap (6 artikel) |
 | Artikel penuh | `index.html#/blog/<slug>` cth `#/blog/dlp-guide` | ✅ Siap |
 | Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap (58 projek, 143 gambar) |
-| Servis (semua 16, ikut kategori) | `index.html#/services` | ✅ Siap |
+| Servis (semua 16, ikut kategori) | `index.html#/services` | ✅ Siap — setiap kad ada gambar |
 | Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (16 servis) |
 
 ### Sub-page servis: kandungan penuh
