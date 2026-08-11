@@ -861,6 +861,48 @@ section { padding: 5rem 2rem; }
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
 }
 
+/* ---- Galeri: susunan masonry ---- */
+.gal-masonry { columns: 3; column-gap: 1.1rem; }
+.gal-item {
+    break-inside: avoid; margin-bottom: 1.1rem; position: relative;
+    border-radius: 14px; overflow: hidden; cursor: pointer;
+    display: block; width: 100%; padding: 0; border: 1px solid var(--border);
+    background: white; font-family: inherit; text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.gal-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.gal-item img { width: 100%; display: block; }
+.gal-item.img-missing img { display: none; }
+.gal-item.img-missing::before {
+    content: ''; display: block; width: 100%; aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #E8F1FB 0%, #D6E7F8 100%);
+}
+.gal-item.img-missing .gal-ph {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+}
+.gal-ph { display: none; }
+.gal-ph svg { width: 42px; height: 42px; color: rgba(21, 101, 192, 0.4); }
+.gal-chip {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    background: rgba(255,255,255,0.94); color: var(--primary-dark);
+    padding: 0.28rem 0.6rem; border-radius: 4px;
+}
+.gal-cap {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem 0.9rem 0.85rem;
+    background: linear-gradient(to top, rgba(10,20,35,0.88), rgba(10,20,35,0.55) 55%, transparent);
+    color: white; opacity: 0; transform: translateY(8px); transition: all 0.3s ease;
+}
+.gal-item:hover .gal-cap { opacity: 1; transform: none; }
+.gal-cap b { display: block; font-size: 0.88rem; font-weight: 700; line-height: 1.35; margin-bottom: 0.15rem; }
+.gal-cap span { font-size: 0.76rem; opacity: 0.85; line-height: 1.45; }
+.gal-item.img-missing .gal-cap { opacity: 1; transform: none; background: none; color: var(--text-body); }
+.gal-item.img-missing .gal-cap b { color: var(--text-dark); }
+@media (hover: none) {
+    .gal-cap { opacity: 1; transform: none; }
+}
+
 /* ---- Blog: senarai artikel ---- */
 .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .blog-card {
@@ -1255,6 +1297,7 @@ section { padding: 5rem 2rem; }
     .review-next { right: -50px; }
     .svc-list-grid { grid-template-columns: repeat(2, 1fr); }
     .value-grid, .team-grid, .blog-grid { grid-template-columns: repeat(2, 1fr); }
+    .gal-masonry { columns: 2; }
     .svc-detail-grid { grid-template-columns: 1fr; gap: 2rem; }
     .svc-side { position: static; }
     .page-head-grid { grid-template-columns: 1fr; gap: 1.75rem; }
@@ -1317,6 +1360,11 @@ section { padding: 5rem 2rem; }
     .report-img.center { width: 50%; max-width: 190px; }
     .report-row { margin-bottom: -24px; }
     .value-grid, .blog-grid { grid-template-columns: 1fr; }
+    .gal-masonry { columns: 2; column-gap: 0.7rem; }
+    .gal-item { margin-bottom: 0.7rem; }
+    .gal-cap { padding: 1.2rem 0.6rem 0.6rem; }
+    .gal-cap b { font-size: 0.78rem; }
+    .gal-cap span { font-size: 0.68rem; }
     .team-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
     .article p { font-size: 0.98rem; }
     .article h3 { font-size: 1.12rem; }
@@ -1360,6 +1408,7 @@ section { padding: 5rem 2rem; }
             <li><a href="#/services" data-nav="services" data-i18n="nav.services">Services</a></li>
             <li><a href="#/about" data-nav="about" data-i18n="nav.about">About</a></li>
             <li><a href="#/projects" data-nav="projects" data-i18n="nav.projects">Projects</a></li>
+            <li><a href="#/gallery" data-nav="gallery" data-i18n="nav.gallery">Gallery</a></li>
             <li><a href="#/blog" data-nav="blog" data-i18n="nav.blog">Articles</a></li>
             <li><a href="#/faq" data-nav="faq" data-i18n="nav.faq">FAQ</a></li>
             <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
@@ -1800,6 +1849,27 @@ section { padding: 5rem 2rem; }
     <div id="aboutBody"><!-- dijana oleh JS --></div>
 </main>
 
+<!-- ############ PAGE: GALERI (#/gallery) ############ -->
+<main id="page-gallery" class="vpage" hidden>
+    <header class="page-head">
+        <div class="section-container">
+            <a class="back-link" href="#" data-i18n="pg.back">Back to Home</a>
+            <div class="section-header page-head-header">
+                <span class="section-tag" data-i18n="gal.tag">Gallery</span>
+                <h2 data-i18n="gal.title">From Our Site Visits</h2>
+                <p data-i18n="gal.sub">Our team, our instruments, and the defects we actually find — photographed on real inspections.</p>
+            </div>
+        </div>
+    </header>
+    <section class="vpage-body">
+        <div class="section-container">
+            <div class="proj-filters" id="galFilters"><!-- dijana oleh JS --></div>
+            <p class="proj-count"><span id="galCount">0</span> <span data-i18n="gal.count">Photos</span></p>
+            <div class="gal-masonry" id="galGrid"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+</main>
+
 <!-- ############ PAGE: BLOG (#/blog) ############ -->
 <main id="page-blog" class="vpage" hidden>
     <header class="page-head">
@@ -1871,6 +1941,7 @@ section { padding: 5rem 2rem; }
                     <li><a href="#/services" data-i18n="nav.services">Services</a></li>
                     <li><a href="#/about" data-i18n="nav.about">About</a></li>
                     <li><a href="#/projects" data-i18n="nav.projects">Projects</a></li>
+                    <li><a href="#/gallery" data-i18n="nav.gallery">Gallery</a></li>
                     <li><a href="#/blog" data-i18n="nav.blog">Articles</a></li>
                     <li><a href="#coverage" data-i18n="nav.coverage">Coverage</a></li>
                     <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
@@ -3316,6 +3387,85 @@ var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale
 })();
 
 /* =========================================================
+   GALERI (#/gallery)
+
+   Cara tambah gambar baharu — salin satu baris dan ubah:
+     { img: "img/nama-fail.jpg", cat: "team",
+       title: { en: "Title", bm: "Tajuk" },
+       caption: { en: "Short caption", bm: "Kapsyen ringkas" } }
+
+   img  : "img/xxx.jpg" (fail sendiri) ATAU "ARLETA:Nama.png" (hosting
+          lama) ATAU "" (kotak placeholder kemas dipaparkan)
+   cat  : team | site | defect | project | equipment
+   caption boleh dibiar kosong jika tidak perlu.
+   ========================================================= */
+var GAL_CATS = [
+    { key: "all",       label: { en: "All", bm: "Semua" } },
+    { key: "team",      label: { en: "Our Team", bm: "Pasukan Kami" } },
+    { key: "site",      label: { en: "On Site", bm: "Di Tapak" } },
+    { key: "defect",    label: { en: "Defects Found", bm: "Kecacatan Ditemui" } },
+    { key: "project",   label: { en: "Projects", bm: "Projek" } },
+    { key: "equipment", label: { en: "Equipment", bm: "Peralatan" } }
+];
+
+var GALLERY = [
+    /* --- Kecacatan sebenar (gambar sedia ada dalam img/) --- */
+    { img: "img/ri-11-before.png", cat: "defect",
+      title: { en: "Construction Debris in TNB Compartment", bm: "Sisa Pembinaan Dalam Ruang TNB" },
+      caption: { en: "Car porch — recorded during re-inspection", bm: "Car porch — direkod semasa re-inspection" } },
+    { img: "img/ri-11-after.png", cat: "defect",
+      title: { en: "Same Compartment, Still Not Cleared", bm: "Ruang Sama, Masih Belum Dibersihkan" },
+      caption: { en: "Marked Not Complete after developer's rectification", bm: "Ditanda Not Complete selepas pembaikian pemaju" } },
+    { img: "img/ri-12-before.png", cat: "defect",
+      title: { en: "Rusty Screw on Chamber Door", bm: "Skru Berkarat Pada Pintu Chamber" },
+      caption: { en: "Tagged with our defect sticker on site", bm: "Ditanda dengan sticker defect kami di tapak" } },
+    { img: "img/ri-12-after.png", cat: "defect",
+      title: { en: "Corrosion Progressing", bm: "Karat Semakin Teruk" },
+      caption: { en: "Re-inspection photo — rectification not done", bm: "Gambar re-inspection — pembaikian tidak dilakukan" } },
+    { img: "img/ri-40-after.png", cat: "site",
+      title: { en: "Clamp Meter Test at Distribution Board", bm: "Ujian Clamp Meter Di Papan Agihan" },
+      caption: { en: "0.06A reading with all MCB off — flagged for review", bm: "Bacaan 0.06A dengan semua MCB ditutup — dikesan untuk semakan" } },
+
+    /* --- Teknologi & peralatan (dari hosting sedia ada) --- */
+    { img: "ARLETA:ThermalOkey.png", cat: "equipment",
+      title: { en: "Thermal Imaging in Use", bm: "Imej Thermal Digunakan" },
+      caption: { en: "Reveals moisture behind finished surfaces", bm: "Mendedahkan lembapan di sebalik permukaan siap" } },
+    { img: "ARLETA:Crack-2.png", cat: "defect",
+      title: { en: "Structural Crack", bm: "Retak Struktur" },
+      caption: { en: "Width measured and monitored over time", bm: "Lebar diukur dan dipantau mengikut masa" } },
+    { img: "ARLETA:Earth-Tester.png", cat: "equipment",
+      title: { en: "Earth Tester", bm: "Earth Tester" },
+      caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
+    { img: "ARLETA:Insulation-test.png", cat: "equipment",
+      title: { en: "Insulation Tester", bm: "Insulation Tester" },
+      caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
+    { img: "ARLETA:Clamp-Meter.png", cat: "equipment",
+      title: { en: "Clamp Meter", bm: "Clamp Meter" },
+      caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
+    { img: "ARLETA:Laser-Distance-2.png", cat: "equipment",
+      title: { en: "Laser Distance Meter", bm: "Laser Distance Meter" },
+      caption: { en: "Measurement & level survey", bm: "Ukuran & tinjauan aras" } },
+
+    /* --- SLOT KOSONG: isi bila gambar sedia ---
+       Buang baris yang tak perlu, atau isi "img" untuk aktifkan. */
+    { img: "", cat: "team",
+      title: { en: "Our Surveyors", bm: "Surveyor Kami" },
+      caption: { en: "Add a team photo here", bm: "Letak gambar pasukan di sini" } },
+    { img: "", cat: "team",
+      title: { en: "Site Briefing", bm: "Taklimat Di Tapak" },
+      caption: { en: "Add a team photo here", bm: "Letak gambar pasukan di sini" } },
+    { img: "", cat: "site",
+      title: { en: "Inspection in Progress", bm: "Inspection Sedang Dijalankan" },
+      caption: { en: "Add an on-site photo here", bm: "Letak gambar di tapak di sini" } },
+    { img: "", cat: "project",
+      title: { en: "High-Rise Project", bm: "Projek Bangunan Tinggi" },
+      caption: { en: "Add a project photo here", bm: "Letak gambar projek di sini" } },
+    { img: "", cat: "project",
+      title: { en: "Landed Property", bm: "Rumah Bertanah" },
+      caption: { en: "Add a project photo here", bm: "Letak gambar projek di sini" } }
+];
+
+/* =========================================================
    BLOG / ARTIKEL (#/blog dan #/blog/<slug>)
 
    Cara tambah artikel baharu:
@@ -3798,7 +3948,10 @@ var I18N = {
         "pillar.more": "Explore all services",
         "nav.projects": "Projects", "nav.about": "About",
         "faq.more": "More Questions & Answers",
-        "nav.blog": "Articles",
+        "nav.blog": "Articles", "nav.gallery": "Gallery",
+        "gal.tag": "Gallery", "gal.title": "From Our Site Visits",
+        "gal.sub": "Our team, our instruments, and the defects we actually find — photographed on real inspections.",
+        "gal.count": "Photos",
         "blog.tag": "Articles", "blog.title": "Guides From the Field",
         "blog.sub": "What we learn on site, written up so property owners can use it — no jargon, no sales pitch.",
         "blog.read": "min read", "blog.next": "Read next",
@@ -3878,7 +4031,10 @@ var I18N = {
         "pillar.more": "Terokai semua servis",
         "nav.projects": "Projek", "nav.about": "Tentang Kami",
         "faq.more": "Lagi Soalan & Jawapan",
-        "nav.blog": "Artikel",
+        "nav.blog": "Artikel", "nav.gallery": "Galeri",
+        "gal.tag": "Galeri", "gal.title": "Dari Lawatan Tapak Kami",
+        "gal.sub": "Pasukan kami, peralatan kami, dan kecacatan yang kami benar-benar temui — dirakam semasa inspection sebenar.",
+        "gal.count": "Gambar",
         "blog.tag": "Artikel", "blog.title": "Panduan Dari Lapangan",
         "blog.sub": "Apa yang kami pelajari di tapak, ditulis supaya pemilik hartanah boleh gunakannya — tiada jargon, tiada jualan.",
         "blog.read": "min bacaan", "blog.next": "Baca seterusnya",
@@ -4342,6 +4498,65 @@ var FAQ_ALL = [
     function renderFaq() {
         buildFaqList(document.getElementById("faqList"),
                      FAQ_ALL.filter(function (f) { return f.home; }), true);
+    }
+
+    /* ---------- Galeri (#/gallery) ---------- */
+    var galFilter = "all";
+    function galSrc(img) {
+        if (!img) return "";
+        if (img.indexOf("ARLETA:") === 0) return CONFIG.imgBase + img.slice(7);
+        return img;
+    }
+    function galCatLabel(key) {
+        var c = GAL_CATS.filter(function (x) { return x.key === key; })[0];
+        return c ? t2(c.label) : key;
+    }
+    function renderGalleryPage() {
+        var filtersEl = document.getElementById("galFilters");
+        var grid = document.getElementById("galGrid");
+        var countEl = document.getElementById("galCount");
+        if (!filtersEl || !grid) return;
+
+        filtersEl.innerHTML = "";
+        GAL_CATS.forEach(function (c) {
+            var n = c.key === "all" ? GALLERY.length
+                                    : GALLERY.filter(function (g) { return g.cat === c.key; }).length;
+            if (!n) return;
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "proj-filter" + (galFilter === c.key ? " active" : "");
+            b.textContent = t2(c.label) + " (" + n + ")";
+            b.addEventListener("click", function () { galFilter = c.key; renderGalleryPage(); });
+            filtersEl.appendChild(b);
+        });
+
+        var list = GALLERY.filter(function (g) { return galFilter === "all" || g.cat === galFilter; });
+        if (countEl) countEl.textContent = list.length;
+
+        var camIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+        grid.innerHTML = list.map(function (g, i) {
+            var src = galSrc(g.img);
+            return '<button class="gal-item' + (src ? "" : " img-missing") + '" type="button" data-gi="' + i + '">' +
+                '<span class="gal-chip">' + galCatLabel(g.cat) + '</span>' +
+                (src ? '<img src="' + src + '" alt="' + t2(g.title) + '" loading="lazy" ' +
+                       'onerror="this.parentElement.classList.add(\'img-missing\')">' : "") +
+                '<span class="gal-ph">' + camIcon + '</span>' +
+                '<span class="gal-cap"><b>' + t2(g.title) + '</b>' +
+                (g.caption ? '<span>' + t2(g.caption) + '</span>' : "") + '</span></button>';
+        }).join("");
+
+        /* klik -> lightbox, hanya gambar yang benar-benar ada */
+        var withImg = list.filter(function (g) { return galSrc(g.img); });
+        grid.querySelectorAll(".gal-item").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var g = list[parseInt(btn.getAttribute("data-gi"), 10)];
+                if (!g || !galSrc(g.img)) return;
+                var start = withImg.indexOf(g);
+                lbOpenItems(withImg.map(function (x) {
+                    return { src: galSrc(x.img), label: t2(x.title) };
+                }), Math.max(start, 0));
+            });
+        });
     }
 
     /* ---------- Blog: senarai (#/blog) & artikel (#/blog/<slug>) ---------- */
@@ -5356,7 +5571,7 @@ var FAQ_ALL = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -5369,6 +5584,7 @@ var FAQ_ALL = [
             else if (parts[0] === "faq") pageKey = "faq";
             else if (parts[0] === "blog" && parts[1] && BLOG_BY_SLUG[parts[1]]) { pageKey = "article"; param = parts[1]; }
             else if (parts[0] === "blog") pageKey = "blog";
+            else if (parts[0] === "gallery") pageKey = "gallery";
             else if (parts[0] === "services" && parts[1] && SVC_BY_SLUG[parts[1]]) { pageKey = "service"; param = parts[1]; }
             else if (parts[0] === "services") pageKey = "services";
         } else if (h.length > 1) {
@@ -5386,6 +5602,7 @@ var FAQ_ALL = [
         if (pageKey === "about") renderAboutPage();
         if (pageKey === "faq") renderFaqPage();
         if (pageKey === "blog") renderBlogPage();
+        if (pageKey === "gallery") renderGalleryPage();
         if (pageKey === "article") renderArticlePage(param);
 
         if (!skipScroll) {
@@ -5405,6 +5622,7 @@ var FAQ_ALL = [
                 (key === "about" && pageKey === "about") ||
                 (key === "faq" && pageKey === "faq") ||
                 (key === "blog" && (pageKey === "blog" || pageKey === "article")) ||
+                (key === "gallery" && pageKey === "gallery") ||
                 (key === "services" && (pageKey === "services" || pageKey === "service")));
         });
 
