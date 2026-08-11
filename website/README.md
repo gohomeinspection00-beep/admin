@@ -10,7 +10,7 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Page | URL | Status |
 |---|---|---|
 | Home | `index.html` | ✅ Siap |
-| Tentang Kami | `index.html#/about` | ✅ Siap |
+| Tentang Kami | `index.html#/about` | ✅ Siap (tanpa seksyen pasukan) |
 | FAQ penuh (39 soalan, 7 kategori) | `index.html#/faq` | ✅ Siap |
 | Galeri gambar | `index.html#/gallery` | ✅ Siap (37 gambar, 6 kategori) |
 | Blog / Artikel | `index.html#/blog` | ✅ Siap (6 artikel) |
@@ -42,6 +42,17 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 
 **Semua 16 servis kini ada kandungan penuh.**
 
+## Home page — susunan seksyen
+
+Hero → Servis (3 tiang + butang **Lihat Lebih Banyak Servis**) →
+**Thermal reveal ikut scroll** → **Bumbung + drone terbang** → Statistik →
+Untuk Siapa → Kenapa Kami → Projek (6) → Peralatan → Proses → Review →
+**Liputan negeri (peta pin interaktif)** → FAQ → Hubungi
+
+Seksyen thermal & drone guna gambar dari hosting `arleta.site`
+(atribut `data-src` dalam HTML). Kalau gambar gagal load, seksyen itu
+tersembunyi automatik.
+
 ## Keputusan reka bentuk (dipersetujui)
 
 - **Positioning:** Firma Building Surveyor (bukan home inspection sahaja) — 3 tiang servis: Residential / Commercial & Asset / Technical & Legal
@@ -54,7 +65,8 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 
 Buka `index.html`, cari bahagian atas `<script>`:
 
-- **`CONFIG`** — nama syarikat, SSM, telefon, email, base URL gambar
+- **`CONFIG`** — nama syarikat (GO XPERT SOLUTION), no. pendaftaran
+  `202503234804 (003768196-A)`, telefon, email, base URL gambar
 - **`I18N`** — semua teks EN/BM
 - **`SVC`** — 16 servis + kandungan sub-page setiap servis (nama, tagline, penerangan, apa termasuk, apa diterima).
   `gal: [...]` = senarai gambar yang **auto-slide** di kepala sub-page
@@ -64,7 +76,8 @@ Buka `index.html`, cari bahagian atas `<script>`:
 - **`GALLERY`** — galeri gambar (`cat`: team/site/defect/project/equipment). Panduan tambah gambar ada dalam komen
 - **`BLOG`** — artikel (slug, kategori, tarikh, masa baca, tajuk, petikan, isi). Panduan tulis artikel baharu ada dalam komen di atas blok ini
 - **`FAQ_ALL`** — 39 soalan FAQ (`cat` = kategori, `home: true` = papar juga di home)
-- **`ABOUT`** — page Tentang Kami: cerita, prinsip, kelayakan, **pasukan** (isi nama + `photo`), **garis masa** (isi tahun)
+- **`ABOUT`** — page Tentang Kami: cerita, prinsip, kelayakan, **garis masa** (isi tahun).
+  Blok `team` masih ada dalam data tetapi seksyen pasukan sudah dibuang dari page
 - **`PROJECTS`** — 58 projek (home papar 6 pertama, page `#/projects` papar semua).
   Setiap projek ada `photos: []` — gambar pertama jadi kad, klik kad buka
   semua gambar projek itu dalam lightbox. Kategori: `residential`,
