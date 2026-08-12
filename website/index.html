@@ -971,6 +971,9 @@ section { padding: 5rem 2rem; }
 }
 .blog-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .blog-cover svg { width: 44px; height: 44px; color: rgba(255,255,255,0.85); position: relative; }
+.blog-cover img ~ svg { display: none; }
+.blog-card:hover .blog-cover img { transform: scale(1.05); }
+.blog-cover img { transition: transform 0.55s ease; }
 .blog-cat {
     position: absolute; top: 12px; left: 12px; z-index: 2;
     font-family: 'JetBrains Mono', monospace; font-size: 0.56rem; font-weight: 600;
@@ -1005,6 +1008,23 @@ section { padding: 5rem 2rem; }
 .article ul li::before {
     content: ''; position: absolute; left: 0; top: 0.62em;
     width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+}
+.article-cover {
+    margin: 0 0 2.25rem; border-radius: 16px; overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+.article-cover img {
+    width: 100%; display: block; max-height: 400px; object-fit: cover;
+}
+.article-fig { margin: 2rem 0; }
+.article-fig img {
+    display: block; margin: 0 auto; border-radius: 14px;
+    max-width: 100%; max-height: 460px; width: auto;
+    border: 1px solid var(--border);
+}
+.article-fig figcaption {
+    margin-top: 0.6rem; max-width: 100%; font-size: 0.82rem; color: var(--text-muted);
+    line-height: 1.5; border-left: 3px solid var(--accent-light); padding-left: 0.75rem;
 }
 .article-note {
     background: #E3F2FD; border-left: 4px solid var(--primary);
@@ -3729,6 +3749,12 @@ var BLOG_CATS = [
 var BLOG = [
     {
         slug: "dlp-guide", cat: "guide", date: "2026-07-28", read: 7,
+        cover: "img/svc/joint-inspection/2.jpg",
+        figs: [
+            { at: 1, img: "img/svc/joint-inspection/1.jpg", cap: { en: "Handover inspection at a new development", bm: "Pemeriksaan penyerahan di projek baharu" } },
+            { at: 10, img: "img/ri-12-before.jpg", cap: { en: "Every defect is tagged and photographed on site", bm: "Setiap kecacatan ditanda dan dirakam di tapak" } },
+            { at: 15, img: "img/ri-12-after.jpg", cap: { en: "The same item at re-inspection — the corrosion had progressed", bm: "Item sama semasa re-inspection — karat semakin teruk" } }
+        ],
         title: { en: "DLP: What Every New Homeowner Must Know Before It Expires",
                  bm: "DLP: Apa Setiap Pemilik Rumah Baru Wajib Tahu Sebelum Ia Tamat" },
         excerpt: { en: "The Defect Liability Period is the only window where the developer must fix defects for free. Here is how to use it properly.",
@@ -3784,6 +3810,13 @@ var BLOG = [
     },
     {
         slug: "common-defects", cat: "defect", date: "2026-07-10", read: 6,
+        cover: "img/svc/rectification/1.jpg",
+        figs: [
+            { at: 2, img: "img/svc/sub-sale/2.jpg", cap: { en: "Floor tiles marked during a tap test", bm: "Jubin lantai ditanda semasa ujian ketuk" } },
+            { at: 4, img: "img/svc/sub-sale/6.jpg", cap: { en: "Gap at a door frame, measured and recorded", bm: "Jurang pada kusen pintu, diukur dan direkod" } },
+            { at: 16, img: "img/svc/leak-detection/3.jpg", cap: { en: "Water staining spreading across a ceiling", bm: "Kesan air merebak pada siling" } },
+            { at: 20, img: "img/ri-11-before.jpg", cap: { en: "Construction debris left inside a service compartment", bm: "Sisa pembinaan ditinggalkan dalam ruang perkhidmatan" } }
+        ],
         title: { en: "10 Defects We Find in Almost Every New Home",
                  bm: "10 Kecacatan Yang Kami Jumpa Dalam Hampir Setiap Rumah Baru" },
         excerpt: { en: "After thousands of inspections, the same problems appear again and again. Here is what to look for in your own unit.",
@@ -3841,6 +3874,11 @@ var BLOG = [
     },
     {
         slug: "hollow-tiles", cat: "defect", date: "2026-06-18", read: 5,
+        cover: "img/svc/sub-sale/12.jpg",
+        figs: [
+            { at: 0, img: "img/svc/sub-sale/2.jpg", cap: { en: "Tap testing maps how far the hollow area spreads", bm: "Ujian ketuk memetakan sejauh mana kawasan hollow" } },
+            { at: 8, img: "img/svc/sub-sale/10.jpg", cap: { en: "Damaged floor area recorded during inspection", bm: "Kawasan lantai rosak direkod semasa pemeriksaan" } }
+        ],
         title: { en: "Hollow Tiles: Why That Tapping Sound Matters",
                  bm: "Jubin Hollow: Kenapa Bunyi Ketukan Itu Penting" },
         excerpt: { en: "It is not a cosmetic complaint. Here is what causes hollow tiles, why they fail, and why patching over them makes it worse.",
@@ -3898,6 +3936,12 @@ var BLOG = [
     },
     {
         slug: "subsale-checklist", cat: "buying", date: "2026-05-30", read: 6,
+        cover: "img/svc/sub-sale/3.jpg",
+        figs: [
+            { at: 4, img: "img/svc/sub-sale/9.jpg", cap: { en: "Gutters and eaves — check these from outside", bm: "Longkang bumbung dan cucur atap — periksa dari luar" } },
+            { at: 6, img: "img/svc/sub-sale/7.jpg", cap: { en: "Timber damage found above a ceiling", bm: "Kerosakan kayu ditemui di atas siling" } },
+            { at: 10, img: "img/svc/leak-detection/5.jpg", cap: { en: "A moisture meter reading taken on site", bm: "Bacaan meter lembapan diambil di tapak" } }
+        ],
         title: { en: "Before You Buy a Sub-Sale Home: What to Check",
                  bm: "Sebelum Anda Beli Rumah Sub-Sale: Apa Yang Perlu Disemak" },
         excerpt: { en: "A viewing takes twenty minutes. The consequences last decades. Here is what to look at — and what you cannot see without instruments.",
@@ -3953,6 +3997,11 @@ var BLOG = [
     },
     {
         slug: "damp-paint-myth", cat: "defect", date: "2026-05-12", read: 4,
+        cover: "img/svc/sub-sale/11.jpg",
+        figs: [
+            { at: 3, img: "img/svc/sub-sale/1.jpg", cap: { en: "Damp and mould at the base of a wall", bm: "Lembap dan kulat di bahagian bawah dinding" } },
+            { at: 8, img: "img/svc/leak-detection/4.jpg", cap: { en: "Thermal imaging over a suspected damp area", bm: "Imej thermal atas kawasan disyaki lembap" } }
+        ],
         title: { en: "Why Anti-Damp Paint Will Not Solve Your Leak",
                  bm: "Kenapa Cat Anti-Lembap Tidak Akan Selesaikan Kebocoran Anda" },
         excerpt: { en: "It is the most common repair we see, and the one that fails most reliably. Here is what is actually happening behind that wall.",
@@ -4002,6 +4051,12 @@ var BLOG = [
     },
     {
         slug: "bca-for-jmb", cat: "owner", date: "2026-04-20", read: 6,
+        cover: "img/proj/supermarket-1.jpg",
+        figs: [
+            { at: 2, img: "img/svc/monitoring/1.jpg", cap: { en: "Crack width measured and recorded", bm: "Lebar retak diukur dan direkod" } },
+            { at: 5, img: "img/svc/maintenance-audit/1.jpg", cap: { en: "Every finding entered on a condition assessment sheet", bm: "Setiap penemuan direkod dalam borang penilaian keadaan" } },
+            { at: 10, img: "img/proj/bangunan-pasar-1.jpg", cap: { en: "Condition assessment of a public building", bm: "Penilaian keadaan bangunan awam" } }
+        ],
         title: { en: "What JMB and MC Committees Should Know About Building Condition Assessment",
                  bm: "Apa Jawatankuasa JMB dan MC Patut Tahu Tentang Building Condition Assessment" },
         excerpt: { en: "If your maintenance budget is decided by whoever complains loudest, a condition assessment changes that conversation entirely.",
@@ -4930,7 +4985,7 @@ var FAQ_ALL = [
         grid.innerHTML = EQUIPMENT.map(function (e) {
             var src = e.img.indexOf("img/") === 0 ? e.img : CONFIG.imgBase + e.img;
             return '<div class="equip-card reveal' + (e.fit === "photo" ? " photo" : "") + '">' +
-                   '<img src="' + src + '" alt="' + e.en + '" loading="lazy" ' +
+                   '<img src="' + thumbSrc(src) + '" alt="' + e.en + '" loading="lazy" decoding="async" ' +
                    'onerror="this.closest(\'.equip-card\').classList.add(\'img-missing\')">' +
                    '<div class="equip-fallback">' + e.emoji + "</div>" +
                    "<span>" + (e[lang] || e.en) + "</span></div>";
@@ -5010,8 +5065,10 @@ var FAQ_ALL = [
             var src = galSrc(g.img);
             return '<button class="gal-item' + (src ? "" : " img-missing") + '" type="button" data-gi="' + i + '">' +
                 '<span class="gal-chip">' + galCatLabel(g.cat) + '</span>' +
-                (src ? '<img src="' + src + '" alt="' + t2(g.title) + '" loading="lazy" ' +
-                       'onerror="this.parentElement.classList.add(\'img-missing\')">' : "") +
+                (src ? '<img src="' + thumbSrc(src) + '" alt="' + t2(g.title) + '" loading="lazy" decoding="async" ' +
+                       'data-full="' + src + '" ' +
+                       'onerror="if(this.src.indexOf(\'img/t/\')>=0){this.src=this.getAttribute(\'data-full\');}' +
+                       'else{this.parentElement.classList.add(\'img-missing\');}">' : "") +
                 '<span class="gal-ph">' + camIcon + '</span>' +
                 '<span class="gal-cap"><b>' + t2(g.title) + '</b>' +
                 (g.caption ? '<span>' + t2(g.caption) + '</span>' : "") + '</span></button>';
@@ -5073,7 +5130,10 @@ var FAQ_ALL = [
         grid.innerHTML = list.map(function (b) {
             return '<a class="blog-card" href="#/blog/' + b.slug + '">' +
                 '<div class="blog-cover"><span class="blog-cat">' + blogCatLabel(b.cat) + '</span>' +
-                (b.cover ? '<img src="' + b.cover + '" alt="" loading="lazy" onerror="this.remove()">' : "") +
+                (b.cover ? '<img src="' + thumbSrc(b.cover) + '" alt="" loading="lazy" decoding="async" ' +
+                           'data-full="' + b.cover + '" ' +
+                           'onerror="if(this.src.indexOf(\'img/t/\')>=0){this.src=this.getAttribute(\'data-full\');}' +
+                           'else{this.remove();}">' : "") +
                 BLOG_ICON + '</div>' +
                 '<div class="blog-body"><h3>' + t2(b.title) + '</h3><p>' + t2(b.excerpt) + '</p>' +
                 '<div class="blog-meta"><span>' + fmtDate(b.date) + '</span><span class="dot"></span>' +
@@ -5086,13 +5146,27 @@ var FAQ_ALL = [
         var box = document.getElementById("articleBody");
         if (!b || !box) return;
 
-        var blocks = (b.body[lang] || b.body.en).map(function (blk) {
-            var kind = blk[0], val = blk[1];
-            if (kind === "h") return "<h3>" + val + "</h3>";
-            if (kind === "ul") return "<ul>" + val.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
-            if (kind === "note") return '<div class="article-note">' + val + "</div>";
-            return "<p>" + val + "</p>";
+        var figAt = {};
+        (b.figs || []).forEach(function (f) { (figAt[f.at] = figAt[f.at] || []).push(f); });
+        function figHtml(f) {
+            return '<figure class="article-fig">' +
+                '<img src="' + f.img + '" alt="' + t2(f.cap) + '" loading="lazy" decoding="async" ' +
+                'onerror="this.closest(\'figure\').remove()">' +
+                '<figcaption>' + t2(f.cap) + '</figcaption></figure>';
+        }
+        var blocks = (b.body[lang] || b.body.en).map(function (blk, i) {
+            var kind = blk[0], val = blk[1], html;
+            if (kind === "h") html = "<h3>" + val + "</h3>";
+            else if (kind === "ul") html = "<ul>" + val.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+            else if (kind === "note") html = '<div class="article-note">' + val + "</div>";
+            else html = "<p>" + val + "</p>";
+            if (figAt[i]) html += figAt[i].map(figHtml).join("");
+            return html;
         }).join("");
+        var coverHtml = b.cover
+            ? '<figure class="article-cover"><img src="' + b.cover + '" alt="' + t2(b.title) + '" ' +
+              'decoding="async" onerror="this.closest(\'figure\').remove()"></figure>'
+            : "";
 
         var others = blogSorted().filter(function (x) { return x.slug !== b.slug; }).slice(0, 3);
 
@@ -5109,7 +5183,7 @@ var FAQ_ALL = [
                 '<span>' + (CONFIG.legalName || "GoXpert") + '</span></div>' +
             '</div></header>' +
             '<section class="vpage-body"><div class="section-container">' +
-                '<article class="article">' + blocks + '</article>' +
+                '<article class="article">' + coverHtml + blocks + '</article>' +
                 (others.length ?
                     '<div class="article-next"><h4>' + t("blog.next") + '</h4>' +
                     others.map(function (x) {
@@ -5396,6 +5470,11 @@ var FAQ_ALL = [
         residential: "proj.res", commercial: "proj.com", infrastructure: "proj.infra",
         public: "proj.pub", land: "proj.land", technical: "proj.tech"
     };
+    /* Grid guna thumbnail kecil (img/t/...), lightbox guna gambar penuh.
+       Kalau thumbnail hilang, jatuh balik ke gambar penuh. */
+    function thumbSrc(v) {
+        return (v && v.indexOf("img/") === 0) ? "img/t/" + v.slice(4) : v;
+    }
     function projSrc(v) {
         if (!v) return "";
         return (/^https?:\/\//.test(v) || v.indexOf("img/") === 0) ? v : CONFIG.imgBase + v;
@@ -5449,8 +5528,12 @@ var FAQ_ALL = [
             media.appendChild(badge);
             if (cover) {
                 var im = document.createElement("img");
-                im.src = cover; im.alt = projName(p); im.loading = "lazy";
-                im.onerror = function () { media.classList.add("ph"); };
+                im.src = thumbSrc(cover); im.alt = projName(p);
+                im.loading = "lazy"; im.decoding = "async";
+                im.onerror = function () {
+                    if (im.src.indexOf("/img/t/") >= 0 || im.getAttribute("src").indexOf("img/t/") === 0) { im.src = cover; return; }
+                    media.classList.add("ph");
+                };
                 media.appendChild(im);
                 if (photos.length > 1) {
                     var cnt = document.createElement("span");
@@ -5511,13 +5594,19 @@ var FAQ_ALL = [
         var dots = box.querySelectorAll(".svc-dots button");
         if (imgs.length < 2) return;
         var i = 0, paused = false;
+        function load(k) {
+            var im = imgs[(k + imgs.length) % imgs.length];
+            if (im && !im.getAttribute("src")) im.src = im.getAttribute("data-src");
+        }
         function go(n) {
             i = (n + imgs.length) % imgs.length;
+            load(i); load(i + 1);          // muat slaid semasa + satu berikutnya sahaja
             for (var k = 0; k < imgs.length; k++) {
                 imgs[k].classList.toggle("on", k === i);
                 if (dots[k]) dots[k].classList.toggle("on", k === i);
             }
         }
+        load(1);
         svcSlideTimer = setInterval(function () { if (!paused) go(i + 1); }, 2600);
         box.addEventListener("mouseenter", function () { paused = true; });
         box.addEventListener("mouseleave", function () { paused = false; });
@@ -5589,8 +5678,10 @@ var FAQ_ALL = [
                 var src = svcImg(s);
                 a.innerHTML =
                     '<span class="svc-mini-img' + (src ? "" : " ph") + '">' +
-                        (src ? '<img src="' + src + '" alt="" loading="lazy" ' +
-                               'onerror="this.parentElement.classList.add(\'ph\')">' : "") +
+                        (src ? '<img src="' + thumbSrc(src) + '" alt="" loading="lazy" decoding="async" ' +
+                               'data-full="' + src + '" ' +
+                               'onerror="if(this.src.indexOf(\'img/t/\')>=0){this.src=this.getAttribute(\'data-full\');}' +
+                               'else{this.parentElement.classList.add(\'ph\');}">' : "") +
                         '<span class="svc-mini-icon">' + CAT_ICONS[s.cat] + '</span>' +
                     '</span>' +
                     '<span class="svc-mini-body"><h4></h4><p></p></span>';
@@ -5644,8 +5735,9 @@ var FAQ_ALL = [
                     (slides.length > 1 ? " has-slides" : "") + (imgSrc ? "" : " ph") + '" id="svcMedia">' +
                     (slides.length > 1 ?
                         slides.map(function (u, i) {
-                            return '<img class="svc-slide' + (i ? "" : " on") + '" src="' + u + '" ' +
-                                   'alt="' + svcName(s) + ' ' + (i + 1) + '" loading="' + (i ? "lazy" : "eager") + '">';
+                            return '<img class="svc-slide' + (i ? "" : " on") + '" ' +
+                                   (i ? 'data-src="' + u + '"' : 'src="' + u + '"') + ' ' +
+                                   'decoding="async" alt="' + svcName(s) + ' ' + (i + 1) + '">';
                         }).join("") +
                         '<span class="svc-slide-count">' + slides.length + ' ' + t("proj.photos") + '</span>' +
                         '<span class="svc-dots">' + slides.map(function (u, i) {

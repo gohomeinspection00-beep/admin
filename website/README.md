@@ -74,7 +74,11 @@ Buka `index.html`, cari bahagian atas `<script>`:
   Gambar pertama dalam `gal` juga jadi `img`
 - **`SVC_EXTRAS`** — kandungan khas setiap sub-page servis (kad nilai, langkah, elemen, status, analisis)
 - **`GALLERY`** — galeri gambar (`cat`: team/site/defect/project/equipment). Panduan tambah gambar ada dalam komen
-- **`BLOG`** — artikel (slug, kategori, tarikh, masa baca, tajuk, petikan, isi). Panduan tulis artikel baharu ada dalam komen di atas blok ini
+- **`BLOG`** — artikel (slug, kategori, tarikh, masa baca, tajuk, petikan, isi).
+  `cover` = gambar kepala artikel + kad senarai.
+  `figs: [{ at, img, cap }]` = gambar dalam badan artikel; `at` ialah
+  nombor blok dalam `body` (gambar dipapar SELEPAS blok itu).
+  Panduan tulis artikel baharu ada dalam komen di atas blok ini
 - **`FAQ_ALL`** — 39 soalan FAQ (`cat` = kategori, `home: true` = papar juga di home)
 - **`ABOUT`** — page Tentang Kami: cerita, prinsip, kelayakan, **garis masa** (isi tahun).
   Blok `team` masih ada dalam data tetapi seksyen pasukan sudah dibuang dari page
@@ -106,6 +110,14 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 | `img/proj/` | 143 gambar untuk 58 projek |
 | `img/gal/` | 20 gambar pasukan / di tapak / ACPIM / latihan |
 | `img/` (root) | 5 gambar re-inspection (before/after) |
+| `img/t/` | thumbnail 560px untuk grid — dijana automatik, jangan edit |
+
+**Prestasi:** gambar penuh dihadkan 900px (JPEG q72) untuk lightbox &
+kepala page. Grid (kad projek, galeri, kad servis, kad blog) guna
+thumbnail `img/t/...` (560px, ±45 KB) — kira-kira 55% lebih ringan.
+Semua gambar grid `loading="lazy"`, dan slideshow servis hanya muat
+slaid semasa + satu berikutnya. Kalau thumbnail hilang, gambar penuh
+digunakan automatik.
 
 **Cara rujuk gambar dalam data:**
 - `"img/xxx.jpg"` — fail tempatan (guna terus)
