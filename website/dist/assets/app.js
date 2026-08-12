@@ -10,8 +10,8 @@ var CONFIG = {
     email: "official@goxpert.my",
     siteUrl: "https://goxpert.my/",   // untuk data Google — tukar bila domain sebenar sedia
     year: new Date().getFullYear(),
-    // Base URL gambar. Bila tuan dah download gambar sendiri, tukar ke "assets/img/"
-    imgBase: "https://arleta.site/interactivelink/1453/",
+    // Semua gambar kini dalam folder img/ (tiada hosting luar).
+    imgBase: "img/",
     reviewCount: 9                  // Review-1.png ... Review-9.png
 };
 
@@ -350,8 +350,11 @@ var SVC_EXTRAS = {
             { img: "img/sticker/minor.png",      label: "Minor" },
             { img: "img/sticker/spesifik.png",   label: "Spesifik" }
         ],
-        reports: ["Report-1-Website.png", "Report-2-Website.png", "Report-3-Website.png", "Report-4-Website.png", "Report-5-Website.png"],
-        pdf: "https://arleta.site/interactivelink/1453/SAMPLE-REPORT-FOR-LANDED-HOUSING-GO-XPERT-SOLUTION-HOME-INSPECTION_compressed-1.pdf"
+        reports: ["img/report/1.jpg", "img/report/2.jpg", "img/report/3.jpg", "img/report/4.jpg", "img/report/5.jpg"],
+        /* Letak fail PDF sample report dalam folder website, contoh
+           "sample-report.pdf", kemudian isi di sini untuk hidupkan
+           butang "Download Sample Report". Biar kosong = butang sorok. */
+        pdf: ""
     }
 };
 
@@ -392,7 +395,8 @@ var DMS_FEATURES = [
     { t: { en: "AI Assistant", bm: "AI Assistant" }, d: { en: "Access AI ready to answer questions about inspection or repair process", bm: "Access AI yang sedia membantu menjawab soalan berkaitan inspection atau proses pembaikian" } }
 ];
 
-var DMS_GALLERY = ["Sub-Sale-1-Website.png", "Sub-Sale-2-Website.png", "Sub-Sale-3-Website.png", "Sub-Sale-4-Website.png", "Sub-Sale-5-Website.png", "Sub-Sale-6-Website.png", "Sub-Sale-7-Website.png"];
+var DMS_GALLERY = ["img/dms/1.jpg", "img/dms/2.jpg", "img/dms/3.jpg", "img/dms/4.jpg",
+                   "img/dms/5.jpg", "img/dms/6.jpg", "img/dms/7.jpg"];
 
 (function () {
     var base = SVC_EXTRAS["home-defect"];
@@ -1517,26 +1521,23 @@ var GALLERY = [
     { img: "img/ri-40-after.jpg", cat: "site",
       title: { en: "Clamp Meter Test at Distribution Board", bm: "Ujian Clamp Meter Di Papan Agihan" },
       caption: { en: "0.06A reading with all MCB off — flagged for review", bm: "Bacaan 0.06A dengan semua MCB ditutup — dikesan untuk semakan" } },
-    { img: "ARLETA:Crack-2.png", cat: "defect",
+    { img: "img/svc/monitoring/2.jpg", cat: "defect",
       title: { en: "Structural Crack", bm: "Retak Struktur" },
       caption: { en: "Width measured and monitored over time", bm: "Lebar diukur dan dipantau mengikut masa" } },
 
     /* --- Peralatan (hosting sedia ada) --- */
-    { img: "ARLETA:ThermalOkey.png", cat: "equipment",
+    { img: "img/svc/thermal-imaging/1.jpg", cat: "equipment",
       title: { en: "Thermal Imaging in Use", bm: "Imej Thermal Digunakan" },
       caption: { en: "Reveals moisture behind finished surfaces", bm: "Mendedahkan lembapan di sebalik permukaan siap" } },
-    { img: "ARLETA:Earth-Tester.png", cat: "equipment",
+    { img: "img/svc/electrical/5.jpg", cat: "equipment",
       title: { en: "Earth Tester", bm: "Earth Tester" },
       caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
-    { img: "ARLETA:Insulation-test.png", cat: "equipment",
+    { img: "img/svc/electrical/3.jpg", cat: "equipment",
       title: { en: "Insulation Tester", bm: "Insulation Tester" },
       caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
-    { img: "ARLETA:Clamp-Meter.png", cat: "equipment",
+    { img: "img/svc/electrical/2.jpg", cat: "equipment",
       title: { en: "Clamp Meter", bm: "Clamp Meter" },
-      caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
-    { img: "ARLETA:Laser-Distance-2.png", cat: "equipment",
-      title: { en: "Laser Distance Meter", bm: "Laser Distance Meter" },
-      caption: { en: "Measurement & level survey", bm: "Ukuran & tinjauan aras" } }
+      caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } }
 ];
 
 /* =========================================================
@@ -2800,11 +2801,6 @@ var FAQ_ALL = [
         }).join("");
     }
 
-    /* gambar hosting luar di home: isi src dari CONFIG.imgBase */
-    document.querySelectorAll("img[data-src]").forEach(function (im) {
-        im.src = CONFIG.imgBase + im.getAttribute("data-src");
-    });
-
     function renderEquipment() {
         var grid = document.getElementById("equipGrid");
         if (!grid) return;
@@ -3068,8 +3064,8 @@ var FAQ_ALL = [
         if (!track || !dots) return;
         var html = "", dotsHtml = "";
         for (var i = 1; i <= CONFIG.reviewCount; i++) {
-            html += '<div class="review-slide"><img src="' + CONFIG.imgBase + "Review-" + i +
-                    '.png" alt="Client review ' + i + '" loading="lazy" ' +
+            html += '<div class="review-slide"><img src="img/review/' + i +
+                    '.jpg" alt="Client review ' + i + '" loading="lazy" decoding="async" ' +
                     'onerror="window.gxReviewFail && window.gxReviewFail()"></div>';
             dotsHtml += '<span class="review-dot' + (i === 1 ? " active" : "") + '" data-i="' + (i - 1) + '"></span>';
         }
@@ -3744,7 +3740,7 @@ var FAQ_ALL = [
             /* pembina galeri gaya konsep: pasangan + tengah, meluncur dari tepi */
             var galBtn = function (imgs, galKey, i, cls) {
                 return '<button class="report-img ' + cls + '" type="button" data-gal="' + galKey + '" data-idx="' + i + '">' +
-                    '<img src="' + CONFIG.imgBase + imgs[i] + '" alt="Page ' + (i + 1) + '" loading="lazy" ' +
+                    '<img src="' + tcSrc(imgs[i]) + '" alt="Page ' + (i + 1) + '" loading="lazy" decoding="async" ' +
                     'onerror="this.parentElement.classList.add(\'img-missing\')"></button>';
             };
             var mkGal = function (imgs, galKey) {
@@ -4007,7 +4003,7 @@ var FAQ_ALL = [
                     if (!g || !g.list) return;
                     var start = parseInt(btn.getAttribute("data-idx"), 10) || 0;
                     lbOpenItems(g.list.map(function (r, i) {
-                        return { src: CONFIG.imgBase + r, label: g.label + " " + (i + 1) + "/" + g.list.length };
+                        return { src: tcSrc(r), label: g.label + " " + (i + 1) + "/" + g.list.length };
                     }), start);
                 });
             });

@@ -192,6 +192,9 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 | `img/gal/` | 20 gambar pasukan / di tapak / ACPIM / latihan |
 | `img/` (root) | logo, pasangan thermal, 5 gambar re-inspection |
 | `img/sticker/` | 7 sticker penanda defect (PNG latar telus) |
+| `img/review/` | 9 review pelanggan |
+| `img/report/` | 5 muka surat sample report |
+| `img/dms/` | 7 paparan sistem pengurusan defect |
 | `img/t/` | thumbnail 560px untuk grid — dijana automatik, jangan edit |
 
 **Prestasi:** gambar penuh dihadkan 900px (JPEG q72) untuk lightbox &
@@ -201,12 +204,11 @@ Semua gambar grid `loading="lazy"`, dan slideshow servis hanya muat
 slaid semasa + satu berikutnya. Kalau thumbnail hilang, gambar penuh
 digunakan automatik.
 
-> **Hosting lama `arleta.site` sudah tidak boleh dicapai.** Logo, pasangan
-> gambar thermal, sticker defect, showcase alat dan bumbung/drone semuanya
-> sudah dipindah ke folder `img/`. Yang masih menunjuk ke hosting lama —
-> **9 gambar review**, **galeri sample report + PDF**, dan **paparan sistem
-> pengurusan defect** — akan **sorok sendiri** bila gagal dimuat, jadi laman
-> tak pernah nampak rosak. Hantar fail-fail itu bila ada untuk dipulihkan.
+> **Semua gambar kini dalam folder `img/` — tiada hosting luar langsung.**
+> Hosting lama `arleta.site` sudah mati dan tiada apa-apa lagi bergantung
+> padanya. Satu-satunya yang belum ada ialah **fail PDF sample report**:
+> letak PDF dalam folder website, kemudian isi `pdf:` dalam
+> `SVC_EXTRAS["home-defect"]` untuk hidupkan butang muat turun.
 
 **Cara rujuk gambar dalam data:**
 - `"img/xxx.jpg"` — fail tempatan (guna terus)
