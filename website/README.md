@@ -167,7 +167,8 @@ Buka `index.html`, cari bahagian atas `<script>`:
   semua gambar projek itu dalam lightbox. Kategori: `residential`,
   `commercial`, `infrastructure`, `public`, `land`.
   `name` dwibahasa — `{ en: "Temple 1", bm: "Kuil 1" }`
-- **`AUDIENCES` / `WHYUS` / `EQUIPMENT` / `PROCESS` / `SERVICES_LIST` / `FAQS`** — kandungan seksyen
+- **`EQUIPMENT`** — 6 alat, semua guna gambar tempatan dalam `img/svc/`
+- **`AUDIENCES` / `WHYUS` / `PROCESS` / `SERVICES_LIST` / `FAQS`** — kandungan seksyen
 - Warna: blok `:root` di bahagian atas `<style>`
 
 ## SEO & kongsi (siap)
@@ -198,6 +199,12 @@ thumbnail `img/t/...` (560px, ±45 KB) — kira-kira 55% lebih ringan.
 Semua gambar grid `loading="lazy"`, dan slideshow servis hanya muat
 slaid semasa + satu berikutnya. Kalau thumbnail hilang, gambar penuh
 digunakan automatik.
+
+> **Hosting lama `arleta.site` sudah tidak boleh dicapai.** Semua gambar
+> penting sudah dipindah ke folder `img/`. Yang masih menunjuk ke sana
+> (logo, 9 gambar review, galeri sample report, sticker defect, showcase
+> alat, thermal reveal, drone) akan **sorok sendiri** bila gagal dimuat —
+> laman tak pernah nampak rosak. Hantar fail-fail itu untuk dipulihkan.
 
 **Cara rujuk gambar dalam data:**
 - `"img/xxx.jpg"` — fail tempatan (guna terus)

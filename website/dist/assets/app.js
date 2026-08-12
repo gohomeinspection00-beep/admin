@@ -1631,7 +1631,7 @@ var BLOG = [
         figs: [
             { at: 2, img: "img/svc/sub-sale/2.jpg", cap: { en: "Floor tiles marked during a tap test", bm: "Jubin lantai ditanda semasa ujian ketuk" } },
             { at: 4, img: "img/svc/sub-sale/6.jpg", cap: { en: "Gap at a door frame, measured and recorded", bm: "Jurang pada kusen pintu, diukur dan direkod" } },
-            { at: 16, img: "img/svc/leak-detection/3.jpg", cap: { en: "Water staining spreading across a ceiling", bm: "Kesan air merebak pada siling" } },
+            { at: 16, img: "img/svc/sub-sale/8.jpg", cap: { en: "Underside of a roof, checked for leaks and gaps", bm: "Bahagian bawah bumbung, disemak untuk kebocoran dan celah" } },
             { at: 20, img: "img/ri-11-before.jpg", cap: { en: "Construction debris left inside a service compartment", bm: "Sisa pembinaan ditinggalkan dalam ruang perkhidmatan" } }
         ],
         title: { en: "10 Defects We Find in Almost Every New Home",
@@ -1693,8 +1693,7 @@ var BLOG = [
         slug: "hollow-tiles", cat: "defect", date: "2026-06-18", read: 5,
         cover: "img/svc/sub-sale/12.jpg",
         figs: [
-            { at: 0, img: "img/svc/sub-sale/2.jpg", cap: { en: "Tap testing maps how far the hollow area spreads", bm: "Ujian ketuk memetakan sejauh mana kawasan hollow" } },
-            { at: 8, img: "img/svc/sub-sale/10.jpg", cap: { en: "Damaged floor area recorded during inspection", bm: "Kawasan lantai rosak direkod semasa pemeriksaan" } }
+            { at: 0, img: "img/svc/sub-sale/2.jpg", cap: { en: "Tap testing maps how far the hollow area spreads", bm: "Ujian ketuk memetakan sejauh mana kawasan hollow" } }
         ],
         title: { en: "Hollow Tiles: Why That Tapping Sound Matters",
                  bm: "Jubin Hollow: Kenapa Bunyi Ketukan Itu Penting" },
@@ -1756,8 +1755,7 @@ var BLOG = [
         cover: "img/svc/sub-sale/3.jpg",
         figs: [
             { at: 4, img: "img/svc/sub-sale/9.jpg", cap: { en: "Gutters and eaves — check these from outside", bm: "Longkang bumbung dan cucur atap — periksa dari luar" } },
-            { at: 6, img: "img/svc/sub-sale/7.jpg", cap: { en: "Timber damage found above a ceiling", bm: "Kerosakan kayu ditemui di atas siling" } },
-            { at: 10, img: "img/svc/leak-detection/5.jpg", cap: { en: "A moisture meter reading taken on site", bm: "Bacaan meter lembapan diambil di tapak" } }
+            { at: 6, img: "img/svc/sub-sale/7.jpg", cap: { en: "Timber damage found above a ceiling", bm: "Kerosakan kayu ditemui di atas siling" } }
         ],
         title: { en: "Before You Buy a Sub-Sale Home: What to Check",
                  bm: "Sebelum Anda Beli Rumah Sub-Sale: Apa Yang Perlu Disemak" },
@@ -1817,7 +1815,7 @@ var BLOG = [
         cover: "img/svc/sub-sale/11.jpg",
         figs: [
             { at: 3, img: "img/svc/sub-sale/1.jpg", cap: { en: "Damp and mould at the base of a wall", bm: "Lembap dan kulat di bahagian bawah dinding" } },
-            { at: 8, img: "img/svc/leak-detection/4.jpg", cap: { en: "Thermal imaging over a suspected damp area", bm: "Imej thermal atas kawasan disyaki lembap" } }
+            { at: 8, img: "img/svc/leak-detection/4.jpg", cap: { en: "Thermal imaging locating a leaking pipe behind the finish", bm: "Imej thermal mengesan paip bocor di sebalik kemasan" } }
         ],
         title: { en: "Why Anti-Damp Paint Will Not Solve Your Leak",
                  bm: "Kenapa Cat Anti-Lembap Tidak Akan Selesaikan Kebocoran Anda" },
@@ -2277,6 +2275,7 @@ var I18N = {
         "hth.tag": "Latest Technology", "hth.title": "Thermal Imaging Reveals Hidden Problems",
         "hth.sub": "Leaks and moisture invisible to the naked eye can be detected through thermal imaging",
         "hth.ori": "Original", "hth.th": "Thermal Imaging",
+        "hth.cap": "Thermal imaging locating a leaking pipe behind a finished wall",
         "gal.tag": "Gallery", "gal.title": "From Our Site Visits",
         "gal.sub": "Our team, our instruments, and the defects we actually find — photographed on real inspections.",
         "gal.count": "Photos",
@@ -2366,6 +2365,7 @@ var I18N = {
         "hth.tag": "Teknologi Terkini", "hth.title": "Thermal Imaging Mendedahkan Masalah Tersembunyi",
         "hth.sub": "Kebocoran dan kelembapan yang tidak nampak pada mata kasar dapat dikesan melalui thermal imaging",
         "hth.ori": "Gambar Asal", "hth.th": "Thermal Imaging",
+        "hth.cap": "Imej thermal mengesan paip bocor di sebalik dinding siap",
         "gal.tag": "Galeri", "gal.title": "Dari Lawatan Tapak Kami",
         "gal.sub": "Pasukan kami, peralatan kami, dan kecacatan yang kami benar-benar temui — dirakam semasa inspection sebenar.",
         "gal.count": "Gambar",
@@ -2477,15 +2477,12 @@ var WHYUS = [
 ];
 
 var EQUIPMENT = [
-    { img: "img/svc/thermal-imaging/1.jpg", fit: "photo",
-      emoji: "🌡️", en: "Thermal Camera", bm: "Kamera Thermal" },
-    { img: "Spirit-Level.png",     emoji: "📏", en: "Spirit Level",      bm: "Spirit Level" },
-    { img: "Measure-tape.png",     emoji: "📐", en: "Measuring Tape",    bm: "Pita Pengukur" },
-    { img: "Lsquare.png",          emoji: "📐", en: "L Square",          bm: "L Square" },
-    { img: "Laser-Distance-2.png", emoji: "🔦", en: "Laser Distance",    bm: "Laser Distance" },
-    { img: "Insulation-test.png",  emoji: "⚡", en: "Insulation Tester", bm: "Insulation Tester" },
-    { img: "Earth-Tester.png",     emoji: "🔌", en: "Earth Tester",      bm: "Earth Tester" },
-    { img: "Clamp-Meter.png",      emoji: "🔧", en: "Clamp Meter",       bm: "Clamp Meter" }
+    { img: "img/svc/thermal-imaging/1.jpg", emoji: "🌡️", en: "Thermal Camera",     bm: "Kamera Thermal" },
+    { img: "img/svc/electrical/2.jpg",      emoji: "🔧", en: "Clamp Meter",        bm: "Clamp Meter" },
+    { img: "img/svc/electrical/3.jpg",      emoji: "⚡", en: "Insulation Tester",  bm: "Insulation Tester" },
+    { img: "img/svc/electrical/5.jpg",      emoji: "🔌", en: "Earth Tester",       bm: "Earth Tester" },
+    { img: "img/svc/monitoring/2.jpg",      emoji: "📏", en: "Crack Width Gauge",  bm: "Tolok Lebar Retak" },
+    { img: "img/svc/monitoring/1.jpg",      emoji: "📐", en: "Measuring Tape",     bm: "Pita Pengukur" }
 ];
 
 var PROCESS = [
@@ -2815,9 +2812,11 @@ var FAQ_ALL = [
         if (!grid) return;
         grid.innerHTML = EQUIPMENT.map(function (e) {
             var src = e.img.indexOf("img/") === 0 ? e.img : CONFIG.imgBase + e.img;
-            return '<div class="equip-card reveal' + (e.fit === "photo" ? " photo" : "") + '">' +
+            return '<div class="equip-card reveal photo">' +
                    '<img src="' + thumbSrc(src) + '" alt="' + e.en + '" loading="lazy" decoding="async" ' +
-                   'onerror="this.closest(\'.equip-card\').classList.add(\'img-missing\')">' +
+                   'data-full="' + src + '" ' +
+                   'onerror="if(this.src.indexOf(\'img/t/\')>=0){this.src=this.getAttribute(\'data-full\');}' +
+                   'else{this.closest(\'.equip-card\').classList.add(\'img-missing\');}">' +
                    '<div class="equip-fallback">' + e.emoji + "</div>" +
                    "<span>" + (e[lang] || e.en) + "</span></div>";
         }).join("");
@@ -3072,9 +3071,17 @@ var FAQ_ALL = [
         var html = "", dotsHtml = "";
         for (var i = 1; i <= CONFIG.reviewCount; i++) {
             html += '<div class="review-slide"><img src="' + CONFIG.imgBase + "Review-" + i +
-                    '.png" alt="Client review ' + i + '" loading="lazy"></div>';
+                    '.png" alt="Client review ' + i + '" loading="lazy" ' +
+                    'onerror="window.gxReviewFail && window.gxReviewFail()"></div>';
             dotsHtml += '<span class="review-dot' + (i === 1 ? " active" : "") + '" data-i="' + (i - 1) + '"></span>';
         }
+        /* Daftar dulu sebelum gambar mula dimuat: kalau gambar review
+           gagal (hosting lama), sorok seluruh seksyen supaya tiada ruang
+           kosong pada laman. */
+        window.gxReviewFail = function () {
+            var sec = document.getElementById("reviews");
+            if (sec) sec.style.display = "none";
+        };
         track.innerHTML = html;
         dots.innerHTML = dotsHtml;
     }
@@ -3126,6 +3133,28 @@ var FAQ_ALL = [
         localStorage.setItem("gx_lang", lang);
         renderAll();
     });
+
+    /* ---------- Kad servis: 3 gambar terkeluar di belakang ----------
+       Desktop: bila mouse atas kad.
+       Telefon: bila kad sampai ke tengah skrin semasa scroll. */
+    (function () {
+        var slots = [].slice.call(document.querySelectorAll(".pillar-slot"));
+        if (!slots.length) return;
+        var canHover = !(window.matchMedia && window.matchMedia("(hover: none)").matches);
+        if (canHover) {
+            slots.forEach(function (el) {
+                el.addEventListener("mouseenter", function () { el.classList.add("peek"); });
+                el.addEventListener("mouseleave", function () { el.classList.remove("peek"); });
+            });
+        } else if ("IntersectionObserver" in window) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) {
+                    en.target.classList.toggle("peek", en.isIntersecting);
+                });
+            }, { rootMargin: "-42% 0px -42% 0px", threshold: 0 });
+            slots.forEach(function (el) { io.observe(el); });
+        }
+    })();
 
     /* ---------- Liputan: pin peta <-> senarai negeri ---------- */
     (function () {
@@ -3283,13 +3312,37 @@ var FAQ_ALL = [
     var lbImg = document.getElementById("lbImg");
     var lbItems = [], lbIdx = 0;   // lbItems: [{src, label}]
 
+    var lbToken = 0;
+    function lbPreload(i) {
+        var it = lbItems[(i + lbItems.length) % lbItems.length];
+        if (it) { var im = new Image(); im.src = it.src; }
+    }
     function lbShow(i) {
         if (!lbItems.length) return;
         lbIdx = (i + lbItems.length) % lbItems.length;
-        lbImg.src = lbItems[lbIdx].src;
-        document.getElementById("lbTitle").textContent = (lbItems[lbIdx].label || "").toUpperCase();
+        var it = lbItems[lbIdx];
+        document.getElementById("lbTitle").textContent = (it.label || "").toUpperCase();
         document.getElementById("lbNow").textContent = lbIdx + 1;
         document.getElementById("lbTotal").textContent = lbItems.length;
+
+        /* Sorok gambar lama dulu, papar pemutar, baru tukar bila gambar
+           baharu siap dimuat — kalau tidak gambar sebelumnya kekal
+           kelihatan sepanjang muat turun dan nampak macam tak bertukar. */
+        var my = ++lbToken;
+        lb.classList.add("loading");
+        lbImg.classList.remove("ready");
+        var probe = new Image();
+        function done() {
+            if (my !== lbToken) return;          // pengguna dah tekan seterusnya
+            lbImg.src = it.src;
+            lbImg.classList.add("ready");
+            lb.classList.remove("loading");
+            lbPreload(lbIdx + 1); lbPreload(lbIdx - 1);
+        }
+        probe.onload = done;
+        probe.onerror = done;
+        probe.src = it.src;
+        if (probe.complete) done();              // sudah dalam cache
     }
     var lbHistory = false;
     function lbOpenItems(items, start) {
