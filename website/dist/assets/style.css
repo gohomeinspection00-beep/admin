@@ -748,8 +748,8 @@ section { padding: 5rem 2rem; }
 }
 .tool-showcase-card.in-view { opacity: 1; transform: translateY(0); }
 .tool-showcase-card img {
-    height: 80px; width: auto; object-fit: contain; margin: 0 auto 0.75rem; display: block;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+    height: 96px; width: 100%; object-fit: cover; margin: 0 auto 0.75rem; display: block;
+    border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 .tool-showcase-card.img-missing img { display: none; }
 .tool-showcase-card.img-missing::before { content: '🛠'; font-size: 2.6rem; display: block; margin-bottom: 0.5rem; }
@@ -1493,7 +1493,7 @@ section { padding: 5rem 2rem; }
     .sticker-grid { gap: 1rem; }
     .sticker-item { width: 84px; }
     .tools-showcase { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-    .tool-showcase-card img { height: 60px; }
+    .tool-showcase-card img { height: 78px; }
     .drone-wrap { width: 110px; }
     .report-img { width: 46%; max-width: 170px; }
     .report-img.center { width: 50%; max-width: 190px; }

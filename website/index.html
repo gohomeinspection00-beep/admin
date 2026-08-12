@@ -786,8 +786,8 @@ section { padding: 5rem 2rem; }
 }
 .tool-showcase-card.in-view { opacity: 1; transform: translateY(0); }
 .tool-showcase-card img {
-    height: 80px; width: auto; object-fit: contain; margin: 0 auto 0.75rem; display: block;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+    height: 96px; width: 100%; object-fit: cover; margin: 0 auto 0.75rem; display: block;
+    border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 .tool-showcase-card.img-missing img { display: none; }
 .tool-showcase-card.img-missing::before { content: '🛠'; font-size: 2.6rem; display: block; margin-bottom: 0.5rem; }
@@ -1531,7 +1531,7 @@ section { padding: 5rem 2rem; }
     .sticker-grid { gap: 1rem; }
     .sticker-item { width: 84px; }
     .tools-showcase { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-    .tool-showcase-card img { height: 60px; }
+    .tool-showcase-card img { height: 78px; }
     .drone-wrap { width: 110px; }
     .report-img { width: 46%; max-width: 170px; }
     .report-img.center { width: 50%; max-width: 190px; }
@@ -2553,14 +2553,12 @@ var SVC_EXTRAS = {
             thTh:       { en: "Thermal Imaging", bm: "Thermal Imaging" }
         },
         toolsShowcase: [
-            { img: "ThermalOkey.png",      name: "Thermal Camera",    cert: "SIRIM Calibrated" },
-            { img: "Insulation-test.png",  name: "Insulation Tester", cert: "SIRIM Calibrated" },
-            { img: "Earth-Tester.png",     name: "Earth Tester",      cert: "SIRIM Calibrated" },
-            { img: "Clamp-Meter.png",      name: "Clamp Meter",       cert: "SIRIM Calibrated" },
-            { img: "Spirit-Level.png",     name: "Spirit Level",      cert: "Alignment Test" },
-            { img: "Laser-Distance-2.png", name: "Laser Distance",    cert: "Measurement" },
-            { img: "Lsquare.png",          name: "L-Square",          cert: "Alignment Test" },
-            { img: "Measure-tape.png",     name: "Measuring Tape",    cert: "Measurement" }
+            { img: "img/svc/thermal-imaging/1.jpg", name: "Thermal Camera",    cert: "SIRIM Calibrated" },
+            { img: "img/svc/electrical/3.jpg",      name: "Insulation Tester", cert: "SIRIM Calibrated" },
+            { img: "img/svc/electrical/5.jpg",      name: "Earth Tester",      cert: "SIRIM Calibrated" },
+            { img: "img/svc/electrical/2.jpg",      name: "Clamp Meter",       cert: "SIRIM Calibrated" },
+            { img: "img/svc/monitoring/2.jpg",      name: "Crack Width Gauge", cert: "Measurement" },
+            { img: "img/svc/monitoring/1.jpg",      name: "Measuring Tape",    cert: "Measurement" }
         ],
         thermal: { base: "Oroginal-Picture.png", overlay: "Thermal-Filter.png" },
         roof: { img: "Roof.png", drone: "Drone-DJI-MINI-3.png" },
@@ -5679,6 +5677,7 @@ var FAQ_ALL = [
     };
     /* Grid guna thumbnail kecil (img/t/...), lightbox guna gambar penuh.
        Kalau thumbnail hilang, jatuh balik ke gambar penuh. */
+    function tcSrc(v) { return v.indexOf("img/") === 0 ? v : CONFIG.imgBase + v; }
     function thumbSrc(v) {
         return (v && v.indexOf("img/") === 0) ? "img/t/" + v.slice(4) : v;
     }
@@ -5789,6 +5788,25 @@ var FAQ_ALL = [
         renderProjectsInto({ filters: "projFiltersFull", grid: "projGridFull", count: "projCountFull" }, 0);
     }
 
+
+    /* Sorok seksyen yang SEMUA gambarnya gagal dimuat — supaya laman tak
+       tinggal deretan kotak kosong bila hosting gambar luar tak dapat
+       dicapai. Seksyen bercampur (ada gambar tempatan) kekal dipapar. */
+    function hideBrokenSections(root) {
+        (root || document).querySelectorAll("section").forEach(function (sec) {
+            if (sec.dataset.gxChecked) return;
+            var imgs = [].slice.call(sec.querySelectorAll("img"));
+            if (!imgs.length) return;
+            sec.dataset.gxChecked = "1";
+            var total = imgs.length, bad = 0;
+            function check() { if (bad >= total) sec.style.display = "none"; }
+            imgs.forEach(function (im) {
+                if (im.complete && im.naturalWidth === 0 && im.getAttribute("src")) bad++;
+                im.addEventListener("error", function () { bad++; check(); });
+            });
+            check();
+        });
+    }
 
     /* ---------- Auto-slide gambar sub-page servis ---------- */
     var svcSlideTimer = null;
@@ -6180,7 +6198,7 @@ var FAQ_ALL = [
                     '<div class="tools-showcase">' +
                     ex.toolsShowcase.map(function (tc) {
                         return '<div class="tool-showcase-card">' +
-                            '<img src="' + CONFIG.imgBase + tc.img + '" alt="' + tc.name + '" loading="lazy" ' +
+                            '<img src="' + thumbSrc(tcSrc(tc.img)) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
                             'onerror="this.parentElement.classList.add(\'img-missing\')">' +
                             '<span>' + tc.name + '</span><div class="tool-cert">' + tc.cert + '</div></div>';
                     }).join("") +
@@ -6272,6 +6290,7 @@ var FAQ_ALL = [
                .forEach(function (el) { dlpObserver.observe(el); });
         }
         initSvcSlides(slides.map(function (u) { return { src: u, label: svcName(s) }; }));
+        hideBrokenSections(box);
     }
 
     /* ---------- Observer & scroll untuk animasi DLP ---------- */
@@ -6405,7 +6424,7 @@ var FAQ_ALL = [
                 '<div class="tools-showcase">' +
                 SVC_EXTRAS["home-defect"].toolsShowcase.map(function (tc) {
                     return '<div class="tool-showcase-card">' +
-                        '<img src="' + CONFIG.imgBase + tc.img + '" alt="' + tc.name + '" loading="lazy" ' +
+                        '<img src="' + thumbSrc(tcSrc(tc.img)) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
                         'onerror="this.parentElement.classList.add(\'img-missing\')">' +
                         '<span>' + tc.name + '</span><div class="tool-cert">' + tc.cert + '</div></div>';
                 }).join("") +
@@ -6491,6 +6510,7 @@ var FAQ_ALL = [
 
         currentPage = pageKey;
         initReveal();
+        setTimeout(function () { hideBrokenSections(document); }, 1200);
     }
     window.addEventListener("hashchange", function () { route(false); });
 

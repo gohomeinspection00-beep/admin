@@ -282,14 +282,12 @@ var SVC_EXTRAS = {
             thTh:       { en: "Thermal Imaging", bm: "Thermal Imaging" }
         },
         toolsShowcase: [
-            { img: "ThermalOkey.png",      name: "Thermal Camera",    cert: "SIRIM Calibrated" },
-            { img: "Insulation-test.png",  name: "Insulation Tester", cert: "SIRIM Calibrated" },
-            { img: "Earth-Tester.png",     name: "Earth Tester",      cert: "SIRIM Calibrated" },
-            { img: "Clamp-Meter.png",      name: "Clamp Meter",       cert: "SIRIM Calibrated" },
-            { img: "Spirit-Level.png",     name: "Spirit Level",      cert: "Alignment Test" },
-            { img: "Laser-Distance-2.png", name: "Laser Distance",    cert: "Measurement" },
-            { img: "Lsquare.png",          name: "L-Square",          cert: "Alignment Test" },
-            { img: "Measure-tape.png",     name: "Measuring Tape",    cert: "Measurement" }
+            { img: "img/svc/thermal-imaging/1.jpg", name: "Thermal Camera",    cert: "SIRIM Calibrated" },
+            { img: "img/svc/electrical/3.jpg",      name: "Insulation Tester", cert: "SIRIM Calibrated" },
+            { img: "img/svc/electrical/5.jpg",      name: "Earth Tester",      cert: "SIRIM Calibrated" },
+            { img: "img/svc/electrical/2.jpg",      name: "Clamp Meter",       cert: "SIRIM Calibrated" },
+            { img: "img/svc/monitoring/2.jpg",      name: "Crack Width Gauge", cert: "Measurement" },
+            { img: "img/svc/monitoring/1.jpg",      name: "Measuring Tape",    cert: "Measurement" }
         ],
         thermal: { base: "Oroginal-Picture.png", overlay: "Thermal-Filter.png" },
         roof: { img: "Roof.png", drone: "Drone-DJI-MINI-3.png" },
@@ -3408,6 +3406,7 @@ var FAQ_ALL = [
     };
     /* Grid guna thumbnail kecil (img/t/...), lightbox guna gambar penuh.
        Kalau thumbnail hilang, jatuh balik ke gambar penuh. */
+    function tcSrc(v) { return v.indexOf("img/") === 0 ? v : CONFIG.imgBase + v; }
     function thumbSrc(v) {
         return (v && v.indexOf("img/") === 0) ? "img/t/" + v.slice(4) : v;
     }
@@ -3518,6 +3517,25 @@ var FAQ_ALL = [
         renderProjectsInto({ filters: "projFiltersFull", grid: "projGridFull", count: "projCountFull" }, 0);
     }
 
+
+    /* Sorok seksyen yang SEMUA gambarnya gagal dimuat — supaya laman tak
+       tinggal deretan kotak kosong bila hosting gambar luar tak dapat
+       dicapai. Seksyen bercampur (ada gambar tempatan) kekal dipapar. */
+    function hideBrokenSections(root) {
+        (root || document).querySelectorAll("section").forEach(function (sec) {
+            if (sec.dataset.gxChecked) return;
+            var imgs = [].slice.call(sec.querySelectorAll("img"));
+            if (!imgs.length) return;
+            sec.dataset.gxChecked = "1";
+            var total = imgs.length, bad = 0;
+            function check() { if (bad >= total) sec.style.display = "none"; }
+            imgs.forEach(function (im) {
+                if (im.complete && im.naturalWidth === 0 && im.getAttribute("src")) bad++;
+                im.addEventListener("error", function () { bad++; check(); });
+            });
+            check();
+        });
+    }
 
     /* ---------- Auto-slide gambar sub-page servis ---------- */
     var svcSlideTimer = null;
@@ -3909,7 +3927,7 @@ var FAQ_ALL = [
                     '<div class="tools-showcase">' +
                     ex.toolsShowcase.map(function (tc) {
                         return '<div class="tool-showcase-card">' +
-                            '<img src="' + CONFIG.imgBase + tc.img + '" alt="' + tc.name + '" loading="lazy" ' +
+                            '<img src="' + thumbSrc(tcSrc(tc.img)) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
                             'onerror="this.parentElement.classList.add(\'img-missing\')">' +
                             '<span>' + tc.name + '</span><div class="tool-cert">' + tc.cert + '</div></div>';
                     }).join("") +
@@ -4001,6 +4019,7 @@ var FAQ_ALL = [
                .forEach(function (el) { dlpObserver.observe(el); });
         }
         initSvcSlides(slides.map(function (u) { return { src: u, label: svcName(s) }; }));
+        hideBrokenSections(box);
     }
 
     /* ---------- Observer & scroll untuk animasi DLP ---------- */
@@ -4134,7 +4153,7 @@ var FAQ_ALL = [
                 '<div class="tools-showcase">' +
                 SVC_EXTRAS["home-defect"].toolsShowcase.map(function (tc) {
                     return '<div class="tool-showcase-card">' +
-                        '<img src="' + CONFIG.imgBase + tc.img + '" alt="' + tc.name + '" loading="lazy" ' +
+                        '<img src="' + thumbSrc(tcSrc(tc.img)) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
                         'onerror="this.parentElement.classList.add(\'img-missing\')">' +
                         '<span>' + tc.name + '</span><div class="tool-cert">' + tc.cert + '</div></div>';
                 }).join("") +
@@ -4220,6 +4239,7 @@ var FAQ_ALL = [
 
         currentPage = pageKey;
         initReveal();
+        setTimeout(function () { hideBrokenSections(document); }, 1200);
     }
     window.addEventListener("hashchange", function () { route(false); });
 
