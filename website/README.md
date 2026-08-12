@@ -195,6 +195,7 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 | `img/review/` | 9 review pelanggan |
 | `img/report/` | 5 muka surat sample report |
 | `img/dms/` | 7 paparan sistem pengurusan defect |
+| `files/` | fail muat turun — `sample-report.pdf` (disalin ke `dist/files/`) |
 | `img/t/` | thumbnail 560px untuk grid — dijana automatik, jangan edit |
 
 **Prestasi:** gambar penuh dihadkan 900px (JPEG q72) untuk lightbox &
@@ -206,9 +207,7 @@ digunakan automatik.
 
 > **Semua gambar kini dalam folder `img/` — tiada hosting luar langsung.**
 > Hosting lama `arleta.site` sudah mati dan tiada apa-apa lagi bergantung
-> padanya. Satu-satunya yang belum ada ialah **fail PDF sample report**:
-> letak PDF dalam folder website, kemudian isi `pdf:` dalam
-> `SVC_EXTRAS["home-defect"]` untuk hidupkan butang muat turun.
+> padanya.
 
 **Cara rujuk gambar dalam data:**
 - `"img/xxx.jpg"` — fail tempatan (guna terus)

@@ -383,8 +383,11 @@ function copyDir(from, to) {
     await browser.close();
     srv.close();
 
-    /* gambar */
+    /* gambar + fail muat turun (PDF dsb.) */
     copyDir(path.join(__dirname, "img"), path.join(OUT, "img"));
+    if (fs.existsSync(path.join(__dirname, "files"))) {
+        copyDir(path.join(__dirname, "files"), path.join(OUT, "files"));
+    }
 
     /* sitemap */
     const today = fs.statSync(SRC).mtime.toISOString().slice(0, 10);

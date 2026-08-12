@@ -351,10 +351,8 @@ var SVC_EXTRAS = {
             { img: "img/sticker/spesifik.png",   label: "Spesifik" }
         ],
         reports: ["img/report/1.jpg", "img/report/2.jpg", "img/report/3.jpg", "img/report/4.jpg", "img/report/5.jpg"],
-        /* Letak fail PDF sample report dalam folder website, contoh
-           "sample-report.pdf", kemudian isi di sini untuk hidupkan
-           butang "Download Sample Report". Biar kosong = butang sorok. */
-        pdf: ""
+        /* Fail PDF sample report. Biar kosong = butang muat turun sorok. */
+        pdf: "files/sample-report.pdf"
     }
 };
 
