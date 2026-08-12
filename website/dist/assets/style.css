@@ -51,7 +51,7 @@ img { max-width: 100%; }
     display: flex; justify-content: space-between; align-items: center; gap: 1rem;
 }
 .logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-.logo img { height: 40px; transition: transform 0.3s ease; }
+.logo img { height: 40px; width: auto; max-width: 190px; object-fit: contain; transition: transform 0.3s ease; }
 .logo:hover img { transform: scale(1.02); }
 .logo-text { font-weight: 800; font-size: 1.25rem; color: var(--primary-dark); letter-spacing: -0.02em; display: none; }
 .logo.no-img .logo-text { display: block; }
@@ -1389,6 +1389,10 @@ section { padding: 5rem 2rem; }
 .footer a { color: #94A3B8; text-decoration: none; transition: color 0.3s ease; }
 .footer a:hover { color: white; }
 .footer-brand { font-weight: 800; font-size: 1.2rem; color: white; margin-bottom: 0.5rem; }
+.footer-logo {
+    width: 170px; height: auto; max-width: 100%; display: block; margin-bottom: 0.9rem;
+    background: #fff; padding: 0.5rem 0.7rem; border-radius: 10px;
+}
 .footer-bottom {
     border-top: 1px solid #1E293B; padding-top: 1.5rem; text-align: center;
     font-size: 0.85rem; color: #64748B;

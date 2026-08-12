@@ -289,8 +289,8 @@ var SVC_EXTRAS = {
             { img: "img/svc/monitoring/2.jpg",      name: "Crack Width Gauge", cert: "Measurement" },
             { img: "img/svc/monitoring/1.jpg",      name: "Measuring Tape",    cert: "Measurement" }
         ],
-        thermal: { base: "Oroginal-Picture.png", overlay: "Thermal-Filter.png" },
-        roof: { img: "Roof.png", drone: "Drone-DJI-MINI-3.png" },
+        thermal: { base: "img/thermal-base.jpg", overlay: "img/thermal-overlay.jpg" },
+        roof: { img: "img/proj/dart-bukit-seni-1.jpg" },
         elements: [
             { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
               t: { en: "Floor", bm: "Lantai" }, s: { en: "Lantai", bm: "Floor" },
@@ -342,13 +342,13 @@ var SVC_EXTRAS = {
               tools: { en: ["Thermal camera", "Moisture detector"], bm: ["Kamera thermal", "Pengesan lembapan"] } }
         ],
         stickers: [
-            { img: "Finishing-Transparent.png",  label: "Finishing" },
-            { img: "Hollow-Transparent.png",     label: "Hollow" },
-            { img: "Jointing-1-Transparent.png", label: "Jointing 1" },
-            { img: "Joinitng-2-Transparent.png", label: "Jointing 2" },
-            { img: "Major-Transparent.png",      label: "Major" },
-            { img: "Minor-Transparent.png",      label: "Minor" },
-            { img: "Spesifik-Transparent.png",   label: "Spesifik" }
+            { img: "img/sticker/finishing.png",  label: "Finishing" },
+            { img: "img/sticker/hollow.png",     label: "Hollow" },
+            { img: "img/sticker/jointing-1.png", label: "Jointing 1" },
+            { img: "img/sticker/jointing-2.png", label: "Jointing 2" },
+            { img: "img/sticker/major.png",      label: "Major" },
+            { img: "img/sticker/minor.png",      label: "Minor" },
+            { img: "img/sticker/spesifik.png",   label: "Spesifik" }
         ],
         reports: ["Report-1-Website.png", "Report-2-Website.png", "Report-3-Website.png", "Report-4-Website.png", "Report-5-Website.png"],
         pdf: "https://arleta.site/interactivelink/1453/SAMPLE-REPORT-FOR-LANDED-HOUSING-GO-XPERT-SOLUTION-HOME-INSPECTION_compressed-1.pdf"
@@ -3406,6 +3406,7 @@ var FAQ_ALL = [
     };
     /* Grid guna thumbnail kecil (img/t/...), lightbox guna gambar penuh.
        Kalau thumbnail hilang, jatuh balik ke gambar penuh. */
+    var DRONE_SVG = '<svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="#0F172A" opacity=".16"><ellipse cx="56" cy="48" rx="36" ry="9"/><ellipse cx="144" cy="48" rx="36" ry="9"/><ellipse cx="56" cy="122" rx="36" ry="9"/><ellipse cx="144" cy="122" rx="36" ry="9"/></g><g stroke="#0F172A" stroke-width="7" stroke-linecap="round"><path d="M62 55L92 75M138 55L108 75M62 115L92 95M138 115L108 95"/></g><g stroke="#0F172A" stroke-width="4" opacity=".6" fill="none"><circle cx="56" cy="48" r="11"/><circle cx="144" cy="48" r="11"/><circle cx="56" cy="122" r="11"/><circle cx="144" cy="122" r="11"/></g><rect x="81" y="66" width="38" height="38" rx="10" fill="#1E293B"/><circle cx="100" cy="85" r="7.5" fill="#38BDF8"/></svg>';
     function tcSrc(v) { return v.indexOf("img/") === 0 ? v : CONFIG.imgBase + v; }
     function thumbSrc(v) {
         return (v && v.indexOf("img/") === 0) ? "img/t/" + v.slice(4) : v;
@@ -3943,10 +3944,10 @@ var FAQ_ALL = [
                         '<p>' + xt(ex.sec.thSub) + '</p>' +
                     '</div>' +
                     '<div class="thermal-compare">' +
-                        '<img class="th-base" src="' + CONFIG.imgBase + ex.thermal.base + '" alt="Original" ' +
+                        '<img class="th-base" src="' + tcSrc(ex.thermal.base) + '" alt="Original" ' +
                         'onerror="this.closest(\'section\').style.display=\'none\'">' +
                         '<div class="th-overlay">' +
-                            '<img src="' + CONFIG.imgBase + ex.thermal.overlay + '" alt="Thermal">' +
+                            '<img src="' + tcSrc(ex.thermal.overlay) + '" alt="Thermal">' +
                         '</div>' +
                     '</div>' +
                     '<div class="thermal-label-wrap">' +
@@ -3957,12 +3958,10 @@ var FAQ_ALL = [
             }
             if (ex.roof) {
                 xh += '<section class="roof-section">' +
-                    '<img class="roof-img" src="' + CONFIG.imgBase + ex.roof.img + '" alt="Roof inspection" ' +
+                    '<img class="roof-img" src="' + tcSrc(ex.roof.img) + '" alt="Roof inspection" ' +
+                    'loading="lazy" decoding="async" ' +
                     'onerror="this.closest(\'section\').style.display=\'none\'">' +
-                    '<div class="drone-wrap">' +
-                        '<img src="' + CONFIG.imgBase + ex.roof.drone + '" alt="Drone" ' +
-                        'onerror="this.closest(\'.drone-wrap\').style.display=\'none\'">' +
-                    '</div></section>';
+                    '<div class="drone-wrap">' + DRONE_SVG + '</div></section>';
             }
             if (ex.reports) {
                 xh += '<section class="svc-extra alt"><div class="section-container">' +
@@ -3989,7 +3988,7 @@ var FAQ_ALL = [
                     ex.stickers.map(function (st, i) {
                         var side = (i < 3 || i === 6) ? "from-left" : "from-right";
                         return '<div class="sticker-item ' + side + '">' +
-                            '<img src="' + CONFIG.imgBase + st.img + '" alt="' + st.label + '" loading="lazy" ' +
+                            '<img src="' + tcSrc(st.img) + '" alt="' + st.label + '" loading="lazy" ' +
                             'onerror="this.parentElement.classList.add(\'img-missing\')">' +
                             '<span>' + st.label + '</span></div>';
                     }).join("") +
@@ -4254,7 +4253,7 @@ var FAQ_ALL = [
             "url": siteUrl,
             "telephone": "+" + CONFIG.phoneRaw,
             "email": CONFIG.email,
-            "image": CONFIG.imgBase + "Logo-Go-Expert-Panjang.png",
+            "image": CONFIG.siteUrl.replace(/\/+$/, "") + "/img/logo.png",
             "priceRange": "$$",
             "address": { "@type": "PostalAddress", "addressCountry": "MY", "addressRegion": "Selangor" },
             "areaServed": ["Johor", "Melaka", "Negeri Sembilan", "Selangor"].map(function (a) {

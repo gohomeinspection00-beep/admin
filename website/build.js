@@ -332,7 +332,7 @@ function copyDir(from, to) {
     fs.writeFileSync(path.join(OUT, "assets", "style.css"), css.trim() + "\n");
     fs.writeFileSync(path.join(OUT, "assets", "app.js"), js.trim() + "\n");
 
-    const port = 8731;
+    const port = Number(process.env.BUILD_PORT || 8731);
     const srv = await serve(__dirname, port);
     const browser = await chromium.launch({ executablePath: CHROME });
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });

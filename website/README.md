@@ -190,7 +190,8 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 | `img/svc/<servis>/` | 54 gambar slideshow untuk 12 sub-page servis |
 | `img/proj/` | 143 gambar untuk 58 projek |
 | `img/gal/` | 20 gambar pasukan / di tapak / ACPIM / latihan |
-| `img/` (root) | 5 gambar re-inspection (before/after) |
+| `img/` (root) | logo, pasangan thermal, 5 gambar re-inspection |
+| `img/sticker/` | 7 sticker penanda defect (PNG latar telus) |
 | `img/t/` | thumbnail 560px untuk grid — dijana automatik, jangan edit |
 
 **Prestasi:** gambar penuh dihadkan 900px (JPEG q72) untuk lightbox &
@@ -200,11 +201,12 @@ Semua gambar grid `loading="lazy"`, dan slideshow servis hanya muat
 slaid semasa + satu berikutnya. Kalau thumbnail hilang, gambar penuh
 digunakan automatik.
 
-> **Hosting lama `arleta.site` sudah tidak boleh dicapai.** Semua gambar
-> penting sudah dipindah ke folder `img/`. Yang masih menunjuk ke sana
-> (logo, 9 gambar review, galeri sample report, sticker defect, showcase
-> alat, thermal reveal, drone) akan **sorok sendiri** bila gagal dimuat —
-> laman tak pernah nampak rosak. Hantar fail-fail itu untuk dipulihkan.
+> **Hosting lama `arleta.site` sudah tidak boleh dicapai.** Logo, pasangan
+> gambar thermal, sticker defect, showcase alat dan bumbung/drone semuanya
+> sudah dipindah ke folder `img/`. Yang masih menunjuk ke hosting lama —
+> **9 gambar review**, **galeri sample report + PDF**, dan **paparan sistem
+> pengurusan defect** — akan **sorok sendiri** bila gagal dimuat, jadi laman
+> tak pernah nampak rosak. Hantar fail-fail itu bila ada untuk dipulihkan.
 
 **Cara rujuk gambar dalam data:**
 - `"img/xxx.jpg"` — fail tempatan (guna terus)
