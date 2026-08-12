@@ -190,8 +190,9 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 | `img/svc/<servis>/` | 54 gambar slideshow untuk 12 sub-page servis |
 | `img/proj/` | 143 gambar untuk 58 projek |
 | `img/gal/` | 20 gambar pasukan / di tapak / ACPIM / latihan |
-| `img/` (root) | logo, pasangan thermal, 5 gambar re-inspection |
+| `img/` (root) | logo, pasangan thermal, bumbung + drone, 5 gambar re-inspection |
 | `img/sticker/` | 7 sticker penanda defect (PNG latar telus) |
+| `img/tool/` | 8 gambar alat berlatar telus (WebP) |
 | `img/review/` | 9 review pelanggan |
 | `img/report/` | 5 muka surat sample report |
 | `img/dms/` | 7 paparan sistem pengurusan defect |

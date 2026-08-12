@@ -748,8 +748,9 @@ section { padding: 5rem 2rem; }
 }
 .tool-showcase-card.in-view { opacity: 1; transform: translateY(0); }
 .tool-showcase-card img {
-    height: 96px; width: 100%; object-fit: cover; margin: 0 auto 0.75rem; display: block;
-    border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    height: 88px; width: auto; max-width: none; object-fit: contain;
+    margin: 0 auto 0.75rem; display: block;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.14));
 }
 .tool-showcase-card.img-missing img { display: none; }
 .tool-showcase-card.img-missing::before { content: '🛠'; font-size: 2.6rem; display: block; margin-bottom: 0.5rem; }
@@ -928,6 +929,8 @@ section { padding: 5rem 2rem; }
 }
 .gal-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 .gal-item img { width: 100%; display: block; }
+/* gambar alat berlatar telus — beri ruang & latar putih */
+.gal-item.equip img { padding: 12% 18%; background: #fff; }
 .gal-item.img-missing img { display: none; }
 .gal-item.img-missing::before {
     content: ''; display: block; width: 100%; aspect-ratio: 4/3;
@@ -1188,7 +1191,7 @@ section { padding: 5rem 2rem; }
 
 /* ==================== EQUIPMENT ==================== */
 .equipment { background: linear-gradient(180deg, white 0%, #E8F4FC 100%); }
-.equip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.equip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
 .equip-card {
     background: white; border-radius: 16px; padding: 1.5rem 1rem; text-align: center;
     border: 1px solid var(--border); transition: all 0.3s ease;
@@ -1203,6 +1206,7 @@ section { padding: 5rem 2rem; }
     width: 100%; height: 150px; object-fit: cover; border-radius: 12px;
     filter: none; box-shadow: var(--shadow);
 }
+.equip-card img { max-width: none; }
 .equip-card .equip-fallback {
     width: 80px; height: 80px; margin: 0 auto 0.75rem; background: #E3F2FD; border-radius: 12px;
     display: none; align-items: center; justify-content: center; font-size: 2rem;
@@ -1464,7 +1468,7 @@ section { padding: 5rem 2rem; }
     .pillar-slot.peek .pillar-peek img:nth-child(3) { transform: translate(62px, -46px) rotate(10deg); }
     .audience-grid { grid-template-columns: repeat(2, 1fr); }
     .equip-grid { grid-template-columns: repeat(2, 1fr); }
-    .equip-card img, .equip-card .equip-fallback { width: 100%; height: 110px; }
+    .equip-card img, .equip-card .equip-fallback { width: 80px; height: 80px; }
     .process-grid { grid-template-columns: 1fr 1fr; }
     .coverage-states { grid-template-columns: repeat(2, 1fr); }
     .cov-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -1497,8 +1501,8 @@ section { padding: 5rem 2rem; }
     .sticker-grid { gap: 1rem; }
     .sticker-item { width: 84px; }
     .tools-showcase { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-    .tool-showcase-card img { height: 78px; }
-    .drone-wrap { width: 110px; }
+    .tool-showcase-card img { height: 70px; }
+    .drone-wrap { width: 120px; }
     .report-img { width: 46%; max-width: 170px; }
     .report-img.center { width: 50%; max-width: 190px; }
     .report-row { margin-bottom: -24px; }

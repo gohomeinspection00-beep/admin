@@ -282,15 +282,17 @@ var SVC_EXTRAS = {
             thTh:       { en: "Thermal Imaging", bm: "Thermal Imaging" }
         },
         toolsShowcase: [
-            { img: "img/svc/thermal-imaging/1.jpg", name: "Thermal Camera",    cert: "SIRIM Calibrated" },
-            { img: "img/svc/electrical/3.jpg",      name: "Insulation Tester", cert: "SIRIM Calibrated" },
-            { img: "img/svc/electrical/5.jpg",      name: "Earth Tester",      cert: "SIRIM Calibrated" },
-            { img: "img/svc/electrical/2.jpg",      name: "Clamp Meter",       cert: "SIRIM Calibrated" },
-            { img: "img/svc/monitoring/2.jpg",      name: "Crack Width Gauge", cert: "Measurement" },
-            { img: "img/svc/monitoring/1.jpg",      name: "Measuring Tape",    cert: "Measurement" }
+            { img: "img/tool/thermal.webp",           name: "Thermal Camera",    cert: "SIRIM Calibrated" },
+            { img: "img/tool/insulation-tester.webp", name: "Insulation Tester", cert: "SIRIM Calibrated" },
+            { img: "img/tool/earth-tester.webp",      name: "Earth Tester",      cert: "SIRIM Calibrated" },
+            { img: "img/tool/clamp-meter.webp",       name: "Clamp Meter",       cert: "SIRIM Calibrated" },
+            { img: "img/tool/spirit-level.webp",      name: "Spirit Level",      cert: "Alignment Test" },
+            { img: "img/tool/laser-distance.webp",    name: "Laser Distance",    cert: "Measurement" },
+            { img: "img/tool/l-square.webp",          name: "L-Square",          cert: "Alignment Test" },
+            { img: "img/tool/measure-tape.webp",      name: "Measuring Tape",    cert: "Measurement" }
         ],
         thermal: { base: "img/thermal-base.jpg", overlay: "img/thermal-overlay.jpg" },
-        roof: { img: "img/proj/dart-bukit-seni-1.jpg" },
+        roof: { img: "img/roof.webp", drone: "img/drone.webp" },
         elements: [
             { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>',
               t: { en: "Floor", bm: "Lantai" }, s: { en: "Lantai", bm: "Floor" },
@@ -1524,16 +1526,16 @@ var GALLERY = [
       caption: { en: "Width measured and monitored over time", bm: "Lebar diukur dan dipantau mengikut masa" } },
 
     /* --- Peralatan (hosting sedia ada) --- */
-    { img: "img/svc/thermal-imaging/1.jpg", cat: "equipment",
+    { img: "img/tool/thermal.webp", cat: "equipment",
       title: { en: "Thermal Imaging in Use", bm: "Imej Thermal Digunakan" },
       caption: { en: "Reveals moisture behind finished surfaces", bm: "Mendedahkan lembapan di sebalik permukaan siap" } },
-    { img: "img/svc/electrical/5.jpg", cat: "equipment",
+    { img: "img/tool/earth-tester.webp", cat: "equipment",
       title: { en: "Earth Tester", bm: "Earth Tester" },
       caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
-    { img: "img/svc/electrical/3.jpg", cat: "equipment",
+    { img: "img/tool/insulation-tester.webp", cat: "equipment",
       title: { en: "Insulation Tester", bm: "Insulation Tester" },
       caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } },
-    { img: "img/svc/electrical/2.jpg", cat: "equipment",
+    { img: "img/tool/clamp-meter.webp", cat: "equipment",
       title: { en: "Clamp Meter", bm: "Clamp Meter" },
       caption: { en: "SIRIM calibrated", bm: "Dikalibrasi SIRIM" } }
 ];
@@ -2474,12 +2476,14 @@ var WHYUS = [
 ];
 
 var EQUIPMENT = [
-    { img: "img/svc/thermal-imaging/1.jpg", emoji: "🌡️", en: "Thermal Camera",     bm: "Kamera Thermal" },
-    { img: "img/svc/electrical/2.jpg",      emoji: "🔧", en: "Clamp Meter",        bm: "Clamp Meter" },
-    { img: "img/svc/electrical/3.jpg",      emoji: "⚡", en: "Insulation Tester",  bm: "Insulation Tester" },
-    { img: "img/svc/electrical/5.jpg",      emoji: "🔌", en: "Earth Tester",       bm: "Earth Tester" },
-    { img: "img/svc/monitoring/2.jpg",      emoji: "📏", en: "Crack Width Gauge",  bm: "Tolok Lebar Retak" },
-    { img: "img/svc/monitoring/1.jpg",      emoji: "📐", en: "Measuring Tape",     bm: "Pita Pengukur" }
+    { img: "img/tool/thermal.webp",           emoji: "🌡️", en: "Thermal Camera",    bm: "Kamera Thermal" },
+    { img: "img/tool/insulation-tester.webp", emoji: "⚡", en: "Insulation Tester", bm: "Insulation Tester" },
+    { img: "img/tool/earth-tester.webp",      emoji: "🔌", en: "Earth Tester",      bm: "Earth Tester" },
+    { img: "img/tool/clamp-meter.webp",       emoji: "🔧", en: "Clamp Meter",       bm: "Clamp Meter" },
+    { img: "img/tool/spirit-level.webp",      emoji: "📏", en: "Spirit Level",      bm: "Spirit Level" },
+    { img: "img/tool/laser-distance.webp",    emoji: "🔦", en: "Laser Distance",    bm: "Laser Distance" },
+    { img: "img/tool/l-square.webp",          emoji: "📐", en: "L Square",          bm: "L Square" },
+    { img: "img/tool/measure-tape.webp",      emoji: "📐", en: "Measuring Tape",    bm: "Pita Pengukur" }
 ];
 
 var PROCESS = [
@@ -2804,7 +2808,7 @@ var FAQ_ALL = [
         if (!grid) return;
         grid.innerHTML = EQUIPMENT.map(function (e) {
             var src = e.img.indexOf("img/") === 0 ? e.img : CONFIG.imgBase + e.img;
-            return '<div class="equip-card reveal photo">' +
+            return '<div class="equip-card reveal">' +
                    '<img src="' + thumbSrc(src) + '" alt="' + e.en + '" loading="lazy" decoding="async" ' +
                    'data-full="' + src + '" ' +
                    'onerror="if(this.src.indexOf(\'img/t/\')>=0){this.src=this.getAttribute(\'data-full\');}' +
@@ -2886,7 +2890,8 @@ var FAQ_ALL = [
         var camIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
         grid.innerHTML = list.map(function (g, i) {
             var src = galSrc(g.img);
-            return '<button class="gal-item' + (src ? "" : " img-missing") + '" type="button" data-gi="' + i + '">' +
+            return '<button class="gal-item' + (src ? "" : " img-missing") +
+                (g.cat === "equipment" ? " equip" : "") + '" type="button" data-gi="' + i + '">' +
                 '<span class="gal-chip">' + galCatLabel(g.cat) + '</span>' +
                 (src ? '<img src="' + thumbSrc(src) + '" alt="' + t2(g.title) + '" loading="lazy" decoding="async" ' +
                        'data-full="' + src + '" ' +
@@ -3400,10 +3405,11 @@ var FAQ_ALL = [
     };
     /* Grid guna thumbnail kecil (img/t/...), lightbox guna gambar penuh.
        Kalau thumbnail hilang, jatuh balik ke gambar penuh. */
-    var DRONE_SVG = '<svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="#0F172A" opacity=".16"><ellipse cx="56" cy="48" rx="36" ry="9"/><ellipse cx="144" cy="48" rx="36" ry="9"/><ellipse cx="56" cy="122" rx="36" ry="9"/><ellipse cx="144" cy="122" rx="36" ry="9"/></g><g stroke="#0F172A" stroke-width="7" stroke-linecap="round"><path d="M62 55L92 75M138 55L108 75M62 115L92 95M138 115L108 95"/></g><g stroke="#0F172A" stroke-width="4" opacity=".6" fill="none"><circle cx="56" cy="48" r="11"/><circle cx="144" cy="48" r="11"/><circle cx="56" cy="122" r="11"/><circle cx="144" cy="122" r="11"/></g><rect x="81" y="66" width="38" height="38" rx="10" fill="#1E293B"/><circle cx="100" cy="85" r="7.5" fill="#38BDF8"/></svg>';
     function tcSrc(v) { return v.indexOf("img/") === 0 ? v : CONFIG.imgBase + v; }
     function thumbSrc(v) {
-        return (v && v.indexOf("img/") === 0) ? "img/t/" + v.slice(4) : v;
+        /* gambar alat berlatar telus sudah kecil — tiada thumbnail */
+        if (!v || v.indexOf("img/tool/") === 0) return v;
+        return v.indexOf("img/") === 0 ? "img/t/" + v.slice(4) : v;
     }
     function projSrc(v) {
         if (!v) return "";
@@ -3922,7 +3928,7 @@ var FAQ_ALL = [
                     '<div class="tools-showcase">' +
                     ex.toolsShowcase.map(function (tc) {
                         return '<div class="tool-showcase-card">' +
-                            '<img src="' + thumbSrc(tcSrc(tc.img)) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
+                            '<img src="' + tcSrc(tc.img) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
                             'onerror="this.parentElement.classList.add(\'img-missing\')">' +
                             '<span>' + tc.name + '</span><div class="tool-cert">' + tc.cert + '</div></div>';
                     }).join("") +
@@ -3955,7 +3961,10 @@ var FAQ_ALL = [
                     '<img class="roof-img" src="' + tcSrc(ex.roof.img) + '" alt="Roof inspection" ' +
                     'loading="lazy" decoding="async" ' +
                     'onerror="this.closest(\'section\').style.display=\'none\'">' +
-                    '<div class="drone-wrap">' + DRONE_SVG + '</div></section>';
+                    '<div class="drone-wrap">' +
+                        '<img src="' + tcSrc(ex.roof.drone) + '" alt="Drone survey" loading="lazy" ' +
+                        'onerror="this.closest(\'.drone-wrap\').style.display=\'none\'">' +
+                    '</div></section>';
             }
             if (ex.reports) {
                 xh += '<section class="svc-extra alt"><div class="section-container">' +
@@ -4146,7 +4155,7 @@ var FAQ_ALL = [
                 '<div class="tools-showcase">' +
                 SVC_EXTRAS["home-defect"].toolsShowcase.map(function (tc) {
                     return '<div class="tool-showcase-card">' +
-                        '<img src="' + thumbSrc(tcSrc(tc.img)) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
+                        '<img src="' + tcSrc(tc.img) + '" alt="' + tc.name + '" loading="lazy" decoding="async" ' +
                         'onerror="this.parentElement.classList.add(\'img-missing\')">' +
                         '<span>' + tc.name + '</span><div class="tool-cert">' + tc.cert + '</div></div>';
                 }).join("") +
