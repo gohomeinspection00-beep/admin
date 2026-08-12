@@ -1,0 +1,76 @@
+# GO XPERT SOLUTION (GoXpert)
+
+> Registered Building Surveyors in Malaysia. We inspect buildings and produce
+> evidence-grade condition reports — for homeowners claiming defects within their
+> Defect Liability Period, for corporations and JMB/MC managing building assets,
+> and for owners who need documentation that holds up at the Tribunal for
+> Homebuyer Claims.
+
+## Facts
+
+- Legal name: GO XPERT SOLUTION
+- Company registration number: 202503234804 (003768196-A)
+- Website: https://goxpert.my/
+- WhatsApp / phone: +6011-3144 6591
+- Email: official@goxpert.my
+- States served: Johor, Melaka, Negeri Sembilan, Selangor (other locations on request)
+- Inspectors are registered with the Royal Institution of Surveyors Malaysia (RISM)
+- Measuring instruments are calibrated by SIRIM Malaysia
+- Languages: English and Bahasa Malaysia
+
+## What we are good at
+
+- Finding defects that are invisible to an untrained eye: hollow tiles by tap-test,
+  moisture inside walls by thermal imaging and moisture meters, missing earthing by
+  instrument testing rather than guesswork.
+- Writing findings so they can be acted on: exact location, defect category, photo,
+  measured reading and date — not a vague complaint a developer can dismiss.
+- Re-inspection: verifying that rectification work was genuinely done, with a
+  before-and-after record for every item.
+- Independence: we do not sell repair works, so our findings are not a sales list.
+
+## Services
+
+- [Home Defect Inspection (DLP)](https://goxpert.my/services/home-defect/): Catch every defect before your Defect Liability Period expires.
+- [Pre-Purchase Inspection](https://goxpert.my/services/pre-purchase/): Buying a sub-sale home? Know the true condition — before you sign.
+- [Sub-Sale Inspection](https://goxpert.my/services/sub-sale/): Bought an older home? Know its true condition and plan repairs right.
+- [Re-Inspection](https://goxpert.my/services/re-inspection/): Verify the developer actually fixed what they promised.
+- [After-Renovation Inspection](https://goxpert.my/services/after-renovation/): Make sure your contractor delivered what you paid for.
+- [Joint Inspection with Developer](https://goxpert.my/services/joint-inspection/): When the developer disputes your defects or comes to close them — we stand on your side.
+- [Building Condition Assessment (BCA)](https://goxpert.my/services/bca/): A systematic health check for your entire building.
+- [Dilapidation Survey](https://goxpert.my/services/dilapidation/): Protect yourself before construction starts next door.
+- [Building Monitoring](https://goxpert.my/services/monitoring/): Track movement and cracks before they become failures.
+- [Commercial Building Inspection](https://goxpert.my/services/commercial-inspection/): Offices, shoplots and factories — inspected to scope.
+- [Maintenance Report / Condition Audit](https://goxpert.my/services/maintenance-audit/): Know what needs fixing first — and what it will cost.
+- [Electrical Inspection](https://goxpert.my/services/electrical/): Calibrated testing for a system you cannot see.
+- [Leak Detection & Moisture Survey](https://goxpert.my/services/leak-detection/): Find the source — not just the stain.
+- [Thermal Imaging](https://goxpert.my/services/thermal-imaging/): See what the naked eye cannot.
+- [Rectification Defect](https://goxpert.my/services/rectification/): The right repair method, verified after the work.
+- [Tribunal Consultation & Documentation](https://goxpert.my/services/tribunal/): Evidence strong enough for your claim.
+
+## Pages
+
+- [Home](https://goxpert.my/)
+- [All services](https://goxpert.my/services/)
+- [Projects handled](https://goxpert.my/projects/)
+- [Gallery](https://goxpert.my/gallery/)
+- [About us](https://goxpert.my/about/)
+- [Questions and answers](https://goxpert.my/faq/)
+- [Articles](https://goxpert.my/blog/)
+
+## Articles
+
+- [DLP: What Every New Homeowner Must Know Before It Expires](https://goxpert.my/blog/dlp-guide/): The Defect Liability Period is the only window where the developer must fix defects for free. Here is how to use it properly.
+- [10 Defects We Find in Almost Every New Home](https://goxpert.my/blog/common-defects/): After thousands of inspections, the same problems appear again and again. Here is what to look for in your own unit.
+- [Hollow Tiles: Why That Tapping Sound Matters](https://goxpert.my/blog/hollow-tiles/): It is not a cosmetic complaint. Here is what causes hollow tiles, why they fail, and why patching over them makes it worse.
+- [Before You Buy a Sub-Sale Home: What to Check](https://goxpert.my/blog/subsale-checklist/): A viewing takes twenty minutes. The consequences last decades. Here is what to look at — and what you cannot see without instruments.
+- [Why Anti-Damp Paint Will Not Solve Your Leak](https://goxpert.my/blog/damp-paint-myth/): It is the most common repair we see, and the one that fails most reliably. Here is what is actually happening behind that wall.
+- [What JMB and MC Committees Should Know About Building Condition Assessment](https://goxpert.my/blog/bca-for-jmb/): If your maintenance budget is decided by whoever complains loudest, a condition assessment changes that conversation entirely.
+
+## Who should contact us
+
+- New homeowners inside their Defect Liability Period (DLP)
+- Buyers of sub-sale or pre-owned homes, before signing
+- Owners who have just completed a renovation and want it verified before final payment
+- JMB / MC / property managers planning a sinking fund from actual building condition
+- Owners in dispute with a developer who need documented, instrument-backed evidence

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Ringkasan syarikat untuk pembantu AI
+# Company summary for AI assistants
+Sitemap: https://goxpert.my/sitemap.xml
+# https://goxpert.my/llms.txt

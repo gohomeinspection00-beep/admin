@@ -1,6 +1,8 @@
 # Laman Web GoXpert — Building Surveying & Inspection
 
-**Satu fail sahaja:** `website/index.html` — download, klik dua kali, terus jalan.
+**Dua bentuk:**
+- `website/index.html` — satu fail, untuk edit & test cepat (klik dua kali, terus jalan)
+- `website/dist/` — laman siap terbit, 29 fail HTML berasingan (lihat di bawah)
 Berasingan sepenuhnya daripada app GoInspect di root repo.
 
 ## Status
@@ -52,6 +54,84 @@ Untuk Siapa → Kenapa Kami → Projek (6) → Peralatan → Proses → Review �
 Seksyen thermal & drone guna gambar dari hosting `arleta.site`
 (atribut `data-src` dalam HTML). Kalau gambar gagal load, seksyen itu
 tersembunyi automatik.
+
+## Untuk terbit (deploy) — folder `dist/`
+
+`dist/` ialah laman siap terbit: **satu fail HTML untuk setiap page**,
+URL sebenar, dan kandungan sudah tertulis dalam HTML (bukan dijana oleh
+JavaScript). Muat naik kandungan folder `dist/` ke root domain.
+
+```
+dist/
+  index.html                 ->  goxpert.my/
+  services/index.html        ->  goxpert.my/services/
+  services/<slug>/index.html ->  goxpert.my/services/bca/  (16 servis)
+  projects/  gallery/  about/  faq/  blog/
+  blog/<slug>/index.html     ->  goxpert.my/blog/dlp-guide/  (6 artikel)
+  assets/style.css           CSS dikongsi (cache sekali)
+  assets/app.js              JS dikongsi (cache sekali)
+  img/                       semua gambar
+  sitemap.xml  robots.txt  llms.txt  404.html
+```
+
+29 page kesemuanya.
+
+**Bina semula selepas edit `index.html`:**
+
+```
+cd website
+npm install playwright-core          # sekali sahaja
+node build.js
+```
+
+Jangan edit fail dalam `dist/` — ia ditulis semula setiap kali build.
+Sumber tunggal ialah `index.html`.
+
+**Bila domain sebenar sedia:** tukar `siteUrl` dalam `CONFIG`
+(dalam `index.html`) kemudian bina semula. Semua canonical, Open Graph,
+sitemap dan llms.txt ikut nilai itu.
+
+## Supaya Google & pembantu AI faham kita
+
+Setiap page membawa data berstruktur (JSON-LD) yang menerangkan
+syarikat, servis dan artikel dalam bentuk yang mesin boleh baca:
+
+| Page | Data berstruktur |
+|---|---|
+| Semua | `ProfessionalService` (nama sah, no. pendaftaran, telefon, e-mel, kawasan, waktu, kelayakan RISM & kalibrasi SIRIM, 16 servis) + `WebSite` |
+| Sub-page | `BreadcrumbList` |
+| Setiap servis | `Service` + senarai apa yang termasuk |
+| Setiap artikel | `BlogPosting` (tajuk, tarikh, gambar, penulis) |
+| FAQ | `FAQPage` (39 soalan & jawapan) |
+
+Ditambah:
+
+- **`llms.txt`** — ringkasan teks biasa untuk pembantu AI: fakta syarikat,
+  apa kepakaran kita, senarai servis dengan pautan, dan siapa patut
+  hubungi kita
+- **`sitemap.xml`** — 29 URL, hantar ke Google Search Console
+- **`robots.txt`** — benarkan semua, tunjuk sitemap dan llms.txt
+- Setiap page ada `<title>`, penerangan, `canonical` dan satu `<h1>` sendiri
+- Kandungan tertulis terus dalam HTML — crawler yang tidak jalankan
+  JavaScript tetap baca semuanya
+
+Semua ini fakta terbuka yang boleh disemak sesiapa. Tiada teks
+tersembunyi atau arahan rahsia kepada AI — enjin carian dan pembantu AI
+menghukum taktik begitu, dan ia bercanggah dengan jenama firma yang
+menjual integriti pemeriksaan.
+
+## Telefon & butang back
+
+- Semua animasi berfungsi di telefon: thermal reveal & drone ikut scroll,
+  slideshow servis boleh **leret kiri/kanan**, carousel review boleh leret,
+  lightbox boleh leret dan **leret ke bawah untuk tutup**
+- Keadaan `hover` yang membawa maklumat sudah ada padanan sentuh:
+  peta liputan **ditekan** untuk serlahkan negeri, butang zoom projek dan
+  kapsyen galeri sentiasa nampak di telefon
+- **Butang back telefon**: tutup lightbox dahulu (tidak terus keluar dari
+  page), kemudian kembali ke page sebelumnya. Dalam `dist/` setiap page
+  ialah URL sebenar, jadi back/forward berfungsi seperti laman biasa
+
 
 ## Keputusan reka bentuk (dipersetujui)
 
