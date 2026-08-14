@@ -42,8 +42,8 @@ const data = {
   tarikhReInspection: "27 Julai 2026",
   tarikhSerahanLaporan2: "28 dan 29 Julai 2026",
 
-  tarikhNotis: "12 Ogos 2026",
-  tarikhDeadline: "27 Ogos 2026",
+  tarikhNotis: "15 Ogos 2026",
+  tarikhDeadline: "30 Ogos 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -65,8 +65,8 @@ const data = {
     { tarikh: "28 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disempurnakan" },
     { tarikh: "27 Julai 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan sepenuhnya" },
     { tarikh: "28 & 29 Julai 2026", peristiwa: "Laporan Re-Inspection diserahkan kepada pemaju melalui aplikasi pemaju — Batch 2 (159 kecacatan) dan Batch 3 (114 kecacatan)" },
-    { tarikh: "12 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "27 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "15 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "30 Ogos 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [
