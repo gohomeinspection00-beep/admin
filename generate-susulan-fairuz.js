@@ -17,9 +17,10 @@ const data = {
   namaPemaju: "MUTIARA RINI SDN. BHD.",
   noSyarikat: "(311297-H)",
   alamatPenerima: [
-    "18th Floor, Menara Boustead,",
-    "69, Jalan Raja Chulan,",
-    "50200 Kuala Lumpur.",
+    "No. 2, Jalan Utama 46,",
+    "Mutiara Rini,",
+    "81300 Skudai,",
+    "Johor Darul Ta'zim.",
   ],
 
   alamatHartanah: "No. 20, Jalan Bestari 66, Rini Homes 8, Taman Mutiara Rini, 81300 Skudai, Johor Bahru, Johor",
@@ -57,8 +58,8 @@ const data = {
 
   salinanKepada: [
     {
-      nama: "MUTIARA RINI SDN. BHD. — Pejabat Projek",
-      alamat: ["No. 2, Jalan Utama 46, Mutiara Rini,", "81300 Skudai, Johor."],
+      nama: "MUTIARA RINI SDN. BHD. — Ibu Pejabat",
+      alamat: ["18th Floor, Menara Boustead,", "69, Jalan Raja Chulan,", "50200 Kuala Lumpur."],
     },
   ],
 };
