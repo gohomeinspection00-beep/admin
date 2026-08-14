@@ -17,6 +17,7 @@ const data = {
   namaPemaju: "MUTIARA RINI SDN. BHD.",
   noSyarikat: "(311297-H)",
   alamatPenerima: [
+    "(Management Office)",
     "No. 2, Jalan Utama 46,",
     "Mutiara Rini,",
     "81300 Skudai,",
