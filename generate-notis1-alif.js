@@ -18,10 +18,10 @@ const data = {
   namaPemaju: "UDA LAND (SOUTH) SDN. BHD.",
   noSyarikat: "(197501001813 / 23298-K)",
   alamatPenerima: [
-    "Tingkat 15, Blok Menara,",
-    "Kompleks Pertama,",
-    "Jalan Tuanku Abdul Rahman,",
-    "50100 Kuala Lumpur.",
+    "No. 1, Jalan Padi Mahsuri 12,",
+    "Bandar Baru Uda,",
+    "81200 Johor Bahru,",
+    "Johor.",
   ],
 
   alamatHartanah: "No. 87, Jalan Uda Utama 5/5, Bandar Uda Utama, 81200 Johor Bahru, Johor",
@@ -67,8 +67,8 @@ const data = {
 
   salinanKepada: [
     {
-      nama: "UDA LAND (SOUTH) SDN. BHD. — Management Office",
-      alamat: ["No. 1, Jalan Padi Mahsuri 12,", "Bandar Baru Uda,", "81200 Johor Bahru, Johor."],
+      nama: "UDA LAND (SOUTH) SDN. BHD. — Ibu Pejabat (SPA)",
+      alamat: ["Tingkat 15, Blok Menara, Kompleks Pertama,", "Jalan Tuanku Abdul Rahman,", "50100 Kuala Lumpur."],
     },
   ],
 };

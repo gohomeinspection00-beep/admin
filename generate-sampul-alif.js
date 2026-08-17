@@ -3,14 +3,14 @@ const fs = require("fs");
 
 const sets = [
   {
-    label: "1. ALIF — ke UDA LAND (SOUTH), Kompleks Pertama KL  [Ruj: NOTIS-1/2026/025]",
+    label: "1. ALIF — ke UDA LAND (SOUTH), Johor Bahru  [Ruj: NOTIS-1/2026/025]",
     pengirim: ["MUHAMMAD ALIF AIMAN BIN JAMALUDIN", "Lot 63059, Jalan Persiaran 1/12,", "Kampung Batu Muda,", "51100 Kuala Lumpur.", "Tel: 018-282 3432"],
-    penerima: ["UDA LAND (SOUTH) SDN. BHD. (197501001813 / 23298-K)", "Tingkat 15, Blok Menara,", "Kompleks Pertama,", "Jalan Tuanku Abdul Rahman,", "50100 Kuala Lumpur."],
+    penerima: ["UDA LAND (SOUTH) SDN. BHD. (197501001813 / 23298-K)", "No. 1, Jalan Padi Mahsuri 12,", "Bandar Baru Uda,", "81200 Johor Bahru, Johor.", "Tel: 07-237 4944"],
   },
   {
-    label: "2. ALIF — salinan (CC) ke Management Office, Johor Bahru  [Ruj: NOTIS-1/2026/025]",
+    label: "2. ALIF — salinan (CC) ke Ibu Pejabat, Kompleks Pertama KL  [Ruj: NOTIS-1/2026/025]",
     pengirim: ["MUHAMMAD ALIF AIMAN BIN JAMALUDIN", "Lot 63059, Jalan Persiaran 1/12,", "Kampung Batu Muda,", "51100 Kuala Lumpur.", "Tel: 018-282 3432"],
-    penerima: ["UDA LAND (SOUTH) SDN. BHD. — Management Office", "No. 1, Jalan Padi Mahsuri 12,", "Bandar Baru Uda,", "81200 Johor Bahru, Johor.", "Tel: 07-237 4944"],
+    penerima: ["UDA LAND (SOUTH) SDN. BHD. — Ibu Pejabat", "Tingkat 15, Blok Menara,", "Kompleks Pertama,", "Jalan Tuanku Abdul Rahman,", "50100 Kuala Lumpur."],
   },
 ];
 
