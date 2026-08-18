@@ -15,16 +15,31 @@ Tiada internet, tiada pemasangan, tiada akaun.
 | 🔤 **Kenal Huruf** | Ketik mana-mana huruf → huruf besar **A** + huruf kecil **a** + gambar (🐔) + perkataan (AYAM), dan suara menyebut "A, A untuk Ayam" |
 | 🎯 **Cari Huruf** | "Mana huruf B?" — pilih antara 3 huruf besar. Betul dapat ⭐, salah cuma goyang sikit (tiada hukuman). Kumpul 6 bintang → skrin 🏆 Syabas |
 
-## Bunyi & suara
+## Bunyi & suara Bahasa Melayu
 
 - **Melodi lagu ABC** dijana sendiri oleh apps (WebAudio) — tiada fail MP3 diperlukan,
   jadi ia berfungsi walaupun tanpa internet.
-- **Suara menyebut huruf** menggunakan *text-to-speech* pelayar (`ms-MY`).
-  Butang 🗣️ / 🤐 untuk hidup-matikan; butang 🔊 / 🔇 untuk melodi & kesan bunyi.
-  Jika peranti tiada suara TTS, butang itu disembunyikan dan apps tetap boleh
-  dimainkan dengan melodi sahaja.
+- **Suara menyebut huruf** menggunakan *text-to-speech* peranti. Apps akan memilih
+  suara mengikut keutamaan ini:
+  1. 🇲🇾 suara **Bahasa Melayu** (`ms-MY`) — paling tepat;
+  2. 🇮🇩 suara **Bahasa Indonesia** (`id-ID`) — sebutannya hampir sama dengan BM;
+  3. jika kedua-duanya tiada, apps bertukar ke **mod fonetik**: perkataan dieja
+     mengikut bunyi Melayu supaya suara Inggeris pun menyebut dengan betul
+     (contoh: `KUCING` → *koo-ching*, `Mana huruf` → *mah-nah hoo-roof*, `Z` → *zed*).
+- Kad **🎙️ Suara Bahasa Melayu** di skrin menu menunjukkan suara yang sedang dipakai,
+  membenarkan ibu bapa/guru pilih suara lain daripada senarai peranti (pilihan disimpan),
+  dan butang ▶️ untuk mencuba bunyinya.
+- **Nak suara BM sebenar?** Pasang dahulu pada peranti:
+  - **Android:** Tetapan → Sistem → Bahasa & input → Output teks-ke-pertuturan →
+    Google Text-to-Speech → Pasang data suara → *Bahasa Melayu*.
+  - **iPhone / iPad:** Tetapan → Kebolehaksesan → Kandungan Dituturkan → Suara → *Bahasa Melayu*.
+  - **Komputer:** guna Chrome atau Edge, dan pasang pakej bahasa Melayu pada sistem.
+  Selepas dipasang, buka semula apps — kad suara akan tunjuk ✅ automatik.
+- Butang 🗣️ / 🤐 untuk hidup-matikan suara; butang 🔊 / 🔇 untuk melodi & kesan bunyi.
 - Tekan skrin dahulu (mula-mula ketik butang) supaya pelayar benarkan bunyi —
   ini peraturan biasa semua pelayar telefon.
+
+Semua teks dalam apps ini 100% Bahasa Melayu Malaysia — tiada antara muka Inggeris.
 
 ## Senarai perkataan A–Z
 

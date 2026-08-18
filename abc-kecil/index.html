@@ -123,6 +123,18 @@
   @keyframes letupA{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-100%) scale(1)}}
 
   .nota{text-align:center;color:var(--lembut);font-size:15px;margin-top:6px}
+  .kad-suara{background:var(--kad);border-radius:20px;padding:14px 16px;margin-top:16px;box-shadow:0 6px 0 rgba(0,0,0,.06)}
+  .kad-suara .tajuk{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin-bottom:8px}
+  .kad-suara select{
+    width:100%;padding:12px 12px;border-radius:14px;border:2px solid #eee6f5;background:#fff;
+    font-family:inherit;font-size:16px;font-weight:700;color:var(--teks)
+  }
+  .kad-suara .info{font-size:14px;color:var(--lembut);margin:10px 0 0;line-height:1.45;text-align:left}
+  .kad-suara .info.baik{color:#1f9d55}
+  .kad-suara .info.amaran{color:#b4690e}
+  .kad-suara details{margin-top:8px}
+  .kad-suara summary{font-size:14px;color:var(--lembut);cursor:pointer;font-weight:700}
+  .kad-suara details p{font-size:13.5px;color:var(--lembut);line-height:1.5;margin:8px 0 0;text-align:left}
   .lirik{text-align:center;font-size:19px;font-weight:800;color:var(--lembut);min-height:28px;margin-top:4px}
 </style>
 </head>
@@ -150,6 +162,19 @@
         <span class="emo">🎯</span>
         <span><span class="tk">Cari Huruf</span><span class="sk">Mana huruf ini? Kumpul bintang!</span></span>
       </button>
+    </div>
+    <div class="kad-suara" id="kadSuara">
+      <div class="tajuk">🎙️ Suara Bahasa Melayu
+        <button class="bulat" id="btnCubaSuara" title="Cuba suara" style="margin-left:auto;width:44px;height:44px;font-size:20px">▶️</button>
+      </div>
+      <select id="pilihSuara" aria-label="Pilih suara"></select>
+      <p class="info" id="notaBM">Mencari suara…</p>
+      <details>
+        <summary>Cara pasang suara Bahasa Melayu</summary>
+        <p><b>Android:</b> Tetapan → Sistem → Bahasa &amp; input → Output teks-ke-pertuturan → Google Text-to-Speech → Pasang data suara → <b>Bahasa Melayu</b>.<br>
+        <b>iPhone / iPad:</b> Tetapan → Kebolehaksesan → Kandungan Dituturkan → Suara → <b>Bahasa Melayu</b>.<br>
+        <b>Komputer:</b> guna pelayar Chrome atau Edge, kemudian pasang pakej bahasa Melayu pada sistem.</p>
+      </details>
     </div>
     <p class="nota" id="notaSuara">Guna telefon atau tablet — ketik sahaja gambar besar 😊</p>
     <p class="nota"><a href="../teka-huruf/index.html" style="color:#7c7396">Untuk abang &amp; kakak sekolah rendah → Teka Huruf 🔤</a></p>
@@ -222,6 +247,24 @@ const HURUF = [
   ["Y","YOYO","🪀"], ["Z","ZEBRA","🦓"]
 ];
 
+/* Ejaan fonetik: dipakai HANYA apabila peranti tiada suara Melayu/Indonesia,
+   supaya suara Inggeris pun menyebut mengikut bunyi Bahasa Melayu. */
+const FONETIK = {
+  AYAM:"ah-yam", BOLA:"boh-lah", CAWAN:"chah-wahn", DAUN:"dah-oon", EPAL:"eh-pahl",
+  FERI:"feh-ree", GAJAH:"gah-jah", HARIMAU:"hah-ree-mow", IKAN:"ee-kahn", JAM:"jahm",
+  KUCING:"koo-ching", LORI:"loh-ree", MATAHARI:"mah-tah-hah-ree", NANAS:"nah-nahs",
+  OREN:"oh-ren", PISANG:"pee-sahng", QURAN:"koor-ahn", RUMAH:"roo-mah", SUSU:"soo-soo",
+  TOPI:"toh-pee", ULAR:"oo-lar", VAN:"vahn", WAU:"wow", XILOFON:"zy-loh-fon",
+  YOYO:"yoh-yoh", ZEBRA:"zeh-brah",
+  BETUL:"beh-tool", UNTUK:"oon-took", MANA:"mah-nah", HURUF:"hoo-roof",
+  CUBA:"choo-bah", LAGI:"lah-ghee", SYABAS:"shah-bahs", KAMU:"kah-moo",
+  MEMANG:"meh-mahng", PANDAI:"pahn-die", HAI:"high", JOM:"johm", BELAJAR:"beh-lah-jar",
+  INI:"ee-nee", SUARA:"soo-ah-rah", DAN:"dahn",
+  BAHASA:"bah-hah-sah", MELAYU:"meh-lah-yoo"
+};
+/* nama huruf ikut sebutan Malaysia (yang berbeza daripada Inggeris) */
+const NAMA_HURUF = { Z:"zed" };
+
 /* ==========================================================
    TETAPAN & ALAT BANTU
    ========================================================== */
@@ -268,12 +311,70 @@ const bunyi = {
 
 /* ---- suara (Text-to-Speech pelayar) ---- */
 const adaSuara = ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
+let senaraiSuara = [], suaraPilih = null, modeFonetik = true;
+
+/* 5 = Melayu Malaysia, 4 = Melayu lain, 3 = Indonesia (sebutan hampir sama), 0 = lain-lain */
+function skorSuara(v){
+  const l = String(v && v.lang || "").toLowerCase().replace(/_/g,"-");
+  if(l === "ms-my") return 5;
+  if(l.indexOf("ms") === 0) return 4;
+  if(l.indexOf("id") === 0) return 3;
+  return 0;
+}
+function teksFonetik(t){
+  return String(t).replace(/[A-Za-z]+/g, function(w){
+    if(w.length === 1) return NAMA_HURUF[w.toUpperCase()] || w;
+    return FONETIK[w.toUpperCase()] || w;
+  });
+}
+function muatSuara(){
+  if(!adaSuara) return;
+  try{ senaraiSuara = window.speechSynthesis.getVoices() || []; }catch(e){ senaraiSuara = []; }
+  senaraiSuara = senaraiSuara.slice().sort(function(a,b){
+    const d = skorSuara(b) - skorSuara(a);
+    return d !== 0 ? d : String(a.name).localeCompare(String(b.name));
+  });
+  let v = null;
+  if(tetapan.suaraURI){
+    for(let i=0;i<senaraiSuara.length;i++) if(senaraiSuara[i].voiceURI === tetapan.suaraURI){ v = senaraiSuara[i]; break; }
+  }
+  if(!v && senaraiSuara.length && skorSuara(senaraiSuara[0]) >= 3) v = senaraiSuara[0];
+  suaraPilih = v;
+  modeFonetik = !(v && skorSuara(v) >= 3);
+  lukisPilihSuara();
+}
+function lukisPilihSuara(){
+  const sel = $("#pilihSuara"), nota = $("#notaBM");
+  if(!sel) return;
+  let html = '<option value="auto">🔎 Pilih automatik (Bahasa Melayu dahulu)</option>';
+  senaraiSuara.forEach(function(v){
+    const tanda = skorSuara(v) >= 4 ? "🇲🇾 " : (skorSuara(v) === 3 ? "🇮🇩 " : "");
+    html += '<option value="' + String(v.voiceURI).replace(/"/g,"&quot;") + '"' +
+            (suaraPilih && v.voiceURI === suaraPilih.voiceURI ? " selected" : "") + ">" +
+            tanda + v.name + " (" + v.lang + ")</option>";
+  });
+  sel.innerHTML = html;
+  if(!senaraiSuara.length){
+    nota.className = "info amaran";
+    nota.textContent = "⏳ Senarai suara belum dimuatkan. Ketik butang ▶️ atau muat semula halaman.";
+  }else if(suaraPilih && skorSuara(suaraPilih) >= 4){
+    nota.className = "info baik";
+    nota.textContent = "✅ Suara Bahasa Melayu digunakan: " + suaraPilih.name;
+  }else if(suaraPilih && skorSuara(suaraPilih) === 3){
+    nota.className = "info";
+    nota.textContent = "ℹ️ Suara Bahasa Indonesia digunakan (" + suaraPilih.name + ") — sebutannya hampir sama dengan Bahasa Melayu.";
+  }else{
+    nota.className = "info amaran";
+    nota.textContent = "⚠️ Peranti ini tiada suara Bahasa Melayu. Apps akan sebut secara fonetik (contoh: KUCING → “koo-ching”) supaya bunyinya tetap seperti Bahasa Melayu.";
+  }
+}
 function sebut(teks, laju, batal){
   if(!adaSuara || !tetapan.suara) return;
   try{
     if(batal !== false) window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(teks);
-    u.lang = "ms-MY";
+    const u = new SpeechSynthesisUtterance(modeFonetik ? teksFonetik(teks) : teks);
+    if(suaraPilih){ u.voice = suaraPilih; u.lang = suaraPilih.lang; }
+    else if(!modeFonetik) u.lang = "ms-MY";
     u.rate = laju || 0.9;
     u.pitch = 1.25;
     window.speechSynthesis.speak(u);
@@ -499,9 +600,27 @@ $("#btnSuara").addEventListener("click", function(){
 /* ==========================================================
    PERMULAAN
    ========================================================== */
-if(!adaSuara){
+$("#pilihSuara").addEventListener("change", function(e){
+  const nilai = e.target.value;
+  tetapan.suaraURI = nilai === "auto" ? "" : nilai;
+  simpan();
+  muatSuara();
+  tetapan.suara = true; kemasIkon();
+  sebut("Hai! Jom belajar huruf Bahasa Melayu.", .9);
+});
+$("#btnCubaSuara").addEventListener("click", function(){
+  muatSuara();
+  tetapan.suara = true; simpan(); kemasIkon();
+  sebut("A untuk AYAM. B untuk BOLA.", .85);
+});
+if(adaSuara){
+  muatSuara();
+  try{ window.speechSynthesis.onvoiceschanged = muatSuara; }catch(e){}
+  setTimeout(muatSuara, 800);   // sesetengah pelayar muat senarai suara lewat
+}else{
   tetapan.suara = false;
   $("#btnSuara").style.display = "none";
+  $("#kadSuara").style.display = "none";
   $("#notaSuara").textContent = "Nota: pelayar ini tiada suara — bunyi lagu & bintang tetap berfungsi 🎵";
 }
 kemasIkon();
