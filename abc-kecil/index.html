@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff7ab8">
+<title>ABC Kecil — Belajar Huruf & Lagu ABC</title>
+<style>
+  :root{
+    --pink:#ff5fa2; --pink-l:#ffe3f0;
+    --biru:#3ab7ff; --biru-l:#e2f4ff;
+    --kuning:#ffc233; --kuning-l:#fff3d6;
+    --hijau:#3ddc84; --hijau-l:#dcfce7;
+    --ungu:#a06bff; --ungu-l:#efe6ff;
+    --teks:#2b2151; --lembut:#7c7396;
+    --kad:#fff; --r:26px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Comic Sans MS","Segoe UI Rounded","Trebuchet MS",system-ui,sans-serif;
+    color:var(--teks);
+    background:
+      radial-gradient(900px 500px at 10% 0%,#ffe9f4 0%,transparent 60%),
+      radial-gradient(800px 500px at 90% 10%,#e4f5ff 0%,transparent 60%),
+      linear-gradient(180deg,#fffdf7 0%,#f4f7ff 100%);
+    min-height:100vh;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .app{max-width:760px;margin:0 auto;padding:12px 14px 34px}
+
+  .atas{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .atas h1{flex:1;margin:0;font-size:26px;letter-spacing:-.5px;white-space:nowrap}
+  .bulat{
+    width:52px;height:52px;border-radius:50%;border:none;font-size:24px;cursor:pointer;
+    background:var(--kad);box-shadow:0 4px 0 #e6e0f2;display:flex;align-items:center;justify-content:center
+  }
+  .bulat:active{transform:translateY(3px);box-shadow:0 1px 0 #e6e0f2}
+  .bulat.off{opacity:.4}
+
+  .skrin{display:none}
+  .skrin.aktif{display:block;animation:naik .3s ease}
+  @keyframes naik{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ---- menu besar ---- */
+  .menu{display:grid;gap:16px}
+  .kad-menu{
+    border:none;border-radius:var(--r);padding:26px 20px;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;gap:18px;text-align:left;color:var(--teks);
+    box-shadow:0 8px 0 rgba(0,0,0,.10);transition:transform .1s
+  }
+  .kad-menu:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.10)}
+  .kad-menu .emo{font-size:56px;line-height:1}
+  .kad-menu .tk{font-size:28px;font-weight:800;display:block}
+  .kad-menu .sk{font-size:16px;color:#5c5478;opacity:.85}
+  .m1{background:linear-gradient(135deg,#ffd1e6,#ffe9c7)}
+  .m2{background:linear-gradient(135deg,#cfeeff,#dcfce7)}
+  .m3{background:linear-gradient(135deg,#e7dbff,#ffe3f0)}
+
+  .balik{
+    border:none;border-radius:999px;padding:14px 26px;font-size:20px;font-weight:800;font-family:inherit;
+    background:var(--kad);color:var(--teks);box-shadow:0 5px 0 #e6e0f2;cursor:pointer;margin-top:18px;width:100%
+  }
+  .balik:active{transform:translateY(3px);box-shadow:0 2px 0 #e6e0f2}
+
+  /* ---- huruf besar di tengah ---- */
+  .pentas{
+    background:var(--kad);border-radius:var(--r);padding:18px 14px;text-align:center;
+    box-shadow:0 8px 0 rgba(0,0,0,.06);margin-bottom:16px
+  }
+  .huruf-besar{font-size:120px;font-weight:800;line-height:1.05;letter-spacing:2px}
+  .huruf-kecil{font-size:56px;font-weight:800;color:var(--lembut);line-height:1}
+  .gambar{font-size:76px;line-height:1.1;margin-top:4px}
+  .perkataan{font-size:30px;font-weight:800;margin-top:2px}
+  @media(max-width:400px){.huruf-besar{font-size:96px}.gambar{font-size:64px}.perkataan{font-size:26px}}
+
+  /* ---- grid huruf ---- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px}
+  .h-kotak{
+    aspect-ratio:1/1;border:none;border-radius:20px;font-family:inherit;font-weight:800;font-size:32px;
+    color:var(--teks);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12);transition:transform .1s;
+    display:flex;align-items:center;justify-content:center
+  }
+  .h-kotak:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.12)}
+  .h-kotak.nyala{outline:5px solid #fff;transform:scale(1.12);box-shadow:0 0 0 6px var(--pink),0 6px 0 rgba(0,0,0,.12);z-index:2}
+  .w0{background:#ffd4e6}.w1{background:#ffe6b8}.w2{background:#d6f2ff}.w3{background:#d9f7e2}.w4{background:#e6dcff}.w5{background:#ffe0d1}
+
+  /* ---- butang besar ---- */
+  .btn-besar{
+    border:none;border-radius:var(--r);padding:20px;font-size:24px;font-weight:800;font-family:inherit;
+    cursor:pointer;width:100%;color:#fff;box-shadow:0 7px 0 rgba(0,0,0,.16);margin-bottom:14px
+  }
+  .btn-besar:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(0,0,0,.16)}
+  .b-pink{background:linear-gradient(135deg,#ff7ab8,#ff5fa2)}
+  .b-biru{background:linear-gradient(135deg,#5cc8ff,#2aa8f5)}
+  .b-hijau{background:linear-gradient(135deg,#5ee79b,#22c46e)}
+
+  .baris2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* ---- permainan cari huruf ---- */
+  .soal{text-align:center;font-size:26px;font-weight:800;margin:6px 0 14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+  .soal b{font-size:38px;color:var(--pink)}
+  .pilihan{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px}
+  .pilih-h{
+    aspect-ratio:1/1;border:none;border-radius:var(--r);font-family:inherit;font-weight:800;font-size:64px;
+    color:var(--teks);cursor:pointer;box-shadow:0 7px 0 rgba(0,0,0,.14)
+  }
+  .pilih-h:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(0,0,0,.14)}
+  .pilih-h.betul{background:#7ef0ab !important;animation:pop .4s}
+  .pilih-h.salah{animation:goyang .4s}
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
+  @keyframes goyang{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}50%{transform:translateX(10px)}75%{transform:translateX(-6px)}}
+  .bintang-baris{text-align:center;font-size:30px;letter-spacing:3px;min-height:38px}
+
+  /* ---- ganjaran ---- */
+  .raikan{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;
+    background:rgba(255,255,255,.94);z-index:80;text-align:center;padding:24px}
+  .raikan.nampak{display:flex}
+  .raikan .b{font-size:88px;animation:pop .6s}
+  .raikan h2{font-size:38px;margin:6px 0}
+  .letup{position:fixed;left:50%;top:34%;transform:translate(-50%,-50%) scale(.4);font-size:96px;opacity:0;pointer-events:none;z-index:90}
+  .letup.main{animation:letupA 1s ease-out}
+  @keyframes letupA{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-100%) scale(1)}}
+
+  .nota{text-align:center;color:var(--lembut);font-size:15px;margin-top:6px}
+  .lirik{text-align:center;font-size:19px;font-weight:800;color:var(--lembut);min-height:28px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="atas">
+    <h1>🌈 ABC Kecil</h1>
+    <button class="bulat" id="btnSuara" title="Suara">🗣️</button>
+    <button class="bulat" id="btnBunyi" title="Bunyi">🔊</button>
+  </div>
+
+  <!-- ===== MENU ===== -->
+  <section class="skrin aktif" id="sMenu">
+    <div class="menu">
+      <button class="kad-menu m1" data-pergi="sLagu">
+        <span class="emo">🎵</span>
+        <span><span class="tk">Lagu ABC</span><span class="sk">Nyanyi sambil tengok huruf</span></span>
+      </button>
+      <button class="kad-menu m2" data-pergi="sHuruf">
+        <span class="emo">🔤</span>
+        <span><span class="tk">Kenal Huruf</span><span class="sk">Ketik huruf, dengar & lihat gambar</span></span>
+      </button>
+      <button class="kad-menu m3" data-pergi="sMain">
+        <span class="emo">🎯</span>
+        <span><span class="tk">Cari Huruf</span><span class="sk">Mana huruf ini? Kumpul bintang!</span></span>
+      </button>
+    </div>
+    <p class="nota" id="notaSuara">Guna telefon atau tablet — ketik sahaja gambar besar 😊</p>
+    <p class="nota"><a href="../teka-huruf/index.html" style="color:#7c7396">Untuk abang &amp; kakak sekolah rendah → Teka Huruf 🔤</a></p>
+  </section>
+
+  <!-- ===== LAGU ABC ===== -->
+  <section class="skrin" id="sLagu">
+    <div class="pentas">
+      <div class="huruf-besar" id="laguHuruf">🎵</div>
+      <div class="lirik" id="laguLirik">Ketik butang untuk mula menyanyi</div>
+    </div>
+    <button class="btn-besar b-pink" id="btnLagu">▶️ Nyanyi Lagu ABC</button>
+    <div class="grid" id="gridLagu"></div>
+    <button class="balik" data-pergi="sMenu">🏠 Balik</button>
+  </section>
+
+  <!-- ===== KENAL HURUF ===== -->
+  <section class="skrin" id="sHuruf">
+    <div class="pentas">
+      <div class="huruf-besar" id="khBesar">A</div>
+      <div class="huruf-kecil" id="khKecil">a</div>
+      <div class="gambar" id="khGambar">🐔</div>
+      <div class="perkataan" id="khKata">AYAM</div>
+    </div>
+    <div class="baris2">
+      <button class="btn-besar b-biru" id="btnKhSebelum">⬅️</button>
+      <button class="btn-besar b-biru" id="btnKhSeterus">➡️</button>
+    </div>
+    <button class="btn-besar b-hijau" id="btnKhSebut">🔊 Dengar Lagi</button>
+    <div class="grid" id="gridHuruf"></div>
+    <button class="balik" data-pergi="sMenu">🏠 Balik</button>
+  </section>
+
+  <!-- ===== CARI HURUF ===== -->
+  <section class="skrin" id="sMain">
+    <div class="bintang-baris" id="bintangBaris"></div>
+    <div class="soal">
+      <span>Mana huruf <b id="soalHuruf">A</b>?</span>
+      <button class="bulat" id="btnUlang" title="Dengar lagi">🔊</button>
+    </div>
+    <div class="pilihan" id="pilihanHuruf"></div>
+    <button class="balik" data-pergi="sMenu">🏠 Balik</button>
+  </section>
+
+</div>
+
+<div class="raikan" id="raikan">
+  <div class="b">🏆</div>
+  <h2>Syabas!</h2>
+  <p style="font-size:20px;color:#7c7396;margin:0 0 18px">Semua bintang dikumpul 🌟</p>
+  <button class="btn-besar b-pink" id="btnMainLagi" style="max-width:320px">🔁 Main Lagi</button>
+  <button class="balik" id="btnRaikanBalik" style="max-width:320px">🏠 Balik</button>
+</div>
+<div class="letup" id="letup">🎉</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ==========================================================
+   DATA: 26 huruf + perkataan mudah Bahasa Melayu + gambar
+   ========================================================== */
+const HURUF = [
+  ["A","AYAM","🐔"], ["B","BOLA","⚽"], ["C","CAWAN","☕"], ["D","DAUN","🍃"],
+  ["E","EPAL","🍎"], ["F","FERI","🛳️"], ["G","GAJAH","🐘"], ["H","HARIMAU","🐅"],
+  ["I","IKAN","🐟"], ["J","JAM","⏰"], ["K","KUCING","🐱"], ["L","LORI","🚚"],
+  ["M","MATAHARI","☀️"], ["N","NANAS","🍍"], ["O","OREN","🍊"], ["P","PISANG","🍌"],
+  ["Q","QURAN","📖"], ["R","RUMAH","🏠"], ["S","SUSU","🥛"], ["T","TOPI","🎩"],
+  ["U","ULAR","🐍"], ["V","VAN","🚐"], ["W","WAU","🪁"], ["X","XILOFON","🎹"],
+  ["Y","YOYO","🪀"], ["Z","ZEBRA","🦓"]
+];
+
+/* ==========================================================
+   TETAPAN & ALAT BANTU
+   ========================================================== */
+const KUNCI = "abcKecil.tetapan.v1";
+let tetapan = {bunyi:true, suara:true};
+try{ const t = localStorage.getItem(KUNCI); if(t) tetapan = JSON.parse(t); }catch(e){}
+function simpan(){ try{ localStorage.setItem(KUNCI, JSON.stringify(tetapan)); }catch(e){} }
+
+const $  = function(s){ return document.querySelector(s); };
+const $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+function rawak(n){ return Math.floor(Math.random()*n); }
+
+/* ---- bunyi (WebAudio, tiada fail luar) ---- */
+let ac = null;
+function ctx(){
+  if(!ac){
+    try{ ac = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; }
+  }
+  if(ac.state === "suspended") ac.resume();
+  return ac;
+}
+function nada(freq, mula, tempoh, kuat, jenis){
+  if(!tetapan.bunyi) return null;
+  const a = ctx(); if(!a) return null;
+  try{
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = jenis || "triangle";
+    o.frequency.value = freq;
+    const t = a.currentTime + mula;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(kuat || 0.16, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + tempoh);
+    o.connect(g); g.connect(a.destination);
+    o.start(t); o.stop(t + tempoh + 0.03);
+    return o;
+  }catch(e){ return null; }
+}
+const bunyi = {
+  ketik: function(){ nada(660,0,.10,.12); },
+  betul: function(){ [523,659,784].forEach(function(f,i){ nada(f, i*.08, .18, .16); }); },
+  salah: function(){ nada(300,0,.14,.12,"sine"); nada(220,.12,.20,.12,"sine"); },
+  hebat: function(){ [523,659,784,1046,1318].forEach(function(f,i){ nada(f, i*.11, .3, .16); }); }
+};
+
+/* ---- suara (Text-to-Speech pelayar) ---- */
+const adaSuara = ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
+function sebut(teks, laju, batal){
+  if(!adaSuara || !tetapan.suara) return;
+  try{
+    if(batal !== false) window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(teks);
+    u.lang = "ms-MY";
+    u.rate = laju || 0.9;
+    u.pitch = 1.25;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function letup(emo){
+  const el = $("#letup");
+  el.textContent = emo;
+  el.classList.remove("main");
+  void el.offsetWidth;
+  el.classList.add("main");
+}
+
+/* ---- navigasi ---- */
+function buka(id){
+  if(id !== "sLagu") hentikanLagu();
+  $$(".skrin").forEach(function(s){ s.classList.toggle("aktif", s.id === id); });
+  window.scrollTo(0,0);
+  if(id === "sMain") mulaMain();
+}
+document.addEventListener("click", function(e){
+  const b = e.target.closest("[data-pergi]");
+  if(!b) return;
+  bunyi.ketik();
+  buka(b.dataset.pergi);
+});
+
+/* ==========================================================
+   1. LAGU ABC  (melodi Twinkle Twinkle + huruf menyala)
+   ========================================================== */
+const NOT = {C:261.63, D:293.66, E:329.63, F:349.23, G:392.00, A:440.00};
+// [huruf atau null, not, panjang ketukan]
+const LAGU = [
+  ["A","C",1], ["B","C",1], ["C","G",1], ["D","G",1], ["E","A",1], ["F","A",1], ["G","G",2],
+  ["H","F",1], ["I","F",1], ["J","E",1], ["K","E",1], ["L","D",.5], ["M","D",.5], ["N","D",.5], ["O","D",.5], ["P","C",2],
+  ["Q","G",1], ["R","G",1], ["S","F",2],
+  ["T","E",1], ["U","E",1], ["V","D",2],
+  ["W","G",1], ["X","G",1], ["Y","F",1], ["Z","F",1], [null,"E",1], [null,"E",1], [null,"D",2],
+  [null,"C",1], [null,"C",1], [null,"G",1], [null,"G",1], [null,"A",1], [null,"A",1], [null,"G",2]
+];
+const KETUK = 0.42; // saat bagi satu ketukan
+let masaLagu = [], sedangLagu = false;
+
+function lukisGridLagu(){
+  $("#gridLagu").innerHTML = HURUF.map(function(h,i){
+    return '<div class="h-kotak w' + (i%6) + '" data-lg="' + h[0] + '">' + h[0] + "</div>";
+  }).join("");
+}
+function nyalakan(huruf){
+  $$("#gridLagu .h-kotak").forEach(function(el){
+    el.classList.toggle("nyala", el.dataset.lg === huruf);
+  });
+}
+function hentikanLagu(){
+  masaLagu.forEach(clearTimeout);
+  masaLagu = [];
+  sedangLagu = false;
+  if(adaSuara){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  $("#btnLagu").innerHTML = "▶️ Nyanyi Lagu ABC";
+  nyalakan(null);
+}
+function mainLagu(){
+  if(sedangLagu){ hentikanLagu(); $("#laguLirik").textContent = "Ketik butang untuk mula menyanyi"; return; }
+  ctx();
+  sedangLagu = true;
+  $("#btnLagu").innerHTML = "⏹️ Berhenti";
+  $("#laguLirik").textContent = "🎶 Nyanyi sama-sama!";
+  let t = 0;
+  LAGU.forEach(function(n){
+    const panjang = n[2] * KETUK;
+    nada(NOT[n[1]], t, panjang * 0.92, .14);
+    const huruf = n[0];
+    masaLagu.push(setTimeout(function(){
+      if(!sedangLagu) return;
+      $("#laguHuruf").textContent = huruf ? huruf : "🎵";
+      nyalakan(huruf);
+      if(huruf) sebut(huruf, n[2] < 1 ? 1.5 : 1.05);
+    }, t * 1000));
+    t += panjang;
+  });
+  masaLagu.push(setTimeout(function(){
+    if(!sedangLagu) return;
+    hentikanLagu();
+    $("#laguHuruf").textContent = "🎉";
+    $("#laguLirik").textContent = "Syabas! Cuba nyanyi sekali lagi 💕";
+    bunyi.hebat();
+    letup("🌟");
+  }, t * 1000 + 400));
+}
+$("#btnLagu").addEventListener("click", mainLagu);
+$("#gridLagu").addEventListener("click", function(e){
+  const el = e.target.closest("[data-lg]"); if(!el || sedangLagu) return;
+  const i = HURUF.findIndex(function(h){ return h[0] === el.dataset.lg; });
+  $("#laguHuruf").textContent = HURUF[i][0];
+  nyalakan(HURUF[i][0]);
+  bunyi.ketik();
+  sebut(HURUF[i][0]);
+});
+
+/* ==========================================================
+   2. KENAL HURUF
+   ========================================================== */
+let kh = 0;
+function lukisGridHuruf(){
+  $("#gridHuruf").innerHTML = HURUF.map(function(h,i){
+    return '<button class="h-kotak w' + (i%6) + '" data-kh="' + i + '">' + h[0] + "</button>";
+  }).join("");
+}
+function tunjukHuruf(i, sebutSekali){
+  kh = (i + HURUF.length) % HURUF.length;
+  const h = HURUF[kh];
+  $("#khBesar").textContent  = h[0];
+  $("#khKecil").textContent  = h[0].toLowerCase();
+  $("#khGambar").textContent = h[2];
+  $("#khKata").textContent   = h[1];
+  if(sebutSekali !== false){
+    bunyi.ketik();
+    sebut(h[0] + ". " + h[0] + " untuk " + h[1] + ".", .85);
+  }
+}
+$("#gridHuruf").addEventListener("click", function(e){
+  const b = e.target.closest("[data-kh]"); if(!b) return;
+  tunjukHuruf(parseInt(b.dataset.kh,10));
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+$("#btnKhSebelum").addEventListener("click", function(){ tunjukHuruf(kh-1); });
+$("#btnKhSeterus").addEventListener("click", function(){ tunjukHuruf(kh+1); });
+$("#btnKhSebut").addEventListener("click", function(){ tunjukHuruf(kh); });
+
+/* ==========================================================
+   3. CARI HURUF (6 pusingan, kumpul bintang)
+   ========================================================== */
+const JUM_PUSINGAN = 6;
+let sasaran = 0, bintang = 0, kunciKlik = false;
+
+function mulaMain(){
+  bintang = 0;
+  lukisBintang();
+  pusingan();
+}
+function lukisBintang(){
+  let s = "";
+  for(let i=0;i<JUM_PUSINGAN;i++) s += i < bintang ? "⭐" : "☆";
+  $("#bintangBaris").textContent = s;
+}
+function pusingan(){
+  kunciKlik = false;
+  sasaran = rawak(HURUF.length);
+  const pilihan = [sasaran];
+  while(pilihan.length < 3){
+    const c = rawak(HURUF.length);
+    if(pilihan.indexOf(c) === -1) pilihan.push(c);
+  }
+  for(let i=pilihan.length-1;i>0;i--){
+    const j = rawak(i+1), t = pilihan[i]; pilihan[i] = pilihan[j]; pilihan[j] = t;
+  }
+  $("#soalHuruf").textContent = HURUF[sasaran][0];
+  $("#pilihanHuruf").innerHTML = pilihan.map(function(i,n){
+    return '<button class="pilih-h w' + (n*2%6) + '" data-p="' + i + '">' + HURUF[i][0] + "</button>";
+  }).join("");
+  setTimeout(function(){ sebut("Mana huruf " + HURUF[sasaran][0] + "?", .85); }, 260);
+}
+$("#btnUlang").addEventListener("click", function(){
+  bunyi.ketik();
+  sebut("Mana huruf " + HURUF[sasaran][0] + "?", .85);
+});
+$("#pilihanHuruf").addEventListener("click", function(e){
+  const b = e.target.closest("[data-p]"); if(!b || kunciKlik) return;
+  const i = parseInt(b.dataset.p,10);
+  if(i === sasaran){
+    kunciKlik = true;
+    b.classList.add("betul");
+    bunyi.betul();
+    letup("⭐");
+    bintang++;
+    lukisBintang();
+    sebut("Betul! " + HURUF[i][0] + " untuk " + HURUF[i][1] + ".", .9);
+    setTimeout(function(){
+      if(bintang >= JUM_PUSINGAN) habisMain();
+      else pusingan();
+    }, 1700);
+  }else{
+    b.classList.add("salah");
+    bunyi.salah();
+    setTimeout(function(){ b.classList.remove("salah"); }, 450);
+    sebut("Cuba lagi", 1);
+  }
+});
+function habisMain(){
+  $("#raikan").classList.add("nampak");
+  bunyi.hebat();
+  letup("🎉");
+  sebut("Syabas! Kamu memang pandai!", .9);
+}
+$("#btnMainLagi").addEventListener("click", function(){
+  $("#raikan").classList.remove("nampak");
+  mulaMain();
+});
+$("#btnRaikanBalik").addEventListener("click", function(){
+  $("#raikan").classList.remove("nampak");
+  buka("sMenu");
+});
+
+/* ==========================================================
+   BUTANG BUNYI / SUARA
+   ========================================================== */
+function kemasIkon(){
+  $("#btnBunyi").textContent = tetapan.bunyi ? "🔊" : "🔇";
+  $("#btnBunyi").classList.toggle("off", !tetapan.bunyi);
+  $("#btnSuara").textContent = tetapan.suara ? "🗣️" : "🤐";
+  $("#btnSuara").classList.toggle("off", !tetapan.suara);
+}
+$("#btnBunyi").addEventListener("click", function(){
+  tetapan.bunyi = !tetapan.bunyi; simpan(); kemasIkon();
+  if(tetapan.bunyi) bunyi.betul();
+});
+$("#btnSuara").addEventListener("click", function(){
+  if(!adaSuara) return;
+  tetapan.suara = !tetapan.suara; simpan(); kemasIkon();
+  if(tetapan.suara) sebut("Hai! Jom belajar huruf.", .9);
+});
+
+/* ==========================================================
+   PERMULAAN
+   ========================================================== */
+if(!adaSuara){
+  tetapan.suara = false;
+  $("#btnSuara").style.display = "none";
+  $("#notaSuara").textContent = "Nota: pelayar ini tiada suara — bunyi lagu & bintang tetap berfungsi 🎵";
+}
+kemasIkon();
+lukisGridLagu();
+lukisGridHuruf();
+tunjukHuruf(0, false);
+
+})();
+</script>
+</body>
+</html>

@@ -44,6 +44,11 @@ pelayar peranti itu sahaja. Tiada data dihantar ke mana-mana pelayan, tiada akau
 diperlukan. Membersihkan data pelayar akan memadam senarai — sila **Eksport**
 senarai penting sebagai simpanan.
 
+## Untuk adik yang lebih kecil (4–6 tahun)
+
+Lihat [ABC Kecil](../abc-kecil/) — apps mengenal huruf A–Z dengan lagu ABC,
+gambar dan suara. Ada pautan ke sana di skrin menu apps ini.
+
 ## Menambah perkataan secara pukal (guru)
 
 1. Buka apps → ikon 📝 → **Eksport** untuk melihat formatnya.
