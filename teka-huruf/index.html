@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4f46e5">
+<title>Teka Huruf — Permainan Perkataan Pelajar</title>
+<style>
+  :root{
+    --ungu:#4f46e5; --ungu-t:#6366f1; --ungu-g:#eef2ff;
+    --hijau:#16a34a; --hijau-g:#dcfce7;
+    --merah:#dc2626; --merah-g:#fee2e2;
+    --kuning:#f59e0b; --kuning-g:#fef3c7;
+    --biru:#0ea5e9; --biru-g:#e0f2fe;
+    --teks:#1e1b4b; --teks-lembut:#64748b;
+    --kad:#ffffff; --sempadan:#e2e8f0;
+    --bayang:0 6px 18px rgba(79,70,229,.10);
+    --r:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--teks);
+    background:linear-gradient(160deg,#eef2ff 0%,#f8fafc 40%,#fdf4ff 100%);
+    min-height:100vh; font-size:16px; line-height:1.5;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .app{max-width:760px;margin:0 auto;padding:12px 14px 32px}
+
+  /* ---------- Topbar ---------- */
+  .topbar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .logo{font-size:26px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;margin:0;flex:1;white-space:nowrap}
+  .logo span.ic{font-size:26px}
+  .ikon-btn{
+    border:1px solid var(--sempadan);background:var(--kad);border-radius:12px;
+    width:42px;height:42px;font-size:19px;cursor:pointer;box-shadow:var(--bayang);
+    display:flex;align-items:center;justify-content:center;transition:transform .12s
+  }
+  .ikon-btn:active{transform:scale(.92)}
+  .ikon-btn.off{opacity:.4}
+
+  /* ---------- Kad & butang ---------- */
+  .kad{background:var(--kad);border:1px solid var(--sempadan);border-radius:var(--r);padding:16px;box-shadow:var(--bayang);margin-bottom:14px}
+  .kad h2{margin:0 0 10px;font-size:17px}
+  .tajuk-kecil{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--teks-lembut);margin:0 0 8px}
+  .btn{
+    border:none;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:transform .12s,filter .12s;width:100%
+  }
+  .btn:active{transform:scale(.97)}
+  .btn.utama{background:linear-gradient(135deg,var(--ungu),var(--ungu-t));color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.35)}
+  .btn.kedua{background:var(--kad);color:var(--teks);border:1px solid var(--sempadan)}
+  .btn.hijau{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+  .btn.merah{background:var(--merah-g);color:var(--merah)}
+  .btn.kecil{padding:10px 14px;font-size:14px;width:auto}
+  .baris{display:flex;gap:8px;flex-wrap:wrap}
+  .baris > .btn{flex:1;min-width:120px}
+
+  /* ---------- Skrin ---------- */
+  .skrin{display:none;animation:masuk .25s ease}
+  .skrin.aktif{display:block}
+  @keyframes masuk{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- Pilihan mod ---------- */
+  .mod-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:560px){.mod-grid{grid-template-columns:1fr 1fr 1fr}}
+  .mod{
+    display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;
+    background:var(--kad);border:2px solid var(--sempadan);border-radius:var(--r);
+    padding:14px;transition:.15s;font-family:inherit;width:100%
+  }
+  @media(min-width:560px){.mod{flex-direction:column;text-align:center;gap:6px}}
+  .mod:active{transform:scale(.98)}
+  .mod.pilih{border-color:var(--ungu);background:var(--ungu-g);box-shadow:var(--bayang)}
+  .mod .emo{font-size:30px;line-height:1}
+  .mod .nm{font-weight:800;font-size:15px;color:var(--teks)}
+  .mod .ds{font-size:12.5px;color:var(--teks-lembut);line-height:1.35}
+
+  /* ---------- Chip ---------- */
+  .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .chip{
+    border:1px solid var(--sempadan);background:var(--kad);border-radius:999px;
+    padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--teks);
+    transition:.12s
+  }
+  .chip:active{transform:scale(.94)}
+  .chip.pilih{background:var(--ungu);color:#fff;border-color:var(--ungu)}
+
+  /* ---------- HUD permainan ---------- */
+  .hud{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .hud .kotak{
+    background:var(--kad);border:1px solid var(--sempadan);border-radius:12px;
+    padding:7px 12px;font-size:13px;font-weight:700;box-shadow:var(--bayang);white-space:nowrap
+  }
+  .hud .kotak b{font-size:15px}
+  .nyawa{letter-spacing:2px;font-size:15px}
+  .bar{height:8px;background:var(--sempadan);border-radius:999px;overflow:hidden;margin-bottom:14px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ungu),var(--biru));border-radius:999px;transition:width .3s}
+
+  .petunjuk{
+    background:var(--kuning-g);border:1px dashed #fbbf24;border-radius:14px;
+    padding:12px 14px;margin-bottom:14px;font-size:14.5px
+  }
+  .petunjuk .kat{display:inline-block;background:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800;margin-right:6px;color:#b45309}
+
+  /* ---------- Papan huruf ---------- */
+  .papan{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:6px 0 18px;min-height:64px}
+  .slot{
+    width:44px;height:56px;border-radius:12px;background:var(--kad);
+    border:2px solid var(--sempadan);display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:800;text-transform:uppercase;transition:.15s
+  }
+  .slot.garis{border:none;border-bottom:4px solid var(--ungu);border-radius:0;background:transparent;height:52px}
+  .slot.isi{background:var(--ungu-g);border-color:var(--ungu-t)}
+  .slot.betul{background:var(--hijau-g);border-color:var(--hijau);color:var(--hijau)}
+  .slot.salah{background:var(--merah-g);border-color:var(--merah);color:var(--merah)}
+  .slot.aktif{border-color:var(--kuning);background:var(--kuning-g);animation:kedip 1s infinite}
+  .slot.boleh-klik{cursor:pointer}
+  @keyframes kedip{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+  @media(max-width:420px){.slot{width:36px;height:48px;font-size:22px}}
+
+  .goyang{animation:goyang .4s}
+  @keyframes goyang{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+  /* ---------- Jubin anagram ---------- */
+  .jubin-baris{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;min-height:56px}
+  .jubin{
+    width:46px;height:52px;border-radius:12px;font-size:24px;font-weight:800;
+    background:linear-gradient(180deg,#fff,#f1f5f9);border:2px solid var(--sempadan);
+    cursor:pointer;font-family:inherit;color:var(--teks);box-shadow:0 3px 0 #cbd5e1;transition:.12s
+  }
+  .jubin:active{transform:translateY(2px);box-shadow:0 1px 0 #cbd5e1}
+  .jubin.guna{opacity:.25;pointer-events:none}
+  @media(max-width:420px){.jubin{width:40px;height:48px;font-size:21px}}
+
+  /* ---------- Papan kekunci ---------- */
+  .kekunci{display:flex;flex-direction:column;gap:6px;align-items:center;margin-bottom:14px}
+  .kekunci .kb{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+  .kek{
+    min-width:38px;height:46px;padding:0 4px;border-radius:10px;border:1px solid var(--sempadan);
+    background:var(--kad);font-size:18px;font-weight:700;font-family:inherit;color:var(--teks);
+    cursor:pointer;box-shadow:0 2px 0 #cbd5e1;transition:.1s
+  }
+  .kek:active{transform:translateY(2px);box-shadow:none}
+  .kek.betul{background:var(--hijau-g);border-color:var(--hijau);color:var(--hijau)}
+  .kek.salah{background:var(--merah-g);border-color:var(--merah);color:#b91c1c;opacity:.55}
+  .kek[disabled]{cursor:default}
+  @media(max-width:420px){
+    .kek{min-width:36px;height:44px;font-size:17px}
+    .logo{font-size:21px}
+    .logo span.ic{font-size:22px}
+    .ikon-btn{width:38px;height:38px;font-size:17px}
+    .app{padding:10px 10px 28px}
+  }
+
+  /* ---------- Gambar hangman ---------- */
+  .hangman{display:flex;justify-content:center;margin-bottom:6px}
+  .hangman svg{width:170px;height:180px}
+  .hangman .bhg{opacity:0;transition:opacity .3s}
+  .hangman .bhg.nampak{opacity:1}
+
+  /* ---------- Maklum balas ---------- */
+  .letup{
+    position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.4);
+    font-size:76px;opacity:0;pointer-events:none;z-index:60
+  }
+  .letup.main{animation:letup .9s ease-out}
+  @keyframes letup{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%) scale(1)}}
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    background:var(--teks);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;
+    z-index:70;opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center
+  }
+  .toast.nampak{opacity:1;bottom:34px}
+
+  /* ---------- Keputusan ---------- */
+  .bintang{font-size:44px;text-align:center;letter-spacing:4px;margin:4px 0}
+  .skor-besar{font-size:52px;font-weight:800;text-align:center;line-height:1;color:var(--ungu)}
+  .ringkas{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0}
+  .ringkas div{background:var(--ungu-g);border-radius:12px;padding:10px;text-align:center}
+  .ringkas b{display:block;font-size:20px}
+  .ringkas span{font-size:11.5px;color:var(--teks-lembut);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .senarai-jwp{list-style:none;padding:0;margin:0}
+  .senarai-jwp li{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--sempadan);font-size:14.5px}
+  .senarai-jwp li:last-child{border-bottom:none}
+  .senarai-jwp .w{font-weight:800;letter-spacing:1px}
+  .senarai-jwp .h{color:var(--teks-lembut);font-size:13px}
+
+  /* ---------- Editor senarai kata ---------- */
+  label.medan{display:block;margin-bottom:10px;font-size:13px;font-weight:700;color:var(--teks-lembut)}
+  input[type=text],select,textarea{
+    width:100%;padding:11px 12px;border:1px solid var(--sempadan);border-radius:12px;
+    font-size:15px;font-family:inherit;margin-top:5px;background:#fff;color:var(--teks)
+  }
+  input[type=text]:focus,select:focus,textarea:focus{outline:2px solid var(--ungu-t);outline-offset:1px}
+  textarea{min-height:110px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+  .tukar{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:14.5px;cursor:pointer}
+  .tukar input{width:20px;height:20px;accent-color:var(--ungu)}
+  .kata-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--sempadan)}
+  .kata-item:last-child{border-bottom:none}
+  .kata-item .isi{flex:1;min-width:0}
+  .kata-item .w{font-weight:800;letter-spacing:.5px}
+  .kata-item .m{font-size:12.5px;color:var(--teks-lembut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .buang{border:none;background:var(--merah-g);color:var(--merah);border-radius:10px;width:36px;height:36px;font-size:16px;cursor:pointer;flex:none}
+  .kosong{text-align:center;color:var(--teks-lembut);padding:22px 8px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <h1 class="logo"><span class="ic">🔤</span> Teka Huruf</h1>
+    <button class="ikon-btn" id="btnBunyi" title="Bunyi">🔊</button>
+    <button class="ikon-btn" id="btnStat" title="Statistik">📊</button>
+    <button class="ikon-btn" id="btnEditor" title="Senarai Kata">📝</button>
+  </div>
+
+  <!-- ============ SKRIN UTAMA ============ -->
+  <section class="skrin aktif" id="skrinUtama">
+    <div class="kad">
+      <p class="tajuk-kecil">1. Pilih permainan</p>
+      <div class="mod-grid" id="modGrid">
+        <button class="mod pilih" data-mod="hangman">
+          <span class="emo">🎯</span>
+          <span><span class="nm">Teka Huruf</span><br><span class="ds">Teka huruf satu demi satu sebelum nyawa habis</span></span>
+        </button>
+        <button class="mod" data-mod="anagram">
+          <span class="emo">🔀</span>
+          <span><span class="nm">Susun Huruf</span><br><span class="ds">Huruf bersepah — susun jadi perkataan betul</span></span>
+        </button>
+        <button class="mod" data-mod="hilang">
+          <span class="emo">🕳️</span>
+          <span><span class="nm">Huruf Hilang</span><br><span class="ds">Isi tempat kosong, contoh B_K_ → BUKU</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="kad">
+      <p class="tajuk-kecil">2. Tahap kesukaran</p>
+      <div class="chips" id="chipTahap">
+        <button class="chip pilih" data-tahap="campur">Campur</button>
+        <button class="chip" data-tahap="mudah">Mudah (3–5 huruf)</button>
+        <button class="chip" data-tahap="sederhana">Sederhana (6–7)</button>
+        <button class="chip" data-tahap="sukar">Sukar (8+)</button>
+      </div>
+    </div>
+
+    <div class="kad">
+      <p class="tajuk-kecil">3. Kategori perkataan</p>
+      <div class="chips" id="chipKategori"></div>
+      <p class="kosong" id="amaranKolam" style="display:none"></p>
+    </div>
+
+    <button class="btn utama" id="btnMula">▶ Mula Main</button>
+  </section>
+
+  <!-- ============ SKRIN PERMAINAN ============ -->
+  <section class="skrin" id="skrinMain">
+    <div class="hud">
+      <span class="kotak" id="hudSoalan">Soalan <b>1</b>/10</span>
+      <span class="kotak" id="hudSkor">Skor <b>0</b></span>
+      <span class="kotak nyawa" id="hudNyawa">❤️❤️❤️</span>
+      <span class="kotak" id="hudRentet" style="display:none">🔥 <b>0</b></span>
+    </div>
+    <div class="bar"><i id="barIsi" style="width:0%"></i></div>
+
+    <div class="hangman" id="kawasanHangman" style="display:none">
+      <svg viewBox="0 0 200 210" aria-hidden="true">
+        <line x1="20" y1="200" x2="120" y2="200" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="200" x2="60" y2="20" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="20" x2="140" y2="20" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+        <line x1="140" y1="20" x2="140" y2="45" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
+        <circle class="bhg" data-i="0" cx="140" cy="68" r="23" fill="none" stroke="#4f46e5" stroke-width="6"/>
+        <line   class="bhg" data-i="1" x1="140" y1="91" x2="140" y2="145" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+        <line   class="bhg" data-i="2" x1="140" y1="105" x2="112" y2="128" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+        <line   class="bhg" data-i="3" x1="140" y1="105" x2="168" y2="128" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+        <line   class="bhg" data-i="4" x1="140" y1="145" x2="116" y2="182" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+        <line   class="bhg" data-i="5" x1="140" y1="145" x2="164" y2="182" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="petunjuk" id="kotakPetunjuk"><span class="kat">Kategori</span><span id="teksPetunjuk">Petunjuk</span></div>
+
+    <div class="papan" id="papanKata"></div>
+    <div class="jubin-baris" id="barisJubin" style="display:none"></div>
+    <div class="kekunci" id="papanKekunci"></div>
+
+    <div class="baris">
+      <button class="btn kedua kecil" id="btnBantu">💡 Bantuan (−5)</button>
+      <button class="btn kedua kecil" id="btnKocok" style="display:none">🔀 Kocok</button>
+      <button class="btn kedua kecil" id="btnPadam" style="display:none">⌫ Padam</button>
+      <button class="btn kedua kecil" id="btnLangkau">⏭ Langkau</button>
+      <button class="btn merah kecil" id="btnKeluar">✕ Tamat</button>
+    </div>
+  </section>
+
+  <!-- ============ SKRIN KEPUTUSAN ============ -->
+  <section class="skrin" id="skrinKeputusan">
+    <div class="kad" style="text-align:center">
+      <div class="bintang" id="bintang">⭐⭐⭐</div>
+      <div class="skor-besar" id="skorAkhir">0</div>
+      <p style="margin:4px 0 0;color:var(--teks-lembut);font-weight:700">MARKAH</p>
+      <p id="mesejAkhir" style="font-size:15px;margin:10px 0 0"></p>
+      <div class="ringkas">
+        <div><b id="rBetul">0</b><span>Betul</span></div>
+        <div><b id="rSalah">0</b><span>Salah</span></div>
+        <div><b id="rTepat">0%</b><span>Ketepatan</span></div>
+      </div>
+    </div>
+    <div class="kad">
+      <h2>📖 Perkataan tadi</h2>
+      <ul class="senarai-jwp" id="senaraiJawapan"></ul>
+    </div>
+    <div class="baris">
+      <button class="btn utama" id="btnMainLagi">🔁 Main Lagi</button>
+      <button class="btn kedua" id="btnBalikUtama">🏠 Menu Utama</button>
+    </div>
+  </section>
+
+  <!-- ============ SKRIN STATISTIK ============ -->
+  <section class="skrin" id="skrinStat">
+    <div class="kad">
+      <h2>📊 Statistik Saya</h2>
+      <div class="ringkas">
+        <div><b id="sMain">0</b><span>Set Dimain</span></div>
+        <div><b id="sTerbaik">0</b><span>Skor Terbaik</span></div>
+        <div><b id="sTepat">0%</b><span>Ketepatan</span></div>
+      </div>
+      <ul class="senarai-jwp" id="statMod"></ul>
+    </div>
+    <div class="baris">
+      <button class="btn kedua" id="btnResetStat">🗑 Reset Statistik</button>
+      <button class="btn utama" id="btnStatBalik">← Kembali</button>
+    </div>
+  </section>
+
+  <!-- ============ SKRIN EDITOR SENARAI KATA ============ -->
+  <section class="skrin" id="skrinEditor">
+    <div class="kad">
+      <h2>📝 Tambah Perkataan Guru</h2>
+      <label class="medan">Perkataan (huruf sahaja, 3–14 huruf)
+        <input type="text" id="inKata" placeholder="Contoh: MATAHARI" maxlength="14" autocomplete="off">
+      </label>
+      <label class="medan">Petunjuk untuk pelajar
+        <input type="text" id="inPetunjuk" placeholder="Contoh: Bersinar pada waktu siang" maxlength="90" autocomplete="off">
+      </label>
+      <label class="medan">Kategori
+        <input type="text" id="inKategori" placeholder="Contoh: Alam Sekitar" maxlength="24" autocomplete="off" list="senaraiKat">
+        <datalist id="senaraiKat"></datalist>
+      </label>
+      <button class="btn utama" id="btnTambahKata">➕ Tambah ke Senarai</button>
+    </div>
+
+    <div class="kad">
+      <label class="tukar"><input type="checkbox" id="tukarCustom"> Guna senarai saya sahaja (abaikan perkataan terbina)</label>
+      <h2>📚 Senarai Saya (<span id="bilKata">0</span>)</h2>
+      <div id="senaraiKata"></div>
+    </div>
+
+    <div class="kad">
+      <p class="tajuk-kecil">Simpan / Pindah senarai</p>
+      <textarea id="kotakJson" placeholder='Salin teks di sini untuk simpan, atau tampal senarai untuk import…'></textarea>
+      <div class="baris" style="margin-top:8px">
+        <button class="btn kedua kecil" id="btnEksport">⬇ Eksport</button>
+        <button class="btn kedua kecil" id="btnImport">⬆ Import</button>
+      </div>
+    </div>
+
+    <button class="btn utama" id="btnEditorBalik">← Kembali</button>
+  </section>
+
+</div>
+
+<div class="letup" id="letup">🎉</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =====================================================================
+   1. BANK PERKATAAN TERBINA (Bahasa Melayu — sekolah rendah)
+   ===================================================================== */
+const BANK = [
+  ["Haiwan","🐾",[
+    ["KUCING","Haiwan peliharaan yang berbunyi meow"],
+    ["AYAM","Bertelur dan berkokok pada waktu pagi"],
+    ["ITIK","Suka berenang, bunyinya kuek kuek"],
+    ["LEMBU","Memberi kita susu untuk diminum"],
+    ["KAMBING","Haiwan berjanggut yang makan rumput"],
+    ["HARIMAU","Raja hutan yang berbelang hitam"],
+    ["GAJAH","Haiwan besar yang mempunyai belalai"],
+    ["ARNAB","Telinganya panjang dan suka makan lobak"],
+    ["BURUNG","Ia berbulu dan boleh terbang di udara"],
+    ["IKAN","Hidup di dalam air dan bernafas dengan insang"],
+    ["KUDA","Boleh ditunggang dan berlari laju"],
+    ["MONYET","Suka memanjat pokok dan makan pisang"],
+    ["ULAR","Haiwan panjang yang menjalar tanpa kaki"],
+    ["KATAK","Melompat dan berbunyi selepas hujan"],
+    ["KERBAU","Membantu petani membajak sawah padi"],
+    ["TIKUS","Haiwan kecil yang takut kepada kucing"],
+    ["RUSA","Haiwan hutan yang bertanduk cabang"],
+    ["BUAYA","Reptilia besar di sungai, gigi tajam"],
+    ["KUPUKUPU","Serangga cantik berterbangan di taman"],
+    ["SEMUT","Serangga kecil yang rajin bekerja"],
+  ]],
+  ["Buah-buahan","🍎",[
+    ["EPAL","Buah merah atau hijau yang rangup"],
+    ["PISANG","Buah kuning panjang, kegemaran monyet"],
+    ["DURIAN","Raja buah, berduri dan berbau kuat"],
+    ["RAMBUTAN","Merah dan berbulu di luar kulitnya"],
+    ["MANGGA","Buah kuning yang manis dan masam"],
+    ["BETIK","Isinya oren, baik untuk pencernaan"],
+    ["TEMBIKAI","Besar, hijau di luar merah di dalam"],
+    ["LIMAU","Rasanya masam, kaya vitamin C"],
+    ["ANGGUR","Buah kecil bergugus, ungu atau hijau"],
+    ["NANAS","Buah bermahkota daun tajam"],
+    ["JAMBU","Buah hijau berbiji kecil, rangup"],
+    ["KELAPA","Airnya sejuk dan menyegarkan"],
+    ["MANGGIS","Ratu buah, kulitnya ungu gelap"],
+    ["CIKU","Buah coklat lembut yang manis"],
+    ["LANGSAT","Buah kecil kekuningan bergugus"],
+  ]],
+  ["Warna","🎨",[
+    ["MERAH","Warna darah dan buah strawberi"],
+    ["BIRU","Warna langit yang cerah"],
+    ["KUNING","Warna matahari dan pisang masak"],
+    ["HIJAU","Warna daun dan rumput"],
+    ["HITAM","Warna malam yang gelap"],
+    ["PUTIH","Warna kapas dan awan"],
+    ["JINGGA","Campuran merah dengan kuning"],
+    ["UNGU","Warna buah anggur dan terung"],
+    ["KELABU","Warna awan sebelum hujan turun"],
+    ["COKLAT","Warna batang pokok dan tanah"],
+  ]],
+  ["Sekolah","🏫",[
+    ["BUKU","Kita membaca dan menulis di dalamnya"],
+    ["PENSEL","Alat menulis yang boleh dipadam"],
+    ["PEMADAM","Digunakan untuk memadam tulisan pensel"],
+    ["PEMBARIS","Alat untuk melukis garis lurus"],
+    ["MEJA","Tempat kita meletakkan buku di kelas"],
+    ["KERUSI","Tempat kita duduk di dalam kelas"],
+    ["GURU","Orang yang mengajar murid di sekolah"],
+    ["MURID","Orang yang belajar di sekolah"],
+    ["KELAS","Bilik tempat kita belajar setiap hari"],
+    ["GUNTING","Alat untuk memotong kertas"],
+    ["KERTAS","Kita menulis dan melukis di atasnya"],
+    ["DEWAN","Tempat perhimpunan sekolah diadakan"],
+    ["PERPUSTAKAAN","Tempat menyimpan dan meminjam buku"],
+    ["KANTIN","Tempat murid membeli makanan"],
+    ["PADANG","Tempat murid bermain dan bersukan"],
+  ]],
+  ["Anggota Badan","🖐️",[
+    ["TANGAN","Kita gunakan untuk memegang sesuatu"],
+    ["KAKI","Kita gunakan untuk berjalan"],
+    ["KEPALA","Bahagian atas badan, ada otak di dalamnya"],
+    ["MATA","Digunakan untuk melihat"],
+    ["HIDUNG","Digunakan untuk menghidu dan bernafas"],
+    ["TELINGA","Digunakan untuk mendengar"],
+    ["MULUT","Digunakan untuk bercakap dan makan"],
+    ["GIGI","Digunakan untuk mengunyah makanan"],
+    ["RAMBUT","Tumbuh di atas kepala kita"],
+    ["JARI","Ada lima pada setiap tangan"],
+    ["LIDAH","Untuk merasa manis dan masin"],
+    ["LUTUT","Sendi di tengah kaki kita"],
+    ["PERUT","Tempat makanan dihadam"],
+    ["SIKU","Sendi di tengah lengan"],
+    ["BAHU","Bahagian antara leher dan lengan"],
+  ]],
+  ["Kenderaan","🚗",[
+    ["KERETA","Kenderaan empat roda untuk keluarga"],
+    ["BASIKAL","Dua roda, dikayuh dengan kaki"],
+    ["MOTOSIKAL","Dua roda tetapi menggunakan enjin"],
+    ["BAS","Kenderaan besar membawa ramai penumpang"],
+    ["LORI","Kenderaan besar pengangkut barang"],
+    ["KAPAL","Kenderaan besar yang belayar di laut"],
+    ["BOT","Kenderaan kecil di atas air"],
+    ["TREN","Berjalan di atas landasan besi"],
+    ["PESAWAT","Terbang tinggi di awan"],
+    ["TEKSI","Kereta sewa yang ada meter tambang"],
+    ["AMBULANS","Kenderaan kecemasan ke hospital"],
+  ]],
+  ["Makanan","🍚",[
+    ["NASI","Makanan ruji orang Malaysia"],
+    ["ROTI","Dimakan dengan jem pada waktu pagi"],
+    ["LAKSA","Mi berkuah pedas yang terkenal"],
+    ["SATAY","Daging dicucuk dan dibakar, cicah kuah kacang"],
+    ["KUIH","Manisan kecil untuk minum petang"],
+    ["SAYUR","Makanan hijau yang menyihatkan badan"],
+    ["TELUR","Datang daripada ayam, boleh digoreng"],
+    ["RENDANG","Daging masak pekat, hidangan hari raya"],
+    ["KARIPAP","Kuih berinti kentang yang digoreng"],
+    ["CENDOL","Air manis dengan santan dan ais"],
+    ["BUBUR","Nasi lembut, sesuai untuk orang sakit"],
+    ["GULAI","Lauk berkuah kuning yang berempah"],
+  ]],
+  ["Alam Semula Jadi","🌳",[
+    ["HUJAN","Air yang turun dari langit"],
+    ["AWAN","Terapung putih di langit"],
+    ["MATAHARI","Bersinar terang pada waktu siang"],
+    ["BULAN","Bercahaya pada waktu malam"],
+    ["BINTANG","Berkelip-kelip di langit malam"],
+    ["ANGIN","Kita rasa tetapi tidak nampak"],
+    ["PELANGI","Tujuh warna selepas hujan berhenti"],
+    ["SUNGAI","Air mengalir dari gunung ke laut"],
+    ["GUNUNG","Tanah tinggi yang perlu didaki"],
+    ["LAUT","Air masin yang sangat luas"],
+    ["POKOK","Ada batang, dahan dan daun"],
+    ["BUNGA","Cantik, berbau wangi di taman"],
+    ["PANTAI","Tepi laut yang berpasir"],
+    ["HUTAN","Kawasan penuh pokok dan haiwan liar"],
+  ]],
+  ["Barang Rumah","🏠",[
+    ["PINTU","Kita buka untuk masuk ke rumah"],
+    ["TINGKAP","Dibuka supaya angin masuk ke bilik"],
+    ["KATIL","Tempat kita tidur pada waktu malam"],
+    ["BANTAL","Alas kepala semasa tidur"],
+    ["CAWAN","Tempat kita minum air"],
+    ["PINGGAN","Tempat kita meletakkan nasi"],
+    ["SUDU","Alat untuk menyuap makanan"],
+    ["GARPU","Bercabang, untuk mencucuk makanan"],
+    ["LAMPU","Memberi cahaya pada waktu malam"],
+    ["KIPAS","Berpusing memberi kita angin sejuk"],
+    ["SELIMUT","Menutup badan supaya tidak sejuk"],
+    ["PERIUK","Digunakan untuk memasak nasi"],
+    ["TUALA","Untuk mengeringkan badan"],
+    ["SABUN","Digunakan untuk mandi dan mencuci"],
+    ["SIKAT","Untuk merapikan rambut"],
+  ]],
+  ["Pekerjaan","👷",[
+    ["DOKTOR","Merawat orang sakit di hospital"],
+    ["POLIS","Menjaga keselamatan orang ramai"],
+    ["PETANI","Menanam padi dan sayur di ladang"],
+    ["NELAYAN","Menangkap ikan di laut"],
+    ["JURUTERA","Merekabentuk jambatan dan bangunan"],
+    ["PILOT","Menerbangkan kapal terbang"],
+    ["TENTERA","Mempertahankan negara kita"],
+    ["PEGUAM","Membela orang di mahkamah"],
+    ["JURURAWAT","Membantu doktor menjaga pesakit"],
+    ["POSMEN","Menghantar surat ke rumah"],
+    ["TUKANGMASAK","Menyediakan makanan di restoran"],
+  ]],
+];
+
+/* =====================================================================
+   2. STOR (localStorage) — senarai guru + statistik + tetapan
+   ===================================================================== */
+const KUNCI_KATA = "tekaHuruf.kataGuru.v1";
+const KUNCI_STAT = "tekaHuruf.stat.v1";
+const KUNCI_SET  = "tekaHuruf.tetapan.v1";
+
+function baca(kunci, lalai){
+  try{
+    const t = localStorage.getItem(kunci);
+    return t ? JSON.parse(t) : lalai;
+  }catch(e){ return lalai; }
+}
+function tulis(kunci, nilai){
+  try{ localStorage.setItem(kunci, JSON.stringify(nilai)); return true; }
+  catch(e){ tunjukToast("⚠️ Storan pelayar penuh / disekat"); return false; }
+}
+
+let kataGuru = baca(KUNCI_KATA, []);
+let stat     = baca(KUNCI_STAT, {main:0, terbaik:0, betul:0, salah:0, mod:{}});
+let tetapan  = baca(KUNCI_SET,  {bunyi:true, customSahaja:false});
+
+/* =====================================================================
+   3. ALAT BANTU
+   ===================================================================== */
+const $  = function(s){ return document.querySelector(s); };
+const $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+const HURUF = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+function kocok(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function bersihKata(s){
+  return (s||"").toUpperCase().replace(/[^A-Z]/g,"");
+}
+
+let masaToast = null;
+function tunjukToast(msg){
+  const el = $("#toast");
+  el.textContent = msg;
+  el.classList.add("nampak");
+  clearTimeout(masaToast);
+  masaToast = setTimeout(function(){ el.classList.remove("nampak"); }, 1900);
+}
+function letupEmo(emo){
+  const el = $("#letup");
+  el.textContent = emo;
+  el.classList.remove("main");
+  void el.offsetWidth;
+  el.classList.add("main");
+}
+
+/* --- bunyi ringkas guna WebAudio (tiada fail luar) --- */
+let ac = null;
+function nada(freq, mula, tempoh, jenis){
+  if(!tetapan.bunyi) return;
+  try{
+    if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state === "suspended") ac.resume();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = jenis || "sine";
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, ac.currentTime + mula);
+    g.gain.exponentialRampToValueAtTime(0.18, ac.currentTime + mula + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + mula + tempoh);
+    o.connect(g); g.connect(ac.destination);
+    o.start(ac.currentTime + mula);
+    o.stop(ac.currentTime + mula + tempoh + 0.02);
+  }catch(e){ /* abaikan */ }
+}
+const bunyi = {
+  ok:    function(){ nada(660,0,.12); nada(880,.09,.16); },
+  salah: function(){ nada(180,0,.22,"square"); },
+  menang:function(){ [523,659,784,1046].forEach(function(f,i){ nada(f, i*0.09, .22); }); },
+  kalah: function(){ [330,262,196].forEach(function(f,i){ nada(f, i*0.12, .28,"triangle"); }); },
+  klik:  function(){ nada(440,0,.05); }
+};
+
+/* =====================================================================
+   4. KEADAAN PERMAINAN
+   ===================================================================== */
+const JUM_SOALAN = 10;
+const NAMA_MOD = { hangman:"Teka Huruf", anagram:"Susun Huruf", hilang:"Huruf Hilang" };
+const NYAWA_MOD = { hangman:6, anagram:3, hilang:3 };
+
+const S = {
+  mod:"hangman", tahap:"campur", kat:"semua",
+  senarai:[], idx:0, skor:0, rentet:0, betul:0, salah:0, keputusan:[],
+  kata:null, nyawaMax:6, silap:0, bantuGuna:false, tamatSoalan:false,
+  dedah:{}, isiSlot:[], jubin:[], kosong:[], slotAktif:-1
+};
+
+/* ---- kolam perkataan mengikut tapisan ---- */
+function semuaKata(){
+  const senarai = [];
+  if(!tetapan.customSahaja){
+    BANK.forEach(function(k){
+      k[2].forEach(function(p){ senarai.push({w:p[0], h:p[1], k:k[0]}); });
+    });
+  }
+  kataGuru.forEach(function(p){
+    senarai.push({w:p.w, h:p.h || "Perkataan daripada guru", k:p.k || "Senarai Guru"});
+  });
+  return senarai;
+}
+function kolam(){
+  return semuaKata().filter(function(p){
+    if(S.kat !== "semua" && p.k !== S.kat) return false;
+    const n = p.w.length;
+    if(S.tahap === "mudah")     return n >= 3 && n <= 5;
+    if(S.tahap === "sederhana") return n >= 6 && n <= 7;
+    if(S.tahap === "sukar")     return n >= 8;
+    return n >= 3;
+  });
+}
+function senaraiKategori(){
+  const set = [];
+  if(!tetapan.customSahaja) BANK.forEach(function(k){ set.push(k[0]); });
+  kataGuru.forEach(function(p){
+    const k = p.k || "Senarai Guru";
+    if(set.indexOf(k) === -1) set.push(k);
+  });
+  return set;
+}
+function emojiKategori(nama){
+  for(let i=0;i<BANK.length;i++) if(BANK[i][0] === nama) return BANK[i][1];
+  return "⭐";
+}
+
+/* =====================================================================
+   5. NAVIGASI SKRIN
+   ===================================================================== */
+function bukaSkrin(id){
+  $$(".skrin").forEach(function(s){ s.classList.toggle("aktif", s.id === id); });
+  window.scrollTo(0,0);
+}
+
+/* =====================================================================
+   6. SKRIN UTAMA
+   ===================================================================== */
+function lukisKategori(){
+  const wadah = $("#chipKategori");
+  const senarai = senaraiKategori();
+  if(senarai.indexOf(S.kat) === -1) S.kat = "semua";
+  let html = '<button class="chip' + (S.kat==="semua"?" pilih":"") + '" data-kat="semua">🌈 Semua</button>';
+  senarai.forEach(function(k){
+    html += '<button class="chip' + (S.kat===k?" pilih":"") + '" data-kat="' + k.replace(/"/g,"&quot;") + '">' +
+            emojiKategori(k) + " " + k + "</button>";
+  });
+  wadah.innerHTML = html;
+  semakKolam();
+}
+function semakKolam(){
+  const n = kolam().length;
+  const amaran = $("#amaranKolam");
+  if(n === 0){
+    amaran.style.display = "block";
+    amaran.textContent = "😅 Tiada perkataan untuk pilihan ini. Cuba tukar tahap atau kategori.";
+    $("#btnMula").disabled = true;
+    $("#btnMula").style.opacity = ".5";
+  }else{
+    amaran.style.display = n < JUM_SOALAN ? "block" : "none";
+    if(n < JUM_SOALAN) amaran.textContent = "ℹ️ Hanya " + n + " perkataan tersedia — set ini akan ada " + n + " soalan.";
+    $("#btnMula").disabled = false;
+    $("#btnMula").style.opacity = "1";
+  }
+}
+
+$("#modGrid").addEventListener("click", function(e){
+  const b = e.target.closest(".mod"); if(!b) return;
+  S.mod = b.dataset.mod;
+  $$("#modGrid .mod").forEach(function(x){ x.classList.toggle("pilih", x === b); });
+  bunyi.klik();
+});
+$("#chipTahap").addEventListener("click", function(e){
+  const b = e.target.closest(".chip"); if(!b) return;
+  S.tahap = b.dataset.tahap;
+  $$("#chipTahap .chip").forEach(function(x){ x.classList.toggle("pilih", x === b); });
+  bunyi.klik(); semakKolam();
+});
+$("#chipKategori").addEventListener("click", function(e){
+  const b = e.target.closest(".chip"); if(!b) return;
+  S.kat = b.dataset.kat;
+  $$("#chipKategori .chip").forEach(function(x){ x.classList.toggle("pilih", x === b); });
+  bunyi.klik(); semakKolam();
+});
+
+/* =====================================================================
+   7. MULA SET PERMAINAN
+   ===================================================================== */
+function mulaSet(){
+  const pool = kolam();
+  if(!pool.length){ tunjukToast("Tiada perkataan untuk pilihan ini"); return; }
+  S.senarai   = kocok(pool).slice(0, Math.min(JUM_SOALAN, pool.length));
+  S.idx = 0; S.skor = 0; S.rentet = 0; S.betul = 0; S.salah = 0; S.keputusan = [];
+  bukaSkrin("skrinMain");
+  mulaSoalan();
+}
+
+function mulaSoalan(){
+  S.kata      = S.senarai[S.idx];
+  S.nyawaMax  = NYAWA_MOD[S.mod];
+  S.silap     = 0;
+  S.bantuGuna = false;
+  S.tamatSoalan = false;
+  S.dedah     = {};
+  S.isiSlot   = [];
+  S.jubin     = [];
+  S.kosong    = [];
+  S.slotAktif = -1;
+
+  $("#btnBantu").disabled = false;
+  $("#btnBantu").style.opacity = "1";
+  $("#kotakPetunjuk").querySelector(".kat").textContent = emojiKategori(S.kata.k) + " " + S.kata.k;
+  $("#teksPetunjuk").textContent = S.kata.h;
+  $("#kawasanHangman").style.display = S.mod === "hangman" ? "flex" : "none";
+  $("#barisJubin").style.display     = S.mod === "anagram" ? "flex" : "none";
+  $("#papanKekunci").style.display   = S.mod === "anagram" ? "none" : "flex";
+  $("#btnKocok").style.display       = S.mod === "anagram" ? "block" : "none";
+  $("#btnPadam").style.display       = S.mod === "anagram" ? "block" : "none";
+
+  if(S.mod === "hangman") sediaHangman();
+  if(S.mod === "anagram") sediaAnagram();
+  if(S.mod === "hilang")  sediaHilang();
+
+  kemasHud();
+}
+
+function kemasHud(){
+  $("#hudSoalan").innerHTML = "Soalan <b>" + (S.idx+1) + "</b>/" + S.senarai.length;
+  $("#hudSkor").innerHTML   = "Skor <b>" + S.skor + "</b>";
+  const tinggal = Math.max(0, S.nyawaMax - S.silap);
+  $("#hudNyawa").textContent = new Array(tinggal+1).join("❤️") + new Array(S.nyawaMax - tinggal + 1).join("🤍");
+  const rk = $("#hudRentet");
+  rk.style.display = S.rentet >= 2 ? "inline-block" : "none";
+  rk.innerHTML = "🔥 <b>" + S.rentet + "</b>";
+  $("#barIsi").style.width = ((S.idx) / S.senarai.length * 100) + "%";
+}
+
+/* =====================================================================
+   8. MOD A — HANGMAN (teka huruf)
+   ===================================================================== */
+function sediaHangman(){
+  lukisSlotHangman();
+  lukisKekunci();
+  kemasGambarHangman();
+}
+function lukisSlotHangman(dedahSemua){
+  const w = S.kata.w;
+  let html = "";
+  for(let i=0;i<w.length;i++){
+    const ada = !!S.dedah[w[i]];
+    const kelas = "slot garis" + (dedahSemua && !ada ? " salah" : (ada ? " betul" : ""));
+    html += '<div class="' + kelas + '">' + (ada || dedahSemua ? w[i] : "") + "</div>";
+  }
+  $("#papanKata").innerHTML = html;
+}
+function lukisKekunci(){
+  const baris = [];
+  for(let i=0;i<HURUF.length;i+=7) baris.push(HURUF.slice(i, i+7));
+  $("#papanKekunci").innerHTML = baris.map(function(b){
+    return '<div class="kb">' + b.map(function(h){
+      return '<button class="kek" data-h="' + h + '">' + h + "</button>";
+    }).join("") + "</div>";
+  }).join("");
+}
+function kemasGambarHangman(){
+  $$("#kawasanHangman .bhg").forEach(function(el){
+    el.classList.toggle("nampak", parseInt(el.dataset.i,10) < S.silap);
+  });
+}
+function tekanHurufHangman(h){
+  if(S.tamatSoalan) return;
+  const kek = $('#papanKekunci .kek[data-h="' + h + '"]');
+  if(kek && kek.disabled) return;
+  if(S.kata.w.indexOf(h) !== -1){
+    S.dedah[h] = true;
+    if(kek){ kek.classList.add("betul"); kek.disabled = true; }
+    bunyi.ok();
+    lukisSlotHangman();
+    const siap = S.kata.w.split("").every(function(c){ return S.dedah[c]; });
+    if(siap) soalanMenang();
+  }else{
+    S.silap++;
+    if(kek){ kek.classList.add("salah"); kek.disabled = true; }
+    bunyi.salah();
+    kemasGambarHangman();
+    $("#papanKata").classList.add("goyang");
+    setTimeout(function(){ $("#papanKata").classList.remove("goyang"); }, 400);
+    kemasHud();
+    if(S.silap >= S.nyawaMax) soalanKalah();
+  }
+}
+
+/* =====================================================================
+   9. MOD B — SUSUN HURUF (anagram)
+   ===================================================================== */
+function sediaAnagram(){
+  const w = S.kata.w.split("");
+  let campur = kocok(w);
+  let cuba = 0;
+  while(campur.join("") === S.kata.w && cuba < 12 && w.length > 1){ campur = kocok(w); cuba++; }
+  S.jubin   = campur.map(function(h){ return {h:h, guna:false}; });
+  S.isiSlot = new Array(w.length).fill(null);
+  lukisAnagram();
+}
+function lukisAnagram(dedahSemua){
+  const w = S.kata.w;
+  let html = "";
+  for(let i=0;i<w.length;i++){
+    const isi = S.isiSlot[i];
+    let kelas = "slot boleh-klik";
+    let teks = isi ? isi.h : "";
+    if(dedahSemua){ kelas = "slot salah"; teks = w[i]; }
+    else if(isi) kelas += " isi";
+    html += '<div class="' + kelas + '" data-slot="' + i + '">' + teks + "</div>";
+  }
+  $("#papanKata").innerHTML = html;
+  $("#barisJubin").innerHTML = S.jubin.map(function(t,i){
+    return '<button class="jubin' + (t.guna?" guna":"") + '" data-jubin="' + i + '">' + t.h + "</button>";
+  }).join("");
+}
+function letakJubin(i){
+  if(S.tamatSoalan) return;
+  const t = S.jubin[i];
+  if(!t || t.guna) return;
+  const kosong = S.isiSlot.indexOf(null);
+  if(kosong === -1) return;
+  t.guna = true;
+  S.isiSlot[kosong] = {h:t.h, jubin:i};
+  bunyi.klik();
+  lukisAnagram();
+  if(S.isiSlot.indexOf(null) === -1) setTimeout(semakAnagram, 260);
+}
+function buangSlot(i){
+  if(S.tamatSoalan) return;
+  const isi = S.isiSlot[i];
+  if(!isi) return;
+  S.jubin[isi.jubin].guna = false;
+  S.isiSlot[i] = null;
+  bunyi.klik();
+  lukisAnagram();
+}
+function padamAkhir(){
+  for(let i=S.isiSlot.length-1;i>=0;i--){ if(S.isiSlot[i]){ buangSlot(i); return; } }
+}
+function semakAnagram(){
+  if(S.tamatSoalan) return;
+  const jawapan = S.isiSlot.map(function(x){ return x ? x.h : ""; }).join("");
+  if(jawapan === S.kata.w){
+    $$("#papanKata .slot").forEach(function(el){ el.classList.add("betul"); });
+    soalanMenang();
+  }else{
+    S.silap++;
+    bunyi.salah();
+    $("#papanKata").classList.add("goyang");
+    setTimeout(function(){ $("#papanKata").classList.remove("goyang"); }, 400);
+    kemasHud();
+    if(S.silap >= S.nyawaMax){ soalanKalah(); return; }
+    setTimeout(function(){
+      if(S.tamatSoalan) return;
+      S.jubin.forEach(function(t){ t.guna = false; });
+      S.isiSlot = S.isiSlot.map(function(){ return null; });
+      lukisAnagram();
+      tunjukToast("Belum betul — cuba susunan lain 💪");
+    }, 420);
+  }
+}
+
+/* =====================================================================
+   10. MOD C — HURUF HILANG
+   ===================================================================== */
+function sediaHilang(){
+  const w = S.kata.w;
+  const bilKosong = Math.max(1, Math.min(w.length - 1, Math.round(w.length * 0.4)));
+  const idxSemua = [];
+  for(let i=0;i<w.length;i++) idxSemua.push(i);
+  S.kosong = kocok(idxSemua).slice(0, bilKosong).sort(function(a,b){ return a-b; });
+  S.isiSlot = new Array(w.length).fill(null);
+  S.slotAktif = S.kosong[0];
+  lukisHilang();
+  lukisKekunci();
+}
+function lukisHilang(dedahSemua){
+  const w = S.kata.w;
+  let html = "";
+  for(let i=0;i<w.length;i++){
+    const kosong = S.kosong.indexOf(i) !== -1;
+    if(!kosong){
+      html += '<div class="slot">' + w[i] + "</div>";
+    }else{
+      const isi = S.isiSlot[i];
+      let kelas = "slot boleh-klik";
+      let teks = "";
+      if(dedahSemua && !isi){ kelas = "slot salah"; teks = w[i]; }
+      else if(isi){ kelas += " betul"; teks = isi; }
+      else if(i === S.slotAktif) kelas += " aktif";
+      html += '<div class="' + kelas + '" data-slot="' + i + '">' + teks + "</div>";
+    }
+  }
+  $("#papanKata").innerHTML = html;
+}
+function slotKosongSeterusnya(){
+  for(let i=0;i<S.kosong.length;i++){
+    const k = S.kosong[i];
+    if(!S.isiSlot[k]) return k;
+  }
+  return -1;
+}
+function tekanHurufHilang(h){
+  if(S.tamatSoalan) return;
+  const k = S.slotAktif;
+  if(k < 0) return;
+  if(S.kata.w[k] === h){
+    S.isiSlot[k] = h;
+    bunyi.ok();
+    S.slotAktif = slotKosongSeterusnya();
+    lukisHilang();
+    if(S.slotAktif === -1) soalanMenang();
+  }else{
+    S.silap++;
+    bunyi.salah();
+    $("#papanKata").classList.add("goyang");
+    setTimeout(function(){ $("#papanKata").classList.remove("goyang"); }, 400);
+    kemasHud();
+    if(S.silap >= S.nyawaMax) soalanKalah();
+  }
+}
+
+/* ---- klik pada papan kata (anagram / huruf hilang) ---- */
+$("#papanKata").addEventListener("click", function(e){
+  const el = e.target.closest("[data-slot]"); if(!el) return;
+  const i = parseInt(el.dataset.slot,10);
+  if(S.mod === "anagram") buangSlot(i);
+  else if(S.mod === "hilang" && !S.isiSlot[i]){ S.slotAktif = i; lukisHilang(); }
+});
+$("#barisJubin").addEventListener("click", function(e){
+  const el = e.target.closest("[data-jubin]"); if(!el) return;
+  letakJubin(parseInt(el.dataset.jubin,10));
+});
+$("#papanKekunci").addEventListener("click", function(e){
+  const el = e.target.closest("[data-h]"); if(!el) return;
+  if(S.mod === "hangman") tekanHurufHangman(el.dataset.h);
+  else if(S.mod === "hilang") tekanHurufHilang(el.dataset.h);
+});
+
+/* =====================================================================
+   11. MENANG / KALAH / SETERUSNYA
+   ===================================================================== */
+function kiraMarkah(){
+  const tinggal = Math.max(0, S.nyawaMax - S.silap);
+  let asas = S.mod === "hangman" ? 10 + tinggal*2 : 10 + tinggal*3;
+  if(S.bantuGuna) asas -= 5;
+  asas = Math.max(5, asas);
+  const bonus = Math.min(Math.max(0, S.rentet-1), 5) * 2;
+  return asas + bonus;
+}
+function soalanMenang(){
+  if(S.tamatSoalan) return;
+  S.tamatSoalan = true;
+  S.rentet++; S.betul++;
+  const markah = kiraMarkah();
+  S.skor += markah;
+  S.keputusan.push({w:S.kata.w, h:S.kata.h, betul:true, markah:markah});
+  bunyi.menang();
+  letupEmo(S.rentet >= 3 ? "🔥" : "🎉");
+  tunjukToast("Bagus! " + S.kata.w + "  +" + markah + " markah");
+  kemasHud();
+  setTimeout(seterusnya, 1250);
+}
+function soalanKalah(pesan){
+  if(S.tamatSoalan) return;
+  S.tamatSoalan = true;
+  S.rentet = 0; S.salah++;
+  S.keputusan.push({w:S.kata.w, h:S.kata.h, betul:false, markah:0});
+  if(S.mod === "hangman") lukisSlotHangman(true);
+  if(S.mod === "anagram") lukisAnagram(true);
+  if(S.mod === "hilang")  lukisHilang(true);
+  bunyi.kalah();
+  letupEmo("😿");
+  tunjukToast(pesan || ("Jawapannya: " + S.kata.w));
+  kemasHud();
+  setTimeout(seterusnya, 1900);
+}
+function seterusnya(){
+  S.idx++;
+  if(S.idx >= S.senarai.length) tamatSet();
+  else mulaSoalan();
+}
+
+/* =====================================================================
+   12. TAMAT SET & KEPUTUSAN
+   ===================================================================== */
+function tamatSet(){
+  const jumlah = S.betul + S.salah;
+  const tepat  = jumlah ? Math.round(S.betul / jumlah * 100) : 0;
+
+  stat.main   = (stat.main||0) + 1;
+  stat.betul  = (stat.betul||0) + S.betul;
+  stat.salah  = (stat.salah||0) + S.salah;
+  stat.terbaik = Math.max(stat.terbaik||0, S.skor);
+  if(!stat.mod) stat.mod = {};
+  const m = stat.mod[S.mod] || {main:0, betul:0, salah:0, terbaik:0};
+  m.main++; m.betul += S.betul; m.salah += S.salah; m.terbaik = Math.max(m.terbaik, S.skor);
+  stat.mod[S.mod] = m;
+  tulis(KUNCI_STAT, stat);
+
+  const bintang = tepat >= 90 ? 3 : tepat >= 60 ? 2 : tepat >= 30 ? 1 : 0;
+  $("#bintang").textContent = new Array(bintang+1).join("⭐") + new Array(3-bintang+1).join("☆");
+  $("#skorAkhir").textContent = S.skor;
+  $("#rBetul").textContent = S.betul;
+  $("#rSalah").textContent = S.salah;
+  $("#rTepat").textContent = tepat + "%";
+  $("#mesejAkhir").textContent =
+    bintang === 3 ? "Hebat sekali! Kamu memang juara perkataan 🏆" :
+    bintang === 2 ? "Bagus! Sikit lagi nak dapat 3 bintang 💪" :
+    bintang === 1 ? "Boleh! Cuba sekali lagi, pasti lebih baik 🌱" :
+                    "Jangan putus asa — baca petunjuk dengan teliti ya 🙂";
+
+  $("#senaraiJawapan").innerHTML = S.keputusan.map(function(r){
+    return "<li>" + (r.betul ? "✅" : "❌") +
+           '<span class="w">' + r.w + "</span>" +
+           '<span class="h">— ' + r.h + "</span></li>";
+  }).join("") || '<li class="kosong">Tiada rekod</li>';
+
+  if(bintang === 3) bunyi.menang();
+  bukaSkrin("skrinKeputusan");
+}
+
+/* =====================================================================
+   13. BUTANG DALAM PERMAINAN
+   ===================================================================== */
+function gunaBantuan(){
+  if(S.tamatSoalan || S.bantuGuna) return;
+  const w = S.kata.w;
+  if(S.mod === "hangman"){
+    const belum = w.split("").filter(function(c){ return !S.dedah[c]; });
+    if(!belum.length) return;
+    const pilih = belum[Math.floor(Math.random()*belum.length)];
+    S.bantuGuna = true;
+    tandaBantu();
+    tekanHurufHangman(pilih);
+    return;
+  }
+  if(S.mod === "anagram"){
+    const i = S.isiSlot.indexOf(null);
+    if(i === -1) return;
+    const perlu = w[i];
+    let j = -1;
+    for(let x=0;x<S.jubin.length;x++){ if(!S.jubin[x].guna && S.jubin[x].h === perlu){ j = x; break; } }
+    if(j === -1) return;
+    S.bantuGuna = true;
+    tandaBantu();
+    letakJubin(j);
+    return;
+  }
+  if(S.mod === "hilang"){
+    const k = S.slotAktif;
+    if(k < 0) return;
+    S.bantuGuna = true;
+    tandaBantu();
+    tekanHurufHilang(w[k]);
+  }
+}
+function tandaBantu(){
+  $("#btnBantu").disabled = true;
+  $("#btnBantu").style.opacity = ".45";
+  tunjukToast("💡 Satu huruf dibuka (−5 markah)");
+}
+
+$("#btnMula").addEventListener("click", mulaSet);
+$("#btnBantu").addEventListener("click", gunaBantuan);
+$("#btnKocok").addEventListener("click", function(){
+  if(S.tamatSoalan || S.mod !== "anagram") return;
+  const belum = S.jubin.filter(function(t){ return !t.guna; });
+  const campur = kocok(belum.map(function(t){ return t.h; }));
+  let n = 0;
+  S.jubin.forEach(function(t){ if(!t.guna) t.h = campur[n++]; });
+  bunyi.klik();
+  lukisAnagram();
+});
+$("#btnPadam").addEventListener("click", padamAkhir);
+$("#btnLangkau").addEventListener("click", function(){
+  if(S.tamatSoalan) return;
+  soalanKalah("Dilangkau — jawapannya: " + S.kata.w);
+});
+$("#btnKeluar").addEventListener("click", function(){
+  if(!confirm("Tamatkan permainan sekarang?")) return;
+  S.tamatSoalan = true;
+  if(S.keputusan.length === 0){ bukaSkrin("skrinUtama"); return; }
+  tamatSet();
+});
+$("#btnMainLagi").addEventListener("click", mulaSet);
+$("#btnBalikUtama").addEventListener("click", function(){ lukisKategori(); bukaSkrin("skrinUtama"); });
+
+/* ---- papan kekunci fizikal ---- */
+document.addEventListener("keydown", function(e){
+  if(!$("#skrinMain").classList.contains("aktif")) return;
+  if(e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toUpperCase();
+  if(k === "BACKSPACE" && S.mod === "anagram"){ e.preventDefault(); padamAkhir(); return; }
+  if(!/^[A-Z]$/.test(k)) return;
+  e.preventDefault();
+  if(S.mod === "hangman") tekanHurufHangman(k);
+  else if(S.mod === "hilang") tekanHurufHilang(k);
+  else if(S.mod === "anagram"){
+    for(let x=0;x<S.jubin.length;x++){
+      if(!S.jubin[x].guna && S.jubin[x].h === k){ letakJubin(x); return; }
+    }
+  }
+});
+
+/* =====================================================================
+   14. STATISTIK
+   ===================================================================== */
+function lukisStat(){
+  const jumlah = (stat.betul||0) + (stat.salah||0);
+  $("#sMain").textContent    = stat.main || 0;
+  $("#sTerbaik").textContent = stat.terbaik || 0;
+  $("#sTepat").textContent   = (jumlah ? Math.round((stat.betul||0)/jumlah*100) : 0) + "%";
+  const kunci = Object.keys(NAMA_MOD);
+  $("#statMod").innerHTML = kunci.map(function(k){
+    const m = (stat.mod && stat.mod[k]) || {main:0, betul:0, salah:0, terbaik:0};
+    const j = m.betul + m.salah;
+    return "<li><span class=\"w\">" + NAMA_MOD[k] + "</span>" +
+           '<span class="h">' + m.main + " set · " + m.betul + " betul · terbaik " + m.terbaik +
+           (j ? " · " + Math.round(m.betul/j*100) + "%" : "") + "</span></li>";
+  }).join("");
+}
+$("#btnStat").addEventListener("click", function(){ lukisStat(); bukaSkrin("skrinStat"); });
+$("#btnStatBalik").addEventListener("click", function(){ lukisKategori(); bukaSkrin("skrinUtama"); });
+$("#btnResetStat").addEventListener("click", function(){
+  if(!confirm("Padam semua statistik?")) return;
+  stat = {main:0, terbaik:0, betul:0, salah:0, mod:{}};
+  tulis(KUNCI_STAT, stat);
+  lukisStat();
+  tunjukToast("Statistik telah direset");
+});
+
+/* =====================================================================
+   15. EDITOR SENARAI KATA (guru)
+   ===================================================================== */
+function lukisEditor(){
+  $("#bilKata").textContent = kataGuru.length;
+  $("#tukarCustom").checked = !!tetapan.customSahaja;
+  $("#senaraiKata").innerHTML = kataGuru.length
+    ? kataGuru.map(function(p,i){
+        return '<div class="kata-item"><div class="isi"><div class="w">' + p.w + "</div>" +
+               '<div class="m">' + (p.k||"Senarai Guru") + " · " + (p.h||"-") + "</div></div>" +
+               '<button class="buang" data-buang="' + i + '" title="Padam">🗑</button></div>';
+      }).join("")
+    : '<p class="kosong">Belum ada perkataan. Tambah di atas untuk mula 👆</p>';
+  const kat = senaraiKategori();
+  $("#senaraiKat").innerHTML = kat.map(function(k){ return '<option value="' + k.replace(/"/g,"&quot;") + '">'; }).join("");
+}
+function tambahKata(){
+  const w = bersihKata($("#inKata").value);
+  const h = $("#inPetunjuk").value.trim();
+  const k = $("#inKategori").value.trim() || "Senarai Guru";
+  if(w.length < 3 || w.length > 14){ tunjukToast("Perkataan mesti 3–14 huruf (A–Z sahaja)"); return; }
+  if(!h){ tunjukToast("Sila isi petunjuk untuk pelajar"); return; }
+  const adaGuru = kataGuru.some(function(p){ return p.w === w; });
+  if(adaGuru){ tunjukToast("Perkataan ini sudah ada dalam senarai"); return; }
+  kataGuru.push({w:w, h:h, k:k});
+  tulis(KUNCI_KATA, kataGuru);
+  $("#inKata").value = ""; $("#inPetunjuk").value = "";
+  $("#inKata").focus();
+  bunyi.ok();
+  tunjukToast("✅ " + w + " ditambah");
+  lukisEditor();
+}
+$("#btnEditor").addEventListener("click", function(){ lukisEditor(); bukaSkrin("skrinEditor"); });
+$("#btnEditorBalik").addEventListener("click", function(){ lukisKategori(); bukaSkrin("skrinUtama"); });
+$("#btnTambahKata").addEventListener("click", tambahKata);
+$("#inPetunjuk").addEventListener("keydown", function(e){ if(e.key === "Enter") tambahKata(); });
+$("#inKata").addEventListener("keydown", function(e){ if(e.key === "Enter") $("#inPetunjuk").focus(); });
+$("#senaraiKata").addEventListener("click", function(e){
+  const b = e.target.closest("[data-buang]"); if(!b) return;
+  const i = parseInt(b.dataset.buang,10);
+  const nama = kataGuru[i] ? kataGuru[i].w : "";
+  if(!confirm("Padam perkataan " + nama + "?")) return;
+  kataGuru.splice(i,1);
+  tulis(KUNCI_KATA, kataGuru);
+  lukisEditor();
+  tunjukToast("Dipadam: " + nama);
+});
+$("#tukarCustom").addEventListener("change", function(e){
+  if(e.target.checked && kataGuru.length < 3){
+    e.target.checked = false;
+    tunjukToast("Tambah sekurang-kurangnya 3 perkataan dahulu");
+    return;
+  }
+  tetapan.customSahaja = e.target.checked;
+  tulis(KUNCI_SET, tetapan);
+  lukisEditor();
+});
+$("#btnEksport").addEventListener("click", function(){
+  $("#kotakJson").value = JSON.stringify(kataGuru);
+  $("#kotakJson").select();
+  tunjukToast("Senarai disalin ke kotak — salin & simpan");
+});
+$("#btnImport").addEventListener("click", function(){
+  let data;
+  try{ data = JSON.parse($("#kotakJson").value); }
+  catch(err){ tunjukToast("❌ Teks tidak sah — pastikan format eksport"); return; }
+  if(!Array.isArray(data)){ tunjukToast("❌ Format mesti senarai []"); return; }
+  let tambah = 0;
+  data.forEach(function(p){
+    if(!p || typeof p !== "object") return;
+    const w = bersihKata(p.w);
+    if(w.length < 3 || w.length > 14) return;
+    if(kataGuru.some(function(q){ return q.w === w; })) return;
+    kataGuru.push({
+      w: w,
+      h: String(p.h || "Perkataan daripada guru").slice(0,90),
+      k: String(p.k || "Senarai Guru").slice(0,24)
+    });
+    tambah++;
+  });
+  tulis(KUNCI_KATA, kataGuru);
+  lukisEditor();
+  tunjukToast(tambah ? ("✅ " + tambah + " perkataan diimport") : "Tiada perkataan baharu ditambah");
+});
+
+/* =====================================================================
+   16. BUNYI ON/OFF & PERMULAAN
+   ===================================================================== */
+function kemasIkonBunyi(){
+  const b = $("#btnBunyi");
+  b.textContent = tetapan.bunyi ? "🔊" : "🔇";
+  b.classList.toggle("off", !tetapan.bunyi);
+}
+$("#btnBunyi").addEventListener("click", function(){
+  tetapan.bunyi = !tetapan.bunyi;
+  tulis(KUNCI_SET, tetapan);
+  kemasIkonBunyi();
+  if(tetapan.bunyi) bunyi.ok();
+});
+
+kemasIkonBunyi();
+lukisKategori();
+lukisEditor();
+
+})();
+</script>
+</body>
+</html>
