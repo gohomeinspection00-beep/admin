@@ -26,6 +26,22 @@ Lihat & Sebut suara dimatikan supaya jawapan tidak terbocor.
   dan **Jana CSV** untuk disalin ke Excel/Google Sheets/WhatsApp.
 - Semua data dalam `localStorage` peranti — tiada data dihantar ke pelayan.
 
+## 🎤 Rakam suara sendiri (suara cikgu/ibu bapa)
+
+Tekan **"Rakam Suara Saya Sendiri"** dalam kad suara di skrin utama:
+
+1. Benarkan akses mikrofon apabila pelayar bertanya.
+2. Ketik 🎙️ pada mana-mana huruf, sebut hurufnya, dan ketik ⏹ (atau tunggu —
+   rakaman berhenti sendiri selepas 4 saat). ▶️ untuk semak, 🗑 untuk padam.
+3. Boleh juga rakam frasa 💬 *"Mana huruf…?"* supaya keseluruhan soalan
+   berbunyi dengan suara anda.
+4. Tandakan **"Guna suara saya dalam ujian"**.
+
+Semasa ujian Dengar & Tunjuk, apps akan mainkan rakaman anda (frasa + huruf);
+huruf yang belum dirakam jatuh balik ke suara TTS secara automatik — jadi tidak
+perlu rakam semua 26 sekali gus. Rakaman disimpan dalam `localStorage` peranti
+itu sahaja (tidak dihantar ke mana-mana), dan kekal walaupun apps ditutup.
+
 ## Suara Bahasa Melayu
 
 Sama seperti ABC Kecil: apps memilih suara `ms-MY` dahulu, kemudian `ms`,

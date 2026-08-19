@@ -146,6 +146,19 @@
   .kad-suara .info.baik{color:var(--hijau)}
   .kad-suara .info.amaran{color:var(--kuning)}
 
+  .rakam-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--sempadan)}
+  .rakam-item:last-child{border-bottom:none}
+  .rakam-item .k{font-weight:800;font-size:20px;width:64px}
+  .rakam-item .st{flex:1;font-size:13px;color:var(--lembut)}
+  .rakam-item .st.ada{color:var(--hijau);font-weight:700}
+  .rakam-item button{border:none;border-radius:10px;width:38px;height:38px;font-size:16px;cursor:pointer;background:var(--biru-l)}
+  .rakam-item button:disabled{opacity:.3;cursor:default}
+  .rakam-item button.rakam{background:var(--merah-l)}
+  .rakam-item button.rakam.jalan{background:var(--merah);color:#fff;animation:denyut 1s infinite}
+  .rakam-item button.padamK{background:#f1f5f4}
+  @keyframes denyut{0%,100%{box-shadow:0 0 0 0 rgba(224,36,36,.4)}50%{box-shadow:0 0 0 8px rgba(224,36,36,0)}}
+  .tukar{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14.5px;cursor:pointer;font-weight:600}
+  .tukar input{width:20px;height:20px;accent-color:var(--hijau)}
   .toast{
     position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--teks);color:#fff;
     padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;z-index:70;opacity:0;transition:.25s;
@@ -217,6 +230,8 @@
       </div>
       <select id="pilihSuara" aria-label="Pilih suara"></select>
       <p class="info" id="notaBM">Mencari suara…</p>
+      <button class="btn kedua k" id="btnKeRakam" style="margin-top:10px;width:100%">🎤 Rakam Suara Saya Sendiri</button>
+      <p class="info" id="notaSuaraSaya"></p>
     </div>
 
     <button class="btn utama" id="btnMula">▶ Mula Ujian</button>
@@ -281,6 +296,26 @@
     <div class="baris">
       <button class="btn merah" id="btnPadamSemua">🗑 Padam Semua</button>
       <button class="btn utama" id="btnRekodBalik">← Kembali</button>
+    </div>
+  </section>
+
+  <!-- ===== RAKAM SUARA SENDIRI ===== -->
+  <section class="skrin" id="sRakam">
+    <div class="kad">
+      <h2>🎤 Suara Saya Sendiri</h2>
+      <p style="font-size:14px;color:var(--lembut);margin:0 0 8px">
+        Rakam sebutan anda untuk setiap huruf (maksimum 4 saat). Semasa ujian
+        <b>Dengar &amp; Tunjuk</b>, apps akan mainkan rakaman anda — bukan suara robot.
+        Rakaman disimpan dalam peranti ini sahaja.</p>
+      <label class="tukar"><input type="checkbox" id="tukarSuaraSaya"> Guna suara saya dalam ujian (huruf yang belum dirakam guna suara robot)</label>
+      <p class="info amaran" id="amaranMik" style="display:none;color:var(--kuning);font-size:13px"></p>
+    </div>
+    <div class="kad">
+      <div id="senaraiRakam"></div>
+    </div>
+    <div class="baris">
+      <button class="btn merah" id="btnPadamRakam">🗑 Padam Semua Rakaman</button>
+      <button class="btn utama" id="btnRakamBalik">← Kembali</button>
     </div>
   </section>
 
@@ -414,6 +449,139 @@ function sebut(teks, laju){
   }catch(e){}
 }
 
+/* ================= SUARA SENDIRI (rakaman guru) ================= */
+const KUNCI_KLIP = "suaraGuru.klip.v1";      // dikongsi untuk semua apps huruf
+const SLOT = ["FRASA"].concat(AZ);
+const NAMA_SLOT = { FRASA: 'Frasa "Mana huruf…?"' };
+let klip = baca(KUNCI_KLIP, {});             // {A:"data:audio/...;base64,..", FRASA:...}
+const adaRakam = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+
+let audioSemasa = null;
+function mainKlip(dataURL){
+  return new Promise(function(res){
+    try{
+      if(audioSemasa){ audioSemasa.pause(); }
+      const a = new Audio(dataURL);
+      audioSemasa = a;
+      a.onended = res; a.onerror = res;
+      const p = a.play();
+      if(p && p.catch) p.catch(res);
+      setTimeout(res, 6000); // jaring keselamatan
+    }catch(e){ res(); }
+  });
+}
+function sebutSoalan(h){
+  if(tetapan.gunaSuaraSaya && klip[h]){
+    const urutan = klip.FRASA ? [klip.FRASA, klip[h]] : [klip[h]];
+    (function seterus(i){
+      if(i >= urutan.length) return;
+      mainKlip(urutan[i]).then(function(){ seterus(i+1); });
+    })(0);
+  }else{
+    sebut("Mana huruf " + h + "?");
+  }
+}
+
+let perakam = null, ketulan = [], slotRakam = null, masaAuto = null;
+function hentiRakam(){
+  if(perakam && perakam.state !== "inactive"){ try{ perakam.stop(); }catch(e){} }
+  clearTimeout(masaAuto);
+}
+function mulaRakam(kunci, btn){
+  if(!adaRakam) return;
+  if(perakam && perakam.state === "recording"){ hentiRakam(); return; }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    ketulan = []; slotRakam = kunci;
+    perakam = new MediaRecorder(stream);
+    perakam.ondataavailable = function(e){ if(e.data && e.data.size) ketulan.push(e.data); };
+    perakam.onstop = function(){
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      btn.classList.remove("jalan"); btn.textContent = "🎙️";
+      const blob = new Blob(ketulan, {type: perakam.mimeType || "audio/webm"});
+      if(!blob.size){ tunjukToast("Rakaman kosong — cuba lagi"); return; }
+      const fr = new FileReader();
+      fr.onload = function(){
+        klip[kunci] = fr.result;
+        if(tulis(KUNCI_KLIP, klip)){
+          tunjukToast("✅ Rakaman " + (NAMA_SLOT[kunci] || kunci) + " disimpan");
+          lukisRakam(); kemasNotaSuaraSaya();
+        }else{
+          delete klip[kunci];
+        }
+      };
+      fr.readAsDataURL(blob);
+    };
+    perakam.start();
+    btn.classList.add("jalan"); btn.textContent = "⏹";
+    masaAuto = setTimeout(hentiRakam, 4000);
+  }).catch(function(){
+    $("#amaranMik").style.display = "block";
+    $("#amaranMik").textContent = "⚠️ Mikrofon tidak dibenarkan. Benarkan akses mikrofon dalam tetapan pelayar, kemudian cuba lagi.";
+  });
+}
+function lukisRakam(){
+  $("#tukarSuaraSaya").checked = !!tetapan.gunaSuaraSaya;
+  $("#senaraiRakam").innerHTML = SLOT.map(function(k){
+    const ada = !!klip[k];
+    return '<div class="rakam-item">' +
+      '<span class="k">' + (k === "FRASA" ? "💬" : k) + "</span>" +
+      '<span class="st' + (ada ? " ada" : "") + '">' +
+        (k === "FRASA" ? NAMA_SLOT.FRASA + " — " : "") + (ada ? "✅ Ada rakaman" : "Belum dirakam") + "</span>" +
+      '<button class="rakam" data-r="' + k + '" title="Rakam">🎙️</button>' +
+      '<button data-m="' + k + '" title="Main" ' + (ada ? "" : "disabled") + ">▶️</button>" +
+      '<button class="padamK" data-x="' + k + '" title="Padam" ' + (ada ? "" : "disabled") + ">🗑</button>" +
+      "</div>";
+  }).join("");
+}
+function kemasNotaSuaraSaya(){
+  const bil = AZ.filter(function(h){ return klip[h]; }).length;
+  const el = $("#notaSuaraSaya");
+  if(tetapan.gunaSuaraSaya && bil){
+    el.className = "info baik";
+    el.textContent = "🎤 Suara anda digunakan (" + bil + "/26 huruf dirakam" + (klip.FRASA ? " + frasa" : "") + ")";
+  }else if(bil){
+    el.className = "info";
+    el.textContent = "🎤 " + bil + "/26 huruf dirakam — hidupkan di skrin rakaman untuk digunakan.";
+  }else{
+    el.textContent = "";
+  }
+}
+$("#senaraiRakam").addEventListener("click", function(e){
+  const r = e.target.closest("[data-r]");
+  if(r){ mulaRakam(r.dataset.r, r); return; }
+  const m = e.target.closest("[data-m]");
+  if(m && klip[m.dataset.m]){ mainKlip(klip[m.dataset.m]); return; }
+  const x = e.target.closest("[data-x]");
+  if(x && klip[x.dataset.x]){
+    delete klip[x.dataset.x];
+    tulis(KUNCI_KLIP, klip);
+    lukisRakam(); kemasNotaSuaraSaya();
+  }
+});
+$("#tukarSuaraSaya").addEventListener("change", function(e){
+  tetapan.gunaSuaraSaya = e.target.checked;
+  tulis(KUNCI_SET, tetapan);
+  kemasNotaSuaraSaya();
+});
+$("#btnKeRakam").addEventListener("click", function(){
+  if(!adaRakam){
+    tunjukToast("Pelayar ini tidak menyokong rakaman mikrofon");
+    return;
+  }
+  lukisRakam();
+  bukaSkrin("sRakam");
+});
+$("#btnRakamBalik").addEventListener("click", function(){ hentiRakam(); kemasNotaSuaraSaya(); bukaSkrin("sSedia"); });
+$("#btnPadamRakam").addEventListener("click", function(){
+  const bil = SLOT.filter(function(k){ return klip[k]; }).length;
+  if(!bil) return;
+  if(!confirm("Padam semua " + bil + " rakaman suara anda?")) return;
+  klip = {};
+  tulis(KUNCI_KLIP, klip);
+  lukisRakam(); kemasNotaSuaraSaya();
+  tunjukToast("Semua rakaman dipadam");
+});
+
 /* ================= KEADAAN UJIAN ================= */
 const U = {
   jenis:"dengar", papar:"besar", jum:26,
@@ -472,9 +640,9 @@ function soalan(){
 
   if(U.jenis === "dengar"){
     $("#arahTeks").innerHTML = 'Ketik huruf yang disebut <button class="ikon" id="btnUlang" style="display:inline-flex">🔊</button>';
-    $("#btnUlang").addEventListener("click", function(){ sebut("Mana huruf " + h + "?"); });
+    $("#btnUlang").addEventListener("click", function(){ sebutSoalan(h); });
     lukisPilihan(h, U.papar === "campur" ? (U.kes[h] || "besar") : U.papar);
-    setTimeout(function(){ sebut("Mana huruf " + h + "?"); }, 350);
+    setTimeout(function(){ sebutSoalan(h); }, 350);
   }else if(U.jenis === "sebut"){
     $("#arahTeks").textContent = "Sebut huruf ini";
     $("#pentasHuruf").textContent = bentuk(h);
@@ -667,6 +835,7 @@ if(adaSuara){
 }
 kemasIkonSuara();
 kemasNama();
+kemasNotaSuaraSaya();
 
 })();
 </script>
