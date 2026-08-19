@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e9f6e">
+<title>Ujian Huruf — Uji Penguasaan Huruf Pelajar</title>
+<style>
+  :root{
+    --hijau:#0e9f6e; --hijau-t:#34d399; --hijau-l:#def7ec;
+    --merah:#e02424; --merah-l:#fde8e8;
+    --biru:#1c64f2; --biru-l:#e1effe;
+    --kuning:#c27803; --kuning-l:#fdf6b2;
+    --teks:#123b2e; --lembut:#6b7f77;
+    --kad:#ffffff; --sempadan:#d9e5e0; --r:20px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    color:var(--teks);font-size:16px;line-height:1.5;min-height:100vh;
+    background:linear-gradient(165deg,#e8fff5 0%,#f6fffb 45%,#eef7ff 100%);
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .app{max-width:720px;margin:0 auto;padding:12px 14px 32px}
+  .atas{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .atas h1{flex:1;margin:0;font-size:24px;white-space:nowrap}
+  .ikon{
+    width:42px;height:42px;border-radius:12px;border:1px solid var(--sempadan);background:var(--kad);
+    font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 12px rgba(14,159,110,.10)
+  }
+  .ikon:active{transform:scale(.93)}
+  .ikon.off{opacity:.4}
+
+  .kad{background:var(--kad);border:1px solid var(--sempadan);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:0 4px 14px rgba(14,159,110,.07)}
+  .kad h2{margin:0 0 10px;font-size:17px}
+  .kecil-tajuk{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--lembut);margin:0 0 8px}
+  .btn{
+    border:none;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:700;font-family:inherit;
+    cursor:pointer;width:100%;transition:transform .1s
+  }
+  .btn:active{transform:scale(.97)}
+  .btn.utama{background:linear-gradient(135deg,var(--hijau),var(--hijau-t));color:#fff;box-shadow:0 6px 14px rgba(14,159,110,.3)}
+  .btn.kedua{background:var(--kad);border:1px solid var(--sempadan);color:var(--teks)}
+  .btn.merah{background:var(--merah-l);color:var(--merah)}
+  .btn.k{padding:10px 14px;font-size:14px;width:auto}
+  .baris{display:flex;gap:8px;flex-wrap:wrap}
+  .baris > .btn{flex:1;min-width:110px}
+
+  .skrin{display:none;animation:masuk .22s ease}
+  .skrin.aktif{display:block}
+  @keyframes masuk{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  input[type=text]{
+    width:100%;padding:12px;border:1px solid var(--sempadan);border-radius:12px;font-size:16px;
+    font-family:inherit;background:#fff;color:var(--teks)
+  }
+  input[type=text]:focus{outline:2px solid var(--hijau-t)}
+
+  .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .chip{
+    border:1px solid var(--sempadan);background:#fff;border-radius:999px;padding:9px 15px;
+    font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--teks)
+  }
+  .chip.pilih{background:var(--hijau);border-color:var(--hijau);color:#fff}
+  .chip:active{transform:scale(.95)}
+
+  .jenis{display:grid;gap:10px}
+  .jenis button{
+    display:flex;gap:12px;align-items:center;text-align:left;font-family:inherit;cursor:pointer;
+    background:#fff;border:2px solid var(--sempadan);border-radius:var(--r);padding:13px 14px;color:var(--teks)
+  }
+  .jenis button.pilih{border-color:var(--hijau);background:var(--hijau-l)}
+  .jenis .emo{font-size:30px}
+  .jenis .nm{font-weight:800;font-size:15.5px}
+  .jenis .ds{font-size:13px;color:var(--lembut);line-height:1.35}
+
+  /* ---- skrin ujian ---- */
+  .hud{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .hud .tag{background:#fff;border:1px solid var(--sempadan);border-radius:12px;padding:6px 12px;font-size:13px;font-weight:700}
+  .hud .nama{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar{height:8px;background:#d7e8e0;border-radius:999px;overflow:hidden;margin-bottom:16px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--hijau),var(--hijau-t));transition:width .3s}
+
+  .arah{text-align:center;font-size:19px;font-weight:800;margin:4px 0 14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+  .huruf-pentas{
+    background:#fff;border:1px solid var(--sempadan);border-radius:var(--r);text-align:center;
+    padding:22px 10px;margin-bottom:16px;box-shadow:0 4px 14px rgba(14,159,110,.07)
+  }
+  .huruf-pentas .h{font-size:130px;font-weight:800;line-height:1}
+  @media(max-width:400px){.huruf-pentas .h{font-size:104px}}
+
+  .pilihan{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .pilih-h{
+    border:none;border-radius:var(--r);font-family:inherit;font-weight:800;font-size:64px;color:var(--teks);
+    background:#fff;border:2px solid var(--sempadan);cursor:pointer;padding:18px 0;
+    box-shadow:0 5px 0 #dcebe4;transition:transform .1s
+  }
+  .pilih-h:active{transform:translateY(3px);box-shadow:0 2px 0 #dcebe4}
+  .pilih-h.kunci{pointer-events:none}
+  .pilih-h.betul{background:var(--hijau-l);border-color:var(--hijau)}
+  .pilih-h.salah{background:var(--merah-l);border-color:var(--merah);animation:goyang .35s}
+  @keyframes goyang{0%,100%{transform:none}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}
+
+  .nilai{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .nilai button{
+    border:none;border-radius:var(--r);font-size:44px;padding:20px 0;cursor:pointer;font-family:inherit;
+    box-shadow:0 6px 0 rgba(0,0,0,.12)
+  }
+  .nilai button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.12)}
+  .nilai .ya{background:var(--hijau-l)}
+  .nilai .tidak{background:var(--merah-l)}
+  .nilai span{display:block;font-size:14px;font-weight:800;margin-top:2px}
+  .nota-guru{text-align:center;color:var(--lembut);font-size:13.5px;margin:0 0 12px}
+
+  /* ---- keputusan ---- */
+  .skor-besar{font-size:54px;font-weight:800;text-align:center;color:var(--hijau);line-height:1.1}
+  .grid-az{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:7px;margin-top:6px}
+  .sel{
+    aspect-ratio:1/1;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:19px;background:#eef3f0;color:#9fb2aa;border:1px solid transparent
+  }
+  .sel.ok{background:var(--hijau-l);color:var(--hijau);border-color:#9ae2c3}
+  .sel.x{background:var(--merah-l);color:var(--merah);border-color:#f5b6b6}
+  .petunjuk-warna{display:flex;gap:14px;font-size:13px;color:var(--lembut);margin-top:10px;flex-wrap:wrap}
+  .petunjuk-warna i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+
+  /* ---- rekod ---- */
+  .rekod-item{border-bottom:1px solid var(--sempadan);padding:10px 0}
+  .rekod-item:last-child{border-bottom:none}
+  .rekod-atas{display:flex;align-items:center;gap:8px}
+  .rekod-atas .n{font-weight:800;flex:1}
+  .rekod-atas .s{font-weight:800;color:var(--hijau)}
+  .rekod-atas .s.rendah{color:var(--merah)}
+  .rekod-bawah{font-size:13px;color:var(--lembut);margin-top:2px}
+  .rekod-bawah b{color:var(--merah);font-weight:700;letter-spacing:1px}
+  .buang{border:none;background:var(--merah-l);color:var(--merah);border-radius:10px;width:34px;height:34px;font-size:15px;cursor:pointer}
+  .kosong{text-align:center;color:var(--lembut);padding:20px 6px}
+  textarea{width:100%;min-height:100px;border:1px solid var(--sempadan);border-radius:12px;padding:10px;font-family:ui-monospace,Consolas,monospace;font-size:12px;margin-top:8px}
+
+  .kad-suara{background:#fff;border:1px solid var(--sempadan);border-radius:var(--r);padding:13px 14px;margin-bottom:14px}
+  .kad-suara .tj{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;margin-bottom:8px}
+  .kad-suara select{width:100%;padding:10px;border-radius:12px;border:1px solid var(--sempadan);font-family:inherit;font-size:14px;font-weight:600;color:var(--teks);background:#fff}
+  .kad-suara .info{font-size:13px;color:var(--lembut);margin:8px 0 0}
+  .kad-suara .info.baik{color:var(--hijau)}
+  .kad-suara .info.amaran{color:var(--kuning)}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--teks);color:#fff;
+    padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;z-index:70;opacity:0;transition:.25s;
+    pointer-events:none;max-width:90vw;text-align:center
+  }
+  .toast.nampak{opacity:1;bottom:34px}
+  .nota{text-align:center;color:var(--lembut);font-size:13.5px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="atas">
+    <h1>📋 Ujian Huruf</h1>
+    <button class="ikon" id="btnSuara" title="Suara">🗣️</button>
+    <button class="ikon" id="btnRekod" title="Rekod">🗂️</button>
+  </div>
+
+  <!-- ===== SEDIA UJIAN ===== -->
+  <section class="skrin aktif" id="sSedia">
+    <div class="kad">
+      <p class="kecil-tajuk">Nama murid</p>
+      <input type="text" id="inNama" placeholder="Contoh: Aisyah" maxlength="40" list="dlNama" autocomplete="off">
+      <datalist id="dlNama"></datalist>
+    </div>
+
+    <div class="kad">
+      <p class="kecil-tajuk">Jenis ujian</p>
+      <div class="jenis" id="pilJenis">
+        <button class="pilih" data-j="dengar">
+          <span class="emo">👂</span>
+          <span><span class="nm">Dengar &amp; Tunjuk</span><br>
+          <span class="ds">Apps sebut huruf, murid ketik huruf yang betul (4 pilihan). Semakan automatik.</span></span>
+        </button>
+        <button data-j="sebut">
+          <span class="emo">🗣️</span>
+          <span><span class="nm">Lihat &amp; Sebut</span><br>
+          <span class="ds">Huruf besar dipapar, murid menyebutnya — guru tanda ✓ atau ✗.</span></span>
+        </button>
+        <button data-j="padan">
+          <span class="emo">🔗</span>
+          <span><span class="nm">Padan Besar–Kecil</span><br>
+          <span class="ds">Huruf besar dipapar, murid pilih huruf kecil yang sepadan. Semakan automatik.</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="kad" id="kadPapar">
+      <p class="kecil-tajuk">Bentuk huruf</p>
+      <div class="chips" id="pilPapar">
+        <button class="chip pilih" data-p="besar">Huruf BESAR</button>
+        <button class="chip" data-p="kecil">huruf kecil</button>
+        <button class="chip" data-p="campur">Campur</button>
+      </div>
+    </div>
+
+    <div class="kad">
+      <p class="kecil-tajuk">Jumlah soalan</p>
+      <div class="chips" id="pilJum">
+        <button class="chip" data-n="10">10 huruf</button>
+        <button class="chip" data-n="15">15 huruf</button>
+        <button class="chip pilih" data-n="26">Semua 26</button>
+      </div>
+    </div>
+
+    <div class="kad-suara" id="kadSuara">
+      <div class="tj">🎙️ Suara Bahasa Melayu
+        <button class="ikon" id="btnCubaSuara" style="margin-left:auto;width:36px;height:36px;font-size:15px">▶️</button>
+      </div>
+      <select id="pilihSuara" aria-label="Pilih suara"></select>
+      <p class="info" id="notaBM">Mencari suara…</p>
+    </div>
+
+    <button class="btn utama" id="btnMula">▶ Mula Ujian</button>
+    <p class="nota">Keputusan disimpan dalam peranti ini — lihat di 🗂️ Rekod.</p>
+  </section>
+
+  <!-- ===== SKRIN UJIAN ===== -->
+  <section class="skrin" id="sUjian">
+    <div class="hud">
+      <span class="tag nama" id="hudNama">Murid</span>
+      <span class="tag" id="hudSoalan">1/26</span>
+    </div>
+    <div class="bar"><i id="barIsi" style="width:0%"></i></div>
+
+    <div class="arah" id="arahTeks"></div>
+    <div class="huruf-pentas" id="pentas" style="display:none"><div class="h" id="pentasHuruf">A</div></div>
+    <p class="nota-guru" id="notaGuru" style="display:none">Guru: tanda selepas murid menyebut huruf di atas.</p>
+    <div class="pilihan" id="pilihanHuruf" style="display:none"></div>
+    <div class="nilai" id="nilaiGuru" style="display:none">
+      <button class="ya" id="btnYa">✓<span>Betul</span></button>
+      <button class="tidak" id="btnTidak">✗<span>Salah</span></button>
+    </div>
+
+    <button class="btn merah k" id="btnBatal" style="margin:6px auto 0;display:block">✕ Batal ujian</button>
+  </section>
+
+  <!-- ===== KEPUTUSAN ===== -->
+  <section class="skrin" id="sKeputusan">
+    <div class="kad" style="text-align:center">
+      <p class="kecil-tajuk" id="kNama">Murid</p>
+      <div class="skor-besar" id="kSkor">0/26</div>
+      <p id="kMesej" style="margin:6px 0 0;font-size:15px"></p>
+    </div>
+    <div class="kad">
+      <h2>Huruf yang diuji</h2>
+      <div class="grid-az" id="gridAZ"></div>
+      <div class="petunjuk-warna">
+        <span><i style="background:var(--hijau-l);border:1px solid #9ae2c3"></i>Dikuasai</span>
+        <span><i style="background:var(--merah-l);border:1px solid #f5b6b6"></i>Perlu latihan</span>
+        <span><i style="background:#eef3f0"></i>Tidak diuji</span>
+      </div>
+      <p class="nota" id="kCadangan" style="text-align:left"></p>
+    </div>
+    <div class="baris">
+      <button class="btn utama" id="btnUjiLagi">🔁 Uji Lagi</button>
+      <button class="btn kedua" id="btnKeMenu">🏠 Menu</button>
+    </div>
+  </section>
+
+  <!-- ===== REKOD ===== -->
+  <section class="skrin" id="sRekod">
+    <div class="kad">
+      <h2>🗂️ Rekod Keputusan</h2>
+      <div class="chips" id="tapisNama" style="margin-bottom:10px"></div>
+      <div id="senaraiRekod"></div>
+    </div>
+    <div class="kad">
+      <p class="kecil-tajuk">Eksport (salin ke Excel / WhatsApp)</p>
+      <button class="btn kedua k" id="btnCSV">⬇ Jana CSV</button>
+      <textarea id="kotakCSV" placeholder="Tekan 'Jana CSV' kemudian salin teks di sini…"></textarea>
+    </div>
+    <div class="baris">
+      <button class="btn merah" id="btnPadamSemua">🗑 Padam Semua</button>
+      <button class="btn utama" id="btnRekodBalik">← Kembali</button>
+    </div>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= DATA ================= */
+const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const NAMA_JENIS = {dengar:"Dengar & Tunjuk", sebut:"Lihat & Sebut", padan:"Padan Besar–Kecil"};
+/* fonetik untuk suara Inggeris (sandaran) */
+const FONETIK = {
+  MANA:"mah-nah", HURUF:"hoo-roof", KETIK:"keh-tick", SEBUT:"ser-boot",
+  BAGUS:"bah-goos", SIAP:"see-up", UJIAN:"oo-jee-ahn", TAMAT:"tah-mutt",
+  CARI:"chah-ree", PASANGAN:"pah-sahng-ahn", KECIL:"ker-cheel", INI:"ee-nee"
+};
+const NAMA_HURUF = { Z:"zed" };
+
+/* ================= STOR ================= */
+const KUNCI_REKOD = "ujianHuruf.rekod.v1";
+const KUNCI_SET   = "ujianHuruf.tetapan.v1";
+function baca(k, lalai){ try{ const t = localStorage.getItem(k); return t ? JSON.parse(t) : lalai; }catch(e){ return lalai; } }
+function tulis(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ tunjukToast("⚠️ Storan pelayar penuh / disekat"); return false; } }
+let rekod   = baca(KUNCI_REKOD, []);
+let tetapan = baca(KUNCI_SET, {suara:true, suaraURI:""});
+
+/* ================= ALAT ================= */
+const $  = function(s){ return document.querySelector(s); };
+const $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+function kocok(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+let masaToast = null;
+function tunjukToast(m){
+  const el = $("#toast"); el.textContent = m; el.classList.add("nampak");
+  clearTimeout(masaToast); masaToast = setTimeout(function(){ el.classList.remove("nampak"); }, 1900);
+}
+function bukaSkrin(id){
+  $$(".skrin").forEach(function(s){ s.classList.toggle("aktif", s.id === id); });
+  window.scrollTo(0,0);
+}
+
+/* ---- bunyi ringkas ---- */
+let ac = null;
+function nada(f, mula, tempoh, jenis){
+  try{
+    if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state === "suspended") ac.resume();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = jenis || "triangle"; o.frequency.value = f;
+    const t = ac.currentTime + mula;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.15, t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+tempoh);
+    o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+tempoh+0.02);
+  }catch(e){}
+}
+const bunyi = {
+  betul: function(){ [523,784].forEach(function(f,i){ nada(f,i*.09,.16); }); },
+  salah: function(){ nada(240,0,.2,"sine"); },
+  tamat: function(){ [523,659,784,1046].forEach(function(f,i){ nada(f,i*.1,.25); }); }
+};
+
+/* ---- suara TTS (sama seperti ABC Kecil) ---- */
+const adaSuara = ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
+let senaraiSuara = [], suaraPilih = null, modeFonetik = true;
+function skorSuara(v){
+  const l = String(v && v.lang || "").toLowerCase().replace(/_/g,"-");
+  if(l === "ms-my") return 5;
+  if(l.indexOf("ms") === 0) return 4;
+  if(l.indexOf("id") === 0) return 3;
+  return 0;
+}
+function teksFonetik(t){
+  return String(t).replace(/[A-Za-z]+/g, function(w){
+    if(w.length === 1) return NAMA_HURUF[w.toUpperCase()] || w;
+    return FONETIK[w.toUpperCase()] || w;
+  });
+}
+function muatSuara(){
+  if(!adaSuara) return;
+  try{ senaraiSuara = window.speechSynthesis.getVoices() || []; }catch(e){ senaraiSuara = []; }
+  senaraiSuara = senaraiSuara.slice().sort(function(a,b){
+    const d = skorSuara(b) - skorSuara(a);
+    return d !== 0 ? d : String(a.name).localeCompare(String(b.name));
+  });
+  let v = null;
+  if(tetapan.suaraURI){
+    for(let i=0;i<senaraiSuara.length;i++) if(senaraiSuara[i].voiceURI === tetapan.suaraURI){ v = senaraiSuara[i]; break; }
+  }
+  if(!v && senaraiSuara.length && skorSuara(senaraiSuara[0]) >= 3) v = senaraiSuara[0];
+  suaraPilih = v;
+  modeFonetik = !(v && skorSuara(v) >= 3);
+  lukisPilihSuara();
+}
+function lukisPilihSuara(){
+  const sel = $("#pilihSuara"), nota = $("#notaBM");
+  let html = '<option value="auto">🔎 Pilih automatik (Bahasa Melayu dahulu)</option>';
+  senaraiSuara.forEach(function(v){
+    const tanda = skorSuara(v) >= 4 ? "🇲🇾 " : (skorSuara(v) === 3 ? "🇮🇩 " : "");
+    html += '<option value="' + String(v.voiceURI).replace(/"/g,"&quot;") + '"' +
+            (suaraPilih && v.voiceURI === suaraPilih.voiceURI ? " selected" : "") + ">" +
+            tanda + v.name + " (" + v.lang + ")</option>";
+  });
+  sel.innerHTML = html;
+  if(!senaraiSuara.length){
+    nota.className = "info amaran";
+    nota.textContent = "⏳ Senarai suara belum dimuatkan — ketik ▶️ atau muat semula.";
+  }else if(suaraPilih && skorSuara(suaraPilih) >= 4){
+    nota.className = "info baik";
+    nota.textContent = "✅ Suara Bahasa Melayu: " + suaraPilih.name;
+  }else if(suaraPilih && skorSuara(suaraPilih) === 3){
+    nota.className = "info";
+    nota.textContent = "ℹ️ Suara Indonesia (" + suaraPilih.name + ") — sebutan hampir sama dengan BM.";
+  }else{
+    nota.className = "info amaran";
+    nota.textContent = "⚠️ Tiada suara Melayu — huruf akan disebut secara fonetik Melayu.";
+  }
+}
+function sebut(teks, laju){
+  if(!adaSuara || !tetapan.suara) return;
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(modeFonetik ? teksFonetik(teks) : teks);
+    if(suaraPilih){ u.voice = suaraPilih; u.lang = suaraPilih.lang; }
+    else if(!modeFonetik) u.lang = "ms-MY";
+    u.rate = laju || 0.85;
+    u.pitch = 1.1;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ================= KEADAAN UJIAN ================= */
+const U = {
+  jenis:"dengar", papar:"besar", jum:26,
+  nama:"", susunan:[], idx:0, betul:0,
+  jawapan:{},           // {A:true/false} keputusan setiap huruf
+  kes:{},               // bentuk paparan setiap huruf dalam ujian campur
+  kunci:false
+};
+
+/* ---- pilihan di skrin sedia ---- */
+$("#pilJenis").addEventListener("click", function(e){
+  const b = e.target.closest("[data-j]"); if(!b) return;
+  U.jenis = b.dataset.j;
+  $$("#pilJenis button").forEach(function(x){ x.classList.toggle("pilih", x === b); });
+  $("#kadPapar").style.display = U.jenis === "padan" ? "none" : "block";
+});
+$("#pilPapar").addEventListener("click", function(e){
+  const b = e.target.closest("[data-p]"); if(!b) return;
+  U.papar = b.dataset.p;
+  $$("#pilPapar .chip").forEach(function(x){ x.classList.toggle("pilih", x === b); });
+});
+$("#pilJum").addEventListener("click", function(e){
+  const b = e.target.closest("[data-n]"); if(!b) return;
+  U.jum = parseInt(b.dataset.n,10);
+  $$("#pilJum .chip").forEach(function(x){ x.classList.toggle("pilih", x === b); });
+});
+
+function bentuk(h){
+  if(U.jenis === "padan") return h;                      // sentiasa besar di pentas
+  const k = U.kes[h] || U.papar;
+  return k === "kecil" ? h.toLowerCase() : h;
+}
+
+function mulaUjian(){
+  U.nama = ($("#inNama").value || "").trim() || "Murid";
+  U.susunan = kocok(AZ).slice(0, U.jum);
+  U.idx = 0; U.betul = 0; U.jawapan = {}; U.kes = {}; U.kunci = false;
+  if(U.papar === "campur" && U.jenis !== "padan"){
+    U.susunan.forEach(function(h){ U.kes[h] = Math.random() < 0.5 ? "besar" : "kecil"; });
+  }
+  $("#hudNama").textContent = "👧 " + U.nama;
+  bukaSkrin("sUjian");
+  soalan();
+}
+
+function soalan(){
+  U.kunci = false;
+  const h = U.susunan[U.idx];
+  $("#hudSoalan").textContent = (U.idx+1) + "/" + U.susunan.length;
+  $("#barIsi").style.width = (U.idx / U.susunan.length * 100) + "%";
+
+  $("#pentas").style.display       = U.jenis === "dengar" ? "none" : "block";
+  $("#pilihanHuruf").style.display = U.jenis === "sebut"  ? "none" : "grid";
+  $("#nilaiGuru").style.display    = U.jenis === "sebut"  ? "grid" : "none";
+  $("#notaGuru").style.display     = U.jenis === "sebut"  ? "block" : "none";
+
+  if(U.jenis === "dengar"){
+    $("#arahTeks").innerHTML = 'Ketik huruf yang disebut <button class="ikon" id="btnUlang" style="display:inline-flex">🔊</button>';
+    $("#btnUlang").addEventListener("click", function(){ sebut("Mana huruf " + h + "?"); });
+    lukisPilihan(h, U.papar === "campur" ? (U.kes[h] || "besar") : U.papar);
+    setTimeout(function(){ sebut("Mana huruf " + h + "?"); }, 350);
+  }else if(U.jenis === "sebut"){
+    $("#arahTeks").textContent = "Sebut huruf ini";
+    $("#pentasHuruf").textContent = bentuk(h);
+  }else{ // padan
+    $("#arahTeks").textContent = "Cari huruf kecil yang sepadan";
+    $("#pentasHuruf").textContent = h;
+    lukisPilihan(h, "kecil");
+  }
+}
+
+function lukisPilihan(h, kes){
+  const pilihan = [h];
+  while(pilihan.length < 4){
+    const c = AZ[Math.floor(Math.random()*26)];
+    if(pilihan.indexOf(c) === -1) pilihan.push(c);
+  }
+  $("#pilihanHuruf").innerHTML = kocok(pilihan).map(function(x){
+    const papar = kes === "kecil" ? x.toLowerCase() : x;
+    return '<button class="pilih-h" data-h="' + x + '">' + papar + "</button>";
+  }).join("");
+}
+
+$("#pilihanHuruf").addEventListener("click", function(e){
+  const b = e.target.closest("[data-h]"); if(!b || U.kunci) return;
+  U.kunci = true;
+  const h = U.susunan[U.idx];
+  const kena = b.dataset.h === h;
+  $$("#pilihanHuruf .pilih-h").forEach(function(x){ x.classList.add("kunci"); });
+  b.classList.add(kena ? "betul" : "salah");
+  rekodJawapan(kena);
+});
+$("#btnYa").addEventListener("click", function(){ if(!U.kunci){ U.kunci = true; rekodJawapan(true); } });
+$("#btnTidak").addEventListener("click", function(){ if(!U.kunci){ U.kunci = true; rekodJawapan(false); } });
+
+function rekodJawapan(kena){
+  const h = U.susunan[U.idx];
+  U.jawapan[h] = kena;
+  if(kena){ U.betul++; bunyi.betul(); } else bunyi.salah();
+  setTimeout(function(){
+    U.idx++;
+    if(U.idx >= U.susunan.length) tamatUjian();
+    else soalan();
+  }, U.jenis === "sebut" ? 250 : 850);
+}
+
+$("#btnBatal").addEventListener("click", function(){
+  if(!confirm("Batalkan ujian ini? Keputusan tidak akan disimpan.")) return;
+  bukaSkrin("sSedia");
+});
+
+/* ================= KEPUTUSAN ================= */
+function tamatUjian(){
+  const salah = U.susunan.filter(function(h){ return !U.jawapan[h]; });
+  const r = {
+    n:U.nama, t:Date.now(), j:U.jenis,
+    p:U.jenis === "padan" ? "-" : U.papar,
+    b:U.betul, jm:U.susunan.length, s:salah
+  };
+  rekod.unshift(r);
+  if(rekod.length > 300) rekod.length = 300;
+  tulis(KUNCI_REKOD, rekod);
+
+  const pct = Math.round(U.betul / U.susunan.length * 100);
+  $("#kNama").textContent = U.nama + " · " + NAMA_JENIS[U.jenis];
+  $("#kSkor").textContent = U.betul + "/" + U.susunan.length;
+  $("#kSkor").style.color = pct >= 60 ? "var(--hijau)" : "var(--merah)";
+  $("#kMesej").textContent =
+    pct === 100 ? "Cemerlang! Semua huruf dikuasai 🏆" :
+    pct >= 80   ? "Bagus! Tinggal sedikit sahaja lagi 💪" :
+    pct >= 50   ? "Sederhana — perlukan lebih latihan 🌱" :
+                  "Perlu banyak latihan — cuba apps ABC Kecil dahulu 🙂";
+
+  $("#gridAZ").innerHTML = AZ.map(function(h){
+    const diuji = U.jawapan.hasOwnProperty(h);
+    const kelas = !diuji ? "sel" : (U.jawapan[h] ? "sel ok" : "sel x");
+    return '<div class="' + kelas + '">' + h + "</div>";
+  }).join("");
+  $("#kCadangan").innerHTML = salah.length
+    ? "📌 <b>Perlu latihan:</b> " + salah.join(", ") +
+      ' — latih huruf ini dalam <a href="../abc-kecil/index.html">ABC Kecil 🌈</a> kemudian uji semula.'
+    : "Sedia untuk ke peringkat perkataan — cuba <a href=\"../teka-huruf/index.html\">Teka Huruf 🔤</a>!";
+  bunyi.tamat();
+  sebut(pct === 100 ? "Bagus! Ujian tamat." : "Ujian tamat.");
+  bukaSkrin("sKeputusan");
+}
+$("#btnUjiLagi").addEventListener("click", mulaUjian);
+$("#btnKeMenu").addEventListener("click", function(){ kemasNama(); bukaSkrin("sSedia"); });
+
+/* ================= REKOD ================= */
+let tapis = "semua";
+function tarikh(t){
+  const d = new Date(t);
+  const dd = ("0"+d.getDate()).slice(-2), mm = ("0"+(d.getMonth()+1)).slice(-2);
+  return dd + "/" + mm + "/" + d.getFullYear() + " " + ("0"+d.getHours()).slice(-2) + ":" + ("0"+d.getMinutes()).slice(-2);
+}
+function senaraiNama(){
+  const s = [];
+  rekod.forEach(function(r){ if(s.indexOf(r.n) === -1) s.push(r.n); });
+  return s;
+}
+function kemasNama(){
+  $("#dlNama").innerHTML = senaraiNama().map(function(n){
+    return '<option value="' + n.replace(/"/g,"&quot;") + '">';
+  }).join("");
+}
+function lukisRekod(){
+  const nama = senaraiNama();
+  if(tapis !== "semua" && nama.indexOf(tapis) === -1) tapis = "semua";
+  $("#tapisNama").innerHTML =
+    '<button class="chip' + (tapis==="semua"?" pilih":"") + '" data-t="semua">Semua</button>' +
+    nama.map(function(n){
+      return '<button class="chip' + (tapis===n?" pilih":"") + '" data-t="' + n.replace(/"/g,"&quot;") + '">' + n + "</button>";
+    }).join("");
+  const senarai = rekod.filter(function(r){ return tapis === "semua" || r.n === tapis; });
+  $("#senaraiRekod").innerHTML = senarai.length
+    ? senarai.map(function(r){
+        const i = rekod.indexOf(r);
+        const pct = Math.round(r.b / r.jm * 100);
+        return '<div class="rekod-item">' +
+          '<div class="rekod-atas"><span class="n">' + r.n + '</span>' +
+          '<span class="s' + (pct < 60 ? " rendah" : "") + '">' + r.b + "/" + r.jm + "</span>" +
+          '<button class="buang" data-b="' + i + '">🗑</button></div>' +
+          '<div class="rekod-bawah">' + tarikh(r.t) + " · " + NAMA_JENIS[r.j] + (r.p !== "-" ? " · " + r.p : "") +
+          (r.s.length ? "<br>Perlu latihan: <b>" + r.s.join(" ") + "</b>" : " · Semua betul ✅") +
+          "</div></div>";
+      }).join("")
+    : '<p class="kosong">Tiada rekod lagi. Jalankan ujian dahulu 📋</p>';
+}
+$("#tapisNama").addEventListener("click", function(e){
+  const b = e.target.closest("[data-t]"); if(!b) return;
+  tapis = b.dataset.t; lukisRekod();
+});
+$("#senaraiRekod").addEventListener("click", function(e){
+  const b = e.target.closest("[data-b]"); if(!b) return;
+  const i = parseInt(b.dataset.b,10);
+  if(!confirm("Padam rekod " + rekod[i].n + " (" + rekod[i].b + "/" + rekod[i].jm + ")?")) return;
+  rekod.splice(i,1); tulis(KUNCI_REKOD, rekod); lukisRekod();
+});
+$("#btnPadamSemua").addEventListener("click", function(){
+  if(!rekod.length) return;
+  if(!confirm("Padam SEMUA " + rekod.length + " rekod? Tindakan ini tidak boleh diundur.")) return;
+  rekod = []; tulis(KUNCI_REKOD, rekod); lukisRekod();
+  tunjukToast("Semua rekod dipadam");
+});
+$("#btnCSV").addEventListener("click", function(){
+  const baris = ['Nama,Tarikh,Jenis Ujian,Bentuk,Skor,Jumlah,Peratus,Huruf Perlu Latihan'];
+  rekod.forEach(function(r){
+    baris.push([
+      '"' + r.n.replace(/"/g,'""') + '"', tarikh(r.t), NAMA_JENIS[r.j], r.p,
+      r.b, r.jm, Math.round(r.b/r.jm*100) + "%", '"' + r.s.join(" ") + '"'
+    ].join(","));
+  });
+  $("#kotakCSV").value = baris.join("\n");
+  $("#kotakCSV").select();
+  tunjukToast(rekod.length ? "CSV sedia — salin teks di bawah" : "Tiada rekod untuk dieksport");
+});
+$("#btnRekod").addEventListener("click", function(){ lukisRekod(); bukaSkrin("sRekod"); });
+$("#btnRekodBalik").addEventListener("click", function(){ kemasNama(); bukaSkrin("sSedia"); });
+
+/* ================= SUARA & MULA ================= */
+function kemasIkonSuara(){
+  $("#btnSuara").textContent = tetapan.suara ? "🗣️" : "🤐";
+  $("#btnSuara").classList.toggle("off", !tetapan.suara);
+}
+$("#btnSuara").addEventListener("click", function(){
+  if(!adaSuara) return;
+  tetapan.suara = !tetapan.suara; tulis(KUNCI_SET, tetapan); kemasIkonSuara();
+  if(tetapan.suara) sebut("Suara dihidupkan.");
+});
+$("#pilihSuara").addEventListener("change", function(e){
+  tetapan.suaraURI = e.target.value === "auto" ? "" : e.target.value;
+  tulis(KUNCI_SET, tetapan);
+  muatSuara();
+  sebut("Mana huruf B?");
+});
+$("#btnCubaSuara").addEventListener("click", function(){
+  muatSuara();
+  sebut("Mana huruf B?");
+});
+$("#btnMula").addEventListener("click", mulaUjian);
+
+if(adaSuara){
+  muatSuara();
+  try{ window.speechSynthesis.onvoiceschanged = muatSuara; }catch(e){}
+  setTimeout(muatSuara, 800);
+}else{
+  tetapan.suara = false;
+  $("#btnSuara").style.display = "none";
+  $("#kadSuara").style.display = "none";
+}
+kemasIkonSuara();
+kemasNama();
+
+})();
+</script>
+</body>
+</html>
