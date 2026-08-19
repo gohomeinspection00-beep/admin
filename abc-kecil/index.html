@@ -43,19 +43,27 @@
   @keyframes naik{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
   /* ---- menu besar ---- */
-  .menu{display:grid;gap:16px}
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .kad-menu{
-    border:none;border-radius:var(--r);padding:26px 20px;cursor:pointer;font-family:inherit;
-    display:flex;align-items:center;gap:18px;text-align:left;color:var(--teks);
+    border:none;border-radius:var(--r);padding:16px 10px;cursor:pointer;font-family:inherit;
+    display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;color:var(--teks);
     box-shadow:0 8px 0 rgba(0,0,0,.10);transition:transform .1s
   }
   .kad-menu:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.10)}
-  .kad-menu .emo{font-size:56px;line-height:1}
-  .kad-menu .tk{font-size:28px;font-weight:800;display:block}
-  .kad-menu .sk{font-size:16px;color:#5c5478;opacity:.85}
+  .kad-menu .emo{font-size:42px;line-height:1}
+  .kad-menu .tk{font-size:19px;font-weight:800;display:block;line-height:1.2}
+  .kad-menu .sk{font-size:12.5px;color:#5c5478;opacity:.85;line-height:1.3}
+  .kad-menu.lebar{grid-column:1/-1;flex-direction:row;text-align:left;gap:16px;padding:20px 18px}
+  .kad-menu.lebar .emo{font-size:52px}
+  .kad-menu.lebar .tk{font-size:26px}
+  .kad-menu.lebar .sk{font-size:15px}
   .m1{background:linear-gradient(135deg,#ffd1e6,#ffe9c7)}
   .m2{background:linear-gradient(135deg,#cfeeff,#dcfce7)}
   .m3{background:linear-gradient(135deg,#e7dbff,#ffe3f0)}
+  .m4{background:linear-gradient(135deg,#ffe9c7,#dcfce7)}
+  .m5{background:linear-gradient(135deg,#ffd9d1,#e7dbff)}
+  .m6{background:linear-gradient(135deg,#dcfce7,#cfeeff)}
+  .m7{background:linear-gradient(135deg,#fff3c4,#ffd1e6)}
 
   .balik{
     border:none;border-radius:999px;padding:14px 26px;font-size:20px;font-weight:800;font-family:inherit;
@@ -122,6 +130,42 @@
   .letup.main{animation:letupA 1s ease-out}
   @keyframes letupA{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-100%) scale(1)}}
 
+  /* ---- surih (tulis huruf) ---- */
+  .kanvas-wrap{background:#fff;border-radius:var(--r);box-shadow:0 8px 0 rgba(0,0,0,.06);padding:10px;margin-bottom:14px}
+  #kanvasSurih{width:100%;display:block;border-radius:18px;background:linear-gradient(180deg,#fbfaff,#f2f7ff);touch-action:none;cursor:crosshair}
+
+  /* ---- cari pasangan ---- */
+  .grid-kad{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  .kad-flip{border:none;background:transparent;padding:0;cursor:pointer;font-family:inherit;aspect-ratio:3/4;perspective:600px}
+  .kad-flip .dalam{position:relative;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}
+  .kad-flip.buka .dalam{transform:rotateY(180deg)}
+  .kad-flip .muka{
+    position:absolute;inset:0;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 4px 0 rgba(0,0,0,.12)
+  }
+  .kad-flip .depan{background:linear-gradient(135deg,#a06bff,#ff7ab8);color:#fff;font-size:26px}
+  .kad-flip .belakang{background:#fff;transform:rotateY(180deg);color:var(--teks);font-size:38px}
+  .kad-flip.padan .belakang{background:var(--hijau-l);outline:3px solid var(--hijau)}
+  .kad-flip.salah .dalam{animation:goyang .4s}
+
+  /* ---- belon ---- */
+  .langit{
+    position:relative;height:340px;border-radius:var(--r);overflow:hidden;margin-bottom:12px;
+    background:linear-gradient(180deg,#d8f0ff 0%,#eef9ff 70%,#e8fff1 100%);box-shadow:inset 0 0 0 2px #e0f0fb
+  }
+  .belon{position:absolute;border:none;background:transparent;padding:0;cursor:pointer;font-family:inherit;animation:apung 3s ease-in-out infinite}
+  .belon .glob{
+    width:76px;height:90px;border-radius:50% 50% 47% 47%;display:flex;align-items:center;justify-content:center;
+    font-size:36px;font-weight:800;color:#fff;box-shadow:inset -8px -10px 0 rgba(0,0,0,.10)
+  }
+  .belon .tali{display:block;width:2px;height:20px;background:#c9a;margin:0 auto}
+  .belon.pop{animation:letupB .35s forwards}
+  .belon.salah .glob{animation:goyang .4s}
+  @keyframes apung{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+  @keyframes letupB{40%{transform:scale(1.35)}100%{transform:scale(1.7);opacity:0}}
+  @media(max-width:400px){.belon .glob{width:64px;height:78px;font-size:30px}}
+
+  .pilih-g{font-size:52px !important}
   .nota{text-align:center;color:var(--lembut);font-size:15px;margin-top:6px}
   .kad-suara{background:var(--kad);border-radius:20px;padding:14px 16px;margin-top:16px;box-shadow:0 6px 0 rgba(0,0,0,.06)}
   .kad-suara .tajuk{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin-bottom:8px}
@@ -150,17 +194,33 @@
   <!-- ===== MENU ===== -->
   <section class="skrin aktif" id="sMenu">
     <div class="menu">
-      <button class="kad-menu m1" data-pergi="sLagu">
+      <button class="kad-menu m1 lebar" data-pergi="sLagu">
         <span class="emo">🎵</span>
         <span><span class="tk">Lagu ABC</span><span class="sk">Nyanyi sambil tengok huruf</span></span>
       </button>
       <button class="kad-menu m2" data-pergi="sHuruf">
         <span class="emo">🔤</span>
-        <span><span class="tk">Kenal Huruf</span><span class="sk">Ketik huruf, dengar & lihat gambar</span></span>
+        <span class="tk">Kenal Huruf</span><span class="sk">Dengar &amp; lihat gambar</span>
+      </button>
+      <button class="kad-menu m4" data-pergi="sSurih">
+        <span class="emo">✏️</span>
+        <span class="tk">Surih Huruf</span><span class="sk">Tulis ikut jejak dengan jari</span>
       </button>
       <button class="kad-menu m3" data-pergi="sMain">
         <span class="emo">🎯</span>
-        <span><span class="tk">Cari Huruf</span><span class="sk">Mana huruf ini? Kumpul bintang!</span></span>
+        <span class="tk">Cari Huruf</span><span class="sk">Mana huruf ini?</span>
+      </button>
+      <button class="kad-menu m5" data-pergi="sPasangan">
+        <span class="emo">🃏</span>
+        <span class="tk">Cari Pasangan</span><span class="sk">Padan A dengan a</span>
+      </button>
+      <button class="kad-menu m6" data-pergi="sGambar">
+        <span class="emo">🖼️</span>
+        <span class="tk">Huruf &amp; Gambar</span><span class="sk">B untuk bola!</span>
+      </button>
+      <button class="kad-menu m7" data-pergi="sBelon">
+        <span class="emo">🎈</span>
+        <span class="tk">Letupkan Belon</span><span class="sk">Tembak huruf yang disebut</span>
       </button>
     </div>
     <div class="kad-suara" id="kadSuara">
@@ -220,6 +280,48 @@
     <button class="balik" data-pergi="sMenu">🏠 Balik</button>
   </section>
 
+  <!-- ===== SURIH HURUF ===== -->
+  <section class="skrin" id="sSurih">
+    <div class="soal"><span>Surih huruf <b id="surihLabel" style="color:var(--pink)">A a</b></span>
+      <button class="bulat" id="btnSurihSebut" title="Dengar">🔊</button></div>
+    <div class="kanvas-wrap"><canvas id="kanvasSurih"></canvas></div>
+    <div class="baris2">
+      <button class="btn-besar b-biru" id="btnSurihSebelum">⬅️</button>
+      <button class="btn-besar b-biru" id="btnSurihSeterus">➡️</button>
+    </div>
+    <div class="baris2">
+      <button class="btn-besar b-pink" id="btnSurihPadam">🧽 Padam</button>
+      <button class="btn-besar b-hijau" id="btnSurihSiap">⭐ Siap!</button>
+    </div>
+    <button class="balik" data-pergi="sMenu">🏠 Balik</button>
+  </section>
+
+  <!-- ===== CARI PASANGAN ===== -->
+  <section class="skrin" id="sPasangan">
+    <div class="soal"><span>Cari pasangan <b style="color:var(--pink)">A</b>+<b style="color:var(--biru)">a</b></span></div>
+    <div class="grid-kad" id="gridPasangan"></div>
+    <button class="btn-besar b-pink" id="btnPasanganBaru">🔀 Set Baru</button>
+    <button class="balik" data-pergi="sMenu">🏠 Balik</button>
+  </section>
+
+  <!-- ===== HURUF & GAMBAR ===== -->
+  <section class="skrin" id="sGambar">
+    <div class="bintang-baris" id="bintangGambar"></div>
+    <div class="soal"><span>Huruf <b id="gambarHuruf" style="color:var(--pink);font-size:38px">B</b> — mana gambarnya?</span>
+      <button class="bulat" id="btnGambarUlang" title="Dengar lagi">🔊</button></div>
+    <div class="pilihan" id="pilihanGambar"></div>
+    <button class="balik" data-pergi="sMenu">🏠 Balik</button>
+  </section>
+
+  <!-- ===== LETUPKAN BELON ===== -->
+  <section class="skrin" id="sBelon">
+    <div class="bintang-baris" id="bintangBelon"></div>
+    <div class="soal"><span>Letupkan belon <b id="belonHuruf" style="color:var(--pink);font-size:38px">D</b>!</span>
+      <button class="bulat" id="btnBelonUlang" title="Dengar lagi">🔊</button></div>
+    <div class="langit" id="langit"></div>
+    <button class="balik" data-pergi="sMenu">🏠 Balik</button>
+  </section>
+
 </div>
 
 <div class="raikan" id="raikan">
@@ -261,7 +363,10 @@ const FONETIK = {
   CUBA:"choo-bah", LAGI:"lah-ghee", SYABAS:"shah-bahs", KAMU:"kah-moo",
   MEMANG:"meh-mahng", PANDAI:"pahn-die", HAI:"high", JOM:"johm", BELAJAR:"beh-lah-jar",
   INI:"ee-nee", SUARA:"soo-ah-rah", DAN:"dahn",
-  BAHASA:"bah-hah-sah", MELAYU:"meh-lah-yoo"
+  BAHASA:"bah-hah-sah", MELAYU:"meh-lah-yoo",
+  LETUPKAN:"ler-toop-kahn", BELON:"beh-lohn", GAMBAR:"gahm-bar", MULA:"moo-lah",
+  DENGAN:"der-ngahn", YANG:"yahng", SAMA:"sah-mah", SURIH:"soo-reeh",
+  SIAP:"see-up", BAGUS:"bah-goos", TULIS:"too-lease"
 };
 /* nama huruf ikut sebutan Malaysia (yang berbeza daripada Inggeris) */
 const NAMA_HURUF = { Z:"zed" };
@@ -395,6 +500,10 @@ function buka(id){
   $$(".skrin").forEach(function(s){ s.classList.toggle("aktif", s.id === id); });
   window.scrollTo(0,0);
   if(id === "sMain") mulaMain();
+  else if(id === "sSurih") bukaSurih();
+  else if(id === "sPasangan") mulaPasangan();
+  else if(id === "sGambar") mulaGambar();
+  else if(id === "sBelon") mulaBelon();
 }
 document.addEventListener("click", function(e){
   const b = e.target.closest("[data-pergi]");
@@ -564,19 +673,246 @@ $("#pilihanHuruf").addEventListener("click", function(e){
     sebut("Cuba lagi", 1);
   }
 });
-function habisMain(){
+let semulaFn = null;
+function raikanSiap(fn){
+  semulaFn = fn || mulaMain;
   $("#raikan").classList.add("nampak");
   bunyi.hebat();
   letup("🎉");
   sebut("Syabas! Kamu memang pandai!", .9);
 }
+function habisMain(){ raikanSiap(mulaMain); }
 $("#btnMainLagi").addEventListener("click", function(){
   $("#raikan").classList.remove("nampak");
-  mulaMain();
+  (semulaFn || mulaMain)();
 });
 $("#btnRaikanBalik").addEventListener("click", function(){
   $("#raikan").classList.remove("nampak");
   buka("sMenu");
+});
+
+/* ==========================================================
+   4. SURIH HURUF (tulis ikut jejak)
+   ========================================================== */
+const kanvas = $("#kanvasSurih");
+let ctxS = null, surIdx = 0, melukis = false, warnaHue = 0;
+
+function saizKanvas(){
+  const w = kanvas.clientWidth || 320;
+  const h = Math.round(w * 0.72);
+  const dpr = window.devicePixelRatio || 1;
+  kanvas.width = Math.round(w * dpr);
+  kanvas.height = Math.round(h * dpr);
+  kanvas.style.height = h + "px";
+  ctxS = kanvas.getContext("2d");
+  ctxS.setTransform(dpr, 0, 0, dpr, 0, 0);
+  panduanSurih();
+}
+function panduanSurih(){
+  if(!ctxS) return;
+  const w = kanvas.clientWidth, h = parseInt(kanvas.style.height, 10) || 240;
+  ctxS.clearRect(0, 0, w, h);
+  const H = HURUF[surIdx][0];
+  const fon = "'Comic Sans MS','Segoe UI Rounded','Trebuchet MS',sans-serif";
+  ctxS.textAlign = "center"; ctxS.textBaseline = "middle";
+  ctxS.font = "700 " + Math.round(h * 0.66) + "px " + fon;
+  ctxS.fillStyle = "#ece6f8";
+  ctxS.fillText(H, w * 0.32, h * 0.52);
+  ctxS.lineWidth = 2; ctxS.strokeStyle = "#cfc2ec";
+  ctxS.strokeText(H, w * 0.32, h * 0.52);
+  ctxS.font = "700 " + Math.round(h * 0.48) + "px " + fon;
+  ctxS.fillStyle = "#e4f0fb";
+  ctxS.fillText(H.toLowerCase(), w * 0.73, h * 0.58);
+  ctxS.strokeStyle = "#b9d6ee";
+  ctxS.strokeText(H.toLowerCase(), w * 0.73, h * 0.58);
+}
+function bukaSurih(sebutJuga){
+  const H = HURUF[surIdx][0];
+  $("#surihLabel").textContent = H + " " + H.toLowerCase();
+  saizKanvas();
+  if(sebutJuga !== false) sebut("Jom tulis huruf " + H + ".");
+}
+function posKanvas(e){
+  const r = kanvas.getBoundingClientRect();
+  return {x: e.clientX - r.left, y: e.clientY - r.top};
+}
+kanvas.addEventListener("pointerdown", function(e){
+  e.preventDefault();
+  melukis = true;
+  try{ kanvas.setPointerCapture(e.pointerId); }catch(err){}
+  const p = posKanvas(e);
+  ctxS.beginPath(); ctxS.moveTo(p.x, p.y);
+});
+kanvas.addEventListener("pointermove", function(e){
+  if(!melukis) return;
+  e.preventDefault();
+  const p = posKanvas(e);
+  warnaHue = (warnaHue + 4) % 360;
+  ctxS.strokeStyle = "hsl(" + warnaHue + ",85%,58%)";
+  ctxS.lineWidth = 13; ctxS.lineCap = "round"; ctxS.lineJoin = "round";
+  ctxS.lineTo(p.x, p.y); ctxS.stroke();
+  ctxS.beginPath(); ctxS.moveTo(p.x, p.y);
+});
+["pointerup","pointercancel","pointerleave"].forEach(function(ev){
+  kanvas.addEventListener(ev, function(){ melukis = false; });
+});
+window.addEventListener("resize", function(){
+  if($("#sSurih").classList.contains("aktif")) saizKanvas();
+});
+$("#btnSurihSebut").addEventListener("click", function(){ sebut(HURUF[surIdx][0]); });
+$("#btnSurihPadam").addEventListener("click", function(){ bunyi.ketik(); panduanSurih(); });
+$("#btnSurihSebelum").addEventListener("click", function(){ bunyi.ketik(); surIdx = (surIdx + 25) % 26; bukaSurih(); });
+$("#btnSurihSeterus").addEventListener("click", function(){ bunyi.ketik(); surIdx = (surIdx + 1) % 26; bukaSurih(); });
+$("#btnSurihSiap").addEventListener("click", function(){
+  bunyi.betul();
+  letup("🌟");
+  sebut("Siap! Bagus.");
+  setTimeout(function(){ surIdx = (surIdx + 1) % 26; bukaSurih(); }, 900);
+});
+
+/* ==========================================================
+   5. CARI PASANGAN (memori: A + a)
+   ========================================================== */
+let pasangPilih = null, pasangKunci = false, pasangSiap = 0;
+function mulaPasangan(){
+  const set = [];
+  const semua = HURUF.map(function(h){ return h[0]; });
+  while(set.length < 4){
+    const c = semua[rawak(26)];
+    if(set.indexOf(c) === -1) set.push(c);
+  }
+  let kads = [];
+  set.forEach(function(h){ kads.push({h:h, j:"B"}); kads.push({h:h, j:"K"}); });
+  for(let i=kads.length-1;i>0;i--){ const j = rawak(i+1); const t = kads[i]; kads[i] = kads[j]; kads[j] = t; }
+  pasangPilih = null; pasangKunci = false; pasangSiap = 0;
+  $("#gridPasangan").innerHTML = kads.map(function(k, i){
+    return '<button class="kad-flip" data-h="' + k.h + '" data-j="' + k.j + '">' +
+      '<span class="dalam"><span class="muka depan">⭐</span>' +
+      '<span class="muka belakang">' + (k.j === "B" ? k.h : k.h.toLowerCase()) + "</span></span></button>";
+  }).join("");
+}
+$("#gridPasangan").addEventListener("click", function(e){
+  const b = e.target.closest(".kad-flip");
+  if(!b || pasangKunci || b === pasangPilih) return;
+  if(b.classList.contains("buka") || b.classList.contains("padan")) return;
+  b.classList.add("buka");
+  bunyi.ketik();
+  if(!pasangPilih){ pasangPilih = b; return; }
+  const a = pasangPilih;
+  pasangPilih = null;
+  if(a.dataset.h === b.dataset.h){
+    a.classList.add("padan"); b.classList.add("padan");
+    bunyi.betul();
+    sebut("Sama! " + b.dataset.h + " besar dan " + b.dataset.h + " kecil.");
+    pasangSiap++;
+    if(pasangSiap === 4) setTimeout(function(){ raikanSiap(mulaPasangan); }, 700);
+  }else{
+    pasangKunci = true;
+    bunyi.salah();
+    setTimeout(function(){
+      a.classList.remove("buka"); b.classList.remove("buka");
+      pasangKunci = false;
+    }, 900);
+  }
+});
+$("#btnPasanganBaru").addEventListener("click", function(){ bunyi.ketik(); mulaPasangan(); });
+
+/* ==========================================================
+   6. HURUF & GAMBAR (B untuk bola)
+   ========================================================== */
+let gambarSasar = 0, gambarBintang = 0, gambarKunci = false;
+function mulaGambar(){ gambarBintang = 0; lukisBintangG(); pusinganGambar(); }
+function lukisBintangG(){
+  let t = ""; for(let i=0;i<JUM_PUSINGAN;i++) t += i < gambarBintang ? "⭐" : "☆";
+  $("#bintangGambar").textContent = t;
+}
+function pusinganGambar(){
+  gambarKunci = false;
+  const idx = [rawak(26)];
+  while(idx.length < 3){ const c = rawak(26); if(idx.indexOf(c) === -1) idx.push(c); }
+  gambarSasar = idx[0];
+  const susun = idx.slice();
+  for(let i=susun.length-1;i>0;i--){ const j = rawak(i+1); const t = susun[i]; susun[i] = susun[j]; susun[j] = t; }
+  $("#gambarHuruf").textContent = HURUF[gambarSasar][0];
+  $("#pilihanGambar").innerHTML = susun.map(function(i, n){
+    return '<button class="pilih-h pilih-g w' + (n*2%6) + '" data-i="' + i + '">' + HURUF[i][2] + "</button>";
+  }).join("");
+  setTimeout(function(){ sebut("Mana gambar yang mula dengan huruf " + HURUF[gambarSasar][0] + "?"); }, 260);
+}
+$("#btnGambarUlang").addEventListener("click", function(){
+  bunyi.ketik();
+  sebut("Mana gambar yang mula dengan huruf " + HURUF[gambarSasar][0] + "?");
+});
+$("#pilihanGambar").addEventListener("click", function(e){
+  const b = e.target.closest("[data-i]"); if(!b || gambarKunci) return;
+  const i = parseInt(b.dataset.i, 10);
+  if(i === gambarSasar){
+    gambarKunci = true;
+    b.classList.add("betul");
+    bunyi.betul();
+    letup("⭐");
+    gambarBintang++;
+    lukisBintangG();
+    sebut("Betul! " + HURUF[i][0] + " untuk " + HURUF[i][1] + ".");
+    setTimeout(function(){
+      if(gambarBintang >= JUM_PUSINGAN) raikanSiap(mulaGambar);
+      else pusinganGambar();
+    }, 1700);
+  }else{
+    b.classList.add("salah");
+    bunyi.salah();
+    setTimeout(function(){ b.classList.remove("salah"); }, 450);
+    sebut("Cuba lagi", 1);
+  }
+});
+
+/* ==========================================================
+   7. LETUPKAN BELON
+   ========================================================== */
+const WARNA_BELON = ["#ff6f9d","#3ab7ff","#ffb02e","#3ddc84"];
+let belonSasar = "A", belonBintang = 0, belonKunci = false;
+function mulaBelon(){ belonBintang = 0; lukisBintangB(); pusinganBelon(); }
+function lukisBintangB(){
+  let t = ""; for(let i=0;i<JUM_PUSINGAN;i++) t += i < belonBintang ? "⭐" : "☆";
+  $("#bintangBelon").textContent = t;
+}
+function pusinganBelon(){
+  belonKunci = false;
+  const semua = HURUF.map(function(h){ return h[0]; });
+  const set = [];
+  while(set.length < 4){ const c = semua[rawak(26)]; if(set.indexOf(c) === -1) set.push(c); }
+  belonSasar = set[rawak(4)];
+  $("#belonHuruf").textContent = belonSasar;
+  $("#langit").innerHTML = set.map(function(h, i){
+    return '<button class="belon" data-h="' + h + '" style="left:' + (4 + i*24) + "%;top:" + (14 + (i%2)*38) + "%;animation-delay:" + (i*0.45) + 's">' +
+      '<span class="glob" style="background:' + WARNA_BELON[i] + '">' + h + '</span><span class="tali"></span></button>';
+  }).join("");
+  setTimeout(function(){ sebut("Letupkan belon huruf " + belonSasar + "!"); }, 260);
+}
+$("#btnBelonUlang").addEventListener("click", function(){
+  bunyi.ketik();
+  sebut("Letupkan belon huruf " + belonSasar + "!");
+});
+$("#langit").addEventListener("click", function(e){
+  const b = e.target.closest(".belon"); if(!b || belonKunci) return;
+  if(b.dataset.h === belonSasar){
+    belonKunci = true;
+    b.classList.add("pop");
+    bunyi.betul();
+    letup("💥");
+    belonBintang++;
+    lukisBintangB();
+    sebut("Betul!");
+    setTimeout(function(){
+      if(belonBintang >= JUM_PUSINGAN) raikanSiap(mulaBelon);
+      else pusinganBelon();
+    }, 1000);
+  }else{
+    b.classList.add("salah");
+    bunyi.salah();
+    setTimeout(function(){ b.classList.remove("salah"); }, 450);
+    sebut("Cuba lagi", 1);
+  }
 });
 
 /* ==========================================================
