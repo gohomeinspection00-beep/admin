@@ -10,7 +10,7 @@ const sets = [
   {
     label: "2. NGU — Surat 2: ke PARKLAND CITY, Pejabat Pengurusan Layangkasa  [Ruj: NOTIS-1/2026/028]",
     pengirim: ["NGU YI KIET", "No. 30, Jalan Berlian 14,", "Taman Cahaya Masai,", "81750 Pasir Gudang, Johor.", "Tel: 014-916 8526"],
-    penerima: ["PARKLAND CITY SDN. BHD. (201201031906 / 1016393-K)", "Bangunan Parkland Group,", "Persiaran Wau Kikik,", "Bandar Layangkasa,", "81700 Pasir Gudang, Johor."],
+    penerima: ["PARKLAND CITY SDN. BHD. (201201031906 / 1016393-K)", "Bangunan Parkland Group,", "Persiaran Wau Kikik,", "Bandar Layangkasa,", "81700 Pasir Gudang, Johor.", "Tel: 013-665 5111"],
   },
 ];
 
