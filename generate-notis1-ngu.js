@@ -5,10 +5,9 @@ const alamatMelaka = {
   label: "MELAKA",
   fail: "/home/user/admin/NOTIS_1_NGU_MELAKA.pdf",
   alamatPenerima: [
-    "48, Jalan Kota Laksamana 2/15,",
-    "Taman Kota Laksamana, Seksyen 2,",
-    "75200 Bandar Melaka,",
-    "Melaka.",
+    "(Parkland Headquarters Office)",
+    "No. 112, Jalan Tun Perak,",
+    "75300 Melaka.",
   ],
   salinanKepada: [
     {
@@ -29,8 +28,8 @@ const alamatLayangkasa = {
   ],
   salinanKepada: [
     {
-      nama: "PARKLAND CITY SDN. BHD. — Alamat Berdaftar (SPA)",
-      alamat: ["48, Jalan Kota Laksamana 2/15,", "Taman Kota Laksamana, Seksyen 2,", "75200 Bandar Melaka, Melaka."],
+      nama: "PARKLAND CITY SDN. BHD. — Ibu Pejabat (HQ)",
+      alamat: ["No. 112, Jalan Tun Perak,", "75300 Melaka."],
     },
   ],
 };

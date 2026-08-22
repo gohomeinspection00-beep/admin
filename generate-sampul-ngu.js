@@ -3,9 +3,9 @@ const fs = require("fs");
 
 const sets = [
   {
-    label: "1. NGU — Surat 1: ke PARKLAND CITY, alamat berdaftar Melaka (S&P)  [Ruj: NOTIS-1/2026/028]",
+    label: "1. NGU — Surat 1: ke PARKLAND CITY, Ibu Pejabat (HQ) Melaka  [Ruj: NOTIS-1/2026/028]",
     pengirim: ["NGU YI KIET", "No. 30, Jalan Berlian 14,", "Taman Cahaya Masai,", "81750 Pasir Gudang, Johor.", "Tel: 014-916 8526"],
-    penerima: ["PARKLAND CITY SDN. BHD. (201201031906 / 1016393-K)", "48, Jalan Kota Laksamana 2/15,", "Taman Kota Laksamana, Seksyen 2,", "75200 Bandar Melaka, Melaka."],
+    penerima: ["PARKLAND CITY SDN. BHD. (201201031906 / 1016393-K)", "(Parkland Headquarters Office)", "No. 112, Jalan Tun Perak,", "75300 Melaka.", "Tel: 06-222 2888"],
   },
   {
     label: "2. NGU — Surat 2: ke PARKLAND CITY, Pejabat Pengurusan Layangkasa  [Ruj: NOTIS-1/2026/028]",
