@@ -121,6 +121,11 @@ for (const line of data.alamatPenerima) { doc.text(line, mL, y); y += LH_S; }
 doc.text(data.tarikhSurat, pageW - mR, y - LH_S, { align: "right" });
 
 y += 3;
+doc.setFont("helvetica", "bolditalic");
+doc.setFontSize(SZ.SMALL);
+doc.text("MELALUI SERAHAN TANGAN (BY HAND)", mL, y);
+doc.setFont("helvetica", "normal");
+y += 5;
 
 doc.setFontSize(SZ.SMALL);
 doc.text(`Ruj. Kami: ${data.noRujukan}`, mL, y); y += 4.5;
