@@ -275,16 +275,11 @@ for (const f of fnL) { checkBreak(6); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(4,
-  `Perhatian khusus diberikan kepada item No. 53, di mana pemasangan wayar Live dan Neutral yang terbalik pada Distribution Box merupakan bahaya keselamatan elektrik yang serius — semua soket dan litar lampu terjejas, dan berisiko menyebabkan renjatan elektrik walaupun suis dimatikan. Kami menuntut agar item ini dibaiki dengan SEGERA tanpa menunggu tempoh pembaikan biasa.`
-);
-y += 4;
-
-numPara(5,
   `Dengan ini, kami mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan terhadap kecacatan yang dilaporkan disiapkan sepenuhnya selewat-lewatnya pada ${data.tarikhDeadline}, iaitu tarikh tamat tempoh tiga puluh (30) hari di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA}. Sekiranya pembaikan masih tidak disempurnakan selepas tarikh tersebut, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari.`
 );
 y += 4;
 
-numPara(6, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, kami akan:");
+numPara(5, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, kami akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -292,7 +287,7 @@ bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak t
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
-numPara(7,
+numPara(6,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -305,7 +300,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(8,
+numPara(7,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, kami akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
