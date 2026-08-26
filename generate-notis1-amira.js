@@ -37,11 +37,11 @@ const data = {
   tempohDLP: "24",
 
   tarikhPemeriksaan1: "20 Julai 2026",
-  tarikhSerahanLaporan: "5 dan 7 Ogos 2026",
+  tarikhSerahanLaporan: "24 Julai dan 7 Ogos 2026",
   kaedahSerahanLaporan: "aplikasi pemaju (Mah Sing)",
   noKes1: "ME4A1-H-142447141433-001-H",
   noKes2: "ME4A1-H-142447141433-002-H",
-  tarikhTamat30Hari: "4 dan 6 September 2026",
+  tarikhTamat30Hari: "23 Ogos 2026 (Kes 001-H) dan 6 September 2026 (Kes 002-H)",
 
   tarikhNotis: "27 Ogos 2026",
   tarikhDeadline: "6 September 2026",
@@ -61,10 +61,11 @@ const data = {
   kronologi: [
     { tarikh: "9 Januari 2024", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
     { tarikh: "20 Julai 2026", peristiwa: "Pemeriksaan Kecacatan (Defect Inspection) dijalankan ke atas hartanah" },
-    { tarikh: "5 Ogos 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-001-H" },
+    { tarikh: "24 Julai 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-001-H" },
     { tarikh: "7 Ogos 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-002-H" },
+    { tarikh: "23 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 001-H — pembaikan masih belum disempurnakan" },
     { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "4 & 6 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan di bawah Klausa 27(1) Jadual G — tarikh akhir pembaikan: 6 September 2026" },
+    { tarikh: "6 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 002-H — tarikh akhir pembaikan keseluruhan" },
   ],
 
   salinanKepada: [
@@ -245,7 +246,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period), dalam masa tiga puluh (30) hari selepas menerima notis bertulis daripada pembeli. Tempoh tiga puluh (30) hari bagi kedua-dua kes tersebut akan tamat pada ${data.tarikhTamat30Hari}.`
+  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period), dalam masa tiga puluh (30) hari selepas menerima notis bertulis daripada pembeli. Tempoh tiga puluh (30) hari bagi Kes ${data.noKes1} TELAH TAMAT pada 23 Ogos 2026, manakala bagi Kes ${data.noKes2} akan tamat pada 6 September 2026.`
 );
 y += 4;
 
