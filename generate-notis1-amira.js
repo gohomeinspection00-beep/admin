@@ -43,7 +43,7 @@ const data = {
   noKes2: "ME4A1-H-142447141433-002-H",
   tarikhTamat30Hari: "23 Ogos 2026 (Kes 001-H) dan 6 September 2026 (Kes 002-H)",
 
-  tarikhNotis: "27 Ogos 2026",
+  tarikhNotis: "2 September 2026",
   tarikhDeadline: "6 September 2026",
   tempohNotis2: "15",
 
@@ -64,7 +64,7 @@ const data = {
     { tarikh: "24 Julai 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-001-H" },
     { tarikh: "7 Ogos 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-002-H" },
     { tarikh: "23 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 001-H — pembaikan masih belum disempurnakan" },
-    { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "6 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 002-H — tarikh akhir pembaikan keseluruhan" },
   ],
 
