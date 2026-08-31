@@ -48,6 +48,9 @@ const data = {
   tempohNotis2: "15",
 
   kecacatan: [
+    { tag: "38", lokasi: "Living & Dining — Ceiling", kecacatan: "Kelembapan tinggi pada permukaan siling di dalam ceiling manhole masih ada — kebocoran dari Master Bathroom (High moisture on ceiling surface inside ceiling manhole still observed — Leaking issue)", status: "Belum Diselesaikan" },
+    { tag: "68", lokasi: "Bathroom 3 — Fixtures", kecacatan: "Pemegang tisu longgar masih ada (Loose tissue handle still observed)", status: "Belum Diselesaikan" },
+    { tag: "170", lokasi: "Ceiling Area (Bedroom 2) — Roof", kecacatan: "Genting bumbung rosak menyebabkan kebocoran pada siling — masih ada (Damaged on roof tiles resulting leaking on ceiling still observed — Major defects)", status: "Belum Diselesaikan" },
     { tag: "175", lokasi: "Ceiling Area (Master Bedroom) — Roof", kecacatan: "Genting bumbung rosak masih ada (Damaged on roof tiles still observed — Major defects)", status: "Belum Diselesaikan" },
     { tag: "182", lokasi: "Water Tank Area — Fixtures", kecacatan: "Penutup tangki air tidak dapat ditutup dengan sempurna menyebabkan kebocoran pada siling — masih ada (Water tank cover cannot properly close resulting in leaking on ceiling)", status: "Belum Diselesaikan" },
     { tag: "184", lokasi: "RC Flat Roof — Floor", kecacatan: "Air bertakung pada papak lantai masih ada (Stagnant water on floor slab still observed)", status: "Belum Diselesaikan" },
