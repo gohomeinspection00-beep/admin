@@ -13,7 +13,7 @@ const data = {
   ],
   noKP: "950315-08-6785",
   telefonPembeli: "016-270 1856",
-  emailPembeli: "nanthini1194@gmail.com",
+  emailPembeli: "r.mages1413@gmail.com",
 
   namaPemaju: "ECO TROPICS DEVELOPMENT SDN. BHD.",
   noSyarikat: "(199401030842 / 316524-U)",
