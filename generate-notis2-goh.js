@@ -396,6 +396,31 @@ drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
 
 // ============================================================
+// LAMPIRAN — BUKTI SERAHAN NOTIS 1
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN — BUKTI SERAHAN NOTIS PERTAMA";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 10;
+
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL); bk();
+doc.text("1. Notis Pertama diserahkan di pejabat pengurusan pada 14 Julai 2026 — dicop \"RECEIVED\":", mL, y);
+y += 5;
+const img1 = fs.readFileSync("/home/user/admin/goh-bukti-received.jpg");
+doc.addImage(Buffer.from(img1).toString("base64"), "JPEG", mL, y, 72, 160);
+
+const cap2 = doc.splitTextToSize("2. Akuan Terima (AR) Pos Daftar No. RW214685270MY — pos 23 Julai 2026, diakui terima oleh wakil pemaju:", 78);
+let cy2 = y + 3;
+for (const l of cap2) { doc.text(l, mL + 82, cy2); cy2 += 4.5; }
+const img2 = fs.readFileSync("/home/user/admin/goh-bukti-ar.jpg");
+doc.addImage(Buffer.from(img2).toString("base64"), "JPEG", mL + 82, y + 17, 78, 139);
+
+
+// ============================================================
 // FOOTER
 // ============================================================
 const totalPages = pageNum;
