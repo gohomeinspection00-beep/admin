@@ -42,8 +42,8 @@ const data = {
   tarikhReInspection: "20 Ogos 2026",
   tarikhSerahanLaporan2: "20 Ogos 2026",
 
-  tarikhNotis: "2 September 2026",
-  tarikhDeadline: "17 September 2026",
+  tarikhNotis: "3 September 2026",
+  tarikhDeadline: "18 September 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -66,8 +66,8 @@ const data = {
     { tarikh: "15 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi EcoWorld" },
     { tarikh: "14 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disempurnakan" },
     { tarikh: "20 Ogos 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan dan Laporan Re-Inspection diserahkan melalui aplikasi EcoWorld — kecacatan masih belum diselesaikan" },
-    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "17 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "3 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "18 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [
