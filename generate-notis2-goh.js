@@ -65,7 +65,8 @@ const data = {
     { tarikh: "24 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui serahan tangan (hardcopy)" },
     { tarikh: "24 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan tidak disempurnakan" },
     { tarikh: "3 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Kedua (Second Inspection) dijalankan — kecacatan masih wujud" },
-    { tarikh: "14 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — dihantar melalui Pos Berdaftar AR setelah wakil pemaju enggan menandatangani akuan terima" },
+    { tarikh: "14 Julai 2026", peristiwa: "Notis Pertama (First Notice) diserahkan secara serahan tangan di pejabat pengurusan pemaju — dicop \"RECEIVED\" oleh pihak pemaju" },
+    { tarikh: "23 Julai 2026", peristiwa: "Notis Pertama dihantar semula ke ibu pejabat pemaju melalui Pos Berdaftar AR (No. RW214685270MY) — diterima dan diakui terima oleh wakil pemaju" },
     { tarikh: "29 Julai 2026", peristiwa: "Tarikh akhir pembaikan Notis Pertama (15 hari) — tidak dipatuhi oleh pemaju" },
     { tarikh: "24 Ogos 2026", peristiwa: "Pemeriksaan Kali Ketiga (Third Inspection) dijalankan oleh Juruukur Bangunan berdaftar RISM — kecacatan masih belum diselesaikan, termasuk kecacatan baru" },
     { tarikh: "3 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
@@ -241,7 +242,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dihantar melalui ${data.kaedahPenghantaranNotis1}, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
+  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1}, yang telah (a) diserahkan secara serahan tangan di pejabat pengurusan pihak tuan pada 14 Julai 2026 dan dicop "RECEIVED" oleh pihak tuan, dan (b) dihantar semula ke ibu pejabat pihak tuan melalui Pos Berdaftar Akuan Terima (AR) — No. Pos Daftar RW214685270MY — pada 23 Julai 2026, yang telah diterima dan diakui terima oleh wakil pihak tuan, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
 );
 y += 4;
 
