@@ -4,7 +4,10 @@ const fs = require("fs");
 const data = {
   noRujukan: "NOTIS-1/2026/036",
 
-  namaPembeli: "NAIM DESA",
+  namaPembeli: "HAFIZAH BINTI MISKAM",
+  noKP: "940822-01-6854",
+  namaPembeli2: "KHAIROL NAIM BIN MOHD DESA",
+  noKP2: "940312-02-5945",
   alamatPengirim: [
     "No. 97, Areca 4B,",
     "Jalan Uda Utama 5/4,",
@@ -12,7 +15,7 @@ const data = {
     "Johor.",
   ],
   telefonPembeli: "017-712 6071",
-  emailPembeli: "k.naimdesa94@gmail.com",
+  emailPembeli: "hafizahmiskam2208@gmail.com",
 
   namaPemaju: "UDA LAND (SOUTH) SDN. BHD.",
   noSyarikat: "(197501001813 / 23298-K)",
@@ -27,6 +30,8 @@ const data = {
   jenisHartanah: "Rumah Teres (1,300 kaki persegi, Unit PTD 217344)",
   namaProyek: "Areca Terrace, Phase 4B, Bandar Uda Utama",
 
+  noSPA: "8971-18/eSPA/130924/PTD217344/01",
+  tarikhSPA: "13 September 2024",
   jenisSPA: "Jadual G",
   klausaPembaikan: "27(1)",
   klausaSerahan: "29(1)",
@@ -183,13 +188,14 @@ y = 25;
 doc.setFont("helvetica", "bold");
 doc.setFontSize(SZ.BODY);
 bk();
-doc.text(data.namaPembeli, mL, y);
-y += LH;
+doc.text(`${data.namaPembeli} &`, mL, y); y += LH_S;
+doc.text(data.namaPembeli2, mL, y); y += LH;
 
 doc.setFont("helvetica", "normal");
 for (const line of data.alamatPengirim) { doc.text(line, mL, y); y += LH_S; }
 y += 1;
 doc.setFontSize(SZ.SMALL);
+doc.text(`No. K/P: ${data.noKP} / ${data.noKP2}`, mL, y); y += LH_S;
 doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
 doc.text(`Tel: ${data.telefonPembeli}`, mL, y); y += LH_S;
 
@@ -240,7 +246,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli}, pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli mengikut ${data.jenisSPA}, telah menjalankan Pemeriksaan Kecacatan (Defect Inspection) pada ${data.tarikhPemeriksaan1} dan telah mengemukakan Laporan Pemeriksaan Kecacatan (Defect Inspection Report) secara rasmi kepada pihak tuan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}, merangkumi sebanyak 248 kecacatan. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
+  `Kami, ${data.namaPembeli} (No. K/P: ${data.noKP}) dan ${data.namaPembeli2} (No. K/P: ${data.noKP2}), pemilik bersama unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli bertarikh ${data.tarikhSPA} (No. Rujukan SPA: ${data.noSPA}) mengikut ${data.jenisSPA}, telah menjalankan Pemeriksaan Kecacatan (Defect Inspection) pada ${data.tarikhPemeriksaan1} dan telah mengemukakan Laporan Pemeriksaan Kecacatan (Defect Inspection Report) secara rasmi kepada pihak tuan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}, merangkumi sebanyak 248 kecacatan. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
 );
 y += 4;
 
@@ -274,11 +280,11 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan.`
+  `Dengan ini, kami mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan.`
 );
 y += 4;
 
-numPara(5, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+numPara(5, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, kami akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -300,11 +306,11 @@ doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
 numPara(7,
-  `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
+  `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, kami akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
 
-para("Saya berharap pihak tuan mengambil tindakan segera terhadap Notis Pertama ini. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.");
+para("Kami berharap pihak tuan mengambil tindakan segera terhadap Notis Pertama ini. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.");
 y += 4;
 para("Sekian.");
 y += 4;
@@ -313,13 +319,19 @@ checkBreak(60);
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Yang benar,", mL, y);
 y += 12;
+const sigCol2 = mL + 85;
 doc.setLineWidth(0.3);
 doc.line(mL, y, mL + 60, y);
+doc.line(sigCol2, y, sigCol2 + 60, y);
 y += 5;
-doc.setFont("helvetica", "bold");
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL);
 doc.text(`(${data.namaPembeli})`, mL, y);
+doc.text(`(${data.namaPembeli2})`, sigCol2, y);
 y += 5;
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text(`No. K/P: ${data.noKP}`, mL, y);
+doc.text(`No. K/P: ${data.noKP2}`, sigCol2, y);
+y += 4;
 doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
 doc.text(`Telefon: ${data.telefonPembeli}`, mL, y); y += 7;
 
@@ -379,7 +391,7 @@ function drawAkuanTerima(copyLabel) {
   y += 12;
 
   doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
-  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
+  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} dan ${data.namaPembeli2} berhubung hartanah di ${data.alamatHartanah}.`;
   const ls = doc.splitTextToSize(akText, cW);
   for (const l of ls) { doc.text(l, mL, y); y += LH; }
 
