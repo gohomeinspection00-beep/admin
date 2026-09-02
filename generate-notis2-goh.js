@@ -53,6 +53,8 @@ const data = {
   kaedahPenghantaranNotis2: "pos berdaftar AR",
 
   kecacatan: [
+    { tag: "9", lokasi: "Car Porch — Floor", kecacatan: "Keretakan pada jubin lantai masih ada (Still have crack on floor tiles)", status: "Belum Diselesaikan" },
+    { tag: "15", lokasi: "Car Porch — Wall", kecacatan: "Keretakan pada permukaan dinding bercat masih ada (Still have crack on painted wall surface)", status: "Belum Diselesaikan" },
     { tag: "18", lokasi: "Car Porch — Ceiling", kecacatan: "Bunyi hollow pada bahagian soffit masih ada — keseluruhan (Still have hollow sound on soffit area — All)", status: "Belum Diselesaikan" },
     { tag: "23", lokasi: "Car Porch — Structure", kecacatan: "KECACATAN BARU — keretakan pada dinding saliran masih ada (New Defect — crack on drainage wall still observed — Major defects)", status: "Belum Diselesaikan" },
     { tag: "73", lokasi: "Garden Area — Wall", kecacatan: "Bunyi hollow pada dinding bercat masih ada (Still have hollow sound on painted wall)", status: "Belum Diselesaikan" },
