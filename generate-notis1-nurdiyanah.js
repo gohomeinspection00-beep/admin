@@ -20,7 +20,6 @@ const data = {
   namaPemaju: "NICE FRONTIER SDN. BHD.",
   noSyarikat: "(199401014059 / 299739-U)",
   alamatPenerima: [
-    "(Customer Relations Unit, IOI Properties Group Berhad)",
     "Jalan Putra 4, Bandar Putra,",
     "81000 Kulai,",
     "Johor.",
