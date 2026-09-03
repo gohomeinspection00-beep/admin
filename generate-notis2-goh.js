@@ -47,8 +47,8 @@ const data = {
 
   tarikhReInspection: "24 Ogos 2026",
 
-  tarikhNotis2: "3 September 2026",
-  tarikhDeadlineNotis2: "18 September 2026",
+  tarikhNotis2: "4 September 2026",
+  tarikhDeadlineNotis2: "19 September 2026",
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "pos berdaftar AR",
 
@@ -73,8 +73,8 @@ const data = {
     { tarikh: "23 Julai 2026", peristiwa: "Notis Pertama dihantar semula ke ibu pejabat pemaju melalui Pos Berdaftar AR (No. RW214685270MY) — diterima dan diakui terima oleh wakil pemaju" },
     { tarikh: "29 Julai 2026", peristiwa: "Tarikh akhir pembaikan Notis Pertama (15 hari) — tidak dipatuhi oleh pemaju" },
     { tarikh: "24 Ogos 2026", peristiwa: "Pemeriksaan Kali Ketiga (Third Inspection) dijalankan oleh Juruukur Bangunan berdaftar RISM — kecacatan masih belum diselesaikan, termasuk kecacatan baru" },
-    { tarikh: "3 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
-    { tarikh: "18 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "4 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
+    { tarikh: "19 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
