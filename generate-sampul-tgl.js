@@ -5,7 +5,7 @@ const sets = [
   {
     label: "1. TEO GEOK YAN — ke COUNTRY VIEW RESOURCES, Menara Landmark JB  [Ruj: NOTIS-1/2026/035]",
     pengirim: ["TEO GEOK YAN", "A-162, Aurora Resort,", "Jalan Aurora Utama, Aurora Sentral,", "79100 Iskandar Puteri, Johor.", "Tel: +65 8617 8812"],
-    penerima: ["COUNTRY VIEW RESOURCES SDN BHD (200001021248 / 523855-A)", "No. 26-01, Level 26, Mail Box 261,", "Menara Landmark, No. 12, Jalan Ngee Heng,", "80000 Johor Bahru, Johor.", "Tel: 07-335 9877"],
+    penerima: ["COUNTRY VIEW RESOURCES SDN BHD (200001021248 / 523855-A)", "No. 26-01, Level 26, Mail Box 261,", "Menara Landmark, No. 12, Jalan Ngee Heng,", "80000 Johor Bahru, Johor.", "Tel: 07-335 9877 / 07-223 6799"],
   },
   {
     label: "2. TEO GEOK YAN — salinan (CC) ke peguam stakeholder K.H. KOH, AZHAR & KOH  [Ruj: NOTIS-1/2026/035]",
@@ -20,7 +20,7 @@ const sets = [
   {
     label: "4. LOO CHUN HUA — ke COUNTRY VIEW RESOURCES, Menara Landmark JB  [Ruj: NOTIS-1/2026/037]",
     pengirim: ["LOO CHUN HUA", "No. 72, Jalan Perwira 12,", "Taman Ungku Tun Aminah,", "81300 Skudai, Johor.", "Tel: 010-461 0373"],
-    penerima: ["COUNTRY VIEW RESOURCES SDN BHD (200001021248 / 523855-A)", "No. 26-01, Level 26, Mail Box 261,", "Menara Landmark, No. 12, Jalan Ngee Heng,", "80000 Johor Bahru, Johor.", "Tel: 07-335 9877"],
+    penerima: ["COUNTRY VIEW RESOURCES SDN BHD (200001021248 / 523855-A)", "No. 26-01, Level 26, Mail Box 261,", "Menara Landmark, No. 12, Jalan Ngee Heng,", "80000 Johor Bahru, Johor.", "Tel: 07-335 9877 / 07-223 6799"],
   },
   {
     label: "5. LOO CHUN HUA — salinan (CC) ke peguam stakeholder K.H. KOH, AZHAR & KOH  [Ruj: NOTIS-1/2026/037]",
