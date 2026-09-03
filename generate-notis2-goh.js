@@ -317,6 +317,8 @@ y += 10;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Yang benar,", mL, y);
+const sigImg = fs.readFileSync("/home/user/admin/goh-signature.png");
+doc.addImage(Buffer.from(sigImg).toString("base64"), "PNG", mL + 8, y + 3, 38, 15);
 y += 20;
 doc.setLineWidth(0.3);
 doc.line(mL, y, mL + 60, y);
