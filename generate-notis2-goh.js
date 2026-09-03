@@ -59,6 +59,7 @@ const data = {
     { tag: "23", lokasi: "Car Porch — Structure", kecacatan: "KECACATAN BARU — keretakan pada dinding saliran masih ada (New Defect — crack on drainage wall still observed — Major defects)", status: "Belum Diselesaikan" },
     { tag: "73", lokasi: "Garden Area — Wall", kecacatan: "Bunyi hollow pada dinding bercat masih ada (Still have hollow sound on painted wall)", status: "Belum Diselesaikan" },
     { tag: "148", lokasi: "Family Area — Wall", kecacatan: "Bunyi hollow pada dinding bercat masih ada (Still have hollow sound on painted wall)", status: "Belum Diselesaikan" },
+    { tag: "262", lokasi: "Bathroom 2 — M&E", kecacatan: "Pemanas air masih tidak berfungsi dengan sempurna — lampu penunjuk pada suis tidak menyala apabila dihidupkan; suis pemanas air di satu bilik menyebabkan penunjuk di bilik lain kekal menyala walaupun suis dimatikan (Water heater not properly function; switch indicator anomaly — masih belum diselesaikan)", status: "Belum Diselesaikan" },
     { tag: "275", lokasi: "Water Tank Area — Floor", kecacatan: "Papan siling masih hilang dan terdapat bukaan (Still missing ceiling board and have opening)", status: "Belum Diselesaikan" },
   ],
 
@@ -276,11 +277,16 @@ for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}).`
+  `Perhatian khusus diberikan kepada item No. 262 (Bathroom 2 — M&E): hasil pemeriksaan bersama (joint inspection) dengan PIC pihak tuan, didapati apabila suis pemanas air di satu bilik dihidupkan, lampu penunjuk di bilik lain kekal menyala walaupun suis tersebut dimatikan. Sehubungan itu, saya menuntut agar pihak tuan/kontraktor menyemak semula susunan pendawaian (wiring arrangement) dan mengemukakan pengesahan rasmi secara bertulis daripada Jurutera Profesional (PE) atau juruelektrik bertauliah sama ada ini merupakan reka bentuk suis dua hala (2-way switching) yang disengajakan selaras dengan reka bentuk elektrik yang diluluskan.`
 );
 y += 4;
 
 numPara(4,
+  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}).`
+);
+y += 4;
+
+numPara(5,
   `Merujuk kepada Klausa Penyampaian Dokumen ${data.klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -293,7 +299,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(5,
+numPara(6,
   `Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Kedua (Final Notice) ini tamat tempohnya pada ${data.tarikhDeadlineNotis2}, saya akan tanpa berlengah lagi mengambil tindakan berikut:`
 );
 y += 2;
