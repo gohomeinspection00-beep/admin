@@ -51,6 +51,10 @@ const data = {
   kaedahPenghantaranNotis: "serahan tangan",
 
   kecacatan: [
+    { tag: "20", lokasi: "Car Porch — Wall", kecacatan: "Hollowness pada dinding masih ada (Hollowness on wall still observed)", status: "Belum Diselesaikan" },
+    { tag: "23", lokasi: "Car Porch — Drainage", kecacatan: "Keretakan pada U-drain masih ada (Crack on U-drain still observed — Major defects)", status: "Belum Diselesaikan" },
+    { tag: "35", lokasi: "Backyard — Wall", kecacatan: "Chipping dan keretakan pada dinding bercat — keretakan masih kelihatan (Chipping and crack on painted wall; crack still observed)", status: "Belum Diselesaikan" },
+    { tag: "36", lokasi: "Backyard — Wall", kecacatan: "Cat mengelupas dan keretakan pada dinding bercat — keretakan masih kelihatan (Peeling paint and crack on painted wall; crack still observed)", status: "Belum Diselesaikan" },
     { tag: "111", lokasi: "Bedroom 2 — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Diselesaikan" },
     { tag: "162", lokasi: "Bedroom 4 — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Diselesaikan" },
     { tag: "204", lokasi: "Terrace — Floor", kecacatan: "Keretakan besar di antara papak dan u-drain — keretakan masih kelihatan selepas pembaikan (Large crack between slab and u-drain; cracks still observed — Major defects)", status: "Belum Diselesaikan" },
