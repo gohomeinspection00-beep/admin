@@ -38,31 +38,35 @@ const data = {
   tempohDLP: "24",
 
   tarikhPemerhatian: "25 Jun 2026",
+  tarikhReInspection: "15 Ogos 2026",
+  tarikhSerahanLaporan2: "20 Ogos 2026",
   tarikhSerahanLaporan: "24 April 2026",
   kaedahSerahanLaporan: "e-mel dan aplikasi pemaju (IJM Connect)",
 
-  tarikhNotis: "1 Julai 2026",
-  tarikhDeadline: "16 Julai 2026",
+  tarikhNotis: "4 September 2026",
+  tarikhDeadline: "19 September 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
   kaedahPenghantaranNotis: "serahan tangan",
 
   kecacatan: [
-    { tag: "6", lokasi: "External Area — Wall", kecacatan: "Loose top of wall fence", status: "Belum Dibaiki" },
-    { tag: "13", lokasi: "Terrace — Floor", kecacatan: "Exposed construction left over on ground", status: "Belum Dibaiki" },
-    { tag: "198", lokasi: "Ceiling Area — Wall", kecacatan: "Exposed RC on column", status: "Belum Dibaiki" },
-    { tag: "218", lokasi: "Roof Area (First Level) — Roof", kecacatan: "Missing roof tiles causes of have opening", status: "Belum Dibaiki" },
-    { tag: "223", lokasi: "Top Roof — Wall", kecacatan: "Exposed corner bead and damage on edge of wall", status: "Belum Dibaiki" },
+    { tag: "111", lokasi: "Bedroom 2 — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Diselesaikan" },
+    { tag: "162", lokasi: "Bedroom 4 — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Diselesaikan" },
+    { tag: "204", lokasi: "Terrace — Floor", kecacatan: "Keretakan besar di antara papak dan u-drain — keretakan masih kelihatan selepas pembaikan (Large crack between slab and u-drain; cracks still observed — Major defects)", status: "Belum Diselesaikan" },
+    { tag: "215", lokasi: "Terrace — Ceiling", kecacatan: "Bunyi hollow pada soffit masih ada (Hollow sound on soffit still observed)", status: "Belum Diselesaikan" },
+    { tag: "218", lokasi: "Flat Roof 2 — Floor", kecacatan: "Kemungkinan air bertakung pada papak masih ada (Possible water stagnant on slab still observed)", status: "Belum Diselesaikan" },
   ],
 
   kronologi: [
     { tarikh: "16 Disember 2023", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
     { tarikh: "24 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui e-mel dan aplikasi pemaju (IJM Connect)" },
     { tarikh: "24 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan diambil" },
-    { tarikh: "25 Jun 2026", peristiwa: "Pemerhatian pemilik — kecacatan masih wujud dan belum dibaiki" },
-    { tarikh: "1 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "16 Julai 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "1 Julai 2026", peristiwa: "Notis Pertama dikeluarkan (tarikh akhir 16 Julai 2026) — pembaikan masih tidak disempurnakan" },
+    { tarikh: "15 Ogos 2026", peristiwa: "Pemeriksaan Kali Kedua (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan" },
+    { tarikh: "20 Ogos 2026", peristiwa: "Laporan Re-Inspection diserahkan kepada pemaju melalui aplikasi pemaju" },
+    { tarikh: "4 September 2026", peristiwa: "Notis Pertama (kemas kini) dikeluarkan" },
+    { tarikh: "19 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari notis ini)" },
   ],
 
   salinanKepada: [],
@@ -239,7 +243,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh notis ini dikeluarkan, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan langsung oleh pihak tuan. Berdasarkan pemerhatian pemilik pada ${data.tarikhPemerhatian}, kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari telah lama tamat dan Notis Pertama bertarikh 1 Julai 2026 telah dikeluarkan, Pemeriksaan Kali Kedua (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mendapati kecacatan masih belum diselesaikan oleh pihak tuan. Laporan Re-Inspection tersebut telah diserahkan kepada pihak tuan melalui aplikasi pemaju pada ${data.tarikhSerahanLaporan2}. Antara kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
