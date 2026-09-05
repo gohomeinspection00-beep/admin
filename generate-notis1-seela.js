@@ -43,8 +43,8 @@ const data = {
   tarikhSerahanLaporan: "24 April 2026",
   kaedahSerahanLaporan: "e-mel dan aplikasi pemaju (IJM Connect)",
 
-  tarikhNotis: "4 September 2026",
-  tarikhDeadline: "19 September 2026",
+  tarikhNotis: "5 September 2026",
+  tarikhDeadline: "20 September 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -69,8 +69,8 @@ const data = {
     { tarikh: "1 Julai 2026", peristiwa: "Notis Pertama dikeluarkan (tarikh akhir 16 Julai 2026) — pembaikan masih tidak disempurnakan" },
     { tarikh: "15 Ogos 2026", peristiwa: "Pemeriksaan Kali Kedua (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "20 Ogos 2026", peristiwa: "Laporan Re-Inspection diserahkan kepada pemaju melalui aplikasi pemaju" },
-    { tarikh: "4 September 2026", peristiwa: "Notis Pertama (kemas kini) dikeluarkan" },
-    { tarikh: "19 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari notis ini)" },
+    { tarikh: "5 September 2026", peristiwa: "Notis Pertama (kemas kini) dikeluarkan" },
+    { tarikh: "20 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari notis ini)" },
   ],
 
   salinanKepada: [],
