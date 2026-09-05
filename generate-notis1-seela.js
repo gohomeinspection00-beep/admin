@@ -66,11 +66,10 @@ const data = {
     { tarikh: "16 Disember 2023", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
     { tarikh: "24 April 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui e-mel dan aplikasi pemaju (IJM Connect)" },
     { tarikh: "24 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — tiada tindakan diambil" },
-    { tarikh: "1 Julai 2026", peristiwa: "Notis Pertama dikeluarkan (tarikh akhir 16 Julai 2026) — pembaikan masih tidak disempurnakan" },
     { tarikh: "15 Ogos 2026", peristiwa: "Pemeriksaan Kali Kedua (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "20 Ogos 2026", peristiwa: "Laporan Re-Inspection diserahkan kepada pemaju melalui aplikasi pemaju" },
-    { tarikh: "5 September 2026", peristiwa: "Notis Pertama (kemas kini) dikeluarkan" },
-    { tarikh: "20 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari notis ini)" },
+    { tarikh: "5 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "20 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -247,7 +246,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari telah lama tamat dan Notis Pertama bertarikh 1 Julai 2026 telah dikeluarkan, Pemeriksaan Kali Kedua (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mendapati kecacatan masih belum diselesaikan oleh pihak tuan. Laporan Re-Inspection tersebut telah diserahkan kepada pihak tuan melalui aplikasi pemaju pada ${data.tarikhSerahanLaporan2}. Antara kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah lama tamat pada 24 Mei 2026, Pemeriksaan Kali Kedua (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mendapati kecacatan masih belum diselesaikan oleh pihak tuan. Laporan Re-Inspection tersebut telah diserahkan kepada pihak tuan melalui aplikasi pemaju pada ${data.tarikhSerahanLaporan2}. Antara kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
