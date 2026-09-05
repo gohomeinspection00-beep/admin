@@ -309,6 +309,7 @@ y += 4;
 para("Sekian.");
 y += 10;
 
+checkBreak(60);
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Yang benar,", mL, y);
 y += 20;
