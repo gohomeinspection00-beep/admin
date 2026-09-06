@@ -957,7 +957,7 @@ function lukisPapan(bekas) {
               var tugas = x.tugasSubmit || x.tugasReport;
               return '<button type="button" class="amaran-item" data-tunggak="' + esc(x.id) +
                 '" data-sub-tunggak="' + (x._sub ? "1" : "") + '">' +
-                '<span><span class="nama">' + esc(x.nama || "Tanpa nama") +
+                '<span><span class="nama">' + esc(namaPapar(x.nama)) +
                 (x._sub ? ' <span class="tag-sub">SUB</span>' : "") + "</span>" +
                 '<div class="kecil">' + esc(fmtTarikh(x.tarikh)) + " · " +
                 esc(x.projek || "-") + (x.unit ? " " + esc(x.unit) : "") +
@@ -1083,14 +1083,14 @@ function lukisPapan(bekas) {
             subBakiSemua.slice(0, 5).map(function (x) {
               return '<button type="button" class="jumlah-baris" style="width:100%;border:0;background:none;' +
                 'cursor:pointer;text-align:left;font:inherit" data-sub-baki="' + esc(x.id) + '"><span>' +
-                esc(x.nama) + ' <span class="tag-sub">SUB</span>' +
+                esc(namaPapar(x.nama)) + ' <span class="tag-sub">SUB</span>' +
                 '<div class="kecil">' + esc(fmtTarikh(x.tarikh)) + "</div></span><b>" +
                 esc(rm(kiraSub(x).baki)) + "</b></button>";
             }).join("")
           : "") +
         '<div class="tajuk-seksyen">Baki belum kutip (' + adaBaki.length + ")</div>" +
         (adaBaki.length ? adaBaki.slice(0, 6).map(function (s) {
-          return '<div class="jumlah-baris"><span>' + esc(s.nama) + '<span class="kecil"> · ' +
+          return '<div class="jumlah-baris"><span>' + esc(namaPapar(s.nama)) + '<span class="kecil"> · ' +
             esc(fmtTarikh(s.tarikh)) + "</span></span><b>" + esc(rm(kiraSale(s).baki)) + "</b></div>";
         }).join("") : '<div class="kecil">Tiada baki tertunggak.</div>') +
       "</div>" +
@@ -1171,7 +1171,7 @@ function cartaMendatar(baris) {
   if (!baris.length) return kosong("Tiada data.");
   return '<div class="carta">' + baris.map(function (x) {
     return '<div class="carta-baris" title="' + esc(x.nama + ": " + x.teks) + '">' +
-      '<span class="nama">' + esc(x.nama) + "</span>" +
+      '<span class="nama">' + esc(namaPapar(x.nama)) + "</span>" +
       '<span class="carta-jalur"><span style="width:' +
         Math.max(2, Math.round((x.nilai / maks) * 100)) + '%"></span></span>' +
       '<span class="nilai">' + esc(x.teks) + "</span></div>";
@@ -1731,7 +1731,7 @@ function jobHari(tarikh) {
     job.map(function (s) {
       var k = kiraSale(s);
       return '<div class="senarai-item"><div class="jumlah-baris" style="border:0;padding:0">' +
-        "<span><b>" + esc(s.masaMula || "-") + "</b> · " + esc(s.nama) +
+        "<span><b>" + esc(s.masaMula || "-") + "</b> · " + esc(namaPapar(s.nama)) +
         '<div class="kecil">' + esc(s.projek || "-") + (s.unit ? " · " + esc(s.unit) : "") + "</div></span>" +
         "<span style='text-align:right'><b>" + esc(rm(k.total)) + "</b><br>" +
         lencanaKerja(s.statusKerja) + "</span></div></div>";
@@ -1908,7 +1908,7 @@ function jadualSale(senarai) {
       return "<tr>" +
         "<td>" + esc(fmtTarikh(s.tarikh)) + '<div class="kecil">' + esc(namaHari(s.tarikh)) + "</div></td>" +
         "<td>" + esc(s.masaMula || "-") + (s.masaTamat ? '<div class="kecil">hingga ' + esc(s.masaTamat) + "</div>" : "") + "</td>" +
-        '<td class="bungkus"><b>' + esc(s.nama || "-") + "</b>" +
+        '<td class="bungkus"><b>' + esc(namaPapar(s.nama)) + "</b>" +
           (s.telefon ? '<div class="kecil">' + esc(s.telefon) + "</div>" : "") + "</td>" +
         '<td class="bungkus">' + esc(s.projek || "-") +
           '<div class="kecil">' + esc(s.unit || "-") + (s.size ? " · " + esc(s.size) : "") + "</div></td>" +
@@ -2130,7 +2130,7 @@ function lihatSale(rekodId) {
   var k = kiraSale(s);
   var masa = (s.masaMula || "-") + (s.masaTamat ? " – " + s.masaTamat : "");
 
-  var m = modal("Butiran Jualan — " + (s.nama || "-"),
+  var m = modal("Butiran Jualan — " + namaPapar(s.nama),
     '<div class="baris-medan" style="margin-bottom:4px">' +
       medan("Status Kerja", "<select id='statusPantas'>" + statusSenarai(data.tetapan).map(function (x) {
         return "<option" + ((s.statusKerja || "Tempahan") === x ? " selected" : "") + ">" + esc(x) + "</option>";
@@ -2550,7 +2550,7 @@ function borangSale(rekodId, tarikhAsal, awalData) {
 
       '<div class="tajuk-seksyen">Client</div>' +
       '<div class="baris-medan">' +
-        medan("Nama *", '<input type="text" name="nama" value="' + esc(s.nama || "") + '" required>') +
+        medan("Nama", '<input type="text" name="nama" value="' + esc(s.nama || "") + '">') +
         medan("No. Telefon", '<input type="tel" name="telefon" placeholder="012-3456789" value="' + esc(s.telefon || "") + '">') +
         medan("Email", '<input type="email" name="email" value="' + esc(s.email || "") + '">') +
       "</div>" +
@@ -2663,7 +2663,6 @@ function borangSale(rekodId, tarikhAsal, awalData) {
     nilai.inspector = $$(".inspektorPilih:checked", borang).map(function (c) { return c.value; });
     if (quoteId) nilai.quoteId = quoteId;
     if (!nilai.tarikh) return toast("Sila isi tarikh.", "bad");
-    if (!nilai.nama) return toast("Sila isi nama client.", "bad");
     nilai.telefon = telefonKemas(nilai.telefon);
 
     var simpanan = baca();
@@ -2721,6 +2720,11 @@ function pilihanInspektor(data, dipilih) {
     return '<label class="chip pilih-chip"><input type="checkbox" class="inspektorPilih" value="' +
       esc(n) + '"' + (dipilih.indexOf(n) !== -1 ? " checked" : "") + ">" + esc(n) + "</label>";
   }).join("");
+}
+
+// Nama client tidak wajib — papar label ganti supaya senarai tidak kosong.
+function namaPapar(nama) {
+  return String(nama || "").trim() || "Tanpa nama";
 }
 
 function inisial(nama) {
@@ -3676,7 +3680,8 @@ function htmlQuotation(qt) {
     "</div>" +
 
     '<table style="margin-top:12px"><tr>' +
-      "<td style='width:50%'><b>Kepada:</b><br>" + esc(qt.client.nama || "-") +
+      "<td style='width:50%'><b>Kepada:</b>" +
+        (qt.client.nama ? "<br>" + esc(qt.client.nama) : "") +
         (qt.client.telefon ? "<br>" + esc(qt.client.telefon) : "") +
         (qt.client.alamat ? "<br>" + esc(qt.client.alamat) : "") + "</td>" +
       "<td><b>Perkhidmatan:</b> " + esc(qt.service) + "<br>" +
@@ -3954,11 +3959,12 @@ function bangunPdfQuote(qt) {
 
       /* --- kepala: logo + maklumat syarikat --- */
       var atas = y;
+      var tinggiLogo = 0;
       if (logo) {
         var skala = logo.scale(1);
-        var lebarLogo = Math.min(120, skala.width);
-        var tinggiLogo = skala.height * (lebarLogo / skala.width);
-        if (tinggiLogo > 54) { tinggiLogo = 54; lebarLogo = skala.width * (54 / skala.height); }
+        var lebarLogo = 160;                       // lebar tetap, sama nisbah dengan paparan skrin
+        tinggiLogo = skala.height * (lebarLogo / skala.width);
+        if (tinggiLogo > 92) { tinggiLogo = 92; lebarLogo = skala.width * (92 / skala.height); }
         muka.drawImage(logo, { x: PDF_TEPI, y: atas - tinggiLogo, width: lebarLogo, height: tinggiLogo });
       }
       var barisKepala = [c.namaSyarikat].concat(String(c.alamat || "").split("\n"))
@@ -3974,7 +3980,7 @@ function bangunPdfQuote(qt) {
             y: yKepala, size: saiz, font: font, color: i === 0 ? JENAMA : KELABU });
         });
       });
-      y = Math.min(yKepala, atas - (logo ? 58 : 0)) - 8;
+      y = Math.min(yKepala, atas - tinggiLogo) - 8;
       garisan(1.2, JENAMA);
       y -= 14;
 
@@ -3996,7 +4002,8 @@ function bangunPdfQuote(qt) {
       y = Math.min(y - 26, yKanan) - 10;
 
       /* --- kotak client / perkhidmatan --- */
-      var kiriBaris = ["Kepada:", qt.client.nama || "-"]
+      var kiriBaris = ["Kepada:"]
+        .concat(qt.client.nama ? [qt.client.nama] : [])
         .concat(qt.client.telefon ? [qt.client.telefon] : [])
         .concat(qt.client.alamat ? String(qt.client.alamat).split("\n") : []);
       var kananBaris = ["Perkhidmatan:", qt.service || "-", "",
@@ -4105,9 +4112,9 @@ function bangunPdfQuote(qt) {
       ruang(90);
       if (tandatangan) {
         var s2 = tandatangan.scale(1);
-        var lebarTt = Math.min(120, s2.width);
+        var lebarTt = 140;
         var tinggiTt = s2.height * (lebarTt / s2.width);
-        if (tinggiTt > 48) { tinggiTt = 48; lebarTt = s2.width * (48 / s2.height); }
+        if (tinggiTt > 70) { tinggiTt = 70; lebarTt = s2.width * (70 / s2.height); }
         muka.drawImage(tandatangan, { x: PDF_TEPI, y: y - tinggiTt, width: lebarTt, height: tinggiTt });
         y -= tinggiTt + 4;
       }
@@ -4275,7 +4282,7 @@ function borangQuotation(qId, saleId) {
 
       '<div class="tajuk-seksyen">Client</div>' +
       '<div class="baris-medan">' +
-        medan("Nama Client *", '<input type="text" name="c_nama" value="' + esc(qt.client.nama) + '" required>') +
+        medan("Nama Client", '<input type="text" name="c_nama" value="' + esc(qt.client.nama) + '">') +
         medan("No. WhatsApp", '<input type="tel" name="c_telefon" value="' + esc(qt.client.telefon) + '">') +
         medan("Jenis Hartanah", "<select name='c_jenis'>" + (t.jenisHartanah || []).map(function (x) {
           return "<option" + (qt.client.jenisHartanah === x ? " selected" : "") + ">" + esc(x) + "</option>";
@@ -4381,7 +4388,6 @@ function borangQuotation(qId, saleId) {
     e.preventDefault();
     var v = ambilNilai(borang);
     var fees = bacaFee();
-    if (!v.c_nama) return toast("Sila isi nama client.", "bad");
     if (!fees.length || jumlahFee(fees) <= 0) return toast("Sila isi sekurang-kurangnya satu pecahan harga.", "bad");
     var d = baca();
     if (d.quotation.some(function (x) { return x.no === v.no && x.id !== qId; })) {
@@ -4447,6 +4453,33 @@ function saleDariQuote(qId) {
   });
 }
 
+// Tukar quotation jadi sub job — data client dibawa, agihan RM diisi kemudian.
+function subJobDariQuote(qId) {
+  var data = baca();
+  var qt = data.quotation.filter(function (x) { return x.id === qId; })[0];
+  if (!qt) return;
+  if (qt.subjobId && data.subjob.some(function (x) { return x.id === qt.subjobId; })) {
+    return lihatSubJob(qt.subjobId);
+  }
+  var alamat = String(qt.client.alamat || "").replace(/\n+/g, ", ").trim();
+  var projek = "";
+  (data.tetapan.projek || []).forEach(function (p) {
+    if (p && alamat.toLowerCase().indexOf(String(p).toLowerCase()) !== -1 && p.length > projek.length) {
+      projek = p;
+    }
+  });
+  borangSubJob(null, kunciTarikh(), {
+    nama: qt.client.nama,
+    telefon: qt.client.telefon,
+    projek: projek,
+    unit: alamat,
+    size: qt.client.jenisHartanah || "",
+    harga: nom(qt.total),
+    catatan: "Dari quotation " + qt.no + (qt.service ? " · " + qt.service : ""),
+    quoteId: qt.id
+  });
+}
+
 function lihatQuotation(qId) {
   var data = baca();
   var qt = data.quotation.filter(function (x) { return x.id === qId; })[0];
@@ -4477,14 +4510,22 @@ function lihatQuotation(qId) {
       '<button type="button" class="btn btn-lembut btn-kecil" id="btnSalinPautan">Salin Pautan</button>' +
       '<button type="button" class="btn btn-lembut btn-kecil" id="btnBukaPautan">Buka Pautan</button>' +
     "</div>" +
+    '<div class="tajuk-seksyen">Tukar Jadi Kerja</div>' +
+    '<div class="aksi" style="margin:-4px 0 12px">' +
+      (qt.saleId
+        ? '<button type="button" class="btn btn-lembut btn-kecil" id="btnLihatSale">Lihat Sale</button>'
+        : '<button type="button" class="btn btn-ok btn-kecil" id="btnJadiSale">Jadikan Sale</button>') +
+      (qt.subjobId
+        ? '<button type="button" class="btn btn-lembut btn-kecil" id="btnLihatSub">Lihat Sub Job</button>'
+        : '<button type="button" class="btn btn-lembut btn-kecil" id="btnJadiSub">Jadikan Sub Job</button>') +
+    "</div>" +
+    '<p class="kecil" style="margin:-8px 0 12px">Sale masuk jualan syarikat. ' +
+      "Sub job direkod berasingan (tidak masuk target jualan).</p>" +
     '<div class="tajuk-seksyen">Mesej WhatsApp</div>' +
     '<textarea id="teksQuote" style="min-height:190px">' + esc(teksQuotation(qt)) + "</textarea>" +
     '<div class="baris-butang modal-kaki">' +
       '<button type="button" class="btn btn-bad" id="btnPadamQ">Padam</button>' +
       '<button type="button" class="btn btn-lembut" id="btnSuntingQ">Sunting</button>' +
-      (qt.saleId
-        ? '<button type="button" class="btn btn-lembut" id="btnLihatSale">Lihat Sale</button>'
-        : '<button type="button" class="btn btn-ok" id="btnJadiSale">Jadikan Sale</button>') +
       '<button type="button" class="btn btn-lembut" id="btnSalinQ">Salin Mesej</button>' +
       '<button type="button" class="btn btn-ok" id="btnWaQ">WhatsApp</button>' +
       '<button type="button" class="btn btn-lembut" id="btnCetakQ">Cetak</button>' +
@@ -4511,6 +4552,12 @@ function lihatQuotation(qId) {
   }
   if ($("#btnLihatSale", m.el)) {
     $("#btnLihatSale", m.el).onclick = function () { m.tutup(); lihatSale(qt.saleId); };
+  }
+  if ($("#btnJadiSub", m.el)) {
+    $("#btnJadiSub", m.el).onclick = function () { m.tutup(); subJobDariQuote(qId); };
+  }
+  if ($("#btnLihatSub", m.el)) {
+    $("#btnLihatSub", m.el).onclick = function () { m.tutup(); lihatSubJob(qt.subjobId); };
   }
   $("#statusQuote", m.el).onchange = function (e) {
     var d = baca();
@@ -4661,16 +4708,22 @@ function barisAgihan(a, i) {
   "</div>";
 }
 
-function borangSubJob(subId, tarikhAsal) {
+function borangSubJob(subId, tarikhAsal, awalData) {
   var data = baca();
   var j = subId ? data.subjob.filter(function (x) { return x.id === subId; })[0] : null;
   var baru = !j;
-  j = j || { tarikh: tarikhAsal || kunciTarikh(), statusKerja: statusSenarai(data.tetapan)[0],
-             agihan: [{ nama: "", jumlah: "", nota: "" }] };
+  j = j || Object.assign({ tarikh: tarikhAsal || kunciTarikh(),
+             statusKerja: statusSenarai(data.tetapan)[0],
+             agihan: [{ nama: "", jumlah: "", nota: "" }] }, awalData || {});
+  var quoteId = (awalData && awalData.quoteId) || j.quoteId || null;
+  var quote = quoteId ? data.quotation.filter(function (x) { return x.id === quoteId; })[0] : null;
 
   var m = modal(baru ? "Sub Job Baharu" : "Sunting Sub Job",
     '<p class="kecil" style="margin:0 0 12px">Sub job direkod berasingan — ia <b>tidak masuk</b> ' +
       "dalam jualan syarikat, target, atau resit/invois. Semua sub job diurus dalam menu Sub Job.</p>" +
+    (quote ? '<p class="kecil" style="margin:0 0 12px;padding:8px 10px;background:#f1f5f9;' +
+      'border-radius:8px">Diisi dari quotation <b>' + esc(quote.no) + "</b> (" + esc(rm(quote.total)) +
+      "). Lengkapkan tarikh, masa dan agihan RM di bawah.</p>" : "") +
     '<form id="borangSub">' +
       '<div class="tajuk-seksyen">Tempahan</div>' +
       '<div class="baris-medan">' +
@@ -4679,7 +4732,7 @@ function borangSubJob(subId, tarikhAsal) {
         medan("Masa Tamat", '<input type="text" name="masaTamat" placeholder="12.30pm" value="' + esc(j.masaTamat || "") + '">') +
       "</div>" +
       '<div class="baris-medan">' +
-        medan("Nama Client *", '<input type="text" name="nama" value="' + esc(j.nama || "") + '" required>') +
+        medan("Nama Client", '<input type="text" name="nama" value="' + esc(j.nama || "") + '">') +
         medan("No. Telefon", '<input type="tel" name="telefon" value="' + esc(j.telefon || "") + '">') +
         medan("Email", '<input type="email" name="email" value="' + esc(j.email || "") + '">') +
       "</div>" +
@@ -4770,7 +4823,6 @@ function borangSubJob(subId, tarikhAsal) {
     e.preventDefault();
     var v = ambilNilai(borang);
     if (!v.tarikh) return toast("Sila isi tarikh.", "bad");
-    if (!v.nama) return toast("Sila isi nama client.", "bad");
     var rekod = {
       id: subId || id(),
       tarikh: v.tarikh, masaMula: v.masaMula, masaTamat: v.masaTamat,
@@ -4778,15 +4830,29 @@ function borangSubJob(subId, tarikhAsal) {
       projek: v.projek, unit: v.unit, size: v.size,
       harga: nom(v.harga), statusKerja: v.statusKerja, catatan: v.catatan,
       agihan: bacaAgihan(),
+      quoteId: quoteId || null,
+      bayaran: j.bayaran || [],
       createdAt: j.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     var d = baca();
     if (subId) d.subjob = d.subjob.map(function (x) { return x.id === subId ? rekod : x; });
-    else d.subjob.push(rekod);
+    else {
+      d.subjob.push(rekod);
+      if (quoteId) {
+        d.quotation = d.quotation.map(function (x) {
+          if (x.id !== quoteId) return x;
+          x.subjobId = rekod.id;
+          if (x.status === "Draf" || x.status === "Dihantar") x.status = "Diterima";
+          return x;
+        });
+      }
+    }
     if (!simpan(d)) return;
     m.tutup();
-    toast(subId ? "Sub job dikemas kini." : "Sub job direkod.", "ok");
+    toast(subId
+      ? "Sub job dikemas kini."
+      : (quoteId ? "Sub job direkod & quotation ditanda Diterima." : "Sub job direkod."), "ok");
     lukis();
   };
 }
@@ -4796,7 +4862,7 @@ function lihatSubJob(subId) {
   var j = data.subjob.filter(function (x) { return x.id === subId; })[0];
   if (!j) return;
   var k = kiraSub(j);
-  var m = modal("Sub Job — " + (j.nama || "-"),
+  var m = modal("Sub Job — " + namaPapar(j.nama),
     '<div class="baris-medan" style="margin-bottom:8px">' +
       medan("Status Kerja", "<select id='statusSub'>" + statusSenarai(data.tetapan).map(function (x) {
         return "<option" + ((j.statusKerja || "") === x ? " selected" : "") + ">" + esc(x) + "</option>";
@@ -4806,6 +4872,11 @@ function lihatSubJob(subId) {
     "</div>" +
     '<div class="tajuk-seksyen">Butiran</div>' +
     '<dl class="kunci-nilai">' +
+      (function () {
+        var q = j.quoteId ? data.quotation.filter(function (x) { return x.id === j.quoteId; })[0] : null;
+        return q ? "<dt>Quotation</dt><dd>" + esc(q.no) + " · " + esc(rm(q.total)) +
+          " <button type='button' class='btn btn-lembut btn-kecil' id='btnQuoteSub'>Buka</button></dd>" : "";
+      })() +
       baris("Tarikh", fmtTarikh(j.tarikh) + " (" + namaHari(j.tarikh) + ")") +
       baris("Masa", (j.masaMula || "-") + (j.masaTamat ? " – " + j.masaTamat : "")) +
       baris("Client", j.nama) + baris("Telefon", j.telefon) + baris("Email", j.email) +
@@ -4856,6 +4927,9 @@ function lihatSubJob(subId) {
   });
   $("#btnTutupSub", m.el).onclick = m.tutup;
   $("#btnSuntingSub", m.el).onclick = function () { m.tutup(); borangSubJob(subId); };
+  if ($("#btnQuoteSub", m.el)) {
+    $("#btnQuoteSub", m.el).onclick = function () { m.tutup(); lihatQuotation(j.quoteId); };
+  }
   $("#statusSub", m.el).onchange = function (e) {
     var d = baca();
     d.subjob = d.subjob.map(function (x) {
@@ -4937,7 +5011,7 @@ function lukisSubJob(bekas) {
           return "<tr>" +
             "<td>" + esc(fmtTarikh(j.tarikh)) + '<div class="kecil">' +
               esc(j.masaMula || "-") + "</div></td>" +
-            '<td class="bungkus"><b>' + esc(j.nama) + "</b>" +
+            '<td class="bungkus"><b>' + esc(namaPapar(j.nama)) + "</b>" +
               (j.telefon ? '<div class="kecil">' + esc(j.telefon) + "</div>" : "") + "</td>" +
             '<td class="bungkus">' + esc(j.projek || "-") +
               '<div class="kecil">' + esc(j.unit || "-") + "</div></td>" +
@@ -5091,7 +5165,7 @@ function lukisOperasi(bekas) {
           return "<tr>" +
             "<td><b>" + esc(s.masaMula || "-") + "</b>" +
               (s.masaTamat ? '<div class="kecil">hingga ' + esc(s.masaTamat) + "</div>" : "") + "</td>" +
-            '<td class="bungkus"><b>' + esc(s.nama || "-") + "</b>" +
+            '<td class="bungkus"><b>' + esc(namaPapar(s.nama)) + "</b>" +
               (s.telefon ? '<div class="kecil">' + esc(s.telefon) + "</div>" : "") + "</td>" +
             '<td class="bungkus">' + esc(s.projek || "-") +
               '<div class="kecil">' + esc(s.unit || "-") + "</div></td>" +
@@ -5128,7 +5202,7 @@ function lukisOperasi(bekas) {
             (senarai.length ? senarai.map(function (s) {
               return '<div class="kecil" style="padding-left:2px">' +
                 esc(s.masaMula || "-") + (s.masaTamat ? " – " + esc(s.masaTamat) : "") + " · " +
-                esc(s.nama) + " · " + esc(s.projek || "-") + "</div>";
+                esc(namaPapar(s.nama)) + " · " + esc(s.projek || "-") + "</div>";
             }).join("") : "") +
           "</div>";
         }).join("") : kosong("Belum ada staf kumpulan Operasi. Tambah di menu Staf.")) +
@@ -5145,7 +5219,7 @@ function lukisOperasi(bekas) {
           }).sort(function (a, b) { return String(a.tarikh).localeCompare(String(b.tarikh)); });
           return akan.length ? akan.map(function (s) {
             return '<div class="jumlah-baris"><span>' + esc(fmtTarikh(s.tarikh)) + " · " +
-              esc(s.masaMula || "-") + " · " + esc(s.nama) + "</span>" +
+              esc(s.masaMula || "-") + " · " + esc(namaPapar(s.nama)) + "</span>" +
               '<button class="btn btn-lembut btn-kecil" data-tugas="' + esc(s.id) + '">Tugaskan</button></div>';
           }).join("") : '<div class="kecil">Semua job dalam 7 hari sudah ada staf.</div>';
         })() +
@@ -5269,7 +5343,7 @@ function borangInspektor(rekodId, bekas) {
   var data = baca();
   var s = data.sale.filter(function (x) { return x.id === rekodId; })[0];
   if (!s) return;
-  var m = modal("Tugaskan Staf — " + (s.nama || "-"),
+  var m = modal("Tugaskan Staf — " + namaPapar(s.nama),
     '<p class="kecil" style="margin:0 0 12px">' + esc(fmtTarikh(s.tarikh)) + " · " +
       esc(s.masaMula || "-") + (s.masaTamat ? " – " + esc(s.masaTamat) : "") + " · " +
       esc(s.projek || "-") + "</p>" +
