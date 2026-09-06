@@ -140,3 +140,102 @@ td.bungkus{white-space:normal;min-width:200px}
 </style>
 </head>
 <body>
+
+<!-- =====================================================================
+     RANGKA UI + PETA MODUL
+     Fail ini adalah asas (design system + peta modul) untuk Sistem
+     Pengurusan Syarikat. Modul sebenar akan ditambah satu per satu.
+     ================================================================== -->
+<div class="rangka">
+  <aside id="sisi" class="sisi">
+    <div class="sisi-atas">
+      <div class="logo kecil">SP</div>
+      <div>
+        <div class="sisi-syarikat">Syarikat Saya</div>
+        <div class="sisi-sub">Sistem Pengurusan</div>
+      </div>
+    </div>
+    <nav id="navMenu" class="nav"></nav>
+    <div class="sisi-bawah">
+      <div class="pengguna">
+        <div class="avatar">A</div>
+        <div>
+          <div class="pengguna-nama">Admin</div>
+          <div class="pengguna-peranan">Pentadbir</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div id="litup" class="litup"></div>
+  <main class="utama">
+    <header class="bar-atas">
+      <button id="btnMenu" class="btn-ikon" type="button" aria-label="Menu">&#9776;</button>
+      <h2>Peta Modul</h2>
+    </header>
+    <div class="kandungan">
+      <div class="kad">
+        <div class="kad-tajuk">
+          <h3>Sistem Pengurusan Syarikat — rangka awal</h3>
+          <span class="badge badge-warn">Dalam pembinaan</span>
+        </div>
+        <p class="kecil">Fail ini mengandungi rangka antara muka (warna, butang, jadual,
+        kad, menu sisi, paparan telefon). Modul sebenar akan dibina satu demi satu
+        mengikut keutamaan yang dipersetujui.</p>
+      </div>
+      <div id="petaModul" class="grid grid-2"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* Peta modul — susunan fasa pembinaan. Kemas kini status bila modul siap. */
+var PETA = [
+  { fasa:"Fasa 1 — Key-in Sale (keutamaan)", status:"seterusnya", modul:[
+    "Borang key-in tempahan: tarikh, masa, nama, no. tel, email",
+    "Butiran unit: size, no. unit, projek/daerah",
+    "Kewangan: harga, deposit, baki (auto kira), water & electric",
+    "Closed by (sales) + sumber lead (From)",
+    "Senarai harian & bulanan — cari, tapis, sunting, padam",
+    "Target harian vs jualan sebenar + baki ke target bulanan"]},
+  { fasa:"Fasa 2 — Track Submission", status:"cadangan", modul:[
+    "Status kerja: Tempahan → Inspection selesai → Report submit → Selesai",
+    "Tanda invois 1 & invois 2, resit deposit / baki",
+    "Amaran: baki belum bayar, report belum submit",
+    "Rekod hari cuti / offday supaya target harian tepat"]},
+  { fasa:"Fasa 3 — Laporan & Eksport", status:"cadangan", modul:[
+    "Ringkasan bulanan: jumlah sale, deposit, baki, capaian target",
+    "Prestasi setiap sales (closed by) & setiap projek",
+    "Eksport CSV/Excel + cetak jadual harian",
+    "Backup & restore data (fail JSON)"]},
+  { fasa:"Fasa 4 — Management (kemudian)", status:"cadangan", modul:[
+    "Log masuk & peranan (Admin / Sales / Staf)",
+    "Kehadiran staf, cuti, tuntutan (claim)",
+    "Pengumuman dalaman & log aktiviti",
+    "Gaji / komisen sales"]}
+];
+
+document.getElementById("petaModul").innerHTML = PETA.map(function(f){
+  return '<div class="kad"><div class="kad-tajuk"><h3>' + f.fasa +
+    '</h3><span class="badge badge-muted">' + f.status + '</span></div>' +
+    f.modul.map(function(m){ return '<div class="senarai-item">' + m + '</div>'; }).join("") +
+    '</div>';
+}).join("");
+
+document.getElementById("navMenu").innerHTML = [
+  ["🏠","Papan Utama"],["🕒","Kehadiran"],["🧾","Tuntutan"],
+  ["🌴","Cuti"],["📢","Pengumuman"],["👥","Urus Staf"],
+  ["📊","Laporan"],["⚙️","Tetapan"]
+].map(function(m,i){
+  return '<a class="nav-item' + (i===0?' aktif':'') + '" href="#"><span class="nav-ikon">' +
+    m[0] + '</span><span>' + m[1] + '</span></a>';
+}).join("");
+
+document.getElementById("btnMenu").onclick = function(){
+  document.getElementById("sisi").classList.toggle("buka");
+};
+document.getElementById("litup").onclick = function(){
+  document.getElementById("sisi").classList.remove("buka");
+};
+</script>
+</body>
+</html>
