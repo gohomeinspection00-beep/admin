@@ -258,6 +258,19 @@ body.cetak-resit #kertasResit{display:block}
   .resit{width:auto;min-height:auto;padding:0;box-shadow:none}
 }
 
+/* --- kumpulan ikut client (boleh kembang) --- */
+.kumpulan{border:1px solid var(--garis);border-radius:12px;margin-bottom:10px;overflow:hidden;background:#fff}
+.kumpulan-kepala{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;background:#f8fafc;border:0;font:inherit;cursor:pointer;text-align:left;color:var(--teks)}
+.kumpulan-kepala:hover{background:#f1f5f9}
+.kumpulan-panah{transition:transform .15s;color:var(--lembut);font-size:12px;flex:0 0 12px}
+.kumpulan.buka .kumpulan-panah{transform:rotate(90deg)}
+.kumpulan-nama{font-weight:700}
+.kumpulan-info{color:var(--lembut);font-size:12px}
+.kumpulan-kanan{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
+.kumpulan-anak{display:none;padding:0 12px 10px}
+.kumpulan.buka .kumpulan-anak{display:block}
+@media(max-width:560px){.kumpulan-kepala{flex-wrap:wrap}.kumpulan-kanan{margin-left:0;width:100%;text-align:left}}
+
 /* --- telefon --- */
 @media(max-width:860px){
   .sisi{position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .22s ease}
@@ -375,7 +388,18 @@ var TETAPAN_ASAL = {
     prefixInvois: "INV",
     nomborInvois: 1,
     tempohHari: 7,
-    notaInvois: "Sila jelaskan bayaran sebelum tarikh akhir di atas."
+    notaInvois: "Sila jelaskan bayaran sebelum tarikh akhir di atas.",
+    teksInvois: "Salam {nama},\n\n" +
+      "Berikut invois {no} untuk {servis}.\n" +
+      "Tarikh inspection: {tarikhInspeksi}\n\n" +
+      "Jumlah perlu dibayar: {jumlah}\n" +
+      "Sila jelaskan sebelum {tarikhAkhir}.\n\n" +
+      "Pembayaran:\n{bank}\n{akaun} ({namaAkaun})\n\n" +
+      "Mohon hantar bukti pembayaran selepas transaksi. Terima kasih.\n{syarikat}",
+    teksResit: "Salam {nama},\n\n" +
+      "Terima kasih. Kami telah menerima bayaran {jenis} sebanyak {jumlah}.\n\n" +
+      "No. resit: {no}\nTarikh: {tarikh}\nBaki tertunggak: {baki}\n\n" +
+      "Resit rasmi dilampirkan. Terima kasih.\n{syarikat}"
   }
 };
 
@@ -738,6 +762,27 @@ function lukisPapan(bekas) {
 
   $("#papanBulan").onchange = function (e) { papanBulan = e.target.value; lukisPapan(bekas); };
   $("#btnCepatSale").onclick = function () { borangSale(null); };
+}
+
+// Kumpulkan dokumen (resit/invois) ikut nama client, boleh kembang.
+function kumpulanClient(senarai, nilaiUtama) {
+  var peta = {};
+  senarai.forEach(function (r) {
+    var kunci = String(r.client && r.client.nama ? r.client.nama : "Tanpa nama").trim().toLowerCase();
+    if (!peta[kunci]) {
+      peta[kunci] = { nama: (r.client && r.client.nama) || "Tanpa nama", senarai: [], jumlah: 0 };
+    }
+    peta[kunci].senarai.push(r);
+    peta[kunci].jumlah += nom(nilaiUtama(r));
+  });
+  return Object.keys(peta).map(function (k) { return peta[k]; })
+    .sort(function (a, b) { return b.jumlah - a.jumlah; });
+}
+
+function pasangKumpulan(bekas) {
+  $$(".kumpulan-kepala", bekas).forEach(function (btn) {
+    btn.onclick = function () { btn.parentElement.classList.toggle("buka"); };
+  });
 }
 
 function kadStat(label, nilai, nota) {
@@ -1452,8 +1497,8 @@ function jadualSale(senarai) {
             ? esc(s.inspector.join(", ")) : "belum tugas") + "</div></td>" +
         "<td>" + lencanaKerja(s.statusKerja) + "<div style='margin-top:4px'>" + lencanaBayar(k) + "</div></td>" +
         '<td><div class="aksi">' +
-          '<button class="btn btn-lembut" data-lihat="' + esc(s.id) + '">Lihat</button>' +
-          '<button class="btn btn-lembut" data-sunting="' + esc(s.id) + '">Sunting</button>' +
+          '<button class="btn btn-lembut" data-lihat="' + esc(s.id) + '">Buka</button>' +
+          '<button class="btn btn-lembut" data-invois-sale="' + esc(s.id) + '">Invois</button>' +
         "</div></td></tr>";
     }).join("") + "</tbody></table>";
 }
@@ -1461,6 +1506,9 @@ function jadualSale(senarai) {
 function pasangAksiJadual(bekas) {
   $$("[data-sunting]", bekas).forEach(function (b) {
     b.onclick = function () { borangSale(b.getAttribute("data-sunting")); };
+  });
+  $$("[data-invois-sale]", bekas).forEach(function (b) {
+    b.onclick = function () { borangInvois({ saleId: b.getAttribute("data-invois-sale") }); };
   });
   $$("[data-lihat]", bekas).forEach(function (b) {
     b.onclick = function () { lihatSale(b.getAttribute("data-lihat")); };
@@ -1616,7 +1664,8 @@ function jenisSeterusnya(bil) {
   return ["Deposit", "Bayaran Kedua", "Bayaran Ketiga", "Bayaran Akhir"][bil] || "Bayaran Tambahan";
 }
 
-function borangBayaran(saleId, bayaranId) {
+function borangBayaran(saleId, bayaranId, opsi) {
+  opsi = opsi || {};
   var data = baca();
   var s = data.sale.filter(function (x) { return x.id === saleId; })[0];
   if (!s) return;
@@ -1626,7 +1675,9 @@ function borangBayaran(saleId, bayaranId) {
   var bakiSemasa = baru ? k.baki : k.baki + nom(b.jumlah);
 
   b = b || { tarikh: kunciTarikh(), jenis: jenisSeterusnya((s.bayaran || []).length),
-             jumlah: bakiSemasa, kaedah: KAEDAH_BAYAR[0], rujukan: "", catatan: "" };
+             jumlah: opsi.jumlah !== undefined ? nom(opsi.jumlah) : bakiSemasa,
+             kaedah: KAEDAH_BAYAR[0], rujukan: "",
+             catatan: opsi.invoisId ? "Bayaran bagi invois" : "" };
 
   var m = modal((baru ? "Rekod Bayaran" : "Sunting Bayaran") + " — " + (s.nama || "-"),
     '<div class="jumlah-baris"><span>Jumlah invois</span><b>' + esc(rm(k.total)) + "</b></div>" +
@@ -1715,7 +1766,7 @@ function borangBayaran(saleId, bayaranId) {
     toast(bayaranId ? "Bayaran dikemas kini." : "Bayaran direkod.", "ok");
     lukis();
     if (bayaranId) lihatSale(saleId);
-    else borangResit({ saleId: saleId, bayaranId: idBaru });
+    else borangDok("resit", { saleId: saleId, bayaranId: idBaru, invoisId: opsi.invoisId || null });
   };
 }
 
@@ -2067,28 +2118,32 @@ function cetakResit(id) { cetakDok("resit", id); }
 function teksDok(r) {
   var k = kiraResit(r);
   var c = r.syarikat || TETAPAN_ASAL.resit;
-  var kepala = r.dokJenis === "invois"
-    ? "INVOIS PEMBAYARAN\n" : "RESIT PEMBAYARAN\n";
-  var badan = "No: " + r.no + "\n" +
-    "Tarikh: " + fmtTarikh(r.tarikh) + "\n" +
-    (r.dokJenis === "invois" && r.tarikhAkhir ? "Bayar sebelum: " + fmtTarikh(r.tarikhAkhir) + "\n" : "") +
-    "\nClient: " + r.client.nama + "\n" +
-    "Servis: " + r.servis + "\n" +
-    (r.insp.tarikh ? "Tarikh inspection: " + fmtTarikh(r.insp.tarikh) +
-      (r.insp.masa ? " (" + r.insp.masa + ")" : "") + "\n" : "") + "\n" +
-    "Sub-total: " + rm(k.sub) + "\n" +
-    (k.terdahulu > 0 ? (r.dokJenis === "invois" ? "Bayaran diterima: " : "Bayaran terdahulu: ") +
-      rm(k.terdahulu) + "\n" : "");
+  var invois = r.dokJenis === "invois";
+  var templat = (invois ? c.teksInvois : c.teksResit) ||
+    (invois ? TETAPAN_ASAL.resit.teksInvois : TETAPAN_ASAL.resit.teksResit);
 
-  if (r.dokJenis === "invois") {
-    badan += "JUMLAH PERLU DIBAYAR: " + rm(r.jumlahPerluBayar) + "\n\n" +
-      "Pembayaran:\n" + c.bank + "\n" + c.noAkaun + "\n" + c.namaAkaun + "\n\n" +
-      "Terima kasih.\n" + c.namaSyarikat;
-  } else {
-    badan += "Jumlah diterima (" + r.jenis + "): " + rm(r.jumlahDiterima) + "\n" +
-      "Baki: " + rm(k.baki) + "\n\nTerima kasih.\n" + c.namaSyarikat;
-  }
-  return kepala + badan;
+  var nilai = {
+    "{syarikat}": c.namaSyarikat,
+    "{no}": r.no,
+    "{tarikh}": fmtTarikh(r.tarikh),
+    "{tarikhAkhir}": r.tarikhAkhir ? fmtTarikh(r.tarikhAkhir) : "-",
+    "{nama}": r.client.nama,
+    "{telefon}": r.client.telefon || "",
+    "{servis}": r.servis,
+    "{jenis}": invois ? "Invois" : r.jenis,
+    "{jumlah}": rm(invois ? r.jumlahPerluBayar : r.jumlahDiterima),
+    "{subtotal}": rm(k.sub),
+    "{dibayar}": rm(k.terdahulu),
+    "{baki}": rm(k.baki),
+    "{bank}": c.bank,
+    "{akaun}": c.noAkaun,
+    "{namaAkaun}": c.namaAkaun,
+    "{tarikhInspeksi}": r.insp.tarikh
+      ? fmtTarikh(r.insp.tarikh) + (r.insp.masa ? " (" + r.insp.masa + ")" : "") : "-"
+  };
+  return Object.keys(nilai).reduce(function (teks, kunci) {
+    return teks.split(kunci).join(nilai[kunci]);
+  }, templat);
 }
 
 function teksResit(r) { return teksDok(r); }
@@ -2113,14 +2168,36 @@ function lihatDok(jenis, id) {
   var invois = jenis === "invois";
   var label = invois ? "Invois" : "Resit";
 
+  var data = baca();
+  var st = invois ? statusInvois(data, r) : null;
+  var resitBerkait = r.resitId ? data.resit.filter(function (x) { return x.id === r.resitId; })[0] : null;
+
   var m = modal(label + " " + r.no,
+    (invois
+      ? '<div class="baris-medan" style="margin-bottom:6px">' +
+          medan("Status Bayaran", "<select id='statusInvois'>" +
+            ["(automatik)", "Belum Bayar", "Bayar Sebahagian", "Sudah Bayar", "Batal"].map(function (x) {
+              var nilai = x === "(automatik)" ? "" : x;
+              return '<option value="' + esc(nilai) + '"' +
+                ((r.statusManual || "") === nilai ? " selected" : "") + ">" + esc(x) + "</option>";
+            }).join("") + "</select>") +
+          medan("Status Semasa", '<div style="padding-top:8px"><span class="badge badge-' + st.warna +
+            '">' + esc(st.teks) + "</span>" +
+            (resitBerkait ? ' <button type="button" class="btn btn-lembut btn-kecil" id="btnResitInvois">Resit ' +
+              esc(resitBerkait.no) + "</button>" : "") + "</div>") +
+        "</div>" +
+        (resitBerkait ? "" :
+          '<p class="kecil" style="margin:0 0 10px">Bila client sudah bayar, tekan ' +
+          "<b>Terima Bayaran &amp; Jana Resit</b> — bayaran akan direkod pada jualan dan resit dijana terus.</p>")
+      : "") +
     '<div class="pratonton">' + htmlDokumen(r) + "</div>" +
     '<div class="tajuk-seksyen">Teks untuk WhatsApp</div>' +
     '<textarea id="teksResitKotak" style="min-height:150px">' + esc(teksDok(r)) + "</textarea>" +
     '<div class="baris-butang modal-kaki">' +
       '<button type="button" class="btn btn-bad" id="btnPadamResit">Padam</button>' +
       '<button type="button" class="btn btn-lembut" id="btnSuntingResit">Sunting</button>' +
-      (invois && r.saleId ? '<button type="button" class="btn btn-lembut" id="btnBayarInvois">Rekod Bayaran</button>' : "") +
+      (invois && !resitBerkait
+        ? '<button type="button" class="btn btn-ok" id="btnBayarInvois">Terima Bayaran &amp; Jana Resit</button>' : "") +
       '<button type="button" class="btn btn-lembut" id="btnSalinResit">Salin Teks</button>' +
       '<button type="button" class="btn btn-ok" id="btnWaResit">WhatsApp</button>' +
       '<button type="button" class="btn btn-utama" id="btnCetakResit">Cetak / Simpan PDF</button>' +
@@ -2136,7 +2213,27 @@ function lihatDok(jenis, id) {
   };
   $("#btnSuntingResit", m.el).onclick = function () { m.tutup(); borangDok(jenis, { dokId: id }); };
   if ($("#btnBayarInvois", m.el)) {
-    $("#btnBayarInvois", m.el).onclick = function () { m.tutup(); borangBayaran(r.saleId, null); };
+    $("#btnBayarInvois", m.el).onclick = function () {
+      m.tutup();
+      if (r.saleId) borangBayaran(r.saleId, null, { jumlah: r.jumlahPerluBayar, invoisId: r.id });
+      else borangDok("resit", { invoisId: r.id });      // invois manual tanpa rekod jualan
+    };
+  }
+  if ($("#btnResitInvois", m.el)) {
+    $("#btnResitInvois", m.el).onclick = function () { m.tutup(); lihatResit(resitBerkait.id); };
+  }
+  if ($("#statusInvois", m.el)) {
+    $("#statusInvois", m.el).onchange = function (e) {
+      var d = baca();
+      d.invois = d.invois.map(function (x) {
+        if (x.id === id) x.statusManual = e.target.value;
+        return x;
+      });
+      if (!simpan(d)) return;
+      toast(e.target.value ? "Status ditetapkan: " + e.target.value
+                           : "Status kembali automatik.", "ok");
+      lukis();
+    };
   }
   $("#btnPadamResit", m.el).onclick = function () {
     sahkan("Padam " + label.toLowerCase() + " " + r.no + "? Nombor ini tidak akan digunakan semula.")
@@ -2171,6 +2268,8 @@ function borangDok(jenis, opsi) {
   if (r) {
     awal = JSON.parse(JSON.stringify(r));
   } else {
+    var inv = opsi.invoisId
+      ? data.invois.filter(function (x) { return x.id === opsi.invoisId; })[0] : null;
     var k = sale ? kiraSale(sale) : null;
     // Urutan ledger = urutan bayaran direkod. Jangan susun ikut tarikh, kerana
     // deposit boleh bertarikh lain daripada tarikh ia dimasukkan.
@@ -2220,6 +2319,22 @@ function borangDok(jenis, opsi) {
         inspector: sale ? (sale.inspector || []).join(", ") : ""
       }
     };
+
+    // Resit yang dijana dari invois tanpa rekod jualan: salin terus dari invois.
+    if (inv && !sale) {
+      awal.client = JSON.parse(JSON.stringify(inv.client));
+      awal.prop = JSON.parse(JSON.stringify(inv.prop));
+      awal.insp = JSON.parse(JSON.stringify(inv.insp));
+      awal.servis = inv.servis;
+      awal.qty = inv.qty;
+      awal.harga = inv.harga;
+      awal.diskaun = inv.diskaun;
+      awal.sebelum = inv.sebelum || [];
+      awal.bayaranTerdahulu = nom(inv.bayaranTerdahulu);
+      awal.jumlahDiterima = nom(inv.jumlahPerluBayar);
+      awal.jenis = "Bayaran Penuh";
+      awal.penuh = inv.penuh;
+    }
   }
 
   var m = modal(baru ? label + " Baharu" : "Sunting " + label + " " + r.no,
@@ -2329,6 +2444,13 @@ function borangDok(jenis, opsi) {
     var v = ambilNilai(borang);
     var d = baca();
     if (!v.no) return toast("Sila isi nombor " + label.toLowerCase() + ".", "bad");
+    if (invois && nom(v.jumlahPerluBayar) <= 0) {
+      return toast("Jumlah perlu dibayar mesti lebih daripada RM 0.", "bad", 4500);
+    }
+    if (!invois && nom(v.jumlahDiterima) <= 0) {
+      return toast("Resit mesti ada jumlah diterima. Rekod bayaran dahulu, " +
+        "kemudian tekan Buat Resit pada bayaran itu.", "bad", 6000);
+    }
     var bertindih = simpananDok(d, jenis).some(function (x) {
       return x.no === v.no && x.id !== (r ? r.id : null);
     });
@@ -2343,12 +2465,15 @@ function borangDok(jenis, opsi) {
       jenis: invois ? "Invois" : v.jenis,
       jumlahDiterima: invois ? 0 : nom(v.jumlahDiterima),
       jumlahPerluBayar: invois ? nom(v.jumlahPerluBayar) : 0,
+      statusManual: r ? (r.statusManual || "") : "",
+      resitId: r ? (r.resitId || null) : null,
       saleId: sale ? sale.id : (r ? r.saleId : null),
       servis: v.servis,
       qty: nom(v.qty) || 1,
       harga: nom(v.harga),
       diskaun: nom(v.diskaun),
       bayaranId: r ? r.bayaranId : (opsi.bayaranId || null),
+      invoisId: r ? r.invoisId : (opsi.invoisId || null),
       sebelum: r ? r.sebelum : awal.sebelum,
       bayaranTerdahulu: nom(v.bayaranTerdahulu),
       catatan: v.catatan,
@@ -2378,6 +2503,13 @@ function borangDok(jenis, opsi) {
       }
     }
 
+    // Sambungkan resit dengan invois asalnya.
+    if (!invois && rekod.invoisId) {
+      d.invois = d.invois.map(function (x) {
+        if (x.id === rekod.invoisId) x.resitId = rekod.id;
+        return x;
+      });
+    }
     // Sambungkan resit dengan bayaran supaya senarai bayaran tunjuk nombor resit.
     if (!invois && rekod.bayaranId && rekod.saleId) {
       d.sale = d.sale.map(function (x) {
@@ -2402,32 +2534,57 @@ function borangInvois(opsi) { borangDok("invois", opsi); }
 
 /* ------------------------- halaman invois ----------------------------- */
 var invoisBulan = "";
+var invoisCari = "";
+var resitBulan = "";
+var resitCari = "";
 
 // Status invois dikira dari bayaran sebenar dalam rekod jualan.
 function statusInvois(data, r) {
+  if (r.statusManual) {
+    return { teks: r.statusManual,
+      warna: r.statusManual === "Sudah Bayar" ? "ok" : (r.statusManual === "Batal" ? "bad" : "warn") };
+  }
   var sale = r.saleId ? data.sale.filter(function (x) { return x.id === r.saleId; })[0] : null;
   if (!sale) return { teks: "Manual", warna: "muted" };
   var k = kiraSale(sale);
   if (k.baki <= 0.005) return { teks: "Sudah Bayar", warna: "ok" };
   if (k.dibayar > nom(r.bayaranTerdahulu) + 0.005) return { teks: "Bayar Sebahagian", warna: "warn" };
   var lewat = r.tarikhAkhir && r.tarikhAkhir < kunciTarikh();
-  return { teks: lewat ? "Lewat" : "Belum Bayar", warna: lewat ? "bad" : "muted" };
+  return lewat ? { teks: "Lewat", warna: "bad" } : { teks: "Belum Bayar", warna: "muted" };
 }
 
+// Baki semasa bagi semua jualan yang berkaitan dengan satu kumpulan dokumen.
+function bakiKumpulan(data, kumpulan) {
+  var idJualan = [];
+  kumpulan.senarai.forEach(function (r) {
+    if (r.saleId && idJualan.indexOf(r.saleId) === -1) idJualan.push(r.saleId);
+  });
+  return idJualan.reduce(function (j, sid) {
+    var sale = data.sale.filter(function (x) { return x.id === sid; })[0];
+    return j + (sale ? kiraSale(sale).baki : 0);
+  }, 0);
+}
+
+function tapisDok(senarai, bulan, cari) {
+  var teks = String(cari || "").trim().toLowerCase();
+  return senarai.filter(function (r) {
+    if (bulan && String(r.tarikh).slice(0, 7) !== bulan) return false;
+    if (teks) {
+      var gabung = [r.no, r.client.nama, r.client.telefon, r.client.email, r.servis].join(" ").toLowerCase();
+      if (gabung.indexOf(teks) === -1) return false;
+    }
+    return true;
+  }).sort(function (a, b) { return String(b.tarikh + b.no).localeCompare(String(a.tarikh + a.no)); });
+}
+
+/* ------------------------- halaman invois ----------------------------- */
 function lukisInvois(bekas) {
   var data = baca();
-  var senarai = data.invois.slice().sort(function (a, b) {
-    return String(b.tarikh + b.no).localeCompare(String(a.tarikh + a.no));
-  });
-  if (invoisBulan) {
-    senarai = senarai.filter(function (r) { return String(r.tarikh).slice(0, 7) === invoisBulan; });
-  }
+  var senarai = tapisDok(data.invois, invoisBulan, invoisCari);
   var jumlah = senarai.reduce(function (j, r) { return j + nom(r.jumlahPerluBayar); }, 0);
-  var belum = senarai.filter(function (r) {
-    var st = statusInvois(data, r).teks;
-    return st !== "Sudah Bayar";
-  });
+  var belum = senarai.filter(function (r) { return statusInvois(data, r).teks !== "Sudah Bayar"; });
   var jumlahBelum = belum.reduce(function (j, r) { return j + nom(r.jumlahPerluBayar); }, 0);
+  var kumpulan = kumpulanClient(senarai, function (r) { return r.jumlahPerluBayar; });
 
   bekas.innerHTML =
     '<div class="grid grid-4">' +
@@ -2438,7 +2595,7 @@ function lukisInvois(bekas) {
     "</div>" +
 
     '<div class="kad">' +
-      '<div class="kad-tajuk"><h3>Senarai Invois</h3>' +
+      '<div class="kad-tajuk"><h3>Invois Ikut Client</h3>' +
         '<div class="aksi">' +
           '<button class="btn btn-utama" id="btnInvoisBaru">Invois Baharu</button>' +
           '<button class="btn btn-lembut" id="btnEksportInvois">Eksport CSV</button>' +
@@ -2446,33 +2603,57 @@ function lukisInvois(bekas) {
       "</div>" +
       '<div class="penapis">' +
         '<label>Bulan<input type="month" id="fBulanInvois" value="' + esc(invoisBulan) + '"></label>' +
-        '<button class="btn btn-lembut" id="btnSemuaInvois">Semua Bulan</button>' +
+        '<label style="min-width:220px">Cari<input type="search" id="fCariInvois" placeholder="Nama client, no. invois…" value="' + esc(invoisCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnSemuaInvois">Reset</button>' +
       "</div>" +
-      '<div class="jadual-bungkus">' +
-      (senarai.length ? "<table><thead><tr><th>No. Invois</th><th>Tarikh</th><th>Tarikh Akhir</th>" +
-        "<th>Client</th><th class='num'>Perlu Bayar</th><th>Status</th><th></th></tr></thead><tbody>" +
-        senarai.map(function (r) {
-          var st = statusInvois(data, r);
-          return "<tr>" +
-            "<td><b>" + esc(r.no) + "</b></td>" +
-            "<td>" + esc(fmtTarikh(r.tarikh)) + "</td>" +
-            "<td>" + (r.tarikhAkhir ? esc(fmtTarikh(r.tarikhAkhir)) : "-") + "</td>" +
-            '<td class="bungkus">' + esc(r.client.nama) +
-              (r.client.telefon ? '<div class="kecil">' + esc(r.client.telefon) + "</div>" : "") + "</td>" +
-            '<td class="num"><b>' + esc(rm(r.jumlahPerluBayar)) + "</b></td>" +
-            '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span></td>" +
-            '<td><div class="aksi">' +
-              '<button class="btn btn-lembut" data-invois="' + esc(r.id) + '">Buka</button>' +
-              '<button class="btn btn-lembut" data-cetak-invois="' + esc(r.id) + '">Cetak</button>' +
-            "</div></td></tr>";
-        }).join("") + "</tbody></table>"
+      (kumpulan.length ? kumpulan.map(function (g) {
+        var baki = bakiKumpulan(data, g);
+        return '<div class="kumpulan' + (kumpulan.length === 1 ? " buka" : "") + '">' +
+          '<button type="button" class="kumpulan-kepala">' +
+            '<span class="kumpulan-panah">&#9654;</span>' +
+            "<span><span class='kumpulan-nama'>" + esc(g.nama) + "</span>" +
+              '<div class="kumpulan-info">' + g.senarai.length + " invois" +
+              (baki > 0.005 ? " · baki jualan " + esc(rm(baki)) : " · semua jualan lunas") + "</div></span>" +
+            '<span class="kumpulan-kanan"><b>' + esc(rm(g.jumlah)) + "</b>" +
+              '<div class="kumpulan-info">nilai invois</div></span>' +
+          "</button>" +
+          '<div class="kumpulan-anak"><div class="jadual-bungkus"><table><thead><tr>' +
+            "<th>No. Invois</th><th>Tarikh</th><th>Tarikh Akhir</th><th>Servis</th>" +
+            "<th class='num'>Perlu Bayar</th><th>Status</th><th></th></tr></thead><tbody>" +
+            g.senarai.map(function (r) {
+              var st = statusInvois(data, r);
+              return "<tr>" +
+                "<td><b>" + esc(r.no) + "</b></td>" +
+                "<td>" + esc(fmtTarikh(r.tarikh)) + "</td>" +
+                "<td>" + (r.tarikhAkhir ? esc(fmtTarikh(r.tarikhAkhir)) : "-") + "</td>" +
+                '<td class="bungkus">' + esc(r.servis) + "</td>" +
+                '<td class="num"><b>' + esc(rm(r.jumlahPerluBayar)) + "</b></td>" +
+                '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span>" +
+                  (r.resitId ? '<div class="kecil">resit dijana</div>' : "") + "</td>" +
+                '<td><div class="aksi">' +
+                  '<button class="btn btn-lembut" data-invois="' + esc(r.id) + '">Buka</button>' +
+                  '<button class="btn btn-lembut" data-cetak-invois="' + esc(r.id) + '">Cetak</button>' +
+                "</div></td></tr>";
+            }).join("") + "</tbody></table></div></div>" +
+        "</div>";
+      }).join("")
         : kosong("Belum ada invois. Tekan “Invois Baharu”, atau buka satu jualan dan tekan “Buat Invois”.")) +
-      "</div>" +
     "</div>";
 
   $("#btnInvoisBaru").onclick = function () { borangInvois({}); };
   $("#fBulanInvois").onchange = function (e) { invoisBulan = e.target.value; lukisInvois(bekas); };
-  $("#btnSemuaInvois").onclick = function () { invoisBulan = ""; lukisInvois(bekas); };
+  $("#btnSemuaInvois").onclick = function () {
+    invoisBulan = ""; invoisCari = ""; lukisInvois(bekas);
+  };
+  var kotak = $("#fCariInvois");
+  kotak.oninput = function (e) {
+    var pos = e.target.selectionStart;
+    invoisCari = e.target.value;
+    lukisInvois(bekas);
+    var baharu = $("#fCariInvois", bekas);
+    baharu.focus();
+    baharu.setSelectionRange(pos, pos);
+  };
   $("#btnEksportInvois").onclick = function () {
     if (!senarai.length) return toast("Tiada invois untuk dieksport.", "warn");
     csv("invois" + (invoisBulan ? "-" + invoisBulan : ""),
@@ -2484,66 +2665,88 @@ function lukisInvois(bekas) {
                 k.sub, k.terdahulu, nom(r.jumlahPerluBayar), statusInvois(data, r).teks];
       }));
   };
+  pasangKumpulan(bekas);
   $$("[data-invois]", bekas).forEach(function (b) {
-    b.onclick = function () { lihatInvois(b.getAttribute("data-invois")); };
+    b.onclick = function (e) { e.stopPropagation(); lihatInvois(b.getAttribute("data-invois")); };
   });
   $$("[data-cetak-invois]", bekas).forEach(function (b) {
-    b.onclick = function () { cetakDok("invois", b.getAttribute("data-cetak-invois")); };
+    b.onclick = function (e) { e.stopPropagation(); cetakDok("invois", b.getAttribute("data-cetak-invois")); };
   });
 }
 
 /* ------------------------- halaman resit ------------------------------ */
-var resitBulan = "";
-
 function lukisResit(bekas) {
   var data = baca();
-  var senarai = data.resit.slice().sort(function (a, b) {
-    return String(b.tarikh + b.no).localeCompare(String(a.tarikh + a.no));
-  });
-  if (resitBulan) {
-    senarai = senarai.filter(function (r) { return String(r.tarikh).slice(0, 7) === resitBulan; });
-  }
+  var senarai = tapisDok(data.resit, resitBulan, resitCari);
   var jumlah = senarai.reduce(function (j, r) { return j + nom(r.jumlahDiterima); }, 0);
+  var kumpulan = kumpulanClient(senarai, function (r) { return r.jumlahDiterima; });
 
   bekas.innerHTML =
+    '<div class="grid grid-4">' +
+      kadStat("Resit Dikeluarkan", String(senarai.length), resitBulan ? fmtBulan(resitBulan) : "semua bulan") +
+      kadStat("Jumlah Diterima", rm(jumlah), "mengikut resit") +
+      kadStat("Client", String(kumpulan.length), "ada resit") +
+      kadStat("Baki Semua Client", rm(kumpulan.reduce(function (j, g) {
+        return j + bakiKumpulan(data, g); }, 0)), "dari jualan berkaitan") +
+    "</div>" +
+
     '<div class="kad">' +
-      '<div class="kad-tajuk"><h3>Resit Dikeluarkan</h3>' +
+      '<div class="kad-tajuk"><h3>Resit Ikut Client</h3>' +
         '<div class="aksi">' +
-          '<button class="btn btn-utama" id="btnResitBaru">Resit Baharu</button>' +
           '<button class="btn btn-lembut" id="btnEksportResit">Eksport CSV</button>' +
         "</div>" +
       "</div>" +
       '<div class="penapis">' +
         '<label>Bulan<input type="month" id="fBulanResit" value="' + esc(resitBulan) + '"></label>' +
-        '<button class="btn btn-lembut" id="btnSemuaResit">Semua Bulan</button>' +
-        '<div style="margin-left:auto" class="kecil">' + senarai.length + " resit · jumlah diterima <b>" +
-          esc(rm(jumlah)) + "</b></div>" +
+        '<label style="min-width:220px">Cari<input type="search" id="fCariResit" placeholder="Nama client, no. resit…" value="' + esc(resitCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnSemuaResit">Reset</button>' +
       "</div>" +
-      '<div class="jadual-bungkus">' +
-      (senarai.length ? "<table><thead><tr><th>No. Resit</th><th>Tarikh</th><th>Client</th>" +
-        "<th>Jenis</th><th class='num'>Diterima</th><th class='num'>Baki</th><th></th></tr></thead><tbody>" +
-        senarai.map(function (r) {
-          var k = kiraResit(r);
-          return "<tr>" +
-            "<td><b>" + esc(r.no) + "</b></td>" +
-            "<td>" + esc(fmtTarikh(r.tarikh)) + "</td>" +
-            '<td class="bungkus">' + esc(r.client.nama) +
-              (r.client.telefon ? '<div class="kecil">' + esc(r.client.telefon) + "</div>" : "") + "</td>" +
-            '<td><span class="badge badge-muted">' + esc(r.jenis) + "</span></td>" +
-            '<td class="num"><b>' + esc(rm(r.jumlahDiterima)) + "</b></td>" +
-            '<td class="num">' + esc(rm(k.baki)) + "</td>" +
-            '<td><div class="aksi">' +
-              '<button class="btn btn-lembut" data-resit="' + esc(r.id) + '">Buka</button>' +
-              '<button class="btn btn-lembut" data-cetak="' + esc(r.id) + '">Cetak</button>' +
-            "</div></td></tr>";
-        }).join("") + "</tbody></table>"
-        : kosong("Belum ada resit. Tekan “Resit Baharu”, atau buka satu jualan dan tekan “Buat Resit”.")) +
-      "</div>" +
+      '<p class="kecil" style="margin:-4px 0 12px">Resit dijana dari bayaran yang direkod pada jualan. ' +
+      "Buka jualan → <b>+ Bayaran</b> → <b>Buat Resit</b>.</p>" +
+      (kumpulan.length ? kumpulan.map(function (g) {
+        var baki = bakiKumpulan(data, g);
+        return '<div class="kumpulan' + (kumpulan.length === 1 ? " buka" : "") + '">' +
+          '<button type="button" class="kumpulan-kepala">' +
+            '<span class="kumpulan-panah">&#9654;</span>' +
+            "<span><span class='kumpulan-nama'>" + esc(g.nama) + "</span>" +
+              '<div class="kumpulan-info">' + g.senarai.length + " resit" +
+              (baki > 0.005 ? " · baki belum bayar " + esc(rm(baki)) : " · lunas") + "</div></span>" +
+            '<span class="kumpulan-kanan"><b>' + esc(rm(g.jumlah)) + "</b>" +
+              '<div class="kumpulan-info">jumlah diterima</div></span>' +
+          "</button>" +
+          '<div class="kumpulan-anak"><div class="jadual-bungkus"><table><thead><tr>' +
+            "<th>No. Resit</th><th>Tarikh</th><th>Jenis Bayaran</th>" +
+            "<th class='num'>Diterima</th><th class='num'>Baki Ketika Itu</th><th></th></tr></thead><tbody>" +
+            g.senarai.map(function (r) {
+              var k = kiraResit(r);
+              return "<tr>" +
+                "<td><b>" + esc(r.no) + "</b></td>" +
+                "<td>" + esc(fmtTarikh(r.tarikh)) + "</td>" +
+                '<td><span class="badge badge-muted">' + esc(r.jenis) + "</span>" +
+                  (r.invoisId ? '<div class="kecil">dari invois</div>' : "") + "</td>" +
+                '<td class="num"><b>' + esc(rm(r.jumlahDiterima)) + "</b></td>" +
+                '<td class="num">' + esc(rm(k.baki)) + "</td>" +
+                '<td><div class="aksi">' +
+                  '<button class="btn btn-lembut" data-resit="' + esc(r.id) + '">Buka</button>' +
+                  '<button class="btn btn-lembut" data-cetak="' + esc(r.id) + '">Cetak</button>' +
+                "</div></td></tr>";
+            }).join("") + "</tbody></table></div></div>" +
+        "</div>";
+      }).join("")
+        : kosong("Belum ada resit. Buka satu jualan, rekod bayaran, kemudian tekan “Buat Resit”.")) +
     "</div>";
 
-  $("#btnResitBaru").onclick = function () { borangResit({}); };
   $("#fBulanResit").onchange = function (e) { resitBulan = e.target.value; lukisResit(bekas); };
-  $("#btnSemuaResit").onclick = function () { resitBulan = ""; lukisResit(bekas); };
+  $("#btnSemuaResit").onclick = function () { resitBulan = ""; resitCari = ""; lukisResit(bekas); };
+  var kotakR = $("#fCariResit");
+  kotakR.oninput = function (e) {
+    var pos = e.target.selectionStart;
+    resitCari = e.target.value;
+    lukisResit(bekas);
+    var baharu = $("#fCariResit", bekas);
+    baharu.focus();
+    baharu.setSelectionRange(pos, pos);
+  };
   $("#btnEksportResit").onclick = function () {
     if (!senarai.length) return toast("Tiada resit untuk dieksport.", "warn");
     csv("resit" + (resitBulan ? "-" + resitBulan : ""),
@@ -2554,13 +2757,15 @@ function lukisResit(bekas) {
                 nom(r.jumlahDiterima), k.sub, k.baki, r.servis];
       }));
   };
+  pasangKumpulan(bekas);
   $$("[data-resit]", bekas).forEach(function (b) {
-    b.onclick = function () { lihatResit(b.getAttribute("data-resit")); };
+    b.onclick = function (e) { e.stopPropagation(); lihatResit(b.getAttribute("data-resit")); };
   });
   $$("[data-cetak]", bekas).forEach(function (b) {
-    b.onclick = function () { cetakResit(b.getAttribute("data-cetak")); };
+    b.onclick = function (e) { e.stopPropagation(); cetakResit(b.getAttribute("data-cetak")); };
   });
 }
+
 
 /* ======================================================================
    HALAMAN 3 — OPERASI (siapa bergerak hari ini)
@@ -3005,6 +3210,14 @@ function lukisTetapan(bekas) {
           medan("Tempoh Bayaran (hari)", '<input type="number" min="0" name="tempohHari" value="' + esc(t.resit.tempohHari) + '">') +
         "</div>" +
         medan("Nota Bawah Invois", '<input type="text" name="notaInvois" value="' + esc(t.resit.notaInvois) + '">') +
+        '<div class="tajuk-seksyen">Ayat Hantar (WhatsApp)</div>' +
+        '<p class="kecil" style="margin:-4px 0 10px">Boleh guna: {nama} {no} {tarikh} {tarikhAkhir} ' +
+        "{servis} {jenis} {jumlah} {subtotal} {dibayar} {baki} {bank} {akaun} {namaAkaun} " +
+        "{tarikhInspeksi} {syarikat}</p>" +
+        medan("Ayat Hantar Invois",
+          '<textarea name="teksInvois" style="min-height:150px">' + esc(t.resit.teksInvois) + "</textarea>") +
+        medan("Ayat Hantar Resit",
+          '<textarea name="teksResit" style="min-height:130px">' + esc(t.resit.teksResit) + "</textarea>") +
         '<div class="baris-medan">' +
           medan("Bank", '<input type="text" name="bank" value="' + esc(t.resit.bank) + '">') +
           medan("No. Akaun", '<input type="text" name="noAkaun" value="' + esc(t.resit.noAkaun) + '">') +

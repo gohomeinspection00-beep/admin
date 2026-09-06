@@ -108,6 +108,10 @@ Selepas menyimpan bayaran, borang resit terus terbuka. Untuk bayaran lama,
 tekan **Buat Resit** pada baris bayaran itu. Resit yang sudah dijana dipapar
 sebagai nombor resit dalam senarai bayaran — tekan untuk buka semula.
 
+Resit **mesti ada jumlah diterima** — sistem tidak benarkan resit RM 0.
+Halaman Resit dan Invois disusun **ikut nama client** (tekan nama untuk kembang),
+lengkap dengan jumlah diterima dan baki semasa client itu.
+
 Resit mengambil kira **semua bayaran terdahulu**, contoh resit bayaran kedua:
 
 ```
@@ -139,7 +143,23 @@ AMOUNT DUE                             RM 450.00
 - Cetak/PDF, salin teks, atau hantar WhatsApp — sama seperti resit
 - **Status dikira automatik** dari bayaran sebenar dalam rekod jualan:
   Belum Bayar → Bayar Sebahagian → Sudah Bayar (Lewat jika lepas tarikh akhir)
-- Butang **Rekod Bayaran** dalam invois terus membuka borang bayaran
+- Butang **Terima Bayaran & Jana Resit** dalam invois: bayaran terus direkod pada
+  jualan (jumlah = amaun invois), resit dijana, dan invois bertukar *Sudah Bayar*
+  dengan pautan ke resit tersebut
+- Status juga boleh **ditetapkan manual** (Belum Bayar / Bayar Sebahagian /
+  Sudah Bayar / Batal) jika perlu
+- Invois boleh dijana dari butiran jualan **atau** terus dari baris dalam
+  paparan Senarai Key-in Sale
+
+## Ayat hantar WhatsApp
+
+Menu **Tetapan → Tetapan Resit** ada dua kotak ayat yang boleh disunting:
+*Ayat Hantar Invois* dan *Ayat Hantar Resit*. Guna kod ini dalam ayat, sistem
+akan gantikan automatik:
+
+`{nama}` `{no}` `{tarikh}` `{tarikhAkhir}` `{servis}` `{jenis}` `{jumlah}`
+`{subtotal}` `{dibayar}` `{baki}` `{bank}` `{akaun}` `{namaAkaun}`
+`{tarikhInspeksi}` `{syarikat}`
 
 Dari pratonton: **Cetak / Simpan PDF** (pilih "Save as PDF" dalam dialog cetak),
 **Salin Teks**, atau **WhatsApp** (terus ke nombor client jika ada).
