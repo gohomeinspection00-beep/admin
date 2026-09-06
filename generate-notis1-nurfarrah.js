@@ -203,8 +203,12 @@ y += 6;
 doc.setFont("helvetica", "bold");
 doc.setFontSize(SZ.BODY);
 bk();
-doc.text(`${data.namaPemaju} ${data.noSyarikat}`, mL, y);
+doc.text("PARKLAND GROUP", mL, y);
 y += LH_S;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text(`(bagi pihak ${data.namaPemaju} ${data.noSyarikat})`, mL, y);
+y += LH_S;
+doc.setFontSize(SZ.BODY);
 
 doc.setFont("helvetica", "normal");
 doc.setFontSize(SZ.BODY);
@@ -389,7 +393,7 @@ function drawAkuanTerima(copyLabel) {
   y += 12;
 
   doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
-  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
+  const akText = `Dengan ini diakui bahawa PARKLAND GROUP, bagi pihak ${data.namaPemaju} ${data.noSyarikat}, telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
   const ls = doc.splitTextToSize(akText, cW);
   for (const l of ls) { doc.text(l, mL, y); y += LH; }
 
