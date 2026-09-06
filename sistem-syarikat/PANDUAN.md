@@ -15,6 +15,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Papan Utama** | **Jalur amaran tugasan tertunggak di atas sekali**, jualan bulan ini, deposit, baki, % capai target, bilangan site, **carta 12 bulan (boleh tukar Jualan RM ↔ bilangan Site)**, job hari ini, kerja tertunggak, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf ditugaskan, job belum ditugaskan, beban kerja 7 hari, **carta tugasan inspector bulan ini**, **nilai site setiap inspector**, tugasan report & submission, tukar status terus dari jadual |
+| **Sub Job** | Kerja yang disubkan — direkod berasingan daripada jualan syarikat, dengan agihan RM kepada setiap staf/rakan dan baki bahagian syarikat |
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
@@ -213,6 +214,31 @@ Baris yang tak diisi diabaikan. Tarikh menerima `8/9/2026`, `08-09-2026` atau
 `2026-09-08`. Masa boleh guna `-`, `–` atau `hingga`. Staf inspection dipisah
 dengan koma dan terus ditandakan dalam borang.
 
+## Sub Job
+
+Kerja yang awak subkan kepada orang lain. **Tidak dikira** dalam jualan syarikat,
+target bulanan, papan utama, resit atau invois — semuanya diurus dalam menu
+**Sub Job** sahaja.
+
+Cara buat: klik kanan pada tarikh dalam kalendar → **Sub job baharu pada hari ini**
+(atau butang *Sub Job Baharu* dalam menu Sub Job).
+
+Isi butiran seperti biasa (tarikh, masa, client, projek, unit, harga), kemudian
+bahagian **Agihan**:
+
+- Tambah seberapa ramai staf/rakan — setiap seorang dapat berapa RM, dan peranan
+  mereka (contoh: *buat inspection*)
+- **Bahagian syarikat dikira automatik** = harga client − jumlah agihan
+  (contoh: RM 600 − RM 250 − RM 150 = **RM 200** untuk syarikat kerana cari site)
+
+Menu Sub Job memaparkan jumlah nilai client, jumlah diagihkan, bahagian syarikat,
+senarai penuh, carian, eksport CSV, serta **carta pendapatan setiap staf** dari
+sub job.
+
+Dalam kalendar, sub job dipapar dengan bingkai putus-putus dan tanda **SUB**
+supaya jadual tidak bertindih — tetapi jumlah harian dan target kekal mengira
+jualan syarikat sahaja.
+
 ## Kiraan automatik
 
 ```
@@ -257,6 +283,13 @@ Selain staf inspection, setiap job boleh ditetapkan:
 
 - **Report Disediakan Oleh** — siapa tulis report
 - **Submission Oleh** + **Jenis Submission** — siapa hantar dan submission apa
+
+Untuk submission, boleh simpan sekali **Portal / App**, **Username**, **Password**
+dan **Nota Submission** (contoh: OTP ke telefon siapa). Password dipapar bertanda
+titik dalam butiran job — tekan **Papar** untuk lihat.
+
+> Maklumat log masuk disimpan dalam pelayar komputer itu sahaja dan tidak dihantar
+> ke mana-mana. Jangan guna komputer berkongsi, dan pastikan backup disimpan selamat.
 
 Boleh diisi semasa key-in, atau melalui butang **Tugaskan** dalam menu Operasi.
 Menu Operasi memaparkan jadual *Tugasan Report & Submission* — berapa report dan
