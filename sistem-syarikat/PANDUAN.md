@@ -13,9 +13,30 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | Menu | Kegunaan |
 |---|---|
 | **Papan Utama** | Jualan bulan ini, deposit dikutip, baki belum kutip, % capai target, job hari ini, senarai perlu tindakan, prestasi ikut sales & projek |
-| **Key-in Sale** | Rekod setiap tempahan: tarikh, masa, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
+| **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Staf** | Tambah / sunting / padam staf. Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Nama syarikat, target jualan harian, hari bekerja, senarai projek, sumber lead, hari cuti, backup & restore |
+
+## Kalendar Key-in Sale
+
+Setiap kotak tarikh memaparkan nama client, **masa inspection (dari–hingga)**, jumlah,
+serta jumlah jualan hari itu. Warna jalur mengikut status kerja.
+
+| Tindakan | Cara |
+|---|---|
+| Key-in sale pada satu tarikh | **Klik kiri** pada kotak tarikh |
+| Lihat / tukar status / sunting / padam satu job | **Klik pada nama client** |
+| Tandakan cuti hujung minggu | **Klik kanan** → *Tandakan Cuti Hujung Minggu* |
+| Tandakan cuti lain (pilih sebab) | **Klik kanan** → *Tandakan cuti (pilih sebab)…* |
+| Buang tanda cuti | **Klik kanan** → *Buang tanda cuti* |
+| Tulis remark harian | **Klik kanan** → *Tambah remark* |
+| Urus semua cuti bulan itu | **Klik kanan** → *Urus cuti bulan …* |
+
+Pada telefon, **tekan lama** menggantikan klik kanan.
+
+Cuti yang ditanda dari kalendar akan jadi **merah** dan target harian menjadi RM 0,
+tetapi **tidak** masuk senarai Hari Cuti dalam Tetapan — melainkan kotak
+*"Masukkan juga ke senarai Hari Cuti dalam Tetapan"* ditandakan.
 
 ## Kiraan automatik
 
