@@ -18,6 +18,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Quotation** | Jana sebut harga A4, pautan Syarat & Terma untuk client, mesej WhatsApp, dan tukar quotation yang diterima menjadi sale |
 | **Sub Job** | Kerja yang disubkan — direkod berasingan daripada jualan syarikat, dengan agihan RM kepada setiap staf/rakan dan baki bahagian syarikat |
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
+| **Tunggakan** | Semua baki yang belum dikutip — jualan, sub job dan invois manual — disusun ikut umur hutang, dengan butang kejar bayaran WhatsApp |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Terbahagi kepada 5 tab: Syarikat & Target, Jualan & Status, Resit & Invois, Quotation, Data & Backup |
@@ -446,6 +447,34 @@ Menu Operasi memaparkan jadual *Tugasan Report & Submission* — berapa report d
 submission tertunggak bagi setiap staf, termasuk yang **belum ditugaskan**.
 
 Nombor merah pada menu **Key-in Sale** = bilangan job yang belum selesai.
+
+## Tunggakan (aging)
+
+Menu **Tunggakan** mengumpul semua duit yang belum masuk dalam satu skrin:
+
+- **Jualan** yang masih ada baki (rekod berstatus Batal tidak dikira)
+- **Sub job** yang belum dijelaskan client
+- **Invois manual** yang belum ditanda *Sudah Bayar*
+
+Umur hutang dikira dari **tarikh akhir invois**; kalau job itu tiada invois,
+dikira dari **tarikh kerja**. Kumpulan umur: *Belum matang* (belum sampai
+tarikh), *1–30 hari*, *31–60 hari*, *61 hari ke atas*.
+
+Setiap baris ada tiga butang:
+
+| Butang | Fungsi |
+|---|---|
+| **Buka** | Buka butiran jualan / sub job / invois |
+| **Bayar** | Terus rekod bayaran (jumlah baki sudah terisi) |
+| **WA** | Buka WhatsApp client dengan ayat kejar bayaran siap |
+
+Ayat kejar bayaran diubah di Tetapan → **Resit & Invois** → *Ayat Kejar Bayaran*.
+Boleh guna: `{nama} {syarikat} {tarikh} {tarikhAkhir} {projek} {unit} {jumlah}
+{dibayar} {baki} {hari} {bank} {akaun} {namaAkaun}`.
+
+Papan utama pula memaparkan jalur **Tunggakan Bayaran** bila ada rekod yang
+sudah lewat, dan menu sisi menunjukkan bilangannya. Semua senarai boleh
+dieksport ke CSV.
 
 ## Menu Tetapan
 

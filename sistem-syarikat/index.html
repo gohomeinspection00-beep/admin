@@ -511,7 +511,14 @@ var TETAPAN_ASAL = {
     teksResit: "Salam {nama},\n\n" +
       "Terima kasih. Kami telah menerima bayaran {jenis} sebanyak {jumlah}.\n\n" +
       "No. resit: {no}\nTarikh: {tarikh}\nBaki tertunggak: {baki}\n\n" +
-      "Resit rasmi dilampirkan. Terima kasih.\n{syarikat}"
+      "Resit rasmi dilampirkan. Terima kasih.\n{syarikat}",
+    teksKejar: "Salam {nama},\n\n" +
+      "Peringatan mesra dari {syarikat} berkenaan baki bayaran untuk inspection " +
+      "pada {tarikh} ({projek}).\n\n" +
+      "Jumlah: {jumlah}\nSudah dibayar: {dibayar}\n*Baki: {baki}*\n\n" +
+      "Pembayaran:\n{bank}\n{akaun} ({namaAkaun})\n\n" +
+      "Mohon hantar bukti pembayaran selepas transaksi supaya kami boleh keluarkan resit. " +
+      "Terima kasih.\n{syarikat}"
   }
 };
 
@@ -971,6 +978,31 @@ function lukisPapan(bekas) {
             ? '<div class="amaran-lagi">+ ' + (tunggak.length - 6) + " tugasan lagi tertunggak</div>" : "") +
         "</div>"
       : "") +
+    (function () {
+      var lewat = senaraiTunggakan(data).filter(function (x) { return x.hari > 0; });
+      if (!lewat.length) return "";
+      var jum = lewat.reduce(function (a, x) { return a + x.baki; }, 0);
+      var kritikal = lewat.filter(function (x) { return x.hari > 60; });
+      return '<div class="amaran">' +
+        '<div class="amaran-kepala"><h3>Tunggakan Bayaran</h3>' +
+          '<span class="amaran-kira">' + lewat.length + "</span>" +
+          '<span class="kecil" style="margin-left:auto">' + esc(rm(jum)) + " belum dikutip" +
+          (kritikal.length ? " · " + kritikal.length + " melebihi 60 hari" : "") + "</span></div>" +
+        '<div class="amaran-senarai">' +
+          lewat.slice(0, 4).map(function (x) {
+            return '<button type="button" class="amaran-item" data-tunggakbayar="' + esc(x.id) +
+              '" data-jenisbayar="' + esc(x.jenis) + '">' +
+              '<span><span class="nama">' + esc(namaPapar(x.nama)) + "</span>" +
+              '<div class="kecil">' + esc(fmtTarikh(x.tarikh)) + " · " +
+              esc(x.projek || "-") + " · " + esc(x.jenis) + "</div></span>" +
+              '<span class="kanan"><b style="color:var(--bad)">' + esc(rm(x.baki)) + "</b>" +
+              '<span class="badge badge-bad">' + x.hari + " hari</span></span></button>";
+          }).join("") +
+        "</div>" +
+        '<div class="amaran-lagi"><button type="button" class="btn btn-lembut btn-kecil" ' +
+          'id="bukaTunggak">Buka Senarai Tunggakan</button></div>' +
+      "</div>";
+    })() +
     '<div class="penapis">' +
       '<label>Bulan<input type="month" id="papanBulan" value="' + esc(papanBulan) + '"></label>' +
       '<button class="btn btn-utama" id="btnCepatSale">+ Key-in Sale Baru</button>' +
@@ -1118,6 +1150,15 @@ function lukisPapan(bekas) {
   $("#metrikJualan").onclick = function () { papanMetrik = "jualan"; lukisPapan(bekas); };
   $("#metrikSite").onclick = function () { papanMetrik = "site"; lukisPapan(bekas); };
   if ($("#bukaSubJob")) $("#bukaSubJob").onclick = function () { location.hash = "#/subjob"; };
+  if ($("#bukaTunggak")) $("#bukaTunggak").onclick = function () { location.hash = "#/tunggak"; };
+  $$("[data-tunggakbayar]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      var rid = b.getAttribute("data-tunggakbayar"), jenis = b.getAttribute("data-jenisbayar");
+      if (jenis === "Sub Job") return lihatSubJob(rid);
+      if (jenis === "Invois Manual") return lihatDok("invois", rid);
+      lihatSale(rid);
+    };
+  });
   $("#tahunTolak").onclick = function () { papanTahun--; lukisPapan(bekas); };
   $("#tahunTambah").onclick = function () { papanTahun++; lukisPapan(bekas); };
   $$(".carta-lajur", bekas).forEach(function (el, i) {
@@ -5812,6 +5853,11 @@ function lukisTetapan(bekas) {
             '<textarea name="teksInvois" style="min-height:150px">' + esc(t.resit.teksInvois) + "</textarea>") +
           medan("Ayat Hantar Resit",
             '<textarea name="teksResit" style="min-height:130px">' + esc(t.resit.teksResit) + "</textarea>") +
+          medan("Ayat Kejar Bayaran (halaman Tunggakan)",
+            '<textarea name="teksKejar" style="min-height:150px">' +
+            esc(t.resit.teksKejar || TETAPAN_ASAL.resit.teksKejar) + "</textarea>") +
+          '<p class="kecil" style="margin:-6px 0 12px">Ayat kejar bayaran boleh guna juga: ' +
+          "{projek} {unit} {hari} (bilangan hari lewat).</p>" +
           '<p class="kecil">Resit dan invois yang sudah dijana menyimpan salinan tetapan ini, ' +
           "jadi dokumen lama tidak berubah bila tetapan diubah.</p>" +
           '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan</button></div>' +
@@ -6100,6 +6146,265 @@ function pecahBaris(teks) {
 /* ======================================================================
    MENU & PENGHALAAN
    ================================================================== */
+/* ======================================================================
+   TUNGGAKAN — semua baki belum kutip (jualan, sub job, invois manual)
+   ================================================================== */
+
+var tunggakCari = "";
+var tunggakUmur = "";
+var tunggakJenis = "";
+
+// Tarikh sepatutnya dibayar: tarikh akhir invois kalau ada, jika tidak tarikh kerja.
+function tarikhTuntut(data, saleId, tarikhKerja) {
+  var akhir = "";
+  (data.invois || []).forEach(function (r) {
+    if (r.saleId === saleId && r.tarikhAkhir && r.tarikhAkhir > akhir) akhir = r.tarikhAkhir;
+  });
+  return akhir || tarikhKerja;
+}
+
+var UMUR_KUMPULAN = [
+  { id: "belum", label: "Belum matang", warna: "muted" },
+  { id: "1-30",  label: "1–30 hari",    warna: "warn" },
+  { id: "31-60", label: "31–60 hari",   warna: "warn" },
+  { id: "61",    label: "61 hari ke atas", warna: "bad" }
+];
+
+function kumpulanUmur(hari) {
+  if (hari <= 0) return UMUR_KUMPULAN[0];
+  if (hari <= 30) return UMUR_KUMPULAN[1];
+  if (hari <= 60) return UMUR_KUMPULAN[2];
+  return UMUR_KUMPULAN[3];
+}
+
+function senaraiTunggakan(data) {
+  var hasil = [];
+
+  data.sale.forEach(function (s) {
+    if ((s.statusKerja || "") === data.tetapan.statusBatal) return;
+    var k = kiraSale(s);
+    if (k.total <= 0 || k.baki <= 0.005) return;
+    var tt = tarikhTuntut(data, s.id, s.tarikh);
+    hasil.push({ id: s.id, jenis: "Jualan", nama: s.nama, telefon: s.telefon,
+      projek: s.projek, unit: s.unit, tarikh: s.tarikh, tarikhAkhir: tt,
+      total: k.total, dibayar: k.dibayar, baki: k.baki, hari: hariSejak(tt),
+      status: s.statusKerja || "" });
+  });
+
+  data.subjob.forEach(function (j) {
+    if ((j.statusKerja || "") === data.tetapan.statusBatal) return;
+    var k = kiraSub(j);
+    if (k.harga <= 0 || k.baki <= 0.005) return;
+    hasil.push({ id: j.id, jenis: "Sub Job", nama: j.nama, telefon: j.telefon,
+      projek: j.projek, unit: j.unit, tarikh: j.tarikh, tarikhAkhir: j.tarikh,
+      total: k.harga, dibayar: k.dibayar, baki: k.baki, hari: hariSejak(j.tarikh),
+      status: j.statusKerja || "" });
+  });
+
+  // Invois manual (tiada rekod jualan) — kalau tidak, tunggakannya terlepas pandang.
+  (data.invois || []).forEach(function (r) {
+    if (r.saleId) return;
+    if (r.statusManual === "Sudah Bayar" || r.statusManual === "Batal") return;
+    var baki = nom(r.jumlahPerluBayar);
+    if (baki <= 0.005) return;
+    var tt = r.tarikhAkhir || r.tarikh;
+    hasil.push({ id: r.id, jenis: "Invois Manual", nama: r.client.nama, telefon: r.client.telefon,
+      projek: r.servis, unit: r.no, tarikh: r.tarikh, tarikhAkhir: tt,
+      total: baki, dibayar: nom(r.bayaranTerdahulu), baki: baki, hari: hariSejak(tt),
+      status: r.statusManual || "" });
+  });
+
+  return hasil.sort(function (a, b) {
+    return (b.hari - a.hari) || (b.baki - a.baki);
+  });
+}
+
+// Ayat kejar bayaran untuk WhatsApp.
+function teksKejar(x, data) {
+  var c = data.tetapan.resit;
+  var templat = c.teksKejar || TETAPAN_ASAL.resit.teksKejar;
+  var nilai = {
+    "{syarikat}": c.namaSyarikat,
+    "{nama}": x.nama || "Tuan/Puan",
+    "{tarikh}": fmtTarikh(x.tarikh),
+    "{tarikhAkhir}": x.tarikhAkhir ? fmtTarikh(x.tarikhAkhir) : "-",
+    "{projek}": x.projek || "-",
+    "{unit}": x.unit || "-",
+    "{jumlah}": rm(x.total),
+    "{dibayar}": rm(x.dibayar),
+    "{baki}": rm(x.baki),
+    "{hari}": String(Math.max(0, x.hari)),
+    "{bank}": c.bank,
+    "{akaun}": c.noAkaun,
+    "{namaAkaun}": c.namaAkaun
+  };
+  return Object.keys(nilai).reduce(function (teks, kunci) {
+    return teks.split(kunci).join(nilai[kunci]);
+  }, templat);
+}
+
+function bukaWaTunggak(x, data) {
+  var no = String(x.telefon || "").replace(/[^\d]/g, "");
+  if (no.charAt(0) === "0") no = "6" + no;
+  if (!no || no.length < 9) toast("Rekod ini tiada nombor telefon — mesej dibuka tanpa penerima.", "warn", 5000);
+  window.open("https://wa.me/" + (no.length > 8 ? no : "") + "?text=" +
+    encodeURIComponent(teksKejar(x, data)), "_blank");
+}
+
+function lukisTunggak(bekas) {
+  var data = baca();
+  var semua = senaraiTunggakan(data);
+  var teks = tunggakCari.trim().toLowerCase();
+
+  var senarai = semua.filter(function (x) {
+    if (tunggakJenis && x.jenis !== tunggakJenis) return false;
+    if (tunggakUmur && kumpulanUmur(x.hari).id !== tunggakUmur) return false;
+    if (teks) {
+      var gabung = [x.nama, x.telefon, x.projek, x.unit, x.jenis].join(" ").toLowerCase();
+      if (gabung.indexOf(teks) === -1) return false;
+    }
+    return true;
+  });
+
+  var jumSemua = semua.reduce(function (t, x) { return t + x.baki; }, 0);
+  var lewat = semua.filter(function (x) { return x.hari > 0; });
+  var jumLewat = lewat.reduce(function (t, x) { return t + x.baki; }, 0);
+  var kritikal = semua.filter(function (x) { return x.hari > 60; });
+  var jumKritikal = kritikal.reduce(function (t, x) { return t + x.baki; }, 0);
+  var jumSub = semua.filter(function (x) { return x.jenis === "Sub Job"; })
+    .reduce(function (t, x) { return t + x.baki; }, 0);
+  var jumTapis = senarai.reduce(function (t, x) { return t + x.baki; }, 0);
+
+  var ikutUmur = UMUR_KUMPULAN.map(function (u) {
+    var baris = semua.filter(function (x) { return kumpulanUmur(x.hari).id === u.id; });
+    var nilai = baris.reduce(function (t, x) { return t + x.baki; }, 0);
+    return { nama: u.label, nilai: nilai, teks: rm(nilai) + " · " + baris.length + " rekod", id: u.id };
+  });
+
+  bekas.innerHTML =
+    '<div class="grid grid-4">' +
+      kadStat("Jumlah Belum Kutip", rm(jumSemua), semua.length + " rekod") +
+      kadStat("Sudah Lewat", rm(jumLewat), lewat.length + " rekod lepas tarikh") +
+      kadStat("Lewat 60+ Hari", rm(jumKritikal), kritikal.length + " rekod perlu dikejar") +
+      kadStat("Tunggakan Sub Job", rm(jumSub), "belum masuk dari sub job") +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Umur Tunggakan</h3>' +
+        '<span class="kecil">dikira dari tarikh akhir invois, atau tarikh kerja kalau tiada invois</span></div>' +
+      cartaMendatar(ikutUmur.filter(function (x) { return x.nilai > 0; })) +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Senarai Tunggakan</h3>' +
+        '<div class="aksi">' +
+          '<span class="kecil">Dipapar: <b>' + esc(rm(jumTapis)) + "</b></span>" +
+          '<button class="btn btn-lembut" id="btnEksportTunggak">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<div class="penapis">' +
+        "<label>Umur<select id='fUmurTunggak'><option value=''>Semua umur</option>" +
+          UMUR_KUMPULAN.map(function (u) {
+            return "<option value='" + u.id + "'" + (tunggakUmur === u.id ? " selected" : "") +
+              ">" + esc(u.label) + "</option>";
+          }).join("") + "</select></label>" +
+        "<label>Jenis<select id='fJenisTunggak'><option value=''>Semua jenis</option>" +
+          ["Jualan", "Sub Job", "Invois Manual"].map(function (j) {
+            return "<option" + (tunggakJenis === j ? " selected" : "") + ">" + esc(j) + "</option>";
+          }).join("") + "</select></label>" +
+        '<label style="min-width:220px">Cari<input type="search" id="fCariTunggak" ' +
+          'placeholder="Nama, telefon, projek…" value="' + esc(tunggakCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetTunggak">Reset</button>' +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length
+        ? "<table><thead><tr><th>Client</th><th>Tarikh</th>" +
+          "<th class='num'>Jumlah</th><th class='num'>Baki</th><th>Umur</th><th></th>" +
+          "</tr></thead><tbody>" +
+          senarai.map(function (x) {
+            var u = kumpulanUmur(x.hari);
+            return "<tr>" +
+              '<td class="bungkus"><b>' + esc(namaPapar(x.nama)) + "</b>" +
+                (x.jenis === "Jualan" ? "" : ' <span class="tag-sub">' +
+                  (x.jenis === "Sub Job" ? "SUB" : "INV") + "</span>") +
+                (x.telefon ? '<div class="kecil">' + esc(x.telefon) + "</div>" : "") +
+                '<div class="kecil">' + esc([x.projek, x.unit].filter(Boolean).join(" · ") || "-") +
+                (x.status ? " · " + esc(x.status) : "") + "</div></td>" +
+              "<td>" + esc(fmtTarikh(x.tarikh)) +
+                (x.tarikhAkhir && x.tarikhAkhir !== x.tarikh
+                  ? '<div class="kecil">akhir ' + esc(fmtTarikh(x.tarikhAkhir)) + "</div>" : "") + "</td>" +
+              '<td class="num">' + esc(rm(x.total)) +
+                '<div class="kecil">' + esc(rm(x.dibayar)) + " dibayar</div></td>" +
+              '<td class="num"><b style="color:var(--bad)">' + esc(rm(x.baki)) + "</b></td>" +
+              '<td><span class="badge badge-' + u.warna + '">' +
+                (x.hari > 0 ? x.hari + " hari" : esc(u.label)) + "</span></td>" +
+              '<td><div class="aksi">' +
+                '<button class="btn btn-lembut" data-tbuka="' + esc(x.id) + '" data-tjenis="' +
+                  esc(x.jenis) + '">Buka</button>' +
+                (x.jenis === "Invois Manual" ? "" :
+                  '<button class="btn btn-lembut" data-tbayar="' + esc(x.id) + '" data-tjenis="' +
+                  esc(x.jenis) + '">Bayar</button>') +
+                '<button class="btn btn-ok" data-twa="' + esc(x.id) + '" data-tjenis="' +
+                  esc(x.jenis) + '">WA</button>' +
+              "</div></td></tr>";
+          }).join("") + "</tbody></table>"
+        : kosong(semua.length
+            ? "Tiada rekod padan dengan penapis ini."
+            : "Tiada tunggakan — semua bayaran sudah dikutip.")) +
+      "</div>" +
+      '<p class="kecil" style="margin-top:10px">Ayat kejar bayaran boleh diubah dalam ' +
+      "Tetapan → Resit &amp; Invois → <b>Ayat Kejar Bayaran</b>.</p>" +
+    "</div>";
+
+  $("#fUmurTunggak").onchange = function (e) { tunggakUmur = e.target.value; lukisTunggak(bekas); };
+  $("#fJenisTunggak").onchange = function (e) { tunggakJenis = e.target.value; lukisTunggak(bekas); };
+  $("#btnResetTunggak").onclick = function () {
+    tunggakUmur = ""; tunggakJenis = ""; tunggakCari = ""; lukisTunggak(bekas);
+  };
+  var kotak = $("#fCariTunggak");
+  kotak.oninput = function (e) {
+    tunggakCari = e.target.value;
+    clearTimeout(kotak._t);
+    kotak._t = setTimeout(function () {
+      lukisTunggak(bekas);
+      var baharu = $("#fCariTunggak");
+      baharu.focus();
+      baharu.setSelectionRange(baharu.value.length, baharu.value.length);
+    }, 260);
+  };
+  $("#btnEksportTunggak").onclick = function () {
+    csv("tunggakan",
+      ["Client", "Telefon", "Jenis", "Projek", "Unit", "Tarikh", "Tarikh Akhir",
+       "Jumlah", "Dibayar", "Baki", "Umur (hari)", "Status"],
+      senarai.map(function (x) {
+        return [x.nama, x.telefon, x.jenis, x.projek, x.unit, x.tarikh, x.tarikhAkhir,
+                x.total, x.dibayar, x.baki, Math.max(0, x.hari), x.status];
+      }));
+  };
+  $$("[data-tbuka]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      var rid = b.getAttribute("data-tbuka"), jenis = b.getAttribute("data-tjenis");
+      if (jenis === "Sub Job") return lihatSubJob(rid);
+      if (jenis === "Invois Manual") return lihatDok("invois", rid);
+      lihatSale(rid);
+    };
+  });
+  $$("[data-tbayar]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      var rid = b.getAttribute("data-tbayar");
+      borangBayaran(rid, null,
+        b.getAttribute("data-tjenis") === "Sub Job" ? { jenisRekod: "subjob" } : {});
+    };
+  });
+  $$("[data-twa]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      var rid = b.getAttribute("data-twa"), jenis = b.getAttribute("data-tjenis");
+      var x = senarai.filter(function (y) { return y.id === rid && y.jenis === jenis; })[0];
+      if (x) bukaWaTunggak(x, data);
+    };
+  });
+}
+
 var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -6108,6 +6413,7 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  tunggak: '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M8.5 2.5h7"/></svg>',
   staf: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6"/><path d="M17.5 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>',
   tetapan: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.54 15a1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.54h.09A1.7 1.7 0 0 0 10 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.46 9v.09a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>'
 };
@@ -6120,6 +6426,7 @@ var HALAMAN = [
   { id: "subjob",  label: "Sub Job",      ikon: IKON.subjob,  lukis: lukisSubJob },
   { id: "invois",  label: "Invois",       ikon: IKON.invois,  lukis: lukisInvois },
   { id: "resit",   label: "Resit",        ikon: IKON.resit,   lukis: lukisResit },
+  { id: "tunggak", label: "Tunggakan",    ikon: IKON.tunggak, lukis: lukisTunggak },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
   { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
 ];
@@ -6136,10 +6443,14 @@ function binaMenu() {
     return s.tarikh <= hariIni && ["Selesai", "Batal", "Report Submit"].indexOf(s.statusKerja || "Tempahan") === -1;
   }).length;
 
+  var bilLewat = senaraiTunggakan(data).filter(function (x) { return x.hari > 0; }).length;
+
   $("#navMenu").innerHTML = HALAMAN.map(function (h) {
+    var lencana = (h.id === "sale" && perluTindakan) ? perluTindakan
+      : ((h.id === "tunggak" && bilLewat) ? bilLewat : 0);
     return '<a class="nav-item" href="#/' + h.id + '" data-nav="' + h.id + '">' +
       '<span class="nav-ikon">' + h.ikon + "</span><span>" + esc(h.label) + "</span>" +
-      (h.id === "sale" && perluTindakan ? '<span class="lencana-menu">' + perluTindakan + "</span>" : "") +
+      (lencana ? '<span class="lencana-menu">' + lencana + "</span>" : "") +
       "</a>";
   }).join("");
   $$("#navMenu a").forEach(function (a) {
