@@ -171,6 +171,48 @@ lama tidak berubah walaupun tetapan diubah kemudian.
 nombor resit seterusnya, maklumat bank, nota bawah resit, URL logo & tandatangan,
 nama dan jawatan penandatangan.
 
+## Target ikut bulan
+
+Secara lalai, target bulan = **target harian × hari bekerja**. Kalau mahu target
+berbeza untuk bulan tertentu, pergi **Tetapan → Target Ikut Bulan**, pilih bulan
+dan masukkan jumlah. Bulan itu akan guna target khas tersebut, dan target harian
+dalam kalendar dikira semula (target bulan ÷ hari bekerja). Tekan **Buang** untuk
+kembali kepada kiraan automatik.
+
+## Isi auto dari WhatsApp
+
+Dalam **Key-in Sale** tekan **Isi Auto (WhatsApp)**:
+
+1. **Salin Format Kosong** (atau **Hantar Format ke WhatsApp**) — hantar kepada admin.
+2. Admin isi maklumat dalam WhatsApp dan hantar balik.
+3. Paste mesej itu ke dalam kotak, tekan **Isi Borang** — borang key-in terisi automatik.
+
+Format:
+
+```
+KEY-IN SALE
+Tarikh: 8/9/2026
+Masa: 9.30am - 12.30pm
+Nama Client: Ahmad Faiz
+No. Telefon: 012-3456789
+Email: faiz@gmail.com
+Projek: Panorama
+No. Unit: A-07-07
+Size: 950
+Harga (RM): 500
+Water (RM): 50
+Electric (RM): 0
+Deposit (RM): 100
+Closed By: Dastie
+Dari (sumber): Facebook
+Staf Inspection: Fikri, Haziq
+Catatan: Client minta pagi
+```
+
+Baris yang tak diisi diabaikan. Tarikh menerima `8/9/2026`, `08-09-2026` atau
+`2026-09-08`. Masa boleh guna `-`, `–` atau `hingga`. Staf inspection dipisah
+dengan koma dan terus ditandakan dalam borang.
+
 ## Kiraan automatik
 
 ```

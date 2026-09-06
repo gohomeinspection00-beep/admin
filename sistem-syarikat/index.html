@@ -370,6 +370,7 @@ var TETAPAN_ASAL = {
            "Sierra Height", "Midas Seri Alam", "Kempas Utama", "Batu Pahat", "Jasin Melaka"],
   sumber: ["Facebook", "WhatsApp", "Referral", "Walk-in", "Google", "Repeat Client"],
   cuti: [],                                   // [{tarikh:"2025-01-29", sebab:"Tahun Baru Cina"}]
+  targetBulan: {},                            // { "2026-09": 20000 } — ganti target bulan tertentu
   resit: {
     namaSyarikat: "GoXpert Solution",
     alamat: "Nook Workspace,\nJalan Aliff 6, Taman Damansara Aliff,\n81200 Johor Bahru, Johor",
@@ -422,6 +423,7 @@ function baca() {
     mentah = { tetapan: {}, staf: [], sale: [] };
   }
   mentah.tetapan = Object.assign({}, TETAPAN_ASAL, mentah.tetapan || {});
+  mentah.tetapan.targetBulan = mentah.tetapan.targetBulan || {};
   mentah.staf = (mentah.staf || []).map(function (x) {
     // Rekod lama tiada kumpulan — teka dari jawatan.
     if (!x.kumpulan) {
@@ -639,24 +641,48 @@ function cutiPada(tarikh, data) {
   return null;
 }
 
+// Bilangan hari bekerja (tolak hujung minggu tidak bekerja dan hari cuti).
+function hariBekerjaBulan(bulan, data) {
+  var bhg = String(bulan).split("-");
+  var tahun = parseInt(bhg[0], 10), bln = parseInt(bhg[1], 10);
+  if (!tahun || !bln) return 0;
+  var hariAkhir = new Date(tahun, bln, 0).getDate();
+  var bil = 0;
+  for (var h = 1; h <= hariAkhir; h++) {
+    var p = function (x) { return String(x).padStart(2, "0"); };
+    var tarikh = tahun + "-" + p(bln) + "-" + p(h);
+    var d = keDate(tarikh);
+    if (!d) continue;
+    if (cutiPada(tarikh, data)) continue;
+    if ((data.tetapan.hariBekerja || []).indexOf(d.getDay()) === -1) continue;
+    bil++;
+  }
+  return bil;
+}
+
+function targetKhasBulan(bulan, data) {
+  var nilai = (data.tetapan.targetBulan || {})[bulan];
+  return nilai === undefined || nilai === "" ? null : nom(nilai);
+}
+
 function targetHari(tarikh, data) {
   var d = keDate(tarikh);
   if (!d) return 0;
   if (cutiPada(tarikh, data)) return 0;
   if ((data.tetapan.hariBekerja || []).indexOf(d.getDay()) === -1) return 0;
+  // Bulan yang ada target khas: target harian = target bulan / hari bekerja.
+  var khas = targetKhasBulan(String(tarikh).slice(0, 7), data);
+  if (khas !== null) {
+    var bil = hariBekerjaBulan(String(tarikh).slice(0, 7), data);
+    return bil ? Math.round((khas / bil) * 100) / 100 : 0;
+  }
   return nom(data.tetapan.targetHarian);
 }
 
 function targetBulan(bulan, data) {
-  var bhg = bulan.split("-");
-  var tahun = parseInt(bhg[0], 10), bln = parseInt(bhg[1], 10);
-  var hariAkhir = new Date(tahun, bln, 0).getDate();
-  var jumlah = 0;
-  for (var h = 1; h <= hariAkhir; h++) {
-    var p = function (x) { return String(x).padStart(2, "0"); };
-    jumlah += targetHari(tahun + "-" + p(bln) + "-" + p(h), data);
-  }
-  return jumlah;
+  var khas = targetKhasBulan(bulan, data);
+  if (khas !== null) return khas;
+  return hariBekerjaBulan(bulan, data) * nom(data.tetapan.targetHarian);
 }
 
 function saleBulan(data, bulan) {
@@ -862,6 +888,7 @@ function lukisSale(bekas) {
         "</div>" +
         '<div class="aksi">' +
           '<button class="btn btn-utama" id="btnSaleBaru">Key-in Sale Baru</button>' +
+          '<button class="btn btn-lembut" id="btnPasteWS">Isi Auto (WhatsApp)</button>' +
           (paparanSale === "kalendar"
             ? '<button class="btn btn-lembut" id="btnModPilih">' +
               (modPilih ? "Batal Pilih Tarikh" : "Slot Kosong") + "</button>" : "") +
@@ -938,6 +965,7 @@ function lukisSale(bekas) {
     kotak.setSelectionRange(kedudukan, kedudukan);
   };
   $("#btnSaleBaru").onclick = function () { borangSale(null); };
+  $("#btnPasteWS").onclick = function () { borangPasteWS(); };
   $("#btnCetak").onclick = function () { window.print(); };
   $("#btnEksport").onclick = function () {
     if (!senarai.length) return toast("Tiada data untuk dieksport.", "warn");
@@ -1014,7 +1042,7 @@ function kalendarSale(data, senarai) {
             ? '<span class="kal-cuti-label" title="' + esc(cutiInfo.sebab || "Cuti") + '">' +
               esc(cutiInfo.sebab || "Cuti") + "</span>"
             : sasar > 0
-              ? '<span class="kal-sasar">' + esc(nom(sasar).toLocaleString("ms-MY")) + "</span>"
+              ? '<span class="kal-sasar">' + esc(Math.round(nom(sasar)).toLocaleString("ms-MY")) + "</span>"
               : '<span class="kal-rehat-label">Rehat</span>') +
       "</div>" +
       (nota ? '<div class="kal-nota" title="' + esc(nota) + '">' + esc(nota) + "</div>" : "") +
@@ -1770,12 +1798,127 @@ function borangBayaran(saleId, bayaranId, opsi) {
   };
 }
 
+/* ------------- isi auto dari mesej WhatsApp (paste) -------------------- */
+var MEDAN_WS = [
+  ["Tarikh", "tarikh"], ["Masa", "masa"], ["Nama Client", "nama"], ["No. Telefon", "telefon"],
+  ["Email", "email"], ["Projek", "projek"], ["No. Unit", "unit"], ["Size", "size"],
+  ["Harga (RM)", "harga"], ["Water (RM)", "water"], ["Electric (RM)", "electric"],
+  ["Deposit (RM)", "depositAwal"], ["Closed By", "closedBy"], ["Dari (sumber)", "sumber"],
+  ["Staf Inspection", "inspector"], ["Catatan", "catatan"]
+];
+
+function formatWS(contoh) {
+  var isi = {
+    "Tarikh": "8/9/2026", "Masa": "9.30am - 12.30pm", "Nama Client": "Ahmad Faiz",
+    "No. Telefon": "012-3456789", "Email": "faiz@gmail.com", "Projek": "Panorama",
+    "No. Unit": "A-07-07", "Size": "950", "Harga (RM)": "500", "Water (RM)": "50",
+    "Electric (RM)": "0", "Deposit (RM)": "100", "Closed By": "Dastie",
+    "Dari (sumber)": "Facebook", "Staf Inspection": "Fikri, Haziq", "Catatan": "Client minta pagi"
+  };
+  return "KEY-IN SALE\n" + MEDAN_WS.map(function (m) {
+    return m[0] + ": " + (contoh ? (isi[m[0]] || "") : "");
+  }).join("\n");
+}
+
+// Tukar teks tarikh (8/9/2026, 08-09-2026, 2026-09-08) kepada YYYY-MM-DD.
+function tarikhDariTeks(teks) {
+  var t = String(teks || "").trim();
+  var a = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (a) return a[1] + "-" + String(a[2]).padStart(2, "0") + "-" + String(a[3]).padStart(2, "0");
+  var b = t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if (b) {
+    var tahun = b[3].length === 2 ? "20" + b[3] : b[3];
+    return tahun + "-" + String(b[2]).padStart(2, "0") + "-" + String(b[1]).padStart(2, "0");
+  }
+  return "";
+}
+
+function huraiWS(teks) {
+  var baris = String(teks || "").replace(/\r/g, "").split("\n");
+  var hasil = {};
+  baris.forEach(function (b) {
+    var pisah = b.indexOf(":");
+    if (pisah === -1) return;
+    var label = b.slice(0, pisah).replace(/[*_]/g, "").trim().toLowerCase();
+    var nilai = b.slice(pisah + 1).trim();
+    if (!nilai) return;
+    MEDAN_WS.forEach(function (m) {
+      var padanan = m[0].toLowerCase();
+      var ringkas = padanan.replace(/\s*\(rm\)/, "").replace(/\s*\(sumber\)/, "");
+      if (label === padanan || label === ringkas ||
+          (m[1] === "nama" && (label === "nama" || label === "client")) ||
+          (m[1] === "telefon" && (label === "telefon" || label === "no telefon" || label === "phone")) ||
+          (m[1] === "projek" && (label === "projek" || label === "daerah" || label === "projek/daerah")) ||
+          (m[1] === "unit" && (label === "unit" || label === "no unit")) ||
+          (m[1] === "inspector" && (label === "inspector" || label === "staf")) ) {
+        hasil[m[1]] = nilai;
+      }
+    });
+  });
+
+  var awal = {};
+  if (hasil.tarikh) awal.tarikh = tarikhDariTeks(hasil.tarikh) || kunciTarikh();
+  if (hasil.masa) {
+    var bhg = hasil.masa.split(/\s*(?:-|–|hingga|until|to)\s*/i);
+    awal.masaMula = (bhg[0] || "").trim();
+    awal.masaTamat = (bhg[1] || "").trim();
+  }
+  ["nama", "telefon", "email", "projek", "unit", "size", "closedBy", "sumber", "catatan"]
+    .forEach(function (k) { if (hasil[k]) awal[k] = hasil[k]; });
+  ["harga", "water", "electric", "depositAwal"].forEach(function (k) {
+    if (hasil[k]) awal[k] = nom(String(hasil[k]).replace(/[^\d.\-]/g, ""));
+  });
+  if (hasil.inspector) {
+    awal.inspector = hasil.inspector.split(/[,\/]+/).map(function (x) { return x.trim(); })
+      .filter(Boolean);
+  }
+  return { awal: awal, bilangan: Object.keys(hasil).length };
+}
+
+function borangPasteWS() {
+  var m = modal("Isi Auto dari WhatsApp",
+    '<p class="kecil" style="margin:0 0 12px">Salin format kosong, hantar kepada admin melalui ' +
+      "WhatsApp, dan bila admin balas dengan maklumat penuh — paste semula di sini. " +
+      "Borang key-in akan diisi automatik.</p>" +
+    '<div class="aksi" style="flex-wrap:wrap;margin-bottom:12px">' +
+      '<button type="button" class="btn btn-lembut" id="btnSalinFormat">Salin Format Kosong</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnContohFormat">Isi Contoh</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnWaFormat">Hantar Format ke WhatsApp</button>' +
+    "</div>" +
+    medan("Paste mesej di sini",
+      '<textarea id="teksWS" style="min-height:230px" placeholder="' + esc(formatWS(false)) + '"></textarea>') +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+      '<button type="button" class="btn btn-utama" id="btnHuraiWS">Isi Borang</button>' +
+    "</div>", 620);
+
+  $("#btnSalinFormat", m.el).onclick = function () {
+    var kotak = $("#teksWS", m.el);
+    if (!kotak.value.trim()) kotak.value = formatWS(false);
+    salinTeks(kotak);
+  };
+  $("#btnContohFormat", m.el).onclick = function () { $("#teksWS", m.el).value = formatWS(true); };
+  $("#btnWaFormat", m.el).onclick = function () {
+    window.open("https://wa.me/?text=" + encodeURIComponent(formatWS(false)), "_blank");
+  };
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#btnHuraiWS", m.el).onclick = function () {
+    var hasil = huraiWS($("#teksWS", m.el).value);
+    if (!hasil.bilangan) {
+      return toast("Tiada maklumat dikenali. Pastikan setiap baris seperti “Nama Client: Ahmad”.", "bad", 6000);
+    }
+    m.tutup();
+    toast(hasil.bilangan + " medan diisi automatik. Sila semak sebelum simpan.", "ok", 4500);
+    borangSale(null, hasil.awal.tarikh || kunciTarikh(), hasil.awal);
+  };
+}
+
 /* --------------------- borang key-in / sunting sale -------------------- */
-function borangSale(rekodId, tarikhAsal) {
+function borangSale(rekodId, tarikhAsal, awalData) {
   var data = baca();
   var s = rekodId ? data.sale.filter(function (x) { return x.id === rekodId; })[0] : null;
   var baru = !s;
-  s = s || { tarikh: tarikhAsal || kunciTarikh(), statusKerja: "Tempahan" };
+  s = s || Object.assign({ tarikh: tarikhAsal || kunciTarikh(), statusKerja: "Tempahan" }, awalData || {});
 
   var pilihanSales = data.staf.filter(function (x) { return x.status === "aktif"; })
     .map(function (x) { return x.nama; });
@@ -1815,7 +1958,8 @@ function borangSale(rekodId, tarikhAsal) {
       '<div class="baris-medan">' +
         (baru
           ? medan("Deposit Diterima (RM)",
-              '<input type="number" step="0.01" min="0" name="depositAwal" value="">')
+              '<input type="number" step="0.01" min="0" name="depositAwal" value="' +
+              esc(s.depositAwal || "") + '">')
           : medan("Sudah Dibayar",
               '<input type="text" readonly value="' + esc(rm(kiraSale(s).dibayar)) +
               " (" + (s.bayaran || []).length + ' bayaran)">')) +
@@ -2287,7 +2431,7 @@ function borangDok(jenis, opsi) {
       no: (invois ? nomborInvoisBaharu(data) : nomborResitBaharu(data)).no,
       tarikh: bayaran && !invois ? bayaran.tarikh : kunciTarikh(),
       tarikhAkhir: kunciTarikh(tempoh),
-      jenis: bayaran ? bayaran.jenis : "Deposit",
+      jenis: bayaran ? bayaran.jenis : (sale ? "Deposit" : "Bayaran Penuh"),
       jumlahDiterima: bayaran ? nom(bayaran.jumlah) : 0,
       jumlahPerluBayar: Math.max(hargaAwal - jumlahSebelum, 0),
       bayaranId: opsi.bayaranId || null,
@@ -2693,6 +2837,7 @@ function lukisResit(bekas) {
     '<div class="kad">' +
       '<div class="kad-tajuk"><h3>Resit Ikut Client</h3>' +
         '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnResitManual">Resit Manual</button>' +
           '<button class="btn btn-lembut" id="btnEksportResit">Eksport CSV</button>' +
         "</div>" +
       "</div>" +
@@ -2701,8 +2846,9 @@ function lukisResit(bekas) {
         '<label style="min-width:220px">Cari<input type="search" id="fCariResit" placeholder="Nama client, no. resit…" value="' + esc(resitCari) + '"></label>' +
         '<button class="btn btn-lembut" id="btnSemuaResit">Reset</button>' +
       "</div>" +
-      '<p class="kecil" style="margin:-4px 0 12px">Resit dijana dari bayaran yang direkod pada jualan. ' +
-      "Buka jualan → <b>+ Bayaran</b> → <b>Buat Resit</b>.</p>" +
+      '<p class="kecil" style="margin:-4px 0 12px">Resit biasa dijana dari bayaran pada jualan ' +
+      "(buka jualan → <b>+ Bayaran</b> → <b>Buat Resit</b>). Gunakan <b>Resit Manual</b> " +
+      "untuk bayaran di luar sistem jualan.</p>" +
       (kumpulan.length ? kumpulan.map(function (g) {
         var baki = bakiKumpulan(data, g);
         return '<div class="kumpulan' + (kumpulan.length === 1 ? " buka" : "") + '">' +
@@ -2736,6 +2882,7 @@ function lukisResit(bekas) {
         : kosong("Belum ada resit. Buka satu jualan, rekod bayaran, kemudian tekan “Buat Resit”.")) +
     "</div>";
 
+  $("#btnResitManual").onclick = function () { borangResit({}); };
   $("#fBulanResit").onchange = function (e) { resitBulan = e.target.value; lukisResit(bekas); };
   $("#btnSemuaResit").onclick = function () { resitBulan = ""; resitCari = ""; lukisResit(bekas); };
   var kotakR = $("#fCariResit");
@@ -3145,8 +3292,9 @@ function lukisTetapan(bekas) {
                 ((t.hariBekerja || []).indexOf(i) !== -1 ? " checked" : "") + ">" + esc(h) + "</label>";
             }).join("") +
           "</div>" +
-          '<div class="jumlah-baris"><span>Target ' + esc(fmtBulan(bulan)) + " (dikira automatik)</span><b id=\"paparTargetBulan\">" +
-            esc(rm(targetBulan(bulan, data))) + "</b></div>" +
+          '<div class="jumlah-baris"><span>Target ' + esc(fmtBulan(bulan)) +
+            (targetKhasBulan(bulan, data) !== null ? " (target khas bulan ini)" : " (dikira automatik)") +
+            "</span><b>" + esc(rm(targetBulan(bulan, data))) + "</b></div>" +
           medan("Senarai Projek / Daerah (satu baris satu)",
             '<textarea name="projek">' + esc((t.projek || []).join("\n")) + "</textarea>") +
           medan("Sumber Lead (satu baris satu)",
@@ -3171,6 +3319,29 @@ function lukisTetapan(bekas) {
               (c.sebab ? " · " + esc(c.sebab) : "") +
               '<button type="button" data-buang-cuti="' + esc(c.tarikh) + '" title="Buang">&times;</button></span>';
           }).join("") : '<span class="kecil">Belum ada hari cuti direkod.</span>') +
+        "</div>" +
+
+        '<div class="kad-tajuk" style="margin-top:24px"><h3>Target Ikut Bulan</h3></div>' +
+        '<p class="kecil">Bulan yang ditetapkan di sini akan guna target khas ini, bukan kiraan ' +
+        "target harian × hari bekerja. Target harian dalam kalendar dikira semula = target bulan ÷ hari bekerja.</p>" +
+        '<form id="borangTargetBulan" class="baris-medan" style="align-items:end">' +
+          medan("Bulan", '<input type="month" name="bulan" value="' + esc(bulan) + '" required>') +
+          medan("Target Jualan (RM)", '<input type="number" step="1" min="0" name="jumlah" required>') +
+          '<div><button class="btn btn-utama penuh" type="submit">Simpan</button></div>' +
+        "</form>" +
+        '<div id="senaraiTargetBulan">' +
+          (function () {
+            var kunci = Object.keys(t.targetBulan || {}).sort();
+            if (!kunci.length) return '<div class="kecil">Tiada target khas. Semua bulan guna kiraan automatik.</div>';
+            return kunci.map(function (b) {
+              return '<div class="jumlah-baris"><span><b>' + esc(fmtBulan(b)) + "</b>" +
+                '<div class="kecil">' + hariBekerjaBulan(b, data) + " hari bekerja · sehari " +
+                esc(rm(hariBekerjaBulan(b, data) ? nom(t.targetBulan[b]) / hariBekerjaBulan(b, data) : 0)) +
+                "</div></span><span><b>" + esc(rm(t.targetBulan[b])) + "</b> " +
+                '<button type="button" class="btn btn-lembut btn-kecil" data-buang-target="' + esc(b) +
+                '">Buang</button></span></div>';
+            }).join("");
+          })() +
         "</div>" +
 
         '<div class="kad-tajuk" style="margin-top:24px"><h3>Data & Backup</h3></div>' +
@@ -3266,6 +3437,27 @@ function lukisTetapan(bekas) {
     toast("Tetapan resit disimpan.", "ok");
     lukis();
   };
+
+  $("#borangTargetBulan").onsubmit = function (e) {
+    e.preventDefault();
+    var nilai = ambilNilai($("#borangTargetBulan"));
+    if (!nilai.bulan) return toast("Sila pilih bulan.", "bad");
+    var d = baca();
+    d.tetapan.targetBulan = d.tetapan.targetBulan || {};
+    d.tetapan.targetBulan[nilai.bulan] = nom(nilai.jumlah);
+    if (!simpan(d)) return;
+    toast("Target " + fmtBulan(nilai.bulan) + " ditetapkan: " + rm(nilai.jumlah), "ok", 4000);
+    lukis();
+  };
+  $$("[data-buang-target]").forEach(function (b) {
+    b.onclick = function () {
+      var d = baca();
+      delete d.tetapan.targetBulan[b.getAttribute("data-buang-target")];
+      simpan(d);
+      toast("Target khas dibuang. Bulan itu kembali ke kiraan automatik.", "ok", 4000);
+      lukis();
+    };
+  });
 
   $("#borangCuti").onsubmit = function (e) {
     e.preventDefault();
