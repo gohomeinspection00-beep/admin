@@ -211,6 +211,18 @@ td.bungkus{white-space:normal;min-width:130px;max-width:210px}
 .kal-rehat-label{font-size:10px;font-weight:700;color:var(--lembut);text-transform:uppercase;letter-spacing:.4px}
 .kal-nota{font-size:11px;line-height:1.4;color:var(--warn);background:#fffbeb;border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:3px 6px;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 
+/* --- mod pilih tarikh (slot kosong) --- */
+.bar-pilih{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.bar-pilih .kecil{color:#1d4ed8}
+.kal-hari.dipilih{background:#eff6ff!important;box-shadow:inset 0 0 0 2px var(--utama)!important}
+.kal-tik{width:17px;height:17px;border:1.5px solid #cbd5e1;border-radius:5px;background:#fff;flex:0 0 17px;position:relative}
+.kal-hari.dipilih .kal-tik{background:var(--utama);border-color:var(--utama)}
+.kal-hari.dipilih .kal-tik::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.slot-baris{display:grid;grid-template-columns:1fr 110px 110px;gap:10px;align-items:end;padding:10px 0;border-bottom:1px solid var(--garis)}
+.slot-baris label{margin:0}
+.slot-tarikh b{display:block}
+@media(max-width:560px){.slot-baris{grid-template-columns:1fr 1fr}.slot-tarikh{grid-column:1/-1}}
+
 /* --- telefon --- */
 @media(max-width:860px){
   .sisi{position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .22s ease}
@@ -310,6 +322,8 @@ var TETAPAN_ASAL = {
   cuti: []                                    // [{tarikh:"2025-01-29", sebab:"Tahun Baru Cina"}]
 };
 
+var KUMPULAN = ["Operasi", "Management"];
+
 var STATUS_KERJA = ["Tempahan", "Inspection Siap", "Report Submit", "Selesai", "Batal"];
 
 /* ----------------------------- simpanan ------------------------------- */
@@ -320,7 +334,13 @@ function baca() {
     mentah = { tetapan: {}, staf: [], sale: [] };
   }
   mentah.tetapan = Object.assign({}, TETAPAN_ASAL, mentah.tetapan || {});
-  mentah.staf = mentah.staf || [];
+  mentah.staf = (mentah.staf || []).map(function (x) {
+    // Rekod lama tiada kumpulan — teka dari jawatan.
+    if (!x.kumpulan) {
+      x.kumpulan = /inspect|operasi|teknik|site/i.test(x.jawatan || "") ? "Operasi" : "Management";
+    }
+    return x;
+  });
   mentah.sale = mentah.sale || [];
   mentah.nota = mentah.nota || {};          // { "2026-09-07": "catatan hari" }
   mentah.tanda = mentah.tanda || {};        // tanda cuti dari kalendar sahaja
@@ -340,8 +360,10 @@ function simpan(data) {
 function benihkan() {
   if (localStorage.getItem(KUNCI)) return;
   var data = { tetapan: Object.assign({}, TETAPAN_ASAL), staf: [
-    { id: id(), nama: "Dastie", jawatan: "Sales", jabatan: "Jualan", telefon: "", email: "", status: "aktif", tarikhMula: "" },
-    { id: id(), nama: "Ummi", jawatan: "Sales", jabatan: "Jualan", telefon: "", email: "", status: "aktif", tarikhMula: "" }
+    { id: id(), nama: "Dastie", jawatan: "Sales", kumpulan: "Management", jabatan: "Jualan",
+      telefon: "", email: "", status: "aktif", tarikhMula: "" },
+    { id: id(), nama: "Ummi", jawatan: "Sales", kumpulan: "Management", jabatan: "Jualan",
+      telefon: "", email: "", status: "aktif", tarikhMula: "" }
   ], sale: [], nota: {}, tanda: {} };
   simpan(data);
 }
@@ -669,6 +691,8 @@ function kadPrestasi(tajuk, senarai, sasar) {
    ================================================================== */
 var tapis = { bulan: bulanKini(), cari: "", kerja: "", sales: "" };
 var paparanSale = "kalendar";   // "kalendar" atau "senarai"
+var modPilih = false;           // mod tick tarikh untuk kongsi slot kosong
+var tarikhPilih = [];
 
 function saleDitapis(data) {
   var teks = tapis.cari.trim().toLowerCase();
@@ -708,6 +732,9 @@ function lukisSale(bekas) {
         "</div>" +
         '<div class="aksi">' +
           '<button class="btn btn-utama" id="btnSaleBaru">Key-in Sale Baru</button>' +
+          (paparanSale === "kalendar"
+            ? '<button class="btn btn-lembut" id="btnModPilih">' +
+              (modPilih ? "Batal Pilih Tarikh" : "Slot Kosong") + "</button>" : "") +
           '<button class="btn btn-lembut" id="btnEksport">Eksport CSV</button>' +
           '<button class="btn btn-lembut" id="btnCetak">Cetak</button>' +
         "</div>" +
@@ -734,11 +761,33 @@ function lukisSale(bekas) {
         kadStat("Target Bulan", rm(sasar), sasar > 0 ? Math.round((r.total / sasar) * 100) + "% dicapai" : "tiada target") +
       "</div>" +
 
+      (paparanSale === "kalendar" && modPilih
+        ? '<div class="bar-pilih">' +
+            '<span class="kecil">Tick tarikh yang ada slot kosong, kemudian tekan ' +
+            "<b>Dapatkan Slot</b>. <b id=\"kiraPilih\">" + tarikhPilih.length + "</b> tarikh dipilih.</span>" +
+            '<div class="aksi">' +
+              '<button class="btn btn-utama btn-kecil" id="btnJanaSlot">Dapatkan Slot</button>' +
+              '<button class="btn btn-lembut btn-kecil" id="btnKosongPilih">Kosongkan</button>' +
+            "</div>" +
+          "</div>" : "") +
       (paparanSale === "kalendar"
         ? kalendarSale(data, senarai)
         : '<div class="jadual-bungkus">' + jadualSale(senarai) + "</div>") +
     "</div>";
 
+  if ($("#btnModPilih")) $("#btnModPilih").onclick = function () {
+    modPilih = !modPilih;
+    if (!modPilih) tarikhPilih = [];
+    lukisSale(bekas);
+  };
+  if ($("#btnJanaSlot")) $("#btnJanaSlot").onclick = function () {
+    if (!tarikhPilih.length) return toast("Tick sekurang-kurangnya satu tarikh dahulu.", "warn");
+    borangSlot(bekas);
+  };
+  if ($("#btnKosongPilih")) $("#btnKosongPilih").onclick = function () {
+    tarikhPilih = [];
+    lukisSale(bekas);
+  };
   $("#suisKalendar").onclick = function () { paparanSale = "kalendar"; lukisSale(bekas); };
   $("#suisSenarai").onclick = function () { paparanSale = "senarai"; lukisSale(bekas); };
   if ($("#fBulan")) $("#fBulan").onchange = function (e) { tapis.bulan = e.target.value; lukisSale(bekas); };
@@ -823,17 +872,20 @@ function kalendarSale(data, senarai) {
     if (tarikh === hariIni) kelas.push("kal-ini");
     if (sasar > 0 && jumlah >= sasar) kelas.push("kal-capai");
     if (job.length) kelas.push("ada-job");
+    if (modPilih && tarikhPilih.indexOf(tarikh) !== -1) kelas.push("dipilih");
 
     sel.push('<div class="' + kelas.join(" ") + '" data-hari="' + tarikh + '">' +
       '<div class="kal-atas">' +
         '<span class="kal-tarikh">' + h +
           '<span class="kal-nama-hari">' + HARI_PENDEK[(new Date(tahun, bln - 1, h).getDay() + 6) % 7] + "</span></span>" +
-        (cutiInfo
-          ? '<span class="kal-cuti-label" title="' + esc(cutiInfo.sebab || "Cuti") + '">' +
-            esc(cutiInfo.sebab || "Cuti") + "</span>"
-          : sasar > 0
-            ? '<span class="kal-sasar">' + esc(nom(sasar).toLocaleString("ms-MY")) + "</span>"
-            : '<span class="kal-rehat-label">Rehat</span>') +
+        (modPilih
+          ? '<span class="kal-tik"></span>'
+          : cutiInfo
+            ? '<span class="kal-cuti-label" title="' + esc(cutiInfo.sebab || "Cuti") + '">' +
+              esc(cutiInfo.sebab || "Cuti") + "</span>"
+            : sasar > 0
+              ? '<span class="kal-sasar">' + esc(nom(sasar).toLocaleString("ms-MY")) + "</span>"
+              : '<span class="kal-rehat-label">Rehat</span>') +
       "</div>" +
       (nota ? '<div class="kal-nota" title="' + esc(nota) + '">' + esc(nota) + "</div>" : "") +
       job.slice(0, 3).map(function (s) {
@@ -1138,6 +1190,114 @@ function jobHari(tarikh) {
     esc(rm(jum.total)) + "</b></div>", 520);
 }
 
+/* ------------------- slot kosong untuk dikongsi ----------------------- */
+
+// Tukar minit kepada teks masa gaya tempatan: 540 -> "9.00am"
+function masaTeks(minit) {
+  var jam = Math.floor(minit / 60), min = minit % 60;
+  var ap = jam >= 12 ? "pm" : "am";
+  var jam12 = jam % 12;
+  if (jam12 === 0) jam12 = 12;
+  return jam12 + "." + String(min).padStart(2, "0") + ap;
+}
+
+// Cari ruang kosong terbesar dalam waktu kerja pada satu tarikh.
+function slotDicadang(tarikh, data) {
+  var mula = masaMinit(data.tetapan.waktuMasuk);
+  var tamat = masaMinit(data.tetapan.waktuKeluar);
+  if (mula >= 99999 || tamat >= 99999 || tamat <= mula) { mula = 9 * 60; tamat = 18 * 60; }
+
+  var sibuk = data.sale.filter(function (s) {
+    return s.tarikh === tarikh && s.statusKerja !== "Batal";
+  }).map(function (s) {
+    var a = masaMinit(s.masaMula);
+    if (a >= 99999) return null;
+    var b = s.masaTamat ? masaMinit(s.masaTamat) : a + 180;   // anggap 3 jam bila tiada masa tamat
+    if (b >= 99999 || b <= a) b = a + 180;
+    return [a, b];
+  }).filter(Boolean).sort(function (x, y) { return x[0] - y[0]; });
+
+  var ruang = [], kursor = mula;
+  sibuk.forEach(function (j) {
+    if (j[0] - kursor >= 60) ruang.push([kursor, j[0]]);
+    if (j[1] > kursor) kursor = j[1];
+  });
+  if (tamat - kursor >= 60) ruang.push([kursor, tamat]);
+  if (!ruang.length) return null;
+
+  ruang.sort(function (x, y) { return (y[1] - y[0]) - (x[1] - x[0]); });
+  return { mula: masaTeks(ruang[0][0]), tamat: masaTeks(ruang[0][1]) };
+}
+
+function borangSlot(bekas) {
+  var data = baca();
+  var tarikh = tarikhPilih.slice().sort();
+
+  var m = modal("Slot Kosong untuk Client",
+    '<p class="kecil" style="margin:0 0 10px">Masa dicadangkan secara automatik dari ruang kosong ' +
+      "dalam waktu kerja. Ubah jika perlu, kemudian salin atau hantar ke WhatsApp.</p>" +
+    '<div id="senaraiSlot">' + tarikh.map(function (t, i) {
+      var cadang = slotDicadang(t, data) || { mula: data.tetapan.waktuMasuk, tamat: data.tetapan.waktuKeluar };
+      var bilJob = data.sale.filter(function (s) {
+        return s.tarikh === t && s.statusKerja !== "Batal";
+      }).length;
+      return '<div class="slot-baris" data-tarikh="' + esc(t) + '">' +
+        '<div class="slot-tarikh"><b>' + esc(namaHari(t)) + ", " + esc(fmtTarikh(t)) + "</b>" +
+        '<span class="kecil">' + (bilJob ? bilJob + " job pada hari ini" : "Tiada job lagi") + "</span></div>" +
+        medan("Dari", '<input type="text" class="slotMula" value="' + esc(cadang.mula) + '">') +
+        medan("Hingga", '<input type="text" class="slotTamat" value="' + esc(cadang.tamat) + '">') +
+      "</div>";
+    }).join("") + "</div>" +
+
+    '<div class="tajuk-seksyen">Teks untuk dihantar</div>' +
+    '<textarea id="teksSlot" style="min-height:170px"></textarea>' +
+    '<p class="kecil" style="margin:-6px 0 12px">Anda boleh sunting teks ini sebelum salin atau hantar.</p>' +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-lembut" id="btnTutupSlot">Tutup</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnSalinSlot">Salin Teks</button>' +
+      '<button type="button" class="btn btn-ok" id="btnWaSlot">Hantar WhatsApp</button>' +
+    "</div>", 620);
+
+  function binaTeks() {
+    var baris = $$(".slot-baris", m.el).map(function (b, i) {
+      var t = b.getAttribute("data-tarikh");
+      return (i + 1) + ". " + namaHari(t) + ", " + fmtTarikh(t) + " — " +
+        $(".slotMula", b).value.trim() + " hingga " + $(".slotTamat", b).value.trim();
+    });
+    $("#teksSlot", m.el).value =
+      "Salam, ini slot inspection yang masih kosong:\n\n" + baris.join("\n") +
+      "\n\nSila maklumkan slot yang sesuai untuk tempahan. Terima kasih.\n" +
+      data.tetapan.namaSyarikat;
+  }
+  binaTeks();
+  $$("#senaraiSlot input", m.el).forEach(function (el) { el.oninput = binaTeks; });
+
+  $("#btnTutupSlot", m.el).onclick = m.tutup;
+
+  $("#btnSalinSlot", m.el).onclick = function () {
+    var kotak = $("#teksSlot", m.el);
+    kotak.select();
+    kotak.setSelectionRange(0, 99999);
+    var berjaya = false;
+    try { berjaya = document.execCommand("copy"); } catch (e) { berjaya = false; }
+    if (!berjaya && navigator.clipboard) {
+      navigator.clipboard.writeText(kotak.value).then(function () {
+        toast("Teks disalin.", "ok");
+      }, function () {
+        toast("Tidak dapat salin automatik — tekan lama pada teks dan salin sendiri.", "warn", 5000);
+      });
+      return;
+    }
+    toast(berjaya ? "Teks disalin." : "Tidak dapat salin — salin sendiri dari kotak teks.",
+      berjaya ? "ok" : "warn", berjaya ? 3000 : 5000);
+  };
+
+  $("#btnWaSlot", m.el).onclick = function () {
+    var teks = $("#teksSlot", m.el).value;
+    window.open("https://wa.me/?text=" + encodeURIComponent(teks), "_blank");
+  };
+}
+
 function pasangAksiKalendar(bekas) {
   var lukisSemula = function () { lukisSale(bekas); };
   $("#kalSebelum").onclick = function () { tapis.bulan = tambahBulan(tapis.bulan, -1); lukisSemula(); };
@@ -1149,6 +1309,14 @@ function pasangAksiKalendar(bekas) {
 
     sel.onclick = function (e) {
       if (Date.now() - masaMenu < 600) return;      // baru sahaja buka menu
+      if (modPilih) {
+        var pos = tarikhPilih.indexOf(tarikh);
+        if (pos === -1) tarikhPilih.push(tarikh); else tarikhPilih.splice(pos, 1);
+        sel.classList.toggle("dipilih", pos === -1);
+        var kira = $("#kiraPilih");
+        if (kira) kira.textContent = tarikhPilih.length;
+        return;
+      }
       var job = e.target.closest ? e.target.closest(".kal-job") : null;
       if (job) return lihatSale(job.getAttribute("data-lihat"));
       borangSale(null, tarikh);
@@ -1433,11 +1601,13 @@ function borangSale(rekodId, tarikhAsal) {
 // Senarai staf aktif + sebarang nama yang sudah ditugaskan pada rekod ini.
 function pilihanInspektor(data, dipilih) {
   dipilih = dipilih || [];
-  var nama = data.staf.filter(function (x) { return x.status === "aktif"; })
-    .map(function (x) { return x.nama; });
+  var nama = data.staf.filter(function (x) {
+    return x.status === "aktif" && x.kumpulan === "Operasi";
+  }).map(function (x) { return x.nama; });
   dipilih.forEach(function (n) { if (nama.indexOf(n) === -1) nama.push(n); });
   if (!nama.length) {
-    return '<p class="kecil">Belum ada staf. Tambah staf di menu Staf dahulu.</p>';
+    return '<p class="kecil">Belum ada staf kumpulan <b>Operasi</b>. ' +
+      "Tambah staf di menu Staf dan pilih kumpulan Operasi.</p>";
   }
   return nama.map(function (n) {
     return '<label class="chip pilih-chip"><input type="checkbox" class="inspektorPilih" value="' +
@@ -1485,7 +1655,9 @@ function lukisOperasi(bekas) {
   var data = baca();
   var semua = data.sale.filter(function (s) { return s.tarikh === opTarikh; });
   var job = semua.filter(function (s) { return s.statusKerja !== "Batal"; }).sort(susunMasa);
-  var staf = data.staf.filter(function (x) { return x.status === "aktif"; });
+  var staf = data.staf.filter(function (x) {
+    return x.status === "aktif" && x.kumpulan === "Operasi";
+  });
 
   var peta = {};
   staf.forEach(function (x) { peta[x.nama] = []; });
@@ -1526,7 +1698,7 @@ function lukisOperasi(bekas) {
     '<div class="grid grid-4">' +
       kadStat("Job Hari Ini", String(job.length), siap + " sudah selesai inspection") +
       kadStat("Staf Bergerak", bergerak.length + " / " + staf.length,
-        lapang.length ? lapang.length + " staf tiada tugasan" : "semua staf ada tugasan") +
+        lapang.length ? lapang.length + " staf operasi tiada tugasan" : "semua staf operasi bertugas") +
       kadStat("Belum Ditugaskan", String(belumTugas.length),
         belumTugas.length ? "job perlu staf" : "semua job ada staf") +
       kadStat("Nilai Job Hari Ini", rm(nilai.total), "baki " + rm(nilai.baki)) +
@@ -1582,7 +1754,7 @@ function lukisOperasi(bekas) {
                 esc(s.nama) + " · " + esc(s.projek || "-") + "</div>";
             }).join("") : "") +
           "</div>";
-        }).join("") : kosong("Belum ada staf aktif. Tambah di menu Staf.")) +
+        }).join("") : kosong("Belum ada staf kumpulan Operasi. Tambah di menu Staf.")) +
       "</div>" +
 
       '<div class="kad tanpa-margin">' +
@@ -1709,10 +1881,11 @@ function lukisStaf(bekas) {
         '<div class="aksi"><button class="btn btn-utama" id="btnStafBaru">+ Tambah Staf</button>' +
         '<button class="btn btn-lembut" id="btnEksportStaf">Eksport CSV</button></div>' +
       "</div>" +
-      '<p class="kecil">Nama staf yang aktif akan muncul dalam pilihan “Closed By” semasa key-in sale. ' +
-      "Jualan di bawah adalah untuk bulan " + esc(fmtBulan(bulan)) + ".</p>" +
+      '<p class="kecil">Staf kumpulan <b>Operasi</b> boleh ditugaskan untuk inspection; ' +
+      "semua staf aktif muncul dalam pilihan “Closed By”. Jualan di bawah adalah untuk bulan " +
+      esc(fmtBulan(bulan)) + ".</p>" +
       '<div class="jadual-bungkus">' +
-      (staf.length ? "<table><thead><tr><th>Nama</th><th>Jawatan</th><th>Jabatan</th>" +
+      (staf.length ? "<table><thead><tr><th>Nama</th><th>Jawatan</th><th>Kumpulan</th>" +
         "<th>Telefon</th><th>Email</th><th>Mula Kerja</th><th class='num'>Jualan Bulan Ini</th>" +
         "<th>Status</th><th></th></tr></thead><tbody>" +
         staf.map(function (p) {
@@ -1720,7 +1893,8 @@ function lukisStaf(bekas) {
           return "<tr>" +
             "<td><b>" + esc(p.nama) + "</b></td>" +
             "<td>" + esc(p.jawatan || "-") + "</td>" +
-            "<td>" + esc(p.jabatan || "-") + "</td>" +
+            '<td><span class="badge ' + (p.kumpulan === "Operasi" ? "badge-ok" : "badge-muted") + '">' +
+              esc(p.kumpulan || "-") + "</span></td>" +
             "<td>" + esc(p.telefon || "-") + "</td>" +
             '<td class="bungkus">' + esc(p.email || "-") + "</td>" +
             "<td>" + (p.tarikhMula ? esc(fmtTarikh(p.tarikhMula)) : "-") + "</td>" +
@@ -1739,9 +1913,9 @@ function lukisStaf(bekas) {
   $("#btnStafBaru").onclick = function () { borangStaf(null); };
   $("#btnEksportStaf").onclick = function () {
     if (!staf.length) return toast("Tiada staf untuk dieksport.", "warn");
-    csv("senarai-staf", ["Nama", "Jawatan", "Jabatan", "Telefon", "Email", "Mula Kerja", "Status"],
+    csv("senarai-staf", ["Nama", "Jawatan", "Kumpulan", "Jabatan", "Telefon", "Email", "Mula Kerja", "Status"],
       staf.map(function (p) {
-        return [p.nama, p.jawatan, p.jabatan, p.telefon, p.email, p.tarikhMula, p.status];
+        return [p.nama, p.jawatan, p.kumpulan, p.jabatan, p.telefon, p.email, p.tarikhMula, p.status];
       }));
   };
   $$("[data-sunting-staf]", bekas).forEach(function (b) {
@@ -1775,12 +1949,19 @@ function borangStaf(stafId) {
         medan("Jawatan", '<input type="text" name="jawatan" placeholder="Sales / Inspector / Admin" value="' + esc(p.jawatan || "") + '">') +
       "</div>" +
       '<div class="baris-medan">' +
-        medan("Jabatan", '<input type="text" name="jabatan" placeholder="Jualan / Operasi" value="' + esc(p.jabatan || "") + '">') +
+        medan("Kumpulan *", "<select name='kumpulan'>" + KUMPULAN.map(function (g) {
+          return "<option" + ((p.kumpulan || "Operasi") === g ? " selected" : "") + ">" + esc(g) + "</option>";
+        }).join("") + "</select>") +
         medan("No. Telefon", '<input type="tel" name="telefon" value="' + esc(p.telefon || "") + '">') +
       "</div>" +
       '<div class="baris-medan">' +
         medan("Email", '<input type="email" name="email" value="' + esc(p.email || "") + '">') +
         medan("Tarikh Mula Kerja", '<input type="date" name="tarikhMula" value="' + esc(p.tarikhMula || "") + '">') +
+      "</div>" +
+      '<p class="kecil" style="margin:-6px 0 14px">Kumpulan <b>Operasi</b> = staf yang turun ke site ' +
+      "(boleh ditugaskan untuk inspection). Kumpulan <b>Management</b> = pejabat, jualan, pentadbiran." +
+      "</p>" +
+      '<div class="baris-medan">' +
       "</div>" +
       medan("Status", "<select name='status'>" +
         "<option value='aktif'" + (p.status === "aktif" ? " selected" : "") + ">Aktif</option>" +

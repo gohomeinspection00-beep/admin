@@ -15,7 +15,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Papan Utama** | Jualan bulan ini, deposit dikutip, baki belum kutip, % capai target, job hari ini, senarai perlu tindakan, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf yang ditugaskan, job belum ditugaskan, beban kerja 7 hari, tukar status terus dari jadual |
-| **Staf** | Tambah / sunting / padam staf. Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
+| **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Nama syarikat, target jualan harian, hari bekerja, senarai projek, sumber lead, hari cuti, backup & restore |
 
 ## Kalendar Key-in Sale
@@ -32,6 +32,7 @@ serta jumlah jualan hari itu. Warna jalur mengikut status kerja.
 | Buang tanda cuti | **Klik kanan** → *Buang tanda cuti* |
 | Tulis remark harian | **Klik kanan** → *Tambah remark* |
 | Urus semua cuti bulan itu | **Klik kanan** → *Urus cuti bulan …* |
+| Kongsi slot kosong dengan client | Butang **Slot Kosong** (lihat di bawah) |
 
 Pada telefon, **tekan lama** menggantikan klik kanan.
 
@@ -39,9 +40,20 @@ Cuti yang ditanda dari kalendar akan jadi **merah** dan target harian menjadi RM
 tetapi **tidak** masuk senarai Hari Cuti dalam Tetapan — melainkan kotak
 *"Masukkan juga ke senarai Hari Cuti dalam Tetapan"* ditandakan.
 
+## Kumpulan staf
+
+Setiap staf mesti dalam satu kumpulan:
+
+- **Operasi** — staf yang turun ke site. Hanya kumpulan ini muncul semasa
+  menugaskan inspector, dan hanya mereka dikira dalam halaman Operasi.
+- **Management** — pejabat, jualan, pentadbiran.
+
+Semua staf aktif (kedua-dua kumpulan) tetap muncul dalam pilihan *Closed By*.
+
 ## Staf inspection
 
-Semasa key-in sale, tandakan staf yang akan turun (boleh lebih daripada seorang).
+Semasa key-in sale, tandakan staf yang akan turun (boleh lebih daripada seorang
+untuk satu site).
 Dalam kalendar, staf dipapar sebagai lencana ringkas (contoh `FI`, `HA`);
 tanda `?` bermakna job itu belum ditugaskan kepada sesiapa.
 
@@ -52,6 +64,27 @@ Menu **Operasi** memaparkan, untuk satu-satu hari:
 - Pergerakan setiap staf (job mereka hari itu dan waktunya) serta siapa tiada tugasan
 - Beban kerja 7 hari akan datang bagi setiap staf, dan senarai job yang belum ditugaskan
 - Butang **Cetak Jadual** untuk cetak jadual harian
+
+## Slot kosong untuk client
+
+1. Dalam paparan Kalendar, tekan butang **Slot Kosong**.
+2. **Tick** mana-mana tarikh yang ada slot kosong (tekan sekali lagi untuk buang tanda).
+3. Tekan **Dapatkan Slot** — sistem mencadangkan masa kosong terbesar bagi setiap
+   tarikh berdasarkan waktu kerja dan job yang sudah ditempah. Ubah masa jika perlu.
+4. Teks siap sedia dijana dan boleh disunting, kemudian **Salin Teks** atau
+   **Hantar WhatsApp**.
+
+Contoh teks yang dijana:
+
+```
+Salam, ini slot inspection yang masih kosong:
+
+1. Selasa, 8 Sep 2026 — 1.00pm hingga 6.00pm
+2. Khamis, 10 Sep 2026 — 9.00am hingga 6.00pm
+
+Sila maklumkan slot yang sesuai untuk tempahan. Terima kasih.
+Go Home Inspection
+```
 
 ## Kiraan automatik
 
