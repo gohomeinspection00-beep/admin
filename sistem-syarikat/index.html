@@ -223,6 +223,41 @@ td.bungkus{white-space:normal;min-width:130px;max-width:210px}
 .slot-tarikh b{display:block}
 @media(max-width:560px){.slot-baris{grid-template-columns:1fr 1fr}.slot-tarikh{grid-column:1/-1}}
 
+/* --- resit A4 (format asal syarikat) --- */
+#kertasResit{display:none}
+body.cetak-resit .rangka,body.cetak-resit .modal-bg,body.cetak-resit .toast-box,body.cetak-resit .menu-konteks{display:none!important}
+body.cetak-resit #kertasResit{display:block}
+.resit{--jenama:#183a73;width:794px;min-height:1050px;background:#fff;color:#222;margin:0 auto;padding:18px 22px;
+  font:13px/1.5 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+.resit + .resit{page-break-before:always;margin-top:24px}
+.resit-kepala{display:grid;grid-template-columns:140px 1fr;gap:14px;align-items:center;border-bottom:3px solid var(--jenama);padding-bottom:10px;margin-bottom:12px}
+.resit-kepala img{width:140px;height:auto;object-fit:contain;justify-self:start}
+.resit-syarikat{font-size:12px;text-align:right;color:#333;justify-self:end;white-space:pre-line}
+.resit-syarikat h2{margin:0 0 4px;font-size:17px}
+.resit-tajuk{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.resit-tajuk h2{margin:0;font-size:22px;letter-spacing:1px}
+.resit-tajuk .kanan{font-size:13px;text-align:right}
+.resit-billto{margin:12px 0;font-size:13px}
+.resit table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+.resit th,.resit td{border:1px solid #e1e5ea;padding:8px;vertical-align:top;text-align:left;white-space:normal}
+.resit th{background:var(--jenama);color:#fff;font-size:12px;letter-spacing:.2px;text-transform:none}
+.resit .jumlah-resit{width:100%;max-width:440px;margin-left:auto}
+.resit .jumlah-resit td:first-child{font-weight:700}
+.resit .jumlah-resit td:last-child{text-align:right}
+.resit .baris-diterima td{background:#eaf3ea;color:#14532d;font-weight:700}
+.resit-tengah{text-align:center;margin-top:16px;font-size:12.5px;line-height:1.7}
+.resit-tandatangan{margin-top:26px;text-align:right}
+.resit-tandatangan img{height:64px;display:inline-block}
+.resit-seksyen{background:var(--jenama);color:#fff;padding:6px 10px;border-radius:6px;margin-top:14px;font-size:13px;font-weight:600}
+.resit .info-resit td:first-child{background:#f4f7fb;font-weight:600;width:46%}
+.pratonton{background:#eef2f7;border:1px solid var(--garis);border-radius:10px;padding:10px;overflow:auto;max-height:58vh;margin-bottom:14px}
+.pratonton .resit{zoom:.62;box-shadow:0 2px 10px rgba(0,0,0,.12);min-height:auto;padding-bottom:26px}
+@media print{
+  @page{size:A4;margin:10mm}
+  body.cetak-resit{background:#fff}
+  .resit{width:auto;min-height:auto;padding:0;box-shadow:none}
+}
+
 /* --- telefon --- */
 @media(max-width:860px){
   .sisi{position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .22s ease}
@@ -268,6 +303,8 @@ td.bungkus{white-space:normal;min-width:130px;max-width:210px}
 </style>
 </head>
 <body>
+
+<div id="kertasResit"></div>
 
 <div class="rangka">
   <aside id="sisi" class="sisi">
@@ -319,8 +356,26 @@ var TETAPAN_ASAL = {
   projek: ["Panorama", "Impian Emas", "Pulai Mutiara 2", "Clover Pulai Mutiara",
            "Sierra Height", "Midas Seri Alam", "Kempas Utama", "Batu Pahat", "Jasin Melaka"],
   sumber: ["Facebook", "WhatsApp", "Referral", "Walk-in", "Google", "Repeat Client"],
-  cuti: []                                    // [{tarikh:"2025-01-29", sebab:"Tahun Baru Cina"}]
+  cuti: [],                                   // [{tarikh:"2025-01-29", sebab:"Tahun Baru Cina"}]
+  resit: {
+    namaSyarikat: "GoXpert Solution",
+    alamat: "Nook Workspace,\nJalan Aliff 6, Taman Damansara Aliff,\n81200 Johor Bahru, Johor",
+    email: "official@goxpert.my",
+    ssm: "202503234804 (003768196-A)",
+    logoUrl: "https://arleta.site/interactivelink/1453/Logo-Go-Expert-1.png",
+    tandatanganUrl: "https://arleta.site/interactivelink/1453/sign-fikri.png",
+    namaPenandatangan: "FIKRI RAHMAN",
+    jawatanPenandatangan: "(OPERATION STRATEGY MANAGER)",
+    bank: "Maybank",
+    noAkaun: "551137785563",
+    namaAkaun: "Go Xpert Solution",
+    nota: "**Receipt needs to be send on WhatsApp: +6011-31446591",
+    prefix: "GX",
+    nombor: 1
+  }
 };
+
+var JENIS_BAYARAN = ["Deposit", "Final Payment", "Bayaran Penuh", "Bayaran Tambahan", "Lain-lain"];
 
 var KUMPULAN = ["Operasi", "Management"];
 
@@ -344,6 +399,8 @@ function baca() {
   mentah.sale = mentah.sale || [];
   mentah.nota = mentah.nota || {};          // { "2026-09-07": "catatan hari" }
   mentah.tanda = mentah.tanda || {};        // tanda cuti dari kalendar sahaja
+  mentah.resit = mentah.resit || [];
+  mentah.tetapan.resit = Object.assign({}, TETAPAN_ASAL.resit, mentah.tetapan.resit || {});
   return mentah;
 }
 
@@ -364,7 +421,7 @@ function benihkan() {
       telefon: "", email: "", status: "aktif", tarikhMula: "" },
     { id: id(), nama: "Ummi", jawatan: "Sales", kumpulan: "Management", jabatan: "Jualan",
       telefon: "", email: "", status: "aktif", tarikhMula: "" }
-  ], sale: [], nota: {}, tanda: {} };
+  ], sale: [], resit: [], nota: {}, tanda: {} };
   simpan(data);
 }
 
@@ -1441,6 +1498,7 @@ function lihatSale(rekodId) {
     '<div class="baris-butang modal-kaki">' +
       '<button type="button" class="btn btn-bad" id="btnPadamSale">Padam</button>' +
       '<button type="button" class="btn btn-lembut" id="btnTutupSale">Tutup</button>' +
+      '<button type="button" class="btn btn-ok" id="btnResitSale">Buat Resit</button>' +
       '<button type="button" class="btn btn-utama" id="btnSuntingSale">Sunting Rekod</button>' +
     "</div>", 560);
 
@@ -1459,6 +1517,7 @@ function lihatSale(rekodId) {
   };
 
   $("#btnTutupSale", m.el).onclick = m.tutup;
+  $("#btnResitSale", m.el).onclick = function () { m.tutup(); borangResit({ saleId: rekodId }); };
   $("#btnSuntingSale", m.el).onclick = function () { m.tutup(); borangSale(rekodId); };
   $("#btnPadamSale", m.el).onclick = function () {
     sahkan("Padam rekod jualan ini? Tindakan ini tidak boleh dibatalkan.").then(function (ya) {
@@ -1634,6 +1693,450 @@ function ambilNilai(borang) {
     hasil[el.name] = el.type === "number" ? (el.value === "" ? "" : nom(el.value)) : el.value.trim();
   });
   return hasil;
+}
+
+/* ======================================================================
+   RESIT — format A4 syarikat (boleh cetak / simpan PDF / kongsi)
+   ================================================================== */
+
+function nomborResitBaharu(data) {
+  var t = data.tetapan.resit;
+  var nombor = Math.max(1, parseInt(t.nombor, 10) || 1);
+  var ada = data.resit.map(function (r) { return r.no; });
+  var calon;
+  do {
+    calon = t.prefix + "-" + String(nombor).padStart(4, "0");
+    nombor++;
+  } while (ada.indexOf(calon) !== -1);
+  return { no: calon, seterusnya: nombor };
+}
+
+function kiraResit(r) {
+  var gross = nom(r.qty) * nom(r.harga);
+  var sub = gross - (gross * nom(r.diskaun) / 100);
+  var baki = Math.max(sub - nom(r.deposit) - nom(r.finalPayment), 0);
+  return { gross: gross, sub: sub, baki: baki };
+}
+
+function htmlResit(r) {
+  var c = r.syarikat || TETAPAN_ASAL.resit;
+  var k = kiraResit(r);
+  var muka1 =
+    '<div class="resit">' +
+      '<div class="resit-kepala">' +
+        (c.logoUrl ? '<img src="' + esc(c.logoUrl) + '" alt="Logo" crossorigin="anonymous" referrerpolicy="no-referrer">' : "<div></div>") +
+        '<div class="resit-syarikat"><h2>' + esc(c.namaSyarikat) + "</h2>" +
+          esc(c.alamat) + "\n" +
+          (c.email ? "Email: " + esc(c.email) + "\n" : "") +
+          (c.ssm ? "SSM: " + esc(c.ssm) : "") +
+        "</div>" +
+      "</div>" +
+
+      '<div class="resit-tajuk"><h2>RECEIPT</h2>' +
+        '<div class="kanan"><b>No:</b> ' + esc(r.no) + "<br><b>Date:</b> " + esc(fmtTarikh(r.tarikh)) + "</div>" +
+      "</div>" +
+
+      '<div class="resit-billto"><b>Billed To:</b><br>' +
+        esc(r.client.nama) + "<br>" +
+        (r.client.alamat ? esc(r.client.alamat) + "<br>" : "") +
+        "Phone: " + esc(r.client.telefon || "-") + "<br>" +
+        "Email: " + esc(r.client.email || "-") +
+      "</div>" +
+
+      "<table><tr><th>Services</th><th>Qty</th><th>Date</th><th>Price</th><th>Total</th></tr>" +
+        "<tr><td>" + esc(r.servis) + "</td><td>" + esc(r.qty) + "</td><td>" +
+        esc(r.insp.tarikh ? fmtTarikh(r.insp.tarikh) : "-") + "</td><td>" +
+        esc(rm(r.harga)) + "</td><td>" + esc(rm(k.gross)) + "</td></tr></table>" +
+
+      '<table class="jumlah-resit">' +
+        "<tr><td>Gross Total</td><td>" + esc(rm(k.gross)) + "</td></tr>" +
+        "<tr><td>Discount</td><td>" + esc(nom(r.diskaun)) + "%</td></tr>" +
+        "<tr><td>Sub-Total</td><td>" + esc(rm(k.sub)) + "</td></tr>" +
+        "<tr><td>Deposit Received</td><td>" + esc(rm(r.deposit)) + "</td></tr>" +
+        "<tr><td>Final Payment</td><td>" + esc(rm(r.finalPayment)) + "</td></tr>" +
+        "<tr><td><b>Balance</b></td><td>" + esc(rm(k.baki)) + "</td></tr>" +
+        '<tr class="baris-diterima"><td>Payment Received (' + esc(r.jenis) + ")</td><td>" +
+          esc(rm(r.jumlahDiterima)) + "</td></tr>" +
+      "</table>" +
+
+      (r.catatan ? '<p style="margin-top:12px;font-size:12.5px"><b>Note:</b> ' + esc(r.catatan) + "</p>" : "") +
+
+      '<div class="resit-tengah"><b>Payment Method</b><br>' +
+        esc(c.bank) + "<br>Account number: " + esc(c.noAkaun) + "<br>" +
+        "Account Name: " + esc(c.namaAkaun) + "<br><br><b>" + esc(c.nota) + "</b></div>" +
+
+      '<div class="resit-tandatangan">' +
+        (c.tandatanganUrl ? '<img src="' + esc(c.tandatanganUrl) + '" alt="Signature" crossorigin="anonymous" referrerpolicy="no-referrer"><br>' : "") +
+        "<b>" + esc(c.namaPenandatangan) + "</b><br>" + esc(c.jawatanPenandatangan) +
+      "</div>" +
+    "</div>";
+
+  if (!r.penuh) return muka1;
+
+  var barisInfo = function (label, nilai) {
+    return "<tr><td>" + esc(label) + "</td><td>" + esc(nilai || "-") + "</td></tr>";
+  };
+  var muka2 =
+    '<div class="resit">' +
+      '<h2 style="margin:0 0 8px;font-size:20px">INSPECTION INFORMATION</h2>' +
+      '<div class="resit-seksyen">Owner Information</div>' +
+      '<table class="info-resit">' +
+        barisInfo("Name", r.client.nama) + barisInfo("Phone", r.client.telefon) +
+        barisInfo("Email", r.client.email) + "</table>" +
+      '<div class="resit-seksyen">Property Information</div>' +
+      '<table class="info-resit">' +
+        barisInfo("Full Address", r.client.alamat) + barisInfo("City", r.client.bandar) +
+        barisInfo("Postcode", r.client.poskod) + barisInfo("State", r.client.negeri) +
+        barisInfo("Built-Up Size", r.prop.size) + barisInfo("Property Type", r.prop.jenis) +
+        barisInfo("Water Supply", r.prop.water) + barisInfo("Electrical Supply", r.prop.electric) +
+      "</table>" +
+      '<div class="resit-seksyen">Inspection Detail</div>' +
+      '<table class="info-resit">' +
+        barisInfo("Booking Date", r.insp.bookDate ? fmtTarikh(r.insp.bookDate) : "") +
+        barisInfo("Inspection Date", r.insp.tarikh ? fmtTarikh(r.insp.tarikh) : "") +
+        barisInfo("Inspection Time", r.insp.masa) + "</table>" +
+      '<div class="resit-seksyen">Inspector Information</div>' +
+      '<table class="info-resit">' + barisInfo("In Charge Inspector", r.insp.inspector) + "</table>" +
+    "</div>";
+
+  return muka1 + muka2;
+}
+
+function cetakResit(id) {
+  var data = baca();
+  var r = data.resit.filter(function (x) { return x.id === id; })[0];
+  if (!r) return;
+  var kertas = $("#kertasResit");
+  kertas.innerHTML = htmlResit(r);
+  document.body.classList.add("cetak-resit");
+  var selesai = function () {
+    document.body.classList.remove("cetak-resit");
+    kertas.innerHTML = "";
+    window.removeEventListener("afterprint", selesai);
+  };
+  window.addEventListener("afterprint", selesai);
+  setTimeout(function () {
+    try { window.print(); } catch (e) { toast("Pelayar tidak dapat membuka dialog cetak.", "bad"); }
+    // Sandaran: jika afterprint tidak berlaku, skrin mesti kembali normal.
+    setTimeout(selesai, 800);
+  }, 250);                                            // beri masa logo dimuatkan
+}
+
+function teksResit(r) {
+  var k = kiraResit(r);
+  var c = r.syarikat || TETAPAN_ASAL.resit;
+  return "RESIT PEMBAYARAN\n" +
+    "No: " + r.no + "\n" +
+    "Tarikh: " + fmtTarikh(r.tarikh) + "\n\n" +
+    "Client: " + r.client.nama + "\n" +
+    "Servis: " + r.servis + "\n" +
+    (r.insp.tarikh ? "Tarikh inspection: " + fmtTarikh(r.insp.tarikh) +
+      (r.insp.masa ? " (" + r.insp.masa + ")" : "") + "\n" : "") + "\n" +
+    "Jumlah diterima (" + r.jenis + "): " + rm(r.jumlahDiterima) + "\n" +
+    "Sub-total: " + rm(k.sub) + "\n" +
+    "Baki: " + rm(k.baki) + "\n\n" +
+    "Terima kasih.\n" + c.namaSyarikat;
+}
+
+function salinTeks(kotak) {
+  kotak.select();
+  kotak.setSelectionRange(0, 99999);
+  var berjaya = false;
+  try { berjaya = document.execCommand("copy"); } catch (e) { berjaya = false; }
+  if (berjaya) return toast("Teks disalin.", "ok");
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(kotak.value).then(function () { toast("Teks disalin.", "ok"); },
+      function () { toast("Tidak dapat salin automatik — salin sendiri dari kotak teks.", "warn", 5000); });
+    return;
+  }
+  toast("Tidak dapat salin — salin sendiri dari kotak teks.", "warn", 5000);
+}
+
+function lihatResit(id) {
+  var data = baca();
+  var r = data.resit.filter(function (x) { return x.id === id; })[0];
+  if (!r) return;
+
+  var m = modal("Resit " + r.no,
+    '<div class="pratonton">' + htmlResit(r) + "</div>" +
+    '<div class="tajuk-seksyen">Teks untuk WhatsApp</div>' +
+    '<textarea id="teksResitKotak" style="min-height:150px">' + esc(teksResit(r)) + "</textarea>" +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-bad" id="btnPadamResit">Padam</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnSuntingResit">Sunting</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnSalinResit">Salin Teks</button>' +
+      '<button type="button" class="btn btn-ok" id="btnWaResit">WhatsApp</button>' +
+      '<button type="button" class="btn btn-utama" id="btnCetakResit">Cetak / Simpan PDF</button>' +
+    "</div>", 760);
+
+  $("#btnCetakResit", m.el).onclick = function () { cetakResit(id); };
+  $("#btnSalinResit", m.el).onclick = function () { salinTeks($("#teksResitKotak", m.el)); };
+  $("#btnWaResit", m.el).onclick = function () {
+    var teks = $("#teksResitKotak", m.el).value;
+    var no = String(r.client.telefon || "").replace(/[^\d]/g, "");
+    if (no.charAt(0) === "0") no = "6" + no;
+    window.open("https://wa.me/" + (no.length > 8 ? no : "") + "?text=" + encodeURIComponent(teks), "_blank");
+  };
+  $("#btnSuntingResit", m.el).onclick = function () { m.tutup(); borangResit({ resitId: id }); };
+  $("#btnPadamResit", m.el).onclick = function () {
+    sahkan("Padam resit " + r.no + "? Nombor resit ini tidak akan digunakan semula.").then(function (ya) {
+      if (!ya) return;
+      var d = baca();
+      d.resit = d.resit.filter(function (x) { return x.id !== id; });
+      simpan(d);
+      m.tutup();
+      toast("Resit dipadam.", "ok");
+      lukis();
+    });
+  };
+}
+
+/* ------------------------- borang resit ------------------------------- */
+function borangResit(opsi) {
+  opsi = opsi || {};
+  var data = baca();
+  var r = opsi.resitId ? data.resit.filter(function (x) { return x.id === opsi.resitId; })[0] : null;
+  var baru = !r;
+  var sale = opsi.saleId ? data.sale.filter(function (x) { return x.id === opsi.saleId; })[0]
+    : (r && r.saleId ? data.sale.filter(function (x) { return x.id === r.saleId; })[0] : null);
+
+  // Nilai awal: dari resit sedia ada, atau dari rekod jualan, atau kosong.
+  var awal;
+  if (r) {
+    awal = JSON.parse(JSON.stringify(r));
+  } else {
+    var k = sale ? kiraSale(sale) : null;
+    awal = {
+      no: nomborResitBaharu(data).no,
+      tarikh: kunciTarikh(),
+      jenis: sale && nom(sale.deposit) > 0 && nom(sale.finalPayment) > 0 ? "Final Payment" : "Deposit",
+      jumlahDiterima: sale ? (nom(sale.finalPayment) || nom(sale.deposit) || 0) : 0,
+      servis: sale && (nom(sale.water) > 0 || nom(sale.electric) > 0)
+        ? "Home Inspection + Water & Electrical Test" : "Home Inspection",
+      qty: 1,
+      harga: k ? k.total : 0,
+      diskaun: 0,
+      deposit: sale ? nom(sale.deposit) : 0,
+      finalPayment: sale ? nom(sale.finalPayment) : 0,
+      catatan: "",
+      penuh: false,
+      client: {
+        nama: sale ? sale.nama : "", telefon: sale ? sale.telefon : "", email: sale ? sale.email : "",
+        alamat: sale ? [sale.unit, sale.projek].filter(Boolean).join(", ") : "",
+        bandar: "", poskod: "", negeri: ""
+      },
+      prop: {
+        size: sale ? sale.size : "", jenis: "",
+        water: sale && nom(sale.water) > 0 ? "Yes (" + rm(sale.water) + ")" : "-",
+        electric: sale && nom(sale.electric) > 0 ? "Yes (" + rm(sale.electric) + ")" : "-"
+      },
+      insp: {
+        bookDate: sale ? (sale.createdAt || "").slice(0, 10) : "",
+        tarikh: sale ? sale.tarikh : "",
+        masa: sale ? (sale.masaMula || "") + (sale.masaTamat ? " – " + sale.masaTamat : "") : "",
+        inspector: sale ? (sale.inspector || []).join(", ") : ""
+      }
+    };
+  }
+
+  var m = modal(baru ? "Resit Baharu" : "Sunting Resit " + r.no,
+    '<form id="borangResit">' +
+      '<div class="tajuk-seksyen">Resit</div>' +
+      '<div class="baris-medan">' +
+        medan("No. Resit *", '<input type="text" name="no" value="' + esc(awal.no) + '" required>') +
+        medan("Tarikh Resit *", '<input type="date" name="tarikh" value="' + esc(awal.tarikh) + '" required>') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Jenis Bayaran", "<select name='jenis'>" + JENIS_BAYARAN.map(function (x) {
+          return "<option" + (awal.jenis === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+        medan("Jumlah Diterima (RM) *",
+          '<input type="number" step="0.01" min="0" name="jumlahDiterima" value="' + esc(awal.jumlahDiterima) + '" required>') +
+      "</div>" +
+
+      '<div class="tajuk-seksyen">Client</div>' +
+      '<div class="baris-medan">' +
+        medan("Nama *", '<input type="text" name="c_nama" value="' + esc(awal.client.nama) + '" required>') +
+        medan("Telefon", '<input type="tel" name="c_telefon" value="' + esc(awal.client.telefon) + '">') +
+        medan("Email", '<input type="email" name="c_email" value="' + esc(awal.client.email) + '">') +
+      "</div>" +
+      medan("Alamat Property", '<textarea name="c_alamat" style="min-height:60px">' + esc(awal.client.alamat) + "</textarea>") +
+      '<div class="baris-medan">' +
+        medan("Bandar", '<input type="text" name="c_bandar" value="' + esc(awal.client.bandar) + '">') +
+        medan("Poskod", '<input type="text" name="c_poskod" value="' + esc(awal.client.poskod) + '">') +
+        medan("Negeri", '<input type="text" name="c_negeri" value="' + esc(awal.client.negeri) + '">') +
+      "</div>" +
+
+      '<div class="tajuk-seksyen">Servis & Caj</div>' +
+      medan("Servis", '<input type="text" name="servis" value="' + esc(awal.servis) + '">') +
+      '<div class="baris-medan">' +
+        medan("Kuantiti", '<input type="number" min="1" name="qty" value="' + esc(awal.qty) + '">') +
+        medan("Harga (RM)", '<input type="number" step="0.01" min="0" name="harga" value="' + esc(awal.harga) + '">') +
+        medan("Diskaun (%)", '<input type="number" step="0.01" min="0" name="diskaun" value="' + esc(awal.diskaun) + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Deposit Diterima (RM)", '<input type="number" step="0.01" min="0" name="deposit" value="' + esc(awal.deposit) + '">') +
+        medan("Final Payment (RM)", '<input type="number" step="0.01" min="0" name="finalPayment" value="' + esc(awal.finalPayment) + '">') +
+        medan("Baki", '<input type="text" id="bakiResit" readonly value="">') +
+      "</div>" +
+      medan("Catatan (pilihan)", '<input type="text" name="catatan" value="' + esc(awal.catatan) + '">') +
+
+      '<div class="tajuk-seksyen">Maklumat Inspeksi (muka surat 2)</div>' +
+      '<label class="chip pilih-chip" style="margin-bottom:12px"><input type="checkbox" name="penuh"' +
+        (awal.penuh ? " checked" : "") + ">Sertakan muka surat Inspection Information</label>" +
+      '<div class="baris-medan">' +
+        medan("Built-Up Size", '<input type="text" name="p_size" value="' + esc(awal.prop.size) + '">') +
+        medan("Jenis Property", '<input type="text" name="p_jenis" value="' + esc(awal.prop.jenis) + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Water Supply", '<input type="text" name="p_water" value="' + esc(awal.prop.water) + '">') +
+        medan("Electrical Supply", '<input type="text" name="p_electric" value="' + esc(awal.prop.electric) + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Tarikh Booking", '<input type="date" name="i_bookDate" value="' + esc(awal.insp.bookDate) + '">') +
+        medan("Tarikh Inspeksi", '<input type="date" name="i_tarikh" value="' + esc(awal.insp.tarikh) + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Masa Inspeksi", '<input type="text" name="i_masa" value="' + esc(awal.insp.masa) + '">') +
+        medan("Inspector", '<input type="text" name="i_inspector" value="' + esc(awal.insp.inspector) + '">') +
+      "</div>" +
+
+      '<div class="baris-butang modal-kaki">' +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Jana Resit" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 720);
+
+  var borang = $("#borangResit", m.el);
+  function kiraPapar() {
+    var v = ambilNilai(borang);
+    var k = kiraResit({ qty: v.qty, harga: v.harga, diskaun: v.diskaun,
+      deposit: v.deposit, finalPayment: v.finalPayment });
+    $("#bakiResit", m.el).value = rm(k.baki) + "  (sub-total " + rm(k.sub) + ")";
+  }
+  borang.addEventListener("input", kiraPapar);
+  kiraPapar();
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai(borang);
+    var d = baca();
+    if (!v.no) return toast("Sila isi nombor resit.", "bad");
+    var bertindih = d.resit.some(function (x) {
+      return x.no === v.no && x.id !== (r ? r.id : null);
+    });
+    if (bertindih) return toast("Nombor resit " + v.no + " sudah digunakan.", "bad", 5000);
+
+    var rekod = {
+      id: r ? r.id : id(),
+      no: v.no,
+      tarikh: v.tarikh,
+      jenis: v.jenis,
+      jumlahDiterima: nom(v.jumlahDiterima),
+      saleId: sale ? sale.id : (r ? r.saleId : null),
+      servis: v.servis,
+      qty: nom(v.qty) || 1,
+      harga: nom(v.harga),
+      diskaun: nom(v.diskaun),
+      deposit: nom(v.deposit),
+      finalPayment: nom(v.finalPayment),
+      catatan: v.catatan,
+      penuh: $("[name=penuh]", borang).checked,
+      client: { nama: v.c_nama, telefon: v.c_telefon, email: v.c_email, alamat: v.c_alamat,
+                bandar: v.c_bandar, poskod: v.c_poskod, negeri: v.c_negeri },
+      prop: { size: v.p_size, jenis: v.p_jenis, water: v.p_water, electric: v.p_electric },
+      insp: { bookDate: v.i_bookDate, tarikh: v.i_tarikh, masa: v.i_masa, inspector: v.i_inspector },
+      syarikat: r ? r.syarikat : JSON.parse(JSON.stringify(d.tetapan.resit)),
+      createdAt: r ? r.createdAt : new Date().toISOString()
+    };
+
+    if (r) {
+      d.resit = d.resit.map(function (x) { return x.id === r.id ? rekod : x; });
+    } else {
+      d.resit.push(rekod);
+      // Naikkan kaunter hanya bila nombor auto yang dicadangkan digunakan.
+      if (v.no === awal.no) {
+        var padanan = String(v.no).match(/(\d+)\s*$/);
+        if (padanan) d.tetapan.resit.nombor = parseInt(padanan[1], 10) + 1;
+      }
+    }
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(r ? "Resit dikemas kini." : "Resit " + rekod.no + " dijana.", "ok");
+    lihatResit(rekod.id);
+    lukis();
+  };
+}
+
+/* ------------------------- halaman resit ------------------------------ */
+var resitBulan = "";
+
+function lukisResit(bekas) {
+  var data = baca();
+  var senarai = data.resit.slice().sort(function (a, b) {
+    return String(b.tarikh + b.no).localeCompare(String(a.tarikh + a.no));
+  });
+  if (resitBulan) {
+    senarai = senarai.filter(function (r) { return String(r.tarikh).slice(0, 7) === resitBulan; });
+  }
+  var jumlah = senarai.reduce(function (j, r) { return j + nom(r.jumlahDiterima); }, 0);
+
+  bekas.innerHTML =
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Resit Dikeluarkan</h3>' +
+        '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnResitBaru">Resit Baharu</button>' +
+          '<button class="btn btn-lembut" id="btnEksportResit">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<div class="penapis">' +
+        '<label>Bulan<input type="month" id="fBulanResit" value="' + esc(resitBulan) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnSemuaResit">Semua Bulan</button>' +
+        '<div style="margin-left:auto" class="kecil">' + senarai.length + " resit · jumlah diterima <b>" +
+          esc(rm(jumlah)) + "</b></div>" +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length ? "<table><thead><tr><th>No. Resit</th><th>Tarikh</th><th>Client</th>" +
+        "<th>Jenis</th><th class='num'>Diterima</th><th class='num'>Baki</th><th></th></tr></thead><tbody>" +
+        senarai.map(function (r) {
+          var k = kiraResit(r);
+          return "<tr>" +
+            "<td><b>" + esc(r.no) + "</b></td>" +
+            "<td>" + esc(fmtTarikh(r.tarikh)) + "</td>" +
+            '<td class="bungkus">' + esc(r.client.nama) +
+              (r.client.telefon ? '<div class="kecil">' + esc(r.client.telefon) + "</div>" : "") + "</td>" +
+            '<td><span class="badge badge-muted">' + esc(r.jenis) + "</span></td>" +
+            '<td class="num"><b>' + esc(rm(r.jumlahDiterima)) + "</b></td>" +
+            '<td class="num">' + esc(rm(k.baki)) + "</td>" +
+            '<td><div class="aksi">' +
+              '<button class="btn btn-lembut" data-resit="' + esc(r.id) + '">Buka</button>' +
+              '<button class="btn btn-lembut" data-cetak="' + esc(r.id) + '">Cetak</button>' +
+            "</div></td></tr>";
+        }).join("") + "</tbody></table>"
+        : kosong("Belum ada resit. Tekan “Resit Baharu”, atau buka satu jualan dan tekan “Buat Resit”.")) +
+      "</div>" +
+    "</div>";
+
+  $("#btnResitBaru").onclick = function () { borangResit({}); };
+  $("#fBulanResit").onchange = function (e) { resitBulan = e.target.value; lukisResit(bekas); };
+  $("#btnSemuaResit").onclick = function () { resitBulan = ""; lukisResit(bekas); };
+  $("#btnEksportResit").onclick = function () {
+    if (!senarai.length) return toast("Tiada resit untuk dieksport.", "warn");
+    csv("resit" + (resitBulan ? "-" + resitBulan : ""),
+      ["No Resit", "Tarikh", "Client", "Telefon", "Jenis", "Jumlah Diterima", "Sub-Total", "Baki", "Servis"],
+      senarai.map(function (r) {
+        var k = kiraResit(r);
+        return [r.no, r.tarikh, r.client.nama, r.client.telefon, r.jenis,
+                nom(r.jumlahDiterima), k.sub, k.baki, r.servis];
+      }));
+  };
+  $$("[data-resit]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatResit(b.getAttribute("data-resit")); };
+  });
+  $$("[data-cetak]", bekas).forEach(function (b) {
+    b.onclick = function () { cetakResit(b.getAttribute("data-cetak")); };
+  });
 }
 
 /* ======================================================================
@@ -2052,8 +2555,43 @@ function lukisTetapan(bekas) {
         "</div>" +
         '<input type="file" id="failPulih" accept="application/json" hidden>' +
         '<div class="jumlah-baris" style="margin-top:16px"><span>Jumlah rekod jualan</span><b>' + data.sale.length + "</b></div>" +
+        '<div class="jumlah-baris"><span>Jumlah resit</span><b>' + data.resit.length + "</b></div>" +
         '<div class="jumlah-baris"><span>Jumlah staf</span><b>' + data.staf.length + "</b></div>" +
       "</div>" +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Tetapan Resit</h3>' +
+        '<span class="kecil">Nombor resit seterusnya: <b>' + esc(nomborResitBaharu(data).no) + "</b></span></div>" +
+      '<form id="borangResitTetapan">' +
+        '<div class="baris-medan">' +
+          medan("Nama Syarikat (pada resit)", '<input type="text" name="namaSyarikat" value="' + esc(t.resit.namaSyarikat) + '">') +
+          medan("Email", '<input type="text" name="email" value="' + esc(t.resit.email) + '">') +
+          medan("No. SSM", '<input type="text" name="ssm" value="' + esc(t.resit.ssm) + '">') +
+        "</div>" +
+        medan("Alamat Syarikat", '<textarea name="alamat" style="min-height:70px">' + esc(t.resit.alamat) + "</textarea>") +
+        '<div class="baris-medan">' +
+          medan("Prefix No. Resit", '<input type="text" name="prefix" value="' + esc(t.resit.prefix) + '">') +
+          medan("Nombor Seterusnya", '<input type="number" min="1" name="nombor" value="' + esc(t.resit.nombor) + '">') +
+        "</div>" +
+        '<div class="baris-medan">' +
+          medan("Bank", '<input type="text" name="bank" value="' + esc(t.resit.bank) + '">') +
+          medan("No. Akaun", '<input type="text" name="noAkaun" value="' + esc(t.resit.noAkaun) + '">') +
+          medan("Nama Akaun", '<input type="text" name="namaAkaun" value="' + esc(t.resit.namaAkaun) + '">') +
+        "</div>" +
+        medan("Nota Bawah Resit", '<input type="text" name="nota" value="' + esc(t.resit.nota) + '">') +
+        '<div class="baris-medan">' +
+          medan("URL Logo", '<input type="text" name="logoUrl" value="' + esc(t.resit.logoUrl) + '">') +
+          medan("URL Tandatangan", '<input type="text" name="tandatanganUrl" value="' + esc(t.resit.tandatanganUrl) + '">') +
+        "</div>" +
+        '<div class="baris-medan">' +
+          medan("Nama Penandatangan", '<input type="text" name="namaPenandatangan" value="' + esc(t.resit.namaPenandatangan) + '">') +
+          medan("Jawatan Penandatangan", '<input type="text" name="jawatanPenandatangan" value="' + esc(t.resit.jawatanPenandatangan) + '">') +
+        "</div>" +
+        '<p class="kecil">Logo dan tandatangan menggunakan URL gambar. Resit yang sudah dijana ' +
+        "menyimpan salinan tetapan ini, jadi resit lama tidak berubah bila tetapan diubah.</p>" +
+        '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan Tetapan Resit</button></div>' +
+      "</form>" +
     "</div>";
 
   $("#borangTetapan").onsubmit = function (e) {
@@ -2068,6 +2606,18 @@ function lukisTetapan(bekas) {
     d.tetapan.sumber = pecahBaris(nilai.sumber);
     if (!simpan(d)) return;
     toast("Tetapan disimpan.", "ok");
+    lukis();
+  };
+
+  $("#borangResitTetapan").onsubmit = function (e) {
+    e.preventDefault();
+    var nilai = ambilNilai($("#borangResitTetapan"));
+    var d = baca();
+    Object.keys(nilai).forEach(function (kunci) {
+      d.tetapan.resit[kunci] = kunci === "nombor" ? Math.max(1, nom(nilai[kunci])) : nilai[kunci];
+    });
+    if (!simpan(d)) return;
+    toast("Tetapan resit disimpan.", "ok");
     lukis();
   };
 
@@ -2146,6 +2696,7 @@ var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
   operasi: '<svg viewBox="0 0 24 24"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>',
+  resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
   staf: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6"/><path d="M17.5 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>',
   tetapan: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.54 15a1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.54h.09A1.7 1.7 0 0 0 10 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.46 9v.09a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>'
 };
@@ -2154,6 +2705,7 @@ var HALAMAN = [
   { id: "papan",   label: "Papan Utama",  ikon: IKON.papan,   lukis: lukisPapan },
   { id: "sale",    label: "Key-in Sale",  ikon: IKON.sale,    lukis: lukisSale },
   { id: "operasi", label: "Operasi",      ikon: IKON.operasi, lukis: lukisOperasi },
+  { id: "resit",   label: "Resit",        ikon: IKON.resit,   lukis: lukisResit },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
   { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
 ];

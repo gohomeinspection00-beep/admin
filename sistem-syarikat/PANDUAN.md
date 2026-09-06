@@ -15,6 +15,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Papan Utama** | Jualan bulan ini, deposit dikutip, baki belum kutip, % capai target, job hari ini, senarai perlu tindakan, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf yang ditugaskan, job belum ditugaskan, beban kerja 7 hari, tukar status terus dari jadual |
+| **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Nama syarikat, target jualan harian, hari bekerja, senarai projek, sumber lead, hari cuti, backup & restore |
 
@@ -85,6 +86,31 @@ Salam, ini slot inspection yang masih kosong:
 Sila maklumkan slot yang sesuai untuk tempahan. Terima kasih.
 Go Home Inspection
 ```
+
+## Resit
+
+Satu jualan boleh ada **beberapa resit** (deposit, final payment, bayaran tambahan) —
+setiap satu dengan nombor sendiri yang tidak berulang.
+
+**Cara jana resit:**
+
+1. Buka satu jualan (klik nama client dalam kalendar) → **Buat Resit**.
+   Semua maklumat client, property, masa inspeksi, inspector dan kewangan
+   diisi automatik dari rekod jualan.
+2. Pilih **Jenis Bayaran** (Deposit / Final Payment / Bayaran Penuh / Lain-lain)
+   dan **Jumlah Diterima** untuk resit itu.
+3. Tandakan *Sertakan muka surat Inspection Information* jika mahu resit 2 muka surat.
+4. Tekan **Jana Resit** — pratonton resit terus dipaparkan.
+
+Dari pratonton: **Cetak / Simpan PDF** (pilih "Save as PDF" dalam dialog cetak),
+**Salin Teks**, atau **WhatsApp** (terus ke nombor client jika ada).
+
+Resit yang dijana menyimpan salinan tetapan syarikat pada masa itu, jadi resit
+lama tidak berubah walaupun tetapan diubah kemudian.
+
+**Tetapan resit** (menu Tetapan): nama syarikat, alamat, email, SSM, prefix &
+nombor resit seterusnya, maklumat bank, nota bawah resit, URL logo & tandatangan,
+nama dan jawatan penandatangan.
 
 ## Kiraan automatik
 
