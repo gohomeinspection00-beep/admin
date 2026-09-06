@@ -127,6 +127,66 @@ td.bungkus{white-space:normal;min-width:130px;max-width:210px}
 .toast-ok{background:var(--ok)}.toast-bad{background:var(--bad)}.toast-warn{background:var(--warn)}
 @keyframes naik{from{opacity:0;transform:translateY(8px)}}
 
+/* --- ikon & kawalan paparan --- */
+.nav-ikon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px}
+.nav-ikon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.suis{display:inline-flex;background:var(--bg);border:1px solid var(--garis);border-radius:10px;padding:3px}
+.suis button{border:0;background:transparent;padding:7px 16px;border-radius:8px;font:inherit;font-size:13px;font-weight:600;color:var(--lembut);cursor:pointer}
+.suis button.aktif{background:#fff;color:var(--teks);box-shadow:0 1px 2px rgba(15,23,42,.1)}
+
+/* --- kalendar --- */
+.kal-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.kal-nav{display:flex;align-items:center;gap:8px}
+.kal-nav h3{margin:0;font-size:17px;min-width:170px;text-align:center}
+.kal-nav button{border:1px solid var(--garis);background:#fff;width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:16px;line-height:1;color:var(--teks)}
+.kal-nav button:hover{background:var(--bg)}
+.petunjuk{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--lembut);align-items:center}
+.petunjuk i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.kal-luar-bungkus{overflow-x:auto}
+.kal{display:grid;grid-template-columns:repeat(7,minmax(132px,1fr));gap:1px;background:var(--garis);border:1px solid var(--garis);border-radius:12px;overflow:hidden}
+.kal-kepala{background:#f8fafc;padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--lembut);text-align:center}
+.kal-hari{background:#fff;min-height:118px;padding:8px;position:relative;cursor:pointer;transition:background .12s}
+.kal-hari:hover{background:#f8fafc}
+.kal-hari.kal-luar{background:#fafbfc;color:#cbd5e1;cursor:default}
+.kal-hari.kal-luar:hover{background:#fafbfc}
+.kal-hari.kal-cuti{background:#fbfcfd}
+.kal-hari.kal-ini{box-shadow:inset 0 0 0 2px var(--utama)}
+.kal-hari.kal-capai{box-shadow:inset 3px 0 0 var(--ok)}
+.kal-atas{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:6px}
+.kal-tarikh{font-size:13px;font-weight:700}
+.kal-nama-hari{display:none;margin-left:7px;font-weight:500;color:var(--lembut)}
+.kal-nav button{white-space:nowrap}
+.kal-hari.kal-ini .kal-tarikh{color:var(--utama)}
+.kal-sasar{font-size:10px;color:var(--lembut);text-transform:uppercase;letter-spacing:.3px}
+.kal-job{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--utama);background:#eff6ff;border-radius:0 6px 6px 0;padding:4px 6px;margin-bottom:4px;font:inherit;font-size:11.5px;line-height:1.35;cursor:pointer;color:var(--teks)}
+.kal-job:hover{background:#dbeafe}
+.kal-job.j-selesai{border-left-color:var(--ok);background:#f0fdf4}
+.kal-job.j-selesai:hover{background:#dcfce7}
+.kal-job.j-submit{border-left-color:var(--warn);background:#fffbeb}
+.kal-job.j-submit:hover{background:#fef3c7}
+.kal-job.j-batal{border-left-color:var(--bad);background:#fef2f2;text-decoration:line-through;opacity:.7}
+.kal-job b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kal-job span{color:var(--lembut)}
+.kal-lagi{font-size:11px;color:var(--utama);font-weight:600;padding:2px 6px}
+.kal-jumlah{position:absolute;left:8px;right:8px;bottom:6px;font-size:11px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.kal-jumlah.kurang{color:var(--lembut)}
+.kal-jumlah.capai{color:var(--ok)}
+.kal-hari.ada-job{padding-bottom:22px}
+.kal-cuti-label{font-size:10px;font-weight:700;color:var(--lembut);text-transform:uppercase;letter-spacing:.4px}
+@media(max-width:760px){
+  .kal{grid-template-columns:1fr;gap:0}
+  .kal-kepala{display:none}
+  .kal-hari{min-height:0;border-bottom:1px solid var(--garis);display:flex;flex-direction:column}
+  .kal-hari.kal-luar{display:none}
+  .kal-hari.kal-lompang{display:none}
+  .kal-nama-hari{display:inline;font-size:12px}
+  .kal-nav{width:100%;justify-content:space-between}
+  .kal-nav h3{min-width:0;flex:1}
+  .kal-jumlah{position:static;text-align:left;margin-top:4px}
+  .kal-hari.ada-job{padding-bottom:8px}
+}
+@media print{.kal-hari{break-inside:avoid}.suis,.kal-nav button{display:none!important}}
+
 /* --- telefon --- */
 @media(max-width:860px){
   .sisi{position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .22s ease}
@@ -495,12 +555,12 @@ function lukisPapan(bekas) {
         (belumSubmit.length ? belumSubmit.slice(0, 6).map(function (s) {
           return '<div class="jumlah-baris"><span>' + esc(fmtTarikh(s.tarikh)) + " · " + esc(s.nama) +
             "</span>" + lencanaKerja(s.statusKerja) + "</div>";
-        }).join("") : '<div class="kecil">Semua report sudah submit. 👍</div>') +
+        }).join("") : '<div class="kecil">Semua report sudah submit.</div>') +
         '<div class="tajuk-seksyen">Baki belum kutip (' + adaBaki.length + ")</div>" +
         (adaBaki.length ? adaBaki.slice(0, 6).map(function (s) {
           return '<div class="jumlah-baris"><span>' + esc(s.nama) + '<span class="kecil"> · ' +
             esc(fmtTarikh(s.tarikh)) + "</span></span><b>" + esc(rm(kiraSale(s).baki)) + "</b></div>";
-        }).join("") : '<div class="kecil">Tiada baki tertunggak. 👍</div>') +
+        }).join("") : '<div class="kecil">Tiada baki tertunggak.</div>') +
       "</div>" +
     "</div>" +
 
@@ -548,6 +608,7 @@ function kadPrestasi(tajuk, senarai, sasar) {
    HALAMAN 2 — KEY-IN SALE
    ================================================================== */
 var tapis = { bulan: bulanKini(), cari: "", kerja: "", sales: "" };
+var paparanSale = "kalendar";   // "kalendar" atau "senarai"
 
 function saleDitapis(data) {
   var teks = tapis.cari.trim().toLowerCase();
@@ -581,15 +642,19 @@ function lukisSale(bekas) {
 
     '<div class="kad">' +
       '<div class="kad-tajuk">' +
-        "<h3>Rekod Jualan</h3>" +
+        '<div class="suis">' +
+          '<button type="button" id="suisKalendar"' + (paparanSale === "kalendar" ? ' class="aktif"' : "") + ">Kalendar</button>" +
+          '<button type="button" id="suisSenarai"' + (paparanSale === "senarai" ? ' class="aktif"' : "") + ">Senarai</button>" +
+        "</div>" +
         '<div class="aksi">' +
-          '<button class="btn btn-utama" id="btnSaleBaru">+ Key-in Sale Baru</button>' +
+          '<button class="btn btn-utama" id="btnSaleBaru">Key-in Sale Baru</button>' +
           '<button class="btn btn-lembut" id="btnEksport">Eksport CSV</button>' +
           '<button class="btn btn-lembut" id="btnCetak">Cetak</button>' +
         "</div>" +
       "</div>" +
       '<div class="penapis">' +
-        '<label>Bulan<input type="month" id="fBulan" value="' + esc(tapis.bulan) + '"></label>' +
+        (paparanSale === "senarai"
+          ? '<label>Bulan<input type="month" id="fBulan" value="' + esc(tapis.bulan) + '"></label>' : "") +
         '<label style="min-width:220px">Cari<input type="search" id="fCari" placeholder="Nama, telefon, unit, projek…" value="' + esc(tapis.cari) + '"></label>' +
         "<label>Status Kerja<select id=\"fKerja\"><option value=''>Semua</option>" +
           STATUS_KERJA.map(function (s) {
@@ -609,10 +674,15 @@ function lukisSale(bekas) {
         kadStat("Target Bulan", rm(sasar), sasar > 0 ? Math.round((r.total / sasar) * 100) + "% dicapai" : "tiada target") +
       "</div>" +
 
-      '<div class="jadual-bungkus">' + jadualSale(senarai) + "</div>" +
+      (paparanSale === "kalendar"
+        ? kalendarSale(data, senarai)
+        : '<div class="jadual-bungkus">' + jadualSale(senarai) + "</div>") +
     "</div>";
 
-  $("#fBulan").onchange = function (e) { tapis.bulan = e.target.value; lukisSale(bekas); };
+  $("#suisKalendar").onclick = function () { paparanSale = "kalendar"; lukisSale(bekas); };
+  $("#suisSenarai").onclick = function () { paparanSale = "senarai"; lukisSale(bekas); };
+  if ($("#fBulan")) $("#fBulan").onchange = function (e) { tapis.bulan = e.target.value; lukisSale(bekas); };
+  if (paparanSale === "kalendar") pasangAksiKalendar(bekas);
   $("#fKerja").onchange = function (e) { tapis.kerja = e.target.value; lukisSale(bekas); };
   $("#fSales").onchange = function (e) { tapis.sales = e.target.value; lukisSale(bekas); };
   $("#btnReset").onclick = function () {
@@ -622,8 +692,11 @@ function lukisSale(bekas) {
   var kotakCari = $("#fCari");
   kotakCari.oninput = function (e) {
     tapis.cari = e.target.value;
-    $(".jadual-bungkus", bekas).innerHTML = jadualSale(saleDitapis(baca()));
-    pasangAksiJadual(bekas);
+    var kedudukan = e.target.selectionStart;
+    lukisSale(bekas);
+    var kotak = $("#fCari", bekas);
+    kotak.focus();
+    kotak.setSelectionRange(kedudukan, kedudukan);
   };
   $("#btnSaleBaru").onclick = function () { borangSale(null); };
   $("#btnCetak").onclick = function () { window.print(); };
@@ -643,7 +716,117 @@ function lukisSale(bekas) {
           s.closedBy, s.sumber, s.statusKerja || "Tempahan", s.invois1, s.invois2, s.catatan];
       }));
   };
-  pasangAksiJadual(bekas);
+  if (paparanSale === "senarai") pasangAksiJadual(bekas);
+}
+
+/* ------------------------- paparan kalendar --------------------------- */
+var HARI_PENDEK = ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu", "Ahad"];
+
+function tambahBulan(bulan, langkah) {
+  var b = bulan.split("-");
+  var d = new Date(parseInt(b[0], 10), parseInt(b[1], 10) - 1 + langkah, 1);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+}
+
+function kalendarSale(data, senarai) {
+  var b = tapis.bulan.split("-");
+  var tahun = parseInt(b[0], 10), bln = parseInt(b[1], 10);
+  var pertama = new Date(tahun, bln - 1, 1);
+  var lompang = (pertama.getDay() + 6) % 7;            // Isnin = 0
+  var hariAkhir = new Date(tahun, bln, 0).getDate();
+  var hariIni = kunciTarikh();
+
+  var peta = {};
+  senarai.forEach(function (s) {
+    (peta[s.tarikh] = peta[s.tarikh] || []).push(s);
+  });
+  Object.keys(peta).forEach(function (t) {
+    peta[t].sort(function (x, y) { return String(x.masaMula).localeCompare(String(y.masaMula)); });
+  });
+
+  var sel = [];
+  for (var i = 0; i < lompang; i++) sel.push('<div class="kal-hari kal-luar kal-lompang"></div>');
+
+  for (var h = 1; h <= hariAkhir; h++) {
+    var tarikh = tahun + "-" + String(bln).padStart(2, "0") + "-" + String(h).padStart(2, "0");
+    var job = peta[tarikh] || [];
+    var sah = job.filter(function (x) { return x.statusKerja !== "Batal"; });
+    var jumlah = ringkasan(sah).total;
+    var sasar = targetHari(tarikh, data.tetapan);
+    var cutiInfo = (data.tetapan.cuti || []).filter(function (c) { return c.tarikh === tarikh; })[0];
+
+    var kelas = ["kal-hari"];
+    if (sasar === 0) kelas.push("kal-cuti");
+    if (tarikh === hariIni) kelas.push("kal-ini");
+    if (sasar > 0 && jumlah >= sasar) kelas.push("kal-capai");
+    if (job.length) kelas.push("ada-job");
+
+    sel.push('<div class="' + kelas.join(" ") + '" data-hari="' + tarikh + '">' +
+      '<div class="kal-atas">' +
+        '<span class="kal-tarikh">' + h +
+          '<span class="kal-nama-hari">' + HARI_PENDEK[(new Date(tahun, bln - 1, h).getDay() + 6) % 7] + "</span></span>" +
+        (sasar > 0
+          ? '<span class="kal-sasar">' + esc(nom(sasar).toLocaleString("ms-MY")) + "</span>"
+          : '<span class="kal-cuti-label">' + esc(cutiInfo ? (cutiInfo.sebab || "Cuti") : "Rehat") + "</span>") +
+      "</div>" +
+      job.slice(0, 3).map(function (s) {
+        var k = kiraSale(s);
+        var gaya = s.statusKerja === "Selesai" ? " j-selesai"
+          : s.statusKerja === "Report Submit" ? " j-submit"
+          : s.statusKerja === "Batal" ? " j-batal" : "";
+        return '<button type="button" class="kal-job' + gaya + '" data-lihat="' + esc(s.id) + '">' +
+          "<b>" + esc(s.nama || "Tanpa nama") + "</b>" +
+          "<span>" + (s.masaMula ? esc(s.masaMula) + " · " : "") + esc(rm(k.total)) + "</span></button>";
+      }).join("") +
+      (job.length > 3 ? '<div class="kal-lagi">+ ' + (job.length - 3) + " job lagi</div>" : "") +
+      (jumlah > 0
+        ? '<div class="kal-jumlah ' + (sasar > 0 && jumlah >= sasar ? "capai" : "kurang") + '">' +
+          esc(rm(jumlah)) + "</div>"
+        : "") +
+    "</div>");
+  }
+
+  var baki = (7 - (sel.length % 7)) % 7;
+  for (var j = 0; j < baki; j++) sel.push('<div class="kal-hari kal-luar kal-lompang"></div>');
+
+  var jumBulan = ringkasan(senarai.filter(function (x) { return x.statusKerja !== "Batal"; }));
+  var sasarBulan = targetBulan(tapis.bulan, data.tetapan);
+
+  return '<div class="kal-bar">' +
+      '<div class="kal-nav">' +
+        '<button type="button" id="kalSebelum" aria-label="Bulan sebelum">&#8249;</button>' +
+        "<h3>" + esc(fmtBulan(tapis.bulan)) + "</h3>" +
+        '<button type="button" id="kalSelepas" aria-label="Bulan seterusnya">&#8250;</button>' +
+        '<button type="button" id="kalIni" style="width:auto;padding:0 12px">Hari Ini</button>' +
+      "</div>" +
+      '<div class="petunjuk">' +
+        '<span><i style="background:#2563eb"></i>Tempahan</span>' +
+        '<span><i style="background:#d97706"></i>Report submit</span>' +
+        '<span><i style="background:#16a34a"></i>Selesai</span>' +
+        "<span>" + esc(rm(jumBulan.total)) + " / " + esc(rm(sasarBulan)) + "</span>" +
+      "</div>" +
+    "</div>" +
+    '<div class="kal-luar-bungkus"><div class="kal">' +
+      HARI_PENDEK.map(function (n) { return '<div class="kal-kepala">' + n + "</div>"; }).join("") +
+      sel.join("") +
+    "</div></div>" +
+    '<p class="kecil" style="margin:12px 0 0">Klik mana-mana tarikh untuk key-in sale pada hari itu. ' +
+    "Klik nama client untuk lihat butiran. Nombor kelabu di penjuru kanan ialah target harian.</p>";
+}
+
+function pasangAksiKalendar(bekas) {
+  var lukisSemula = function () { lukisSale(bekas); };
+  $("#kalSebelum").onclick = function () { tapis.bulan = tambahBulan(tapis.bulan, -1); lukisSemula(); };
+  $("#kalSelepas").onclick = function () { tapis.bulan = tambahBulan(tapis.bulan, 1); lukisSemula(); };
+  $("#kalIni").onclick = function () { tapis.bulan = bulanKini(); lukisSemula(); };
+
+  $$(".kal-hari[data-hari]", bekas).forEach(function (sel) {
+    sel.onclick = function (e) {
+      var job = e.target.closest ? e.target.closest(".kal-job") : null;
+      if (job) return lihatSale(job.getAttribute("data-lihat"));
+      borangSale(null, sel.getAttribute("data-hari"));
+    };
+  });
 }
 
 function jadualSale(senarai) {
@@ -735,11 +918,11 @@ function baris(label, nilai) {
 }
 
 /* --------------------- borang key-in / sunting sale -------------------- */
-function borangSale(rekodId) {
+function borangSale(rekodId, tarikhAsal) {
   var data = baca();
   var s = rekodId ? data.sale.filter(function (x) { return x.id === rekodId; })[0] : null;
   var baru = !s;
-  s = s || { tarikh: kunciTarikh(), statusKerja: "Tempahan" };
+  s = s || { tarikh: tarikhAsal || kunciTarikh(), statusKerja: "Tempahan" };
 
   var pilihanSales = data.staf.filter(function (x) { return x.status === "aktif"; })
     .map(function (x) { return x.nama; });
@@ -1134,11 +1317,18 @@ function pecahBaris(teks) {
 /* ======================================================================
    MENU & PENGHALAAN
    ================================================================== */
+var IKON = {
+  papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
+  sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+  staf: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6"/><path d="M17.5 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>',
+  tetapan: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.54 15a1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.54h.09A1.7 1.7 0 0 0 10 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.46 9v.09a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>'
+};
+
 var HALAMAN = [
-  { id: "papan",   label: "Papan Utama",  ikon: "🏠", lukis: lukisPapan },
-  { id: "sale",    label: "Key-in Sale",  ikon: "💰", lukis: lukisSale },
-  { id: "staf",    label: "Staf",         ikon: "👥", lukis: lukisStaf },
-  { id: "tetapan", label: "Tetapan",      ikon: "⚙️", lukis: lukisTetapan }
+  { id: "papan",   label: "Papan Utama",  ikon: IKON.papan,   lukis: lukisPapan },
+  { id: "sale",    label: "Key-in Sale",  ikon: IKON.sale,    lukis: lukisSale },
+  { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
+  { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
 ];
 
 function halamanSemasa() {
