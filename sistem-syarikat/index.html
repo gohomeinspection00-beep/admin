@@ -151,7 +151,7 @@ td.bungkus{white-space:normal;min-width:130px;max-width:210px}
 .kal-hari.kal-luar:hover{background:#fafbfc}
 .kal-hari.kal-cuti{background:#fbfcfd}
 .kal-hari.kal-ini{box-shadow:inset 0 0 0 2px var(--utama)}
-.kal-hari.kal-capai{box-shadow:inset 3px 0 0 var(--ok)}
+.kal-hari.kal-capai,.kal-hari.kal-cuti.kal-capai{box-shadow:inset 3px 0 0 var(--ok)}
 .kal-atas{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:6px}
 .kal-tarikh{font-size:13px;font-weight:700}
 .kal-nama-hari{display:none;margin-left:7px;font-weight:500;color:var(--lembut)}
@@ -186,6 +186,25 @@ td.bungkus{white-space:normal;min-width:130px;max-width:210px}
   .kal-hari.ada-job{padding-bottom:8px}
 }
 @media print{.kal-hari{break-inside:avoid}.suis,.kal-nav button{display:none!important}}
+
+/* --- menu klik kanan --- */
+.menu-konteks{position:fixed;z-index:80;background:#fff;border:1px solid var(--garis);border-radius:11px;box-shadow:0 12px 34px rgba(15,23,42,.18);padding:5px;min-width:210px}
+.menu-kepala{padding:8px 11px 6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--lembut);border-bottom:1px solid var(--garis);margin-bottom:4px}
+.menu-item{display:block;width:100%;text-align:left;border:0;background:transparent;padding:9px 11px;border-radius:8px;font:inherit;font-size:13.5px;color:var(--teks);cursor:pointer}
+.menu-item:hover{background:var(--bg)}
+.menu-item.bahaya{color:var(--bad)}
+.menu-item.bahaya:hover{background:var(--badbg)}
+.menu-pisah{height:1px;background:var(--garis);margin:4px 0}
+
+/* --- hari cuti (merah) & nota --- */
+.kal-hari.kal-cuti{background:#fdf1f1;box-shadow:inset 3px 0 0 #f87171}
+.kal-hari.kal-cuti:hover{background:#fdecec}
+.kal-hari.kal-cuti .kal-tarikh{color:var(--bad)}
+.kal-cuti-label{font-size:10px;font-weight:700;color:var(--bad);text-transform:uppercase;letter-spacing:.2px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kal-hari.kal-rehat{background:#fafbfc}
+.kal-hari.kal-rehat:hover{background:#f5f7f9}
+.kal-rehat-label{font-size:10px;font-weight:700;color:var(--lembut);text-transform:uppercase;letter-spacing:.4px}
+.kal-nota{font-size:11px;line-height:1.4;color:var(--warn);background:#fffbeb;border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:3px 6px;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 
 /* --- telefon --- */
 @media(max-width:860px){
@@ -292,6 +311,7 @@ function baca() {
   mentah.tetapan = Object.assign({}, TETAPAN_ASAL, mentah.tetapan || {});
   mentah.staf = mentah.staf || [];
   mentah.sale = mentah.sale || [];
+  mentah.nota = mentah.nota || {};          // { "2026-09-07": "catatan hari" }
   return mentah;
 }
 
@@ -310,7 +330,7 @@ function benihkan() {
   var data = { tetapan: Object.assign({}, TETAPAN_ASAL), staf: [
     { id: id(), nama: "Dastie", jawatan: "Sales", jabatan: "Jualan", telefon: "", email: "", status: "aktif", tarikhMula: "" },
     { id: id(), nama: "Ummi", jawatan: "Sales", jabatan: "Jualan", telefon: "", email: "", status: "aktif", tarikhMula: "" }
-  ], sale: [] };
+  ], sale: [], nota: {} };
   simpan(data);
 }
 
@@ -755,8 +775,10 @@ function kalendarSale(data, senarai) {
     var sasar = targetHari(tarikh, data.tetapan);
     var cutiInfo = (data.tetapan.cuti || []).filter(function (c) { return c.tarikh === tarikh; })[0];
 
+    var nota = (data.nota || {})[tarikh];
     var kelas = ["kal-hari"];
-    if (sasar === 0) kelas.push("kal-cuti");
+    if (cutiInfo) kelas.push("kal-cuti");
+    else if (sasar === 0) kelas.push("kal-rehat");
     if (tarikh === hariIni) kelas.push("kal-ini");
     if (sasar > 0 && jumlah >= sasar) kelas.push("kal-capai");
     if (job.length) kelas.push("ada-job");
@@ -765,10 +787,14 @@ function kalendarSale(data, senarai) {
       '<div class="kal-atas">' +
         '<span class="kal-tarikh">' + h +
           '<span class="kal-nama-hari">' + HARI_PENDEK[(new Date(tahun, bln - 1, h).getDay() + 6) % 7] + "</span></span>" +
-        (sasar > 0
-          ? '<span class="kal-sasar">' + esc(nom(sasar).toLocaleString("ms-MY")) + "</span>"
-          : '<span class="kal-cuti-label">' + esc(cutiInfo ? (cutiInfo.sebab || "Cuti") : "Rehat") + "</span>") +
+        (cutiInfo
+          ? '<span class="kal-cuti-label" title="' + esc(cutiInfo.sebab || "Cuti") + '">' +
+            esc(cutiInfo.sebab || "Cuti") + "</span>"
+          : sasar > 0
+            ? '<span class="kal-sasar">' + esc(nom(sasar).toLocaleString("ms-MY")) + "</span>"
+            : '<span class="kal-rehat-label">Rehat</span>') +
       "</div>" +
+      (nota ? '<div class="kal-nota" title="' + esc(nota) + '">' + esc(nota) + "</div>" : "") +
       job.slice(0, 3).map(function (s) {
         var k = kiraSale(s);
         var gaya = s.statusKerja === "Selesai" ? " j-selesai"
@@ -803,6 +829,7 @@ function kalendarSale(data, senarai) {
         '<span><i style="background:#2563eb"></i>Tempahan</span>' +
         '<span><i style="background:#d97706"></i>Report submit</span>' +
         '<span><i style="background:#16a34a"></i>Selesai</span>' +
+        '<span><i style="background:#dc2626"></i>Cuti</span>' +
         "<span>" + esc(rm(jumBulan.total)) + " / " + esc(rm(sasarBulan)) + "</span>" +
       "</div>" +
     "</div>" +
@@ -810,8 +837,229 @@ function kalendarSale(data, senarai) {
       HARI_PENDEK.map(function (n) { return '<div class="kal-kepala">' + n + "</div>"; }).join("") +
       sel.join("") +
     "</div></div>" +
-    '<p class="kecil" style="margin:12px 0 0">Klik mana-mana tarikh untuk key-in sale pada hari itu. ' +
-    "Klik nama client untuk lihat butiran. Nombor kelabu di penjuru kanan ialah target harian.</p>";
+    '<p class="kecil" style="margin:12px 0 0">Klik kiri pada tarikh untuk key-in sale. ' +
+    "Klik kanan (atau tekan lama pada telefon) untuk tandakan cuti, tulis remark, " +
+    "atau urus cuti bulan ini. Nombor kelabu di penjuru kanan ialah target harian.</p>";
+}
+
+/* --------------------- menu klik kanan kalendar ----------------------- */
+var masaMenu = 0;
+
+function tutupMenu() {
+  var m = $(".menu-konteks");
+  if (m) m.remove();
+  // Buang pendengar supaya menu berikutnya tidak ditutup oleh pendengar lama.
+  document.removeEventListener("click", tutupMenu);
+  document.removeEventListener("contextmenu", tutupMenu);
+  window.removeEventListener("scroll", tutupMenu, true);
+  window.removeEventListener("resize", tutupMenu);
+}
+
+function menuKonteks(x, y, tajuk, item) {
+  tutupMenu();
+  var m = document.createElement("div");
+  m.className = "menu-konteks";
+  m.innerHTML = '<div class="menu-kepala">' + esc(tajuk) + "</div>" +
+    item.map(function (b, i) {
+      return b.pisah ? '<div class="menu-pisah"></div>'
+        : '<button type="button" class="menu-item' + (b.bahaya ? " bahaya" : "") +
+          '" data-i="' + i + '">' + esc(b.label) + "</button>";
+    }).join("");
+  document.body.appendChild(m);
+
+  // kekal dalam skrin
+  var kotak = m.getBoundingClientRect();
+  m.style.left = Math.max(8, Math.min(x, window.innerWidth - kotak.width - 8)) + "px";
+  m.style.top = Math.max(8, Math.min(y, window.innerHeight - kotak.height - 8)) + "px";
+
+  $$(".menu-item", m).forEach(function (btn) {
+    btn.onclick = function () {
+      var pilih = item[parseInt(btn.getAttribute("data-i"), 10)];
+      tutupMenu();
+      if (pilih && pilih.aksi) pilih.aksi();
+    };
+  });
+
+  setTimeout(function () {
+    document.addEventListener("click", tutupMenu);
+    document.addEventListener("contextmenu", tutupMenu);
+    window.addEventListener("scroll", tutupMenu, true);
+    window.addEventListener("resize", tutupMenu);
+  }, 0);
+}
+
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") tutupMenu(); });
+
+function menuHari(x, y, tarikh, bekas) {
+  var data = baca();
+  var cutiInfo = (data.tetapan.cuti || []).filter(function (c) { return c.tarikh === tarikh; })[0];
+  var nota = (data.nota || {})[tarikh];
+  var adaJob = data.sale.some(function (s) { return s.tarikh === tarikh; });
+  var item = [];
+
+  item.push({ label: "Key-in sale pada hari ini", aksi: function () { borangSale(null, tarikh); } });
+  item.push({ pisah: true });
+
+  if (cutiInfo) {
+    item.push({ label: "Tukar sebab cuti", aksi: function () { borangCuti(tarikh, cutiInfo.sebab, bekas); } });
+    item.push({ label: "Buang tanda cuti", bahaya: true, aksi: function () {
+      var d = baca();
+      d.tetapan.cuti = (d.tetapan.cuti || []).filter(function (c) { return c.tarikh !== tarikh; });
+      simpan(d);
+      toast(fmtTarikh(tarikh) + " bukan lagi hari cuti.", "ok");
+      lukisSale(bekas);
+    } });
+  } else {
+    item.push({ label: "Tandakan sebagai cuti", aksi: function () { borangCuti(tarikh, "", bekas); } });
+  }
+
+  item.push({ pisah: true });
+  item.push({ label: nota ? "Sunting remark" : "Tambah remark", aksi: function () { borangNota(tarikh, bekas); } });
+  if (nota) {
+    item.push({ label: "Buang remark", bahaya: true, aksi: function () {
+      var d = baca();
+      delete d.nota[tarikh];
+      simpan(d);
+      toast("Remark dibuang.", "ok");
+      lukisSale(bekas);
+    } });
+  }
+
+  item.push({ pisah: true });
+  item.push({ label: "Urus cuti bulan " + fmtBulan(tapis.bulan), aksi: function () { urusCutiBulan(bekas); } });
+  if (adaJob) {
+    item.push({ label: "Lihat semua job hari ini", aksi: function () { jobHari(tarikh); } });
+  }
+
+  menuKonteks(x, y, namaHari(tarikh) + ", " + fmtTarikh(tarikh), item);
+}
+
+var SEBAB_CUTI = ["Cuti Umum", "Offday", "Cuti Peristiwa", "Cuti Syarikat", "Cuti Peribadi"];
+
+function borangCuti(tarikh, sebabAsal, bekas) {
+  var m = modal(sebabAsal ? "Tukar Sebab Cuti" : "Tandakan Hari Cuti",
+    '<p class="kecil" style="margin:0 0 14px">' + esc(namaHari(tarikh) + ", " + fmtTarikh(tarikh)) +
+      " — target jualan hari ini akan dikira sebagai RM 0.</p>" +
+    '<form id="borangCutiHari">' +
+      medan("Sebab", '<input type="text" name="sebab" value="' + esc(sebabAsal || "") +
+        '" placeholder="Cuti Umum" autofocus>') +
+      '<div style="margin:-6px 0 14px">' + SEBAB_CUTI.map(function (x) {
+        return '<button type="button" class="chip" data-sebab="' + esc(x) + '" style="cursor:pointer">' +
+          esc(x) + "</button>";
+      }).join("") + "</div>" +
+      '<div class="baris-butang"><button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+      '<button type="submit" class="btn btn-utama">Simpan</button></div>' +
+    "</form>", 480);
+
+  $$("[data-sebab]", m.el).forEach(function (b) {
+    b.onclick = function () { $("[name=sebab]", m.el).value = b.getAttribute("data-sebab"); };
+  });
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangCutiHari", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var sebab = $("[name=sebab]", m.el).value.trim() || "Cuti";
+    var d = baca();
+    d.tetapan.cuti = (d.tetapan.cuti || []).filter(function (c) { return c.tarikh !== tarikh; });
+    d.tetapan.cuti.push({ tarikh: tarikh, sebab: sebab });
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(fmtTarikh(tarikh) + " ditanda sebagai " + sebab + ".", "ok");
+    lukisSale(bekas);
+  };
+}
+
+function borangNota(tarikh, bekas) {
+  var data = baca();
+  var m = modal("Remark — " + fmtTarikh(tarikh),
+    '<form id="borangNotaHari">' +
+      medan("Catatan untuk hari ini",
+        '<textarea name="nota" placeholder="Contoh: Fikri cuti, inspector standby, follow up client">' +
+        esc((data.nota || {})[tarikh] || "") + "</textarea>") +
+      '<div class="baris-butang"><button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+      '<button type="submit" class="btn btn-utama">Simpan Remark</button></div>' +
+    "</form>", 480);
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangNotaHari", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var teks = $("[name=nota]", m.el).value.trim();
+    var d = baca();
+    d.nota = d.nota || {};
+    if (teks) d.nota[tarikh] = teks; else delete d.nota[tarikh];
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(teks ? "Remark disimpan." : "Remark dibuang.", "ok");
+    lukisSale(bekas);
+  };
+}
+
+function urusCutiBulan(bekas) {
+  var data = baca();
+  var senarai = (data.tetapan.cuti || []).filter(function (c) {
+    return String(c.tarikh).slice(0, 7) === tapis.bulan;
+  }).sort(function (a, b) { return String(a.tarikh).localeCompare(String(b.tarikh)); });
+
+  var m = modal("Cuti — " + fmtBulan(tapis.bulan),
+    '<form id="tambahCutiBulan" class="baris-medan" style="align-items:end">' +
+      medan("Tarikh", '<input type="date" name="tarikh" min="' + tapis.bulan + '-01" required>') +
+      medan("Sebab", '<input type="text" name="sebab" placeholder="Cuti Umum">') +
+      '<div><button class="btn btn-utama penuh" type="submit">Tambah</button></div>' +
+    "</form>" +
+    '<div class="tajuk-seksyen">Hari cuti bulan ini (' + senarai.length + ")</div>" +
+    '<div id="senaraiCutiBulan">' +
+      (senarai.length ? senarai.map(function (c) {
+        return '<div class="jumlah-baris"><span><b>' + esc(fmtTarikh(c.tarikh)) + "</b> · " +
+          esc(namaHari(c.tarikh)) + '<div class="kecil">' + esc(c.sebab || "Cuti") + "</div></span>" +
+          '<button type="button" class="btn btn-lembut btn-kecil" data-buang="' + esc(c.tarikh) +
+          '">Buang</button></div>';
+      }).join("") : '<div class="kecil">Tiada hari cuti direkod untuk bulan ini.</div>') +
+    "</div>", 520);
+
+  $("#tambahCutiBulan", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var nilai = ambilNilai($("#tambahCutiBulan", m.el));
+    if (!nilai.tarikh) return toast("Sila pilih tarikh.", "bad");
+    var d = baca();
+    d.tetapan.cuti = (d.tetapan.cuti || []).filter(function (c) { return c.tarikh !== nilai.tarikh; });
+    d.tetapan.cuti.push({ tarikh: nilai.tarikh, sebab: nilai.sebab || "Cuti" });
+    if (!simpan(d)) return;
+    m.tutup();
+    toast("Hari cuti ditambah.", "ok");
+    lukisSale(bekas);
+    urusCutiBulan(bekas);
+  };
+
+  $$("[data-buang]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      var d = baca();
+      d.tetapan.cuti = (d.tetapan.cuti || []).filter(function (c) {
+        return c.tarikh !== b.getAttribute("data-buang");
+      });
+      simpan(d);
+      m.tutup();
+      toast("Hari cuti dibuang.", "ok");
+      lukisSale(bekas);
+      urusCutiBulan(bekas);
+    };
+  });
+}
+
+function jobHari(tarikh) {
+  var data = baca();
+  var job = data.sale.filter(function (s) { return s.tarikh === tarikh; })
+    .sort(function (a, b) { return String(a.masaMula).localeCompare(String(b.masaMula)); });
+  var jum = ringkasan(job.filter(function (s) { return s.statusKerja !== "Batal"; }));
+  modal("Job — " + namaHari(tarikh) + ", " + fmtTarikh(tarikh),
+    job.map(function (s) {
+      var k = kiraSale(s);
+      return '<div class="senarai-item"><div class="jumlah-baris" style="border:0;padding:0">' +
+        "<span><b>" + esc(s.masaMula || "-") + "</b> · " + esc(s.nama) +
+        '<div class="kecil">' + esc(s.projek || "-") + (s.unit ? " · " + esc(s.unit) : "") + "</div></span>" +
+        "<span style='text-align:right'><b>" + esc(rm(k.total)) + "</b><br>" +
+        lencanaKerja(s.statusKerja) + "</span></div></div>";
+    }).join("") +
+    '<div class="jumlah-baris" style="margin-top:10px"><span><b>Jumlah hari ini</b></span><b>' +
+    esc(rm(jum.total)) + "</b></div>", 520);
 }
 
 function pasangAksiKalendar(bekas) {
@@ -821,11 +1069,35 @@ function pasangAksiKalendar(bekas) {
   $("#kalIni").onclick = function () { tapis.bulan = bulanKini(); lukisSemula(); };
 
   $$(".kal-hari[data-hari]", bekas).forEach(function (sel) {
+    var tarikh = sel.getAttribute("data-hari");
+
     sel.onclick = function (e) {
+      if (Date.now() - masaMenu < 600) return;      // baru sahaja buka menu
       var job = e.target.closest ? e.target.closest(".kal-job") : null;
       if (job) return lihatSale(job.getAttribute("data-lihat"));
-      borangSale(null, sel.getAttribute("data-hari"));
+      borangSale(null, tarikh);
     };
+
+    sel.oncontextmenu = function (e) {
+      e.preventDefault();
+      menuHari(e.clientX, e.clientY, tarikh, bekas);
+    };
+
+    // telefon: tekan lama
+    var pemasa = null;
+    sel.addEventListener("touchstart", function (e) {
+      var sentuh = e.touches[0];
+      pemasa = setTimeout(function () {
+        pemasa = null;
+        menuHari(sentuh.clientX, sentuh.clientY, tarikh, bekas);
+        masaMenu = Date.now();          // halang klik yang menyusul selepas tekan lama
+      }, 550);
+    }, { passive: true });
+    ["touchend", "touchmove", "touchcancel"].forEach(function (jenis) {
+      sel.addEventListener(jenis, function () {
+        if (pemasa) { clearTimeout(pemasa); pemasa = null; }
+      }, { passive: true });
+    });
   });
 }
 
