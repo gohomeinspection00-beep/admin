@@ -12,8 +12,8 @@ Projek ini ada **dua fail berasingan** yang perlu di-deploy berbeza:
 1. Pergi ke [app.netlify.com/drop](https://app.netlify.com/drop) (atau mana-mana hosting statik).
 2. Seret **fail `tnc.html` sahaja** ke ruang itu (boleh letak dalam satu folder kosong dahulu).
 3. Netlify beri pautan, contoh: `https://tnc-goxpert.netlify.app/tnc.html`
-4. Buka sistem admin → **Tetapan → Tetapan Quotation** → tampal pautan itu dalam
-   **Halaman Terms & Conditions (URL)** → Simpan.
+4. Buka sistem admin → **Tetapan → tab Quotation** → tampal pautan itu dalam
+   **Halaman Syarat & Terma untuk client (URL)** → Simpan.
 
 Selepas ini, setiap quotation yang dijana akan menghasilkan pautan seperti:
 
@@ -27,6 +27,16 @@ Client buka pautan → nampak Syarat & Terma + ringkasan quotation (harga, pecah
 no. quotation, tarikh sah) → tekan **Saya Setuju** → pilih tarikh → WhatsApp
 terbuka kepada nombor syarikat untuk pengesahan.
 
+## Katalog PDF (page belakang quotation)
+
+Fail katalog **tidak perlu di-deploy**. Muat naik terus:
+Tetapan → tab **Quotation** → pilih servis → **Muat Naik PDF**.
+Fail disimpan dalam sistem, dan bila **Muat Turun PDF** ditekan pada quotation,
+sistem gabung page quotation + semua muka surat katalog jadi satu fail PDF.
+
+Fail katalog ikut sekali dalam **backup JSON**, jadi bila pulih di komputer lain
+tak perlu muat naik semula.
+
 ## Nota deploy sistem admin
 
 - Sistem admin menyimpan data dalam **localStorage pelayar**. Kalau di-deploy ke
@@ -34,8 +44,11 @@ terbuka kepada nombor syarikat untuk pengesahan.
 - Kalau deploy ke pautan awam, sesiapa yang tahu pautan boleh buka sistem
   (tiada log masuk lagi). Untuk sekarang, cara paling selamat ialah simpan
   `index.html` dalam komputer admin sahaja.
-- Buat **backup** (Tetapan → Muat Turun Backup) sebelum tukar komputer atau
-  sebelum "clear browsing data".
+- Buat **backup** (Tetapan → Data & Backup → Muat Turun Backup) sebelum tukar
+  komputer atau sebelum "clear browsing data". Backup ini termasuk fail katalog PDF.
+- `index.html` sekarang mengandungi pustaka **pdf-lib** (MIT) supaya sistem boleh
+  gabung PDF tanpa internet — sebab itu saiz failnya lebih besar. Jangan buang
+  bahagian itu.
 
 ## Nombor WhatsApp dalam `tnc.html`
 

@@ -238,18 +238,33 @@ Tetapan → Quotation → *Senarai Servis*. Bila service ditukar, tiga benda
 bertukar automatik: **link skop penuh**, **link lampiran PDF**, dan
 **halaman belakang**. Semuanya masih boleh diubah untuk quotation itu sahaja.
 
-### Page depan + page belakang (katalog)
+### Page depan + page belakang (katalog PDF)
 
-Setiap servis boleh ada senarai **Halaman Belakang Quotation** (URL gambar,
-satu baris satu — muka surat katalog yang sudah ditukar jadi JPG/PNG).
-Bila **Cetak / PDF** ditekan, sistem mencetak:
+Setiap servis boleh disimpan **satu fail PDF katalog**:
+Tetapan → **Quotation** → pilih servis → **Muat Naik PDF**.
+Fail itu disimpan terus di dalam sistem (bukan link), jadi ia kekal walaupun
+tiada internet.
 
-- **Page 1** — quotation A4
-- **Page 2, 3, …** — setiap gambar katalog, satu muka surat satu
+Dalam quotation, tekan **Muat Turun PDF** — sistem menghasilkan **satu fail PDF**:
 
-Jadi satu PDF sahaja untuk dihantar kepada client. Sistem menunggu semua gambar
-siap dimuat turun sebelum dialog cetak dibuka, jadi pastikan komputer ada
-internet semasa mencetak (atau guna gambar yang disimpan di dalam komputer).
+- **Page 1** — quotation A4 (logo, pecahan harga, nota, tandatangan)
+- **Page 2 dan seterusnya** — semua muka surat katalog PDF tadi
+
+Fail keluar sebagai `Quotation Q-0001 - Nama Client.pdf` — terus boleh hantar
+kepada client melalui WhatsApp atau email.
+
+Butang **Cetak** pula mencetak page quotation sahaja (untuk cetak kertas).
+
+Nota:
+- Kalau servis itu belum ada fail katalog, PDF akan ada page quotation sahaja
+  (sistem akan beritahu di dalam tetingkap quotation).
+- Kalau ruangan *Link Lampiran PDF* diisi dengan pautan `.pdf` dan komputer ada
+  internet, sistem cuba muat turun pautan itu untuk digabung. Cara paling
+  selamat tetap **muat naik fail** dalam Tetapan.
+- Untuk logo & tandatangan keluar dalam PDF tanpa internet, guna butang
+  **Muat Naik Fail Logo / Tandatangan** dalam Tetapan → Resit & Invois.
+- Fail katalog turut dimasukkan ke dalam **fail backup**, jadi bila pulih di
+  komputer lain, katalog ikut sekali.
 
 ### Jadikan Sale
 
@@ -269,8 +284,8 @@ Butang **Jadikan Sale** hilang selepas dipakai supaya tiada rekod berganda.
 
 Tetapan → tab **Quotation**: prefix & nombor seterusnya, tempoh sah,
 **URL halaman Syarat & Terma**, senarai servis (nama, link skop, link lampiran
-PDF, halaman belakang) dengan butang *+ Tambah Servis* / *Buang*, pecahan harga
-lalai dan senarai jenis hartanah.
+PDF untuk mesej, dan **fail katalog PDF**) dengan butang *+ Tambah Servis* /
+*Buang*, pecahan harga lalai dan senarai jenis hartanah.
 
 > **Halaman `tnc.html` mesti di-deploy berasingan** supaya client boleh buka
 > pautan itu. Lihat `DEPLOY.md` untuk langkah penuh.
@@ -428,7 +443,7 @@ Tetapan dibahagikan kepada tab supaya senang cari:
 | **Syarikat & Target** | Nama syarikat, target jualan harian, hari bekerja, target ikut bulan, hari cuti / offday |
 | **Jualan & Status** | Senarai projek/daerah, sumber lead, senarai status kerja, status "selesai" & "batal", tempoh pending |
 | **Resit & Invois** | Maklumat syarikat pada dokumen, prefix & nombor resit/invois, bank, logo & tandatangan, ayat hantar WhatsApp |
-| **Quotation** | Prefix & nombor quotation, tempoh sah, URL Syarat & Terma, senarai servis + halaman belakang, pecahan harga lalai, jenis hartanah |
+| **Quotation** | Prefix & nombor quotation, tempoh sah, URL Syarat & Terma, senarai servis + fail katalog PDF, pecahan harga lalai, jenis hartanah |
 | **Data & Backup** | Muat turun backup, pulih dari fail, padam semua data, ringkasan bilangan rekod |
 
 Setiap tab ada butang **Simpan** sendiri — simpan tab itu dahulu sebelum tukar tab.
@@ -437,7 +452,8 @@ Setiap tab ada butang **Simpan** sendiri — simpan tab itu dahulu sebelum tukar
 
 Data disimpan dalam pelayar komputer yang digunakan sahaja.
 
-- Buat **backup** kerap: Tetapan → *Muat Turun Backup* (fail JSON).
+- Buat **backup** kerap: Tetapan → Data & Backup → *Muat Turun Backup* (fail JSON,
+  termasuk fail katalog PDF).
 - Untuk pindah ke komputer lain: Tetapan → *Pulih dari Fail*.
 - Jangan "clear browsing data / cookies + site data" tanpa backup — data akan hilang.
 - Guna **Eksport CSV** untuk buka data dalam Excel.
