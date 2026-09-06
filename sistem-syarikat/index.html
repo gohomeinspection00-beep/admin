@@ -452,6 +452,7 @@ var TETAPAN_ASAL = {
   sumber: ["Facebook", "WhatsApp", "Referral", "Walk-in", "Google", "Repeat Client"],
   cuti: [],                                   // [{tarikh:"2025-01-29", sebab:"Tahun Baru Cina"}]
   targetBulan: {},                            // { "2026-09": 20000 } — ganti target bulan tertentu
+  kategoriAlat: ["Alat Ukur", "Alat Tangan", "Elektrik", "Bahan Habis", "Keselamatan"],
   statusKerja: ["Tempahan", "Inspection Siap", "Report Siap", "Submit Report",
                 "Submit App", "Minta Bayaran", "Selesai", "Batal"],
   quote: {
@@ -577,6 +578,7 @@ function baca() {
   }
   mentah.tetapan = Object.assign({}, TETAPAN_ASAL, mentah.tetapan || {});
   mentah.tetapan.targetBulan = mentah.tetapan.targetBulan || {};
+  mentah.tetapan.kategoriAlat = mentah.tetapan.kategoriAlat || TETAPAN_ASAL.kategoriAlat.slice();
   mentah.staf = (mentah.staf || []).map(function (x) {
     // Rekod lama tiada kumpulan — teka dari jawatan.
     if (!x.kumpulan) {
@@ -591,6 +593,7 @@ function baca() {
   mentah.invois = mentah.invois || [];
   mentah.subjob = mentah.subjob || [];      // kerja sub — tidak dikira dalam jualan syarikat
   mentah.quotation = mentah.quotation || [];
+  mentah.alat = mentah.alat || [];          // inventori alat & bahan pakai habis
   mentah.tetapan.quote = Object.assign({}, TETAPAN_ASAL.quote, mentah.tetapan.quote || {});
   // Setiap servis perlu id tetap — kunci untuk fail lampiran PDF dalam storan.
   mentah.tetapan.quote.servis = (mentah.tetapan.quote.servis || []).map(function (x) {
@@ -1003,6 +1006,31 @@ function lukisPapan(bekas) {
           'id="bukaTunggak">Buka Senarai Tunggakan</button></div>' +
       "</div>";
     })() +
+    (function () {
+      var perlu = alatPerluPerhatian(data);
+      if (!perlu.length) return "";
+      var habis = perlu.filter(function (a) { return kiraAlat(a).habis; });
+      return '<div class="amaran">' +
+        '<div class="amaran-kepala"><h3>Alat &amp; Stok Perlu Perhatian</h3>' +
+          '<span class="amaran-kira">' + perlu.length + "</span>" +
+          '<span class="kecil" style="margin-left:auto">' +
+          (habis.length ? habis.length + " sudah habis / tiada yang berfungsi · " : "") +
+          "rosak, hilang atau hampir habis</span></div>" +
+        '<div class="amaran-senarai">' +
+          perlu.slice(0, 4).map(function (a) {
+            var k = kiraAlat(a), st = statusAlat(a);
+            return '<button type="button" class="amaran-item" data-alatpapan="' + esc(a.id) + '">' +
+              '<span><span class="nama">' + esc(a.nama) + "</span>" +
+              '<div class="kecil">' + esc([a.kategori, a.lokasi].filter(Boolean).join(" · ") || "-") +
+              " · tinggal " + k.berfungsi + " " + esc(a.unit) + "</div></span>" +
+              '<span class="kanan"><span class="badge badge-' + st.warna + '">' +
+              esc(st.teks) + "</span></span></button>";
+          }).join("") +
+        "</div>" +
+        '<div class="amaran-lagi"><button type="button" class="btn btn-lembut btn-kecil" ' +
+          'id="bukaAlat">Buka Alat &amp; Stok</button></div>' +
+      "</div>";
+    })() +
     '<div class="penapis">' +
       '<label>Bulan<input type="month" id="papanBulan" value="' + esc(papanBulan) + '"></label>' +
       '<button class="btn btn-utama" id="btnCepatSale">+ Key-in Sale Baru</button>' +
@@ -1151,6 +1179,10 @@ function lukisPapan(bekas) {
   $("#metrikSite").onclick = function () { papanMetrik = "site"; lukisPapan(bekas); };
   if ($("#bukaSubJob")) $("#bukaSubJob").onclick = function () { location.hash = "#/subjob"; };
   if ($("#bukaTunggak")) $("#bukaTunggak").onclick = function () { location.hash = "#/tunggak"; };
+  if ($("#bukaAlat")) $("#bukaAlat").onclick = function () { location.hash = "#/alat"; };
+  $$("[data-alatpapan]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatAlat(b.getAttribute("data-alatpapan")); };
+  });
   $$("[data-tunggakbayar]", bekas).forEach(function (b) {
     b.onclick = function () {
       var rid = b.getAttribute("data-tunggakbayar"), jenis = b.getAttribute("data-jenisbayar");
@@ -6405,6 +6437,479 @@ function lukisTunggak(bekas) {
   });
 }
 
+/* ======================================================================
+   ALAT & STOK — inventori peralatan inspection dan bahan pakai habis
+   ================================================================== */
+
+var alatCari = "";
+var alatKategori = "";
+var alatJenis = "";
+var alatPerhatian = false;
+
+var JENIS_ALAT = ["Alat", "Bahan Pakai"];
+var UNIT_ALAT = ["unit", "pcs", "set", "rol", "kotak", "pek", "botol", "meter"];
+
+var GERAK_ALAT = {
+  tambah: { label: "Tambah Stok", tajuk: "Tambah Stok Masuk", medan: "Kuantiti masuk" },
+  guna:   { label: "Guna / Keluar", tajuk: "Rekod Penggunaan", medan: "Kuantiti digunakan" },
+  rosak:  { label: "Tanda Rosak", tajuk: "Tanda Barang Rosak", medan: "Berapa unit rosak" },
+  baiki:  { label: "Sudah Dibaiki", tajuk: "Barang Sudah Dibaiki", medan: "Berapa unit dibaiki" },
+  hilang: { label: "Tanda Hilang", tajuk: "Tanda Barang Hilang", medan: "Berapa unit hilang" },
+  jumpa:  { label: "Jumpa Semula", tajuk: "Barang Dijumpai Semula", medan: "Berapa unit dijumpai" },
+  lupus:  { label: "Lupus / Buang", tajuk: "Lupus Barang", medan: "Berapa unit dilupuskan" }
+};
+
+function kiraAlat(a) {
+  var jumlah = Math.max(0, nom(a.jumlah));
+  var rosak = Math.max(0, nom(a.rosak));
+  var hilang = Math.max(0, nom(a.hilang));
+  var berfungsi = Math.max(0, jumlah - rosak - hilang);
+  var minimum = Math.max(0, nom(a.minimum));
+  // Bahan pakai: amaran bila sampai paras minimum. Alat: amaran bila kurang dari paras minimum.
+  var rendah = minimum > 0 &&
+    (a.jenis === "Bahan Pakai" ? berfungsi <= minimum : berfungsi < minimum);
+  return {
+    jumlah: jumlah, rosak: rosak, hilang: hilang, berfungsi: berfungsi, minimum: minimum,
+    nilai: berfungsi * nom(a.harga),
+    rendah: rendah,
+    habis: berfungsi <= 0
+  };
+}
+
+function statusAlat(a) {
+  var k = kiraAlat(a);
+  if (k.habis) {
+    return { teks: a.jenis === "Bahan Pakai" ? "Habis" : "Tiada yang berfungsi", warna: "bad", perhatian: true };
+  }
+  if (k.rendah) return { teks: "Hampir habis", warna: "warn", perhatian: true };
+  if (k.rosak > 0) return { teks: k.rosak + " rosak", warna: "warn", perhatian: true };
+  if (k.hilang > 0) return { teks: k.hilang + " hilang", warna: "warn", perhatian: true };
+  return { teks: "Baik", warna: "ok", perhatian: false };
+}
+
+function alatPerluPerhatian(data) {
+  return (data.alat || []).filter(function (a) { return statusAlat(a).perhatian; })
+    .sort(function (x, y) {
+      var a = kiraAlat(x), b = kiraAlat(y);
+      return (a.habis === b.habis) ? (a.berfungsi - b.berfungsi) : (a.habis ? -1 : 1);
+    });
+}
+
+function logAlat(a, jenis, kuantiti, oleh, nota) {
+  a.log = a.log || [];
+  a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(),
+    jenis: jenis, kuantiti: nom(kuantiti), oleh: oleh || "", nota: nota || "" });
+  if (a.log.length > 200) a.log = a.log.slice(0, 200);
+}
+
+/* ---------------------------- borang ---------------------------------- */
+
+function borangAlat(alatId) {
+  var data = baca();
+  var a = alatId ? data.alat.filter(function (x) { return x.id === alatId; })[0] : null;
+  var baru = !a;
+  a = a || { jenis: "Alat", unit: "unit", jumlah: 1, rosak: 0, hilang: 0, minimum: 0 };
+
+  var m = modal(baru ? "Barang Baharu" : "Sunting Barang",
+    '<form id="borangAlat">' +
+      '<div class="baris-medan">' +
+        medan("Nama Barang *", '<input type="text" name="nama" value="' + esc(a.nama || "") +
+          '" placeholder="Contoh: Moisture Meter" required>') +
+        medan("Kategori", '<input list="senaraiKategoriAlat" name="kategori" value="' +
+          esc(a.kategori || "") + '" placeholder="Alat Ukur / Bahan Habis">') +
+        medan("Jenis", "<select name='jenis'>" + JENIS_ALAT.map(function (x) {
+          return "<option" + (a.jenis === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+      "</div>" +
+      '<datalist id="senaraiKategoriAlat">' + (data.tetapan.kategoriAlat || []).map(function (x) {
+        return "<option>" + esc(x) + "</option>";
+      }).join("") + "</datalist>" +
+
+      '<div class="baris-medan">' +
+        medan("Jumlah Dimiliki *", '<input type="number" step="1" min="0" name="jumlah" value="' +
+          esc(a.jumlah) + '" required>') +
+        medan("Unit", '<input list="senaraiUnitAlat" name="unit" value="' + esc(a.unit || "unit") + '">') +
+        medan("Paras Minimum", '<input type="number" step="1" min="0" name="minimum" value="' +
+          esc(a.minimum || 0) + '">') +
+      "</div>" +
+      '<datalist id="senaraiUnitAlat">' + UNIT_ALAT.map(function (x) {
+        return "<option>" + esc(x) + "</option>";
+      }).join("") + "</datalist>" +
+
+      '<div class="baris-medan">' +
+        medan("Rosak", '<input type="number" step="1" min="0" name="rosak" value="' + esc(a.rosak || 0) + '">') +
+        medan("Hilang", '<input type="number" step="1" min="0" name="hilang" value="' + esc(a.hilang || 0) + '">') +
+        medan("Harga Seunit (RM)", '<input type="number" step="0.01" min="0" name="harga" value="' +
+          esc(a.harga || "") + '">') +
+      "</div>" +
+
+      '<div class="baris-medan">' +
+        medan("Simpan Di Mana", '<input type="text" name="lokasi" value="' + esc(a.lokasi || "") +
+          '" placeholder="Stor pejabat / dalam kereta">') +
+        medan("Dipegang Oleh", '<input list="senaraiStafAlat" name="pegang" value="' +
+          esc(a.pegang || "") + '">') +
+        medan("Tarikh Beli", '<input type="date" name="tarikhBeli" value="' + esc(a.tarikhBeli || "") + '">') +
+      "</div>" +
+      '<datalist id="senaraiStafAlat">' + data.staf.filter(function (x) { return x.status === "aktif"; })
+        .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
+
+      '<p class="kecil" style="margin:-6px 0 12px">Paras minimum ialah amaran stok: ' +
+      "bahan pakai habis akan ditanda <b>Hampir habis</b> bila baki sampai paras ini, " +
+      "manakala alat ditanda bila baki <b>kurang</b> dari paras ini. Isi 0 kalau tak perlu amaran.</p>" +
+      medan("Nota", '<textarea name="nota" style="min-height:56px">' + esc(a.nota || "") + "</textarea>") +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamAlat">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan Barang" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 700);
+
+  var borang = $("#borangAlat", m.el);
+  $("[data-batal]", m.el).onclick = m.tutup;
+
+  if ($("#btnPadamAlat", m.el)) {
+    $("#btnPadamAlat", m.el).onclick = function () {
+      sahkan("Padam " + a.nama + " dari senarai?").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.alat = d.alat.filter(function (x) { return x.id !== alatId; });
+        simpan(d);
+        m.tutup();
+        toast("Barang dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai(borang);
+    if (!v.nama) return toast("Sila isi nama barang.", "bad");
+    if (nom(v.rosak) + nom(v.hilang) > nom(v.jumlah)) {
+      return toast("Rosak + hilang tidak boleh melebihi jumlah dimiliki.", "bad", 5000);
+    }
+    var d = baca();
+    var rekod = {
+      id: alatId || id(),
+      nama: v.nama, kategori: v.kategori, jenis: v.jenis, unit: v.unit || "unit",
+      jumlah: nom(v.jumlah), rosak: nom(v.rosak), hilang: nom(v.hilang), minimum: nom(v.minimum),
+      harga: nom(v.harga), lokasi: v.lokasi, pegang: v.pegang, tarikhBeli: v.tarikhBeli, nota: v.nota,
+      log: a.log || [],
+      createdAt: a.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    if (!alatId) logAlat(rekod, "Daftar", rekod.jumlah, "", "Rekod pertama");
+    if (v.kategori && (d.tetapan.kategoriAlat || []).indexOf(v.kategori) === -1) {
+      d.tetapan.kategoriAlat = (d.tetapan.kategoriAlat || []).concat([v.kategori]);
+    }
+    if (alatId) d.alat = d.alat.map(function (x) { return x.id === alatId ? rekod : x; });
+    else d.alat.push(rekod);
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(alatId ? "Barang dikemas kini." : "Barang ditambah.", "ok");
+    lukis();
+  };
+}
+
+// Satu borang untuk semua pergerakan stok (tambah, guna, rosak, baiki, hilang, jumpa, lupus).
+function gerakAlat(alatId, kunciGerak) {
+  var data = baca();
+  var a = data.alat.filter(function (x) { return x.id === alatId; })[0];
+  if (!a) return;
+  var g = GERAK_ALAT[kunciGerak];
+  var k = kiraAlat(a);
+
+  var m = modal(g.tajuk + " — " + a.nama,
+    '<div class="jumlah-baris"><span>Jumlah dimiliki</span><b>' + k.jumlah + " " + esc(a.unit) + "</b></div>" +
+    '<div class="jumlah-baris"><span>Boleh guna</span><b>' + k.berfungsi + " " + esc(a.unit) + "</b></div>" +
+    '<div class="jumlah-baris" style="margin-bottom:14px"><span>Rosak / hilang</span><b>' +
+      k.rosak + " / " + k.hilang + "</b></div>" +
+    '<form id="borangGerak">' +
+      '<div class="baris-medan">' +
+        medan(g.medan + " *", '<input type="number" step="1" min="1" name="kuantiti" value="1" required>') +
+        medan("Oleh", '<input list="senaraiStafGerak" name="oleh" value="">') +
+        medan("Tarikh", '<input type="date" name="tarikh" value="' + esc(kunciTarikh()) + '">') +
+      "</div>" +
+      '<datalist id="senaraiStafGerak">' + data.staf.filter(function (x) { return x.status === "aktif"; })
+        .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
+      medan("Nota", '<input type="text" name="nota" placeholder="Contoh: guna untuk site Setia Alam">') +
+      '<div class="baris-butang modal-kaki">' +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">Simpan</button>' +
+      "</div>" +
+    "</form>", 520);
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangGerak", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangGerak", m.el));
+    var q = Math.max(0, nom(v.kuantiti));
+    if (q <= 0) return toast("Kuantiti mesti lebih dari sifar.", "bad");
+
+    var d = baca();
+    var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
+    var kk = kiraAlat(rekod);
+
+    if (kunciGerak === "tambah") {
+      rekod.jumlah = kk.jumlah + q;
+    } else if (kunciGerak === "guna" || kunciGerak === "lupus") {
+      if (q > kk.berfungsi) return toast("Hanya " + kk.berfungsi + " " + rekod.unit + " boleh digunakan.", "bad", 5000);
+      rekod.jumlah = kk.jumlah - q;
+    } else if (kunciGerak === "rosak") {
+      if (q > kk.berfungsi) return toast("Hanya " + kk.berfungsi + " " + rekod.unit + " yang masih baik.", "bad", 5000);
+      rekod.rosak = kk.rosak + q;
+    } else if (kunciGerak === "baiki") {
+      if (q > kk.rosak) return toast("Hanya " + kk.rosak + " unit ditanda rosak.", "bad", 5000);
+      rekod.rosak = kk.rosak - q;
+    } else if (kunciGerak === "hilang") {
+      if (q > kk.berfungsi) return toast("Hanya " + kk.berfungsi + " " + rekod.unit + " ada.", "bad", 5000);
+      rekod.hilang = kk.hilang + q;
+    } else if (kunciGerak === "jumpa") {
+      if (q > kk.hilang) return toast("Hanya " + kk.hilang + " unit ditanda hilang.", "bad", 5000);
+      rekod.hilang = kk.hilang - q;
+    }
+
+    logAlat(rekod, g.label, q, v.oleh, v.nota);
+    if (v.tarikh) rekod.log[0].tarikh = v.tarikh;
+    rekod.updatedAt = new Date().toISOString();
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(g.label + " direkod: " + q + " " + rekod.unit + ".", "ok");
+    lukis();
+  };
+}
+
+function lihatAlat(alatId) {
+  var data = baca();
+  var a = data.alat.filter(function (x) { return x.id === alatId; })[0];
+  if (!a) return;
+  var k = kiraAlat(a);
+  var st = statusAlat(a);
+  var bahan = a.jenis === "Bahan Pakai";
+
+  var m = modal(a.nama,
+    '<div class="grid grid-4" style="margin-bottom:4px">' +
+      kadStat("Boleh Guna", k.berfungsi + " " + a.unit, "dari " + k.jumlah + " dimiliki") +
+      kadStat("Rosak", String(k.rosak), k.rosak ? "perlu dibaiki" : "tiada") +
+      kadStat("Hilang", String(k.hilang), k.hilang ? "belum dijumpai" : "tiada") +
+      kadStat("Nilai", rm(k.nilai), a.harga ? rm(a.harga) + " seunit" : "harga belum diisi") +
+    "</div>" +
+    '<div style="margin-bottom:12px"><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span>" +
+      (k.minimum ? ' <span class="kecil">amaran bila tinggal ' + k.minimum + " " + esc(a.unit) + "</span>" : "") +
+    "</div>" +
+
+    '<div class="tajuk-seksyen">Butiran</div>' +
+    '<dl class="kunci-nilai">' +
+      baris("Kategori", a.kategori) + baris("Jenis", a.jenis) +
+      baris("Simpan di", a.lokasi) + baris("Dipegang oleh", a.pegang) +
+      baris("Tarikh beli", a.tarikhBeli ? fmtTarikh(a.tarikhBeli) : "") +
+      baris("Nota", a.nota) +
+    "</dl>" +
+
+    '<div class="tajuk-seksyen">Rekod Pergerakan</div>' +
+    ((a.log || []).length
+      ? '<div class="jadual-bungkus"><table><thead><tr><th>Tarikh</th><th>Perkara</th>' +
+        "<th class='num'>Kuantiti</th><th>Oleh</th><th>Nota</th></tr></thead><tbody>" +
+        a.log.slice(0, 20).map(function (l) {
+          return "<tr><td>" + esc(fmtTarikh(l.tarikh)) + "</td><td>" + esc(l.jenis) + "</td>" +
+            '<td class="num">' + esc(l.kuantiti) + "</td><td>" + esc(l.oleh || "-") + "</td>" +
+            '<td class="bungkus kecil">' + esc(l.nota || "-") + "</td></tr>";
+        }).join("") + "</tbody></table></div>"
+      : kosong("Belum ada rekod pergerakan.")) +
+
+    '<div class="baris-butang modal-kaki" style="flex-wrap:wrap">' +
+      '<button type="button" class="btn btn-bad" data-gerak="' + (bahan ? "guna" : "lupus") + '">' +
+        (bahan ? "Guna / Keluar" : "Lupus") + "</button>" +
+      (k.rosak ? '<button type="button" class="btn btn-lembut" data-gerak="baiki">Sudah Dibaiki</button>' : "") +
+      (k.hilang ? '<button type="button" class="btn btn-lembut" data-gerak="jumpa">Jumpa Semula</button>' : "") +
+      '<button type="button" class="btn btn-lembut" data-gerak="hilang">Tanda Hilang</button>' +
+      '<button type="button" class="btn btn-lembut" data-gerak="rosak">Tanda Rosak</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnSuntingAlat">Sunting</button>' +
+      '<button type="button" class="btn btn-utama" data-gerak="tambah">Tambah Stok</button>' +
+    "</div>", 720);
+
+  $$("[data-gerak]", m.el).forEach(function (b) {
+    b.onclick = function () { m.tutup(); gerakAlat(alatId, b.getAttribute("data-gerak")); };
+  });
+  $("#btnSuntingAlat", m.el).onclick = function () { m.tutup(); borangAlat(alatId); };
+}
+
+/* ---------------------------- halaman --------------------------------- */
+
+function lukisAlat(bekas) {
+  var data = baca();
+  var teks = alatCari.trim().toLowerCase();
+  var semua = data.alat || [];
+
+  var senarai = semua.filter(function (a) {
+    if (alatKategori && (a.kategori || "") !== alatKategori) return false;
+    if (alatJenis && a.jenis !== alatJenis) return false;
+    if (alatPerhatian && !statusAlat(a).perhatian) return false;
+    if (teks) {
+      var gabung = [a.nama, a.kategori, a.lokasi, a.pegang, a.nota].join(" ").toLowerCase();
+      if (gabung.indexOf(teks) === -1) return false;
+    }
+    return true;
+  }).sort(function (x, y) {
+    var sx = statusAlat(x).perhatian ? 0 : 1, sy = statusAlat(y).perhatian ? 0 : 1;
+    return (sx - sy) || String(x.nama).localeCompare(String(y.nama));
+  });
+
+  var jum = semua.reduce(function (t, a) {
+    var k = kiraAlat(a);
+    t.unit += k.jumlah; t.rosak += k.rosak; t.hilang += k.hilang; t.nilai += k.nilai;
+    if (statusAlat(a).perhatian) t.perhatian++;
+    if (a.jenis === "Bahan Pakai" && (k.habis || k.rendah)) t.stokRendah++;
+    return t;
+  }, { unit: 0, rosak: 0, hilang: 0, nilai: 0, perhatian: 0, stokRendah: 0 });
+
+  var kategori = [];
+  semua.forEach(function (a) {
+    if (a.kategori && kategori.indexOf(a.kategori) === -1) kategori.push(a.kategori);
+  });
+  kategori.sort();
+
+  bekas.innerHTML =
+    '<div class="grid grid-4">' +
+      kadStat("Jenis Barang", String(semua.length), jum.unit + " unit kesemuanya") +
+      kadStat("Perlu Perhatian", String(jum.perhatian), "rosak, hilang atau hampir habis") +
+      kadStat("Bahan Hampir Habis", String(jum.stokRendah), "perlu beli semula") +
+      kadStat("Nilai Alat Berfungsi", rm(jum.nilai), "ikut harga seunit") +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Senarai Alat &amp; Stok</h3>' +
+        '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnAlatBaru">Tambah Barang</button>' +
+          (semua.length ? "" : '<button class="btn btn-lembut" id="btnAlatContoh">Isi Senarai Asas</button>') +
+          '<button class="btn btn-lembut" id="btnEksportAlat">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<div class="penapis">' +
+        "<label>Kategori<select id='fKategoriAlat'><option value=''>Semua kategori</option>" +
+          kategori.map(function (x) {
+            return "<option" + (alatKategori === x ? " selected" : "") + ">" + esc(x) + "</option>";
+          }).join("") + "</select></label>" +
+        "<label>Jenis<select id='fJenisAlat'><option value=''>Semua jenis</option>" +
+          JENIS_ALAT.map(function (x) {
+            return "<option" + (alatJenis === x ? " selected" : "") + ">" + esc(x) + "</option>";
+          }).join("") + "</select></label>" +
+        '<label style="min-width:200px">Cari<input type="search" id="fCariAlat" ' +
+          'placeholder="Nama, lokasi, staf…" value="' + esc(alatCari) + '"></label>' +
+        '<label class="chip pilih-chip" style="align-self:end"><input type="checkbox" id="fPerhatianAlat"' +
+          (alatPerhatian ? " checked" : "") + ">Perlu perhatian sahaja</label>" +
+        '<button class="btn btn-lembut" id="btnResetAlat">Reset</button>' +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length
+        ? "<table><thead><tr><th>Barang</th><th>Jenis</th><th class='num'>Boleh Guna</th>" +
+          "<th class='num'>Rosak / Hilang</th><th>Status</th><th></th></tr></thead><tbody>" +
+          senarai.map(function (a) {
+            var k = kiraAlat(a), st = statusAlat(a);
+            var bahan = a.jenis === "Bahan Pakai";
+            return "<tr>" +
+              '<td class="bungkus"><b>' + esc(a.nama) + "</b>" +
+                '<div class="kecil">' + esc([a.kategori, a.lokasi, a.pegang].filter(Boolean).join(" · ") || "-") +
+              "</div></td>" +
+              "<td>" + esc(a.jenis) + '<div class="kecil">' + esc(a.unit) + "</div></td>" +
+              '<td class="num"><b>' + k.berfungsi + "</b>" +
+                '<div class="kecil">dari ' + k.jumlah + "</div></td>" +
+              '<td class="num">' + (k.rosak || k.hilang
+                ? "<b style='color:var(--bad)'>" + k.rosak + " / " + k.hilang + "</b>"
+                : '<span class="kecil">0 / 0</span>') + "</td>" +
+              '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span>" +
+                (k.minimum ? '<div class="kecil">min ' + k.minimum + "</div>" : "") + "</td>" +
+              '<td><div class="aksi">' +
+                '<button class="btn btn-lembut" data-alat="' + esc(a.id) + '">Buka</button>' +
+                '<button class="btn btn-lembut" data-alatgerak="' + esc(a.id) + '" data-kunci="' +
+                  (bahan ? "guna" : "rosak") + '">' + (bahan ? "Guna" : "Rosak") + "</button>" +
+                '<button class="btn btn-ok" data-alatgerak="' + esc(a.id) +
+                  '" data-kunci="tambah">+ Stok</button>' +
+              "</div></td></tr>";
+          }).join("") + "</tbody></table>"
+        : kosong(semua.length
+            ? "Tiada barang padan dengan penapis ini."
+            : "Belum ada barang. Tekan “Tambah Barang”, atau “Isi Senarai Asas” untuk mula dengan " +
+              "senarai alat inspection biasa.")) +
+      "</div>" +
+    "</div>";
+
+  $("#btnAlatBaru").onclick = function () { borangAlat(null); };
+  if ($("#btnAlatContoh")) $("#btnAlatContoh").onclick = function () { isiAlatContoh(); };
+  $("#fKategoriAlat").onchange = function (e) { alatKategori = e.target.value; lukisAlat(bekas); };
+  $("#fJenisAlat").onchange = function (e) { alatJenis = e.target.value; lukisAlat(bekas); };
+  $("#fPerhatianAlat").onchange = function (e) { alatPerhatian = e.target.checked; lukisAlat(bekas); };
+  $("#btnResetAlat").onclick = function () {
+    alatKategori = ""; alatJenis = ""; alatCari = ""; alatPerhatian = false; lukisAlat(bekas);
+  };
+  var kotak = $("#fCariAlat");
+  kotak.oninput = function (e) {
+    alatCari = e.target.value;
+    clearTimeout(kotak._t);
+    kotak._t = setTimeout(function () {
+      lukisAlat(bekas);
+      var baharu = $("#fCariAlat");
+      baharu.focus();
+      baharu.setSelectionRange(baharu.value.length, baharu.value.length);
+    }, 260);
+  };
+  $("#btnEksportAlat").onclick = function () {
+    csv("alat-stok",
+      ["Barang", "Kategori", "Jenis", "Unit", "Jumlah", "Boleh Guna", "Rosak", "Hilang",
+       "Minimum", "Harga Seunit", "Nilai", "Lokasi", "Dipegang", "Status", "Nota"],
+      senarai.map(function (a) {
+        var k = kiraAlat(a);
+        return [a.nama, a.kategori, a.jenis, a.unit, k.jumlah, k.berfungsi, k.rosak, k.hilang,
+                k.minimum, nom(a.harga), k.nilai, a.lokasi, a.pegang, statusAlat(a).teks, a.nota];
+      }));
+  };
+  $$("[data-alat]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatAlat(b.getAttribute("data-alat")); };
+  });
+  $$("[data-alatgerak]", bekas).forEach(function (b) {
+    b.onclick = function () { gerakAlat(b.getAttribute("data-alatgerak"), b.getAttribute("data-kunci")); };
+  });
+}
+
+// Senarai permulaan supaya admin tak perlu taip satu-satu.
+var ALAT_CONTOH = [
+  { nama: "Moisture Meter", kategori: "Alat Ukur", jenis: "Alat", unit: "unit", jumlah: 2, minimum: 1 },
+  { nama: "Thermal Camera", kategori: "Alat Ukur", jenis: "Alat", unit: "unit", jumlah: 1, minimum: 1 },
+  { nama: "Laser Distance Meter", kategori: "Alat Ukur", jenis: "Alat", unit: "unit", jumlah: 2, minimum: 1 },
+  { nama: "Spirit Level", kategori: "Alat Ukur", jenis: "Alat", unit: "unit", jumlah: 3, minimum: 1 },
+  { nama: "Hammer Test / Tapping Rod", kategori: "Alat Tangan", jenis: "Alat", unit: "unit", jumlah: 3, minimum: 1 },
+  { nama: "Tangga Lipat", kategori: "Alat Tangan", jenis: "Alat", unit: "unit", jumlah: 2, minimum: 1 },
+  { nama: "Torchlight", kategori: "Alat Tangan", jenis: "Alat", unit: "unit", jumlah: 4, minimum: 2 },
+  { nama: "Socket Tester", kategori: "Elektrik", jenis: "Alat", unit: "unit", jumlah: 2, minimum: 1 },
+  { nama: "Sticker Defect", kategori: "Bahan Habis", jenis: "Bahan Pakai", unit: "rol", jumlah: 10, minimum: 3 },
+  { nama: "Marker Pen", kategori: "Bahan Habis", jenis: "Bahan Pakai", unit: "pcs", jumlah: 12, minimum: 4 },
+  { nama: "Masking Tape", kategori: "Bahan Habis", jenis: "Bahan Pakai", unit: "rol", jumlah: 8, minimum: 3 },
+  { nama: "Bateri AA", kategori: "Bahan Habis", jenis: "Bahan Pakai", unit: "pek", jumlah: 6, minimum: 2 },
+  { nama: "Sarung Tangan", kategori: "Keselamatan", jenis: "Bahan Pakai", unit: "pasang", jumlah: 10, minimum: 3 },
+  { nama: "Helmet Keselamatan", kategori: "Keselamatan", jenis: "Alat", unit: "unit", jumlah: 4, minimum: 2 }
+];
+
+function isiAlatContoh() {
+  sahkan("Masukkan " + ALAT_CONTOH.length + " barang asas ke dalam senarai? " +
+    "Semua nombor boleh diubah selepas ini.").then(function (ya) {
+    if (!ya) return;
+    var d = baca();
+    ALAT_CONTOH.forEach(function (c) {
+      if (d.alat.some(function (x) { return x.nama.toLowerCase() === c.nama.toLowerCase(); })) return;
+      var rekod = Object.assign({ id: id(), rosak: 0, hilang: 0, harga: 0, lokasi: "", pegang: "",
+        nota: "", log: [], createdAt: new Date().toISOString() }, c);
+      logAlat(rekod, "Daftar", rekod.jumlah, "", "Senarai asas");
+      d.alat.push(rekod);
+      if (c.kategori && (d.tetapan.kategoriAlat || []).indexOf(c.kategori) === -1) {
+        d.tetapan.kategoriAlat = (d.tetapan.kategoriAlat || []).concat([c.kategori]);
+      }
+    });
+    if (!simpan(d)) return;
+    toast("Senarai asas dimasukkan. Ubah kuantiti ikut stok sebenar.", "ok", 5000);
+    lukis();
+  });
+}
+
 var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -6413,6 +6918,7 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  alat: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1 5.4 5.2l-8.6 8.6a2 2 0 0 1-2.8-2.8l8.6-8.6"/><path d="M9.5 4.5 4 10l3.5 3.5"/></svg>',
   tunggak: '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M8.5 2.5h7"/></svg>',
   staf: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6"/><path d="M17.5 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>',
   tetapan: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.54 15a1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.54h.09A1.7 1.7 0 0 0 10 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.46 9v.09a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>'
@@ -6427,6 +6933,7 @@ var HALAMAN = [
   { id: "invois",  label: "Invois",       ikon: IKON.invois,  lukis: lukisInvois },
   { id: "resit",   label: "Resit",        ikon: IKON.resit,   lukis: lukisResit },
   { id: "tunggak", label: "Tunggakan",    ikon: IKON.tunggak, lukis: lukisTunggak },
+  { id: "alat",    label: "Alat & Stok",  ikon: IKON.alat,    lukis: lukisAlat },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
   { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
 ];
@@ -6445,9 +6952,12 @@ function binaMenu() {
 
   var bilLewat = senaraiTunggakan(data).filter(function (x) { return x.hari > 0; }).length;
 
+  var bilAlat = alatPerluPerhatian(data).length;
+
   $("#navMenu").innerHTML = HALAMAN.map(function (h) {
     var lencana = (h.id === "sale" && perluTindakan) ? perluTindakan
-      : ((h.id === "tunggak" && bilLewat) ? bilLewat : 0);
+      : ((h.id === "tunggak" && bilLewat) ? bilLewat
+      : ((h.id === "alat" && bilAlat) ? bilAlat : 0));
     return '<a class="nav-item" href="#/' + h.id + '" data-nav="' + h.id + '">' +
       '<span class="nav-ikon">' + h.ikon + "</span><span>" + esc(h.label) + "</span>" +
       (lencana ? '<span class="lencana-menu">' + lencana + "</span>" : "") +

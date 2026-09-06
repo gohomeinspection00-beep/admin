@@ -19,6 +19,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Sub Job** | Kerja yang disubkan — direkod berasingan daripada jualan syarikat, dengan agihan RM kepada setiap staf/rakan dan baki bahagian syarikat |
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Tunggakan** | Semua baki yang belum dikutip — jualan, sub job dan invois manual — disusun ikut umur hutang, dengan butang kejar bayaran WhatsApp |
+| **Alat & Stok** | Inventori alat inspection dan bahan pakai habis — berapa ada, berapa rosak, berapa hilang, dan bila stok hampir habis |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Terbahagi kepada 5 tab: Syarikat & Target, Jualan & Status, Resit & Invois, Quotation, Data & Backup |
@@ -475,6 +476,43 @@ Boleh guna: `{nama} {syarikat} {tarikh} {tarikhAkhir} {projek} {unit} {jumlah}
 Papan utama pula memaparkan jalur **Tunggakan Bayaran** bila ada rekod yang
 sudah lewat, dan menu sisi menunjukkan bilangannya. Semua senarai boleh
 dieksport ke CSV.
+
+## Alat & Stok
+
+Menu **Alat & Stok** menjejak semua barang syarikat. Dua jenis:
+
+- **Alat** — moisture meter, thermal camera, tangga, socket tester dan sebagainya.
+  Boleh ditanda **rosak**, **hilang**, **sudah dibaiki**, **jumpa semula** atau **lupus**.
+- **Bahan Pakai** — sticker defect, marker, masking tape, bateri, sarung tangan.
+  Setiap kali guna, tekan **Guna** dan taip kuantiti — stok tolak sendiri.
+
+Kali pertama buka, tekan **Isi Senarai Asas** untuk masukkan 14 barang biasa
+inspection, kemudian ubah kuantiti ikut stok sebenar. Atau **Tambah Barang**
+satu per satu.
+
+### Status automatik
+
+| Status | Bila keluar |
+|---|---|
+| **Baik** | Semua elok |
+| **Hampir habis** | Bahan pakai: baki sampai paras minimum. Alat: baki kurang dari paras minimum |
+| **Habis / Tiada yang berfungsi** | Tiada lagi yang boleh guna |
+| **x rosak / x hilang** | Ada unit ditanda rosak atau hilang |
+
+*Boleh guna* = jumlah dimiliki − rosak − hilang.
+Paras minimum ditetapkan setiap barang (isi 0 kalau tak perlu amaran).
+
+### Rekod pergerakan
+
+Setiap kali stok bertambah, digunakan, rosak, dibaiki, hilang atau dijumpai,
+sistem simpan rekod: tarikh, kuantiti, siapa, dan nota (contoh: *guna untuk
+site Setia Alam*). Buka mana-mana barang untuk lihat sejarah penuh.
+
+### Amaran
+
+Papan utama keluarkan jalur **Alat & Stok Perlu Perhatian** bila ada barang
+rosak, hilang atau hampir habis, dan menu sisi tunjuk bilangannya — jadi tak
+sampai keluar site baru sedar sticker dah habis. Senarai boleh dieksport CSV.
 
 ## Menu Tetapan
 
