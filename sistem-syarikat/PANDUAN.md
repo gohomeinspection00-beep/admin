@@ -266,7 +266,7 @@ Nota:
 - Fail katalog turut dimasukkan ke dalam **fail backup**, jadi bila pulih di
   komputer lain, katalog ikut sekali.
 
-### Jadikan Sale
+### Jadikan Sale / Jadikan Sub Job
 
 Tekan **Jadikan Sale** pada quotation — borang Key-in Sale terus terbuka dengan
 nama, telefon, alamat (No. Unit), jenis hartanah, harga dan catatan sudah terisi;
@@ -278,7 +278,20 @@ kemudian **Simpan Sale**. Bila disimpan:
 - Quotation dan sale terpaut — butang **Lihat Sale** muncul pada quotation, dan
   butiran jualan pula memaparkan baris **Quotation** dengan butang *Buka*
 
-Butang **Jadikan Sale** hilang selepas dipakai supaya tiada rekod berganda.
+Butang **Jadikan Sale** hilang selepas dipakai supaya tiada rekod berganda
+(digantikan **Lihat Sale**).
+
+Kalau kerja itu nak disubkan pula, tekan **Jadikan Sub Job** — borang Sub Job
+terbuka dengan data client, alamat, jenis hartanah dan harga sudah terisi.
+Tinggal isi tarikh, masa dan **agihan RM kepada staf/rakan**. Sub job juga
+terpaut dengan quotation (butang *Lihat Sub Job* / baris *Quotation → Buka*),
+dan ingat: sub job **tidak masuk** jualan syarikat atau target.
+
+### Nama client tidak wajib
+
+Nama client boleh dikosongkan dalam quotation, key-in sale dan sub job (kadang
+client tak beri nama). Dalam senarai dan kalendar ia dipapar sebagai
+**Tanpa nama**, dan pada quotation yang dicetak baris nama itu hilang terus.
 
 ### Tetapan quotation
 
