@@ -15,6 +15,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Papan Utama** | Jualan bulan ini, deposit dikutip, baki belum kutip, % capai target, job hari ini, senarai perlu tindakan, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf yang ditugaskan, job belum ditugaskan, beban kerja 7 hari, tukar status terus dari jadual |
+| **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Nama syarikat, target jualan harian, hari bekerja, senarai projek, sumber lead, hari cuti, backup & restore |
@@ -118,6 +119,27 @@ Balance Due                           RM   0.00
 ```
 
 Tandakan *Sertakan muka surat Inspection Information* untuk resit 2 muka surat.
+
+## Invois
+
+Untuk **minta bayaran** sebelum client bayar. Buka jualan → **Buat Invois**.
+Semua maklumat diambil dari rekod jualan yang sama, dan bayaran yang sudah
+diterima ditolak automatik:
+
+```
+Sub-Total                              RM 550.00
+Payment Received — Deposit (1 Sep)     RM 100.00
+Balance                                RM 450.00
+AMOUNT DUE                             RM 450.00
+```
+
+- **Tarikh akhir bayaran** diisi automatik (tempoh boleh ubah dalam Tetapan, default 7 hari)
+- **Jumlah Perlu Dibayar** boleh diubah jika mahu minta sebahagian sahaja
+- Nombor invois berasingan dari resit (contoh `INV-0001` dan `GX-0001`)
+- Cetak/PDF, salin teks, atau hantar WhatsApp — sama seperti resit
+- **Status dikira automatik** dari bayaran sebenar dalam rekod jualan:
+  Belum Bayar → Bayar Sebahagian → Sudah Bayar (Lewat jika lepas tarikh akhir)
+- Butang **Rekod Bayaran** dalam invois terus membuka borang bayaran
 
 Dari pratonton: **Cetak / Simpan PDF** (pilih "Save as PDF" dalam dialog cetak),
 **Salin Teks**, atau **WhatsApp** (terus ke nombor client jika ada).
