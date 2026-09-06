@@ -434,6 +434,31 @@ var TETAPAN_ASAL = {
   targetBulan: {},                            // { "2026-09": 20000 } — ganti target bulan tertentu
   statusKerja: ["Tempahan", "Inspection Siap", "Report Siap", "Submit Report",
                 "Submit App", "Minta Bayaran", "Selesai", "Batal"],
+  quote: {
+    prefix: "Q",
+    nombor: 1,
+    tempohSahHari: 14,
+    termsBase: "https://quotationgoxpert.netlify.app/tnc.html",
+    servis: [
+      { nama: "Home Defect Inspection",
+        scopeLink: "https://servicegoxpert.netlify.app/newdefectinspection.html",
+        lampiranUrl: "https://arleta.site/interactivelink/1453/HOME-DEFECT-INSPECTION-BOOK.pdf" },
+      { nama: "Sub-Sale Inspection",
+        scopeLink: "https://servicegoxpert.netlify.app/subsaleafter.html", lampiranUrl: "" },
+      { nama: "Pre-Purchase Inspection",
+        scopeLink: "https://servicegoxpert.netlify.app/subsalebefore.html", lampiranUrl: "" },
+      { nama: "Electrical Inspection",
+        scopeLink: "https://www.gohomeinspection.asia/what-we-inspect", lampiranUrl: "" }
+    ],
+    feeAsal: [
+      { nama: "Inspection Fee", jumlah: 200 },
+      { nama: "Transportation", jumlah: 50 },
+      { nama: "PDF Report with Photos", jumlah: 30 },
+      { nama: "Consultation", jumlah: 20 }
+    ],
+    jenisHartanah: ["Teres Setingkat", "Teres Dua Tingkat", "Semi-D Setingkat", "Semi-D Dua Tingkat",
+                    "Banglo", "Kondominium / Apartment", "Townhouse", "Lain-lain"]
+  },
   statusSelesai: "Selesai",
   statusBatal: "Batal",
   tempohPendingHari: 3,
@@ -538,6 +563,8 @@ function baca() {
   mentah.resit = mentah.resit || [];
   mentah.invois = mentah.invois || [];
   mentah.subjob = mentah.subjob || [];      // kerja sub — tidak dikira dalam jualan syarikat
+  mentah.quotation = mentah.quotation || [];
+  mentah.tetapan.quote = Object.assign({}, TETAPAN_ASAL.quote, mentah.tetapan.quote || {});
   mentah.sale = (mentah.sale || []).map(function (s) {
     // Rekod lama menyimpan deposit/finalPayment sebagai nombor tunggal.
     // Tukar kepada senarai bayaran supaya satu jualan boleh ada banyak bayaran.
@@ -578,7 +605,7 @@ function benihkan() {
       telefon: "", email: "", status: "aktif", tarikhMula: "" },
     { id: id(), nama: "Ummi", jawatan: "Sales", kumpulan: "Management", jabatan: "Jualan",
       telefon: "", email: "", status: "aktif", tarikhMula: "" }
-  ], sale: [], resit: [], invois: [], subjob: [], nota: {}, tanda: {} };
+  ], sale: [], resit: [], invois: [], subjob: [], quotation: [], nota: {}, tanda: {} };
   simpan(data);
 }
 
@@ -2129,6 +2156,7 @@ function lihatSale(rekodId) {
       '<button type="button" class="btn btn-bad" id="btnPadamSale">Padam</button>' +
       '<button type="button" class="btn btn-lembut" id="btnTutupSale">Tutup</button>' +
       '<button type="button" class="btn btn-lembut" id="btnInvoisSale">Buat Invois</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnQuoteSale">Buat Quotation</button>' +
       '<button type="button" class="btn btn-utama" id="btnSuntingSale">Sunting Rekod</button>' +
     "</div>", 560);
 
@@ -2162,6 +2190,7 @@ function lihatSale(rekodId) {
   });
   $("#btnTutupSale", m.el).onclick = m.tutup;
   $("#btnInvoisSale", m.el).onclick = function () { m.tutup(); borangInvois({ saleId: rekodId }); };
+  $("#btnQuoteSale", m.el).onclick = function () { m.tutup(); borangQuotation(null, rekodId); };
   $("#btnTambahBayar", m.el).onclick = function () { m.tutup(); borangBayaran(rekodId, null); };
   $$("[data-sunting-bayar]", m.el).forEach(function (b) {
     b.onclick = function () { m.tutup(); borangBayaran(rekodId, b.getAttribute("data-sunting-bayar")); };
@@ -3487,6 +3516,537 @@ function lukisResit(bekas) {
 
 
 /* ======================================================================
+   QUOTATION — jana sebut harga, pautan Terms, mesej WhatsApp, PDF A4
+   ================================================================== */
+var quoteBulan = "";
+var quoteCari = "";
+var STATUS_QUOTE = ["Draf", "Dihantar", "Diterima", "Ditolak", "Luput"];
+
+function nomborQuoteBaharu(data) {
+  var t = data.tetapan.quote;
+  var nombor = Math.max(1, parseInt(t.nombor, 10) || 1);
+  var ada = data.quotation.map(function (x) { return x.no; });
+  var calon;
+  do {
+    calon = t.prefix + "-" + String(nombor).padStart(4, "0");
+    nombor++;
+  } while (ada.indexOf(calon) !== -1);
+  return { no: calon, seterusnya: nombor };
+}
+
+function jumlahFee(fees) {
+  return (fees || []).reduce(function (t, f) { return t + nom(f.jumlah); }, 0);
+}
+
+// Pautan Terms & Conditions dengan pecahan harga (dibaca oleh halaman tnc.html).
+function pautanTerms(qt) {
+  var asas = String(qt.termsBase || "").trim();
+  if (!asas) return "";
+  var param = [
+    ["client", qt.client.nama], ["price", String(jumlahFee(qt.fees))], ["cur", "RM"],
+    ["quote", qt.no], ["service", qt.service], ["valid", qt.validUntil]
+  ];
+  (qt.fees || []).forEach(function (f, i) {
+    param.push(["fee" + i + "_name", f.nama]);
+    param.push(["fee" + i + "_amt", String(nom(f.jumlah))]);
+  });
+  return asas + (asas.indexOf("?") === -1 ? "?" : "&") +
+    param.map(function (p) { return encodeURIComponent(p[0]) + "=" + encodeURIComponent(p[1] || ""); }).join("&");
+}
+
+function teksQuotation(qt) {
+  var c = qt.syarikat || TETAPAN_ASAL.resit;
+  var total = jumlahFee(qt.fees);
+  var pecahan = (qt.fees || []).map(function (f) {
+    return "- " + f.nama + ": RM" + nom(f.jumlah).toFixed(2);
+  }).join("\n");
+  var pautan = pautanTerms(qt);
+
+  if (qt.bahasa === "en") {
+    return "*Home Inspection Quotation*\n\n" +
+      "Thank you " + (qt.client.nama || "Sir/Madam") + " for the property details. " +
+      "Based on the size & location, the quotation is:\n\n" +
+      "*Total:* RM" + total.toFixed(2) + "\n*Breakdown:*\n" + pecahan + "\n\n" +
+      "*Quotation No.:* " + qt.no + "\n*Service:* " + qt.service + "\n" +
+      "*Valid Until:* " + (qt.validUntil ? fmtTarikh(qt.validUntil) : "-") + "\n\n" +
+      "*What we will do*\n" +
+      "- Inspection by *qualified Inspector (Building Surveyor)*\n" +
+      "- Referencing standards: *Malaysia Standard, JKR, UBBL, SIRIM, Energy Commission, Fire Dept*\n" +
+      "- Tools & methods follow *CIS 7 Malaysia*\n" +
+      "Full scope: " + (qt.scopeLink || "-") + "\n\n" +
+      "*Important Notes*\n" +
+      "- Ensure active water & electricity on inspection day\n" +
+      "- If not available, a second visit for utilities will be chargeable\n\n" +
+      (qt.lampiranUrl ? "Attachment: " + qt.lampiranUrl + "\n\n" : "") +
+      (pautan ? "To confirm, please open this link:\n" + pautan + "\n\n" : "") +
+      (qt.notes ? qt.notes + "\n\n" : "") +
+      "_If you agree, reply *\"OK, I agree\"* and we will propose the earliest available date._\n" +
+      c.namaSyarikat;
+  }
+  return "*Quotation Pemeriksaan Rumah*\n\n" +
+    "Terima kasih " + (qt.client.nama || "Tuan/Puan") + " atas maklumat rumah. " +
+    "Berdasarkan keluasan & lokasi, sebut harga adalah:\n\n" +
+    "*Jumlah:* RM" + total.toFixed(2) + "\n*Pecahan:*\n" + pecahan + "\n\n" +
+    "*No. Quotation:* " + qt.no + "\n*Perkhidmatan:* " + qt.service + "\n" +
+    "*Sah hingga:* " + (qt.validUntil ? fmtTarikh(qt.validUntil) : "-") + "\n\n" +
+    "*Apa yang akan kami lakukan?*\n" +
+    "- Pemeriksaan oleh *Inspector bertauliah (Building Surveyor)*\n" +
+    "- Rujukan standard: *Malaysia Standard, JKR, UBBL (Majlis), SIRIM, Suruhanjaya Tenaga, Bomba*\n" +
+    "- Tools & kaedah mengikut *CIS 7 Malaysia*\n" +
+    "Skop penuh: " + (qt.scopeLink || "-") + "\n\n" +
+    "*Nota Penting*\n" +
+    "- Pastikan bekalan air & elektrik aktif pada hari pemeriksaan\n" +
+    "- Jika tiada, lawatan kedua untuk utiliti akan dicaj berasingan\n\n" +
+    (qt.lampiranUrl ? "Lampiran PDF: " + qt.lampiranUrl + "\n\n" : "") +
+    (pautan ? "Untuk pengesahan, sila buka pautan ini:\n" + pautan + "\n\n" : "") +
+    (qt.notes ? qt.notes + "\n\n" : "") +
+    "_Jika bersetuju, balas *\"OK, saya setuju\"* dan kami akan cadangkan tarikh terawal._\n" +
+    c.namaSyarikat;
+}
+
+// Susun atur A4 quotation — mengikut susunan PDF sedia ada.
+function htmlQuotation(qt) {
+  var c = qt.syarikat || TETAPAN_ASAL.resit;
+  var total = jumlahFee(qt.fees);
+  var pautan = pautanTerms(qt);
+  return '<div class="resit">' +
+    '<div class="resit-kepala">' +
+      (c.logoUrl ? '<img src="' + esc(c.logoUrl) + '" alt="Logo" crossorigin="anonymous" referrerpolicy="no-referrer">' : "<div></div>") +
+      '<div class="resit-syarikat"><h2>' + esc(c.namaSyarikat) + "</h2>" +
+        esc(c.alamat) + "\n" + (c.email ? "Email: " + esc(c.email) + "\n" : "") +
+        (c.ssm ? "SSM: " + esc(c.ssm) : "") + "</div>" +
+    "</div>" +
+
+    '<div class="resit-tajuk"><h2>QUOTATION</h2>' +
+      '<div class="kanan"><b>No:</b> ' + esc(qt.no) + "<br><b>Tarikh:</b> " + esc(fmtTarikh(qt.tarikh)) +
+      (qt.validUntil ? "<br><b>Sah hingga:</b> " + esc(fmtTarikh(qt.validUntil)) : "") + "</div>" +
+    "</div>" +
+
+    '<table style="margin-top:12px"><tr>' +
+      "<td style='width:50%'><b>Kepada:</b><br>" + esc(qt.client.nama || "-") +
+        (qt.client.telefon ? "<br>" + esc(qt.client.telefon) : "") +
+        (qt.client.alamat ? "<br>" + esc(qt.client.alamat) : "") + "</td>" +
+      "<td><b>Perkhidmatan:</b> " + esc(qt.service) + "<br>" +
+        "<b>Jenis Hartanah:</b> " + esc(qt.client.jenisHartanah || "-") + "</td>" +
+    "</tr></table>" +
+
+    "<table><tr><th style='width:40px'>No.</th><th>Perkara / Item</th><th style='width:120px'>Jumlah (RM)</th></tr>" +
+      (qt.fees || []).map(function (f, i) {
+        return "<tr><td>" + (i + 1) + "</td><td>" + esc(f.nama) + "</td><td>" +
+          esc(rm(f.jumlah)) + "</td></tr>";
+      }).join("") +
+      "<tr><td></td><td><b>JUMLAH / TOTAL</b></td><td><b>" + esc(rm(total)) + "</b></td></tr>" +
+    "</table>" +
+
+    '<div class="resit-seksyen">Apa Yang Kami Lakukan / What We Will Do</div>' +
+    '<div style="font-size:12.5px;line-height:1.7;padding:4px 2px">' +
+      "• Pemeriksaan oleh Inspector bertauliah (Building Surveyor)<br>" +
+      "• Rujukan standard: Malaysia Standard, JKR, UBBL (Majlis), SIRIM, Suruhanjaya Tenaga, Bomba<br>" +
+      "• Tools &amp; kaedah mengikut CIS 7 Malaysia<br>" +
+      "• Skop penuh: " + esc(qt.scopeLink || "-") +
+    "</div>" +
+
+    '<div style="background:#fffbe8;border-left:4px solid #eab308;border-radius:8px;padding:10px 12px;' +
+      'margin-top:12px;font-size:12.5px"><b>Nota Penting:</b><br>' +
+      "• Pastikan bekalan air &amp; elektrik aktif pada hari pemeriksaan<br>" +
+      "• Jika tiada, lawatan kedua untuk utiliti akan dicaj berasingan</div>" +
+
+    (qt.notes ? '<p style="margin-top:12px;font-size:12.5px"><b>Nota Tambahan:</b><br>' +
+      esc(qt.notes).split("\n").join("<br>") + "</p>" : "") +
+
+    (pautan ? '<p style="margin-top:12px;font-size:11.5px"><b>Untuk pengesahan, sila buka pautan ini:</b><br>' +
+      '<span style="color:#0ea5e9;word-break:break-all">' + esc(pautan) + "</span></p>" : "") +
+
+    '<div class="resit-tandatangan">' +
+      (c.tandatanganUrl ? '<img src="' + esc(c.tandatanganUrl) + '" alt="Signature" crossorigin="anonymous" referrerpolicy="no-referrer"><br>' : "") +
+      "<b>" + esc(c.namaPenandatangan) + "</b><br>" + esc(c.jawatanPenandatangan) +
+    "</div>" +
+    '<p class="resit-tengah" style="font-size:11px;color:#6b7280">' +
+      esc(c.namaSyarikat) + " · SSM: " + esc(c.ssm) + " · " + esc(c.email) + "<br>" +
+      "Dokumen ini dijana secara automatik dan sah tanpa tandatangan.</p>" +
+  "</div>";
+}
+
+function cetakQuotation(qId) {
+  var data = baca();
+  var qt = data.quotation.filter(function (x) { return x.id === qId; })[0];
+  if (!qt) return;
+  var kertas = $("#kertasResit");
+  kertas.innerHTML = htmlQuotation(qt);
+  document.body.classList.add("cetak-resit");
+  var selesai = function () {
+    document.body.classList.remove("cetak-resit");
+    kertas.innerHTML = "";
+    window.removeEventListener("afterprint", selesai);
+  };
+  window.addEventListener("afterprint", selesai);
+  setTimeout(function () {
+    try { window.print(); } catch (e) { toast("Pelayar tidak dapat membuka dialog cetak.", "bad"); }
+    setTimeout(selesai, 800);
+  }, 250);
+}
+
+function barisFee(f) {
+  f = f || {};
+  return '<div class="baris-agih" data-fee>' +
+    medan("Perkara", '<input type="text" class="feeNama" placeholder="cth: Inspection Fee" value="' +
+      esc(f.nama || "") + '">') +
+    medan("Harga (RM)", '<input type="number" step="0.01" min="0" class="feeJumlah" value="' +
+      esc(f.jumlah !== undefined ? f.jumlah : "") + '">') +
+    medan("", '<input type="text" class="feeNota" placeholder="nota (pilihan)" value="' +
+      esc(f.nota || "") + '">') +
+    '<button type="button" class="btn-buang-baris" data-buang-fee title="Buang">&times;</button>' +
+  "</div>";
+}
+
+function borangQuotation(qId, saleId) {
+  var data = baca();
+  var t = data.tetapan.quote;
+  var qt = qId ? data.quotation.filter(function (x) { return x.id === qId; })[0] : null;
+  var baru = !qt;
+  var sale = saleId ? data.sale.filter(function (x) { return x.id === saleId; })[0] : null;
+
+  if (!qt) {
+    var sah = new Date();
+    sah.setDate(sah.getDate() + Math.max(0, parseInt(t.tempohSahHari, 10) || 14));
+    qt = {
+      no: nomborQuoteBaharu(data).no,
+      tarikh: kunciTarikh(),
+      validUntil: kunciTarikh(sah),
+      bahasa: "ms",
+      service: (t.servis[0] || {}).nama || "Home Defect Inspection",
+      scopeLink: (t.servis[0] || {}).scopeLink || "",
+      lampiranUrl: (t.servis[0] || {}).lampiranUrl || "",
+      termsBase: t.termsBase,
+      notes: "",
+      status: "Draf",
+      client: {
+        nama: sale ? sale.nama : "", telefon: sale ? sale.telefon : "",
+        alamat: sale ? [sale.unit, sale.projek].filter(Boolean).join(", ") : "",
+        jenisHartanah: (t.jenisHartanah || [])[1] || ""
+      },
+      fees: (t.feeAsal || []).map(function (f) { return { nama: f.nama, jumlah: nom(f.jumlah) }; }),
+      saleId: sale ? sale.id : null
+    };
+  }
+
+  var m = modal(baru ? "Quotation Baharu" : "Sunting Quotation " + qt.no,
+    '<form id="borangQuote">' +
+      '<div class="tajuk-seksyen">Quotation</div>' +
+      '<div class="baris-medan">' +
+        medan("No. Quotation *", '<input type="text" name="no" value="' + esc(qt.no) + '" required>') +
+        medan("Tarikh", '<input type="date" name="tarikh" value="' + esc(qt.tarikh) + '">') +
+        medan("Sah Hingga", '<input type="date" name="validUntil" value="' + esc(qt.validUntil || "") + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Bahasa Mesej", "<select name='bahasa'><option value='ms'" +
+          (qt.bahasa === "ms" ? " selected" : "") + ">Bahasa Melayu</option><option value='en'" +
+          (qt.bahasa === "en" ? " selected" : "") + ">English</option></select>") +
+        medan("Status", "<select name='status'>" + STATUS_QUOTE.map(function (x) {
+          return "<option" + (qt.status === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+      "</div>" +
+
+      '<div class="tajuk-seksyen">Client</div>' +
+      '<div class="baris-medan">' +
+        medan("Nama Client *", '<input type="text" name="c_nama" value="' + esc(qt.client.nama) + '" required>') +
+        medan("No. WhatsApp", '<input type="tel" name="c_telefon" value="' + esc(qt.client.telefon) + '">') +
+        medan("Jenis Hartanah", "<select name='c_jenis'>" + (t.jenisHartanah || []).map(function (x) {
+          return "<option" + (qt.client.jenisHartanah === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+      "</div>" +
+      medan("Alamat Hartanah", '<textarea name="c_alamat" style="min-height:56px">' + esc(qt.client.alamat) + "</textarea>") +
+
+      '<div class="tajuk-seksyen">Perkhidmatan</div>' +
+      '<div class="baris-medan">' +
+        medan("Service", '<input list="senaraiServis" name="service" value="' + esc(qt.service) + '">') +
+        medan("Skop Penuh (link)", '<input type="text" name="scopeLink" value="' + esc(qt.scopeLink) + '">') +
+      "</div>" +
+      '<datalist id="senaraiServis">' + (t.servis || []).map(function (x) {
+        return "<option>" + esc(x.nama) + "</option>";
+      }).join("") + "</datalist>" +
+      '<div class="baris-medan">' +
+        medan("Lampiran PDF (link)", '<input type="text" name="lampiranUrl" value="' + esc(qt.lampiranUrl || "") + '">') +
+        medan("Halaman Terms (link)", '<input type="text" name="termsBase" value="' + esc(qt.termsBase || "") + '">') +
+      "</div>" +
+
+      '<div class="tajuk-seksyen">Pecahan Harga</div>' +
+      '<div id="senaraiFee">' + (qt.fees && qt.fees.length ? qt.fees : [{}]).map(barisFee).join("") + "</div>" +
+      '<button type="button" class="btn btn-lembut btn-kecil" id="btnTambahFee">+ Tambah Pecahan</button>' +
+      '<div class="jumlah-baris" style="margin-top:12px"><span><b>Jumlah Keseluruhan</b></span>' +
+        '<b id="paparJumlahQuote">RM 0.00</b></div>' +
+
+      medan("Nota Tambahan", '<textarea name="notes" style="min-height:60px">' + esc(qt.notes || "") + "</textarea>") +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamQuote">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Jana Quotation" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 720);
+
+  var borang = $("#borangQuote", m.el);
+  function bacaFee() {
+    return $$("[data-fee]", m.el).map(function (b) {
+      return { nama: $(".feeNama", b).value.trim(), jumlah: nom($(".feeJumlah", b).value),
+               nota: $(".feeNota", b).value.trim() };
+    }).filter(function (f) { return f.nama || f.jumlah; });
+  }
+  function kiraPapar() {
+    $("#paparJumlahQuote", m.el).textContent = rm(jumlahFee(bacaFee()));
+  }
+  function pasangFee() {
+    $$("[data-buang-fee]", m.el).forEach(function (b) {
+      b.onclick = function () {
+        if ($$("[data-fee]", m.el).length <= 1) return toast("Perlu sekurang-kurangnya satu baris.", "warn");
+        b.parentElement.remove();
+        kiraPapar();
+      };
+    });
+  }
+  pasangFee();
+  kiraPapar();
+  borang.addEventListener("input", kiraPapar);
+  $("#btnTambahFee", m.el).onclick = function () {
+    $("#senaraiFee", m.el).insertAdjacentHTML("beforeend", barisFee({}));
+    pasangFee();
+  };
+  // Tukar service → isi skop & lampiran dari tetapan.
+  $("[name=service]", borang).onchange = function (e) {
+    var cfg = (t.servis || []).filter(function (x) { return x.nama === e.target.value; })[0];
+    if (cfg) {
+      $("[name=scopeLink]", borang).value = cfg.scopeLink || "";
+      $("[name=lampiranUrl]", borang).value = cfg.lampiranUrl || "";
+    }
+  };
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  if ($("#btnPadamQuote", m.el)) {
+    $("#btnPadamQuote", m.el).onclick = function () {
+      sahkan("Padam quotation " + qt.no + "?").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.quotation = d.quotation.filter(function (x) { return x.id !== qId; });
+        simpan(d);
+        m.tutup();
+        toast("Quotation dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai(borang);
+    var fees = bacaFee();
+    if (!v.c_nama) return toast("Sila isi nama client.", "bad");
+    if (!fees.length || jumlahFee(fees) <= 0) return toast("Sila isi sekurang-kurangnya satu pecahan harga.", "bad");
+    var d = baca();
+    if (d.quotation.some(function (x) { return x.no === v.no && x.id !== qId; })) {
+      return toast("Nombor quotation " + v.no + " sudah digunakan.", "bad", 5000);
+    }
+    var rekod = {
+      id: qId || id(),
+      no: v.no, tarikh: v.tarikh || kunciTarikh(), validUntil: v.validUntil,
+      bahasa: v.bahasa, status: v.status,
+      client: { nama: v.c_nama, telefon: telefonKemas(v.c_telefon), alamat: v.c_alamat,
+                jenisHartanah: v.c_jenis },
+      service: v.service, scopeLink: v.scopeLink, lampiranUrl: v.lampiranUrl,
+      termsBase: v.termsBase, notes: v.notes,
+      fees: fees, total: jumlahFee(fees),
+      saleId: qt.saleId || null,
+      syarikat: qt.syarikat || JSON.parse(JSON.stringify(d.tetapan.resit)),
+      createdAt: qt.createdAt || new Date().toISOString()
+    };
+    if (qId) d.quotation = d.quotation.map(function (x) { return x.id === qId ? rekod : x; });
+    else {
+      d.quotation.push(rekod);
+      if (v.no === qt.no) {
+        var padanan = String(v.no).match(/(\d+)\s*$/);
+        if (padanan) d.tetapan.quote.nombor = parseInt(padanan[1], 10) + 1;
+      }
+    }
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(qId ? "Quotation dikemas kini." : "Quotation " + rekod.no + " dijana.", "ok");
+    lihatQuotation(rekod.id);
+    lukis();
+  };
+}
+
+function lihatQuotation(qId) {
+  var data = baca();
+  var qt = data.quotation.filter(function (x) { return x.id === qId; })[0];
+  if (!qt) return;
+  var pautan = pautanTerms(qt);
+
+  var m = modal("Quotation " + qt.no,
+    '<div class="baris-medan" style="margin-bottom:8px">' +
+      medan("Status", "<select id='statusQuote'>" + STATUS_QUOTE.map(function (x) {
+        return "<option" + (qt.status === x ? " selected" : "") + ">" + esc(x) + "</option>";
+      }).join("") + "</select>") +
+      medan("Jumlah", '<div style="padding-top:8px"><b>' + esc(rm(qt.total)) + "</b> · " +
+        esc(qt.fees.length) + " item</div>") +
+    "</div>" +
+    '<div class="pratonton">' + htmlQuotation(qt) + "</div>" +
+    '<div class="tajuk-seksyen">Pautan Terms &amp; Conditions</div>' +
+    '<textarea id="pautanQuote" style="min-height:70px">' + esc(pautan) + "</textarea>" +
+    '<div class="aksi" style="margin:-4px 0 12px">' +
+      '<button type="button" class="btn btn-lembut btn-kecil" id="btnSalinPautan">Salin Pautan</button>' +
+      '<button type="button" class="btn btn-lembut btn-kecil" id="btnBukaPautan">Buka Pautan</button>' +
+    "</div>" +
+    '<div class="tajuk-seksyen">Mesej WhatsApp</div>' +
+    '<textarea id="teksQuote" style="min-height:190px">' + esc(teksQuotation(qt)) + "</textarea>" +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-bad" id="btnPadamQ">Padam</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnSuntingQ">Sunting</button>' +
+      (qt.saleId ? "" : '<button type="button" class="btn btn-lembut" id="btnJadiSale">Jadikan Sale</button>') +
+      '<button type="button" class="btn btn-lembut" id="btnSalinQ">Salin Mesej</button>' +
+      '<button type="button" class="btn btn-ok" id="btnWaQ">WhatsApp</button>' +
+      '<button type="button" class="btn btn-utama" id="btnCetakQ">Cetak / PDF</button>' +
+    "</div>", 780);
+
+  $("#btnSalinPautan", m.el).onclick = function () { salinTeks($("#pautanQuote", m.el)); };
+  $("#btnBukaPautan", m.el).onclick = function () {
+    var u = $("#pautanQuote", m.el).value.trim();
+    if (u) window.open(u, "_blank"); else toast("Halaman Terms belum ditetapkan.", "warn");
+  };
+  $("#btnSalinQ", m.el).onclick = function () { salinTeks($("#teksQuote", m.el)); };
+  $("#btnCetakQ", m.el).onclick = function () { cetakQuotation(qId); };
+  $("#btnSuntingQ", m.el).onclick = function () { m.tutup(); borangQuotation(qId); };
+  $("#btnWaQ", m.el).onclick = function () {
+    var no = String(qt.client.telefon || "").replace(/[^\d]/g, "");
+    if (no.charAt(0) === "0") no = "6" + no;
+    window.open("https://wa.me/" + (no.length > 8 ? no : "") + "?text=" +
+      encodeURIComponent($("#teksQuote", m.el).value), "_blank");
+  };
+  if ($("#btnJadiSale", m.el)) {
+    $("#btnJadiSale", m.el).onclick = function () {
+      m.tutup();
+      borangSale(null, kunciTarikh(), {
+        nama: qt.client.nama, telefon: qt.client.telefon,
+        projek: qt.client.alamat, harga: qt.total, catatan: "Dari quotation " + qt.no
+      });
+    };
+  }
+  $("#statusQuote", m.el).onchange = function (e) {
+    var d = baca();
+    d.quotation = d.quotation.map(function (x) {
+      if (x.id === qId) x.status = e.target.value;
+      return x;
+    });
+    if (!simpan(d)) return;
+    toast("Status quotation: " + e.target.value, "ok");
+    lukis();
+  };
+  $("#btnPadamQ", m.el).onclick = function () {
+    sahkan("Padam quotation " + qt.no + "?").then(function (ya) {
+      if (!ya) return;
+      var d = baca();
+      d.quotation = d.quotation.filter(function (x) { return x.id !== qId; });
+      simpan(d);
+      m.tutup();
+      toast("Quotation dipadam.", "ok");
+      lukis();
+    });
+  };
+}
+
+function lukisQuotation(bekas) {
+  var data = baca();
+  var teks = quoteCari.trim().toLowerCase();
+  var senarai = data.quotation.filter(function (x) {
+    if (quoteBulan && String(x.tarikh).slice(0, 7) !== quoteBulan) return false;
+    if (teks) {
+      var gabung = [x.no, x.client.nama, x.client.telefon, x.service].join(" ").toLowerCase();
+      if (gabung.indexOf(teks) === -1) return false;
+    }
+    return true;
+  }).sort(function (a, b) { return String(b.tarikh + b.no).localeCompare(String(a.tarikh + a.no)); });
+
+  var jumlah = senarai.reduce(function (t, x) { return t + nom(x.total); }, 0);
+  var diterima = senarai.filter(function (x) { return x.status === "Diterima"; });
+  var menunggu = senarai.filter(function (x) { return x.status === "Draf" || x.status === "Dihantar"; });
+
+  bekas.innerHTML =
+    '<div class="grid grid-4">' +
+      kadStat("Quotation", String(senarai.length), quoteBulan ? fmtBulan(quoteBulan) : "semua bulan") +
+      kadStat("Nilai Quotation", rm(jumlah), "semua status") +
+      kadStat("Diterima", String(diterima.length),
+        rm(diterima.reduce(function (t, x) { return t + nom(x.total); }, 0))) +
+      kadStat("Menunggu Jawapan", String(menunggu.length), "draf atau sudah dihantar") +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Senarai Quotation</h3>' +
+        '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnQuoteBaru">Quotation Baharu</button>' +
+          '<button class="btn btn-lembut" id="btnEksportQuote">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<p class="kecil" style="margin:-4px 0 12px">Pautan Terms &amp; Conditions dijana dari halaman ' +
+      "<b>tnc.html</b> yang perlu di-deploy berasingan. Tetapkan alamatnya dalam Tetapan → Quotation.</p>" +
+      '<div class="penapis">' +
+        '<label>Bulan<input type="month" id="fBulanQuote" value="' + esc(quoteBulan) + '"></label>' +
+        '<label style="min-width:220px">Cari<input type="search" id="fCariQuote" placeholder="No. quotation, client…" value="' + esc(quoteCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetQuote">Reset</button>' +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length ? "<table><thead><tr><th>No.</th><th>Tarikh</th><th>Client</th><th>Service</th>" +
+        "<th class='num'>Jumlah</th><th>Sah Hingga</th><th>Status</th><th></th></tr></thead><tbody>" +
+        senarai.map(function (x) {
+          var luput = x.validUntil && x.validUntil < kunciTarikh() && x.status !== "Diterima";
+          return "<tr>" +
+            "<td><b>" + esc(x.no) + "</b></td>" +
+            "<td>" + esc(fmtTarikh(x.tarikh)) + "</td>" +
+            '<td class="bungkus">' + esc(x.client.nama) +
+              (x.client.telefon ? '<div class="kecil">' + esc(x.client.telefon) + "</div>" : "") + "</td>" +
+            '<td class="bungkus">' + esc(x.service) + "</td>" +
+            '<td class="num"><b>' + esc(rm(x.total)) + "</b></td>" +
+            "<td>" + (x.validUntil ? esc(fmtTarikh(x.validUntil)) : "-") +
+              (luput ? '<div class="kecil" style="color:var(--bad)">luput</div>' : "") + "</td>" +
+            '<td><span class="badge ' + (x.status === "Diterima" ? "badge-ok"
+              : x.status === "Ditolak" ? "badge-bad"
+              : x.status === "Dihantar" ? "badge-warn" : "badge-muted") + '">' + esc(x.status) + "</span></td>" +
+            '<td><div class="aksi">' +
+              '<button class="btn btn-lembut" data-quote="' + esc(x.id) + '">Buka</button>' +
+              '<button class="btn btn-lembut" data-cetak-quote="' + esc(x.id) + '">Cetak</button>' +
+            "</div></td></tr>";
+        }).join("") + "</tbody></table>"
+        : kosong("Belum ada quotation. Tekan “Quotation Baharu”.")) +
+      "</div>" +
+    "</div>";
+
+  $("#btnQuoteBaru").onclick = function () { borangQuotation(null, null); };
+  $("#fBulanQuote").onchange = function (e) { quoteBulan = e.target.value; lukisQuotation(bekas); };
+  $("#btnResetQuote").onclick = function () { quoteBulan = ""; quoteCari = ""; lukisQuotation(bekas); };
+  var kotak = $("#fCariQuote");
+  kotak.oninput = function (e) {
+    var pos = e.target.selectionStart;
+    quoteCari = e.target.value;
+    lukisQuotation(bekas);
+    var baharu = $("#fCariQuote", bekas);
+    baharu.focus();
+    baharu.setSelectionRange(pos, pos);
+  };
+  $("#btnEksportQuote").onclick = function () {
+    if (!senarai.length) return toast("Tiada quotation untuk dieksport.", "warn");
+    csv("quotation" + (quoteBulan ? "-" + quoteBulan : ""),
+      ["No", "Tarikh", "Sah Hingga", "Client", "Telefon", "Service", "Jumlah", "Status", "Pecahan"],
+      senarai.map(function (x) {
+        return [x.no, x.tarikh, x.validUntil, x.client.nama, x.client.telefon, x.service,
+                nom(x.total), x.status,
+                (x.fees || []).map(function (f) { return f.nama + ": " + nom(f.jumlah); }).join(" | ")];
+      }));
+  };
+  $$("[data-quote]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatQuotation(b.getAttribute("data-quote")); };
+  });
+  $$("[data-cetak-quote]", bekas).forEach(function (b) {
+    b.onclick = function () { cetakQuotation(b.getAttribute("data-cetak-quote")); };
+  });
+}
+
+/* ======================================================================
    SUB JOB — kerja yang disubkan; tidak dikira dalam jualan syarikat
    ================================================================== */
 var subBulan = "";
@@ -4380,6 +4940,32 @@ function lukisTetapan(bekas) {
           }).join("") : '<span class="kecil">Belum ada hari cuti direkod.</span>') +
         "</div>" +
 
+        '<div class="kad-tajuk" style="margin-top:24px"><h3>Tetapan Quotation</h3>' +
+          '<span class="kecil">Seterusnya: <b>' + esc(nomborQuoteBaharu(data).no) + "</b></span></div>" +
+        '<form id="borangQuoteTetapan">' +
+          '<div class="baris-medan">' +
+            medan("Prefix No.", '<input type="text" name="prefix" value="' + esc(t.quote.prefix) + '">') +
+            medan("Nombor Seterusnya", '<input type="number" min="1" name="nombor" value="' + esc(t.quote.nombor) + '">') +
+            medan("Tempoh Sah (hari)", '<input type="number" min="0" name="tempohSahHari" value="' + esc(t.quote.tempohSahHari) + '">') +
+          "</div>" +
+          medan("Halaman Terms & Conditions (URL)",
+            '<input type="text" name="termsBase" value="' + esc(t.quote.termsBase) + '">') +
+          '<p class="kecil" style="margin:-6px 0 12px">Fail <b>tnc.html</b> dalam projek ini perlu ' +
+          "<b>di-deploy berasingan</b> (contoh Netlify) supaya ada pautan awam. Tampal pautan itu di sini — " +
+          "sistem akan tambah maklumat quotation pada hujung pautan secara automatik.</p>" +
+          medan("Senarai Servis (nama | link skop | link lampiran PDF)",
+            '<textarea name="servis" style="min-height:110px">' +
+            esc((t.quote.servis || []).map(function (x) {
+              return [x.nama, x.scopeLink || "", x.lampiranUrl || ""].join(" | ");
+            }).join("\n")) + "</textarea>") +
+          medan("Pecahan Harga Lalai (nama | harga)",
+            '<textarea name="feeAsal" style="min-height:90px">' +
+            esc((t.quote.feeAsal || []).map(function (x) {
+              return x.nama + " | " + nom(x.jumlah);
+            }).join("\n")) + "</textarea>") +
+          '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan Tetapan Quotation</button></div>' +
+        "</form>" +
+
         '<div class="kad-tajuk" style="margin-top:24px"><h3>Target Ikut Bulan</h3></div>' +
         '<p class="kecil">Bulan yang ditetapkan di sini akan guna target khas ini, bukan kiraan ' +
         "target harian × hari bekerja. Target harian dalam kalendar dikira semula = target bulan ÷ hari bekerja.</p>" +
@@ -4416,6 +5002,7 @@ function lukisTetapan(bekas) {
         '<div class="jumlah-baris"><span>Jumlah resit</span><b>' + data.resit.length + "</b></div>" +
         '<div class="jumlah-baris"><span>Jumlah invois</span><b>' + data.invois.length + "</b></div>" +
         '<div class="jumlah-baris"><span>Jumlah sub job</span><b>' + data.subjob.length + "</b></div>" +
+        '<div class="jumlah-baris"><span>Jumlah quotation</span><b>' + data.quotation.length + "</b></div>" +
         '<div class="jumlah-baris"><span>Jumlah staf</span><b>' + data.staf.length + "</b></div>" +
       "</div>" +
     "</div>" +
@@ -4503,6 +5090,28 @@ function lukisTetapan(bekas) {
     });
     if (!simpan(d)) return;
     toast("Tetapan resit disimpan.", "ok");
+    lukis();
+  };
+
+  $("#borangQuoteTetapan").onsubmit = function (e) {
+    e.preventDefault();
+    var nilai = ambilNilai($("#borangQuoteTetapan"));
+    var d = baca();
+    d.tetapan.quote.prefix = nilai.prefix || "Q";
+    d.tetapan.quote.nombor = Math.max(1, nom(nilai.nombor));
+    d.tetapan.quote.tempohSahHari = Math.max(0, nom(nilai.tempohSahHari));
+    d.tetapan.quote.termsBase = (nilai.termsBase || "").trim();
+    d.tetapan.quote.servis = pecahBaris(nilai.servis).map(function (b) {
+      var bhg = b.split("|");
+      return { nama: (bhg[0] || "").trim(), scopeLink: (bhg[1] || "").trim(),
+               lampiranUrl: (bhg[2] || "").trim() };
+    }).filter(function (x) { return x.nama; });
+    d.tetapan.quote.feeAsal = pecahBaris(nilai.feeAsal).map(function (b) {
+      var bhg = b.split("|");
+      return { nama: (bhg[0] || "").trim(), jumlah: nom(bhg[1]) };
+    }).filter(function (x) { return x.nama; });
+    if (!simpan(d)) return;
+    toast("Tetapan quotation disimpan.", "ok");
     lukis();
   };
 
@@ -4602,6 +5211,7 @@ var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
   operasi: '<svg viewBox="0 0 24 24"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>',
+  quote: '<svg viewBox="0 0 24 24"><path d="M4 4h12l4 4v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M8 11h8M8 15h5"/><path d="M15 4v5h5"/></svg>',
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
@@ -4613,6 +5223,7 @@ var HALAMAN = [
   { id: "papan",   label: "Papan Utama",  ikon: IKON.papan,   lukis: lukisPapan },
   { id: "sale",    label: "Key-in Sale",  ikon: IKON.sale,    lukis: lukisSale },
   { id: "operasi", label: "Operasi",      ikon: IKON.operasi, lukis: lukisOperasi },
+  { id: "quote",   label: "Quotation",    ikon: IKON.quote,   lukis: lukisQuotation },
   { id: "subjob",  label: "Sub Job",      ikon: IKON.subjob,  lukis: lukisSubJob },
   { id: "invois",  label: "Invois",       ikon: IKON.invois,  lukis: lukisInvois },
   { id: "resit",   label: "Resit",        ikon: IKON.resit,   lukis: lukisResit },

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Syarat & Terma Pemeriksaan</title>
+<style>
+  :root{ --brand:#1a3d7c; --ink:#1f2937; --muted:#6b7280; --bg:#f5f7fb; --card:#ffffff; --warn:#eab308; --line:#e5e7eb; --ok:#0ea5e9; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:980px;margin:0 auto;padding:16px}
+  .card{background:var(--card);border-radius:16px;box-shadow:0 6px 20px rgba(20,35,70,.07);padding:18px}
+  header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .brand{font-weight:800;color:var(--brand);letter-spacing:.3px}
+  .lang{display:flex;gap:8px;align-items:center}
+  .seg{display:inline-flex;border:1px solid #cfd6e4;border-radius:12px;overflow:hidden}
+  .seg button{padding:8px 12px;border:0;background:transparent;color:var(--ink);font-weight:700;cursor:pointer}
+  .seg button.active{background:var(--brand);color:#fff}
+  .muted{color:var(--muted);font-size:13px}
+  .row{display:grid;grid-template-columns:1fr;gap:14px}
+  @media (min-width:760px){ .row{grid-template-columns:1.2fr .8fr} }
+  h2{font-size:18px;margin:16px 0 8px}
+  ul{margin:8px 0 0 20px} li{margin:6px 0}
+  .note{padding:10px;border-left:4px solid var(--warn);background:#fffbe8;border-radius:8px;margin-top:8px}
+  .bar{height:1px;background:var(--line);margin:12px 0}
+  .inputs{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
+  .inputs input,.inputs textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit}
+  .agree{display:flex;gap:10px;align-items:flex-start;margin-top:8px}
+  .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer}
+  .btn-primary{background:var(--brand);color:#fff}
+  .btn-ghost{background:#eef2ff;color:#334155}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .small{font-size:12px}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,10,30,.35);display:none;align-items:center;justify-content:center;padding:16px;z-index:30}
+  .modal{background:#fff;border-radius:16px;max-width:520px;width:100%;padding:16px;box-shadow:0 12px 30px rgba(0,0,0,.2)}
+  .modal h3{margin:0 0 8px}
+  .view{display:none} .view.active{display:block}
+  .tbl{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;background:#fff}
+  .tbl thead th{background:#f7f9ff !important;text-align:left;font-size:14px}
+  .tbl tr:last-child td{border-bottom:0}
+  .chip{display:inline-block;background:#eef2ff;padding:2px 8px;border-radius:999px;font-size:12px;margin:2px 6px 2px 0;white-space:nowrap}
+  .quoteBox{background:#ecfbff;border-left:4px solid var(--ok);padding:12px;border-radius:12px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ========= VIEW: TERMS ========= -->
+  <div id="view-terms" class="card view active">
+    <header>
+      <div>
+        <div class="brand" id="t_title">Syarat & Terma Pemeriksaan</div>
+        <div class="muted" id="t_sub">Sila baca sebelum setuju & pilih tarikh.</div>
+      </div>
+      <div class="lang">
+        <span class="muted" id="t_lang">Bahasa</span>
+        <div class="seg" role="tablist" aria-label="language switch">
+          <button id="btn-ms" class="active" aria-selected="true">BM</button>
+          <button id="btn-en" aria-selected="false">EN</button>
+        </div>
+      </div>
+    </header>
+
+<div class="note">
+      <strong id="t_util_title">Utiliti & Pengesahan Slot</strong> —
+      <span id="t_util_desc">
+        Jika utiliti tiada pada lawatan pertama, pemeriksaan lain diteruskan; lawatan utiliti kedua akan dicaj; tiada pengurangan harga.
+        Tarikh yang dipilih adalah <b>tertakluk kepada pengesahan admin</b> (pemilihan tidak menjamin slot).
+      </span>
+    </div>
+
+<div class="row">
+      <!-- LEFT: Terms -->
+      <div>
+        <h2 id="t_pre_title">Pra-Pemeriksaan (Tanggungjawab Pelanggan)</h2>
+        <ul id="t_pre_list"></ul>
+
+<h2 id="t_scope_title">Skop Pemeriksaan (Ringkas)</h2>
+        <ul id="t_scope_list"></ul>
+
+<div class="cta">
+          <button id="btnDetail" class="btn btn-ghost">🔎 <span id="t_view_detail">Lihat Skop Terperinci</span></button>
+        </div>
+
+<h2 id="t_payment_title">Bayaran & Jadual</h2>
+        <ul id="t_payment_list"></ul>
+
+<details>
+          <summary id="t_more_title">Butiran Tambahan</summary>
+          <ul id="t_more_list"></ul>
+        </details>
+      </div>
+
+<!-- RIGHT: Your details + Quote + Agree -->
+      <div>
+        <h2 id="t_quote_title">Ringkasan Quotation</h2>
+        <div id="quoteBox" class="quoteBox">
+          <div><b id="q_service">Perkhidmatan:</b> <span id="q_service_val">-</span></div>
+          <div><b id="q_price">Jumlah:</b> <span id="q_price_val">-</span></div>
+          <div class="mono" id="q_breakdown" style="margin:6px 0 0"></div>
+          <div><b id="q_quote">No. Quotation:</b> <span id="q_quote_val">-</span></div>
+          <div><b id="q_valid">Sah hingga:</b> <span id="q_valid_val">-</span></div>
+          <div class="muted small" id="q_note">Harga khusus pautan ini & tertakluk pengesahan admin.</div>
+        </div>
+
+<div class="bar"></div>
+
+<h2 id="t_your_details">Butiran Anda (pilihan)</h2>
+        <div class="inputs">
+          <input id="in_name" type="text" placeholder="Nama Penuh / Full Name (optional)" />
+          <textarea id="in_addr" rows="3" placeholder="Alamat Unit (optional)"></textarea>
+        </div>
+
+<div class="bar"></div>
+
+<div class="agree">
+          <input id="chk" type="checkbox" aria-labelledby="t_agree_label" />
+          <label id="t_agree_label" for="chk">
+            Saya telah membaca & bersetuju, termasuk <b>deposit RM100 tidak dipulangkan selepas tarikh disahkan</b>, klausa utiliti, dan bahawa <b>tarikh pilihan tertakluk kepada pengesahan admin</b>.
+          </label>
+        </div>
+
+<div class="cta">
+          <button id="btnAgree" class="btn btn-primary" disabled>✔ Saya Setuju</button>
+          <button id="btnReset" class="btn btn-ghost" type="button">Reset</button>
+        </div>
+
+<p class="muted small" style="margin-top:6px" id="t_after_agree">
+          Selepas tekan “Saya Setuju”, popup akan minta tarikh & catatan, kemudian WhatsApp akan dibuka untuk pengesahan.
+        </p>
+      </div>
+    </div>
+  </div>
+
+<!-- ========= VIEW: DETAILED SCOPE ========= -->
+  <div id="view-scope" class="card view">
+    <header style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="brand" id="t_scope_big_title">Skop Terperinci Pemeriksaan</div>
+        <div class="muted" id="t_scope_big_sub">Senarai elemen, jenis kecacatan & kaedah ujian/alat.</div>
+      </div>
+      <div class="lang">
+        <span class="muted" id="t_lang2">Bahasa</span>
+        <div class="seg" role="tablist" aria-label="language switch">
+          <button id="btn2-ms" class="active" aria-selected="true">BM</button>
+          <button id="btn2-en" aria-selected="false">EN</button>
+        </div>
+      </div>
+    </header>
+
+<p class="note" id="t_scope_note">Tip: Halaman ini menggunakan “hash routing”. Butang back pada telefon/penyemak imbas akan kembali ke Syarat & Terma.</p>
+
+<table class="tbl" id="matrix">
+      <thead>
+        <tr>
+          <th style="width:48px">#</th>
+          <th id="th_elem">Elemen</th>
+          <th id="th_type">Jenis Kecacatan</th>
+          <th id="th_tools">Ujian / Alat</th>
+        </tr>
+      </thead>
+      <tbody id="matrix_body"></tbody>
+    </table>
+
+<div class="cta" style="margin-top:12px">
+      <button id="btnBackTerms" class="btn btn-ghost">← <span id="t_back_terms">Kembali ke Syarat & Terma</span></button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== Modal Pilih Tarikh & Catatan ===== -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m_title">
+    <h3 id="m_title">Pilih Tarikh Pemeriksaan</h3>
+    <p class="muted" id="m_desc">Pilih tarikh (wajib). Admin akan sahkan ketersediaan slot.</p>
+    <div class="inputs">
+      <input id="md_date" type="date" />
+      <input id="md_note" type="text" placeholder="Catatan (optional) — contoh: prefer slot pagi / boleh wakilkan" />
+    </div>
+    <div class="cta" style="margin-top:10px">
+      <button id="m_cancel" class="btn btn-ghost">Kembali</button>
+      <button id="m_ok" class="btn btn-primary">Teruskan</button>
+    </div>
+    <p class="muted small" style="margin-top:6px" id="m_priv">WhatsApp akan dibuka ke 011-3144 6591 (Go Home Inspection).</p>
+  </div>
+</div>
+
+<script>
+/* ===== MATRIX DATA (ringkas) — kekal macam versi abang yang betul ejaan ===== */
+const DATA_MATRIX = [
+  { no:1, element_ms:"Lantai", element_en:"Floor",
+    types_ms:["Kemasan","Kekosongan (Hollowness)","Kelegaan/Keolengan (Alignment)","Kerosakan Kecil","Kerosakan Besar"],
+    types_en:["Finishing","Hollowness","Alignment","Minor Damage","Major Damage"],
+    tools_ms:["Visual & tools","Hollowness test","Alignment test"],
+    tools_en:["Visual & tools","Hollowness test","Alignment test"]
+  },
+  { no:2, element_ms:"Dinding", element_en:"Wall",
+    types_ms:["Kemasan","Kekosongan (Hollowness)","Alignment","Kerosakan Kecil","Kerosakan Besar","Kelembapan/Kebocoran","Kelembapan/Kebocoran (Visual)"],
+    types_en:["Finishing","Hollowness","Alignment","Minor Damage","Major Damage","Moisture/Leak","Moisture/Leak (Visual)"],
+    tools_ms:["Visual & tools","Alignment test","Thermal test","Moisture detector"],
+    tools_en:["Visual & tools","Alignment test","Thermal test","Moisture detector"]
+  },
+  { no:3, element_ms:"Siling", element_en:"Ceiling",
+    types_ms:["Kemasan","Alignment","Kerosakan Kecil","Kerosakan Besar","Kelembapan/Kebocoran","Kelembapan/Kebocoran (Visual)"],
+    types_en:["Finishing","Alignment","Minor Damage","Major Damage","Moisture/Leak","Moisture/Leak (Visual)"],
+    tools_ms:["Visual & tools","Thermal test","Moisture detector"],
+    tools_en:["Visual & tools","Thermal test","Moisture detector"]
+  },
+  { no:4, element_ms:"Bukaan (Pintu/Tingkap)", element_en:"Openings (Doors/Windows)",
+    types_ms:["Kemasan","Alignment","Kerosakan Kecil","Kerosakan Besar","Kecacatan Lembapan","Fungsi","Item Hilang"],
+    types_en:["Finishing","Alignment","Minor Damage","Major Damage","Moisture Defect","Functionality","Missing Item"],
+    tools_ms:["Visual & tools","Thermal test","Moisture detector","Ujian fungsi"],
+    tools_en:["Visual & tools","Thermal test","Moisture detector","Function tests"]
+  },
+  { no:5, element_ms:"Perpaipan", element_en:"Plumbing",
+    types_ms:["Kemasan","Alignment","Kerosakan Kecil","Kerosakan Besar","Kebocoran","Fungsi","Item Hilang","Kebocoran (Visual)"],
+    types_en:["Finishing","Alignment","Minor Damage","Major Damage","Leak","Functionality","Missing Item","Leak (Visual)"],
+    tools_ms:["Visual & tools","Flushing test","Pressure test","Thermal test","Moisture detector"],
+    tools_en:["Visual & tools","Flushing test","Pressure test","Thermal test","Moisture detector"]
+  },
+  { no:6, element_ms:"Elektrikal", element_en:"Electrical",
+    types_ms:["Kemasan","Alignment","Kerosakan Kecil","Kerosakan Besar","Fungsi","Item Hilang","Piawaian & Peraturan"],
+    types_en:["Finishing","Alignment","Minor Damage","Major Damage","Functionality","Missing Item","Standards & Regulations"],
+    tools_ms:["Ujian voltan (buka DB jika perlu)","Ujian RCCB","Ujian soket 13A/15A","Ujian lampu/kipas/AC/pemanas air","Ujian bumi (earth)","Ujian penebatan (insulation)","Ujian beban (load)"],
+    tools_en:["Voltage test (open DB if needed)","RCCB test","13A/15A socket test","Light/Fan/AC/Water heater point test","Earth test","Insulation test","Load test"]
+  },
+  { no:7, element_ms:"Atas Siling", element_en:"Above Ceiling",
+    types_ms:["Isu Struktur","Kemasan","Alignment","Kerosakan Kecil","Kerosakan Besar","Fungsi","Item Hilang","Piawaian & Peraturan"],
+    types_en:["Structure Issue","Finishing","Alignment","Minor Damage","Major Damage","Functionality","Missing Item","Standards & Regulations"],
+    tools_ms:["Visual & tools"], tools_en:["Visual & tools"]
+  },
+  { no:8, element_ms:"Kawasan Tangki Air", element_en:"Water Tank Area",
+    types_ms:["Keperluan Garis Panduan Pemasangan","Kemasan","Alignment","Kerosakan Kecil","Kerosakan Besar","Fungsi","Item Hilang","Piawaian & Peraturan"],
+    types_en:["Installation Guideline Requirement","Finishing","Alignment","Minor Damage","Major Damage","Functionality","Missing Item","Standards & Regulations"],
+    tools_ms:["Visual & tools"], tools_en:["Visual & tools"]
+  },
+  { no:9, element_ms:"Bumbung", element_en:"Roof",
+    types_ms:["Kemasan","Alignment","Kerosakan Kecil","Kerosakan Besar","Fungsi","Item Hilang"],
+    types_en:["Finishing","Alignment","Minor Damage","Major Damage","Functionality","Missing Item"],
+    tools_ms:["Visual & tools"], tools_en:["Visual & tools"]
+  },
+  { no:10, element_ms:"Semakan S&P", element_en:"S&P Review",
+    types_ms:["Semak pelan lantai & reka bentuk","Spesifikasi Bangunan"],
+    types_en:["Review floor plan & design","Building Specification"],
+    tools_ms:["Visual & peralatan ukuran","Semakan dokumen"],
+    tools_en:["Visual & measurement tools","Document review"]
+  },
+  { no:11, element_ms:"Ujian Kolam Air", element_en:"Water Ponding Test",
+    types_ms:["Ujian Fungsian"], types_en:["Functional Test"],
+    tools_ms:["Setup kolam air & pemerhatian"], tools_en:["Water ponding setup & observation"]
+  }
+];
+
+const STR = {
+  ms:{
+    title:"Syarat & Terma Pemeriksaan", sub:"Sila baca sebelum setuju & pilih tarikh.", lang:"Bahasa",
+    util_title:"Utiliti & Pengesahan Slot",
+    util_desc:"Jika utiliti tiada pada lawatan pertama, pemeriksaan lain diteruskan; lawatan utiliti kedua akan dicaj; tiada pengurangan harga. Tarikh yang dipilih adalah tertakluk kepada pengesahan admin (pemilihan tidak menjamin slot).",
+    pre_title:"Pra-Pemeriksaan (Tanggungjawab Pelanggan)",
+    pre_list:[
+      "Pastikan bekalan air & elektrik aktif sebelum pemeriksaan.",
+      "Jika anda sibuk: boleh wakilkan orang lain, atau tinggalkan kunci pada pihak dipercayai. Jangan kunci rumah pada hari pemeriksaan supaya pemeriksa boleh masuk.",
+      "Sediakan kunci/akses kad/QR/letter of authorization pada masa dipersetujui.",
+      "Sediakan S&P/pelan lantai/senarai perubahan (jika ada) untuk ketepatan semakan.",
+      "Jika utiliti tiada semasa lawatan pertama, pemeriksaan aspek lain tetap diteruskan. Lawatan kedua untuk utiliti akan dicaj. Tiada pengurangan harga pemeriksaan pertama."
+    ],
+    scope_title:"Skop Pemeriksaan (Ringkas)",
+    scope_list:[
+      "Pemeriksaan visual & ujian fungsi asas (air, elektrik, pintu/tingkap, kebocoran jelas, kemasan, alignment).",
+      "Tanpa kerja bukaan/ujian makmal/ujian beban struktur; kawasan risiko tinggi boleh ditangguh atas faktor keselamatan.",
+      "Perincian penuh tersedia dalam ‘Skop Terperinci’."
+    ],
+    view_detail:"Lihat Skop Terperinci",
+    pay_title:"Bayaran & Jadual",
+    pay_list:[
+      "Deposit RM100 diperlukan untuk mengunci tarikh; tidak dipulangkan selepas tarikh disahkan.",
+      "Baki bayaran dibayar selepas laporan siap (sebelum serahan laporan akhir).",
+      "Pembatalan >48 jam: deposit dipindah ke tarikh baharu. ≤48 jam: deposit hangus & perlu ditetapkan semula dengan deposit baharu."
+    ],
+    more_title:"Butiran Tambahan",
+    more_list:[
+      "Laporan PDF dengan foto; satu pusingan pembetulan minor (fakta/typo) dibenarkan.",
+      "Rakaman foto untuk laporan & QA; data peribadi digunakan untuk tujuan perkhidmatan sahaja.",
+      "Dapatan adalah pada masa pemeriksaan; perubahan selepas itu di luar kawalan."
+    ],
+    your_details:"Butiran Anda (pilihan)",
+    after_agree:"Selepas tekan “Saya Setuju”, popup akan minta tarikh & catatan, kemudian WhatsApp akan dibuka untuk pengesahan.",
+    btn_agree:"✔ Saya Setuju",
+    // scope view
+    scope_big_title:"Skop Terperinci Pemeriksaan",
+    scope_big_sub:"Senarai elemen, jenis kecacatan & kaedah ujian/alat.",
+    scope_note:"Tip: Halaman ini menggunakan “hash routing”. Butang back pada telefon/penyemak imbas akan kembali ke Syarat & Terma.",
+    th_elem:"Elemen", th_type:"Jenis Kecacatan", th_tools:"Ujian / Alat",
+    back_terms:"Kembali ke Syarat & Terma",
+    // modal
+    m_title:"Pilih Tarikh Pemeriksaan", m_desc:"Pilih tarikh (wajib). Admin akan sahkan ketersediaan slot.",
+    m_priv:"WhatsApp akan dibuka ke 011-3144 6591 (Go Home Inspection).",
+    m_back:"Kembali", m_ok:"Teruskan",
+    // WhatsApp confirm text (TERMASUK QUOTE RINGKAS)
+    wa_text:(date,name,addr,note,quoteObj)=>`Saya ingin SAHKAN PERSETUJUAN pemeriksaan rumah.
+
+• Tarikh dipilih: ${date}
+${name?`• Nama: ${name}\n`:""}${addr?`• Alamat: ${addr}\n`:""}${note?`• Catatan: ${note}\n`:""}
+Ringkasan Quotation:
+• No. Quotation: ${quoteObj.quote||"-"}
+• Perkhidmatan: ${quoteObj.service||"-"}
+• Jumlah: ${quoteObj.cur||"RM"} ${fmt(quoteObj.price)}
+${quoteObj.hasBreakdown ? `• Pecahan:\n${quoteObj.fees.map(f=>`  - ${f.name}: ${quoteObj.cur||"RM"} ${fmt(f.amount)}`).join("\n")}` : ""}${quoteObj.valid?`\n• Sah hingga: ${quoteObj.valid}`:""}
+
+Saya faham & bersetuju:
+- Deposit RM100 tidak dipulangkan selepas tarikh disahkan.
+- Jika bekalan air atau elektrik tiada semasa lawatan pertama, pemeriksaan akan tetap dijalankan untuk aspek lain. Caj lawatan kedua akan dikenakan sekiranya anda ingin pemeriksaan semula bagi utiliti. Tiada pengurangan harga untuk pemeriksaan pertama.
+
+Nota: Tarikh tertakluk kepada pengesahan admin (pemilihan tidak menjamin slot).`
+  },
+  en:{
+    /* Eng strings kept for toggle, not critical for flow */
+    title:"Inspection Terms & Conditions", sub:"Please read before you agree & choose a date.", lang:"Language",
+    util_title:"Utilities & Slot Confirmation",
+    util_desc:"If utilities are unavailable on the first visit, other checks proceed; a second utility visit is chargeable; no price reduction. The selected date is subject to admin confirmation (selection does not guarantee the slot).",
+    pre_title:"Pre-Inspection (Customer Responsibilities)",
+    pre_list:[
+      "Ensure water & electricity are active before inspection.",
+      "If you’re busy: appoint a representative or leave the keys with a trusted party. Do not keep the unit locked on inspection day so the inspector can enter.",
+      "Provide keys/access card/QR/letter of authorization at the agreed time.",
+      "Prepare S&P/floor plan/list of alterations (if any) for accurate checks.",
+      "If utilities are unavailable during the first visit, other aspects will be inspected. A second visit for utilities will be chargeable. No reduction to the first inspection fee."
+    ],
+    scope_title:"Inspection Scope (Summary)",
+    scope_list:[
+      "Visual checks & basic functional tests (water, power, doors/windows, visible leaks, finishes, alignment).",
+      "No destructive works/lab/structural load tests; high-risk areas may be postponed for safety.",
+      "Full details available in ‘Detailed Scope’."
+    ],
+    view_detail:"View Detailed Scope",
+    pay_title:"Payments & Scheduling",
+    pay_list:[
+      "RM100 deposit to lock the date; non-refundable once the date is confirmed.",
+      "Balance is due after the report is completed (before final release).",
+      "Cancellation >48h: deposit moved to a new date. ≤48h: deposit forfeited; a new deposit is required for re-booking."
+    ],
+    more_title:"Additional Details",
+    more_list:[
+      "PDF report with photos; one round of minor factual/typo corrections allowed.",
+      "Photos for reporting & QA; personal data used only for service communication.",
+      "Findings reflect the unit condition at the time of inspection; later changes are beyond our control."
+    ],
+    your_details:"Your Details (optional)",
+    after_agree:"After clicking “I Agree”, a popup will ask for the date & notes, then WhatsApp will open to confirm.",
+    btn_agree:"✔ I Agree",
+    scope_big_title:"Detailed Inspection Scope", scope_big_sub:"List of elements, defect types & test methods/tools.",
+    scope_note:"Tip: This page uses hash routing. Your phone/browser back button will return to Terms.",
+    th_elem:"Element", th_type:"Type of Defect", th_tools:"Testing / Tools",
+    back_terms:"Back to Terms",
+    m_title:"Choose Inspection Date", m_desc:"Select a date (required). Admin will confirm slot availability.",
+    m_priv:"WhatsApp will open to 011-3144 6591 (Go Home Inspection).", m_back:"Back", m_ok:"Continue",
+    wa_text:(date,name,addr,note,quoteObj)=>`I would like to CONFIRM my agreement for a home inspection.
+
+• Selected date: ${date}
+${name?`• Name: ${name}\n`:""}${addr?`• Address: ${addr}\n`:""}${note?`• Notes: ${note}\n`:""}
+Quotation Summary:
+• Quotation No.: ${quoteObj.quote||"-"}
+• Service: ${quoteObj.service||"-"}
+• Total: ${quoteObj.cur||"RM"} ${fmt(quoteObj.price)}
+${quoteObj.hasBreakdown ? `• Breakdown:\n${quoteObj.fees.map(f=>`  - ${f.name}: ${quoteObj.cur||"RM"} ${fmt(f.amount)}`).join("\n")}` : ""}${quoteObj.valid?`\n• Valid until: ${quoteObj.valid}`:""}
+
+I acknowledge & agree:
+- RM100 deposit is non-refundable once a date is confirmed.
+- If utilities are unavailable during the first visit, a second visit will be chargeable for utility checks. No reduction will be applied to the first inspection fee.
+
+Note: Date is subject to admin confirmation (selection does not guarantee the slot).`
+  }
+};
+
+/* ===== HOOKS ===== */
+const els = {
+  viewTerms: q("#view-terms"), viewScope: q("#view-scope"),
+  btnMS: q("#btn-ms"), btnEN: q("#btn-en"), btn2MS: q("#btn2-ms"), btn2EN: q("#btn2-en"),
+  preList: q("#t_pre_list"), scopeList: q("#t_scope_list"), payList: q("#t_payment_list"), moreList: q("#t_more_list"),
+  th_elem: q("#th_elem"), th_type: q("#th_type"), th_tools: q("#th_tools"),
+  btnDetail: q("#btnDetail"), btnBackTerms: q("#btnBackTerms"),
+  btnAgree: q("#btnAgree"), btnReset: q("#btnReset"),
+  chk: q("#chk"), inName: q("#in_name"), inAddr: q("#in_addr"),
+  modal: q("#modal"), mdDate: q("#md_date"), mdNote: q("#md_note"),
+  mCancel: q("#m_cancel"), mOk: q("#m_ok"),
+  matrixBody: q("#matrix_body"),
+  // quote box
+  qServiceVal: q("#q_service_val"), qPriceVal: q("#q_price_val"),
+  qQuoteVal: q("#q_quote_val"), qValidVal: q("#q_valid_val"),
+  qBreak: q("#q_breakdown"),
+  t: (id)=>q("#"+id)
+};
+
+let LANG = localStorage.getItem("lang") || "ms";
+applyLang(LANG);
+renderMatrix();
+
+// === parse params ===
+const qp = new URLSearchParams(location.search);
+const QUOTE = {
+  price: num(qp.get("price")), cur: qp.get("cur") || "RM", quote: qp.get("quote") || "",
+  service: qp.get("service") || "Home Inspection", valid: qp.get("valid") || "", client: qp.get("client") || "",
+  fees: []
+};
+// Parse dynamic fee breakdown: fee0_name, fee0_amt, fee1_name, fee1_amt, ...
+for(let i=0; i<50; i++){
+  const fname = qp.get("fee"+i+"_name");
+  const famt = qp.get("fee"+i+"_amt");
+  if(fname===null && famt===null) break;
+  QUOTE.fees.push({ name: fname||"Item", amount: num(famt)||0 });
+}
+QUOTE.hasBreakdown = QUOTE.fees.length > 0;
+
+renderQuoteBox();
+
+// === date min today ===
+const today = new Date(); const minDate = today.toISOString().slice(0,10); els.mdDate.min = minDate;
+
+// === interactions ===
+els.chk.addEventListener("change", ()=> els.btnAgree.disabled = !els.chk.checked);
+els.btnReset.addEventListener("click", ()=>{ els.chk.checked=false; els.btnAgree.disabled=true; els.inName.value=""; els.inAddr.value=""; });
+
+els.btnAgree.addEventListener("click", ()=>{ els.mdDate.value=minDate; els.mdNote.value=""; showModal(true); });
+els.mCancel.addEventListener("click", ()=> showModal(false));
+els.mOk.addEventListener("click", ()=>{
+  if(!els.mdDate.value){ alert(LANG==="ms"?"Sila pilih tarikh.":"Please choose a date."); return; }
+  showModal(false); openWhatsApp(els.mdDate.value, els.mdNote.value);
+});
+
+// language toggles
+[els.btnMS,els.btn2MS].forEach(b=>b.addEventListener("click",()=>setLang("ms")));
+[els.btnEN,els.btn2EN].forEach(b=>b.addEventListener("click",()=>setLang("en")));
+
+// routing
+els.btnDetail.addEventListener("click", ()=> location.hash="#scope");
+els.btnBackTerms.addEventListener("click", ()=> history.back());
+window.addEventListener("hashchange", handleRoute);
+handleRoute();
+
+/* ====== FUNCTIONS ====== */
+function q(s){ return document.querySelector(s); }
+function num(v){ const n = Number(v); return isFinite(n)?n:NaN; }
+function fmt(n){ return Number(n||0).toFixed(2); }
+
+function setLang(lang){ LANG=lang; localStorage.setItem("lang",lang); applyLang(lang); renderMatrix(); renderQuoteBox(); }
+
+function applyLang(lang){
+  const S = STR[lang]; document.documentElement.lang = (lang==="ms"?"ms":"en");
+  ["t_title","t_sub","t_lang","t_util_title","t_util_desc","t_pre_title","t_scope_title","t_view_detail","t_payment_title","t_more_title","t_your_details","t_after_agree","t_scope_big_title","t_scope_big_sub","t_lang2","t_scope_note","t_back_terms","m_title","m_desc","m_priv"].forEach(id=>{
+    const el = els.t(id); if(el){ el.textContent = S[id.replace(/t_|m_/,"")]; }
+  });
+  setList(els.preList, S.pre_list); setList(els.scopeList, S.scope_list); setList(els.payList, S.pay_list); setList(els.moreList, S.more_list);
+  els.th_elem.textContent = S.th_elem; els.th_type.textContent = S.th_type; els.th_tools.textContent = S.th_tools;
+  ["btn-ms","btn2-ms"].forEach(id=>{ q("#"+id).classList.toggle("active", lang==="ms"); q("#"+id).setAttribute("aria-selected", lang==="ms"); });
+  ["btn-en","btn2-en"].forEach(id=>{ q("#"+id).classList.toggle("active", lang==="en"); q("#"+id).setAttribute("aria-selected", lang==="en"); });
+  q("#btnAgree").textContent = S.btn_agree;
+}
+
+function setList(container, items){
+  container.innerHTML=""; items.forEach(t=>{ const li=document.createElement("li"); li.textContent=t; container.appendChild(li); });
+}
+function renderMatrix(){
+  const isMS = (LANG==="ms"); els.matrixBody.innerHTML="";
+  DATA_MATRIX.forEach(item=>{
+    const tr=document.createElement("tr");
+    const tdNo=document.createElement("td"); tdNo.textContent=item.no;
+    const tdEl=document.createElement("td"); tdEl.textContent=isMS?item.element_ms:item.element_en;
+    const tdType=document.createElement("td");
+    (isMS?item.types_ms:item.types_en).forEach(t=>{ const span=document.createElement("span"); span.className="chip"; span.textContent=t; tdType.appendChild(span); });
+    const tdTools=document.createElement("td");
+    (isMS?item.tools_ms:item.tools_en).forEach(t=>{ const div=document.createElement("div"); div.textContent="• "+t; tdTools.appendChild(div); });
+    tr.append(tdNo,tdEl,tdType,tdTools); els.matrixBody.appendChild(tr);
+  });
+}
+
+function renderQuoteBox(){
+  const cur = QUOTE.cur||"RM";
+  const priceLine = isFinite(QUOTE.price) ? `${cur} ${fmt(QUOTE.price)}` : "-";
+  els.qServiceVal.textContent = QUOTE.service||"-";
+  els.qPriceVal.textContent = priceLine;
+  els.qQuoteVal.textContent = QUOTE.quote||"-";
+  els.qValidVal.textContent = QUOTE.valid||"-";
+  if(QUOTE.hasBreakdown){
+    const breakText = QUOTE.fees.map(f => `${f.name} ${cur} ${fmt(f.amount)}`).join(" • ");
+    els.qBreak.innerHTML = `Pecahan: ${breakText}`;
+  } else {
+    els.qBreak.innerHTML = `<span class="muted">Pecahan tidak disediakan.</span>`;
+  }
+}
+
+function showModal(show){ els.modal.style.display = show ? "flex" : "none"; }
+
+function openWhatsApp(date, note){
+  const name=(els.inName.value||"").trim();
+  const addr=(els.inAddr.value||"").trim();
+  const to="601131446591";
+  const S = STR[LANG];
+  const text = S.wa_text(date,name,addr,(note||"").trim(), QUOTE);
+  const url = `https://wa.me/${to}?text=${encodeURIComponent(text)}`;
+  window.open(url,"_blank");
+}
+
+function handleRoute(){ if(location.hash==="#scope"){ els.viewTerms.classList.remove("active"); els.viewScope.classList.add("active"); } else { els.viewScope.classList.remove("active"); els.viewTerms.classList.add("active"); } }
+</script>
+</body>
+</html>

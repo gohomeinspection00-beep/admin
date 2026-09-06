@@ -15,6 +15,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Papan Utama** | **Jalur amaran tugasan tertunggak di atas sekali**, jualan bulan ini, deposit, baki, % capai target, bilangan site, **carta 12 bulan (boleh tukar Jualan RM ↔ bilangan Site)**, job hari ini, kerja tertunggak, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf ditugaskan, job belum ditugaskan, beban kerja 7 hari, **carta tugasan inspector bulan ini**, **nilai site setiap inspector**, tugasan report & submission, tukar status terus dari jadual |
+| **Quotation** | Jana sebut harga A4, pautan Syarat & Terma untuk client, mesej WhatsApp, dan tukar quotation yang diterima menjadi sale |
 | **Sub Job** | Kerja yang disubkan — direkod berasingan daripada jualan syarikat, dengan agihan RM kepada setiap staf/rakan dan baki bahagian syarikat |
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
@@ -213,6 +214,31 @@ Catatan: Client minta pagi
 Baris yang tak diisi diabaikan. Tarikh menerima `8/9/2026`, `08-09-2026` atau
 `2026-09-08`. Masa boleh guna `-`, `–` atau `hingga`. Staf inspection dipisah
 dengan koma dan terus ditandakan dalam borang.
+
+## Quotation
+
+Menu **Quotation** menjana sebut harga lengkap:
+
+1. **Quotation Baharu** (atau dari butiran jualan → *Buat Quotation*)
+2. Isi client, jenis hartanah, alamat, service, dan **pecahan harga**
+   (baris lalai: Inspection Fee, Transportation, PDF Report, Consultation —
+   boleh tambah/buang). Jumlah dikira automatik
+3. Tekan **Jana Quotation** — terus dapat:
+   - **Quotation A4** (pratonton + Cetak/Simpan PDF) dengan logo, pecahan harga,
+     "Apa Yang Kami Lakukan", nota penting dan tandatangan
+   - **Pautan Syarat & Terma** untuk client (harga & pecahan dibawa dalam pautan)
+   - **Mesej WhatsApp** siap (BM atau English) — salin atau hantar terus
+
+Status quotation: Draf → Dihantar → Diterima / Ditolak / Luput.
+Quotation yang **Diterima** boleh ditekan **Jadikan Sale** — borang key-in sale
+terbuka dengan nama, telefon, alamat dan harga sudah terisi.
+
+Tetapan → **Tetapan Quotation**: prefix & nombor seterusnya, tempoh sah,
+senarai servis (nama | link skop | link lampiran PDF), pecahan harga lalai, dan
+**URL halaman Syarat & Terma**.
+
+> **Halaman `tnc.html` mesti di-deploy berasingan** supaya client boleh buka
+> pautan itu. Lihat `DEPLOY.md` untuk langkah penuh.
 
 ## Sub Job
 
