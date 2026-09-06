@@ -12,9 +12,9 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 
 | Menu | Kegunaan |
 |---|---|
-| **Papan Utama** | Jualan bulan ini, deposit dikutip, baki belum kutip, % capai target, job hari ini, senarai perlu tindakan, prestasi ikut sales & projek |
+| **Papan Utama** | Jualan bulan ini, deposit, baki, % capai target, bilangan site, **carta jualan 12 bulan** (naik/turun berbanding bulan lepas), job hari ini, kerja tertunggak, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
-| **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf yang ditugaskan, job belum ditugaskan, beban kerja 7 hari, tukar status terus dari jadual |
+| **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf ditugaskan, job belum ditugaskan, beban kerja 7 hari, **carta tugasan inspector bulan ini**, **nilai site setiap inspector**, tugasan report & submission, tukar status terus dari jadual |
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
@@ -225,10 +225,34 @@ Target bulan = Target harian × bilangan hari bekerja (tolak hari cuti)
 
 ## Status kerja
 
-`Tempahan` → `Inspection Siap` → `Report Submit` → `Selesai`
-(`Batal` untuk job yang dibatalkan — tidak dikira dalam jualan)
+Senarai status **boleh diubah sendiri** dalam Tetapan (satu baris satu, ikut turutan).
+Default:
 
-Nombor merah pada menu **Key-in Sale** = bilangan job yang report belum submit.
+`Tempahan` → `Inspection Siap` → `Report Siap` → `Submit Report` → `Submit App`
+→ `Minta Bayaran` → `Selesai` · `Batal`
+
+Dalam Tetapan juga ditetapkan status mana bermaksud **Selesai** dan **Batal**,
+serta **Tempoh Pending (hari)** — default 3 hari.
+
+Setiap status ada warna sendiri dalam kalendar. Job yang belum sampai status
+Selesai selepas tempoh pending (dikira dari tarikh inspection) akan:
+
+- ditanda **bingkai merah + lencana bilangan hari** dalam kalendar
+- naik dalam **Perlu Tindakan** di papan utama, dikumpul mengikut status semasa
+  (contoh: *Tersekat di "Report Siap" (2)*) berserta nama staf yang ditugaskan
+
+## Tugasan report & submission
+
+Selain staf inspection, setiap job boleh ditetapkan:
+
+- **Report Disediakan Oleh** — siapa tulis report
+- **Submission Oleh** + **Jenis Submission** — siapa hantar dan submission apa
+
+Boleh diisi semasa key-in, atau melalui butang **Tugaskan** dalam menu Operasi.
+Menu Operasi memaparkan jadual *Tugasan Report & Submission* — berapa report dan
+submission tertunggak bagi setiap staf, termasuk yang **belum ditugaskan**.
+
+Nombor merah pada menu **Key-in Sale** = bilangan job yang belum selesai.
 
 ## Data & backup — PENTING
 
