@@ -12,7 +12,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 
 | Menu | Kegunaan |
 |---|---|
-| **Papan Utama** | Jualan bulan ini, deposit, baki, % capai target, bilangan site, **carta jualan 12 bulan** (naik/turun berbanding bulan lepas), job hari ini, kerja tertunggak, prestasi ikut sales & projek |
+| **Papan Utama** | **Jalur amaran tugasan tertunggak di atas sekali**, jualan bulan ini, deposit, baki, % capai target, bilangan site, **carta 12 bulan (boleh tukar Jualan RM ↔ bilangan Site)**, job hari ini, kerja tertunggak, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf ditugaskan, job belum ditugaskan, beban kerja 7 hari, **carta tugasan inspector bulan ini**, **nilai site setiap inspector**, tugasan report & submission, tukar status terus dari jadual |
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
@@ -238,8 +238,18 @@ Setiap status ada warna sendiri dalam kalendar. Job yang belum sampai status
 Selesai selepas tempoh pending (dikira dari tarikh inspection) akan:
 
 - ditanda **bingkai merah + lencana bilangan hari** dalam kalendar
-- naik dalam **Perlu Tindakan** di papan utama, dikumpul mengikut status semasa
-  (contoh: *Tersekat di "Report Siap" (2)*) berserta nama staf yang ditugaskan
+- naik dalam **jalur amaran merah di atas sekali papan utama** — dengan kiraan,
+  ringkasan setiap status, dan senarai yang boleh diklik terus ke job berkenaan.
+  Jalur ini hilang sendiri sebaik status bertukar kepada Selesai
+- naik juga dalam **Perlu Tindakan** di papan utama, dikumpul mengikut status
+  semasa (contoh: *Tersekat di "Report Siap" (2)*) berserta staf yang ditugaskan
+
+## Carta 12 bulan
+
+Papan utama memaparkan carta bar Jan–Dis. Suis di atas carta menukar antara
+**Jualan (RM)** dan **Site** (bilangan job), lengkap dengan perbandingan
+naik/turun berbanding bulan lepas. Butang ‹ › menukar tahun, dan klik mana-mana
+bar untuk menukar bulan yang dipaparkan pada kad-kad lain.
 
 ## Tugasan report & submission
 

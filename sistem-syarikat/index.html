@@ -311,6 +311,20 @@ body.cetak-resit #kertasResit{display:block}
 .carta-baris .nilai{text-align:right;font-size:12px;font-variant-numeric:tabular-nums;color:var(--lembut)}
 @media(max-width:560px){.carta-baris{grid-template-columns:92px 1fr 78px}.carta-tegak{height:150px}}
 
+/* --- jalur amaran tugasan tertunggak --- */
+.amaran{border:1px solid #fecaca;background:#fff5f5;border-radius:14px;padding:16px 18px;margin-bottom:18px;box-shadow:var(--bayang)}
+.amaran-kepala{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.amaran-kepala h3{margin:0;font-size:16px;color:#b91c1c}
+.amaran-kira{background:#dc2626;color:#fff;border-radius:999px;font-size:12px;font-weight:700;padding:2px 9px}
+.amaran-chip{display:inline-block;background:#fff;border:1px solid #fecaca;color:#b91c1c;border-radius:999px;font-size:12px;font-weight:600;padding:3px 10px;margin:0 6px 6px 0}
+.amaran-senarai{display:grid;gap:1px;background:#fecaca;border:1px solid #fecaca;border-radius:10px;overflow:hidden}
+.amaran-item{display:flex;align-items:center;gap:12px;background:#fff;padding:9px 12px;cursor:pointer;text-align:left;border:0;font:inherit;width:100%}
+.amaran-item:hover{background:#fff1f1}
+.amaran-item .nama{font-weight:600}
+.amaran-item .kanan{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.amaran-lagi{font-size:12px;color:#b91c1c;font-weight:600;padding:8px 2px 0}
+@media(max-width:560px){.amaran-item{flex-wrap:wrap}.amaran-item .kanan{margin-left:0;width:100%}}
+
 /* --- telefon --- */
 @media(max-width:860px){
   .sisi{position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .22s ease}
@@ -791,6 +805,7 @@ function ringkasan(senarai) {
    ================================================================== */
 var papanBulan = bulanKini();
 var papanTahun = new Date().getFullYear();
+var papanMetrik = "jualan";   // "jualan" atau "site"
 
 function lukisPapan(bekas) {
   var data = baca();
@@ -826,7 +841,8 @@ function lukisPapan(bekas) {
     var rB = ringkasan(saleBulan(data, kunciB));
     siteTahun += rB.bil;
     titik.push({ kunci: kunciB, label: NAMA_BULAN[bln - 1].slice(0, 3),
-                 nilai: rB.total, nota: rB.bil + " site" });
+                 nilai: papanMetrik === "site" ? rB.bil : rB.total,
+                 nota: papanMetrik === "site" ? rm(rB.total) : rB.bil + " site" });
   }
   var idxKini = titik.map(function (x) { return x.kunci; }).indexOf(papanBulan);
   var beza = null;
@@ -846,6 +862,34 @@ function lukisPapan(bekas) {
   });
 
   bekas.innerHTML =
+    (tunggak.length
+      ? '<div class="amaran">' +
+          '<div class="amaran-kepala"><h3>Tugasan Tertunggak</h3>' +
+            '<span class="amaran-kira">' + tunggak.length + "</span>" +
+            '<span class="kecil" style="margin-left:auto">lebih ' + esc(nom(t.tempohPendingHari)) +
+            " hari selepas inspection · hilang sendiri bila status jadi " +
+            esc(t.statusSelesai) + "</span>" +
+          "</div>" +
+          "<div>" + Object.keys(petaTunggak).map(function (st) {
+            return '<span class="amaran-chip">' + esc(st) + ": " + petaTunggak[st].length + "</span>";
+          }).join("") + "</div>" +
+          '<div class="amaran-senarai">' +
+            tunggak.slice(0, 6).map(function (x) {
+              var tugas = x.tugasSubmit || x.tugasReport;
+              return '<button type="button" class="amaran-item" data-tunggak="' + esc(x.id) + '">' +
+                '<span><span class="nama">' + esc(x.nama || "Tanpa nama") + "</span>" +
+                '<div class="kecil">' + esc(fmtTarikh(x.tarikh)) + " · " +
+                esc(x.projek || "-") + (x.unit ? " " + esc(x.unit) : "") +
+                (tugas ? " · " + esc(tugas) : " · belum ditugaskan") +
+                (x.jenisSubmit ? " · " + esc(x.jenisSubmit) : "") + "</div></span>" +
+                '<span class="kanan">' + lencanaKerja(x.statusKerja, t) +
+                lencanaTunggak(hariSejak(x.tarikh)) + "</span></button>";
+            }).join("") +
+          "</div>" +
+          (tunggak.length > 6
+            ? '<div class="amaran-lagi">+ ' + (tunggak.length - 6) + " tugasan lagi tertunggak</div>" : "") +
+        "</div>"
+      : "") +
     '<div class="penapis">' +
       '<label>Bulan<input type="month" id="papanBulan" value="' + esc(papanBulan) + '"></label>' +
       '<button class="btn btn-utama" id="btnCepatSale">+ Key-in Sale Baru</button>' +
@@ -865,21 +909,35 @@ function lukisPapan(bekas) {
 
     '<div class="kad">' +
       '<div class="kad-tajuk">' +
-        "<h3>Jualan Bulanan " + papanTahun + "</h3>" +
+        "<h3>" + (papanMetrik === "site" ? "Bilangan Site " : "Jualan Bulanan ") + papanTahun + "</h3>" +
         '<div class="aksi">' +
-          (beza
+          '<div class="suis">' +
+            '<button type="button" id="metrikJualan"' + (papanMetrik === "jualan" ? ' class="aktif"' : "") + ">Jualan (RM)</button>" +
+            '<button type="button" id="metrikSite"' + (papanMetrik === "site" ? ' class="aktif"' : "") + ">Site</button>" +
+          "</div>" +
+          (beza && beza.jumlah > 0
             ? '<span class="badge ' + (beza.naik ? "badge-ok" : "badge-bad") + '">' +
-              (beza.naik ? "Naik " : "Turun ") + esc(rm(beza.jumlah)) +
+              (beza.naik ? "Naik " : "Turun ") +
+              esc(papanMetrik === "site" ? beza.jumlah + " site" : rm(beza.jumlah)) +
               (beza.peratus !== null ? " (" + beza.peratus + "%)" : "") + " vs bulan lepas</span>"
-            : "") +
+            : (beza ? '<span class="badge badge-muted">Sama seperti bulan lepas</span>' : "")) +
           '<button class="btn btn-lembut btn-kecil" id="tahunTolak">&#8249;</button>' +
           '<button class="btn btn-lembut btn-kecil" id="tahunTambah">&#8250;</button>' +
         "</div>" +
       "</div>" +
-      cartaTegak(titik, papanBulan) +
+      cartaTegak(titik, papanBulan, papanMetrik === "site"
+        ? function (n) { return String(n); } : rmPendek) +
       '<div class="carta-paksi"><span>Jumlah setahun: <b>' +
-        esc(rm(titik.reduce(function (j, x) { return j + x.nilai; }, 0))) + "</b></span>" +
-        "<span>" + siteTahun + " site · klik bulan di atas untuk tukar paparan</span></div>" +
+        esc(papanMetrik === "site"
+          ? titik.reduce(function (j, x) { return j + x.nilai; }, 0) + " site"
+          : rm(titik.reduce(function (j, x) { return j + x.nilai; }, 0))) + "</b></span>" +
+        "<span>" + (papanMetrik === "site"
+          ? esc(rm(data.sale.filter(function (x) {
+              return String(x.tarikh).slice(0, 4) === String(papanTahun) &&
+                     x.statusKerja !== t.statusBatal;
+            }).reduce(function (j, x) { return j + kiraSale(x).total; }, 0)))
+          : siteTahun + " site") +
+        " · klik bulan di atas untuk tukar paparan</span></div>" +
     "</div>" +
 
     '<div class="grid grid-2">' +
@@ -937,6 +995,11 @@ function lukisPapan(bekas) {
     papanTahun = parseInt(papanBulan.slice(0, 4), 10);
     lukisPapan(bekas);
   };
+  $$("[data-tunggak]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatSale(b.getAttribute("data-tunggak")); };
+  });
+  $("#metrikJualan").onclick = function () { papanMetrik = "jualan"; lukisPapan(bekas); };
+  $("#metrikSite").onclick = function () { papanMetrik = "site"; lukisPapan(bekas); };
   $("#tahunTolak").onclick = function () { papanTahun--; lukisPapan(bekas); };
   $("#tahunTambah").onclick = function () { papanTahun++; lukisPapan(bekas); };
   $$(".carta-lajur", bekas).forEach(function (el, i) {
@@ -969,15 +1032,16 @@ function pasangKumpulan(bekas) {
 
 // Carta bar tegak: satu siri, label bulan di bawah, nilai pada bar tertinggi
 // dan bar semasa sahaja supaya tidak sesak.
-function cartaTegak(titik, penanda) {
+function cartaTegak(titik, penanda, fmt) {
+  fmt = fmt || rmPendek;
   var maks = Math.max.apply(null, titik.map(function (x) { return x.nilai; }).concat([1]));
   return '<div class="carta"><div class="carta-tegak">' +
     titik.map(function (x) {
       var tinggi = Math.round((x.nilai / maks) * 100);
       var tunjuk = x.kunci === penanda || (x.nilai === maks && maks > 0);
       return '<div class="carta-lajur' + (x.kunci === penanda ? " kini" : "") +
-        '" title="' + esc(x.label + ": " + rm(x.nilai) + (x.nota ? " · " + x.nota : "")) + '">' +
-        '<span class="carta-nilai">' + (tunjuk && x.nilai > 0 ? esc(rmPendek(x.nilai)) : "") + "</span>" +
+        '" title="' + esc(x.label + ": " + fmt(x.nilai) + (x.nota ? " · " + x.nota : "")) + '">' +
+        '<span class="carta-nilai">' + (tunjuk && x.nilai > 0 ? esc(fmt(x.nilai)) : "") + "</span>" +
         '<span class="carta-batang" style="height:' + Math.max(tinggi, x.nilai > 0 ? 2 : 0) + '%"></span>' +
         '<span class="carta-label">' + esc(x.label) + "</span></div>";
     }).join("") + "</div></div>";
