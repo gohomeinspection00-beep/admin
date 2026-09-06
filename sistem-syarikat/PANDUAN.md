@@ -14,6 +14,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 |---|---|
 | **Papan Utama** | Jualan bulan ini, deposit dikutip, baki belum kutip, % capai target, job hari ini, senarai perlu tindakan, prestasi ikut sales & projek |
 | **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
+| **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf yang ditugaskan, job belum ditugaskan, beban kerja 7 hari, tukar status terus dari jadual |
 | **Staf** | Tambah / sunting / padam staf. Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Nama syarikat, target jualan harian, hari bekerja, senarai projek, sumber lead, hari cuti, backup & restore |
 
@@ -37,6 +38,20 @@ Pada telefon, **tekan lama** menggantikan klik kanan.
 Cuti yang ditanda dari kalendar akan jadi **merah** dan target harian menjadi RM 0,
 tetapi **tidak** masuk senarai Hari Cuti dalam Tetapan — melainkan kotak
 *"Masukkan juga ke senarai Hari Cuti dalam Tetapan"* ditandakan.
+
+## Staf inspection
+
+Semasa key-in sale, tandakan staf yang akan turun (boleh lebih daripada seorang).
+Dalam kalendar, staf dipapar sebagai lencana ringkas (contoh `FI`, `HA`);
+tanda `?` bermakna job itu belum ditugaskan kepada sesiapa.
+
+Menu **Operasi** memaparkan, untuk satu-satu hari:
+
+- Bilangan job, staf bergerak, job belum ditugaskan, nilai job hari itu
+- Jadual mengikut masa — boleh tukar status kerja dan tugaskan staf terus dari situ
+- Pergerakan setiap staf (job mereka hari itu dan waktunya) serta siapa tiada tugasan
+- Beban kerja 7 hari akan datang bagi setiap staf, dan senarai job yang belum ditugaskan
+- Butang **Cetak Jadual** untuk cetak jadual harian
 
 ## Kiraan automatik
 
