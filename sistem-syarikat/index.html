@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>Sistem Pengurusan Syarikat</title>
+<style>
+/* ============================ GAYA ============================ */
+:root{
+  --bg:#f1f5f9; --kad:#fff; --teks:#0f172a; --lembut:#64748b; --garis:#e2e8f0;
+  --utama:#2563eb; --utama2:#1d4ed8; --gelap:#0f172a;
+  --ok:#16a34a; --okbg:#dcfce7; --warn:#d97706; --warnbg:#fef3c7; --bad:#dc2626; --badbg:#fee2e2;
+  --bayang:0 1px 3px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.06); --bulat:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--teks);font:15px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+h1,h2,h3,h4{margin:0 0 12px;line-height:1.25}
+a{color:var(--utama)}
+[hidden]{display:none!important}
+
+/* --- skrin log masuk --- */
+.skrin-log{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(160deg,#1e293b,#0f172a 55%,#1e3a8a)}
+.kad-log{width:100%;max-width:420px;background:var(--kad);border-radius:18px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.kad-log.tengah{text-align:center}
+.log-jenama{text-align:center;margin-bottom:22px}
+.log-jenama h1{font-size:20px;margin:12px 0 4px}
+.log-jenama p{margin:0;color:var(--lembut);font-size:13px}
+.logo{width:54px;height:54px;margin:0 auto;border-radius:16px;background:var(--utama);color:#fff;display:grid;place-items:center;font-weight:700;font-size:20px}
+.logo.kecil{width:38px;height:38px;font-size:14px;border-radius:11px;margin:0}
+.tab-baris{display:flex;gap:6px;background:var(--bg);padding:5px;border-radius:12px;margin-bottom:18px}
+.tab{flex:1;border:0;background:transparent;padding:9px;border-radius:9px;font:inherit;font-weight:600;color:var(--lembut);cursor:pointer}
+.tab.aktif{background:var(--kad);color:var(--teks);box-shadow:var(--bayang)}
+
+/* --- borang --- */
+label{display:block;margin-bottom:14px;font-size:13px;font-weight:600;color:var(--lembut)}
+input,select,textarea{width:100%;margin-top:6px;padding:11px 12px;border:1px solid var(--garis);border-radius:10px;font:inherit;color:var(--teks);background:#fff}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--utama);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+textarea{min-height:90px;resize:vertical}
+input[type=checkbox]{width:auto;margin:0 8px 0 0;vertical-align:middle}
+.nota{font-size:12px;color:var(--lembut);text-align:center;margin:14px 0 0}
+.baris-medan{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+
+/* --- butang --- */
+.btn{border:1px solid transparent;border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer;background:var(--bg);color:var(--teks)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-utama{background:var(--utama);color:#fff}
+.btn-utama:hover:not(:disabled){background:var(--utama2)}
+.btn-lembut{background:#fff;border-color:var(--garis)}
+.btn-lembut:hover:not(:disabled){background:var(--bg)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-bad{background:var(--bad);color:#fff}
+.btn-kecil{padding:6px 11px;font-size:13px;border-radius:8px}
+.penuh{width:100%;display:block}
+.baris-butang{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.btn-ikon{border:0;background:transparent;font-size:22px;cursor:pointer;padding:4px 8px;border-radius:8px;color:var(--teks)}
+
+/* --- rangka --- */
+.rangka{display:flex;min-height:100vh}
+.sisi{width:252px;flex:0 0 252px;background:var(--gelap);color:#cbd5e1;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.sisi-atas{display:flex;align-items:center;gap:11px;padding:18px 16px;border-bottom:1px solid #1e293b}
+.sisi-syarikat{font-weight:700;color:#fff;font-size:14px}
+.sisi-sub{font-size:11px;color:#64748b}
+.nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:#cbd5e1;text-decoration:none;font-weight:500;margin-bottom:3px}
+.nav-item:hover{background:#1e293b;color:#fff}
+.nav-item.aktif{background:var(--utama);color:#fff}
+.nav-ikon{width:20px;text-align:center}
+.lencana-menu{margin-left:auto;background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;font-weight:700}
+.sisi-bawah{padding:14px;border-top:1px solid #1e293b}
+.pengguna{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--utama);color:#fff;display:grid;place-items:center;font-weight:700;flex:0 0 36px}
+.pengguna-nama{color:#fff;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pengguna-peranan{font-size:11px;color:#64748b}
+.litup{display:none}
+.utama{flex:1;min-width:0;display:flex;flex-direction:column}
+.bar-atas{display:flex;align-items:center;gap:10px;padding:14px 22px;background:var(--kad);border-bottom:1px solid var(--garis);position:sticky;top:0;z-index:10}
+.bar-atas h2{margin:0;font-size:18px}
+.bar-atas .btn-ikon{display:none}
+.kandungan{padding:22px;flex:1}
+
+/* --- kad & jadual --- */
+.kad{background:var(--kad);border:1px solid var(--garis);border-radius:var(--bulat);padding:18px;box-shadow:var(--bayang);margin-bottom:18px}
+.kad-tajuk{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.kad-tajuk h3{margin:0;font-size:16px}
+.grid{display:grid;gap:14px;margin-bottom:18px}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.stat{background:var(--kad);border:1px solid var(--garis);border-radius:var(--bulat);padding:16px;box-shadow:var(--bayang)}
+.stat-label{font-size:12px;color:var(--lembut);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.stat-nilai{font-size:26px;font-weight:700;margin-top:6px}
+.stat-nota{font-size:12px;color:var(--lembut);margin-top:4px}
+.jadual-bungkus{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--garis);white-space:nowrap}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--lembut);background:#f8fafc}
+tbody tr:hover{background:#f8fafc}
+td.bungkus{white-space:normal;min-width:200px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.badge-ok{background:var(--okbg);color:var(--ok)}
+.badge-warn{background:var(--warnbg);color:var(--warn)}
+.badge-bad{background:var(--badbg);color:var(--bad)}
+.badge-muted{background:var(--bg);color:var(--lembut)}
+.kosong{padding:30px;text-align:center;color:var(--lembut)}
+.kecil{font-size:12px;color:var(--lembut)}
+.penapis{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.penapis label{margin:0}
+.senarai-item{padding:12px 0;border-bottom:1px solid var(--garis)}
+.senarai-item:last-child{border-bottom:0}
+
+/* --- jam --- */
+.jam-kad{text-align:center}
+.jam-besar{font-size:40px;font-weight:700;letter-spacing:1px}
+.jam-tarikh{color:var(--lembut);margin-bottom:16px}
+.jam-butang{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.jam-butang .btn{min-width:150px;padding:14px 18px;font-size:16px}
+
+/* --- modal & toast --- */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:grid;place-items:center;padding:16px;z-index:50}
+.modal-kad{width:100%;background:var(--kad);border-radius:16px;max-height:90vh;overflow-y:auto}
+.modal-tajuk{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--garis);position:sticky;top:0;background:var(--kad)}
+.modal-tajuk h3{margin:0;font-size:16px}
+.modal-tutup{border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer;color:var(--lembut)}
+.modal-isi{padding:18px}
+.toast-box{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:70;display:grid;gap:8px}
+.toast{background:var(--gelap);color:#fff;padding:11px 18px;border-radius:10px;box-shadow:var(--bayang);font-size:14px;max-width:90vw;animation:naik .2s ease}
+.toast-ok{background:var(--ok)}.toast-bad{background:var(--bad)}.toast-warn{background:var(--warn)}
+@keyframes naik{from{opacity:0;transform:translateY(8px)}}
+
+/* --- telefon --- */
+@media(max-width:860px){
+  .sisi{position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .22s ease}
+  .sisi.buka{transform:none}
+  .sisi.buka~.litup{display:block;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:30}
+  .bar-atas .btn-ikon{display:block}
+  .kandungan{padding:14px}
+  .jam-besar{font-size:34px}
+}
+@media print{.sisi,.bar-atas,.btn,.penapis{display:none!important}.kandungan{padding:0}.kad{box-shadow:none;page-break-inside:avoid}}
+</style>
+</head>
+<body>
