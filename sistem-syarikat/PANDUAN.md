@@ -292,6 +292,46 @@ titik dalam butiran job — tekan **Papar** untuk lihat.
 > ke mana-mana. Jangan guna komputer berkongsi, dan pastikan backup disimpan selamat.
 
 Boleh diisi semasa key-in, atau melalui butang **Tugaskan** dalam menu Operasi.
+
+## Hantar tugasan ke WhatsApp
+
+Dalam butiran job, setiap nama staf ada butang **Hantar** di sebelahnya —
+untuk staf inspection, report, dan submission. Bila ada dua atau lebih inspector,
+ada juga butang **Hantar semua** (satu mesej untuk kedua-duanya).
+
+Tetingkap tugasan membolehkan:
+
+- Tukar jenis tugasan (Staf inspection / Report / Submission)
+- Pilih penerima — seorang, atau beberapa orang dalam satu mesej. Staf lain
+  yang belum ditugaskan ditanda `*` tetapi masih boleh dipilih
+- Tulis **Remark** (disimpan pada job mengikut jenis tugasan, jadi kekal
+  bila dibuka semula)
+- Untuk submission: kotak pilihan **Sertakan username & password**
+  (tidak disertakan secara lalai)
+- **Salin Teks** atau **Hantar WhatsApp** — terus ke nombor staf itu jika ada
+  dalam menu Staf
+
+**Mesej tugasan tidak sekali-kali menyertakan harga, deposit atau baki.**
+Contoh:
+
+```
+TUGASAN INSPECTION
+
+Client: Ahmad Faiz
+Tarikh inspection: 8 Sep 2026 (Selasa)
+Masa: 9.30am – 12.30pm
+Projek: Panorama
+Unit: A-07-07
+Size: 950
+Telefon client: 012-1112222
+Staf bertugas: Fikri, Zaim
+
+Remark: Bawa moisture meter, client minta datang awal
+
+Go Home Inspection
+```
+
+Butang **Hantar** juga ada pada setiap baris jadual dalam menu Operasi.
 Menu Operasi memaparkan jadual *Tugasan Report & Submission* — berapa report dan
 submission tertunggak bagi setiap staf, termasuk yang **belum ditugaskan**.
 

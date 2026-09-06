@@ -1839,6 +1839,180 @@ function pasangAksiJadual(bekas) {
   });
 }
 
+/* ---------------- hantar tugasan kepada staf (WhatsApp) ---------------- */
+
+// Nombor telefon staf dari senarai staf (untuk buka WhatsApp terus).
+function telefonStaf(nama, data) {
+  var x = (data.staf || []).filter(function (p) {
+    return String(p.nama).toLowerCase() === String(nama).toLowerCase();
+  })[0];
+  return x ? String(x.telefon || "").replace(/[^\d]/g, "") : "";
+}
+
+var TUGAS_JENIS = {
+  inspection: { tajuk: "TUGASAN INSPECTION", medan: "inspector", label: "Staf inspection" },
+  report:     { tajuk: "TUGASAN REPORT",     medan: "tugasReport", label: "Report" },
+  submit:     { tajuk: "TUGASAN SUBMISSION", medan: "tugasSubmit", label: "Submission" }
+};
+
+// Bina teks tugasan — tidak sekali-kali menyertakan harga atau bayaran.
+function teksTugasan(s, jenis, penerima, remark, sertakanLogin, data) {
+  var j = TUGAS_JENIS[jenis];
+  var b = [j.tajuk, ""];
+  b.push("Client: " + (s.nama || "-"));
+  b.push("Tarikh inspection: " + fmtTarikh(s.tarikh) + " (" + namaHari(s.tarikh) + ")");
+  if (s.masaMula) b.push("Masa: " + s.masaMula + (s.masaTamat ? " – " + s.masaTamat : ""));
+  if (s.projek) b.push("Projek: " + s.projek);
+  if (s.unit) b.push("Unit: " + s.unit);
+  if (s.size) b.push("Size: " + s.size);
+  if (s.telefon) b.push("Telefon client: " + s.telefon);
+
+  if (jenis === "inspection") {
+    b.push("Staf bertugas: " + (penerima.join(", ") || "-"));
+  } else if (jenis === "report") {
+    b.push("Report disediakan oleh: " + (penerima.join(", ") || "-"));
+    if ((s.inspector || []).length) b.push("Inspection oleh: " + s.inspector.join(", "));
+  } else {
+    b.push("Submission oleh: " + (penerima.join(", ") || "-"));
+    if (s.jenisSubmit) b.push("Jenis submission: " + s.jenisSubmit);
+    if (s.submitPortal) b.push("Portal / App: " + s.submitPortal);
+    if (sertakanLogin && (s.submitUser || s.submitPass)) {
+      b.push("Username: " + (s.submitUser || "-"));
+      b.push("Password: " + (s.submitPass || "-"));
+    }
+    if (s.submitNota) b.push("Nota: " + s.submitNota);
+  }
+  if (remark) b.push("", "Remark: " + remark);
+  b.push("", (data.tetapan.namaSyarikat || ""));
+  return b.join("\n");
+}
+
+function borangTugasan(saleId, jenis, namaTerpilih) {
+  var data = baca();
+  var s = data.sale.filter(function (x) { return x.id === saleId; })[0];
+  if (!s) return;
+  var j = TUGAS_JENIS[jenis] || TUGAS_JENIS.inspection;
+  jenis = TUGAS_JENIS[jenis] ? jenis : "inspection";
+
+  // Calon penerima: staf yang ditugaskan untuk jenis ini + staf aktif lain.
+  var ditugaskan = jenis === "inspection"
+    ? (s.inspector || []).slice()
+    : (s[j.medan] ? [s[j.medan]] : []);
+  var semua = ditugaskan.slice();
+  data.staf.filter(function (x) { return x.status === "aktif"; }).forEach(function (x) {
+    if (semua.indexOf(x.nama) === -1) semua.push(x.nama);
+  });
+  var pilih = namaTerpilih ? [namaTerpilih] : ditugaskan.slice();
+  s.remark = s.remark || {};
+
+  var m = modal("Hantar Tugasan — " + j.label,
+    '<p class="kecil" style="margin:0 0 12px">Mesej ini <b>tidak menyertakan harga</b> atau ' +
+      "sebarang maklumat bayaran. Pilih penerima, tulis remark jika ada, kemudian salin " +
+      "atau hantar terus ke WhatsApp.</p>" +
+    '<div class="tajuk-seksyen">Jenis Tugasan</div>' +
+    '<div class="suis" style="margin-bottom:12px">' +
+      Object.keys(TUGAS_JENIS).map(function (k) {
+        return '<button type="button" data-jenis="' + k + '"' + (k === jenis ? ' class="aktif"' : "") +
+          ">" + esc(TUGAS_JENIS[k].label) + "</button>";
+      }).join("") +
+    "</div>" +
+    '<div class="tajuk-seksyen">Hantar Kepada</div>' +
+    '<div class="pilih-staf" id="pilihPenerima">' +
+      (semua.length ? semua.map(function (n) {
+        return '<label class="chip pilih-chip"><input type="checkbox" class="penerimaPilih" value="' +
+          esc(n) + '"' + (pilih.indexOf(n) !== -1 ? " checked" : "") + ">" + esc(n) +
+          (ditugaskan.indexOf(n) !== -1 ? "" : " *") + "</label>";
+      }).join("") : '<span class="kecil">Belum ada staf. Tambah di menu Staf.</span>') +
+    "</div>" +
+    '<p class="kecil" style="margin:-6px 0 12px">Tanda * bermaksud staf itu belum ditugaskan pada job ini. ' +
+      "Pilih satu nama untuk hantar seorang-seorang, atau pilih beberapa nama untuk satu mesej sama.</p>" +
+    (jenis === "submit"
+      ? '<div style="margin-bottom:14px"><label class="chip pilih-chip">' +
+        '<input type="checkbox" id="sertakanLogin">Sertakan username &amp; password dalam mesej</label></div>'
+      : "") +
+    medan("Remark (pilihan)",
+      '<textarea id="remarkTugas" style="min-height:70px" placeholder="Contoh: bawa moisture meter, client minta datang awal">' +
+      esc(s.remark[jenis] || "") + "</textarea>") +
+    '<div class="tajuk-seksyen">Mesej</div>' +
+    '<textarea id="teksTugas" style="min-height:210px"></textarea>' +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-lembut" data-batal>Tutup</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnSalinTugas">Salin Teks</button>' +
+      '<button type="button" class="btn btn-ok" id="btnWaTugas">Hantar WhatsApp</button>' +
+    "</div>", 620);
+
+  function penerimaPilih() {
+    return $$(".penerimaPilih:checked", m.el).map(function (c) { return c.value; });
+  }
+  function bina() {
+    var login = $("#sertakanLogin", m.el) ? $("#sertakanLogin", m.el).checked : false;
+    $("#teksTugas", m.el).value = teksTugasan(s, jenis, penerimaPilih(),
+      $("#remarkTugas", m.el).value.trim(), login, data);
+  }
+  bina();
+  m.el.addEventListener("input", bina);
+  m.el.addEventListener("change", bina);
+
+  $$("[data-jenis]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      simpanRemark();
+      m.tutup();
+      borangTugasan(saleId, b.getAttribute("data-jenis"), null);
+    };
+  });
+
+  function simpanRemark() {
+    var teks = $("#remarkTugas", m.el).value.trim();
+    var d = baca();
+    d.sale = d.sale.map(function (x) {
+      if (x.id !== saleId) return x;
+      x.remark = x.remark || {};
+      x.remark[jenis] = teks;
+      return x;
+    });
+    simpan(d);
+  }
+
+  $("[data-batal]", m.el).onclick = function () { simpanRemark(); m.tutup(); lihatSale(saleId); };
+  $("#btnSalinTugas", m.el).onclick = function () {
+    simpanRemark();
+    salinTeks($("#teksTugas", m.el));
+  };
+  $("#btnWaTugas", m.el).onclick = function () {
+    var orang = penerimaPilih();
+    if (!orang.length) return toast("Pilih sekurang-kurangnya seorang penerima.", "bad");
+    simpanRemark();
+    var teks = $("#teksTugas", m.el).value;
+    var no = orang.length === 1 ? telefonStaf(orang[0], data) : "";
+    if (no && no.charAt(0) === "0") no = "6" + no;
+    if (orang.length > 1) {
+      toast("Beberapa penerima — pilih kumpulan atau chat dalam WhatsApp.", "info", 4000);
+    } else if (!no) {
+      toast("Tiada nombor telefon untuk " + orang[0] + " dalam menu Staf.", "warn", 5000);
+    }
+    window.open("https://wa.me/" + (no.length > 8 ? no : "") + "?text=" + encodeURIComponent(teks), "_blank");
+  };
+}
+
+// Baris nama + butang hantar tugasan dalam butiran jualan.
+function barisTugas(label, senarai, jenis, saleId) {
+  if (!senarai.length) {
+    return "<dt>" + esc(label) + '</dt><dd><span class="kecil">belum ditugaskan</span> ' +
+      '<button type="button" class="btn btn-lembut btn-kecil" data-hantar="' + jenis +
+      '" data-nama="">Hantar tugasan</button></dd>';
+  }
+  return "<dt>" + esc(label) + "</dt><dd>" +
+    senarai.map(function (n) {
+      return '<span style="display:inline-flex;align-items:center;gap:6px;margin:0 10px 6px 0">' +
+        esc(n) + '<button type="button" class="btn btn-lembut btn-kecil" data-hantar="' + jenis +
+        '" data-nama="' + esc(n) + '" title="Hantar tugasan kepada ' + esc(n) + '">Hantar</button></span>';
+    }).join("") +
+    (senarai.length > 1
+      ? '<button type="button" class="btn btn-utama btn-kecil" data-hantar="' + jenis +
+        '" data-nama="" title="Satu mesej untuk semua">Hantar semua</button>' : "") +
+    "</dd>";
+}
+
 function lihatSale(rekodId) {
   var data = baca();
   var s = data.sale.filter(function (x) { return x.id === rekodId; })[0];
@@ -1859,7 +2033,7 @@ function lihatSale(rekodId) {
     '<dl class="kunci-nilai">' +
       baris("Tarikh", fmtTarikh(s.tarikh) + " (" + namaHari(s.tarikh) + ")") +
       baris("Masa inspection", masa) +
-      baris("Staf inspection", (s.inspector || []).join(", ")) +
+      barisTugas("Staf inspection", (s.inspector || []), "inspection", rekodId) +
     "</dl>" +
     '<div class="tajuk-seksyen">Client</div>' +
     '<dl class="kunci-nilai">' +
@@ -1883,9 +2057,9 @@ function lihatSale(rekodId) {
     '<div class="tajuk-seksyen">Lain-lain</div>' +
     '<dl class="kunci-nilai">' +
       baris("Closed by", s.closedBy) + baris("Dari", s.sumber) +
-      baris("Report oleh", s.tugasReport) +
-      baris("Submission oleh", s.tugasSubmit ? s.tugasSubmit +
-        (s.jenisSubmit ? " (" + s.jenisSubmit + ")" : "") : "") +
+      barisTugas("Report oleh", s.tugasReport ? [s.tugasReport] : [], "report", rekodId) +
+      barisTugas("Submission oleh", s.tugasSubmit ? [s.tugasSubmit] : [], "submit", rekodId) +
+      baris("Jenis submission", s.jenisSubmit) +
       baris("Portal / App", s.submitPortal) +
       baris("Username", s.submitUser) +
       (s.submitPass
@@ -1925,6 +2099,12 @@ function lihatSale(rekodId) {
       this.textContent = tunjuk ? "Sorok" : "Papar";
     };
   }
+  $$("[data-hantar]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      m.tutup();
+      borangTugasan(rekodId, b.getAttribute("data-hantar"), b.getAttribute("data-nama") || null);
+    };
+  });
   $("#btnTutupSale", m.el).onclick = m.tutup;
   $("#btnInvoisSale", m.el).onclick = function () { m.tutup(); borangInvois({ saleId: rekodId }); };
   $("#btnTambahBayar", m.el).onclick = function () { m.tutup(); borangBayaran(rekodId, null); };
@@ -3670,6 +3850,7 @@ function lukisOperasi(bekas) {
             '<td class="num">' + esc(rm(k.total)) + "</td>" +
             '<td><div class="aksi">' +
               '<button class="btn btn-lembut" data-tugas="' + esc(s.id) + '">Tugaskan</button>' +
+              '<button class="btn btn-ok" data-hantar-op="' + esc(s.id) + '">Hantar</button>' +
               '<button class="btn btn-lembut" data-lihat="' + esc(s.id) + '">Butiran</button>' +
             "</div></td></tr>";
         }).join("") + "</tbody></table>"
@@ -3797,6 +3978,9 @@ function lukisOperasi(bekas) {
   });
   $$("[data-lihat]", bekas).forEach(function (b) {
     b.onclick = function () { lihatSale(b.getAttribute("data-lihat")); };
+  });
+  $$("[data-hantar-op]", bekas).forEach(function (b) {
+    b.onclick = function () { borangTugasan(b.getAttribute("data-hantar-op"), "inspection", null); };
   });
 }
 
