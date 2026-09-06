@@ -453,6 +453,7 @@ var TETAPAN_ASAL = {
   cuti: [],                                   // [{tarikh:"2025-01-29", sebab:"Tahun Baru Cina"}]
   targetBulan: {},                            // { "2026-09": 20000 } — ganti target bulan tertentu
   kategoriAlat: ["Alat Ukur", "Alat Tangan", "Elektrik", "Bahan Habis", "Keselamatan"],
+  amaran: { kalibrasi: 30, komitmen: 7, tugasan: 3 },
   statusKerja: ["Tempahan", "Inspection Siap", "Report Siap", "Submit Report",
                 "Submit App", "Minta Bayaran", "Selesai", "Batal"],
   quote: {
@@ -579,6 +580,7 @@ function baca() {
   mentah.tetapan = Object.assign({}, TETAPAN_ASAL, mentah.tetapan || {});
   mentah.tetapan.targetBulan = mentah.tetapan.targetBulan || {};
   mentah.tetapan.kategoriAlat = mentah.tetapan.kategoriAlat || TETAPAN_ASAL.kategoriAlat.slice();
+  mentah.tetapan.amaran = Object.assign({}, TETAPAN_ASAL.amaran, mentah.tetapan.amaran || {});
   mentah.staf = (mentah.staf || []).map(function (x) {
     // Rekod lama tiada kumpulan — teka dari jawatan.
     if (!x.kumpulan) {
@@ -594,6 +596,9 @@ function baca() {
   mentah.subjob = mentah.subjob || [];      // kerja sub — tidak dikira dalam jualan syarikat
   mentah.quotation = mentah.quotation || [];
   mentah.alat = mentah.alat || [];          // inventori alat & bahan pakai habis
+  mentah.kalibrasi = mentah.kalibrasi || [];
+  mentah.komitmen = mentah.komitmen || [];  // transport, pinjaman, komitmen lain
+  mentah.tugasan = mentah.tugasan || [];    // senarai to do
   mentah.tetapan.quote = Object.assign({}, TETAPAN_ASAL.quote, mentah.tetapan.quote || {});
   // Setiap servis perlu id tetap — kunci untuk fail lampiran PDF dalam storan.
   mentah.tetapan.quote.servis = (mentah.tetapan.quote.servis || []).map(function (x) {
@@ -1031,6 +1036,49 @@ function lukisPapan(bekas) {
           'id="bukaAlat">Buka Alat &amp; Stok</button></div>' +
       "</div>";
     })() +
+    (function () {
+      var item = [];
+      kalibrasiPerluPerhatian(data).forEach(function (k) {
+        var st = statusKalibrasi(k, data);
+        item.push({ jenis: "Kalibrasi", tajuk: k.nama, nota: (k.badan || "-") + " · luput " +
+          fmtTarikh(k.tarikhLuput), teks: st.teks, warna: st.warna, hari: st.hari, pergi: "#/alat" });
+      });
+      komitmenPerluPerhatian(data).forEach(function (k) {
+        var st = statusKomitmen(k, data);
+        item.push({ jenis: k.kategori === "Lain" ? "Komitmen" : k.kategori, tajuk: k.nama,
+          nota: rm(k.jumlah) + " · " + (k.pihak || k.kitaran), teks: st.teks, warna: st.warna,
+          hari: st.hari, pergi: "#/komitmen" });
+      });
+      tugasPerluPerhatian(data).forEach(function (t) {
+        var st = statusTugas(t, data);
+        item.push({ jenis: "To Do", tajuk: t.tajuk, nota: (t.untuk || "belum ditugaskan") +
+          (t.tarikh ? " · " + fmtTarikh(t.tarikh) : ""), teks: st.teks, warna: st.warna,
+          hari: st.hari, pergi: "#/todo" });
+      });
+      if (!item.length) return "";
+      item.sort(function (a, b) { return (a.hari === null ? 999 : a.hari) - (b.hari === null ? 999 : b.hari); });
+      var kira = {};
+      item.forEach(function (x) { kira[x.jenis] = (kira[x.jenis] || 0) + 1; });
+      return '<div class="amaran">' +
+        '<div class="amaran-kepala"><h3>Peringatan</h3>' +
+          '<span class="amaran-kira">' + item.length + "</span>" +
+          '<span class="kecil" style="margin-left:auto">kalibrasi, komitmen bulanan dan tugasan ' +
+          "yang sudah lewat atau hampir sampai tarikh</span></div>" +
+        "<div>" + Object.keys(kira).map(function (j) {
+          return '<span class="amaran-chip">' + esc(j) + ": " + kira[j] + "</span>";
+        }).join("") + "</div>" +
+        '<div class="amaran-senarai">' +
+          item.slice(0, 6).map(function (x) {
+            return '<button type="button" class="amaran-item" data-peringatan="' + esc(x.pergi) + '">' +
+              '<span><span class="nama">' + esc(x.tajuk) + "</span>" +
+              '<div class="kecil">' + esc(x.jenis) + " · " + esc(x.nota) + "</div></span>" +
+              '<span class="kanan"><span class="badge badge-' + x.warna + '">' +
+              esc(x.teks) + "</span></span></button>";
+          }).join("") +
+        "</div>" +
+        (item.length > 6 ? '<div class="amaran-lagi">+ ' + (item.length - 6) + " peringatan lagi</div>" : "") +
+      "</div>";
+    })() +
     '<div class="penapis">' +
       '<label>Bulan<input type="month" id="papanBulan" value="' + esc(papanBulan) + '"></label>' +
       '<button class="btn btn-utama" id="btnCepatSale">+ Key-in Sale Baru</button>' +
@@ -1180,6 +1228,9 @@ function lukisPapan(bekas) {
   if ($("#bukaSubJob")) $("#bukaSubJob").onclick = function () { location.hash = "#/subjob"; };
   if ($("#bukaTunggak")) $("#bukaTunggak").onclick = function () { location.hash = "#/tunggak"; };
   if ($("#bukaAlat")) $("#bukaAlat").onclick = function () { location.hash = "#/alat"; };
+  $$("[data-peringatan]", bekas).forEach(function (b) {
+    b.onclick = function () { location.hash = b.getAttribute("data-peringatan"); };
+  });
   $$("[data-alatpapan]", bekas).forEach(function (b) {
     b.onclick = function () { lihatAlat(b.getAttribute("data-alatpapan")); };
   });
@@ -5608,6 +5659,7 @@ var TAB_TETAPAN = [
   { id: "jualan",   label: "Jualan & Status" },
   { id: "dokumen",  label: "Resit & Invois" },
   { id: "quote",    label: "Quotation" },
+  { id: "amaran",   label: "Peringatan" },
   { id: "data",     label: "Data & Backup" }
 ];
 
@@ -5663,6 +5715,7 @@ function buangFailYatim(d) {
   var sah = (d.tetapan.quote.servis || []).map(function (x) { return x.id; });
   failKunci().then(function (kunci) {
     (kunci || []).forEach(function (k) {
+      if (String(k).indexOf("cal-") === 0) return;      // fail sijil kalibrasi
       if (sah.indexOf(k) === -1) failBuang(k).catch(function () {});
     });
   }).catch(function () {});
@@ -5936,6 +5989,40 @@ function lukisTetapan(bekas) {
       "</div>";
   }
 
+  /* ---------------- PERINGATAN ---------------- */
+  if (tabTetapan === "amaran") {
+    var am = t.amaran || {};
+    isi =
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Bila Perlu Diingatkan</h3></div>' +
+        '<p class="kecil">Semua peringatan ini naik di papan utama dan sebagai nombor merah ' +
+        "pada menu sisi.</p>" +
+        '<form id="borangAmaran">' +
+          '<div class="baris-medan">' +
+            medan("Kalibrasi — beri amaran berapa hari sebelum luput",
+              '<input type="number" min="1" name="kalibrasi" value="' +
+              esc(am.kalibrasi || 30) + '">') +
+            medan("Komitmen — berapa hari sebelum tarikh bayar",
+              '<input type="number" min="1" name="komitmen" value="' +
+              esc(am.komitmen || 7) + '">') +
+            medan("To Do — berapa hari sebelum tarikh perlu siap",
+              '<input type="number" min="1" name="tugasan" value="' +
+              esc(am.tugasan || 3) + '">') +
+          "</div>" +
+          '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan</button></div>' +
+        "</form>" +
+        '<div class="tajuk-seksyen">Keadaan Sekarang</div>' +
+        '<div class="jumlah-baris"><span>Alat &amp; stok perlu perhatian</span><b>' +
+          alatPerluPerhatian(data).length + "</b></div>" +
+        '<div class="jumlah-baris"><span>Kalibrasi hampir / sudah luput</span><b>' +
+          kalibrasiPerluPerhatian(data).length + "</b></div>" +
+        '<div class="jumlah-baris"><span>Komitmen perlu dibayar</span><b>' +
+          komitmenPerluPerhatian(data).length + "</b></div>" +
+        '<div class="jumlah-baris"><span>Tugasan lewat / hampir sampai</span><b>' +
+          tugasPerluPerhatian(data).length + "</b></div>" +
+      "</div>";
+  }
+
   /* ---------------- DATA & BACKUP ---------------- */
   if (tabTetapan === "data") {
     isi =
@@ -5958,6 +6045,9 @@ function lukisTetapan(bekas) {
           '<div class="jumlah-baris"><span>Quotation</span><b>' + data.quotation.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Invois</span><b>' + data.invois.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Resit</span><b>' + data.resit.length + "</b></div>" +
+          '<div class="jumlah-baris"><span>Alat &amp; stok</span><b>' + data.alat.length + "</b></div>" +
+          '<div class="jumlah-baris"><span>Komitmen</span><b>' + data.komitmen.length + "</b></div>" +
+          '<div class="jumlah-baris"><span>Tugasan</span><b>' + data.tugasan.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Staf</span><b>' + data.staf.length + "</b></div>" +
         "</div>" +
       "</div>";
@@ -6071,6 +6161,22 @@ function lukisTetapan(bekas) {
     $("#borangQuoteTetapan").onsubmit = function (e) {
       e.preventDefault();
       if (simpanQuoteTetapan(null, null)) toast("Tetapan quotation disimpan.", "ok");
+    };
+  }
+
+  if ($("#borangAmaran")) {
+    $("#borangAmaran").onsubmit = function (e) {
+      e.preventDefault();
+      var nilai = ambilNilai($("#borangAmaran"));
+      var d = baca();
+      d.tetapan.amaran = {
+        kalibrasi: Math.max(1, nom(nilai.kalibrasi) || 30),
+        komitmen: Math.max(1, nom(nilai.komitmen) || 7),
+        tugasan: Math.max(1, nom(nilai.tugasan) || 3)
+      };
+      if (!simpan(d)) return;
+      toast("Tetapan peringatan disimpan.", "ok");
+      lukis();
     };
   }
 
@@ -6468,8 +6574,12 @@ function kiraAlat(a) {
   // Bahan pakai: amaran bila sampai paras minimum. Alat: amaran bila kurang dari paras minimum.
   var rendah = minimum > 0 &&
     (a.jenis === "Bahan Pakai" ? berfungsi <= minimum : berfungsi < minimum);
+  var dipinjam = (a.pinjam || []).filter(function (x) { return !x.tarikhPulang; })
+    .reduce(function (t, x) { return t + nom(x.kuantiti); }, 0);
   return {
     jumlah: jumlah, rosak: rosak, hilang: hilang, berfungsi: berfungsi, minimum: minimum,
+    dipinjam: dipinjam,
+    adaUntukAmbil: Math.max(0, berfungsi - dipinjam),
     nilai: berfungsi * nom(a.harga),
     rendah: rendah,
     habis: berfungsi <= 0
@@ -6500,6 +6610,132 @@ function logAlat(a, jenis, kuantiti, oleh, nota) {
   a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(),
     jenis: jenis, kuantiti: nom(kuantiti), oleh: oleh || "", nota: nota || "" });
   if (a.log.length > 200) a.log = a.log.slice(0, 200);
+}
+
+/* ---------------------- pinjam / ambil barang ------------------------- */
+
+function pinjamTerbuka(a) {
+  return (a.pinjam || []).filter(function (x) { return !x.tarikhPulang; });
+}
+
+function jumlahDipinjam(a) {
+  return pinjamTerbuka(a).reduce(function (t, x) { return t + nom(x.kuantiti); }, 0);
+}
+
+// Siapa pegang apa — untuk paparan ringkas di halaman utama alat.
+function semuaPinjaman(data) {
+  var hasil = [];
+  (data.alat || []).forEach(function (a) {
+    pinjamTerbuka(a).forEach(function (p) {
+      hasil.push({ alatId: a.id, alat: a.nama, unit: a.unit, pinjamId: p.id,
+        nama: p.nama, kuantiti: nom(p.kuantiti), tarikh: p.tarikhAmbil, nota: p.nota,
+        hari: hariSejak(p.tarikhAmbil) });
+    });
+  });
+  return hasil.sort(function (x, y) { return y.hari - x.hari; });
+}
+
+function borangAmbil(alatId) {
+  var data = baca();
+  var a = data.alat.filter(function (x) { return x.id === alatId; })[0];
+  if (!a) return;
+  var k = kiraAlat(a);
+  if (k.adaUntukAmbil <= 0) {
+    return toast("Tiada unit " + a.nama + " yang boleh diambil sekarang.", "warn", 5000);
+  }
+
+  var m = modal("Ambil Barang — " + a.nama,
+    '<div class="jumlah-baris"><span>Boleh guna</span><b>' + k.berfungsi + " " + esc(a.unit) + "</b></div>" +
+    '<div class="jumlah-baris"><span>Sedang dipegang orang</span><b>' + k.dipinjam + "</b></div>" +
+    '<div class="jumlah-baris" style="margin-bottom:14px"><span><b>Boleh diambil sekarang</b></span><b>' +
+      k.adaUntukAmbil + " " + esc(a.unit) + "</b></div>" +
+    '<form id="borangAmbil">' +
+      '<div class="baris-medan">' +
+        medan("Siapa Ambil *", '<input list="senaraiStafAmbil" name="nama" required ' +
+          'placeholder="Nama staf">') +
+        medan("Berapa Unit *", '<input type="number" step="1" min="1" max="' + k.adaUntukAmbil +
+          '" name="kuantiti" value="1" required>') +
+        medan("Tarikh Ambil", '<input type="date" name="tarikhAmbil" value="' + esc(kunciTarikh()) + '">') +
+      "</div>" +
+      '<datalist id="senaraiStafAmbil">' + data.staf.filter(function (x) { return x.status === "aktif"; })
+        .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
+      medan("Untuk Apa / Nota", '<input type="text" name="nota" placeholder="Contoh: inspection Setia Alam">') +
+      '<div class="baris-butang modal-kaki">' +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">Rekod Ambil</button>' +
+      "</div>" +
+    "</form>", 520);
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangAmbil", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangAmbil", m.el));
+    var q = Math.max(0, nom(v.kuantiti));
+    if (!v.nama) return toast("Sila isi nama orang yang ambil.", "bad");
+    var d = baca();
+    var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
+    if (q <= 0 || q > kiraAlat(rekod).adaUntukAmbil) {
+      return toast("Hanya " + kiraAlat(rekod).adaUntukAmbil + " " + rekod.unit + " boleh diambil.", "bad", 5000);
+    }
+    rekod.pinjam = rekod.pinjam || [];
+    rekod.pinjam.unshift({ id: id(), nama: v.nama, kuantiti: q,
+      tarikhAmbil: v.tarikhAmbil || kunciTarikh(), tarikhPulang: null, nota: v.nota || "" });
+    logAlat(rekod, "Ambil", q, v.nama, v.nota);
+    rekod.updatedAt = new Date().toISOString();
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(v.nama + " ambil " + q + " " + rekod.unit + " " + rekod.nama + ".", "ok", 5000);
+    lukis();
+  };
+}
+
+function pulangBarang(alatId, pinjamId) {
+  var data = baca();
+  var a = data.alat.filter(function (x) { return x.id === alatId; })[0];
+  if (!a) return;
+  var p = (a.pinjam || []).filter(function (x) { return x.id === pinjamId; })[0];
+  if (!p) return;
+
+  var m = modal("Pulang Barang — " + a.nama,
+    '<div class="jumlah-baris"><span>Diambil oleh</span><b>' + esc(p.nama) + "</b></div>" +
+    '<div class="jumlah-baris"><span>Kuantiti</span><b>' + nom(p.kuantiti) + " " + esc(a.unit) + "</b></div>" +
+    '<div class="jumlah-baris" style="margin-bottom:14px"><span>Tarikh ambil</span><b>' +
+      esc(fmtTarikh(p.tarikhAmbil)) + " (" + Math.max(0, hariSejak(p.tarikhAmbil)) + " hari)</b></div>" +
+    '<form id="borangPulang">' +
+      '<div class="baris-medan">' +
+        medan("Tarikh Pulang", '<input type="date" name="tarikhPulang" value="' + esc(kunciTarikh()) + '">') +
+        medan("Keadaan Barang", "<select name='keadaan'><option>Baik</option><option>Rosak</option>" +
+          "<option>Hilang</option></select>") +
+      "</div>" +
+      medan("Nota", '<input type="text" name="nota" placeholder="Contoh: bateri kena tukar">') +
+      '<div class="baris-butang modal-kaki">' +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">Rekod Pulang</button>' +
+      "</div>" +
+    "</form>", 520);
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangPulang", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangPulang", m.el));
+    var d = baca();
+    var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
+    var pp = (rekod.pinjam || []).filter(function (x) { return x.id === pinjamId; })[0];
+    if (!pp) return;
+    var q = nom(pp.kuantiti);
+    pp.tarikhPulang = v.tarikhPulang || kunciTarikh();
+    pp.keadaan = v.keadaan;
+    if (v.nota) pp.nota = (pp.nota ? pp.nota + " · " : "") + v.nota;
+    var kk = kiraAlat(rekod);
+    if (v.keadaan === "Rosak") rekod.rosak = Math.min(kk.jumlah, kk.rosak + q);
+    if (v.keadaan === "Hilang") rekod.hilang = Math.min(kk.jumlah, kk.hilang + q);
+    logAlat(rekod, "Pulang" + (v.keadaan !== "Baik" ? " (" + v.keadaan + ")" : ""), q, pp.nama, v.nota);
+    rekod.updatedAt = new Date().toISOString();
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(pp.nama + " pulangkan " + q + " " + rekod.unit + ".", "ok");
+    lukis();
+  };
 }
 
 /* ---------------------------- borang ---------------------------------- */
@@ -6595,6 +6831,7 @@ function borangAlat(alatId) {
       jumlah: nom(v.jumlah), rosak: nom(v.rosak), hilang: nom(v.hilang), minimum: nom(v.minimum),
       harga: nom(v.harga), lokasi: v.lokasi, pegang: v.pegang, tarikhBeli: v.tarikhBeli, nota: v.nota,
       log: a.log || [],
+      pinjam: a.pinjam || [],
       createdAt: a.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -6690,8 +6927,8 @@ function lihatAlat(alatId) {
   var m = modal(a.nama,
     '<div class="grid grid-4" style="margin-bottom:4px">' +
       kadStat("Boleh Guna", k.berfungsi + " " + a.unit, "dari " + k.jumlah + " dimiliki") +
-      kadStat("Rosak", String(k.rosak), k.rosak ? "perlu dibaiki" : "tiada") +
-      kadStat("Hilang", String(k.hilang), k.hilang ? "belum dijumpai" : "tiada") +
+      kadStat("Dipegang Orang", String(k.dipinjam), k.adaUntukAmbil + " lagi boleh diambil") +
+      kadStat("Rosak / Hilang", k.rosak + " / " + k.hilang, k.rosak || k.hilang ? "perlu tindakan" : "tiada") +
       kadStat("Nilai", rm(k.nilai), a.harga ? rm(a.harga) + " seunit" : "harga belum diisi") +
     "</div>" +
     '<div style="margin-bottom:12px"><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span>" +
@@ -6705,6 +6942,34 @@ function lihatAlat(alatId) {
       baris("Tarikh beli", a.tarikhBeli ? fmtTarikh(a.tarikhBeli) : "") +
       baris("Nota", a.nota) +
     "</dl>" +
+
+    (pinjamTerbuka(a).length
+      ? '<div class="tajuk-seksyen">Sedang Dipegang</div>' +
+        '<div class="jadual-bungkus"><table><thead><tr><th>Nama</th><th class="num">Unit</th>' +
+        "<th>Ambil</th><th>Nota</th><th></th></tr></thead><tbody>" +
+        pinjamTerbuka(a).map(function (x) {
+          return "<tr><td><b>" + esc(x.nama) + "</b></td>" +
+            '<td class="num">' + nom(x.kuantiti) + "</td>" +
+            "<td>" + esc(fmtTarikh(x.tarikhAmbil)) + '<div class="kecil">' +
+              Math.max(0, hariSejak(x.tarikhAmbil)) + " hari</div></td>" +
+            '<td class="bungkus kecil">' + esc(x.nota || "-") + "</td>" +
+            '<td><button type="button" class="btn btn-ok btn-kecil" data-pulang="' + esc(x.id) +
+              '">Pulang</button></td></tr>';
+        }).join("") + "</tbody></table></div>"
+      : "") +
+
+    ((a.pinjam || []).filter(function (x) { return x.tarikhPulang; }).length
+      ? '<div class="tajuk-seksyen">Sejarah Ambil / Pulang</div>' +
+        '<div class="jadual-bungkus"><table><thead><tr><th>Nama</th><th class="num">Unit</th>' +
+        "<th>Ambil</th><th>Pulang</th><th>Keadaan</th></tr></thead><tbody>" +
+        a.pinjam.filter(function (x) { return x.tarikhPulang; }).slice(0, 15).map(function (x) {
+          return "<tr><td>" + esc(x.nama) + "</td>" +
+            '<td class="num">' + nom(x.kuantiti) + "</td>" +
+            "<td>" + esc(fmtTarikh(x.tarikhAmbil)) + "</td>" +
+            "<td>" + esc(fmtTarikh(x.tarikhPulang)) + "</td>" +
+            "<td>" + esc(x.keadaan || "Baik") + "</td></tr>";
+        }).join("") + "</tbody></table></div>"
+      : "") +
 
     '<div class="tajuk-seksyen">Rekod Pergerakan</div>' +
     ((a.log || []).length
@@ -6725,25 +6990,273 @@ function lihatAlat(alatId) {
       '<button type="button" class="btn btn-lembut" data-gerak="hilang">Tanda Hilang</button>' +
       '<button type="button" class="btn btn-lembut" data-gerak="rosak">Tanda Rosak</button>' +
       '<button type="button" class="btn btn-lembut" id="btnSuntingAlat">Sunting</button>' +
+      (k.adaUntukAmbil > 0
+        ? '<button type="button" class="btn btn-lembut" id="btnAmbilAlat">Ambil</button>' : "") +
       '<button type="button" class="btn btn-utama" data-gerak="tambah">Tambah Stok</button>' +
-    "</div>", 720);
+    "</div>", 760);
 
   $$("[data-gerak]", m.el).forEach(function (b) {
     b.onclick = function () { m.tutup(); gerakAlat(alatId, b.getAttribute("data-gerak")); };
   });
+  $$("[data-pulang]", m.el).forEach(function (b) {
+    b.onclick = function () { m.tutup(); pulangBarang(alatId, b.getAttribute("data-pulang")); };
+  });
+  if ($("#btnAmbilAlat", m.el)) {
+    $("#btnAmbilAlat", m.el).onclick = function () { m.tutup(); borangAmbil(alatId); };
+  }
   $("#btnSuntingAlat", m.el).onclick = function () { m.tutup(); borangAlat(alatId); };
 }
 
+/* ======================================================================
+   KALIBRASI — sijil kalibrasi alat (SIRIM dsb), tarikh luput & fail PDF
+   ================================================================== */
+
+var kalCari = "";
+
+function amaranHari(data, kunci, lalai) {
+  var v = nom((data.tetapan.amaran || {})[kunci]);
+  return v > 0 ? v : lalai;
+}
+
+function statusKalibrasi(k, data) {
+  var hari = k.tarikhLuput ? -hariSejak(k.tarikhLuput) : null;   // positif = berapa hari lagi
+  var awal = amaranHari(data, "kalibrasi", 30);
+  if (hari === null) return { teks: "Tiada tarikh luput", warna: "muted", perlu: false, hari: null };
+  if (hari < 0) return { teks: "Luput " + Math.abs(hari) + " hari lalu", warna: "bad", perlu: true, hari: hari };
+  if (hari === 0) return { teks: "Luput hari ini", warna: "bad", perlu: true, hari: 0 };
+  if (hari <= awal) return { teks: hari + " hari lagi", warna: "warn", perlu: true, hari: hari };
+  return { teks: "Sah · " + hari + " hari lagi", warna: "ok", perlu: false, hari: hari };
+}
+
+// Rekod terkini bagi setiap alat sahaja yang perlu diberi amaran.
+function kalibrasiPerluPerhatian(data) {
+  var terkini = {};
+  (data.kalibrasi || []).forEach(function (k) {
+    var kunci = k.alatId || ("nama:" + String(k.nama || "").toLowerCase());
+    if (!terkini[kunci] || String(k.tarikhLuput) > String(terkini[kunci].tarikhLuput)) terkini[kunci] = k;
+  });
+  return Object.keys(terkini).map(function (x) { return terkini[x]; })
+    .filter(function (k) { return statusKalibrasi(k, data).perlu; })
+    .sort(function (a, b) { return String(a.tarikhLuput).localeCompare(String(b.tarikhLuput)); });
+}
+
+function borangKalibrasi(kalId, alatId) {
+  var data = baca();
+  var k = kalId ? data.kalibrasi.filter(function (x) { return x.id === kalId; })[0] : null;
+  var baru = !k;
+  var alatAsal = alatId ? data.alat.filter(function (x) { return x.id === alatId; })[0] : null;
+  k = k || { tarikhKalibrasi: kunciTarikh(), badan: "SIRIM",
+             alatId: alatId || "", nama: alatAsal ? alatAsal.nama : "" };
+
+  var m = modal(baru ? "Rekod Kalibrasi Baharu" : "Sunting Rekod Kalibrasi",
+    '<form id="borangKal">' +
+      '<div class="baris-medan">' +
+        medan("Alat", "<select name='alatId'><option value=''>— taip nama sendiri —</option>" +
+          data.alat.filter(function (x) { return x.jenis === "Alat"; }).map(function (x) {
+            return "<option value='" + esc(x.id) + "'" + (k.alatId === x.id ? " selected" : "") +
+              ">" + esc(x.nama) + "</option>";
+          }).join("") + "</select>") +
+        medan("Nama pada Sijil *", '<input type="text" name="nama" value="' + esc(k.nama || "") +
+          '" placeholder="Contoh: Moisture Meter GE-2" required>') +
+        medan("No. Siri Alat", '<input type="text" name="noSiri" value="' + esc(k.noSiri || "") + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Badan Kalibrasi", '<input list="senaraiBadanKal" name="badan" value="' +
+          esc(k.badan || "") + '">') +
+        medan("No. Sijil", '<input type="text" name="noSijil" value="' + esc(k.noSijil || "") + '">') +
+        medan("Kos (RM)", '<input type="number" step="0.01" min="0" name="kos" value="' +
+          esc(k.kos || "") + '">') +
+      "</div>" +
+      '<datalist id="senaraiBadanKal"><option>SIRIM</option><option>Makmal Terakreditasi</option>' +
+        "<option>Pembekal Alat</option></datalist>" +
+      '<div class="baris-medan">' +
+        medan("Tarikh Kalibrasi *", '<input type="date" name="tarikhKalibrasi" value="' +
+          esc(k.tarikhKalibrasi || "") + '" required>') +
+        medan("Tarikh Luput *", '<input type="date" name="tarikhLuput" value="' +
+          esc(k.tarikhLuput || "") + '" required>') +
+        medan("Tempoh Sah", "<select name='tempoh'><option value=''>— pilih untuk isi auto —</option>" +
+          "<option value='6'>6 bulan</option><option value='12'>12 bulan</option>" +
+          "<option value='24'>24 bulan</option><option value='36'>36 bulan</option></select>") +
+      "</div>" +
+      medan("Nota", '<textarea name="nota" style="min-height:56px">' + esc(k.nota || "") + "</textarea>") +
+      '<div class="tajuk-seksyen">Sijil PDF</div>' +
+      '<div class="jumlah-baris" style="margin-bottom:12px"><span>' +
+        (k.fail
+          ? "<b>" + esc(k.fail.nama) + "</b><div class='kecil'>" + esc(saizTeks(k.fail.saiz)) + "</div>"
+          : "<span class='kecil'>Belum ada fail sijil.</span>") +
+      "</span><span>" +
+        '<label class="btn btn-lembut btn-kecil" style="display:inline-block;margin:0">' +
+          (k.fail ? "Ganti Fail" : "Muat Naik PDF") +
+          '<input type="file" accept="application/pdf" id="failKal" hidden></label>' +
+      "</span></div>" +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamKal">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 700);
+
+  var borang = $("#borangKal", m.el);
+  var failBaharu = null;      // { nama, saiz, bait }
+  $("[data-batal]", m.el).onclick = m.tutup;
+
+  $("[name=alatId]", borang).onchange = function (e) {
+    var pilih = data.alat.filter(function (x) { return x.id === e.target.value; })[0];
+    if (pilih && !$("[name=nama]", borang).value) $("[name=nama]", borang).value = pilih.nama;
+  };
+  $("[name=tempoh]", borang).onchange = function (e) {
+    var bulan = nom(e.target.value);
+    var mula = $("[name=tarikhKalibrasi]", borang).value;
+    if (!bulan || !mula) return;
+    var t = keDate(mula);
+    t.setMonth(t.getMonth() + bulan);
+    $("[name=tarikhLuput]", borang).value = kunciTarikh(t);
+  };
+  $("#failKal", m.el).onchange = function (e) {
+    var fail = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!fail) return;
+    fail.arrayBuffer().then(function (buf) {
+      failBaharu = { nama: fail.name, saiz: fail.size, bait: new Uint8Array(buf) };
+      toast("Fail sijil sedia: " + fail.name + ". Tekan Simpan.", "ok", 5000);
+    }).catch(function (err) { toast("Gagal baca fail: " + err.message, "bad", 5000); });
+  };
+
+  if ($("#btnPadamKal", m.el)) {
+    $("#btnPadamKal", m.el).onclick = function () {
+      sahkan("Padam rekod kalibrasi ini?").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.kalibrasi = d.kalibrasi.filter(function (x) { return x.id !== kalId; });
+        simpan(d);
+        failBuang("cal-" + kalId).catch(function () {});
+        m.tutup();
+        toast("Rekod kalibrasi dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai(borang);
+    if (!v.nama) return toast("Sila isi nama alat pada sijil.", "bad");
+    if (v.tarikhLuput && v.tarikhKalibrasi && v.tarikhLuput < v.tarikhKalibrasi) {
+      return toast("Tarikh luput tidak boleh sebelum tarikh kalibrasi.", "bad", 5000);
+    }
+    var d = baca();
+    var rekodId = kalId || id();
+    var rekod = {
+      id: rekodId, alatId: v.alatId || "", nama: v.nama, noSiri: v.noSiri,
+      badan: v.badan, noSijil: v.noSijil, kos: nom(v.kos),
+      tarikhKalibrasi: v.tarikhKalibrasi, tarikhLuput: v.tarikhLuput, nota: v.nota,
+      fail: failBaharu ? { nama: failBaharu.nama, saiz: failBaharu.saiz } : (k.fail || null),
+      createdAt: k.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    var simpanRekod = function () {
+      if (kalId) d.kalibrasi = d.kalibrasi.map(function (x) { return x.id === kalId ? rekod : x; });
+      else d.kalibrasi.push(rekod);
+      if (!simpan(d)) return;
+      m.tutup();
+      toast(kalId ? "Rekod kalibrasi dikemas kini." : "Rekod kalibrasi disimpan.", "ok");
+      lukis();
+    };
+    if (failBaharu) {
+      failSimpan("cal-" + rekodId, { nama: failBaharu.nama, saiz: failBaharu.saiz, bait: failBaharu.bait })
+        .then(simpanRekod)
+        .catch(function (err) { toast("Gagal simpan fail: " + err.message, "bad", 6000); });
+    } else {
+      simpanRekod();
+    }
+  };
+}
+
+function bukaSijil(kalId) {
+  failAmbil("cal-" + kalId).then(function (r) {
+    if (!r || !r.bait) return toast("Fail sijil tidak dijumpai.", "warn");
+    var url = URL.createObjectURL(new Blob([r.bait], { type: "application/pdf" }));
+    window.open(url, "_blank");
+    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+  }).catch(function (e) { toast("Gagal buka fail: " + e.message, "bad", 5000); });
+}
+
+function jadualKalibrasi(data, senarai) {
+  if (!senarai.length) {
+    return kosong("Belum ada rekod kalibrasi. Tekan “Rekod Kalibrasi” untuk tambah sijil pertama.");
+  }
+  return '<div class="jadual-bungkus"><table><thead><tr><th>Alat</th><th>Badan / Sijil</th>' +
+    "<th>Kalibrasi</th><th>Luput</th><th>Status</th><th></th></tr></thead><tbody>" +
+    senarai.map(function (k) {
+      var st = statusKalibrasi(k, data);
+      return "<tr>" +
+        '<td class="bungkus"><b>' + esc(k.nama) + "</b>" +
+          (k.noSiri ? '<div class="kecil">Siri: ' + esc(k.noSiri) + "</div>" : "") + "</td>" +
+        '<td class="bungkus">' + esc(k.badan || "-") +
+          '<div class="kecil">' + esc(k.noSijil || "-") + "</div></td>" +
+        "<td>" + esc(k.tarikhKalibrasi ? fmtTarikh(k.tarikhKalibrasi) : "-") +
+          (k.kos ? '<div class="kecil">' + esc(rm(k.kos)) + "</div>" : "") + "</td>" +
+        "<td>" + esc(k.tarikhLuput ? fmtTarikh(k.tarikhLuput) : "-") + "</td>" +
+        '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span></td>" +
+        '<td><div class="aksi">' +
+          (k.fail ? '<button class="btn btn-lembut" data-sijil="' + esc(k.id) + '">Sijil</button>' : "") +
+          '<button class="btn btn-lembut" data-kalsunting="' + esc(k.id) + '">Sunting</button>' +
+          '<button class="btn btn-ok" data-kalbaharu="' + esc(k.id) + '">Kalibrasi Semula</button>' +
+        "</div></td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
+
 /* ---------------------------- halaman --------------------------------- */
+
+var tabAlat = "alat";
+
+function jadualBarang(senarai, bahan) {
+  if (!senarai.length) return "";
+  return '<div class="jadual-bungkus"><table><thead><tr><th>Barang</th>' +
+    (bahan ? "<th class='num'>Baki</th><th class='num'>Minimum</th>"
+           : "<th class='num'>Boleh Guna</th><th class='num'>Dipegang</th>") +
+    "<th class='num'>Rosak / Hilang</th><th>Status</th><th></th></tr></thead><tbody>" +
+    senarai.map(function (a) {
+      var k = kiraAlat(a), st = statusAlat(a);
+      return "<tr>" +
+        '<td class="bungkus"><b>' + esc(a.nama) + "</b>" +
+          '<div class="kecil">' + esc([a.kategori, a.lokasi, a.pegang].filter(Boolean).join(" · ") || "-") +
+        "</div></td>" +
+        (bahan
+          ? '<td class="num"><b>' + k.berfungsi + "</b><div class=\"kecil\">" + esc(a.unit) + "</div></td>" +
+            '<td class="num">' + (k.minimum || "-") + "</td>"
+          : '<td class="num"><b>' + k.berfungsi + '</b><div class="kecil">dari ' + k.jumlah + "</div></td>" +
+            '<td class="num">' + (k.dipinjam
+              ? "<b>" + k.dipinjam + "</b><div class='kecil'>" + k.adaUntukAmbil + " di rak</div>"
+              : '<span class="kecil">0</span>') + "</td>") +
+        '<td class="num">' + (k.rosak || k.hilang
+          ? "<b style='color:var(--bad)'>" + k.rosak + " / " + k.hilang + "</b>"
+          : '<span class="kecil">0 / 0</span>') + "</td>" +
+        '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span></td>" +
+        '<td><div class="aksi">' +
+          '<button class="btn btn-lembut" data-alat="' + esc(a.id) + '">Buka</button>' +
+          (bahan
+            ? '<button class="btn btn-lembut" data-alatgerak="' + esc(a.id) +
+              '" data-kunci="guna">Ambil / Guna</button>'
+            : (k.adaUntukAmbil > 0
+                ? '<button class="btn btn-lembut" data-ambil="' + esc(a.id) + '">Ambil</button>'
+                : '<button class="btn btn-lembut" data-alat="' + esc(a.id) + '">Pulang</button>')) +
+          '<button class="btn btn-ok" data-alatgerak="' + esc(a.id) +
+            '" data-kunci="tambah">+ Stok</button>' +
+        "</div></td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
 
 function lukisAlat(bekas) {
   var data = baca();
   var teks = alatCari.trim().toLowerCase();
   var semua = data.alat || [];
+  var bahan = tabAlat === "sticker";
 
   var senarai = semua.filter(function (a) {
+    if (tabAlat === "alat" && a.jenis !== "Alat") return false;
+    if (tabAlat === "sticker" && a.jenis !== "Bahan Pakai") return false;
     if (alatKategori && (a.kategori || "") !== alatKategori) return false;
-    if (alatJenis && a.jenis !== alatJenis) return false;
     if (alatPerhatian && !statusAlat(a).perhatian) return false;
     if (teks) {
       var gabung = [a.nama, a.kategori, a.lokasi, a.pegang, a.nota].join(" ").toLowerCase();
@@ -6755,119 +7268,232 @@ function lukisAlat(bekas) {
     return (sx - sy) || String(x.nama).localeCompare(String(y.nama));
   });
 
-  var jum = semua.reduce(function (t, a) {
-    var k = kiraAlat(a);
-    t.unit += k.jumlah; t.rosak += k.rosak; t.hilang += k.hilang; t.nilai += k.nilai;
-    if (statusAlat(a).perhatian) t.perhatian++;
-    if (a.jenis === "Bahan Pakai" && (k.habis || k.rendah)) t.stokRendah++;
-    return t;
-  }, { unit: 0, rosak: 0, hilang: 0, nilai: 0, perhatian: 0, stokRendah: 0 });
-
   var kategori = [];
   semua.forEach(function (a) {
     if (a.kategori && kategori.indexOf(a.kategori) === -1) kategori.push(a.kategori);
   });
   kategori.sort();
 
-  bekas.innerHTML =
-    '<div class="grid grid-4">' +
-      kadStat("Jenis Barang", String(semua.length), jum.unit + " unit kesemuanya") +
-      kadStat("Perlu Perhatian", String(jum.perhatian), "rosak, hilang atau hampir habis") +
-      kadStat("Bahan Hampir Habis", String(jum.stokRendah), "perlu beli semula") +
-      kadStat("Nilai Alat Berfungsi", rm(jum.nilai), "ikut harga seunit") +
-    "</div>" +
+  var pinjaman = semuaPinjaman(data);
+  var kal = (data.kalibrasi || []).slice().sort(function (a, b) {
+    return String(a.tarikhLuput || "9999").localeCompare(String(b.tarikhLuput || "9999"));
+  });
+  var kalTapis = kalCari.trim()
+    ? kal.filter(function (k) {
+        return [k.nama, k.badan, k.noSijil, k.noSiri].join(" ").toLowerCase()
+          .indexOf(kalCari.trim().toLowerCase()) !== -1;
+      })
+    : kal;
 
-    '<div class="kad">' +
-      '<div class="kad-tajuk"><h3>Senarai Alat &amp; Stok</h3>' +
-        '<div class="aksi">' +
-          '<button class="btn btn-utama" id="btnAlatBaru">Tambah Barang</button>' +
-          (semua.length ? "" : '<button class="btn btn-lembut" id="btnAlatContoh">Isi Senarai Asas</button>') +
-          '<button class="btn btn-lembut" id="btnEksportAlat">Eksport CSV</button>' +
+  var isi = "";
+
+  if (tabAlat !== "kalibrasi") {
+    var jum = semua.filter(function (a) {
+      return bahan ? a.jenis === "Bahan Pakai" : a.jenis === "Alat";
+    }).reduce(function (t, a) {
+      var k = kiraAlat(a);
+      t.bil++; t.unit += k.jumlah; t.rosak += k.rosak; t.hilang += k.hilang;
+      t.nilai += k.nilai; t.dipinjam += k.dipinjam;
+      if (statusAlat(a).perhatian) t.perhatian++;
+      return t;
+    }, { bil: 0, unit: 0, rosak: 0, hilang: 0, nilai: 0, dipinjam: 0, perhatian: 0 });
+
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat(bahan ? "Jenis Bahan" : "Jenis Alat", String(jum.bil), jum.unit + " unit kesemuanya") +
+        kadStat("Perlu Perhatian", String(jum.perhatian),
+          bahan ? "hampir habis atau habis" : "rosak, hilang atau kurang") +
+        (bahan
+          ? kadStat("Rosak / Hilang", jum.rosak + " / " + jum.hilang, "unit tidak boleh guna")
+          : kadStat("Sedang Dipegang", String(jum.dipinjam), pinjaman.length + " rekod ambil belum pulang")) +
+        kadStat("Nilai Berfungsi", rm(jum.nilai), "ikut harga seunit") +
+      "</div>" +
+
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>' + (bahan ? "Sticker &amp; Bahan Pakai" : "Senarai Alat") + "</h3>" +
+          '<div class="aksi">' +
+            '<button class="btn btn-utama" id="btnAlatBaru">Tambah Barang</button>' +
+            (semua.length ? "" : '<button class="btn btn-lembut" id="btnAlatContoh">Isi Senarai Asas</button>') +
+            '<button class="btn btn-lembut" id="btnEksportAlat">Eksport CSV</button>' +
+          "</div>" +
         "</div>" +
+        '<p class="kecil" style="margin:-4px 0 12px">' +
+        (bahan
+          ? "Setiap kali staf ambil sticker atau bahan lain, tekan <b>Ambil / Guna</b> — " +
+            "stok tolak sendiri dan nama pengambil disimpan dalam sejarah barang itu."
+          : "Tekan <b>Ambil</b> bila staf bawa keluar alat, dan <b>Pulang</b> bila dipulangkan. " +
+            "Semua rekod disimpan pada barang itu.") + "</p>" +
+        '<div class="penapis">' +
+          "<label>Kategori<select id='fKategoriAlat'><option value=''>Semua kategori</option>" +
+            kategori.map(function (x) {
+              return "<option" + (alatKategori === x ? " selected" : "") + ">" + esc(x) + "</option>";
+            }).join("") + "</select></label>" +
+          '<label style="min-width:200px">Cari<input type="search" id="fCariAlat" ' +
+            'placeholder="Nama, lokasi, staf…" value="' + esc(alatCari) + '"></label>' +
+          '<label class="chip pilih-chip" style="align-self:end"><input type="checkbox" id="fPerhatianAlat"' +
+            (alatPerhatian ? " checked" : "") + ">Perlu perhatian sahaja</label>" +
+          '<button class="btn btn-lembut" id="btnResetAlat">Reset</button>' +
+        "</div>" +
+        (senarai.length ? jadualBarang(senarai, bahan)
+          : kosong(semua.length
+              ? "Tiada barang padan dengan penapis ini."
+              : "Belum ada barang. Tekan “Tambah Barang”, atau “Isi Senarai Asas” untuk mula dengan " +
+                "senarai alat inspection biasa.")) +
       "</div>" +
-      '<div class="penapis">' +
-        "<label>Kategori<select id='fKategoriAlat'><option value=''>Semua kategori</option>" +
-          kategori.map(function (x) {
-            return "<option" + (alatKategori === x ? " selected" : "") + ">" + esc(x) + "</option>";
-          }).join("") + "</select></label>" +
-        "<label>Jenis<select id='fJenisAlat'><option value=''>Semua jenis</option>" +
-          JENIS_ALAT.map(function (x) {
-            return "<option" + (alatJenis === x ? " selected" : "") + ">" + esc(x) + "</option>";
-          }).join("") + "</select></label>" +
-        '<label style="min-width:200px">Cari<input type="search" id="fCariAlat" ' +
-          'placeholder="Nama, lokasi, staf…" value="' + esc(alatCari) + '"></label>' +
-        '<label class="chip pilih-chip" style="align-self:end"><input type="checkbox" id="fPerhatianAlat"' +
-          (alatPerhatian ? " checked" : "") + ">Perlu perhatian sahaja</label>" +
-        '<button class="btn btn-lembut" id="btnResetAlat">Reset</button>' +
-      "</div>" +
-      '<div class="jadual-bungkus">' +
-      (senarai.length
-        ? "<table><thead><tr><th>Barang</th><th>Jenis</th><th class='num'>Boleh Guna</th>" +
-          "<th class='num'>Rosak / Hilang</th><th>Status</th><th></th></tr></thead><tbody>" +
-          senarai.map(function (a) {
-            var k = kiraAlat(a), st = statusAlat(a);
-            var bahan = a.jenis === "Bahan Pakai";
-            return "<tr>" +
-              '<td class="bungkus"><b>' + esc(a.nama) + "</b>" +
-                '<div class="kecil">' + esc([a.kategori, a.lokasi, a.pegang].filter(Boolean).join(" · ") || "-") +
-              "</div></td>" +
-              "<td>" + esc(a.jenis) + '<div class="kecil">' + esc(a.unit) + "</div></td>" +
-              '<td class="num"><b>' + k.berfungsi + "</b>" +
-                '<div class="kecil">dari ' + k.jumlah + "</div></td>" +
-              '<td class="num">' + (k.rosak || k.hilang
-                ? "<b style='color:var(--bad)'>" + k.rosak + " / " + k.hilang + "</b>"
-                : '<span class="kecil">0 / 0</span>') + "</td>" +
-              '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span>" +
-                (k.minimum ? '<div class="kecil">min ' + k.minimum + "</div>" : "") + "</td>" +
-              '<td><div class="aksi">' +
-                '<button class="btn btn-lembut" data-alat="' + esc(a.id) + '">Buka</button>' +
-                '<button class="btn btn-lembut" data-alatgerak="' + esc(a.id) + '" data-kunci="' +
-                  (bahan ? "guna" : "rosak") + '">' + (bahan ? "Guna" : "Rosak") + "</button>" +
-                '<button class="btn btn-ok" data-alatgerak="' + esc(a.id) +
-                  '" data-kunci="tambah">+ Stok</button>' +
-              "</div></td></tr>";
-          }).join("") + "</tbody></table>"
-        : kosong(semua.length
-            ? "Tiada barang padan dengan penapis ini."
-            : "Belum ada barang. Tekan “Tambah Barang”, atau “Isi Senarai Asas” untuk mula dengan " +
-              "senarai alat inspection biasa.")) +
-      "</div>" +
-    "</div>";
 
-  $("#btnAlatBaru").onclick = function () { borangAlat(null); };
+      (!bahan && pinjaman.length
+        ? '<div class="kad">' +
+            '<div class="kad-tajuk"><h3>Siapa Pegang Apa</h3>' +
+              '<span class="kecil">' + pinjaman.length + " rekod belum dipulangkan</span></div>" +
+            '<div class="jadual-bungkus"><table><thead><tr><th>Nama</th><th>Barang</th>' +
+            "<th class='num'>Unit</th><th>Ambil</th><th>Nota</th><th></th></tr></thead><tbody>" +
+            pinjaman.map(function (x) {
+              return "<tr><td><b>" + esc(x.nama) + "</b></td>" +
+                '<td class="bungkus">' + esc(x.alat) + "</td>" +
+                '<td class="num">' + x.kuantiti + "</td>" +
+                "<td>" + esc(fmtTarikh(x.tarikh)) + '<div class="kecil">' +
+                  Math.max(0, x.hari) + " hari</div></td>" +
+                '<td class="bungkus kecil">' + esc(x.nota || "-") + "</td>" +
+                '<td><button class="btn btn-ok" data-pulangbaris="' + esc(x.pinjamId) +
+                  '" data-alatpulang="' + esc(x.alatId) + '">Pulang</button></td></tr>';
+            }).join("") + "</tbody></table></div>" +
+          "</div>"
+        : "");
+  } else {
+    var perlu = kalibrasiPerluPerhatian(data);
+    var luput = perlu.filter(function (k) { return statusKalibrasi(k, data).hari < 0; });
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat("Rekod Kalibrasi", String(kal.length), "semua sijil disimpan") +
+        kadStat("Sudah Luput", String(luput.length), "perlu kalibrasi semula") +
+        kadStat("Akan Luput", String(perlu.length - luput.length),
+          "dalam " + amaranHari(data, "kalibrasi", 30) + " hari") +
+        kadStat("Kos Kalibrasi", rm(kal.reduce(function (t, k) { return t + nom(k.kos); }, 0)),
+          "jumlah direkod") +
+      "</div>" +
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Sijil Kalibrasi</h3>' +
+          '<div class="aksi">' +
+            '<button class="btn btn-utama" id="btnKalBaru">Rekod Kalibrasi</button>' +
+            '<button class="btn btn-lembut" id="btnEksportKal">Eksport CSV</button>' +
+          "</div>" +
+        "</div>" +
+        '<p class="kecil" style="margin:-4px 0 12px">Simpan tarikh kalibrasi, tarikh luput dan ' +
+        "fail sijil PDF. Alat yang hampir luput akan naik di papan utama " +
+        "(" + amaranHari(data, "kalibrasi", 30) + " hari sebelum luput — boleh ubah dalam Tetapan).</p>" +
+        '<div class="penapis">' +
+          '<label style="min-width:220px">Cari<input type="search" id="fCariKal" ' +
+            'placeholder="Nama alat, no. sijil…" value="' + esc(kalCari) + '"></label>' +
+          '<button class="btn btn-lembut" id="btnResetKal">Reset</button>' +
+        "</div>" +
+        jadualKalibrasi(data, kalTapis) +
+      "</div>";
+  }
+
+  bekas.innerHTML =
+    '<div class="suis" style="margin-bottom:16px;flex-wrap:wrap">' +
+      [["alat", "Alat & Stok"], ["sticker", "Sticker & Bahan Pakai"], ["kalibrasi", "Calibration Tool"]]
+        .map(function (x) {
+          return '<button type="button" data-tabalat="' + x[0] + '"' +
+            (tabAlat === x[0] ? ' class="aktif"' : "") + ">" + esc(x[1]) + "</button>";
+        }).join("") +
+    "</div>" + isi;
+
+  $$("[data-tabalat]", bekas).forEach(function (b) {
+    b.onclick = function () { tabAlat = b.getAttribute("data-tabalat"); lukisAlat(bekas); };
+  });
+
+  if ($("#btnAlatBaru")) $("#btnAlatBaru").onclick = function () { borangAlat(null); };
   if ($("#btnAlatContoh")) $("#btnAlatContoh").onclick = function () { isiAlatContoh(); };
-  $("#fKategoriAlat").onchange = function (e) { alatKategori = e.target.value; lukisAlat(bekas); };
-  $("#fJenisAlat").onchange = function (e) { alatJenis = e.target.value; lukisAlat(bekas); };
-  $("#fPerhatianAlat").onchange = function (e) { alatPerhatian = e.target.checked; lukisAlat(bekas); };
-  $("#btnResetAlat").onclick = function () {
-    alatKategori = ""; alatJenis = ""; alatCari = ""; alatPerhatian = false; lukisAlat(bekas);
-  };
-  var kotak = $("#fCariAlat");
-  kotak.oninput = function (e) {
-    alatCari = e.target.value;
-    clearTimeout(kotak._t);
-    kotak._t = setTimeout(function () {
-      lukisAlat(bekas);
-      var baharu = $("#fCariAlat");
-      baharu.focus();
-      baharu.setSelectionRange(baharu.value.length, baharu.value.length);
-    }, 260);
-  };
-  $("#btnEksportAlat").onclick = function () {
-    csv("alat-stok",
-      ["Barang", "Kategori", "Jenis", "Unit", "Jumlah", "Boleh Guna", "Rosak", "Hilang",
-       "Minimum", "Harga Seunit", "Nilai", "Lokasi", "Dipegang", "Status", "Nota"],
-      senarai.map(function (a) {
-        var k = kiraAlat(a);
-        return [a.nama, a.kategori, a.jenis, a.unit, k.jumlah, k.berfungsi, k.rosak, k.hilang,
-                k.minimum, nom(a.harga), k.nilai, a.lokasi, a.pegang, statusAlat(a).teks, a.nota];
-      }));
-  };
+  if ($("#fKategoriAlat")) {
+    $("#fKategoriAlat").onchange = function (e) { alatKategori = e.target.value; lukisAlat(bekas); };
+  }
+  if ($("#fPerhatianAlat")) {
+    $("#fPerhatianAlat").onchange = function (e) { alatPerhatian = e.target.checked; lukisAlat(bekas); };
+  }
+  if ($("#btnResetAlat")) {
+    $("#btnResetAlat").onclick = function () {
+      alatKategori = ""; alatCari = ""; alatPerhatian = false; lukisAlat(bekas);
+    };
+  }
+  if ($("#fCariAlat")) {
+    var kotak = $("#fCariAlat");
+    kotak.oninput = function (e) {
+      alatCari = e.target.value;
+      clearTimeout(kotak._t);
+      kotak._t = setTimeout(function () {
+        lukisAlat(bekas);
+        var baharu = $("#fCariAlat");
+        if (baharu) { baharu.focus(); baharu.setSelectionRange(baharu.value.length, baharu.value.length); }
+      }, 260);
+    };
+  }
+  if ($("#btnEksportAlat")) {
+    $("#btnEksportAlat").onclick = function () {
+      csv("alat-stok",
+        ["Barang", "Kategori", "Jenis", "Unit", "Jumlah", "Boleh Guna", "Dipegang", "Rosak", "Hilang",
+         "Minimum", "Harga Seunit", "Nilai", "Lokasi", "Status", "Nota"],
+        senarai.map(function (a) {
+          var k = kiraAlat(a);
+          return [a.nama, a.kategori, a.jenis, a.unit, k.jumlah, k.berfungsi, k.dipinjam, k.rosak,
+                  k.hilang, k.minimum, nom(a.harga), k.nilai, a.lokasi, statusAlat(a).teks, a.nota];
+        }));
+    };
+  }
+  if ($("#btnKalBaru")) $("#btnKalBaru").onclick = function () { borangKalibrasi(null, null); };
+  if ($("#btnResetKal")) {
+    $("#btnResetKal").onclick = function () { kalCari = ""; lukisAlat(bekas); };
+  }
+  if ($("#fCariKal")) {
+    var kotakK = $("#fCariKal");
+    kotakK.oninput = function (e) {
+      kalCari = e.target.value;
+      clearTimeout(kotakK._t);
+      kotakK._t = setTimeout(function () {
+        lukisAlat(bekas);
+        var bk = $("#fCariKal");
+        if (bk) { bk.focus(); bk.setSelectionRange(bk.value.length, bk.value.length); }
+      }, 260);
+    };
+  }
+  if ($("#btnEksportKal")) {
+    $("#btnEksportKal").onclick = function () {
+      csv("kalibrasi", ["Alat", "No. Siri", "Badan", "No. Sijil", "Tarikh Kalibrasi", "Tarikh Luput",
+        "Kos", "Status", "Nota"],
+        kalTapis.map(function (k) {
+          return [k.nama, k.noSiri, k.badan, k.noSijil, k.tarikhKalibrasi, k.tarikhLuput,
+                  nom(k.kos), statusKalibrasi(k, data).teks, k.nota];
+        }));
+    };
+  }
+
   $$("[data-alat]", bekas).forEach(function (b) {
     b.onclick = function () { lihatAlat(b.getAttribute("data-alat")); };
   });
   $$("[data-alatgerak]", bekas).forEach(function (b) {
     b.onclick = function () { gerakAlat(b.getAttribute("data-alatgerak"), b.getAttribute("data-kunci")); };
+  });
+  $$("[data-ambil]", bekas).forEach(function (b) {
+    b.onclick = function () { borangAmbil(b.getAttribute("data-ambil")); };
+  });
+  $$("[data-pulangbaris]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      pulangBarang(b.getAttribute("data-alatpulang"), b.getAttribute("data-pulangbaris"));
+    };
+  });
+  $$("[data-sijil]", bekas).forEach(function (b) {
+    b.onclick = function () { bukaSijil(b.getAttribute("data-sijil")); };
+  });
+  $$("[data-kalsunting]", bekas).forEach(function (b) {
+    b.onclick = function () { borangKalibrasi(b.getAttribute("data-kalsunting"), null); };
+  });
+  $$("[data-kalbaharu]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      var lama = (baca().kalibrasi || []).filter(function (x) {
+        return x.id === b.getAttribute("data-kalbaharu");
+      })[0];
+      borangKalibrasi(null, lama ? lama.alatId : null);
+    };
   });
 }
 
@@ -6910,6 +7536,663 @@ function isiAlatContoh() {
   });
 }
 
+/* ======================================================================
+   KOMITMEN — transport, pinjaman dan komitmen bulanan lain
+   ================================================================== */
+
+var tabKomitmen = "Transport";
+var komitCari = "";
+
+var KATEGORI_KOMITMEN = ["Transport", "Pinjaman", "Lain"];
+var KITARAN_KOMITMEN = ["Bulanan", "Tahunan", "Sekali"];
+
+function labelKomitmen(kategori) {
+  if (kategori === "Transport") return { tajuk: "Transport", rujukan: "No. Pendaftaran",
+    pihak: "Syarikat / Bank", nama: "Kenderaan" };
+  if (kategori === "Pinjaman") return { tajuk: "Pinjaman", rujukan: "No. Akaun / Pinjaman",
+    pihak: "Bank / Pemberi Pinjaman", nama: "Nama Pinjaman" };
+  return { tajuk: "Komitmen Lain", rujukan: "Rujukan", pihak: "Syarikat / Pihak", nama: "Nama Komitmen" };
+}
+
+function bulanKunci(tarikh) { return String(tarikh).slice(0, 7); }
+
+function sudahBayarTempoh(k, kunciTempoh) {
+  return (k.bayar || []).some(function (b) { return b.tempoh === kunciTempoh; });
+}
+
+// Tarikh bayaran seterusnya + sama ada sudah lepas tempoh.
+function bayaranSeterusnya(k) {
+  var hariIni = kunciTarikh();
+  if (k.kitaran === "Sekali") {
+    var t = k.tarikhBayar || k.mula || hariIni;
+    return { tarikh: t, tempoh: t, dibayar: sudahBayarTempoh(k, t) };
+  }
+  if (k.kitaran === "Tahunan") {
+    var asas = k.tarikhBayar || k.mula || hariIni;
+    var bulanHari = String(asas).slice(5);
+    var tahun = parseInt(hariIni.slice(0, 4), 10);
+    var calon = tahun + "-" + bulanHari;
+    if (sudahBayarTempoh(k, String(tahun)) || calon < hariIni) {
+      if (sudahBayarTempoh(k, String(tahun))) calon = (tahun + 1) + "-" + bulanHari;
+    }
+    return { tarikh: calon, tempoh: calon.slice(0, 4), dibayar: sudahBayarTempoh(k, calon.slice(0, 4)) };
+  }
+  // Bulanan
+  var hari = Math.min(28, Math.max(1, nom(k.hariBayar) || 1));
+  var kini = new Date(hariIni + "T00:00:00");
+  var calonB = kini.getFullYear() + "-" + String(kini.getMonth() + 1).padStart(2, "0") +
+    "-" + String(hari).padStart(2, "0");
+  var tempoh = bulanKunci(calonB);
+  if (sudahBayarTempoh(k, tempoh)) {
+    kini.setMonth(kini.getMonth() + 1);
+    calonB = kini.getFullYear() + "-" + String(kini.getMonth() + 1).padStart(2, "0") +
+      "-" + String(hari).padStart(2, "0");
+    tempoh = bulanKunci(calonB);
+  }
+  return { tarikh: calonB, tempoh: tempoh, dibayar: false };
+}
+
+function statusKomitmen(k, data) {
+  if (k.aktif === false) return { teks: "Tidak aktif", warna: "muted", perlu: false, hari: null };
+  if (k.tamat && k.tamat < kunciTarikh() && k.kitaran !== "Sekali") {
+    return { teks: "Sudah tamat", warna: "muted", perlu: false, hari: null };
+  }
+  var s = bayaranSeterusnya(k);
+  if (k.kitaran === "Sekali" && s.dibayar) {
+    return { teks: "Sudah selesai", warna: "ok", perlu: false, hari: null };
+  }
+  var hari = -hariSejak(s.tarikh);
+  var awal = amaranHari(data, "komitmen", 7);
+  if (hari < 0) return { teks: "Lewat " + Math.abs(hari) + " hari", warna: "bad", perlu: true, hari: hari };
+  if (hari === 0) return { teks: "Bayar hari ini", warna: "bad", perlu: true, hari: 0 };
+  if (hari <= awal) return { teks: hari + " hari lagi", warna: "warn", perlu: true, hari: hari };
+  return { teks: fmtTarikh(s.tarikh), warna: "ok", perlu: false, hari: hari };
+}
+
+function komitmenPerluPerhatian(data) {
+  return (data.komitmen || []).filter(function (k) { return statusKomitmen(k, data).perlu; })
+    .sort(function (a, b) {
+      return (statusKomitmen(a, data).hari || 0) - (statusKomitmen(b, data).hari || 0);
+    });
+}
+
+function borangKomitmen(komitId, kategoriAsal) {
+  var data = baca();
+  var k = komitId ? data.komitmen.filter(function (x) { return x.id === komitId; })[0] : null;
+  var baru = !k;
+  k = k || { kategori: kategoriAsal || "Transport", kitaran: "Bulanan", hariBayar: 1,
+             aktif: true, mula: kunciTarikh() };
+  var L = labelKomitmen(k.kategori);
+
+  var m = modal(baru ? "Komitmen Baharu" : "Sunting Komitmen",
+    '<form id="borangKomit">' +
+      '<div class="baris-medan">' +
+        medan("Kategori", "<select name='kategori'>" + KATEGORI_KOMITMEN.map(function (x) {
+          return "<option" + (k.kategori === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+        medan(L.nama + " *", '<input type="text" name="nama" value="' + esc(k.nama || "") +
+          '" placeholder="Contoh: Toyota Hilux" required>') +
+        medan(L.pihak, '<input type="text" name="pihak" value="' + esc(k.pihak || "") + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan(L.rujukan, '<input type="text" name="rujukan" value="' + esc(k.rujukan || "") + '">') +
+        medan("Bayaran (RM) *", '<input type="number" step="0.01" min="0" name="jumlah" value="' +
+          esc(k.jumlah || "") + '" required>') +
+        medan("Kitaran", "<select name='kitaran'>" + KITARAN_KOMITMEN.map(function (x) {
+          return "<option" + (k.kitaran === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Bayar Pada Hari (1–28)", '<input type="number" min="1" max="28" name="hariBayar" value="' +
+          esc(k.hariBayar || 1) + '">') +
+        medan("Tarikh Bayar (tahunan / sekali)", '<input type="date" name="tarikhBayar" value="' +
+          esc(k.tarikhBayar || "") + '">') +
+        medan("Aktif", "<select name='aktif'><option value='ya'" +
+          (k.aktif !== false ? " selected" : "") + ">Ya</option><option value='tidak'" +
+          (k.aktif === false ? " selected" : "") + ">Tidak</option></select>") +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Mula", '<input type="date" name="mula" value="' + esc(k.mula || "") + '">') +
+        medan("Tamat", '<input type="date" name="tamat" value="' + esc(k.tamat || "") + '">') +
+        medan("Jumlah Keseluruhan (RM)", '<input type="number" step="0.01" min="0" name="jumlahPenuh" value="' +
+          esc(k.jumlahPenuh || "") + '">') +
+      "</div>" +
+      medan("Nota", '<textarea name="nota" style="min-height:56px">' + esc(k.nota || "") + "</textarea>") +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamKomit">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 700);
+
+  var borang = $("#borangKomit", m.el);
+  $("[data-batal]", m.el).onclick = m.tutup;
+
+  if ($("#btnPadamKomit", m.el)) {
+    $("#btnPadamKomit", m.el).onclick = function () {
+      sahkan("Padam komitmen " + k.nama + "?").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.komitmen = d.komitmen.filter(function (x) { return x.id !== komitId; });
+        simpan(d);
+        m.tutup();
+        toast("Komitmen dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai(borang);
+    if (!v.nama) return toast("Sila isi nama komitmen.", "bad");
+    if (nom(v.jumlah) <= 0) return toast("Sila isi jumlah bayaran.", "bad");
+    if (v.kitaran !== "Bulanan" && !v.tarikhBayar) {
+      return toast("Kitaran " + v.kitaran.toLowerCase() + " perlu tarikh bayar.", "bad", 5000);
+    }
+    var d = baca();
+    var rekod = {
+      id: komitId || id(),
+      kategori: v.kategori, nama: v.nama, pihak: v.pihak, rujukan: v.rujukan,
+      jumlah: nom(v.jumlah), kitaran: v.kitaran,
+      hariBayar: Math.min(28, Math.max(1, nom(v.hariBayar) || 1)),
+      tarikhBayar: v.tarikhBayar, mula: v.mula, tamat: v.tamat,
+      jumlahPenuh: nom(v.jumlahPenuh), nota: v.nota, aktif: v.aktif !== "tidak",
+      bayar: k.bayar || [],
+      createdAt: k.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    if (komitId) d.komitmen = d.komitmen.map(function (x) { return x.id === komitId ? rekod : x; });
+    else d.komitmen.push(rekod);
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(komitId ? "Komitmen dikemas kini." : "Komitmen ditambah.", "ok");
+    lukis();
+  };
+}
+
+function bayarKomitmen(komitId) {
+  var data = baca();
+  var k = data.komitmen.filter(function (x) { return x.id === komitId; })[0];
+  if (!k) return;
+  var s = bayaranSeterusnya(k);
+  var dibayarSemua = (k.bayar || []).reduce(function (t, b) { return t + nom(b.jumlah); }, 0);
+
+  var m = modal("Rekod Bayaran — " + k.nama,
+    '<div class="jumlah-baris"><span>Bayaran sepatutnya</span><b>' + esc(rm(k.jumlah)) + "</b></div>" +
+    '<div class="jumlah-baris"><span>Untuk tempoh</span><b>' + esc(s.tempoh) + "</b></div>" +
+    '<div class="jumlah-baris" style="margin-bottom:14px"><span>Jumlah sudah dibayar</span><b>' +
+      esc(rm(dibayarSemua)) + "</b></div>" +
+    '<form id="borangBayarKomit">' +
+      '<div class="baris-medan">' +
+        medan("Jumlah Dibayar (RM) *", '<input type="number" step="0.01" min="0" name="jumlah" value="' +
+          esc(k.jumlah) + '" required>') +
+        medan("Tarikh Bayar", '<input type="date" name="tarikh" value="' + esc(kunciTarikh()) + '">') +
+        medan("Untuk Tempoh", '<input type="text" name="tempoh" value="' + esc(s.tempoh) + '">') +
+      "</div>" +
+      medan("Nota", '<input type="text" name="nota" placeholder="Contoh: auto debit Maybank">') +
+      '<div class="baris-butang modal-kaki">' +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">Simpan Bayaran</button>' +
+      "</div>" +
+    "</form>", 560);
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangBayarKomit", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangBayarKomit", m.el));
+    var d = baca();
+    var rekod = d.komitmen.filter(function (x) { return x.id === komitId; })[0];
+    rekod.bayar = rekod.bayar || [];
+    if (rekod.bayar.some(function (b) { return b.tempoh === v.tempoh; })) {
+      return toast("Tempoh " + v.tempoh + " sudah ada rekod bayaran.", "warn", 5000);
+    }
+    rekod.bayar.unshift({ id: id(), tarikh: v.tarikh || kunciTarikh(), jumlah: nom(v.jumlah),
+      tempoh: v.tempoh, nota: v.nota || "" });
+    rekod.updatedAt = new Date().toISOString();
+    if (!simpan(d)) return;
+    m.tutup();
+    toast("Bayaran " + rm(v.jumlah) + " direkod untuk " + v.tempoh + ".", "ok", 5000);
+    lukis();
+  };
+}
+
+function lihatKomitmen(komitId) {
+  var data = baca();
+  var k = data.komitmen.filter(function (x) { return x.id === komitId; })[0];
+  if (!k) return;
+  var L = labelKomitmen(k.kategori);
+  var st = statusKomitmen(k, data);
+  var s = bayaranSeterusnya(k);
+  var dibayar = (k.bayar || []).reduce(function (t, b) { return t + nom(b.jumlah); }, 0);
+  var baki = nom(k.jumlahPenuh) > 0 ? Math.max(0, nom(k.jumlahPenuh) - dibayar) : null;
+
+  var m = modal(k.nama,
+    '<div class="grid grid-4" style="margin-bottom:4px">' +
+      kadStat("Bayaran " + k.kitaran, rm(k.jumlah), "setiap " +
+        (k.kitaran === "Bulanan" ? "hari " + k.hariBayar : k.kitaran.toLowerCase())) +
+      kadStat("Bayaran Seterusnya", fmtTarikh(s.tarikh), st.teks) +
+      kadStat("Sudah Dibayar", rm(dibayar), (k.bayar || []).length + " kali") +
+      kadStat("Baki Pinjaman", baki === null ? "-" : rm(baki),
+        nom(k.jumlahPenuh) ? "dari " + rm(k.jumlahPenuh) : "jumlah penuh belum diisi") +
+    "</div>" +
+    '<div class="tajuk-seksyen">Butiran</div>' +
+    '<dl class="kunci-nilai">' +
+      baris("Kategori", k.kategori) + baris(L.pihak, k.pihak) + baris(L.rujukan, k.rujukan) +
+      baris("Mula", k.mula ? fmtTarikh(k.mula) : "") +
+      baris("Tamat", k.tamat ? fmtTarikh(k.tamat) : "") +
+      baris("Nota", k.nota) +
+    "</dl>" +
+    '<div class="tajuk-seksyen">Sejarah Bayaran</div>' +
+    ((k.bayar || []).length
+      ? '<div class="jadual-bungkus"><table><thead><tr><th>Tarikh</th><th>Tempoh</th>' +
+        "<th class='num'>Jumlah</th><th>Nota</th><th></th></tr></thead><tbody>" +
+        k.bayar.slice(0, 24).map(function (b) {
+          return "<tr><td>" + esc(fmtTarikh(b.tarikh)) + "</td><td>" + esc(b.tempoh) + "</td>" +
+            '<td class="num">' + esc(rm(b.jumlah)) + "</td>" +
+            '<td class="bungkus kecil">' + esc(b.nota || "-") + "</td>" +
+            '<td><button type="button" class="btn btn-lembut btn-kecil" data-buangbayar="' +
+              esc(b.id) + '">Buang</button></td></tr>';
+        }).join("") + "</tbody></table></div>"
+      : kosong("Belum ada rekod bayaran.")) +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-lembut" id="btnSuntingKomit">Sunting</button>' +
+      '<button type="button" class="btn btn-utama" id="btnBayarKomit">Rekod Bayaran</button>' +
+    "</div>", 720);
+
+  $("#btnSuntingKomit", m.el).onclick = function () { m.tutup(); borangKomitmen(komitId); };
+  $("#btnBayarKomit", m.el).onclick = function () { m.tutup(); bayarKomitmen(komitId); };
+  $$("[data-buangbayar]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      var d = baca();
+      var rekod = d.komitmen.filter(function (x) { return x.id === komitId; })[0];
+      rekod.bayar = (rekod.bayar || []).filter(function (x) { return x.id !== b.getAttribute("data-buangbayar"); });
+      simpan(d);
+      m.tutup();
+      toast("Rekod bayaran dibuang.", "ok");
+      lukis();
+    };
+  });
+}
+
+function lukisKomitmen(bekas) {
+  var data = baca();
+  var teks = komitCari.trim().toLowerCase();
+  var semua = data.komitmen || [];
+  var senarai = semua.filter(function (k) {
+    if (k.kategori !== tabKomitmen) return false;
+    if (teks) {
+      var gabung = [k.nama, k.pihak, k.rujukan, k.nota].join(" ").toLowerCase();
+      if (gabung.indexOf(teks) === -1) return false;
+    }
+    return true;
+  }).sort(function (a, b) {
+    var sa = statusKomitmen(a, data), sb = statusKomitmen(b, data);
+    return (sa.hari === null ? 9999 : sa.hari) - (sb.hari === null ? 9999 : sb.hari);
+  });
+
+  var aktif = senarai.filter(function (k) { return k.aktif !== false; });
+  var sebulan = aktif.reduce(function (t, k) {
+    return t + (k.kitaran === "Bulanan" ? nom(k.jumlah)
+      : (k.kitaran === "Tahunan" ? nom(k.jumlah) / 12 : 0));
+  }, 0);
+  var bulanIni = bulanKini();
+  var sudahBulanIni = aktif.reduce(function (t, k) {
+    return t + (k.bayar || []).filter(function (b) { return bulanKunci(b.tarikh) === bulanIni; })
+      .reduce(function (a, b) { return a + nom(b.jumlah); }, 0);
+  }, 0);
+  var perlu = senarai.filter(function (k) { return statusKomitmen(k, data).perlu; });
+  var L = labelKomitmen(tabKomitmen);
+
+  bekas.innerHTML =
+    '<div class="suis" style="margin-bottom:16px;flex-wrap:wrap">' +
+      KATEGORI_KOMITMEN.map(function (x) {
+        return '<button type="button" data-tabkomit="' + esc(x) + '"' +
+          (tabKomitmen === x ? ' class="aktif"' : "") + ">" + esc(labelKomitmen(x).tajuk) + "</button>";
+      }).join("") +
+    "</div>" +
+
+    '<div class="grid grid-4">' +
+      kadStat(L.tajuk + " Aktif", String(aktif.length), semua.length + " rekod kesemuanya") +
+      kadStat("Komitmen Sebulan", rm(sebulan), "purata bayaran bulanan") +
+      kadStat("Dibayar " + fmtBulan(bulanIni), rm(sudahBulanIni), "direkod bulan ini") +
+      kadStat("Perlu Bayar", String(perlu.length),
+        "dalam " + amaranHari(data, "komitmen", 7) + " hari atau sudah lewat") +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>' + esc(L.tajuk) + "</h3>" +
+        '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnKomitBaru">Tambah ' + esc(L.tajuk) + "</button>" +
+          '<button class="btn btn-lembut" id="btnEksportKomit">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<p class="kecil" style="margin:-4px 0 12px">Bayaran yang hampir sampai tarikh atau sudah ' +
+      "lewat akan naik di papan utama. Tekan <b>Bayar</b> setiap kali sudah jelaskan supaya " +
+      "peringatan berpindah ke bulan berikutnya.</p>" +
+      '<div class="penapis">' +
+        '<label style="min-width:220px">Cari<input type="search" id="fCariKomit" ' +
+          'placeholder="Nama, bank, no. pendaftaran…" value="' + esc(komitCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetKomit">Reset</button>' +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length
+        ? "<table><thead><tr><th>" + esc(L.nama) + "</th><th>" + esc(L.pihak) + "</th>" +
+          "<th class='num'>Bayaran</th><th>Seterusnya</th><th>Status</th><th></th></tr></thead><tbody>" +
+          senarai.map(function (k) {
+            var st = statusKomitmen(k, data);
+            var s = bayaranSeterusnya(k);
+            return "<tr>" +
+              '<td class="bungkus"><b>' + esc(k.nama) + "</b>" +
+                (k.rujukan ? '<div class="kecil">' + esc(k.rujukan) + "</div>" : "") + "</td>" +
+              '<td class="bungkus">' + esc(k.pihak || "-") +
+                '<div class="kecil">' + esc(k.kitaran) + "</div></td>" +
+              '<td class="num"><b>' + esc(rm(k.jumlah)) + "</b>" +
+                (nom(k.jumlahPenuh) ? '<div class="kecil">dari ' + esc(rm(k.jumlahPenuh)) + "</div>" : "") +
+              "</td>" +
+              "<td>" + esc(fmtTarikh(s.tarikh)) +
+                '<div class="kecil">' + esc(s.tempoh) + "</div></td>" +
+              '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span></td>" +
+              '<td><div class="aksi">' +
+                '<button class="btn btn-lembut" data-komit="' + esc(k.id) + '">Buka</button>' +
+                '<button class="btn btn-ok" data-komitbayar="' + esc(k.id) + '">Bayar</button>' +
+              "</div></td></tr>";
+          }).join("") + "</tbody></table>"
+        : kosong("Belum ada rekod " + L.tajuk.toLowerCase() + ". Tekan butang di atas untuk tambah.")) +
+      "</div>" +
+    "</div>";
+
+  $$("[data-tabkomit]", bekas).forEach(function (b) {
+    b.onclick = function () { tabKomitmen = b.getAttribute("data-tabkomit"); lukisKomitmen(bekas); };
+  });
+  $("#btnKomitBaru").onclick = function () { borangKomitmen(null, tabKomitmen); };
+  $("#btnResetKomit").onclick = function () { komitCari = ""; lukisKomitmen(bekas); };
+  var kotak = $("#fCariKomit");
+  kotak.oninput = function (e) {
+    komitCari = e.target.value;
+    clearTimeout(kotak._t);
+    kotak._t = setTimeout(function () {
+      lukisKomitmen(bekas);
+      var b2 = $("#fCariKomit");
+      if (b2) { b2.focus(); b2.setSelectionRange(b2.value.length, b2.value.length); }
+    }, 260);
+  };
+  $("#btnEksportKomit").onclick = function () {
+    csv("komitmen-" + tabKomitmen.toLowerCase(),
+      ["Nama", "Pihak", "Rujukan", "Kitaran", "Bayaran", "Hari Bayar", "Mula", "Tamat",
+       "Jumlah Penuh", "Sudah Dibayar", "Status", "Nota"],
+      senarai.map(function (k) {
+        return [k.nama, k.pihak, k.rujukan, k.kitaran, nom(k.jumlah), k.hariBayar, k.mula, k.tamat,
+                nom(k.jumlahPenuh),
+                (k.bayar || []).reduce(function (t, b) { return t + nom(b.jumlah); }, 0),
+                statusKomitmen(k, data).teks, k.nota];
+      }));
+  };
+  $$("[data-komit]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatKomitmen(b.getAttribute("data-komit")); };
+  });
+  $$("[data-komitbayar]", bekas).forEach(function (b) {
+    b.onclick = function () { bayarKomitmen(b.getAttribute("data-komitbayar")); };
+  });
+}
+
+/* ======================================================================
+   TO DO — senarai kerja pejabat, siapa buat dan bila
+   ================================================================== */
+
+var todoTapis = "belum";
+var todoCari = "";
+var todoUntuk = "";
+
+var KEUTAMAAN_TUGAS = ["Biasa", "Penting", "Segera"];
+var STATUS_TUGAS = ["Belum Mula", "Sedang Buat", "Siap"];
+var ULANG_TUGAS = ["Tiada", "Mingguan", "Bulanan", "Tahunan"];
+
+function statusTugas(t, data) {
+  if (t.status === "Siap") return { teks: "Siap", warna: "ok", perlu: false, hari: null };
+  if (!t.tarikh) return { teks: t.status || "Belum Mula", warna: "muted", perlu: false, hari: null };
+  var hari = -hariSejak(t.tarikh);
+  var awal = amaranHari(data, "tugasan", 3);
+  if (hari < 0) return { teks: "Lewat " + Math.abs(hari) + " hari", warna: "bad", perlu: true, hari: hari };
+  if (hari === 0) return { teks: "Hari ini", warna: "bad", perlu: true, hari: 0 };
+  if (hari <= awal) return { teks: hari + " hari lagi", warna: "warn", perlu: true, hari: hari };
+  return { teks: fmtTarikh(t.tarikh), warna: "muted", perlu: false, hari: hari };
+}
+
+function tugasPerluPerhatian(data) {
+  return (data.tugasan || []).filter(function (t) { return statusTugas(t, data).perlu; })
+    .sort(function (a, b) { return (statusTugas(a, data).hari) - (statusTugas(b, data).hari); });
+}
+
+function tarikhUlang(tarikh, ulang) {
+  var d = keDate(tarikh) || new Date();
+  if (ulang === "Mingguan") d.setDate(d.getDate() + 7);
+  else if (ulang === "Bulanan") d.setMonth(d.getMonth() + 1);
+  else if (ulang === "Tahunan") d.setFullYear(d.getFullYear() + 1);
+  else return null;
+  return kunciTarikh(d);
+}
+
+function borangTugas(tugasId) {
+  var data = baca();
+  var t = tugasId ? data.tugasan.filter(function (x) { return x.id === tugasId; })[0] : null;
+  var baru = !t;
+  t = t || { tarikh: kunciTarikh(), keutamaan: "Biasa", status: "Belum Mula", ulang: "Tiada" };
+
+  var m = modal(baru ? "Tugasan Baharu" : "Sunting Tugasan",
+    '<form id="borangTugas">' +
+      medan("Apa Perlu Buat *", '<input type="text" name="tajuk" value="' + esc(t.tajuk || "") +
+        '" placeholder="Contoh: Renew roadtax Hilux" required>') +
+      '<div class="baris-medan">' +
+        medan("Siapa Buat", '<input list="senaraiStafTugas" name="untuk" value="' +
+          esc(t.untuk || "") + '">') +
+        medan("Tarikh Perlu Siap", '<input type="date" name="tarikh" value="' + esc(t.tarikh || "") + '">') +
+        medan("Keutamaan", "<select name='keutamaan'>" + KEUTAMAAN_TUGAS.map(function (x) {
+          return "<option" + (t.keutamaan === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+      "</div>" +
+      '<datalist id="senaraiStafTugas">' + data.staf.filter(function (x) { return x.status === "aktif"; })
+        .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
+      '<div class="baris-medan">' +
+        medan("Status", "<select name='status'>" + STATUS_TUGAS.map(function (x) {
+          return "<option" + (t.status === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+        medan("Ulang", "<select name='ulang'>" + ULANG_TUGAS.map(function (x) {
+          return "<option" + (t.ulang === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+      "</div>" +
+      '<p class="kecil" style="margin:-6px 0 12px">Kalau tugasan berulang, tugasan baharu ' +
+      "akan dibuat sendiri untuk tarikh berikutnya bila yang ini ditanda siap.</p>" +
+      medan("Nota", '<textarea name="nota" style="min-height:60px">' + esc(t.nota || "") + "</textarea>") +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamTugas">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 620);
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  if ($("#btnPadamTugas", m.el)) {
+    $("#btnPadamTugas", m.el).onclick = function () {
+      sahkan("Padam tugasan ini?").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.tugasan = d.tugasan.filter(function (x) { return x.id !== tugasId; });
+        simpan(d);
+        m.tutup();
+        toast("Tugasan dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  $("#borangTugas", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangTugas", m.el));
+    if (!v.tajuk) return toast("Sila isi apa yang perlu dibuat.", "bad");
+    var d = baca();
+    var rekod = {
+      id: tugasId || id(),
+      tajuk: v.tajuk, untuk: v.untuk, tarikh: v.tarikh, keutamaan: v.keutamaan,
+      status: v.status, ulang: v.ulang, nota: v.nota,
+      siapPada: v.status === "Siap" ? (t.siapPada || kunciTarikh()) : null,
+      createdAt: t.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    if (tugasId) d.tugasan = d.tugasan.map(function (x) { return x.id === tugasId ? rekod : x; });
+    else d.tugasan.push(rekod);
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(tugasId ? "Tugasan dikemas kini." : "Tugasan ditambah.", "ok");
+    lukis();
+  };
+}
+
+function siapkanTugas(tugasId) {
+  var d = baca();
+  var t = d.tugasan.filter(function (x) { return x.id === tugasId; })[0];
+  if (!t) return;
+  if (t.status === "Siap") {
+    t.status = "Belum Mula";
+    t.siapPada = null;
+  } else {
+    t.status = "Siap";
+    t.siapPada = kunciTarikh();
+    var seterusnya = t.ulang && t.ulang !== "Tiada" ? tarikhUlang(t.tarikh || kunciTarikh(), t.ulang) : null;
+    if (seterusnya) {
+      d.tugasan.push({ id: id(), tajuk: t.tajuk, untuk: t.untuk, tarikh: seterusnya,
+        keutamaan: t.keutamaan, status: "Belum Mula", ulang: t.ulang, nota: t.nota,
+        siapPada: null, createdAt: new Date().toISOString() });
+    }
+  }
+  t.updatedAt = new Date().toISOString();
+  if (!simpan(d)) return;
+  toast(t.status === "Siap"
+    ? "Tugasan ditanda siap." + (t.ulang && t.ulang !== "Tiada" ? " Tugasan berikutnya dibuat." : "")
+    : "Tugasan dibuka semula.", "ok", 4500);
+  lukis();
+}
+
+function lukisTugas(bekas) {
+  var data = baca();
+  var teks = todoCari.trim().toLowerCase();
+  var semua = data.tugasan || [];
+
+  var senarai = semua.filter(function (t) {
+    if (todoTapis === "belum" && t.status === "Siap") return false;
+    if (todoTapis === "siap" && t.status !== "Siap") return false;
+    if (todoTapis === "lewat" && !(statusTugas(t, data).hari < 0 && t.status !== "Siap")) return false;
+    if (todoUntuk && (t.untuk || "") !== todoUntuk) return false;
+    if (teks) {
+      var gabung = [t.tajuk, t.untuk, t.nota].join(" ").toLowerCase();
+      if (gabung.indexOf(teks) === -1) return false;
+    }
+    return true;
+  }).sort(function (a, b) {
+    if ((a.status === "Siap") !== (b.status === "Siap")) return a.status === "Siap" ? 1 : -1;
+    return String(a.tarikh || "9999").localeCompare(String(b.tarikh || "9999"));
+  });
+
+  var belum = semua.filter(function (t) { return t.status !== "Siap"; });
+  var lewat = belum.filter(function (t) { return statusTugas(t, data).hari < 0; });
+  var hariIni = belum.filter(function (t) { return t.tarikh === kunciTarikh(); });
+  var orang = [];
+  semua.forEach(function (t) { if (t.untuk && orang.indexOf(t.untuk) === -1) orang.push(t.untuk); });
+  orang.sort();
+
+  bekas.innerHTML =
+    '<div class="grid grid-4">' +
+      kadStat("Belum Siap", String(belum.length), semua.length + " tugasan kesemuanya") +
+      kadStat("Sudah Lewat", String(lewat.length), "lepas tarikh perlu siap") +
+      kadStat("Untuk Hari Ini", String(hariIni.length), fmtTarikh(kunciTarikh())) +
+      kadStat("Siap Bulan Ini", String(semua.filter(function (t) {
+        return t.status === "Siap" && String(t.siapPada || "").slice(0, 7) === bulanKini();
+      }).length), fmtBulan(bulanKini())) +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Senarai To Do</h3>' +
+        '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnTugasBaru">Tambah Tugasan</button>' +
+          '<button class="btn btn-lembut" id="btnEksportTugas">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<div class="penapis">' +
+        "<label>Papar<select id='fTapisTugas'>" +
+          [["belum", "Belum siap"], ["lewat", "Sudah lewat"], ["siap", "Sudah siap"], ["semua", "Semua"]]
+            .map(function (x) {
+              return "<option value='" + x[0] + "'" + (todoTapis === x[0] ? " selected" : "") +
+                ">" + x[1] + "</option>";
+            }).join("") + "</select></label>" +
+        "<label>Untuk<select id='fUntukTugas'><option value=''>Semua orang</option>" +
+          orang.map(function (x) {
+            return "<option" + (todoUntuk === x ? " selected" : "") + ">" + esc(x) + "</option>";
+          }).join("") + "</select></label>" +
+        '<label style="min-width:200px">Cari<input type="search" id="fCariTugas" ' +
+          'placeholder="Tajuk, nama, nota…" value="' + esc(todoCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetTugas">Reset</button>' +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length
+        ? "<table><thead><tr><th style='width:44px'></th><th>Tugasan</th><th>Untuk</th>" +
+          "<th>Tarikh</th><th>Keutamaan</th><th>Status</th><th></th></tr></thead><tbody>" +
+          senarai.map(function (t) {
+            var st = statusTugas(t, data);
+            return "<tr" + (t.status === "Siap" ? ' style="opacity:.6"' : "") + ">" +
+              '<td><input type="checkbox" data-siap="' + esc(t.id) + '"' +
+                (t.status === "Siap" ? " checked" : "") + "></td>" +
+              '<td class="bungkus"><b>' + esc(t.tajuk) + "</b>" +
+                (t.nota ? '<div class="kecil">' + esc(t.nota) + "</div>" : "") +
+                (t.ulang && t.ulang !== "Tiada"
+                  ? '<div class="kecil">Ulang: ' + esc(t.ulang) + "</div>" : "") + "</td>" +
+              "<td>" + esc(t.untuk || "-") + "</td>" +
+              "<td>" + esc(t.tarikh ? fmtTarikh(t.tarikh) : "-") + "</td>" +
+              "<td>" + (t.keutamaan === "Biasa"
+                ? '<span class="kecil">Biasa</span>'
+                : '<span class="badge badge-' + (t.keutamaan === "Segera" ? "bad" : "warn") + '">' +
+                  esc(t.keutamaan) + "</span>") + "</td>" +
+              '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span>" +
+                (t.status !== "Siap" && t.status !== "Belum Mula"
+                  ? '<div class="kecil">' + esc(t.status) + "</div>" : "") + "</td>" +
+              '<td><button class="btn btn-lembut" data-tugas="' + esc(t.id) + '">Buka</button></td></tr>';
+          }).join("") + "</tbody></table>"
+        : kosong(semua.length ? "Tiada tugasan padan dengan penapis ini."
+            : "Belum ada tugasan. Tekan “Tambah Tugasan” untuk mula.")) +
+      "</div>" +
+      '<p class="kecil" style="margin-top:10px">Tugasan yang lewat atau perlu siap dalam ' +
+      amaranHari(data, "tugasan", 3) + " hari akan naik di papan utama.</p>" +
+    "</div>";
+
+  $("#btnTugasBaru").onclick = function () { borangTugas(null); };
+  $("#fTapisTugas").onchange = function (e) { todoTapis = e.target.value; lukisTugas(bekas); };
+  $("#fUntukTugas").onchange = function (e) { todoUntuk = e.target.value; lukisTugas(bekas); };
+  $("#btnResetTugas").onclick = function () {
+    todoTapis = "belum"; todoUntuk = ""; todoCari = ""; lukisTugas(bekas);
+  };
+  var kotak = $("#fCariTugas");
+  kotak.oninput = function (e) {
+    todoCari = e.target.value;
+    clearTimeout(kotak._t);
+    kotak._t = setTimeout(function () {
+      lukisTugas(bekas);
+      var b2 = $("#fCariTugas");
+      if (b2) { b2.focus(); b2.setSelectionRange(b2.value.length, b2.value.length); }
+    }, 260);
+  };
+  $("#btnEksportTugas").onclick = function () {
+    csv("todo", ["Tugasan", "Untuk", "Tarikh", "Keutamaan", "Status", "Ulang", "Siap Pada", "Nota"],
+      senarai.map(function (t) {
+        return [t.tajuk, t.untuk, t.tarikh, t.keutamaan, t.status, t.ulang, t.siapPada, t.nota];
+      }));
+  };
+  $$("[data-siap]", bekas).forEach(function (b) {
+    b.onclick = function () { siapkanTugas(b.getAttribute("data-siap")); };
+  });
+  $$("[data-tugas]", bekas).forEach(function (b) {
+    b.onclick = function () { borangTugas(b.getAttribute("data-tugas")); };
+  });
+}
+
 var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -6918,6 +8201,8 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  komitmen: '<svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M6 15h4"/></svg>',
+  todo: '<svg viewBox="0 0 24 24"><path d="M9 5h11M9 12h11M9 19h11"/><path d="m3 5 1.6 1.6L7.5 3.7"/><path d="m3 12 1.6 1.6L7.5 10.7"/><path d="m3 19 1.6 1.6L7.5 17.7"/></svg>',
   alat: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1 5.4 5.2l-8.6 8.6a2 2 0 0 1-2.8-2.8l8.6-8.6"/><path d="M9.5 4.5 4 10l3.5 3.5"/></svg>',
   tunggak: '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M8.5 2.5h7"/></svg>',
   staf: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6"/><path d="M17.5 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>',
@@ -6934,6 +8219,8 @@ var HALAMAN = [
   { id: "resit",   label: "Resit",        ikon: IKON.resit,   lukis: lukisResit },
   { id: "tunggak", label: "Tunggakan",    ikon: IKON.tunggak, lukis: lukisTunggak },
   { id: "alat",    label: "Alat & Stok",  ikon: IKON.alat,    lukis: lukisAlat },
+  { id: "komitmen", label: "Komitmen",    ikon: IKON.komitmen, lukis: lukisKomitmen },
+  { id: "todo",    label: "To Do",        ikon: IKON.todo,    lukis: lukisTugas },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
   { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
 ];
@@ -6952,12 +8239,16 @@ function binaMenu() {
 
   var bilLewat = senaraiTunggakan(data).filter(function (x) { return x.hari > 0; }).length;
 
-  var bilAlat = alatPerluPerhatian(data).length;
+  var bilAlat = alatPerluPerhatian(data).length + kalibrasiPerluPerhatian(data).length;
+  var bilKomit = komitmenPerluPerhatian(data).length;
+  var bilTugas = tugasPerluPerhatian(data).length;
 
   $("#navMenu").innerHTML = HALAMAN.map(function (h) {
     var lencana = (h.id === "sale" && perluTindakan) ? perluTindakan
       : ((h.id === "tunggak" && bilLewat) ? bilLewat
-      : ((h.id === "alat" && bilAlat) ? bilAlat : 0));
+      : ((h.id === "alat" && bilAlat) ? bilAlat
+      : ((h.id === "komitmen" && bilKomit) ? bilKomit
+      : ((h.id === "todo" && bilTugas) ? bilTugas : 0))));
     return '<a class="nav-item" href="#/' + h.id + '" data-nav="' + h.id + '">' +
       '<span class="nav-ikon">' + h.ikon + "</span><span>" + esc(h.label) + "</span>" +
       (lencana ? '<span class="lencana-menu">' + lencana + "</span>" : "") +

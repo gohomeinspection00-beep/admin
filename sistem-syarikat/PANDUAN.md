@@ -19,7 +19,9 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Sub Job** | Kerja yang disubkan — direkod berasingan daripada jualan syarikat, dengan agihan RM kepada setiap staf/rakan dan baki bahagian syarikat |
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Tunggakan** | Semua baki yang belum dikutip — jualan, sub job dan invois manual — disusun ikut umur hutang, dengan butang kejar bayaran WhatsApp |
-| **Alat & Stok** | Inventori alat inspection dan bahan pakai habis — berapa ada, berapa rosak, berapa hilang, dan bila stok hampir habis |
+| **Alat & Stok** | Tiga tab: Alat (siapa ambil, siapa pulang), Sticker & Bahan Pakai, dan Calibration Tool (sijil SIRIM & tarikh luput) |
+| **Komitmen** | Transport, pinjaman dan komitmen bulanan lain — bila kena bayar, sudah bayar atau belum |
+| **To Do** | Senarai kerja: apa perlu buat, siapa buat, bila kena siap, boleh berulang |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Terbahagi kepada 5 tab: Syarikat & Target, Jualan & Status, Resit & Invois, Quotation, Data & Backup |
@@ -479,40 +481,95 @@ dieksport ke CSV.
 
 ## Alat & Stok
 
-Menu **Alat & Stok** menjejak semua barang syarikat. Dua jenis:
+Menu ini ada **tiga tab**.
 
-- **Alat** — moisture meter, thermal camera, tangga, socket tester dan sebagainya.
-  Boleh ditanda **rosak**, **hilang**, **sudah dibaiki**, **jumpa semula** atau **lupus**.
-- **Bahan Pakai** — sticker defect, marker, masking tape, bateri, sarung tangan.
-  Setiap kali guna, tekan **Guna** dan taip kuantiti — stok tolak sendiri.
+### Tab 1 — Alat
 
-Kali pertama buka, tekan **Isi Senarai Asas** untuk masukkan 14 barang biasa
-inspection, kemudian ubah kuantiti ikut stok sebenar. Atau **Tambah Barang**
-satu per satu.
+Semua alat inspection yang jarang dibeli: moisture meter, thermal camera,
+tangga, socket tester dan sebagainya.
 
-### Status automatik
+**Siapa ambil barang** — tekan **Ambil** pada baris barang, pilih nama staf,
+berapa unit dan untuk apa. Contoh: Zaim ambil 1 daripada 3 socket tester —
+lajur *Dipegang* jadi 1, *di rak* tinggal 2, dan rekod itu masuk sejarah
+barang tersebut.
 
-| Status | Bila keluar |
+Bila dipulangkan, tekan **Pulang** (dalam jadual *Siapa Pegang Apa*, atau
+dalam butiran barang). Masa pulang boleh pilih keadaan barang:
+**Baik**, **Rosak** atau **Hilang** — kalau rosak atau hilang, sistem terus
+tolak dari jumlah yang boleh guna.
+
+Jadual **Siapa Pegang Apa** di bawah senarai memaparkan semua barang yang
+masih di tangan staf dan sudah berapa hari.
+
+### Tab 2 — Sticker & Bahan Pakai
+
+Sticker defect, marker, tape, bateri, sarung tangan. Tekan **Ambil / Guna**,
+taip kuantiti dan nama pengambil — stok tolak sendiri dan nama disimpan dalam
+sejarah. **+ Stok** untuk top up bila beli baharu.
+
+Status: **Baik** → **Hampir habis** (bila baki sampai paras minimum) →
+**Habis**. Paras minimum ditetapkan setiap barang.
+
+### Tab 3 — Calibration Tool
+
+Rekod kalibrasi setiap alat:
+
+- Nama alat dan no. siri
+- Badan kalibrasi (SIRIM dan lain-lain) dan no. sijil
+- Tarikh kalibrasi + tarikh luput (pilih tempoh 6/12/24/36 bulan dan tarikh
+  luput diisi automatik)
+- Kos kalibrasi
+- **Fail sijil PDF** — muat naik terus, simpan dalam sistem, buka bila-bila
+  dengan butang *Sijil*
+
+Alat yang **hampir luput** (30 hari sebelum, boleh ubah) atau **sudah luput**
+naik di papan utama dan jadi nombor merah pada menu. Bila kalibrasi semula,
+tekan **Kalibrasi Semula** — rekod lama kekal sebagai sejarah.
+
+Semua nombor stok, sejarah ambil/pulang dan fail sijil masuk dalam **backup**.
+
+## Komitmen
+
+Tiga tab: **Transport**, **Pinjaman** dan **Komitmen Lain** (sewa, internet,
+insurans, langganan — apa sahaja).
+
+Setiap rekod ada: nama, pihak (bank/syarikat), rujukan (no. pendaftaran
+kenderaan atau no. akaun), jumlah bayaran, kitaran (**Bulanan / Tahunan /
+Sekali**), hari bayar setiap bulan, tarikh mula & tamat, dan jumlah
+keseluruhan (untuk pinjaman).
+
+Sistem kira sendiri **tarikh bayaran seterusnya**. Bila dah bayar, tekan
+**Bayar** — bayaran itu direkod untuk bulan tersebut dan peringatan berpindah
+ke bulan berikutnya. Butiran setiap komitmen memaparkan jumlah sudah dibayar
+dan baki pinjaman.
+
+Kad atas memaparkan komitmen aktif, purata bayaran sebulan, jumlah dibayar
+bulan ini, dan berapa yang perlu dibayar tidak lama lagi.
+
+## To Do
+
+Senarai kerja pejabat: **apa perlu buat**, **siapa buat**, **bila kena siap**,
+keutamaan (Biasa / Penting / Segera) dan status.
+
+- Tanda kotak di kiri untuk tanda siap
+- Kalau tugasan itu **berulang** (mingguan / bulanan / tahunan), tugasan
+  berikutnya dibuat sendiri bila yang sekarang ditanda siap
+- Tapis ikut *Belum siap*, *Sudah lewat*, *Sudah siap*, atau ikut orang
+- Tugasan lewat atau hampir sampai tarikh naik di papan utama
+
+## Peringatan di papan utama
+
+Papan utama mengumpul semua yang perlu tindakan di bahagian atas:
+
+| Jalur | Isi |
 |---|---|
-| **Baik** | Semua elok |
-| **Hampir habis** | Bahan pakai: baki sampai paras minimum. Alat: baki kurang dari paras minimum |
-| **Habis / Tiada yang berfungsi** | Tiada lagi yang boleh guna |
-| **x rosak / x hilang** | Ada unit ditanda rosak atau hilang |
+| **Tugasan Tertunggak** | Job inspection yang belum siap ikut tempoh |
+| **Tunggakan Bayaran** | Duit client yang belum masuk |
+| **Alat & Stok Perlu Perhatian** | Rosak, hilang atau hampir habis |
+| **Peringatan** | Kalibrasi hampir luput, komitmen kena bayar, tugasan To Do |
 
-*Boleh guna* = jumlah dimiliki − rosak − hilang.
-Paras minimum ditetapkan setiap barang (isi 0 kalau tak perlu amaran).
-
-### Rekod pergerakan
-
-Setiap kali stok bertambah, digunakan, rosak, dibaiki, hilang atau dijumpai,
-sistem simpan rekod: tarikh, kuantiti, siapa, dan nota (contoh: *guna untuk
-site Setia Alam*). Buka mana-mana barang untuk lihat sejarah penuh.
-
-### Amaran
-
-Papan utama keluarkan jalur **Alat & Stok Perlu Perhatian** bila ada barang
-rosak, hilang atau hampir habis, dan menu sisi tunjuk bilangannya — jadi tak
-sampai keluar site baru sedar sticker dah habis. Senarai boleh dieksport CSV.
+Berapa hari awal setiap peringatan keluar boleh diubah di
+Tetapan → **Peringatan**.
 
 ## Menu Tetapan
 
@@ -523,6 +580,7 @@ Tetapan dibahagikan kepada tab supaya senang cari:
 | **Syarikat & Target** | Nama syarikat, target jualan harian, hari bekerja, target ikut bulan, hari cuti / offday |
 | **Jualan & Status** | Senarai projek/daerah, sumber lead, senarai status kerja, status "selesai" & "batal", tempoh pending |
 | **Resit & Invois** | Maklumat syarikat pada dokumen, prefix & nombor resit/invois, bank, logo & tandatangan, ayat hantar WhatsApp |
+| **Peringatan** | Berapa hari awal amaran kalibrasi, komitmen dan tugasan To Do keluar |
 | **Quotation** | Prefix & nombor quotation, tempoh sah, URL Syarat & Terma, senarai servis + fail katalog PDF, pecahan harga lalai, jenis hartanah |
 | **Data & Backup** | Muat turun backup, pulih dari fail, padam semua data, ringkasan bilangan rekod |
 
