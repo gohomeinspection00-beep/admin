@@ -20,7 +20,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
-| **Tetapan** | Nama syarikat, target jualan harian, hari bekerja, senarai projek, sumber lead, hari cuti, backup & restore |
+| **Tetapan** | Terbahagi kepada 5 tab: Syarikat & Target, Jualan & Status, Resit & Invois, Quotation, Data & Backup |
 
 ## Kalendar Key-in Sale
 
@@ -230,12 +230,47 @@ Menu **Quotation** menjana sebut harga lengkap:
    - **Mesej WhatsApp** siap (BM atau English) — salin atau hantar terus
 
 Status quotation: Draf → Dihantar → Diterima / Ditolak / Luput.
-Quotation yang **Diterima** boleh ditekan **Jadikan Sale** — borang key-in sale
-terbuka dengan nama, telefon, alamat dan harga sudah terisi.
 
-Tetapan → **Tetapan Quotation**: prefix & nombor seterusnya, tempoh sah,
-senarai servis (nama | link skop | link lampiran PDF), pecahan harga lalai, dan
-**URL halaman Syarat & Terma**.
+### Pilih service dari dropdown
+
+Medan **Service** dalam borang quotation ialah **dropdown** yang diambil dari
+Tetapan → Quotation → *Senarai Servis*. Bila service ditukar, tiga benda
+bertukar automatik: **link skop penuh**, **link lampiran PDF**, dan
+**halaman belakang**. Semuanya masih boleh diubah untuk quotation itu sahaja.
+
+### Page depan + page belakang (katalog)
+
+Setiap servis boleh ada senarai **Halaman Belakang Quotation** (URL gambar,
+satu baris satu — muka surat katalog yang sudah ditukar jadi JPG/PNG).
+Bila **Cetak / PDF** ditekan, sistem mencetak:
+
+- **Page 1** — quotation A4
+- **Page 2, 3, …** — setiap gambar katalog, satu muka surat satu
+
+Jadi satu PDF sahaja untuk dihantar kepada client. Sistem menunggu semua gambar
+siap dimuat turun sebelum dialog cetak dibuka, jadi pastikan komputer ada
+internet semasa mencetak (atau guna gambar yang disimpan di dalam komputer).
+
+### Jadikan Sale
+
+Tekan **Jadikan Sale** pada quotation — borang Key-in Sale terus terbuka dengan
+nama, telefon, alamat (No. Unit), jenis hartanah, harga dan catatan sudah terisi;
+*Dari* diisi **Quotation**. Tinggal isi **tarikh, masa inspection dan staf**,
+kemudian **Simpan Sale**. Bila disimpan:
+
+- Rekod terus masuk **Key-in Sale** dan muncul dalam kalendar
+- Quotation ditukar status kepada **Diterima**
+- Quotation dan sale terpaut — butang **Lihat Sale** muncul pada quotation, dan
+  butiran jualan pula memaparkan baris **Quotation** dengan butang *Buka*
+
+Butang **Jadikan Sale** hilang selepas dipakai supaya tiada rekod berganda.
+
+### Tetapan quotation
+
+Tetapan → tab **Quotation**: prefix & nombor seterusnya, tempoh sah,
+**URL halaman Syarat & Terma**, senarai servis (nama, link skop, link lampiran
+PDF, halaman belakang) dengan butang *+ Tambah Servis* / *Buang*, pecahan harga
+lalai dan senarai jenis hartanah.
 
 > **Halaman `tnc.html` mesti di-deploy berasingan** supaya client boleh buka
 > pautan itu. Lihat `DEPLOY.md` untuk langkah penuh.
@@ -383,6 +418,20 @@ Menu Operasi memaparkan jadual *Tugasan Report & Submission* — berapa report d
 submission tertunggak bagi setiap staf, termasuk yang **belum ditugaskan**.
 
 Nombor merah pada menu **Key-in Sale** = bilangan job yang belum selesai.
+
+## Menu Tetapan
+
+Tetapan dibahagikan kepada tab supaya senang cari:
+
+| Tab | Isi |
+|---|---|
+| **Syarikat & Target** | Nama syarikat, target jualan harian, hari bekerja, target ikut bulan, hari cuti / offday |
+| **Jualan & Status** | Senarai projek/daerah, sumber lead, senarai status kerja, status "selesai" & "batal", tempoh pending |
+| **Resit & Invois** | Maklumat syarikat pada dokumen, prefix & nombor resit/invois, bank, logo & tandatangan, ayat hantar WhatsApp |
+| **Quotation** | Prefix & nombor quotation, tempoh sah, URL Syarat & Terma, senarai servis + halaman belakang, pecahan harga lalai, jenis hartanah |
+| **Data & Backup** | Muat turun backup, pulih dari fail, padam semua data, ringkasan bilangan rekod |
+
+Setiap tab ada butang **Simpan** sendiri — simpan tab itu dahulu sebelum tukar tab.
 
 ## Data & backup — PENTING
 
