@@ -87,20 +87,37 @@ Sila maklumkan slot yang sesuai untuk tempahan. Terima kasih.
 Go Home Inspection
 ```
 
-## Resit
+## Bayaran & Resit
 
-Satu jualan boleh ada **beberapa resit** (deposit, final payment, bayaran tambahan) —
-setiap satu dengan nombor sendiri yang tidak berulang.
+Setiap jualan ada **senarai bayaran** sendiri — deposit, bayaran kedua, bayaran
+akhir dan seterusnya. Baki dikira automatik dari jumlah semua bayaran.
 
-**Cara jana resit:**
+**Rekod bayaran:**
 
-1. Buka satu jualan (klik nama client dalam kalendar) → **Buat Resit**.
-   Semua maklumat client, property, masa inspeksi, inspector dan kewangan
-   diisi automatik dari rekod jualan.
-2. Pilih **Jenis Bayaran** (Deposit / Final Payment / Bayaran Penuh / Lain-lain)
-   dan **Jumlah Diterima** untuk resit itu.
-3. Tandakan *Sertakan muka surat Inspection Information* jika mahu resit 2 muka surat.
-4. Tekan **Jana Resit** — pratonton resit terus dipaparkan.
+1. Semasa key-in sale, isi **Deposit Diterima (RM)** jika client dah bayar deposit.
+2. Bayaran seterusnya: buka jualan (klik nama client dalam kalendar) →
+   butang **+ Bayaran** dalam bahagian *Bayaran Diterima*.
+3. Setiap bayaran menyimpan tarikh, jenis, jumlah, kaedah (Bank Transfer, Tunai,
+   DuitNow, Cek) dan nombor rujukan. Sistem mencadangkan jenis seterusnya
+   (Deposit → Bayaran Kedua → Bayaran Ketiga → Bayaran Akhir) dan jumlah = baki.
+
+**Jana resit:**
+
+Selepas menyimpan bayaran, borang resit terus terbuka. Untuk bayaran lama,
+tekan **Buat Resit** pada baris bayaran itu. Resit yang sudah dijana dipapar
+sebagai nombor resit dalam senarai bayaran — tekan untuk buka semula.
+
+Resit mengambil kira **semua bayaran terdahulu**, contoh resit bayaran kedua:
+
+```
+Sub-Total                             RM 550.00
+Previous Payment — Deposit (1 Sep)    RM 100.00
+Payment Received (Bayaran Kedua)      RM 450.00
+Total Paid                            RM 550.00
+Balance Due                           RM   0.00
+```
+
+Tandakan *Sertakan muka surat Inspection Information* untuk resit 2 muka surat.
 
 Dari pratonton: **Cetak / Simpan PDF** (pilih "Save as PDF" dalam dialog cetak),
 **Salin Teks**, atau **WhatsApp** (terus ke nombor client jika ada).
