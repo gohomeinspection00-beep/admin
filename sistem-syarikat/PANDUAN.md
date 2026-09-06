@@ -231,9 +231,30 @@ bahagian **Agihan**:
 - **Bahagian syarikat dikira automatik** = harga client − jumlah agihan
   (contoh: RM 600 − RM 250 − RM 150 = **RM 200** untuk syarikat kerana cari site)
 
-Menu Sub Job memaparkan jumlah nilai client, jumlah diagihkan, bahagian syarikat,
-senarai penuh, carian, eksport CSV, serta **carta pendapatan setiap staf** dari
-sub job.
+### Bayaran sub job
+
+Setiap sub job ada senarai bayaran sendiri (butang **+ Bayaran** dalam butiran
+sub job) supaya tiada yang terlepas pandang. Sistem menunjukkan berapa sudah
+dibayar dan **baki client**, dan sub job yang belum lunas ditanda merah.
+
+Menu Sub Job memaparkan nilai client, jumlah diagihkan, bahagian syarikat,
+**belum dikutip**, **kerja tertunggak**, senarai penuh, carian, eksport CSV,
+serta **carta pendapatan setiap staf** dari sub job.
+
+### Sub job pada papan utama
+
+Sub job **tidak masuk** dalam kad jualan atau target — tetapi ada kad berasingan
+*Sub Job* pada papan utama:
+
+| Kad | Maksud |
+|---|---|
+| Nilai Client | jumlah harga sub job bulan itu |
+| Syarikat Dapat | bahagian syarikat selepas tolak agihan |
+| Belum Dikutip | baki yang client sub job belum bayar |
+| **Pendapatan Syarikat** | jualan syarikat **+** bahagian sub job |
+
+Sub job yang belum bayar atau status tertunggak juga naik dalam **jalur amaran**
+dan **Perlu Tindakan** dengan tanda `SUB` — tekan untuk buka terus sub job itu.
 
 Dalam kalendar, sub job dipapar dengan bingkai putus-putus dan tanda **SUB**
 supaya jadual tidak bertindih — tetapi jumlah harian dan target kekal mengira

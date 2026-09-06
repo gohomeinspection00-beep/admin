@@ -860,8 +860,24 @@ function lukisPapan(bekas) {
              peratus: lepas > 0 ? Math.round(Math.abs(kini - lepas) / lepas * 100) : null };
   }
 
-  // Kerja tertunggak (melebihi tempoh) dikumpul mengikut status semasa.
+  // Sub job bulan ini — dikira berasingan daripada jualan syarikat.
+  var subBulanIni = data.subjob.filter(function (x) {
+    return String(x.tarikh).slice(0, 7) === papanBulan && x.statusKerja !== t.statusBatal;
+  });
+  var kSub = subBulanIni.reduce(function (a, j) {
+    var k = kiraSub(j);
+    a.harga += k.harga; a.syarikat += k.syarikat; a.baki += k.baki;
+    if (k.baki > 0.005) a.bilBaki++;
+    return a;
+  }, { harga: 0, syarikat: 0, baki: 0, bilBaki: 0 });
+  var subBakiSemua = data.subjob.filter(function (x) {
+    return x.statusKerja !== t.statusBatal && kiraSub(x).baki > 0.005;
+  }).sort(function (a, b) { return String(a.tarikh).localeCompare(String(b.tarikh)); });
+
+  // Kerja tertunggak (melebihi tempoh) — jualan dan sub job digabung.
   var tunggak = data.sale.filter(function (x) { return tertunggak(x, t); })
+    .concat(data.subjob.filter(function (x) { return tertunggak(x, t); })
+      .map(function (x) { var y = Object.assign({}, x); y._sub = true; return y; }))
     .sort(function (a, b) { return hariSejak(b.tarikh) - hariSejak(a.tarikh); });
   var petaTunggak = {};
   tunggak.forEach(function (x) {
@@ -884,8 +900,10 @@ function lukisPapan(bekas) {
           '<div class="amaran-senarai">' +
             tunggak.slice(0, 6).map(function (x) {
               var tugas = x.tugasSubmit || x.tugasReport;
-              return '<button type="button" class="amaran-item" data-tunggak="' + esc(x.id) + '">' +
-                '<span><span class="nama">' + esc(x.nama || "Tanpa nama") + "</span>" +
+              return '<button type="button" class="amaran-item" data-tunggak="' + esc(x.id) +
+                '" data-sub-tunggak="' + (x._sub ? "1" : "") + '">' +
+                '<span><span class="nama">' + esc(x.nama || "Tanpa nama") +
+                (x._sub ? ' <span class="tag-sub">SUB</span>' : "") + "</span>" +
                 '<div class="kecil">' + esc(fmtTarikh(x.tarikh)) + " · " +
                 esc(x.projek || "-") + (x.unit ? " " + esc(x.unit) : "") +
                 (tugas ? " · " + esc(tugas) : " · belum ditugaskan") +
@@ -914,6 +932,25 @@ function lukisPapan(bekas) {
         '<div class="bar-progres' + (peratus >= 100 ? " penuh" : "") + '"><span style="width:' + peratus + '%"></span></div>' +
       "</div>" +
     "</div>" +
+
+    (subBulanIni.length || subBakiSemua.length
+      ? '<div class="kad">' +
+          '<div class="kad-tajuk"><h3>Sub Job — ' + esc(fmtBulan(papanBulan)) + "</h3>" +
+            '<div class="aksi"><span class="badge badge-muted">Tidak dikira dalam target jualan</span>' +
+            '<button class="btn btn-lembut btn-kecil" id="bukaSubJob">Buka Sub Job</button></div></div>' +
+          '<div class="grid grid-4" style="margin-bottom:0">' +
+            kadStat("Nilai Client", rm(kSub.harga), subBulanIni.length + " sub job bulan ini") +
+            kadStat("Syarikat Dapat", rm(kSub.syarikat), "masuk pendapatan syarikat") +
+            kadStat("Belum Dikutip", rm(kSub.baki), kSub.bilBaki + " sub job bulan ini belum lunas") +
+            kadStat("Pendapatan Syarikat", rm(r.total + kSub.syarikat), "jualan + bahagian sub job") +
+          "</div>" +
+          (subBakiSemua.length
+            ? '<p class="kecil" style="margin:12px 0 0">Termasuk bulan lain: <b>' +
+              subBakiSemua.length + " sub job</b> masih belum dibayar sepenuhnya (jumlah " +
+              esc(rm(subBakiSemua.reduce(function (j, x) { return j + kiraSub(x).baki; }, 0))) + ")." + "</p>"
+            : "") +
+        "</div>"
+      : "") +
 
     '<div class="kad">' +
       '<div class="kad-tajuk">' +
@@ -976,6 +1013,7 @@ function lukisPapan(bekas) {
                 petaTunggak[st].slice(0, 5).map(function (x) {
                   var tugas = x.tugasReport || x.tugasSubmit;
                   return '<div class="jumlah-baris"><span>' + esc(x.nama) +
+                    (x._sub ? ' <span class="tag-sub">SUB</span>' : "") +
                     '<div class="kecil">' + esc(fmtTarikh(x.tarikh)) +
                     (tugas ? " · " + esc(tugas) : " · belum ditugaskan") +
                     (x.jenisSubmit ? " · " + esc(x.jenisSubmit) : "") + "</div></span>" +
@@ -985,6 +1023,16 @@ function lukisPapan(bekas) {
                   ? '<div class="kecil">+ ' + (petaTunggak[st].length - 5) + " lagi</div>" : "");
             }).join("")
           : '<div class="kecil">Tiada kerja tertunggak. Semua ikut jadual.</div>') +
+        (subBakiSemua.length
+          ? '<div class="tajuk-seksyen">Sub job belum dibayar (' + subBakiSemua.length + ")</div>" +
+            subBakiSemua.slice(0, 5).map(function (x) {
+              return '<button type="button" class="jumlah-baris" style="width:100%;border:0;background:none;' +
+                'cursor:pointer;text-align:left;font:inherit" data-sub-baki="' + esc(x.id) + '"><span>' +
+                esc(x.nama) + ' <span class="tag-sub">SUB</span>' +
+                '<div class="kecil">' + esc(fmtTarikh(x.tarikh)) + "</div></span><b>" +
+                esc(rm(kiraSub(x).baki)) + "</b></button>";
+            }).join("")
+          : "") +
         '<div class="tajuk-seksyen">Baki belum kutip (' + adaBaki.length + ")</div>" +
         (adaBaki.length ? adaBaki.slice(0, 6).map(function (s) {
           return '<div class="jumlah-baris"><span>' + esc(s.nama) + '<span class="kecil"> · ' +
@@ -1004,10 +1052,17 @@ function lukisPapan(bekas) {
     lukisPapan(bekas);
   };
   $$("[data-tunggak]", bekas).forEach(function (b) {
-    b.onclick = function () { lihatSale(b.getAttribute("data-tunggak")); };
+    b.onclick = function () {
+      if (b.getAttribute("data-sub-tunggak")) lihatSubJob(b.getAttribute("data-tunggak"));
+      else lihatSale(b.getAttribute("data-tunggak"));
+    };
+  });
+  $$("[data-sub-baki]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatSubJob(b.getAttribute("data-sub-baki")); };
   });
   $("#metrikJualan").onclick = function () { papanMetrik = "jualan"; lukisPapan(bekas); };
   $("#metrikSite").onclick = function () { papanMetrik = "site"; lukisPapan(bekas); };
+  if ($("#bukaSubJob")) $("#bukaSubJob").onclick = function () { location.hash = "#/subjob"; };
   $("#tahunTolak").onclick = function () { papanTahun--; lukisPapan(bekas); };
   $("#tahunTambah").onclick = function () { papanTahun++; lukisPapan(bekas); };
   $$(".carta-lajur", bekas).forEach(function (el, i) {
@@ -2176,12 +2231,14 @@ function jenisSeterusnya(bil) {
 
 function borangBayaran(saleId, bayaranId, opsi) {
   opsi = opsi || {};
+  var subMod = opsi.jenisRekod === "subjob";
   var data = baca();
-  var s = data.sale.filter(function (x) { return x.id === saleId; })[0];
+  var senaraiRekod = subMod ? data.subjob : data.sale;
+  var s = senaraiRekod.filter(function (x) { return x.id === saleId; })[0];
   if (!s) return;
   var b = bayaranId ? (s.bayaran || []).filter(function (x) { return x.id === bayaranId; })[0] : null;
   var baru = !b;
-  var k = kiraSale(s);
+  var k = subMod ? kiraSub(s) : kiraSale(s);
   var bakiSemasa = baru ? k.baki : k.baki + nom(b.jumlah);
 
   b = b || { tarikh: kunciTarikh(), jenis: jenisSeterusnya((s.bayaran || []).length),
@@ -2190,7 +2247,8 @@ function borangBayaran(saleId, bayaranId, opsi) {
              catatan: opsi.invoisId ? "Bayaran bagi invois" : "" };
 
   var m = modal((baru ? "Rekod Bayaran" : "Sunting Bayaran") + " — " + (s.nama || "-"),
-    '<div class="jumlah-baris"><span>Jumlah invois</span><b>' + esc(rm(k.total)) + "</b></div>" +
+    '<div class="jumlah-baris"><span>Jumlah ' + (subMod ? "sub job" : "invois") + "</span><b>" +
+      esc(rm(subMod ? k.harga : k.total)) + "</b></div>" +
     '<div class="jumlah-baris"><span>Sudah dibayar sebelum ini</span><b>' +
       esc(rm(k.dibayar - (baru ? 0 : nom(b.jumlah)))) + "</b></div>" +
     '<div class="jumlah-baris" style="margin-bottom:14px"><span><b>Baki belum bayar</b></span><b>' +
@@ -2238,16 +2296,18 @@ function borangBayaran(saleId, bayaranId, opsi) {
       sahkan("Padam bayaran ini? Resit yang sudah dijana tidak akan dipadam.").then(function (ya) {
         if (!ya) return;
         var d = baca();
-        d.sale = d.sale.map(function (x) {
+        var senarai = subMod ? d.subjob : d.sale;
+        var kemas = senarai.map(function (x) {
           if (x.id !== saleId) return x;
           x.bayaran = (x.bayaran || []).filter(function (y) { return y.id !== bayaranId; });
           return x;
         });
+        if (subMod) d.subjob = kemas; else d.sale = kemas;
         simpan(d);
         m.tutup();
         toast("Bayaran dipadam.", "ok");
         lukis();
-        lihatSale(saleId);
+        if (subMod) lihatSubJob(saleId); else lihatSale(saleId);
       });
     };
   }
@@ -2258,7 +2318,7 @@ function borangBayaran(saleId, bayaranId, opsi) {
     if (nom(v.jumlah) <= 0) return toast("Jumlah bayaran mesti lebih daripada sifar.", "bad");
     var d = baca();
     var idBaru = bayaranId || id();
-    d.sale = d.sale.map(function (x) {
+    var senaraiSimpan = (subMod ? d.subjob : d.sale).map(function (x) {
       if (x.id !== saleId) return x;
       x.bayaran = x.bayaran || [];
       var rekod = { id: idBaru, tarikh: v.tarikh, jenis: v.jenis, jumlah: nom(v.jumlah),
@@ -2271,11 +2331,13 @@ function borangBayaran(saleId, bayaranId, opsi) {
       }
       return x;
     });
+    if (subMod) d.subjob = senaraiSimpan; else d.sale = senaraiSimpan;
     if (!simpan(d)) return;
     m.tutup();
     toast(bayaranId ? "Bayaran dikemas kini." : "Bayaran direkod.", "ok");
     lukis();
-    if (bayaranId) lihatSale(saleId);
+    if (subMod) lihatSubJob(saleId);
+    else if (bayaranId) lihatSale(saleId);
     else borangDok("resit", { saleId: saleId, bayaranId: idBaru, invoisId: opsi.invoisId || null });
   };
 }
@@ -3433,7 +3495,14 @@ var subCari = "";
 function kiraSub(j) {
   var harga = nom(j.harga);
   var agih = (j.agihan || []).reduce(function (t, a) { return t + nom(a.jumlah); }, 0);
-  return { harga: harga, agih: agih, syarikat: Math.round((harga - agih) * 100) / 100 };
+  var dibayar = (j.bayaran || []).reduce(function (t, b) { return t + nom(b.jumlah); }, 0);
+  var baki = Math.round((harga - dibayar) * 100) / 100;
+  return {
+    harga: harga, agih: agih,
+    syarikat: Math.round((harga - agih) * 100) / 100,
+    dibayar: dibayar, baki: baki,
+    statusBayar: harga > 0 && baki <= 0.005 ? "lunas" : (dibayar > 0 ? "deposit" : "belum")
+  };
 }
 
 function barisAgihan(a, i) {
@@ -3588,7 +3657,8 @@ function lihatSubJob(subId) {
       medan("Status Kerja", "<select id='statusSub'>" + statusSenarai(data.tetapan).map(function (x) {
         return "<option" + ((j.statusKerja || "") === x ? " selected" : "") + ">" + esc(x) + "</option>";
       }).join("") + "</select>") +
-      medan("Bahagian Syarikat", '<div style="padding-top:8px"><b>' + esc(rm(k.syarikat)) + "</b></div>") +
+      medan("Bahagian Syarikat", '<div style="padding-top:8px"><b>' + esc(rm(k.syarikat)) + "</b> " +
+        lencanaBayar(k) + "</div>") +
     "</div>" +
     '<div class="tajuk-seksyen">Butiran</div>' +
     '<dl class="kunci-nilai">' +
@@ -3606,11 +3676,40 @@ function lihatSubJob(subId) {
         esc(rm(a.jumlah)) + "</b></div>";
     }).join("") +
     '<div class="jumlah-baris"><span><b>Bahagian syarikat</b></span><b>' + esc(rm(k.syarikat)) + "</b></div>" +
+
+    '<div class="tajuk-seksyen" style="display:flex;justify-content:space-between;align-items:center">' +
+      "<span>Bayaran Client</span>" +
+      '<button type="button" class="btn btn-utama btn-kecil" id="btnBayarSub">+ Bayaran</button></div>' +
+    ((j.bayaran || []).length
+      ? '<div class="jadual-bungkus"><table><thead><tr><th>Tarikh</th><th>Jenis</th>' +
+        "<th class='num'>Jumlah</th><th>Kaedah</th><th></th></tr></thead><tbody>" +
+        j.bayaran.slice().sort(function (a, b) {
+          return String(a.tarikh).localeCompare(String(b.tarikh));
+        }).map(function (b) {
+          return "<tr><td>" + esc(fmtTarikh(b.tarikh)) + "</td><td>" + esc(b.jenis) + "</td>" +
+            '<td class="num"><b>' + esc(rm(b.jumlah)) + "</b></td><td>" + esc(b.kaedah || "-") + "</td>" +
+            '<td><button class="btn btn-lembut btn-kecil" data-sunting-bayar-sub="' + esc(b.id) +
+            '">Sunting</button></td></tr>';
+        }).join("") + "</tbody></table></div>"
+      : '<div class="kecil" style="padding:8px 0">Belum ada bayaran direkod.</div>') +
+    '<div class="jumlah-baris"><span><b>Sudah dibayar</b></span><b>' + esc(rm(k.dibayar)) + "</b></div>" +
+    '<div class="jumlah-baris"><span><b>Baki client</b></span><b>' + esc(rm(k.baki)) + "</b></div>" +
+
     '<div class="baris-butang modal-kaki">' +
       '<button type="button" class="btn btn-lembut" id="btnTutupSub">Tutup</button>' +
       '<button type="button" class="btn btn-utama" id="btnSuntingSub">Sunting</button>' +
     "</div>", 560);
 
+  $("#btnBayarSub", m.el).onclick = function () {
+    m.tutup();
+    borangBayaran(subId, null, { jenisRekod: "subjob" });
+  };
+  $$("[data-sunting-bayar-sub]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      m.tutup();
+      borangBayaran(subId, b.getAttribute("data-sunting-bayar-sub"), { jenisRekod: "subjob" });
+    };
+  });
   $("#btnTutupSub", m.el).onclick = m.tutup;
   $("#btnSuntingSub", m.el).onclick = function () { m.tutup(); borangSubJob(subId); };
   $("#statusSub", m.el).onchange = function (e) {
@@ -3641,8 +3740,11 @@ function lukisSubJob(bekas) {
   var jum = senarai.reduce(function (t, j) {
     var k = kiraSub(j);
     t.harga += k.harga; t.agih += k.agih; t.syarikat += k.syarikat;
+    t.dibayar += k.dibayar; t.baki += k.baki;
+    if (k.baki > 0.005) t.bilBaki++;
+    if (tertunggak(j, data.tetapan)) t.bilTunggak++;
     return t;
-  }, { harga: 0, agih: 0, syarikat: 0 });
+  }, { harga: 0, agih: 0, syarikat: 0, dibayar: 0, baki: 0, bilBaki: 0, bilTunggak: 0 });
 
   // Pendapatan setiap staf dari sub job.
   var peta = {};
@@ -3662,7 +3764,9 @@ function lukisSubJob(bekas) {
       kadStat("Sub Job", String(senarai.length), subBulan ? fmtBulan(subBulan) : "semua bulan") +
       kadStat("Nilai Client", rm(jum.harga), "harga dikutip dari client") +
       kadStat("Diagihkan ke Staf", rm(jum.agih), ikutStaf.length + " orang terlibat") +
-      kadStat("Bahagian Syarikat", rm(jum.syarikat), "selepas tolak agihan") +
+      kadStat("Bahagian Syarikat", rm(jum.syarikat), "masuk pendapatan syarikat") +
+      kadStat("Belum Dikutip", rm(jum.baki), jum.bilBaki + " sub job belum lunas") +
+      kadStat("Kerja Tertunggak", String(jum.bilTunggak), "belum sampai " + esc(data.tetapan.statusSelesai)) +
     "</div>" +
 
     '<div class="kad">' +
@@ -3681,7 +3785,8 @@ function lukisSubJob(bekas) {
       "</div>" +
       '<div class="jadual-bungkus">' +
       (senarai.length ? "<table><thead><tr><th>Tarikh</th><th>Client</th><th>Projek / Unit</th>" +
-        "<th class='num'>Harga</th><th>Agihan</th><th class='num'>Syarikat</th><th>Status</th><th></th>" +
+        "<th class='num'>Harga</th><th class='num'>Baki</th><th>Agihan</th>" +
+        "<th class='num'>Syarikat</th><th>Status</th><th></th>" +
         "</tr></thead><tbody>" +
         senarai.map(function (j) {
           var k = kiraSub(j);
@@ -3692,12 +3797,18 @@ function lukisSubJob(bekas) {
               (j.telefon ? '<div class="kecil">' + esc(j.telefon) + "</div>" : "") + "</td>" +
             '<td class="bungkus">' + esc(j.projek || "-") +
               '<div class="kecil">' + esc(j.unit || "-") + "</div></td>" +
-            '<td class="num">' + esc(rm(k.harga)) + "</td>" +
+            '<td class="num">' + esc(rm(k.harga)) +
+              '<div class="kecil">' + esc(rm(k.dibayar)) + " dibayar</div></td>" +
+            '<td class="num">' + (k.baki > 0.005
+              ? "<b style='color:var(--bad)'>" + esc(rm(k.baki)) + "</b>"
+              : '<span class="badge badge-ok">Lunas</span>') + "</td>" +
             '<td class="bungkus kecil">' + ((j.agihan || []).length
               ? esc(j.agihan.map(function (a) { return a.nama + " " + rmPendek(a.jumlah); }).join(", "))
               : "belum diagih") + "</td>" +
             '<td class="num"><b>' + esc(rm(k.syarikat)) + "</b></td>" +
-            "<td>" + lencanaKerja(j.statusKerja, data.tetapan) + "</td>" +
+            "<td>" + lencanaKerja(j.statusKerja, data.tetapan) +
+              (tertunggak(j, data.tetapan)
+                ? "<div style='margin-top:4px'>" + lencanaTunggak(hariSejak(j.tarikh)) + "</div>" : "") + "</td>" +
             '<td><div class="aksi">' +
               '<button class="btn btn-lembut" data-sub="' + esc(j.id) + '">Buka</button>' +
             "</div></td></tr>";
@@ -3729,12 +3840,12 @@ function lukisSubJob(bekas) {
   $("#btnEksportSub").onclick = function () {
     if (!senarai.length) return toast("Tiada sub job untuk dieksport.", "warn");
     csv("sub-job" + (subBulan ? "-" + subBulan : ""),
-      ["Tarikh", "Masa", "Client", "Telefon", "Projek", "Unit", "Harga",
+      ["Tarikh", "Masa", "Client", "Telefon", "Projek", "Unit", "Harga", "Dibayar", "Baki",
        "Agihan Staf", "Jumlah Agihan", "Bahagian Syarikat", "Status"],
       senarai.map(function (j) {
         var k = kiraSub(j);
         return [j.tarikh, (j.masaMula || "") + (j.masaTamat ? "-" + j.masaTamat : ""),
-          j.nama, j.telefon, j.projek, j.unit, k.harga,
+          j.nama, j.telefon, j.projek, j.unit, k.harga, k.dibayar, k.baki,
           (j.agihan || []).map(function (a) { return a.nama + ": " + a.jumlah; }).join(" | "),
           k.agih, k.syarikat, j.statusKerja];
       }));
