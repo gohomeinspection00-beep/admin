@@ -19,7 +19,7 @@ Sale and Schedule
 Operasi
 Sub Job
 Tool ▸ Quotation · Invois · Resit
-Kewangan ▸ Tunggakan · Perbelanjaan · Marketing · Claim Staf · Gaji · Komitmen
+Kewangan ▸ Laporan Kewangan · Tunggakan · Perbelanjaan · Marketing · Claim Staf · Gaji · Komitmen
 Aset & Stok ▸ Alat · Sticker & Bahan · Calibration Tool
 To Do
 Team & Staf ▸ Team · Staf
@@ -41,6 +41,7 @@ ditutup, nombor itu naik ke tajuk kumpulan.
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Tunggakan** | Semua baki yang belum dikutip — jualan, sub job dan invois manual — disusun ikut umur hutang, dengan butang kejar bayaran WhatsApp |
 | **Alat & Stok** | Tiga tab: Alat (siapa ambil, siapa pulang), Sticker & Bahan Pakai, dan Calibration Tool (sijil SIRIM & tarikh luput) |
+| **Laporan Kewangan** | Penyata untung rugi bulanan, graf tunai masuk vs keluar, graf untung/rugi 12 bulan, dan akaun bank |
 | **Perbelanjaan** | Semua duit keluar: perbelanjaan syarikat, marketing (Ads, campaign, flyers) dan claim staf — dengan resit |
 | **Gaji** | Payroll bulanan: gaji pokok, elaun, komisen, elaun site, claim staf, potongan KWSP/PERKESO/EIS/PCB dan slip gaji A4 |
 | **Komitmen** | Transport, pinjaman dan komitmen bulanan lain — bila kena bayar, sudah bayar atau belum |
@@ -599,6 +600,67 @@ naik di papan utama dan jadi nombor merah pada menu. Bila kalibrasi semula,
 tekan **Kalibrasi Semula** — rekod lama kekal sebagai sejarah.
 
 Semua nombor stok, sejarah ambil/pulang dan fail sijil masuk dalam **backup**.
+
+## Laporan Kewangan
+
+Menu **Kewangan → Laporan Kewangan** ada tiga tab.
+
+### Tab 1 — Untung Rugi
+
+Penyata bulanan yang menolak semuanya sampai nampak untung atau rugi sebenar:
+
+```
+Pendapatan
+  Jualan inspection                 (job direkod bulan itu)
+  Bahagian syarikat dari sub job    (bahagian staf tidak dikira)
+= Jumlah pendapatan
+
+Tolak Perbelanjaan Sebenar
+  ikut kategori: Marketing, Gaji & Elaun, Operasi, …
+  Komitmen: Transport, Pinjaman, Komitmen Lain
+= UNTUNG OPERASI
+
+Tolak Peruntukan (anggaran)
+  Servis kenderaan, servis & ganti alat, simpanan cukai, …
+= UNTUNG BERSIH ANGGARAN     + margin %
+```
+
+Gaji dan claim staf sudah termasuk dalam perbelanjaan (kategori *Gaji & Elaun*),
+jadi tak perlu key-in dua kali. Tekan **Cetak Penyata** untuk penyata A4, atau
+**Eksport CSV**.
+
+### Tab 2 — Aliran Tunai & Graf
+
+- Graf **Tunai Masuk vs Keluar** 12 bulan (biru = masuk, merah = keluar)
+- Graf **Untung / Rugi setiap bulan** — batang naik untuk untung, turun untuk rugi
+- Jadual 12 bulan: pendapatan, perbelanjaan, untung operasi, untung bersih,
+  tunai masuk, tunai keluar, dan jumlah setahun
+
+### Tab 3 — Akaun Bank
+
+Key-in **baki permulaan** setiap akaun (bank, tunai, e-wallet) sekali sahaja
+berserta tarikhnya. Selepas itu sistem tambah semua bayaran client dan tolak
+semua perbelanjaan, komitmen dan gaji yang direkod selepas tarikh itu — jadi
+**Duit Dalam Tangan** sentiasa terkini.
+
+**Pelarasan** untuk duit yang tiada dalam sistem: modal masuk, ambil untung,
+caj bank, pindahan antara akaun — boleh lampirkan bukti.
+
+**Semak Baki Bank**: key-in baki sebenar dalam bank, sistem tunjuk bezanya.
+Kalau ada beza, rekod sebagai pelarasan supaya baki padan semula.
+
+### Peruntukan (Tetapan → Kewangan)
+
+Peruntukan ialah duit yang **patut disimpan setiap bulan** untuk kos yang datang
+kemudian. Boleh set **jumlah tetap** (contoh servis kenderaan RM 250 sebulan)
+atau **peratus** (contoh servis & ganti alat 3% dari pendapatan, simpanan cukai
+5%). Empat peruntukan asas sudah disediakan — ubah, tambah atau matikan
+ikut keperluan.
+
+Ia ditolak dalam laporan supaya untung yang dipapar lebih realistik, tetapi ia
+**bukan** perbelanjaan sebenar — bila servis benar-benar dibuat, rekod dalam
+menu Perbelanjaan seperti biasa. Bulan yang langsung tiada aktiviti tidak
+dikenakan peruntukan.
 
 ## Perbelanjaan
 

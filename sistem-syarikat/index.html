@@ -317,6 +317,28 @@ body.cetak-resit #kertasResit{display:block}
 .carta-label{font-size:11px;color:var(--lembut);font-weight:600}
 .carta-lajur.kini .carta-label{color:var(--utama)}
 .carta-paksi{display:flex;justify-content:space-between;font-size:11px;color:var(--lembut);border-top:1px solid var(--garis);padding-top:6px;margin-top:2px}
+.carta-legend{display:flex;gap:16px;font-size:12px;color:var(--lembut);margin:0 0 10px}
+.carta-legend span{display:inline-flex;align-items:center;gap:6px}
+.carta-titik{width:10px;height:10px;border-radius:3px;display:inline-block}
+.carta-pasang{display:flex;align-items:flex-end;gap:6px;height:200px;padding-top:18px}
+.carta-kump{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:6px;cursor:default}
+.carta-duo{display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;height:100%}
+.carta-duo span{width:44%;max-width:16px;border-radius:4px 4px 0 0;min-height:2px}
+.carta-duo .masuk{background:#2563eb}
+.carta-duo .keluar{background:#dc2626}
+.carta-kump:not(.kini) .carta-duo span{opacity:.62}
+.carta-kump:hover .carta-duo span{opacity:1}
+.carta-ur{display:flex;gap:3px;height:220px}
+.carta-ur-lajur{flex:1;display:flex;flex-direction:column;align-items:center;cursor:default}
+.carta-ur-atas,.carta-ur-bawah{flex:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:3px}
+.carta-ur-atas{justify-content:flex-end}
+.carta-ur-bawah{justify-content:flex-start}
+.carta-ur-batang{width:100%;max-width:26px;min-height:2px}
+.carta-ur-atas .carta-ur-batang{background:#2563eb;border-radius:4px 4px 0 0}
+.carta-ur-bawah .carta-ur-batang{background:#dc2626;border-radius:0 0 4px 4px}
+.carta-ur-lajur:not(.kini) .carta-ur-batang{opacity:.62}
+.carta-ur-lajur:hover .carta-ur-batang{opacity:1}
+.carta-sifar{width:100%;border-top:1px solid var(--garis)}
 .carta-baris{display:grid;grid-template-columns:120px 1fr 92px;gap:10px;align-items:center;padding:5px 0}
 .carta-baris .nama{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .carta-jalur{height:12px;background:var(--bg);border-radius:6px;overflow:hidden}
@@ -467,6 +489,16 @@ var TETAPAN_ASAL = {
     prefixSlip: "SG", nomborSlip: 1,
     notaSlip: "Slip gaji ini adalah dokumen sulit. Sila simpan untuk rekod peribadi."
   },
+  peruntukan: [
+    { id: "p-kereta", nama: "Servis & selenggara kenderaan", jenis: "tetap", nilai: 250,
+      asas: "jualan", aktif: true },
+    { id: "p-tool", nama: "Servis & ganti alat", jenis: "peratus", nilai: 3,
+      asas: "jualan", aktif: true },
+    { id: "p-cukai", nama: "Simpanan cukai", jenis: "peratus", nilai: 5,
+      asas: "jualan", aktif: true },
+    { id: "p-kecemasan", nama: "Simpanan kecemasan syarikat", jenis: "peratus", nilai: 5,
+      asas: "jualan", aktif: false }
+  ],
   kategoriBelanja: ["Marketing", "Operasi", "Pejabat", "Kenderaan", "Alat & Stok",
                     "Gaji & Elaun", "Yuran & Lesen", "Lain-lain"],
   saluranMarketing: ["Facebook Ads", "Google Ads", "TikTok Ads", "Instagram",
@@ -600,6 +632,8 @@ function baca() {
   mentah.tetapan.kategoriAlat = mentah.tetapan.kategoriAlat || TETAPAN_ASAL.kategoriAlat.slice();
   mentah.tetapan.amaran = Object.assign({}, TETAPAN_ASAL.amaran, mentah.tetapan.amaran || {});
   mentah.tetapan.gaji = Object.assign({}, TETAPAN_ASAL.gaji, mentah.tetapan.gaji || {});
+  mentah.tetapan.peruntukan = mentah.tetapan.peruntukan ||
+    JSON.parse(JSON.stringify(TETAPAN_ASAL.peruntukan));
   mentah.tetapan.kategoriBelanja = mentah.tetapan.kategoriBelanja || TETAPAN_ASAL.kategoriBelanja.slice();
   mentah.tetapan.saluranMarketing = mentah.tetapan.saluranMarketing || TETAPAN_ASAL.saluranMarketing.slice();
   mentah.staf = (mentah.staf || []).map(function (x) {
@@ -623,6 +657,7 @@ function baca() {
   mentah.belanja = mentah.belanja || [];    // perbelanjaan, marketing & claim staf
   mentah.pasukan = mentah.pasukan || [];    // team kerja
   mentah.gaji = mentah.gaji || [];          // rekod gaji bulanan
+  mentah.akaun = mentah.akaun || [];        // akaun bank / tunai
   mentah.tetapan.quote = Object.assign({}, TETAPAN_ASAL.quote, mentah.tetapan.quote || {});
   // Setiap servis perlu id tetap — kunci untuk fail lampiran PDF dalam storan.
   mentah.tetapan.quote.servis = (mentah.tetapan.quote.servis || []).map(function (x) {
@@ -740,6 +775,11 @@ function fmtBulan(b) {
 }
 
 function bulanKini() { return kunciTarikh().slice(0, 7); }
+function bulanTolak(bulan, n) {
+  var d = new Date(bulan + "-01T00:00:00");
+  d.setMonth(d.getMonth() - n);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+}
 
 function telefonKemas(t) {
   var bersih = String(t || "").replace(/[^\d+]/g, "");
@@ -1127,17 +1167,26 @@ function lukisPapan(bekas) {
       var mkt = belanjaBln.filter(function (b) { return (b.kategori || "") === "Marketing"; });
       var claimBelum = claimBelumBayar(data);
       if (!belanjaBln.length && !keluar.komitmen && !masuk) return "";
+      var untung = untungBulan(data, papanBulan);
+      var pos = posisiTunai(data);
       return '<div class="kad">' +
         '<div class="kad-tajuk"><h3>Kewangan — ' + esc(fmtBulan(papanBulan)) + "</h3>" +
-          '<div class="aksi"><button class="btn btn-lembut btn-kecil" id="bukaBelanja">' +
-          "Buka Perbelanjaan</button></div></div>" +
+          '<div class="aksi">' +
+          '<button class="btn btn-lembut btn-kecil" id="bukaLapor">Laporan Kewangan</button>' +
+          '<button class="btn btn-lembut btn-kecil" id="bukaBelanja">Perbelanjaan</button>' +
+          "</div></div>" +
         '<div class="grid grid-4" style="margin-bottom:0">' +
+          kadStat("Duit Dalam Tangan", rm(pos.baki),
+            (data.akaun || []).length ? "semua akaun" : "belum key-in baki bank") +
           kadStat("Duit Masuk", rm(masuk), "bayaran client diterima") +
           kadStat("Duit Keluar", rm(keluar.jumlah),
             rmPendek(keluar.belanja) + " belanja + " + rmPendek(keluar.komitmen) + " komitmen") +
-          kadStat("Baki Tunai", rm(masuk - keluar.jumlah),
-            masuk - keluar.jumlah >= 0 ? "lebihan bulan ini" : "kurangan bulan ini") +
-          kadStat("Belanja Marketing", rm(kiraBelanja(mkt)), mkt.length + " rekod bulan ini") +
+          '<div class="stat"><div class="stat-label">Untung Bersih Anggaran</div>' +
+            '<div class="stat-nilai" style="color:' +
+            (untung.untungBersih >= 0 ? "var(--ok)" : "var(--bad)") + '">' +
+            esc(rm(untung.untungBersih)) + "</div>" +
+            '<div class="stat-nota">selepas belanja &amp; peruntukan ' +
+            esc(rmPendek(untung.peruntukan)) + "</div></div>" +
         "</div>" +
         (claimBelum.length
           ? '<p class="kecil" style="margin:12px 0 0"><b>' + claimBelum.length + " claim staf</b> " +
@@ -1280,6 +1329,7 @@ function lukisPapan(bekas) {
   if ($("#bukaTunggak")) $("#bukaTunggak").onclick = function () { location.hash = "#/tunggak"; };
   if ($("#bukaAlat")) $("#bukaAlat").onclick = function () { location.hash = "#/alat"; };
   if ($("#bukaBelanja")) $("#bukaBelanja").onclick = function () { location.hash = "#/belanja"; };
+  if ($("#bukaLapor")) $("#bukaLapor").onclick = function () { location.hash = "#/lapor"; };
   $$("[data-peringatan]", bekas).forEach(function (b) {
     b.onclick = function () { location.hash = b.getAttribute("data-peringatan"); };
   });
@@ -5772,9 +5822,36 @@ var TAB_TETAPAN = [
   { id: "quote",    label: "Quotation" },
   { id: "belanja",  label: "Perbelanjaan" },
   { id: "gaji",     label: "Gaji" },
+  { id: "kewangan", label: "Kewangan" },
   { id: "amaran",   label: "Peringatan" },
   { id: "data",     label: "Data & Backup" }
 ];
+
+function barisPeruntukan(x) {
+  x = x || {};
+  return '<div class="kad" style="box-shadow:none;padding:12px 14px;margin-bottom:10px" data-peruntukan>' +
+    '<input type="hidden" class="prId" value="' + esc(x.id || ("p-" + id())) + '">' +
+    '<div class="baris-medan">' +
+      medan("Nama Peruntukan", '<input type="text" class="prNama" value="' + esc(x.nama || "") +
+        '" placeholder="Contoh: Servis kenderaan">') +
+      medan("Jenis", "<select class='prJenis'><option value='tetap'" +
+        (x.jenis === "peratus" ? "" : " selected") + ">Jumlah tetap (RM)</option>" +
+        "<option value='peratus'" + (x.jenis === "peratus" ? " selected" : "") +
+        ">Peratus (%)</option></select>") +
+      medan("Nilai", '<input type="number" step="0.01" min="0" class="prNilai" value="' +
+        esc(x.nilai !== undefined ? x.nilai : "") + '">') +
+      medan("Dikira Dari", "<select class='prAsas'><option value='jualan'" +
+        (x.asas === "masuk" ? "" : " selected") + ">Pendapatan bulan itu</option>" +
+        "<option value='masuk'" + (x.asas === "masuk" ? " selected" : "") +
+        ">Tunai masuk bulan itu</option></select>") +
+    "</div>" +
+    '<div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<label class="chip pilih-chip" style="margin:0"><input type="checkbox" class="prAktif"' +
+        (x.aktif === false ? "" : " checked") + ">Aktif</label>" +
+      '<button type="button" class="btn btn-lembut btn-kecil" data-buang-peruntukan>Buang</button>' +
+    "</div>" +
+  "</div>";
+}
 
 function barisServis(x) {
   x = x || {};
@@ -6175,6 +6252,43 @@ function lukisTetapan(bekas) {
       "</div>";
   }
 
+  /* ---------------- KEWANGAN (peruntukan) ---------------- */
+  if (tabTetapan === "kewangan") {
+    var pr = t.peruntukan || [];
+    var bulanContoh = bulanKini();
+    var contoh = untungBulan(data, bulanContoh);
+    isi =
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Peruntukan Bulanan (anggaran)</h3>' +
+          '<span class="kecil">' + esc(fmtBulan(bulanContoh)) + ": " +
+          esc(rm(contoh.peruntukan)) + "</span></div>" +
+        '<p class="kecil">Peruntukan ialah duit yang <b>patut disimpan setiap bulan</b> untuk ' +
+        "kos yang datang kemudian — servis kenderaan, servis dan ganti alat, cukai, simpanan " +
+        "kecemasan. Ia ditolak dalam Laporan Kewangan supaya untung yang dipapar lebih realistik. " +
+        "Ia <b>bukan</b> perbelanjaan sebenar; bila servis benar-benar dibuat, rekod ia dalam " +
+        "menu Perbelanjaan seperti biasa.</p>" +
+        '<form id="borangPeruntukan">' +
+          '<div id="senaraiPeruntukan">' + pr.map(barisPeruntukan).join("") + "</div>" +
+          '<button type="button" class="btn btn-lembut btn-kecil" id="btnTambahPeruntukan">' +
+            "+ Tambah Peruntukan</button>" +
+          '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan</button></div>' +
+        "</form>" +
+      "</div>" +
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Contoh Kiraan ' + esc(fmtBulan(bulanContoh)) + "</h3></div>" +
+        '<div class="jumlah-baris"><span>Pendapatan bulan ini</span><b>' +
+          esc(rm(contoh.pendapatan)) + "</b></div>" +
+        '<div class="jumlah-baris"><span>Perbelanjaan sebenar</span><b>' +
+          esc(rm(contoh.perbelanjaan)) + "</b></div>" +
+        '<div class="jumlah-baris"><span>Untung operasi</span><b>' +
+          esc(rm(contoh.untungOperasi)) + "</b></div>" +
+        '<div class="jumlah-baris"><span>Tolak peruntukan</span><b>' +
+          esc(rm(contoh.peruntukan)) + "</b></div>" +
+        '<div class="jumlah-baris"><span><b>Untung bersih anggaran</b></span><b>' +
+          esc(rm(contoh.untungBersih)) + "</b></div>" +
+      "</div>";
+  }
+
   /* ---------------- PERINGATAN ---------------- */
   if (tabTetapan === "amaran") {
     var am = t.amaran || {};
@@ -6235,6 +6349,7 @@ function lukisTetapan(bekas) {
           '<div class="jumlah-baris"><span>Komitmen</span><b>' + data.komitmen.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Perbelanjaan</span><b>' + data.belanja.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Rekod gaji</span><b>' + data.gaji.length + "</b></div>" +
+          '<div class="jumlah-baris"><span>Akaun bank</span><b>' + data.akaun.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Team</span><b>' + data.pasukan.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Tugasan</span><b>' + data.tugasan.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Staf</span><b>' + data.staf.length + "</b></div>" +
@@ -6350,6 +6465,36 @@ function lukisTetapan(bekas) {
     $("#borangQuoteTetapan").onsubmit = function (e) {
       e.preventDefault();
       if (simpanQuoteTetapan(null, null)) toast("Tetapan quotation disimpan.", "ok");
+    };
+  }
+
+  if ($("#borangPeruntukan")) {
+    var pasangPeruntukan = function () {
+      $$("[data-buang-peruntukan]").forEach(function (b) {
+        b.onclick = function () { b.closest("[data-peruntukan]").remove(); };
+      });
+    };
+    pasangPeruntukan();
+    $("#btnTambahPeruntukan").onclick = function () {
+      $("#senaraiPeruntukan").insertAdjacentHTML("beforeend", barisPeruntukan({ id: "p-" + id() }));
+      pasangPeruntukan();
+    };
+    $("#borangPeruntukan").onsubmit = function (e) {
+      e.preventDefault();
+      var d = baca();
+      d.tetapan.peruntukan = $$("[data-peruntukan]").map(function (b) {
+        return {
+          id: $(".prId", b).value || ("p-" + id()),
+          nama: $(".prNama", b).value.trim(),
+          jenis: $(".prJenis", b).value,
+          nilai: nom($(".prNilai", b).value),
+          asas: $(".prAsas", b).value,
+          aktif: $(".prAktif", b).checked
+        };
+      }).filter(function (x) { return x.nama; });
+      if (!simpan(d)) return;
+      toast("Peruntukan disimpan.", "ok");
+      lukis();
     };
   }
 
@@ -10166,6 +10311,745 @@ function lukisGaji(bekas) {
   });
 }
 
+/* ======================================================================
+   LAPORAN KEWANGAN — untung rugi, aliran tunai dan akaun bank
+   ================================================================== */
+
+var tabLapor = "untung";
+var laporBulan = "";
+var laporTahun = new Date().getFullYear();
+
+/* ------------------------- kiraan asas -------------------------------- */
+
+// Semua bayaran komitmen dalam satu bulan.
+function komitmenBayarBulan(data, bulan) {
+  var senarai = [];
+  (data.komitmen || []).forEach(function (k) {
+    (k.bayar || []).forEach(function (b) {
+      if (String(b.tarikh).slice(0, 7) === bulan) {
+        senarai.push({ komitmen: k, bayar: b });
+      }
+    });
+  });
+  return senarai;
+}
+
+function peruntukanAktif(data) {
+  return (data.tetapan.peruntukan || []).filter(function (x) { return x.aktif !== false; });
+}
+
+// Untung rugi satu bulan: pendapatan direkod tolak perbelanjaan sebenar dan peruntukan.
+function untungBulan(data, bulan) {
+  var t = data.tetapan;
+  var jualanSenarai = saleBulan(data, bulan).filter(function (s) {
+    return (s.statusKerja || "") !== t.statusBatal;
+  });
+  var jualan = jualanSenarai.reduce(function (a, s) { return a + kiraSale(s).total; }, 0);
+
+  var subSenarai = (data.subjob || []).filter(function (j) {
+    return String(j.tarikh).slice(0, 7) === bulan && (j.statusKerja || "") !== t.statusBatal;
+  });
+  var subSyarikat = subSenarai.reduce(function (a, j) { return a + kiraSub(j).syarikat; }, 0);
+  var pendapatan = jualan + subSyarikat;
+
+  var belanjaSenarai = belanjaBulanIni(data, bulan);
+  var ikutKategori = {};
+  belanjaSenarai.forEach(function (b) {
+    var k = b.kategori || "Lain-lain";
+    ikutKategori[k] = (ikutKategori[k] || 0) + nom(b.jumlah);
+  });
+  var belanja = kiraBelanja(belanjaSenarai);
+
+  var komitSenarai = komitmenBayarBulan(data, bulan);
+  var ikutKomitmen = {};
+  komitSenarai.forEach(function (x) {
+    var k = x.komitmen.kategori === "Lain" ? "Komitmen Lain" : x.komitmen.kategori;
+    ikutKomitmen[k] = (ikutKomitmen[k] || 0) + nom(x.bayar.jumlah);
+  });
+  var komitmen = komitSenarai.reduce(function (a, x) { return a + nom(x.bayar.jumlah); }, 0);
+
+  var perbelanjaan = belanja + komitmen;
+  var untungOperasi = Math.round((pendapatan - perbelanjaan) * 100) / 100;
+
+  var masuk = duitMasukBulan(data, bulan);
+  // Bulan yang langsung tiada aktiviti tidak dikenakan peruntukan.
+  var adaAktiviti = pendapatan > 0 || perbelanjaan > 0 || masuk > 0;
+  var senaraiPeruntukan = (adaAktiviti ? peruntukanAktif(data) : []).map(function (x) {
+    var asas = x.asas === "masuk" ? masuk : pendapatan;
+    var jumlah = x.jenis === "peratus"
+      ? Math.round(asas * nom(x.nilai)) / 100
+      : nom(x.nilai);
+    return { nama: x.nama, jenis: x.jenis, nilai: nom(x.nilai), asas: x.asas,
+             jumlah: Math.round(jumlah * 100) / 100 };
+  });
+  var peruntukan = senaraiPeruntukan.reduce(function (a, x) { return a + x.jumlah; }, 0);
+
+  return {
+    bulan: bulan,
+    jualan: jualan, bilJob: jualanSenarai.length,
+    subSyarikat: subSyarikat, bilSub: subSenarai.length,
+    pendapatan: pendapatan,
+    belanja: belanja, ikutKategori: ikutKategori,
+    komitmen: komitmen, ikutKomitmen: ikutKomitmen,
+    perbelanjaan: perbelanjaan,
+    untungOperasi: untungOperasi,
+    senaraiPeruntukan: senaraiPeruntukan,
+    peruntukan: Math.round(peruntukan * 100) / 100,
+    untungBersih: Math.round((untungOperasi - peruntukan) * 100) / 100,
+    masuk: masuk,
+    keluar: duitKeluarBulan(data, bulan).jumlah,
+    margin: pendapatan > 0 ? Math.round(((untungOperasi - peruntukan) / pendapatan) * 1000) / 10 : 0
+  };
+}
+
+/* ------------------------- akaun & posisi tunai ----------------------- */
+
+function tarikhMulaAkaun(data) {
+  var senarai = (data.akaun || []).map(function (a) { return a.tarikhAwal; }).filter(Boolean).sort();
+  return senarai[0] || "";
+}
+
+function posisiTunai(data) {
+  var mula = tarikhMulaAkaun(data);
+  var selepas = function (tarikh) { return !mula || String(tarikh) >= mula; };
+
+  var bakiAwal = (data.akaun || []).reduce(function (a, x) { return a + nom(x.bakiAwal); }, 0);
+
+  var masuk = 0, keluar = 0;
+  (data.sale || []).forEach(function (s) {
+    (s.bayaran || []).forEach(function (b) { if (selepas(b.tarikh)) masuk += nom(b.jumlah); });
+  });
+  (data.subjob || []).forEach(function (j) {
+    (j.bayaran || []).forEach(function (b) { if (selepas(b.tarikh)) masuk += nom(b.jumlah); });
+  });
+  (data.belanja || []).forEach(function (b) { if (selepas(b.tarikh)) keluar += nom(b.jumlah); });
+  (data.komitmen || []).forEach(function (k) {
+    (k.bayar || []).forEach(function (b) { if (selepas(b.tarikh)) keluar += nom(b.jumlah); });
+  });
+
+  var pelarasanMasuk = 0, pelarasanKeluar = 0;
+  (data.akaun || []).forEach(function (a) {
+    (a.pelarasan || []).forEach(function (x) {
+      if (x.jenis === "Keluar") pelarasanKeluar += nom(x.jumlah);
+      else pelarasanMasuk += nom(x.jumlah);
+    });
+  });
+
+  return {
+    bakiAwal: bakiAwal, masuk: masuk, keluar: keluar,
+    pelarasanMasuk: pelarasanMasuk, pelarasanKeluar: pelarasanKeluar,
+    baki: Math.round((bakiAwal + masuk + pelarasanMasuk - keluar - pelarasanKeluar) * 100) / 100,
+    mula: mula
+  };
+}
+
+function borangAkaun(akaunId) {
+  var data = baca();
+  var a = akaunId ? data.akaun.filter(function (x) { return x.id === akaunId; })[0] : null;
+  var baru = !a;
+  a = a || { jenis: "Bank", aktif: true, tarikhAwal: kunciTarikh(), pelarasan: [] };
+
+  var m = modal(baru ? "Akaun Baharu" : "Sunting Akaun",
+    '<form id="borangAkaun">' +
+      '<div class="baris-medan">' +
+        medan("Nama Akaun *", '<input type="text" name="nama" value="' + esc(a.nama || "") +
+          '" placeholder="Contoh: Maybank Syarikat" required>') +
+        medan("Jenis", "<select name='jenis'>" + ["Bank", "Tunai", "e-Wallet"].map(function (x) {
+          return "<option" + (a.jenis === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+        medan("No. Akaun", '<input type="text" name="noAkaun" value="' + esc(a.noAkaun || "") + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Baki Permulaan (RM) *", '<input type="number" step="0.01" name="bakiAwal" value="' +
+          esc(a.bakiAwal || 0) + '" required>') +
+        medan("Tarikh Baki Permulaan", '<input type="date" name="tarikhAwal" value="' +
+          esc(a.tarikhAwal || "") + '">') +
+        medan("Aktif", "<select name='aktif'><option value='ya'" +
+          (a.aktif !== false ? " selected" : "") + ">Ya</option><option value='tidak'" +
+          (a.aktif === false ? " selected" : "") + ">Tidak</option></select>") +
+      "</div>" +
+      '<p class="kecil" style="margin:-6px 0 12px">Baki permulaan ialah duit yang sudah ada ' +
+      "dalam akaun pada tarikh itu. Semua bayaran client, perbelanjaan dan komitmen " +
+      "<b>selepas tarikh tersebut</b> akan ditambah atau ditolak automatik.</p>" +
+      medan("Nota", '<input type="text" name="nota" value="' + esc(a.nota || "") + '">') +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamAkaun">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 640);
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  if ($("#btnPadamAkaun", m.el)) {
+    $("#btnPadamAkaun", m.el).onclick = function () {
+      sahkan("Padam akaun " + a.nama + "? Rekod pelarasan akaun ini turut dipadam.").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.akaun = d.akaun.filter(function (x) { return x.id !== akaunId; });
+        simpan(d);
+        m.tutup();
+        toast("Akaun dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+  $("#borangAkaun", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangAkaun", m.el));
+    if (!v.nama) return toast("Sila isi nama akaun.", "bad");
+    var d = baca();
+    var rekod = {
+      id: akaunId || id(), nama: v.nama, jenis: v.jenis, noAkaun: v.noAkaun,
+      bakiAwal: nom(v.bakiAwal), tarikhAwal: v.tarikhAwal, aktif: v.aktif !== "tidak",
+      nota: v.nota, pelarasan: a.pelarasan || [],
+      createdAt: a.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString()
+    };
+    if (akaunId) d.akaun = d.akaun.map(function (x) { return x.id === akaunId ? rekod : x; });
+    else d.akaun.push(rekod);
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(akaunId ? "Akaun dikemas kini." : "Akaun ditambah.", "ok");
+    lukis();
+  };
+}
+
+function borangPelarasan(akaunId, cadangJumlah, cadangJenis) {
+  var data = baca();
+  var a = data.akaun.filter(function (x) { return x.id === akaunId; })[0];
+  if (!a) return;
+
+  var m = modal("Pelarasan Akaun — " + a.nama,
+    '<p class="kecil" style="margin:0 0 12px">Guna pelarasan untuk duit masuk atau keluar yang ' +
+    "<b>tiada dalam sistem</b>: modal masuk, ambil untung, caj bank, pindahan antara akaun, " +
+    "atau pembetulan baki.</p>" +
+    '<form id="borangPelarasan">' +
+      '<div class="baris-medan">' +
+        medan("Jenis", "<select name='jenis'><option>Masuk</option><option" +
+          (cadangJenis === "Keluar" ? " selected" : "") + ">Keluar</option></select>") +
+        medan("Jumlah (RM) *", '<input type="number" step="0.01" min="0" name="jumlah" value="' +
+          esc(cadangJumlah !== undefined ? Math.abs(nom(cadangJumlah)) : "") + '" required>') +
+        medan("Tarikh", '<input type="date" name="tarikh" value="' + esc(kunciTarikh()) + '">') +
+      "</div>" +
+      medan("Perkara *", '<input type="text" name="perkara" required ' +
+        'placeholder="Contoh: caj bank / modal masuk / pembetulan baki">') +
+      kotakLampiran("failPelarasan", null, "Bukti (pilihan)") +
+      '<div class="baris-butang modal-kaki">' +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">Simpan Pelarasan</button>' +
+      "</div>" +
+    "</form>", 600);
+
+  var kotak = {};
+  pasangLampiran($("#failPelarasan", m.el), kotak);
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangPelarasan", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangPelarasan", m.el));
+    if (!v.perkara) return toast("Sila isi perkara.", "bad");
+    simpanLampiranBaharu(kotak.fail).then(function (meta) {
+      var d = baca();
+      var rekod = d.akaun.filter(function (x) { return x.id === akaunId; })[0];
+      rekod.pelarasan = rekod.pelarasan || [];
+      rekod.pelarasan.unshift({ id: id(), tarikh: v.tarikh || kunciTarikh(), jenis: v.jenis,
+        jumlah: nom(v.jumlah), perkara: v.perkara, lampiran: meta });
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Pelarasan direkod.", "ok");
+      lukis();
+    }).catch(function (err) { toast("Gagal simpan: " + err.message, "bad", 6000); });
+  };
+}
+
+function lihatAkaun(akaunId) {
+  var data = baca();
+  var a = data.akaun.filter(function (x) { return x.id === akaunId; })[0];
+  if (!a) return;
+  var masuk = (a.pelarasan || []).filter(function (x) { return x.jenis !== "Keluar"; })
+    .reduce(function (t, x) { return t + nom(x.jumlah); }, 0);
+  var keluar = (a.pelarasan || []).filter(function (x) { return x.jenis === "Keluar"; })
+    .reduce(function (t, x) { return t + nom(x.jumlah); }, 0);
+
+  var m = modal("Akaun — " + a.nama,
+    '<div class="grid grid-4" style="margin-bottom:4px">' +
+      kadStat("Baki Permulaan", rm(a.bakiAwal), a.tarikhAwal ? fmtTarikh(a.tarikhAwal) : "-") +
+      kadStat("Pelarasan Masuk", rm(masuk), "modal, pindahan masuk") +
+      kadStat("Pelarasan Keluar", rm(keluar), "caj bank, ambil untung") +
+      kadStat("Jenis", a.jenis || "Bank", a.noAkaun || "") +
+    "</div>" +
+    '<div class="tajuk-seksyen">Rekod Pelarasan</div>' +
+    ((a.pelarasan || []).length
+      ? '<div class="jadual-bungkus"><table><thead><tr><th>Tarikh</th><th>Perkara</th>' +
+        "<th>Jenis</th><th class='num'>Jumlah</th><th></th></tr></thead><tbody>" +
+        a.pelarasan.map(function (x) {
+          return "<tr><td>" + esc(fmtTarikh(x.tarikh)) + "</td>" +
+            '<td class="bungkus">' + esc(x.perkara) + "</td>" +
+            "<td>" + esc(x.jenis) + "</td>" +
+            '<td class="num">' + esc(rm(x.jumlah)) + "</td>" +
+            "<td>" + butangLampiran(x.lampiran, "Bukti") +
+              ' <button type="button" class="btn btn-lembut btn-kecil" data-buangpelarasan="' +
+              esc(x.id) + '">Buang</button></td></tr>';
+        }).join("") + "</tbody></table></div>"
+      : kosong("Belum ada pelarasan.")) +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-lembut" id="btnSuntingAkaun">Sunting Akaun</button>' +
+      '<button type="button" class="btn btn-utama" id="btnPelarasanBaru">+ Pelarasan</button>' +
+    "</div>", 720);
+
+  pasangButangLampiran(m.el);
+  $("#btnSuntingAkaun", m.el).onclick = function () { m.tutup(); borangAkaun(akaunId); };
+  $("#btnPelarasanBaru", m.el).onclick = function () { m.tutup(); borangPelarasan(akaunId); };
+  $$("[data-buangpelarasan]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      var d = baca();
+      var rekod = d.akaun.filter(function (x) { return x.id === akaunId; })[0];
+      rekod.pelarasan = (rekod.pelarasan || []).filter(function (x) {
+        return x.id !== b.getAttribute("data-buangpelarasan");
+      });
+      simpan(d);
+      m.tutup();
+      toast("Pelarasan dibuang.", "ok");
+      lukis();
+    };
+  });
+}
+
+/* ------------------------------ carta --------------------------------- */
+
+// Dua siri bersebelahan: duit masuk lawan duit keluar.
+function cartaDuaSiri(titik, penanda, labelA, labelB) {
+  var maks = Math.max.apply(null, titik.map(function (x) {
+    return Math.max(nom(x.a), nom(x.b));
+  }).concat([1]));
+  return '<div class="carta">' +
+    '<div class="carta-legend">' +
+      '<span><i class="carta-titik" style="background:#2563eb"></i>' + esc(labelA) + "</span>" +
+      '<span><i class="carta-titik" style="background:#dc2626"></i>' + esc(labelB) + "</span>" +
+    "</div>" +
+    '<div class="carta-pasang">' +
+      titik.map(function (x) {
+        var ta = Math.max(nom(x.a) > 0 ? 2 : 0, Math.round((nom(x.a) / maks) * 100));
+        var tb = Math.max(nom(x.b) > 0 ? 2 : 0, Math.round((nom(x.b) / maks) * 100));
+        var tunjuk = x.kunci === penanda;
+        return '<div class="carta-kump' + (tunjuk ? " kini" : "") + '" title="' +
+          esc(x.label + " · " + labelA + ": " + rm(x.a) + " · " + labelB + ": " + rm(x.b)) + '">' +
+          '<span class="carta-nilai">' + (tunjuk ? esc(rmPendek(x.a) + " / " + rmPendek(x.b)) : "") + "</span>" +
+          '<span class="carta-duo">' +
+            '<span class="masuk" style="height:' + ta + '%"></span>' +
+            '<span class="keluar" style="height:' + tb + '%"></span>' +
+          "</span>" +
+          '<span class="carta-label">' + esc(x.label) + "</span></div>";
+      }).join("") +
+    "</div></div>";
+}
+
+// Untung atau rugi setiap bulan — batang naik (untung) dan turun (rugi) dari paksi sifar.
+function cartaUntungRugi(titik, penanda) {
+  var maks = Math.max.apply(null, titik.map(function (x) { return Math.abs(nom(x.nilai)); }).concat([1]));
+  var puncak = titik.reduce(function (a, x) {
+    return Math.abs(nom(x.nilai)) > Math.abs(nom(a.nilai)) ? x : a;
+  }, titik[0] || { nilai: 0 });
+  return '<div class="carta">' +
+    '<div class="carta-legend">' +
+      '<span><i class="carta-titik" style="background:#2563eb"></i>Untung</span>' +
+      '<span><i class="carta-titik" style="background:#dc2626"></i>Rugi</span>' +
+    "</div>" +
+    '<div class="carta-ur">' +
+      titik.map(function (x) {
+        var nilai = nom(x.nilai);
+        var tinggi = Math.max(nilai !== 0 ? 3 : 0, Math.round((Math.abs(nilai) / maks) * 100));
+        var tunjuk = x.kunci === penanda || (puncak && x.kunci === puncak.kunci);
+        return '<div class="carta-ur-lajur' + (x.kunci === penanda ? " kini" : "") + '" title="' +
+          esc(x.label + ": " + rm(nilai)) + '">' +
+          '<span class="carta-ur-atas">' +
+            (tunjuk && nilai > 0 ? '<span class="carta-nilai">' + esc(rmPendek(nilai)) + "</span>" : "") +
+            (nilai > 0 ? '<span class="carta-ur-batang" style="height:' + tinggi + '%"></span>' : "") +
+          "</span>" +
+          '<span class="carta-sifar"></span>' +
+          '<span class="carta-ur-bawah">' +
+            (nilai < 0 ? '<span class="carta-ur-batang" style="height:' + tinggi + '%"></span>' : "") +
+            (tunjuk && nilai < 0 ? '<span class="carta-nilai">' + esc(rmPendek(nilai)) + "</span>" : "") +
+          "</span>" +
+          '<span class="carta-label">' + esc(x.label) + "</span></div>";
+      }).join("") +
+    "</div></div>";
+}
+
+/* --------------------------- penyata cetak ---------------------------- */
+
+function htmlPenyata(data, bulan) {
+  var u = untungBulan(data, bulan);
+  var c = data.tetapan.resit;
+  var baris = function (label, nilai, tebal, tolak) {
+    return "<tr><td>" + (tebal ? "<b>" + esc(label) + "</b>" : esc(label)) + "</td>" +
+      "<td style='width:140px;text-align:right'>" +
+      (tebal ? "<b>" : "") + (tolak ? "(" + esc(rm(nilai)) + ")" : esc(rm(nilai))) +
+      (tebal ? "</b>" : "") + "</td></tr>";
+  };
+  return '<div class="resit">' +
+    '<div class="resit-kepala">' +
+      (c.logoUrl ? '<img src="' + esc(c.logoUrl) + '" alt="Logo" crossorigin="anonymous" referrerpolicy="no-referrer">' : "<div></div>") +
+      '<div class="resit-syarikat"><h2>' + esc(c.namaSyarikat) + "</h2>" +
+        esc(c.alamat) + "\n" + (c.ssm ? "SSM: " + esc(c.ssm) : "") + "</div>" +
+    "</div>" +
+    '<div class="resit-tajuk"><h2>PENYATA UNTUNG RUGI</h2>' +
+      '<div class="kanan"><b>Bulan:</b> ' + esc(fmtBulan(bulan)) +
+      "<br><b>Dijana:</b> " + esc(fmtTarikh(kunciTarikh())) + "</div>" +
+    "</div>" +
+    '<div class="resit-seksyen">Pendapatan</div>' +
+    "<table>" +
+      baris("Jualan inspection (" + u.bilJob + " job)", u.jualan) +
+      baris("Bahagian syarikat dari sub job (" + u.bilSub + ")", u.subSyarikat) +
+      baris("JUMLAH PENDAPATAN", u.pendapatan, true) +
+    "</table>" +
+    '<div class="resit-seksyen">Perbelanjaan</div>' +
+    "<table>" +
+      Object.keys(u.ikutKategori).sort().map(function (k) {
+        return baris(k, u.ikutKategori[k], false, true);
+      }).join("") +
+      Object.keys(u.ikutKomitmen).sort().map(function (k) {
+        return baris("Komitmen: " + k, u.ikutKomitmen[k], false, true);
+      }).join("") +
+      baris("JUMLAH PERBELANJAAN", u.perbelanjaan, true, true) +
+    "</table>" +
+    '<table style="margin-top:10px"><tr>' +
+      "<td style='background:#f1f5f9'><b>UNTUNG OPERASI</b></td>" +
+      "<td style='width:150px;text-align:right;background:#f1f5f9'><b>" +
+      esc(rm(u.untungOperasi)) + "</b></td></tr></table>" +
+    (u.senaraiPeruntukan.length
+      ? '<div class="resit-seksyen">Peruntukan Bulanan (anggaran)</div>' +
+        "<table>" + u.senaraiPeruntukan.map(function (x) {
+          return baris(x.nama + (x.jenis === "peratus" ? " (" + x.nilai + "%)" : ""), x.jumlah, false, true);
+        }).join("") + baris("JUMLAH PERUNTUKAN", u.peruntukan, true, true) + "</table>"
+      : "") +
+    '<table style="margin-top:10px"><tr>' +
+      "<td style='background:#e0e7ff'><b>UNTUNG BERSIH ANGGARAN</b></td>" +
+      "<td style='width:150px;text-align:right;background:#e0e7ff;font-size:15px'><b>" +
+      esc(rm(u.untungBersih)) + "</b></td></tr></table>" +
+    '<p style="margin-top:12px;font-size:12px">Margin untung: <b>' + u.margin + "%</b> · " +
+      "Tunai masuk bulan ini: <b>" + esc(rm(u.masuk)) + "</b> · " +
+      "Tunai keluar: <b>" + esc(rm(u.keluar)) + "</b></p>" +
+    '<p style="margin-top:8px;font-size:11.5px;color:#6b7280">Peruntukan ialah anggaran ' +
+      "simpanan bulanan (contoh servis kenderaan dan alat) — ia bukan duit yang sudah keluar. " +
+      "Penyata ini dijana automatik dari rekod dalam sistem.</p>" +
+    '<p class="resit-tengah" style="font-size:11px;color:#6b7280">' + esc(c.namaSyarikat) + "</p>" +
+  "</div>";
+}
+
+function cetakPenyata(bulan) {
+  var data = baca();
+  var kertas = $("#kertasResit");
+  kertas.innerHTML = htmlPenyata(data, bulan);
+  document.body.classList.add("cetak-resit");
+  var selesai = function () {
+    document.body.classList.remove("cetak-resit");
+    kertas.innerHTML = "";
+    window.removeEventListener("afterprint", selesai);
+  };
+  window.addEventListener("afterprint", selesai);
+  tungguGambar(kertas, function () {
+    try { window.print(); } catch (e) { toast("Pelayar tidak dapat membuka dialog cetak.", "bad"); }
+    setTimeout(selesai, 800);
+  });
+}
+
+function lukisLapor(bekas) {
+  var data = baca();
+  var bulan = laporBulan || bulanKini();
+  var isi = "";
+
+  if (tabLapor === "untung") {
+    var u = untungBulan(data, bulan);
+    var lepas = untungBulan(data, bulanTolak(bulan, 1));
+    var beza = u.untungBersih - lepas.untungBersih;
+
+    var barisPL = function (label, nilai, opsi) {
+      opsi = opsi || {};
+      return "<tr" + (opsi.tebal ? ' style="background:#f8fafc"' : "") + ">" +
+        '<td class="bungkus">' + (opsi.tebal ? "<b>" + esc(label) + "</b>" : esc(label)) +
+        (opsi.nota ? '<div class="kecil">' + esc(opsi.nota) + "</div>" : "") + "</td>" +
+        '<td class="num">' + (opsi.tebal ? "<b>" : "") +
+        (opsi.tolak ? "(" + esc(rm(nilai)) + ")" : esc(rm(nilai))) +
+        (opsi.tebal ? "</b>" : "") + "</td></tr>";
+    };
+
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat("Pendapatan", rm(u.pendapatan), u.bilJob + " job + " + u.bilSub + " sub job") +
+        kadStat("Perbelanjaan", rm(u.perbelanjaan),
+          rmPendek(u.belanja) + " belanja + " + rmPendek(u.komitmen) + " komitmen") +
+        kadStat("Untung Operasi", rm(u.untungOperasi), "sebelum peruntukan") +
+        '<div class="stat"><div class="stat-label">Untung Bersih Anggaran</div>' +
+          '<div class="stat-nilai" style="color:' + (u.untungBersih >= 0 ? "var(--ok)" : "var(--bad)") +
+          '">' + esc(rm(u.untungBersih)) + "</div>" +
+          '<div class="stat-nota">margin ' + u.margin + "% · " +
+          (beza >= 0 ? "naik " : "turun ") + esc(rmPendek(Math.abs(beza))) + " vs bulan lepas</div></div>" +
+      "</div>" +
+
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Penyata Untung Rugi — ' + esc(fmtBulan(bulan)) + "</h3>" +
+          '<div class="aksi">' +
+            '<button class="btn btn-lembut" id="btnCetakPL">Cetak Penyata</button>' +
+            '<button class="btn btn-lembut" id="btnEksportPL">Eksport CSV</button>' +
+          "</div>" +
+        "</div>" +
+        '<div class="jadual-bungkus"><table><tbody>' +
+          "<tr><td colspan='2' class='kecil'><b>PENDAPATAN</b></td></tr>" +
+          barisPL("Jualan inspection", u.jualan, { nota: u.bilJob + " job direkod bulan ini" }) +
+          barisPL("Bahagian syarikat dari sub job", u.subSyarikat,
+            { nota: u.bilSub + " sub job (bahagian staf tidak dikira)" }) +
+          barisPL("Jumlah pendapatan", u.pendapatan, { tebal: true }) +
+
+          "<tr><td colspan='2' class='kecil' style='padding-top:14px'><b>PERBELANJAAN SEBENAR</b></td></tr>" +
+          (Object.keys(u.ikutKategori).length || Object.keys(u.ikutKomitmen).length
+            ? Object.keys(u.ikutKategori).sort().map(function (k) {
+                return barisPL(k, u.ikutKategori[k], { tolak: true });
+              }).join("") +
+              Object.keys(u.ikutKomitmen).sort().map(function (k) {
+                return barisPL("Komitmen: " + k, u.ikutKomitmen[k], { tolak: true });
+              }).join("")
+            : "<tr><td colspan='2' class='kecil'>Tiada perbelanjaan direkod bulan ini.</td></tr>") +
+          barisPL("Jumlah perbelanjaan", u.perbelanjaan, { tebal: true, tolak: true }) +
+          barisPL("UNTUNG OPERASI", u.untungOperasi, { tebal: true }) +
+
+          "<tr><td colspan='2' class='kecil' style='padding-top:14px'><b>PERUNTUKAN (ANGGARAN)</b></td></tr>" +
+          (u.senaraiPeruntukan.length
+            ? u.senaraiPeruntukan.map(function (x) {
+                return barisPL(x.nama, x.jumlah, { tolak: true,
+                  nota: x.jenis === "peratus"
+                    ? x.nilai + "% dari " + (x.asas === "masuk" ? "tunai masuk" : "pendapatan")
+                    : "tetap sebulan" });
+              }).join("")
+            : "<tr><td colspan='2' class='kecil'>Tiada peruntukan aktif. " +
+              "Tetapkan dalam Tetapan → Kewangan.</td></tr>") +
+          barisPL("Jumlah peruntukan", u.peruntukan, { tebal: true, tolak: true }) +
+          barisPL("UNTUNG BERSIH ANGGARAN", u.untungBersih, { tebal: true }) +
+        "</tbody></table></div>" +
+        '<p class="kecil" style="margin-top:10px">Peruntukan ialah <b>simpanan anggaran</b> ' +
+        "(contoh servis kenderaan dan alat) — duit itu belum keluar, tetapi ditolak di sini " +
+        "supaya untung yang dipapar lebih dekat dengan keadaan sebenar. Ubah dalam " +
+        "Tetapan → Kewangan.</p>" +
+      "</div>";
+  }
+
+  if (tabLapor === "tunai") {
+    var titik = [];
+    for (var b = 1; b <= 12; b++) {
+      var kunci = laporTahun + "-" + String(b).padStart(2, "0");
+      var uu = untungBulan(data, kunci);
+      titik.push({ kunci: kunci, label: NAMA_BULAN[b - 1].slice(0, 3),
+        a: uu.masuk, b: uu.keluar, nilai: uu.untungBersih,
+        pendapatan: uu.pendapatan, belanja: uu.perbelanjaan, operasi: uu.untungOperasi });
+    }
+    var jum = titik.reduce(function (t, x) {
+      t.masuk += x.a; t.keluar += x.b; t.pendapatan += x.pendapatan;
+      t.belanja += x.belanja; t.untung += x.nilai;
+      return t;
+    }, { masuk: 0, keluar: 0, pendapatan: 0, belanja: 0, untung: 0 });
+    var posisi = posisiTunai(data);
+
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat("Duit Dalam Tangan", rm(posisi.baki),
+          (data.akaun || []).length + " akaun · termasuk pelarasan") +
+        kadStat("Tunai Masuk " + laporTahun, rm(jum.masuk), "bayaran client diterima") +
+        kadStat("Tunai Keluar " + laporTahun, rm(jum.keluar), "belanja + komitmen dibayar") +
+        '<div class="stat"><div class="stat-label">Untung Bersih ' + laporTahun + "</div>" +
+          '<div class="stat-nilai" style="color:' + (jum.untung >= 0 ? "var(--ok)" : "var(--bad)") +
+          '">' + esc(rm(jum.untung)) + "</div>" +
+          '<div class="stat-nota">selepas peruntukan</div></div>' +
+      "</div>" +
+
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Tunai Masuk vs Keluar ' + laporTahun + "</h3>" +
+          '<div class="aksi">' +
+            '<button class="btn btn-lembut btn-kecil" id="tahunTolakL">‹</button>' +
+            '<button class="btn btn-lembut btn-kecil" id="tahunTambahL">›</button>' +
+          "</div>" +
+        "</div>" +
+        cartaDuaSiri(titik, bulan, "Duit masuk", "Duit keluar") +
+      "</div>" +
+
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Untung / Rugi Setiap Bulan</h3>' +
+          '<span class="kecil">selepas perbelanjaan dan peruntukan</span></div>' +
+        cartaUntungRugi(titik, bulan) +
+      "</div>" +
+
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Jadual Bulanan ' + laporTahun + "</h3>" +
+          '<button class="btn btn-lembut" id="btnEksportTahun">Eksport CSV</button></div>' +
+        '<div class="jadual-bungkus"><table><thead><tr><th>Bulan</th>' +
+          "<th class='num'>Pendapatan</th><th class='num'>Perbelanjaan</th>" +
+          "<th class='num'>Untung Operasi</th><th class='num'>Untung Bersih</th>" +
+          "<th class='num'>Tunai Masuk</th><th class='num'>Tunai Keluar</th></tr></thead><tbody>" +
+          titik.map(function (x) {
+            return "<tr" + (x.kunci === bulan ? ' style="background:#f8fafc"' : "") + ">" +
+              "<td><b>" + esc(x.label) + "</b></td>" +
+              '<td class="num">' + esc(rm(x.pendapatan)) + "</td>" +
+              '<td class="num">' + esc(rm(x.belanja)) + "</td>" +
+              '<td class="num">' + esc(rm(x.operasi)) + "</td>" +
+              '<td class="num"><b style="color:' + (x.nilai >= 0 ? "var(--ok)" : "var(--bad)") +
+                '">' + esc(rm(x.nilai)) + "</b></td>" +
+              '<td class="num">' + esc(rm(x.a)) + "</td>" +
+              '<td class="num">' + esc(rm(x.b)) + "</td></tr>";
+          }).join("") +
+          "<tr style='background:#f1f5f9'><td><b>Setahun</b></td>" +
+            '<td class="num"><b>' + esc(rm(jum.pendapatan)) + "</b></td>" +
+            '<td class="num"><b>' + esc(rm(jum.belanja)) + "</b></td>" +
+            '<td class="num"><b>' + esc(rm(jum.pendapatan - jum.belanja)) + "</b></td>" +
+            '<td class="num"><b>' + esc(rm(jum.untung)) + "</b></td>" +
+            '<td class="num"><b>' + esc(rm(jum.masuk)) + "</b></td>" +
+            '<td class="num"><b>' + esc(rm(jum.keluar)) + "</b></td></tr>" +
+        "</tbody></table></div>" +
+      "</div>";
+  }
+
+  if (tabLapor === "akaun") {
+    var pos = posisiTunai(data);
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat("Duit Dalam Tangan", rm(pos.baki), "semua akaun digabung") +
+        kadStat("Baki Permulaan", rm(pos.bakiAwal),
+          pos.mula ? "dari " + fmtTarikh(pos.mula) : "belum ada akaun") +
+        kadStat("Masuk Sejak Itu", rm(pos.masuk + pos.pelarasanMasuk), "bayaran + pelarasan masuk") +
+        kadStat("Keluar Sejak Itu", rm(pos.keluar + pos.pelarasanKeluar), "belanja + pelarasan keluar") +
+      "</div>" +
+
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Akaun Bank &amp; Tunai</h3>' +
+          '<button class="btn btn-utama" id="btnAkaunBaru">Tambah Akaun</button></div>' +
+        '<p class="kecil" style="margin:-4px 0 12px">Key-in baki permulaan setiap akaun sekali ' +
+        "sahaja. Selepas itu sistem tambah semua bayaran client dan tolak semua perbelanjaan, " +
+        "komitmen dan gaji yang direkod.</p>" +
+        '<div class="jadual-bungkus">' +
+        ((data.akaun || []).length
+          ? "<table><thead><tr><th>Akaun</th><th>Jenis</th><th class='num'>Baki Permulaan</th>" +
+            "<th>Tarikh</th><th class='num'>Pelarasan</th><th></th></tr></thead><tbody>" +
+            data.akaun.map(function (a) {
+              var masukA = (a.pelarasan || []).filter(function (x) { return x.jenis !== "Keluar"; })
+                .reduce(function (t, x) { return t + nom(x.jumlah); }, 0);
+              var keluarA = (a.pelarasan || []).filter(function (x) { return x.jenis === "Keluar"; })
+                .reduce(function (t, x) { return t + nom(x.jumlah); }, 0);
+              return "<tr" + (a.aktif === false ? ' style="opacity:.6"' : "") + ">" +
+                '<td class="bungkus"><b>' + esc(a.nama) + "</b>" +
+                  (a.noAkaun ? '<div class="kecil">' + esc(a.noAkaun) + "</div>" : "") + "</td>" +
+                "<td>" + esc(a.jenis || "Bank") + "</td>" +
+                '<td class="num">' + esc(rm(a.bakiAwal)) + "</td>" +
+                "<td>" + esc(a.tarikhAwal ? fmtTarikh(a.tarikhAwal) : "-") + "</td>" +
+                '<td class="num">' + (masukA || keluarA
+                  ? esc("+" + rmPendek(masukA) + " / -" + rmPendek(keluarA))
+                  : '<span class="kecil">-</span>') + "</td>" +
+                '<td><div class="aksi">' +
+                  '<button class="btn btn-lembut" data-akaun="' + esc(a.id) + '">Buka</button>' +
+                  '<button class="btn btn-lembut" data-pelarasan="' + esc(a.id) + '">+ Pelarasan</button>' +
+                "</div></td></tr>";
+            }).join("") + "</tbody></table>"
+          : kosong("Belum ada akaun. Tekan “Tambah Akaun” dan key-in baki bank semasa.")) +
+        "</div>" +
+      "</div>" +
+
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Semak Baki Bank</h3>' +
+          '<span class="kecil">bandingkan dengan baki sebenar</span></div>' +
+        '<div class="baris-medan" style="align-items:end">' +
+          medan("Baki sebenar dalam bank hari ini (RM)",
+            '<input type="number" step="0.01" id="bakiSebenar" placeholder="0.00">') +
+          medan("Baki ikut sistem", '<input type="text" readonly value="' + esc(rm(pos.baki)) + '">') +
+          '<div><button class="btn btn-lembut penuh" id="btnSemakBaki">Semak Beza</button></div>' +
+        "</div>" +
+        '<div id="hasilSemak"></div>' +
+      "</div>";
+  }
+
+  bekas.innerHTML =
+    '<div class="suis" style="margin-bottom:16px;flex-wrap:wrap">' +
+      [["untung", "Untung Rugi"], ["tunai", "Aliran Tunai & Graf"], ["akaun", "Akaun Bank"]]
+        .map(function (x) {
+          return '<button type="button" data-tablapor="' + x[0] + '"' +
+            (tabLapor === x[0] ? ' class="aktif"' : "") + ">" + esc(x[1]) + "</button>";
+        }).join("") +
+    "</div>" +
+    (tabLapor === "akaun" ? "" :
+      '<div class="penapis">' +
+        '<label>Bulan<input type="month" id="fBulanLapor" value="' + esc(bulan) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetLapor">Bulan Ini</button>' +
+      "</div>") +
+    isi;
+
+  $$("[data-tablapor]", bekas).forEach(function (b) {
+    b.onclick = function () { tabLapor = b.getAttribute("data-tablapor"); lukisLapor(bekas); };
+  });
+  if ($("#fBulanLapor")) {
+    $("#fBulanLapor").onchange = function (e) {
+      laporBulan = e.target.value;
+      if (laporBulan) laporTahun = parseInt(laporBulan.slice(0, 4), 10);
+      lukisLapor(bekas);
+    };
+    $("#btnResetLapor").onclick = function () {
+      laporBulan = ""; laporTahun = new Date().getFullYear(); lukisLapor(bekas);
+    };
+  }
+  if ($("#btnCetakPL")) $("#btnCetakPL").onclick = function () { cetakPenyata(bulan); };
+  if ($("#btnEksportPL")) {
+    $("#btnEksportPL").onclick = function () {
+      var u = untungBulan(data, bulan);
+      var baris = [["Pendapatan — Jualan inspection", u.jualan],
+                   ["Pendapatan — Bahagian sub job", u.subSyarikat],
+                   ["JUMLAH PENDAPATAN", u.pendapatan]];
+      Object.keys(u.ikutKategori).sort().forEach(function (k) {
+        baris.push(["Perbelanjaan — " + k, -u.ikutKategori[k]]);
+      });
+      Object.keys(u.ikutKomitmen).sort().forEach(function (k) {
+        baris.push(["Komitmen — " + k, -u.ikutKomitmen[k]]);
+      });
+      baris.push(["JUMLAH PERBELANJAAN", -u.perbelanjaan]);
+      baris.push(["UNTUNG OPERASI", u.untungOperasi]);
+      u.senaraiPeruntukan.forEach(function (x) { baris.push(["Peruntukan — " + x.nama, -x.jumlah]); });
+      baris.push(["UNTUNG BERSIH ANGGARAN", u.untungBersih]);
+      csv("untung-rugi-" + bulan, ["Perkara", "Jumlah (RM)"], baris);
+    };
+  }
+  if ($("#tahunTolakL")) {
+    $("#tahunTolakL").onclick = function () { laporTahun--; lukisLapor(bekas); };
+    $("#tahunTambahL").onclick = function () { laporTahun++; lukisLapor(bekas); };
+  }
+  if ($("#btnEksportTahun")) {
+    $("#btnEksportTahun").onclick = function () {
+      var baris = [];
+      for (var b2 = 1; b2 <= 12; b2++) {
+        var kunci = laporTahun + "-" + String(b2).padStart(2, "0");
+        var uu = untungBulan(data, kunci);
+        baris.push([kunci, uu.pendapatan, uu.belanja, uu.komitmen, uu.perbelanjaan,
+                    uu.untungOperasi, uu.peruntukan, uu.untungBersih, uu.masuk, uu.keluar]);
+      }
+      csv("kewangan-" + laporTahun,
+        ["Bulan", "Pendapatan", "Belanja", "Komitmen", "Jumlah Perbelanjaan", "Untung Operasi",
+         "Peruntukan", "Untung Bersih", "Tunai Masuk", "Tunai Keluar"], baris);
+    };
+  }
+  if ($("#btnAkaunBaru")) $("#btnAkaunBaru").onclick = function () { borangAkaun(null); };
+  $$("[data-akaun]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatAkaun(b.getAttribute("data-akaun")); };
+  });
+  $$("[data-pelarasan]", bekas).forEach(function (b) {
+    b.onclick = function () { borangPelarasan(b.getAttribute("data-pelarasan")); };
+  });
+  if ($("#btnSemakBaki")) {
+    $("#btnSemakBaki").onclick = function () {
+      var sebenar = nom($("#bakiSebenar").value);
+      var pos2 = posisiTunai(baca());
+      var beza = Math.round((sebenar - pos2.baki) * 100) / 100;
+      $("#hasilSemak").innerHTML = beza === 0
+        ? '<p class="kecil" style="color:var(--ok)"><b>Sama.</b> Baki sistem dan baki bank padan.</p>'
+        : '<div class="jumlah-baris"><span>Beza</span><b style="color:var(--bad)">' +
+          esc(rm(beza)) + "</b></div>" +
+          '<p class="kecil">Beza ini biasanya kerana ada duit masuk atau keluar yang belum ' +
+          "direkod (caj bank, modal, ambil untung). Rekod sebagai pelarasan pada akaun " +
+          "berkenaan supaya baki padan.</p>";
+    };
+  }
+}
+
 var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -10174,6 +11058,7 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  lapor: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
   gaji: '<svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 6.5C17 4.6 14.8 3.5 12 3.5S7 4.6 7 6.5s2.2 2.8 5 3.3 5 1.4 5 3.4-2.2 3.3-5 3.3-5-1.1-5-3"/></svg>',
   pasukan: '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M2.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 14.5a4.5 4.5 0 0 1 5.5 4.5"/></svg>',
   belanja: '<svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 14h3"/></svg>',
@@ -10202,6 +11087,7 @@ var HALAMAN = [
   { id: "komitmen", label: "Komitmen",    ikon: IKON.komitmen, lukis: lukisKomitmen },
   { id: "belanja", label: "Perbelanjaan", ikon: IKON.belanja, lukis: lukisBelanja },
   { id: "gaji",    label: "Gaji",         ikon: IKON.gaji,    lukis: lukisGaji },
+  { id: "lapor",   label: "Laporan Kewangan", ikon: IKON.lapor, lukis: lukisLapor },
   { id: "todo",    label: "To Do",        ikon: IKON.todo,    lukis: lukisTugas },
   { id: "pasukan", label: "Team",         ikon: IKON.pasukan, lukis: lukisPasukan },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
@@ -10217,7 +11103,8 @@ var MENU = [
   { kumpulan: "tool", label: "Tool", ikon: IKON.tool,
     anak: [{ id: "quote" }, { id: "invois" }, { id: "resit" }] },
   { kumpulan: "kewangan", label: "Kewangan", ikon: IKON.wang,
-    anak: [{ id: "tunggak" },
+    anak: [{ id: "lapor", sub: "untung", label: "Laporan Kewangan" },
+           { id: "tunggak" },
            { id: "belanja", sub: "semua", label: "Perbelanjaan" },
            { id: "belanja", sub: "marketing", label: "Marketing" },
            { id: "belanja", sub: "claim", label: "Claim Staf" },
@@ -10252,6 +11139,9 @@ function pasangSubHalaman(idHalaman) {
   if (!HASH_SUB) return;
   if (idHalaman === "alat" && ["alat", "sticker", "kalibrasi"].indexOf(HASH_SUB) !== -1) {
     tabAlat = HASH_SUB;
+  }
+  if (idHalaman === "lapor" && ["untung", "tunai", "akaun"].indexOf(HASH_SUB) !== -1) {
+    tabLapor = HASH_SUB;
   }
   if (idHalaman === "belanja" && ["semua", "marketing", "claim"].indexOf(HASH_SUB) !== -1) {
     tabBelanja = HASH_SUB;
