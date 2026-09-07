@@ -460,6 +460,13 @@ var TETAPAN_ASAL = {
   targetBulan: {},                            // { "2026-09": 20000 } — ganti target bulan tertentu
   kategoriAlat: ["Alat Ukur", "Alat Tangan", "Elektrik", "Bahan Habis", "Keselamatan"],
   amaran: { kalibrasi: 30, komitmen: 7, tugasan: 3 },
+  gaji: {
+    epfPekerja: 11, epfMajikan: 13, epfMajikanTinggi: 12,
+    socsoPekerja: 0.5, socsoMajikan: 1.75,
+    eisPekerja: 0.2, eisMajikan: 0.2,
+    prefixSlip: "SG", nomborSlip: 1,
+    notaSlip: "Slip gaji ini adalah dokumen sulit. Sila simpan untuk rekod peribadi."
+  },
   kategoriBelanja: ["Marketing", "Operasi", "Pejabat", "Kenderaan", "Alat & Stok",
                     "Gaji & Elaun", "Yuran & Lesen", "Lain-lain"],
   saluranMarketing: ["Facebook Ads", "Google Ads", "TikTok Ads", "Instagram",
@@ -592,6 +599,7 @@ function baca() {
   mentah.tetapan.targetBulan = mentah.tetapan.targetBulan || {};
   mentah.tetapan.kategoriAlat = mentah.tetapan.kategoriAlat || TETAPAN_ASAL.kategoriAlat.slice();
   mentah.tetapan.amaran = Object.assign({}, TETAPAN_ASAL.amaran, mentah.tetapan.amaran || {});
+  mentah.tetapan.gaji = Object.assign({}, TETAPAN_ASAL.gaji, mentah.tetapan.gaji || {});
   mentah.tetapan.kategoriBelanja = mentah.tetapan.kategoriBelanja || TETAPAN_ASAL.kategoriBelanja.slice();
   mentah.tetapan.saluranMarketing = mentah.tetapan.saluranMarketing || TETAPAN_ASAL.saluranMarketing.slice();
   mentah.staf = (mentah.staf || []).map(function (x) {
@@ -614,6 +622,7 @@ function baca() {
   mentah.tugasan = mentah.tugasan || [];    // senarai to do
   mentah.belanja = mentah.belanja || [];    // perbelanjaan, marketing & claim staf
   mentah.pasukan = mentah.pasukan || [];    // team kerja
+  mentah.gaji = mentah.gaji || [];          // rekod gaji bulanan
   mentah.tetapan.quote = Object.assign({}, TETAPAN_ASAL.quote, mentah.tetapan.quote || {});
   // Setiap servis perlu id tetap — kunci untuk fail lampiran PDF dalam storan.
   mentah.tetapan.quote.servis = (mentah.tetapan.quote.servis || []).map(function (x) {
@@ -5679,6 +5688,41 @@ function borangStaf(stafId) {
       medan("Status", "<select name='status'>" +
         "<option value='aktif'" + (p.status === "aktif" ? " selected" : "") + ">Aktif</option>" +
         "<option value='nonaktif'" + (p.status !== "aktif" ? " selected" : "") + ">Tidak Aktif</option></select>") +
+
+      '<div class="tajuk-seksyen">Maklumat Gaji</div>' +
+      '<div class="baris-medan">' +
+        medan("Gaji Pokok (RM)", '<input type="number" step="0.01" min="0" name="gajiPokok" value="' +
+          esc(p.gajiPokok || "") + '">') +
+        medan("Komisen Jualan (%)", '<input type="number" step="0.01" min="0" name="komisenPeratus" value="' +
+          esc(p.komisenPeratus || "") + '">') +
+        medan("Elaun Site (RM/site)", '<input type="number" step="0.01" min="0" name="elaunSite" value="' +
+          esc(p.elaunSite || "") + '">') +
+      "</div>" +
+      medan("Elaun Tetap (nama | jumlah, satu baris satu)",
+        '<textarea name="elaunTeks" style="min-height:70px" placeholder="Elaun telefon | 100">' +
+        esc((p.elaun || []).map(function (x) { return x.nama + " | " + nom(x.jumlah); }).join("\n")) +
+        "</textarea>") +
+      '<div class="baris-medan">' +
+        medan("Bank", '<input type="text" name="bank" value="' + esc(p.bank || "") + '">') +
+        medan("No. Akaun Bank", '<input type="text" name="noAkaun" value="' + esc(p.noAkaun || "") + '">') +
+        medan("No. Kad Pengenalan", '<input type="text" name="noKp" value="' + esc(p.noKp || "") + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("No. KWSP", '<input type="text" name="noKwsp" value="' + esc(p.noKwsp || "") + '">') +
+        medan("No. PERKESO", '<input type="text" name="noPerkeso" value="' + esc(p.noPerkeso || "") + '">') +
+      "</div>" +
+      "<label>Caruman Berkanun</label>" +
+      '<div class="senarai-cuti" style="margin-bottom:14px">' +
+        '<label class="chip pilih-chip"><input type="checkbox" id="cEpf"' +
+          (p.epf === false ? "" : " checked") + ">KWSP</label>" +
+        '<label class="chip pilih-chip"><input type="checkbox" id="cSocso"' +
+          (p.socso === false ? "" : " checked") + ">PERKESO</label>" +
+        '<label class="chip pilih-chip"><input type="checkbox" id="cEis"' +
+          (p.eis === false ? "" : " checked") + ">EIS</label>" +
+      "</div>" +
+      '<p class="kecil" style="margin:-6px 0 12px">Maklumat ini digunakan untuk menjana gaji ' +
+      "bulanan dan slip gaji. Semua nombor masih boleh diubah semasa menjana gaji.</p>" +
+
       '<div class="baris-butang"><button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
       '<button type="submit" class="btn btn-utama">' + (baru ? "Tambah" : "Kemas Kini") + "</button></div>" +
     "</form>", 560);
@@ -5689,13 +5733,26 @@ function borangStaf(stafId) {
     var nilai = ambilNilai($("#borangStaf", m.el));
     if (!nilai.nama) return toast("Sila isi nama staf.", "bad");
     nilai.telefon = telefonKemas(nilai.telefon);
+    nilai.gajiPokok = nom(nilai.gajiPokok);
+    nilai.komisenPeratus = nom(nilai.komisenPeratus);
+    nilai.elaunSite = nom(nilai.elaunSite);
+    nilai.elaun = pecahBaris(nilai.elaunTeks || "").map(function (b) {
+      var bhg = b.split("|");
+      return { nama: (bhg[0] || "").trim(), jumlah: nom(bhg[1]) };
+    }).filter(function (x) { return x.nama; });
+    delete nilai.elaunTeks;
+    nilai.epf = $("#cEpf", m.el).checked;
+    nilai.socso = $("#cSocso", m.el).checked;
+    nilai.eis = $("#cEis", m.el).checked;
     var d = baca();
     if (baru) {
       nilai.id = id();
       d.staf.push(nilai);
     } else {
-      nilai.id = stafId;
-      d.staf = d.staf.map(function (x) { return x.id === stafId ? nilai : x; });
+      // Kekalkan medan lain yang tiada dalam borang ini.
+      d.staf = d.staf.map(function (x) {
+        return x.id === stafId ? Object.assign({}, x, nilai, { id: stafId }) : x;
+      });
     }
     if (!simpan(d)) return;
     m.tutup();
@@ -5714,6 +5771,7 @@ var TAB_TETAPAN = [
   { id: "dokumen",  label: "Resit & Invois" },
   { id: "quote",    label: "Quotation" },
   { id: "belanja",  label: "Perbelanjaan" },
+  { id: "gaji",     label: "Gaji" },
   { id: "amaran",   label: "Peringatan" },
   { id: "data",     label: "Data & Backup" }
 ];
@@ -6069,6 +6127,54 @@ function lukisTetapan(bekas) {
       "</div>";
   }
 
+  /* ---------------- GAJI ---------------- */
+  if (tabTetapan === "gaji") {
+    var g = tetapanGaji(data);
+    isi =
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Tetapan Gaji</h3>' +
+          '<span class="kecil">Slip seterusnya: <b>' + esc(nomborSlipBaharu(data).no) + "</b></span></div>" +
+        '<form id="borangGajiTetapan">' +
+          '<div class="tajuk-seksyen">Peratus Caruman (anggaran)</div>' +
+          '<div class="baris-medan">' +
+            medan("KWSP Pekerja (%)", '<input type="number" step="0.01" name="epfPekerja" value="' +
+              esc(g.epfPekerja) + '">') +
+            medan("KWSP Majikan (%) — gaji RM5,000 ke bawah",
+              '<input type="number" step="0.01" name="epfMajikan" value="' + esc(g.epfMajikan) + '">') +
+            medan("KWSP Majikan (%) — melebihi RM5,000",
+              '<input type="number" step="0.01" name="epfMajikanTinggi" value="' +
+              esc(g.epfMajikanTinggi) + '">') +
+          "</div>" +
+          '<div class="baris-medan">' +
+            medan("PERKESO Pekerja (%)", '<input type="number" step="0.01" name="socsoPekerja" value="' +
+              esc(g.socsoPekerja) + '">') +
+            medan("PERKESO Majikan (%)", '<input type="number" step="0.01" name="socsoMajikan" value="' +
+              esc(g.socsoMajikan) + '">') +
+            medan("EIS Pekerja (%)", '<input type="number" step="0.01" name="eisPekerja" value="' +
+              esc(g.eisPekerja) + '">') +
+            medan("EIS Majikan (%)", '<input type="number" step="0.01" name="eisMajikan" value="' +
+              esc(g.eisMajikan) + '">') +
+          "</div>" +
+          '<p class="kecil" style="margin:-6px 0 12px"><b>Penting:</b> nombor ini hanya ' +
+          "<b>anggaran peratus</b>. KWSP, PERKESO dan EIS sebenarnya guna <b>jadual rasmi</b> " +
+          "mengikut julat gaji. Sistem akan mengira cadangan, tetapi sila semak dengan jadual " +
+          "rasmi dan ubah jumlah pada slip jika berbeza.</p>" +
+          '<div class="tajuk-seksyen">Slip Gaji</div>' +
+          '<div class="baris-medan">' +
+            medan("Prefix No. Slip", '<input type="text" name="prefixSlip" value="' +
+              esc(g.prefixSlip) + '">') +
+            medan("Nombor Seterusnya", '<input type="number" min="1" name="nomborSlip" value="' +
+              esc(g.nomborSlip) + '">') +
+          "</div>" +
+          medan("Nota Bawah Slip", '<input type="text" name="notaSlip" value="' +
+            esc(g.notaSlip) + '">') +
+          '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan</button></div>' +
+        "</form>" +
+        '<p class="kecil">Gaji pokok, elaun tetap, peratus komisen, elaun site dan nombor ' +
+        "KWSP/PERKESO setiap staf ditetapkan dalam menu <b>Team &amp; Staf → Staf</b>.</p>" +
+      "</div>";
+  }
+
   /* ---------------- PERINGATAN ---------------- */
   if (tabTetapan === "amaran") {
     var am = t.amaran || {};
@@ -6128,6 +6234,8 @@ function lukisTetapan(bekas) {
           '<div class="jumlah-baris"><span>Alat &amp; stok</span><b>' + data.alat.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Komitmen</span><b>' + data.komitmen.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Perbelanjaan</span><b>' + data.belanja.length + "</b></div>" +
+          '<div class="jumlah-baris"><span>Rekod gaji</span><b>' + data.gaji.length + "</b></div>" +
+          '<div class="jumlah-baris"><span>Team</span><b>' + data.pasukan.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Tugasan</span><b>' + data.tugasan.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Staf</span><b>' + data.staf.length + "</b></div>" +
         "</div>" +
@@ -6242,6 +6350,25 @@ function lukisTetapan(bekas) {
     $("#borangQuoteTetapan").onsubmit = function (e) {
       e.preventDefault();
       if (simpanQuoteTetapan(null, null)) toast("Tetapan quotation disimpan.", "ok");
+    };
+  }
+
+  if ($("#borangGajiTetapan")) {
+    $("#borangGajiTetapan").onsubmit = function (e) {
+      e.preventDefault();
+      var nilai = ambilNilai($("#borangGajiTetapan"));
+      var d = baca();
+      d.tetapan.gaji = Object.assign({}, tetapanGaji(d), {
+        epfPekerja: nom(nilai.epfPekerja), epfMajikan: nom(nilai.epfMajikan),
+        epfMajikanTinggi: nom(nilai.epfMajikanTinggi),
+        socsoPekerja: nom(nilai.socsoPekerja), socsoMajikan: nom(nilai.socsoMajikan),
+        eisPekerja: nom(nilai.eisPekerja), eisMajikan: nom(nilai.eisMajikan),
+        prefixSlip: nilai.prefixSlip || "SG", nomborSlip: Math.max(1, nom(nilai.nomborSlip)),
+        notaSlip: nilai.notaSlip
+      });
+      if (!simpan(d)) return;
+      toast("Tetapan gaji disimpan.", "ok");
+      lukis();
     };
   }
 
@@ -7186,8 +7313,7 @@ function lihatAlat(alatId) {
     '<div class="tajuk-seksyen">Butiran</div>' +
     '<dl class="kunci-nilai">' +
       baris("Kategori", a.kategori) + baris("Jenis", a.jenis) +
-      baris("Kit team", ((a.pasukan || []).map(function (k) { return namaPasukan(data, k); })
-        .filter(Boolean).join(", "))) +
+      baris("Kit team", pasukanBarang(data, a).join(", ")) +
       baris("Simpan di", a.lokasi) + baris("Dipegang oleh", a.pegang) +
       baris("Amaran stok", a.abaikanStok ? "Diabaikan (barang guna sepenuhnya)" : "") +
       baris("Tarikh beli", a.tarikhBeli ? fmtTarikh(a.tarikhBeli) : "") +
@@ -7479,7 +7605,8 @@ function jadualBarang(senarai, bahan) {
           '<div class="kecil">' + esc([a.kategori, a.lokasi, a.pegang].filter(Boolean).join(" · ") || "-") +
         "</div></td>" +
         (bahan
-          ? '<td class="num"><b>' + k.berfungsi + "</b><div class=\"kecil\">" + esc(a.unit) + "</div></td>" +
+          ? '<td class="num"><b>' + k.berfungsi + "</b><div class=\"kecil\">" + esc(a.unit) +
+              (k.dipinjam ? " · " + k.adaUntukAmbil + " di rak" : "") + "</div></td>" +
             '<td class="num">' + (k.minimum || "-") + "</td>"
           : '<td class="num"><b>' + k.berfungsi + '</b><div class="kecil">dari ' + k.jumlah + "</div></td>" +
             '<td class="num">' + (k.dipinjam
@@ -8945,20 +9072,77 @@ function pasukanStaf(data, nama) {
   });
 }
 
-// Alat yang dipegang satu team: kit tetap + yang sedang diambil atas nama team.
+// Alat yang dipegang satu team. Kit team ialah rekod pinjaman terbuka bertanda kit,
+// jadi stok dalam Alat & Stok terus ditolak.
 function alatPasukan(data, pasukanId) {
-  var kit = (data.alat || []).filter(function (a) {
-    return (a.pasukan || []).indexOf(pasukanId) !== -1;
-  });
-  var pinjam = [];
+  var kit = [], pinjam = [];
   (data.alat || []).forEach(function (a) {
     pinjamTerbuka(a).forEach(function (p) {
-      if (p.pasukanId === pasukanId) {
-        pinjam.push({ alat: a, pinjam: p });
-      }
+      if (p.pasukanId !== pasukanId) return;
+      (p.kit ? kit : pinjam).push({ alat: a, pinjam: p });
     });
   });
   return { kit: kit, pinjam: pinjam };
+}
+
+// Nama team yang memegang satu barang sebagai kit.
+function pasukanBarang(data, a) {
+  return pinjamTerbuka(a).filter(function (p) { return p.kit; })
+    .map(function (p) { return p.pasukan + " (" + nom(p.kuantiti) + ")"; });
+}
+
+// Selaraskan kit team dengan stok: tambah, kemas kini atau pulangkan.
+function segerakKit(d, pasukanId, namaTeam, baris) {
+  var mahu = {};
+  baris.forEach(function (b) {
+    if (b.alatId && nom(b.kuantiti) > 0) mahu[b.alatId] = nom(mahu[b.alatId]) + nom(b.kuantiti);
+  });
+  var dihadkan = [];
+  d.alat = d.alat.map(function (a) {
+    a.pinjam = a.pinjam || [];
+    var sedia = a.pinjam.filter(function (p) {
+      return !p.tarikhPulang && p.kit && p.pasukanId === pasukanId;
+    })[0];
+    var k = kiraAlat(a);
+    var boleh = k.adaUntukAmbil + (sedia ? nom(sedia.kuantiti) : 0);
+    var minta = nom(mahu[a.id] || 0);
+    if (minta > boleh) { dihadkan.push(a.nama + " (hanya " + boleh + " " + a.unit + ")"); minta = boleh; }
+
+    if (minta > 0 && sedia) {
+      if (nom(sedia.kuantiti) !== minta) {
+        logAlat(a, "Kit Team dikemas kini", minta, namaTeam, "kit " + namaTeam);
+        sedia.kuantiti = minta;
+        a.updatedAt = new Date().toISOString();
+      }
+    } else if (minta > 0) {
+      a.pinjam.unshift({ id: id(), nama: namaTeam, pasukanId: pasukanId, pasukan: namaTeam,
+        kit: true, kuantiti: minta, tarikhAmbil: kunciTarikh(), tarikhPulang: null,
+        nota: "Kit team " + namaTeam });
+      logAlat(a, "Ambil (Kit Team)", minta, namaTeam, "kit " + namaTeam);
+      a.updatedAt = new Date().toISOString();
+    } else if (sedia) {
+      sedia.tarikhPulang = kunciTarikh();
+      logAlat(a, "Pulang (Kit Team)", nom(sedia.kuantiti), namaTeam, "keluar dari kit " + namaTeam);
+      a.updatedAt = new Date().toISOString();
+    }
+    return a;
+  });
+  return dihadkan;
+}
+
+function barisKit(x, alatSemua) {
+  x = x || {};
+  return '<div class="baris-agih" data-kit>' +
+    medan("Barang", "<select class='kitAlat'><option value=''>— pilih barang —</option>" +
+      alatSemua.map(function (a) {
+        var k = kiraAlat(a);
+        return "<option value='" + esc(a.id) + "'" + (x.alatId === a.id ? " selected" : "") + ">" +
+          esc(a.nama) + " · " + k.adaUntukAmbil + " " + esc(a.unit) + " di rak</option>";
+      }).join("") + "</select>") +
+    medan("Kuantiti", '<input type="number" step="1" min="1" class="kitKuantiti" value="' +
+      esc(x.kuantiti || 1) + '">') +
+    '<button type="button" class="btn-buang-baris" data-buang-kit title="Buang">&times;</button>' +
+  "</div>";
 }
 
 function borangPasukan(pasukanId) {
@@ -8968,7 +9152,13 @@ function borangPasukan(pasukanId) {
   p = p || { nama: "", ahli: [], alat: [], aktif: true };
 
   var stafAktif = data.staf.filter(function (x) { return x.status === "aktif"; });
-  var alatSemua = (data.alat || []).filter(function (x) { return x.jenis === "Alat"; });
+  var alatSemua = (data.alat || []).slice().sort(function (a, b) {
+    return String(a.jenis + a.nama).localeCompare(String(b.jenis + b.nama));
+  });
+  var kenderaanSemua = (data.komitmen || []).filter(function (x) { return x.kategori === "Transport"; });
+  var kitSedia = alatPasukan(data, pasukanId || "").kit.map(function (x) {
+    return { alatId: x.alat.id, kuantiti: nom(x.pinjam.kuantiti) };
+  });
 
   var m = modal(baru ? "Team Baharu" : "Sunting Team",
     '<form id="borangPasukan">' +
@@ -8995,15 +9185,27 @@ function borangPasukan(pasukanId) {
           : '<span class="kecil">Belum ada staf aktif. Team boleh disimpan tanpa ahli.</span>') +
       "</div>" +
 
-      "<label>Alat Dipegang Team <span class='kecil'>(kit tetap team ini)</span></label>" +
+      '<div class="tajuk-seksyen">Kit Team (alat &amp; bahan yang team ini pegang)</div>' +
+      '<p class="kecil" style="margin:-4px 0 10px">Barang yang dimasukkan di sini akan ' +
+      "<b>ditolak dari stok</b> dalam Alat &amp; Stok — ia dikira sedang dipegang team ini. " +
+      "Buang baris untuk pulangkan semula ke stok. Untuk barang yang memang guna sepenuhnya, " +
+      "tandakan <i>Abaikan amaran stok</i> pada barang itu.</p>" +
+      '<div id="senaraiKit">' +
+        (kitSedia.length ? kitSedia : []).map(function (x) { return barisKit(x, alatSemua); }).join("") +
+      "</div>" +
+      (alatSemua.length
+        ? '<button type="button" class="btn btn-lembut btn-kecil" id="btnTambahKit">+ Tambah Barang</button>'
+        : '<p class="kecil">Belum ada barang dalam Alat &amp; Stok.</p>') +
+
+      '<div class="tajuk-seksyen">Kenderaan Team</div>' +
       '<div class="senarai-cuti" style="margin-bottom:14px">' +
-        (alatSemua.length
-          ? alatSemua.map(function (x) {
-              return '<label class="chip pilih-chip"><input type="checkbox" class="alatPilih" value="' +
-                esc(x.id) + '"' + ((p.alat || []).indexOf(x.id) !== -1 ? " checked" : "") +
-                ">" + esc(x.nama) + "</label>";
+        (kenderaanSemua.length
+          ? kenderaanSemua.map(function (x) {
+              return '<label class="chip pilih-chip"><input type="checkbox" class="kenderaanPilih" value="' +
+                esc(x.id) + '"' + ((p.kenderaan || []).indexOf(x.id) !== -1 ? " checked" : "") +
+                ">" + esc(x.nama) + (x.rujukan ? " · " + esc(x.rujukan) : "") + "</label>";
             }).join("")
-          : '<span class="kecil">Belum ada alat dalam sistem.</span>') +
+          : '<span class="kecil">Belum ada kenderaan. Tambah dalam Kewangan → Komitmen → Transport.</span>') +
       "</div>" +
 
       medan("Nota", '<textarea name="nota" style="min-height:56px">' + esc(p.nota || "") + "</textarea>") +
@@ -9015,6 +9217,18 @@ function borangPasukan(pasukanId) {
     "</form>", 680);
 
   var borang = $("#borangPasukan", m.el);
+  function pasangKit() {
+    $$("[data-buang-kit]", m.el).forEach(function (b) {
+      b.onclick = function () { b.parentElement.remove(); };
+    });
+  }
+  pasangKit();
+  if ($("#btnTambahKit", m.el)) {
+    $("#btnTambahKit", m.el).onclick = function () {
+      $("#senaraiKit", m.el).insertAdjacentHTML("beforeend", barisKit({}, alatSemua));
+      pasangKit();
+    };
+  }
   $("[data-batal]", m.el).onclick = m.tutup;
 
   if ($("#btnPadamPasukan", m.el)) {
@@ -9022,11 +9236,8 @@ function borangPasukan(pasukanId) {
       sahkan("Padam team " + p.nama + "? Rekod alat dan sejarah tidak dipadam.").then(function (ya) {
         if (!ya) return;
         var d = baca();
+        segerakKit(d, pasukanId, p.nama, []);        // pulangkan semua kit ke stok
         d.pasukan = d.pasukan.filter(function (x) { return x.id !== pasukanId; });
-        d.alat = d.alat.map(function (a) {
-          a.pasukan = (a.pasukan || []).filter(function (k) { return k !== pasukanId; });
-          return a;
-        });
         simpan(d);
         m.tutup();
         toast("Team dipadam.", "ok");
@@ -9040,28 +9251,28 @@ function borangPasukan(pasukanId) {
     var v = ambilNilai(borang);
     if (!v.nama) return toast("Sila isi nama team.", "bad");
     var ahli = $$(".ahliPilih:checked", m.el).map(function (c) { return c.value; });
-    var alatPilih = $$(".alatPilih:checked", m.el).map(function (c) { return c.value; });
+    var kenderaan = $$(".kenderaanPilih:checked", m.el).map(function (c) { return c.value; });
+    var kit = $$("[data-kit]", m.el).map(function (b) {
+      return { alatId: $(".kitAlat", b).value, kuantiti: nom($(".kitKuantiti", b).value) };
+    }).filter(function (x) { return x.alatId && x.kuantiti > 0; });
     var d = baca();
     var rekodId = pasukanId || id();
     var rekod = {
-      id: rekodId, nama: v.nama, ketua: v.ketua, ahli: ahli, alat: alatPilih,
+      id: rekodId, nama: v.nama, ketua: v.ketua, ahli: ahli, kenderaan: kenderaan,
       aktif: v.aktif !== "tidak", nota: v.nota,
       createdAt: p.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     if (pasukanId) d.pasukan = d.pasukan.map(function (x) { return x.id === pasukanId ? rekod : x; });
     else d.pasukan.push(rekod);
-    // Simpan pegangan pada rekod alat juga supaya senang dipapar dalam senarai alat.
-    d.alat = d.alat.map(function (a) {
-      var ada = (a.pasukan || []).indexOf(rekodId) !== -1;
-      var patut = alatPilih.indexOf(a.id) !== -1;
-      if (patut && !ada) a.pasukan = (a.pasukan || []).concat([rekodId]);
-      if (!patut && ada) a.pasukan = (a.pasukan || []).filter(function (k) { return k !== rekodId; });
-      return a;
-    });
+    var dihadkan = segerakKit(d, rekodId, rekod.nama, kit);
     if (!simpan(d)) return;
     m.tutup();
-    toast(pasukanId ? "Team dikemas kini." : "Team ditambah.", "ok");
+    if (dihadkan.length) {
+      toast("Kuantiti dihadkan ikut stok: " + dihadkan.join(", "), "warn", 8000);
+    } else {
+      toast(pasukanId ? "Team dikemas kini." : "Team ditambah.", "ok");
+    }
     lukis();
   };
 }
@@ -9078,7 +9289,7 @@ function lihatPasukan(pasukanId) {
   var m = modal("Team " + p.nama,
     '<div class="grid grid-4" style="margin-bottom:4px">' +
       kadStat("Ahli", String(orang.length), p.ketua ? "ketua: " + p.ketua : "tiada ketua ditetapkan") +
-      kadStat("Alat Kit Team", String(alat.kit.length), "dipegang tetap") +
+      kadStat("Kit Team", String(alat.kit.length), "barang ditolak dari stok") +
       kadStat("Sedang Diambil", String(alat.pinjam.length), "belum dipulangkan") +
       kadStat("Status", p.aktif === false ? "Tidak aktif" : "Aktif", p.nota || "") +
     "</div>" +
@@ -9090,20 +9301,31 @@ function lihatPasukan(pasukanId) {
         }).join("") + "</div>"
       : kosong("Team ini belum ada ahli. Tidak mengapa — nama team masih boleh digunakan.")) +
 
-    '<div class="tajuk-seksyen">Alat Kit Team</div>' +
+    '<div class="tajuk-seksyen">Kit Team</div>' +
     (alat.kit.length
-      ? '<div class="jadual-bungkus"><table><thead><tr><th>Alat</th><th class="num">Boleh Guna</th>' +
-        "<th>Status</th><th></th></tr></thead><tbody>" +
-        alat.kit.map(function (a) {
-          var k = kiraAlat(a), st = statusAlat(a);
-          return "<tr><td class='bungkus'><b>" + esc(a.nama) + "</b>" +
-            '<div class="kecil">' + esc(a.kategori || "-") + "</div></td>" +
-            '<td class="num">' + k.berfungsi + " " + esc(a.unit) + "</td>" +
+      ? '<div class="jadual-bungkus"><table><thead><tr><th>Barang</th><th class="num">Dipegang</th>' +
+        "<th class='num'>Baki di Rak</th><th>Status</th><th></th></tr></thead><tbody>" +
+        alat.kit.map(function (x) {
+          var k = kiraAlat(x.alat), st = statusAlat(x.alat);
+          return "<tr><td class='bungkus'><b>" + esc(x.alat.nama) + "</b>" +
+            '<div class="kecil">' + esc([x.alat.jenis, x.alat.kategori].filter(Boolean).join(" · ")) +
+            "</div></td>" +
+            '<td class="num"><b>' + nom(x.pinjam.kuantiti) + "</b> " + esc(x.alat.unit) + "</td>" +
+            '<td class="num">' + k.adaUntukAmbil + "</td>" +
             '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span></td>" +
             '<td><button type="button" class="btn btn-lembut btn-kecil" data-alatteam="' +
-              esc(a.id) + '">Buka</button></td></tr>';
+              esc(x.alat.id) + '">Buka</button></td></tr>';
         }).join("") + "</tbody></table></div>"
-      : kosong("Belum ada alat ditetapkan sebagai kit team ini.")) +
+      : kosong("Belum ada barang dalam kit team ini.")) +
+
+    '<div class="tajuk-seksyen">Kenderaan Team</div>' +
+    ((p.kenderaan || []).length
+      ? '<div class="senarai-cuti">' + p.kenderaan.map(function (kid) {
+          var kend = (data.komitmen || []).filter(function (x) { return x.id === kid; })[0];
+          return kend ? '<span class="chip">' + esc(kend.nama) +
+            (kend.rujukan ? " · " + esc(kend.rujukan) : "") + "</span>" : "";
+        }).join("") + "</div>"
+      : kosong("Tiada kenderaan ditetapkan untuk team ini.")) +
 
     '<div class="tajuk-seksyen">Sedang Diambil Atas Nama Team</div>' +
     (alat.pinjam.length
@@ -9144,7 +9366,9 @@ function lukisPasukan(bekas) {
     (p.ketua ? [p.ketua] : []).concat(p.ahli || []).forEach(function (n) { dalamTeam[n] = true; });
   });
   var luarTeam = stafAktif.filter(function (x) { return !dalamTeam[x.nama]; });
-  var jumlahAlat = semua.reduce(function (t, p) { return t + (p.alat || []).length; }, 0);
+  var jumlahAlat = semua.reduce(function (t, p) {
+    return t + alatPasukan(data, p.id).kit.length;
+  }, 0);
 
   bekas.innerHTML =
     '<div class="grid grid-4">' +
@@ -9154,7 +9378,7 @@ function lukisPasukan(bekas) {
         stafAktif.length + " staf aktif") +
       kadStat("Belum Ada Team", String(luarTeam.length),
         luarTeam.length ? luarTeam.map(function (x) { return x.nama; }).slice(0, 3).join(", ") : "semua sudah ada team") +
-      kadStat("Alat Dipegang Team", String(jumlahAlat), "kit tetap semua team") +
+      kadStat("Barang Dalam Kit", String(jumlahAlat), "ditolak dari stok") +
     "</div>" +
 
     '<div class="kad">' +
@@ -9185,7 +9409,15 @@ function lukisPasukan(bekas) {
               "<td>" + esc(p.ketua || "-") + "</td>" +
               '<td class="bungkus kecil">' + ((p.ahli || []).length ? esc(p.ahli.join(", ")) : "-") + "</td>" +
               '<td class="bungkus kecil">' + (alat.kit.length
-                ? esc(alat.kit.map(function (a) { return a.nama; }).join(", ")) : "-") + "</td>" +
+                ? esc(alat.kit.map(function (x) {
+                    return x.alat.nama + " x" + nom(x.pinjam.kuantiti);
+                  }).join(", ")) : "-") +
+                ((p.kenderaan || []).length
+                  ? '<div class="kecil">' + esc(p.kenderaan.map(function (kid) {
+                      var kend = (data.komitmen || []).filter(function (x) { return x.id === kid; })[0];
+                      return kend ? kend.nama : "";
+                    }).filter(Boolean).join(", ")) + "</div>"
+                  : "") + "</td>" +
               "<td>" + (alat.pinjam.length
                 ? '<span class="badge badge-warn">' + alat.pinjam.length + " alat</span>"
                 : '<span class="kecil">tiada</span>') + "</td>" +
@@ -9215,7 +9447,7 @@ function lukisPasukan(bekas) {
       senarai.map(function (p) {
         var alat = alatPasukan(data, p.id);
         return [p.nama, p.ketua, (p.ahli || []).join(", "),
-                alat.kit.map(function (a) { return a.nama; }).join(", "),
+                alat.kit.map(function (x) { return x.alat.nama + " x" + nom(x.pinjam.kuantiti); }).join(", "),
                 p.aktif === false ? "Tidak" : "Ya", p.nota];
       }));
   };
@@ -9227,6 +9459,713 @@ function lukisPasukan(bekas) {
   });
 }
 
+/* ======================================================================
+   GAJI — payroll bulanan: gaji pokok, elaun, komisen, claim, potongan
+   dan slip gaji A4 yang boleh dicetak.
+   ================================================================== */
+
+var gajiBulan = "";
+var gajiCari = "";
+
+var STATUS_GAJI = ["Draf", "Diluluskan", "Dibayar"];
+
+function tetapanGaji(data) {
+  return Object.assign({}, TETAPAN_ASAL.gaji, data.tetapan.gaji || {});
+}
+
+function nomborSlipBaharu(data) {
+  var t = tetapanGaji(data);
+  return { no: (t.prefixSlip || "SG") + "-" + String(t.nomborSlip || 1).padStart(4, "0") };
+}
+
+function kiraGaji(r) {
+  var jumlah = function (senarai) {
+    return (senarai || []).reduce(function (t, x) { return t + nom(x.jumlah); }, 0);
+  };
+  var elaun = jumlah(r.elaun);
+  var tambahan = jumlah(r.tambahan);
+  var claim = jumlah(r.claim);
+  var potonganLain = jumlah(r.potongan);
+  var pokok = nom(r.gajiPokok);
+  var kasar = Math.round((pokok + elaun + nom(r.komisen) + nom(r.elaunSite) + tambahan) * 100) / 100;
+  var epf = nom(r.epfPekerja), socso = nom(r.socsoPekerja), eis = nom(r.eisPekerja), pcb = nom(r.pcb);
+  var jumlahPotongan = Math.round((epf + socso + eis + pcb + potonganLain) * 100) / 100;
+  var bersih = Math.round((kasar - jumlahPotongan + claim) * 100) / 100;
+  var majikan = Math.round((nom(r.epfMajikan) + nom(r.socsoMajikan) + nom(r.eisMajikan)) * 100) / 100;
+  return {
+    elaun: elaun, tambahan: tambahan, claim: claim, potonganLain: potonganLain,
+    kasar: kasar, jumlahPotongan: jumlahPotongan, bersih: bersih,
+    carumanMajikan: majikan,
+    kosMajikan: Math.round((kasar + majikan + claim) * 100) / 100
+  };
+}
+
+// Cadangan gaji bulan tertentu untuk seorang staf (boleh diubah sebelum simpan).
+function cadangGaji(data, staf, bulan) {
+  var t = tetapanGaji(data);
+  var hujungBulan = bulan + "-31";
+
+  // Komisen daripada jualan yang ditutup oleh staf ini.
+  var jualan = saleBulan(data, bulan).filter(function (s) {
+    return (s.closedBy || "").toLowerCase() === String(staf.nama).toLowerCase() &&
+      (s.statusKerja || "") !== data.tetapan.statusBatal;
+  });
+  var nilaiJualan = jualan.reduce(function (a, s) { return a + kiraSale(s).total; }, 0);
+  var peratus = nom(staf.komisenPeratus);
+  var komisen = peratus > 0 ? Math.round(nilaiJualan * peratus) / 100 : 0;
+
+  // Elaun site untuk inspector.
+  var site = saleBulan(data, bulan).filter(function (s) {
+    return (s.inspector || []).indexOf(staf.nama) !== -1 &&
+      (s.statusKerja || "") !== data.tetapan.statusBatal;
+  }).length;
+  var kadarSite = nom(staf.elaunSite);
+  var elaunSite = Math.round(site * kadarSite * 100) / 100;
+
+  // Claim staf yang belum dibayar sehingga hujung bulan ini.
+  var claim = (data.belanja || []).filter(function (b) {
+    return b.jenis === "Claim Staf" && b.statusClaim !== "Sudah Bayar" &&
+      String(b.staf || "").toLowerCase() === String(staf.nama).toLowerCase() &&
+      String(b.tarikh) <= hujungBulan;
+  }).map(function (b) {
+    return { id: b.id, perkara: b.perkara, jumlah: nom(b.jumlah), tarikh: b.tarikh };
+  });
+
+  var elaunTetap = (staf.elaun || []).map(function (x) {
+    return { nama: x.nama, jumlah: nom(x.jumlah) };
+  });
+  var asas = nom(staf.gajiPokok) +
+    elaunTetap.reduce(function (a, x) { return a + nom(x.jumlah); }, 0) + komisen + elaunSite;
+
+  var kadar = function (peratusan) { return Math.round(asas * nom(peratusan)) / 100; };
+
+  return {
+    bulan: bulan, stafId: staf.id, nama: staf.nama, jawatan: staf.jawatan || "",
+    gajiPokok: nom(staf.gajiPokok),
+    elaun: elaunTetap,
+    komisen: komisen, komisenNota: peratus > 0
+      ? peratus + "% dari " + rm(nilaiJualan) + " (" + jualan.length + " job)" : "",
+    elaunSite: elaunSite, elaunSiteNota: kadarSite > 0
+      ? site + " site x " + rm(kadarSite) : "",
+    tambahan: [], claim: claim, potongan: [],
+    epfPekerja: staf.epf === false ? 0 : kadar(t.epfPekerja),
+    epfMajikan: staf.epf === false ? 0 : kadar(asas > 5000 ? t.epfMajikanTinggi : t.epfMajikan),
+    socsoPekerja: staf.socso === false ? 0 : kadar(t.socsoPekerja),
+    socsoMajikan: staf.socso === false ? 0 : kadar(t.socsoMajikan),
+    eisPekerja: staf.eis === false ? 0 : kadar(t.eisPekerja),
+    eisMajikan: staf.eis === false ? 0 : kadar(t.eisMajikan),
+    pcb: 0, status: "Draf", nota: ""
+  };
+}
+
+function borangGaji(gajiId, stafId, bulan) {
+  var data = baca();
+  var r = gajiId ? data.gaji.filter(function (x) { return x.id === gajiId; })[0] : null;
+  var baru = !r;
+  if (!r) {
+    var staf = data.staf.filter(function (x) { return x.id === stafId; })[0];
+    if (!staf) return toast("Staf tidak dijumpai.", "bad");
+    r = cadangGaji(data, staf, bulan || bulanKini());
+  }
+  var stafRekod = data.staf.filter(function (x) { return x.id === r.stafId; })[0] || {};
+
+  var barisWang = function (kelas, x, labelNama, labelJumlah) {
+    x = x || {};
+    return '<div class="baris-agih" data-' + kelas + ">" +
+      medan(labelNama, '<input type="text" class="' + kelas + 'Nama" value="' + esc(x.nama || "") + '">') +
+      medan(labelJumlah, '<input type="number" step="0.01" class="' + kelas +
+        'Jumlah" value="' + esc(x.jumlah !== undefined ? x.jumlah : "") + '">') +
+      '<button type="button" class="btn-buang-baris" data-buang-' + kelas + ' title="Buang">&times;</button>' +
+    "</div>";
+  };
+
+  var m = modal((baru ? "Gaji Baharu" : "Sunting Gaji") + " — " + r.nama + " · " + fmtBulan(r.bulan),
+    '<form id="borangGaji">' +
+      '<div class="baris-medan">' +
+        medan("Bulan *", '<input type="month" name="bulan" value="' + esc(r.bulan) + '" required>') +
+        medan("Gaji Pokok (RM) *", '<input type="number" step="0.01" min="0" name="gajiPokok" value="' +
+          esc(r.gajiPokok) + '" required>') +
+        medan("Status", "<select name='status'>" + STATUS_GAJI.map(function (x) {
+          return "<option" + (r.status === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+      "</div>" +
+
+      '<div class="tajuk-seksyen">Elaun Tetap</div>' +
+      '<div id="senaraiElaun">' + (r.elaun && r.elaun.length ? r.elaun : []).map(function (x) {
+        return barisWang("elaun", x, "Elaun", "Jumlah (RM)");
+      }).join("") + "</div>" +
+      '<button type="button" class="btn btn-lembut btn-kecil" id="btnTambahElaun">+ Elaun</button>' +
+
+      '<div class="tajuk-seksyen">Komisen &amp; Elaun Site</div>' +
+      '<div class="baris-medan">' +
+        medan("Komisen Jualan (RM)", '<input type="number" step="0.01" name="komisen" value="' +
+          esc(r.komisen) + '">') +
+        medan("Elaun Site / Inspection (RM)", '<input type="number" step="0.01" name="elaunSite" value="' +
+          esc(r.elaunSite) + '">') +
+      "</div>" +
+      (r.komisenNota || r.elaunSiteNota
+        ? '<p class="kecil" style="margin:-6px 0 12px">' +
+          (r.komisenNota ? "Komisen: " + esc(r.komisenNota) + ". " : "") +
+          (r.elaunSiteNota ? "Elaun site: " + esc(r.elaunSiteNota) + "." : "") + "</p>"
+        : "") +
+
+      '<div class="tajuk-seksyen">Tambahan Lain (OT, bonus)</div>' +
+      '<div id="senaraiTambahan">' + (r.tambahan || []).map(function (x) {
+        return barisWang("tambahan", x, "Perkara", "Jumlah (RM)");
+      }).join("") + "</div>" +
+      '<button type="button" class="btn btn-lembut btn-kecil" id="btnTambahTambahan">+ Tambahan</button>' +
+
+      '<div class="tajuk-seksyen">Claim Staf (bayar balik)</div>' +
+      ((r.claim || []).length
+        ? '<div class="jadual-bungkus"><table><thead><tr><th>Tarikh</th><th>Perkara</th>' +
+          "<th class='num'>Jumlah</th></tr></thead><tbody>" +
+          r.claim.map(function (c) {
+            return "<tr><td>" + esc(fmtTarikh(c.tarikh)) + "</td>" +
+              '<td class="bungkus">' + esc(c.perkara) + "</td>" +
+              '<td class="num">' + esc(rm(c.jumlah)) + "</td></tr>";
+          }).join("") + "</tbody></table></div>" +
+          '<p class="kecil" style="margin:6px 0 0">Claim ini akan ditanda <b>Sudah Bayar</b> ' +
+          "bila gaji ditanda dibayar. Claim tidak dikira untuk caruman KWSP/PERKESO.</p>"
+        : '<p class="kecil">Tiada claim belum bayar untuk staf ini.</p>') +
+
+      '<div class="tajuk-seksyen">Potongan Berkanun (anggaran — boleh ubah)</div>' +
+      '<div class="baris-medan">' +
+        medan("KWSP Pekerja", '<input type="number" step="0.01" name="epfPekerja" value="' +
+          esc(r.epfPekerja) + '">') +
+        medan("PERKESO Pekerja", '<input type="number" step="0.01" name="socsoPekerja" value="' +
+          esc(r.socsoPekerja) + '">') +
+        medan("EIS Pekerja", '<input type="number" step="0.01" name="eisPekerja" value="' +
+          esc(r.eisPekerja) + '">') +
+        medan("PCB / Cukai", '<input type="number" step="0.01" name="pcb" value="' + esc(r.pcb) + '">') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("KWSP Majikan", '<input type="number" step="0.01" name="epfMajikan" value="' +
+          esc(r.epfMajikan) + '">') +
+        medan("PERKESO Majikan", '<input type="number" step="0.01" name="socsoMajikan" value="' +
+          esc(r.socsoMajikan) + '">') +
+        medan("EIS Majikan", '<input type="number" step="0.01" name="eisMajikan" value="' +
+          esc(r.eisMajikan) + '">') +
+      "</div>" +
+      '<p class="kecil" style="margin:-6px 0 12px">Nombor ini dikira guna peratus dalam ' +
+      "Tetapan → Gaji. Ia <b>anggaran</b> — sila semak dengan jadual rasmi KWSP/PERKESO " +
+      "dan ubah di sini jika berbeza.</p>" +
+
+      '<div class="tajuk-seksyen">Potongan Lain</div>' +
+      '<div id="senaraiPotongan">' + (r.potongan || []).map(function (x) {
+        return barisWang("potongan", x, "Perkara", "Jumlah (RM)");
+      }).join("") + "</div>" +
+      '<button type="button" class="btn btn-lembut btn-kecil" id="btnTambahPotongan">+ Potongan</button>' +
+
+      '<div class="tajuk-seksyen">Ringkasan</div>' +
+      '<div class="jumlah-baris"><span>Gaji kasar</span><b id="pGKasar">RM 0.00</b></div>' +
+      '<div class="jumlah-baris"><span>Jumlah potongan</span><b id="pGPotong">RM 0.00</b></div>' +
+      '<div class="jumlah-baris"><span>Bayar balik claim</span><b id="pGClaim">RM 0.00</b></div>' +
+      '<div class="jumlah-baris"><span><b>Gaji bersih dibayar</b></span><b id="pGBersih">RM 0.00</b></div>' +
+      '<div class="jumlah-baris"><span>Kos majikan (termasuk caruman)</span><b id="pGKos">RM 0.00</b></div>' +
+
+      medan("Nota pada Slip", '<input type="text" name="nota" value="' + esc(r.nota || "") + '">') +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamGaji">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan Gaji" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 780);
+
+  var borang = $("#borangGaji", m.el);
+
+  function bacaBaris(kelas) {
+    return $$("[data-" + kelas + "]", m.el).map(function (b) {
+      return { nama: $("." + kelas + "Nama", b).value.trim(), jumlah: nom($("." + kelas + "Jumlah", b).value) };
+    }).filter(function (x) { return x.nama || x.jumlah; });
+  }
+  function rekodSemasa() {
+    var v = ambilNilai(borang);
+    return Object.assign({}, r, v, {
+      gajiPokok: nom(v.gajiPokok), komisen: nom(v.komisen), elaunSite: nom(v.elaunSite),
+      epfPekerja: nom(v.epfPekerja), socsoPekerja: nom(v.socsoPekerja), eisPekerja: nom(v.eisPekerja),
+      pcb: nom(v.pcb), epfMajikan: nom(v.epfMajikan), socsoMajikan: nom(v.socsoMajikan),
+      eisMajikan: nom(v.eisMajikan),
+      elaun: bacaBaris("elaun"), tambahan: bacaBaris("tambahan"), potongan: bacaBaris("potongan"),
+      claim: r.claim || []
+    });
+  }
+  function kiraPapar() {
+    var k = kiraGaji(rekodSemasa());
+    $("#pGKasar", m.el).textContent = rm(k.kasar);
+    $("#pGPotong", m.el).textContent = rm(k.jumlahPotongan);
+    $("#pGClaim", m.el).textContent = rm(k.claim);
+    $("#pGBersih", m.el).textContent = rm(k.bersih);
+    $("#pGKos", m.el).textContent = rm(k.kosMajikan);
+  }
+  function pasangBuang() {
+    ["elaun", "tambahan", "potongan"].forEach(function (kelas) {
+      $$("[data-buang-" + kelas + "]", m.el).forEach(function (b) {
+        b.onclick = function () { b.parentElement.remove(); kiraPapar(); };
+      });
+    });
+  }
+  pasangBuang();
+  kiraPapar();
+  borang.addEventListener("input", kiraPapar);
+
+  [["btnTambahElaun", "senaraiElaun", "elaun", "Elaun"],
+   ["btnTambahTambahan", "senaraiTambahan", "tambahan", "Perkara"],
+   ["btnTambahPotongan", "senaraiPotongan", "potongan", "Perkara"]].forEach(function (x) {
+    $("#" + x[0], m.el).onclick = function () {
+      $("#" + x[1], m.el).insertAdjacentHTML("beforeend", barisWang(x[2], {}, x[3], "Jumlah (RM)"));
+      pasangBuang();
+      kiraPapar();
+    };
+  });
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  if ($("#btnPadamGaji", m.el)) {
+    $("#btnPadamGaji", m.el).onclick = function () {
+      sahkan("Padam rekod gaji ini?").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.gaji = d.gaji.filter(function (x) { return x.id !== gajiId; });
+        simpan(d);
+        m.tutup();
+        toast("Rekod gaji dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var rekod = rekodSemasa();
+    if (!rekod.bulan) return toast("Sila pilih bulan.", "bad");
+    var d = baca();
+    if (!gajiId && d.gaji.some(function (x) {
+      return x.stafId === rekod.stafId && x.bulan === rekod.bulan;
+    })) {
+      return toast("Gaji " + rekod.nama + " untuk " + fmtBulan(rekod.bulan) + " sudah ada.", "bad", 6000);
+    }
+    rekod.id = gajiId || id();
+    rekod.no = r.no || nomborSlipBaharu(d).no;
+    rekod.bank = stafRekod.bank || "";
+    rekod.noAkaun = stafRekod.noAkaun || "";
+    rekod.noKp = stafRekod.noKp || "";
+    rekod.noKwsp = stafRekod.noKwsp || "";
+    rekod.noPerkeso = stafRekod.noPerkeso || "";
+    rekod.syarikat = r.syarikat || JSON.parse(JSON.stringify(d.tetapan.resit));
+    rekod.notaSlip = r.notaSlip || tetapanGaji(d).notaSlip;
+    rekod.createdAt = r.createdAt || new Date().toISOString();
+    rekod.updatedAt = new Date().toISOString();
+    if (gajiId) d.gaji = d.gaji.map(function (x) { return x.id === gajiId ? rekod : x; });
+    else {
+      d.gaji.push(rekod);
+      var padanan = String(rekod.no).match(/(\d+)\s*$/);
+      if (padanan) d.tetapan.gaji.nomborSlip = parseInt(padanan[1], 10) + 1;
+    }
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(gajiId ? "Rekod gaji dikemas kini." : "Gaji direkod: " + rm(kiraGaji(rekod).bersih), "ok", 5000);
+    lukis();
+  };
+}
+
+// Tanda gaji sudah dibayar: rekod perbelanjaan + tanda claim sudah bayar.
+function bayarGaji(gajiId) {
+  var data = baca();
+  var r = data.gaji.filter(function (x) { return x.id === gajiId; })[0];
+  if (!r) return;
+  if (r.status === "Dibayar") {
+    return sahkan("Buka semula rekod gaji ini? Rekod perbelanjaan berkaitan akan dibuang.")
+      .then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.gaji = d.gaji.map(function (x) {
+          if (x.id === gajiId) { x.status = "Diluluskan"; x.tarikhBayar = ""; }
+          return x;
+        });
+        d.belanja = d.belanja.filter(function (b) { return b.gajiId !== gajiId; });
+        simpan(d);
+        toast("Rekod gaji dibuka semula.", "ok");
+        lukis();
+      });
+  }
+
+  var k = kiraGaji(r);
+  var m = modal("Bayar Gaji — " + r.nama,
+    '<div class="jumlah-baris"><span>Gaji kasar</span><b>' + esc(rm(k.kasar)) + "</b></div>" +
+    '<div class="jumlah-baris"><span>Potongan</span><b>' + esc(rm(k.jumlahPotongan)) + "</b></div>" +
+    '<div class="jumlah-baris"><span>Bayar balik claim</span><b>' + esc(rm(k.claim)) + "</b></div>" +
+    '<div class="jumlah-baris" style="margin-bottom:14px"><span><b>Jumlah dibayar</b></span><b>' +
+      esc(rm(k.bersih)) + "</b></div>" +
+    '<form id="borangBayarGaji">' +
+      '<div class="baris-medan">' +
+        medan("Tarikh Bayar", '<input type="date" name="tarikhBayar" value="' + esc(kunciTarikh()) + '">') +
+        medan("Kaedah", '<input list="senaraiKaedahGaji" name="kaedah" value="Bank Transfer">') +
+        medan("No. Rujukan", '<input type="text" name="rujukan" value="">') +
+      "</div>" +
+      '<datalist id="senaraiKaedahGaji">' + KAEDAH_BELANJA.map(function (x) {
+        return "<option>" + esc(x) + "</option>";
+      }).join("") + "</datalist>" +
+      kotakLampiran("failGaji", null, "Bukti Pembayaran") +
+      '<p class="kecil">Sistem akan merekod perbelanjaan <b>Gaji &amp; Elaun</b> sebanyak ' +
+      esc(rm(k.kasar + k.carumanMajikan)) + " (gaji kasar + caruman majikan) dan menanda " +
+      ((r.claim || []).length ? (r.claim.length + " claim staf sebagai sudah dibayar.") :
+        "tiada claim untuk ditanda.") + "</p>" +
+      '<div class="baris-butang modal-kaki">' +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">Tanda Dibayar</button>' +
+      "</div>" +
+    "</form>", 600);
+
+  var kotak = {};
+  pasangLampiran($("#failGaji", m.el), kotak);
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#borangBayarGaji", m.el).onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai($("#borangBayarGaji", m.el));
+    simpanLampiranBaharu(kotak.fail).then(function (meta) {
+      var d = baca();
+      var rekod = d.gaji.filter(function (x) { return x.id === gajiId; })[0];
+      rekod.status = "Dibayar";
+      rekod.tarikhBayar = v.tarikhBayar || kunciTarikh();
+      rekod.kaedah = v.kaedah;
+      rekod.rujukan = v.rujukan;
+      if (meta) rekod.lampiran = meta;
+      rekod.updatedAt = new Date().toISOString();
+
+      // Claim yang termasuk dalam slip ditanda sudah dibayar (elak dikira dua kali).
+      (rekod.claim || []).forEach(function (c) {
+        d.belanja = d.belanja.map(function (b) {
+          if (b.id === c.id) { b.statusClaim = "Sudah Bayar"; b.tarikhBayar = rekod.tarikhBayar; }
+          return b;
+        });
+      });
+
+      // Rekod perbelanjaan gaji (claim tidak dimasukkan kerana sudah direkod sendiri).
+      var kk = kiraGaji(rekod);
+      d.belanja.push({
+        id: id(), gajiId: rekod.id, tarikh: rekod.tarikhBayar, jenis: "Syarikat",
+        jumlah: Math.round((kk.kasar + kk.carumanMajikan) * 100) / 100,
+        kategori: "Gaji & Elaun", saluran: "", pembekal: "",
+        perkara: "Gaji " + rekod.nama + " — " + fmtBulan(rekod.bulan),
+        kaedah: v.kaedah, rujukan: v.rujukan, staf: rekod.nama, statusClaim: "",
+        tarikhBayar: rekod.tarikhBayar, cukai: true,
+        nota: "Gaji kasar " + rm(kk.kasar) + " + caruman majikan " + rm(kk.carumanMajikan),
+        lampiran: meta || null, createdAt: new Date().toISOString()
+      });
+
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Gaji " + rekod.nama + " ditanda dibayar.", "ok", 5000);
+      lukis();
+    }).catch(function (err) { toast("Gagal simpan: " + err.message, "bad", 6000); });
+  };
+}
+
+/* --------------------------- slip gaji A4 ----------------------------- */
+
+function htmlSlipGaji(r) {
+  var c = r.syarikat || TETAPAN_ASAL.resit;
+  var k = kiraGaji(r);
+  var barisJumlah = function (label, nilai, tebal) {
+    return "<tr><td>" + (tebal ? "<b>" + esc(label) + "</b>" : esc(label)) + "</td>" +
+      "<td style='width:130px;text-align:right'>" +
+      (tebal ? "<b>" + esc(rm(nilai)) + "</b>" : esc(rm(nilai))) + "</td></tr>";
+  };
+
+  var pendapatan = [["Gaji Pokok", r.gajiPokok]]
+    .concat((r.elaun || []).map(function (x) { return [x.nama || "Elaun", x.jumlah]; }))
+    .concat(nom(r.komisen) ? [["Komisen Jualan", r.komisen]] : [])
+    .concat(nom(r.elaunSite) ? [["Elaun Site / Inspection", r.elaunSite]] : [])
+    .concat((r.tambahan || []).map(function (x) { return [x.nama || "Tambahan", x.jumlah]; }));
+
+  var potongan = []
+    .concat(nom(r.epfPekerja) ? [["KWSP (Pekerja)", r.epfPekerja]] : [])
+    .concat(nom(r.socsoPekerja) ? [["PERKESO (Pekerja)", r.socsoPekerja]] : [])
+    .concat(nom(r.eisPekerja) ? [["EIS (Pekerja)", r.eisPekerja]] : [])
+    .concat(nom(r.pcb) ? [["PCB / Cukai", r.pcb]] : [])
+    .concat((r.potongan || []).map(function (x) { return [x.nama || "Potongan", x.jumlah]; }));
+
+  return '<div class="resit">' +
+    '<div class="resit-kepala">' +
+      (c.logoUrl ? '<img src="' + esc(c.logoUrl) + '" alt="Logo" crossorigin="anonymous" referrerpolicy="no-referrer">' : "<div></div>") +
+      '<div class="resit-syarikat"><h2>' + esc(c.namaSyarikat) + "</h2>" +
+        esc(c.alamat) + "\n" + (c.email ? "Email: " + esc(c.email) + "\n" : "") +
+        (c.ssm ? "SSM: " + esc(c.ssm) : "") + "</div>" +
+    "</div>" +
+
+    '<div class="resit-tajuk"><h2>SLIP GAJI</h2>' +
+      '<div class="kanan"><b>No:</b> ' + esc(r.no || "-") + "<br><b>Bulan:</b> " +
+      esc(fmtBulan(r.bulan)) + (r.tarikhBayar ? "<br><b>Tarikh bayar:</b> " +
+      esc(fmtTarikh(r.tarikhBayar)) : "") + "</div>" +
+    "</div>" +
+
+    '<table style="margin-top:12px"><tr>' +
+      "<td style='width:50%'><b>Pekerja:</b><br>" + esc(r.nama) +
+        (r.jawatan ? "<br>" + esc(r.jawatan) : "") +
+        (r.noKp ? "<br>No. KP: " + esc(r.noKp) : "") + "</td>" +
+      "<td><b>Bayaran:</b><br>" +
+        (r.bank ? esc(r.bank) + "<br>" : "") +
+        (r.noAkaun ? "Akaun: " + esc(r.noAkaun) + "<br>" : "") +
+        (r.noKwsp ? "No. KWSP: " + esc(r.noKwsp) + "<br>" : "") +
+        (r.noPerkeso ? "No. PERKESO: " + esc(r.noPerkeso) : "") + "</td>" +
+    "</tr></table>" +
+
+    '<div class="resit-seksyen">Pendapatan</div>' +
+    "<table>" + pendapatan.map(function (x) { return barisJumlah(x[0], x[1]); }).join("") +
+      barisJumlah("JUMLAH PENDAPATAN", k.kasar, true) + "</table>" +
+
+    '<div class="resit-seksyen">Potongan</div>' +
+    "<table>" + (potongan.length
+      ? potongan.map(function (x) { return barisJumlah(x[0], x[1]); }).join("")
+      : "<tr><td>Tiada potongan</td><td style='text-align:right'>RM 0.00</td></tr>") +
+      barisJumlah("JUMLAH POTONGAN", k.jumlahPotongan, true) + "</table>" +
+
+    ((r.claim || []).length
+      ? '<div class="resit-seksyen">Bayaran Balik Claim</div>' +
+        "<table>" + r.claim.map(function (x) {
+          return barisJumlah(x.perkara + " (" + fmtTarikh(x.tarikh) + ")", x.jumlah);
+        }).join("") + barisJumlah("JUMLAH CLAIM", k.claim, true) + "</table>"
+      : "") +
+
+    '<table style="margin-top:14px"><tr>' +
+      "<td style='background:#f1f5f9'><b>GAJI BERSIH DIBAYAR</b></td>" +
+      "<td style='width:150px;text-align:right;background:#f1f5f9;font-size:15px'><b>" +
+      esc(rm(k.bersih)) + "</b></td></tr></table>" +
+
+    '<div class="resit-seksyen">Caruman Majikan</div>' +
+    "<table>" +
+      (nom(r.epfMajikan) ? barisJumlah("KWSP (Majikan)", r.epfMajikan) : "") +
+      (nom(r.socsoMajikan) ? barisJumlah("PERKESO (Majikan)", r.socsoMajikan) : "") +
+      (nom(r.eisMajikan) ? barisJumlah("EIS (Majikan)", r.eisMajikan) : "") +
+      barisJumlah("JUMLAH CARUMAN MAJIKAN", k.carumanMajikan, true) +
+    "</table>" +
+
+    (r.nota ? '<p style="margin-top:12px;font-size:12.5px"><b>Nota:</b> ' + esc(r.nota) + "</p>" : "") +
+    '<p style="margin-top:10px;font-size:11.5px;color:#6b7280">' +
+      esc(r.notaSlip || TETAPAN_ASAL.gaji.notaSlip) + "</p>" +
+
+    '<div class="resit-tandatangan">' +
+      (c.tandatanganUrl ? '<img src="' + esc(c.tandatanganUrl) + '" alt="Signature" crossorigin="anonymous" referrerpolicy="no-referrer"><br>' : "") +
+      "<b>" + esc(c.namaPenandatangan) + "</b><br>" + esc(c.jawatanPenandatangan) +
+    "</div>" +
+    '<p class="resit-tengah" style="font-size:11px;color:#6b7280">' +
+      esc(c.namaSyarikat) + " · Slip ini dijana secara automatik dan sah tanpa tandatangan.</p>" +
+  "</div>";
+}
+
+function cetakSlip(gajiId) {
+  var data = baca();
+  var r = data.gaji.filter(function (x) { return x.id === gajiId; })[0];
+  if (!r) return;
+  var kertas = $("#kertasResit");
+  kertas.innerHTML = htmlSlipGaji(r);
+  document.body.classList.add("cetak-resit");
+  var selesai = function () {
+    document.body.classList.remove("cetak-resit");
+    kertas.innerHTML = "";
+    window.removeEventListener("afterprint", selesai);
+  };
+  window.addEventListener("afterprint", selesai);
+  tungguGambar(kertas, function () {
+    try { window.print(); } catch (e) { toast("Pelayar tidak dapat membuka dialog cetak.", "bad"); }
+    setTimeout(selesai, 800);
+  });
+}
+
+function lihatSlip(gajiId) {
+  var data = baca();
+  var r = data.gaji.filter(function (x) { return x.id === gajiId; })[0];
+  if (!r) return;
+  var k = kiraGaji(r);
+  var m = modal("Slip Gaji — " + r.nama + " · " + fmtBulan(r.bulan),
+    '<div class="baris-medan" style="margin-bottom:8px">' +
+      medan("Status", '<div style="padding-top:8px"><span class="badge badge-' +
+        (r.status === "Dibayar" ? "ok" : (r.status === "Diluluskan" ? "warn" : "muted")) + '">' +
+        esc(r.status) + "</span></div>") +
+      medan("Gaji Bersih", '<div style="padding-top:8px"><b>' + esc(rm(k.bersih)) + "</b></div>") +
+      medan("Kos Majikan", '<div style="padding-top:8px">' + esc(rm(k.kosMajikan)) + "</div>") +
+    "</div>" +
+    '<div class="pratonton">' + htmlSlipGaji(r) + "</div>" +
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-bad" id="btnPadamSlip">Padam</button>' +
+      '<button type="button" class="btn btn-lembut" id="btnSuntingSlip">Sunting</button>' +
+      (r.status === "Dibayar"
+        ? '<button type="button" class="btn btn-lembut" id="btnBayarSlip">Buka Semula</button>'
+        : '<button type="button" class="btn btn-ok" id="btnBayarSlip">Tanda Dibayar</button>') +
+      '<button type="button" class="btn btn-utama" id="btnCetakSlip">Cetak / PDF</button>' +
+    "</div>", 800);
+
+  $("#btnCetakSlip", m.el).onclick = function () { cetakSlip(gajiId); };
+  $("#btnSuntingSlip", m.el).onclick = function () { m.tutup(); borangGaji(gajiId); };
+  $("#btnBayarSlip", m.el).onclick = function () { m.tutup(); bayarGaji(gajiId); };
+  $("#btnPadamSlip", m.el).onclick = function () {
+    sahkan("Padam slip gaji ini?").then(function (ya) {
+      if (!ya) return;
+      var d = baca();
+      d.gaji = d.gaji.filter(function (x) { return x.id !== gajiId; });
+      d.belanja = d.belanja.filter(function (b) { return b.gajiId !== gajiId; });
+      simpan(d);
+      m.tutup();
+      toast("Slip gaji dipadam.", "ok");
+      lukis();
+    });
+  };
+}
+
+function janaGajiSemua(bulan) {
+  var data = baca();
+  var aktif = data.staf.filter(function (x) { return x.status === "aktif"; });
+  var perlu = aktif.filter(function (s) {
+    return !data.gaji.some(function (g) { return g.stafId === s.id && g.bulan === bulan; });
+  });
+  if (!perlu.length) return toast("Semua staf aktif sudah ada rekod gaji untuk bulan ini.", "warn", 5000);
+  sahkan("Jana gaji " + fmtBulan(bulan) + " untuk " + perlu.length + " staf? " +
+    "Semua nombor boleh diubah selepas ini.").then(function (ya) {
+    if (!ya) return;
+    var d = baca();
+    perlu.forEach(function (s) {
+      var rekod = cadangGaji(d, s, bulan);
+      rekod.id = id();
+      rekod.no = nomborSlipBaharu(d).no;
+      rekod.bank = s.bank || ""; rekod.noAkaun = s.noAkaun || ""; rekod.noKp = s.noKp || "";
+      rekod.noKwsp = s.noKwsp || ""; rekod.noPerkeso = s.noPerkeso || "";
+      rekod.syarikat = JSON.parse(JSON.stringify(d.tetapan.resit));
+      rekod.notaSlip = tetapanGaji(d).notaSlip;
+      rekod.createdAt = new Date().toISOString();
+      d.gaji.push(rekod);
+      d.tetapan.gaji.nomborSlip = nom(d.tetapan.gaji.nomborSlip) + 1;
+    });
+    if (!simpan(d)) return;
+    toast(perlu.length + " rekod gaji dijana. Semak dan ubah jika perlu.", "ok", 6000);
+    lukis();
+  });
+}
+
+function lukisGaji(bekas) {
+  var data = baca();
+  var bulan = gajiBulan || bulanKini();
+  var teks = gajiCari.trim().toLowerCase();
+  var semua = (data.gaji || []).filter(function (g) { return g.bulan === bulan; });
+  var senarai = semua.filter(function (g) {
+    if (!teks) return true;
+    return [g.nama, g.jawatan, g.no].join(" ").toLowerCase().indexOf(teks) !== -1;
+  }).sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); });
+
+  var jum = semua.reduce(function (t, g) {
+    var k = kiraGaji(g);
+    t.kasar += k.kasar; t.potongan += k.jumlahPotongan; t.bersih += k.bersih;
+    t.claim += k.claim; t.kos += k.kosMajikan;
+    if (g.status === "Dibayar") t.dibayar += k.bersih; else t.belum += k.bersih;
+    return t;
+  }, { kasar: 0, potongan: 0, bersih: 0, claim: 0, kos: 0, dibayar: 0, belum: 0 });
+
+  var aktif = data.staf.filter(function (x) { return x.status === "aktif"; });
+  var belumJana = aktif.filter(function (s) {
+    return !semua.some(function (g) { return g.stafId === s.id; });
+  });
+
+  bekas.innerHTML =
+    '<div class="grid grid-4">' +
+      kadStat("Gaji Bersih " + fmtBulan(bulan), rm(jum.bersih), semua.length + " staf") +
+      kadStat("Belum Dibayar", rm(jum.belum),
+        semua.filter(function (g) { return g.status !== "Dibayar"; }).length + " slip") +
+      kadStat("Jumlah Potongan", rm(jum.potongan), "KWSP, PERKESO, EIS, PCB") +
+      kadStat("Kos Majikan", rm(jum.kos), "gaji + caruman + claim") +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Gaji ' + esc(fmtBulan(bulan)) + "</h3>" +
+        '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnJanaGaji">Jana Gaji Semua Staf</button>' +
+          '<button class="btn btn-lembut" id="btnEksportGaji">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<p class="kecil" style="margin:-4px 0 12px">Sistem mencadangkan gaji pokok, elaun tetap, ' +
+      "komisen jualan, elaun site dan claim staf yang belum dibayar. Semua nombor boleh diubah " +
+      "sebelum slip dikeluarkan." +
+      (belumJana.length ? " <b>" + belumJana.length + " staf</b> belum ada rekod gaji bulan ini: " +
+        esc(belumJana.map(function (s) { return s.nama; }).join(", ")) + "." : "") + "</p>" +
+      '<div class="penapis">' +
+        '<label>Bulan<input type="month" id="fBulanGaji" value="' + esc(bulan) + '"></label>' +
+        '<label style="min-width:200px">Cari<input type="search" id="fCariGaji" ' +
+          'placeholder="Nama staf…" value="' + esc(gajiCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetGaji">Reset</button>' +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length
+        ? "<table><thead><tr><th>Staf</th><th class='num'>Kasar</th><th class='num'>Potongan</th>" +
+          "<th class='num'>Claim</th><th class='num'>Bersih</th><th>Status</th><th></th>" +
+          "</tr></thead><tbody>" +
+          senarai.map(function (g) {
+            var k = kiraGaji(g);
+            return "<tr>" +
+              '<td class="bungkus"><b>' + esc(g.nama) + "</b>" +
+                '<div class="kecil">' + esc(g.jawatan || "-") + " · " + esc(g.no || "-") + "</div></td>" +
+              '<td class="num">' + esc(rm(k.kasar)) + "</td>" +
+              '<td class="num">' + esc(rm(k.jumlahPotongan)) + "</td>" +
+              '<td class="num">' + (k.claim ? esc(rm(k.claim)) : '<span class="kecil">-</span>') + "</td>" +
+              '<td class="num"><b>' + esc(rm(k.bersih)) + "</b></td>" +
+              '<td><span class="badge badge-' +
+                (g.status === "Dibayar" ? "ok" : (g.status === "Diluluskan" ? "warn" : "muted")) +
+                '">' + esc(g.status) + "</span>" +
+                (g.tarikhBayar ? '<div class="kecil">' + esc(fmtTarikh(g.tarikhBayar)) + "</div>" : "") +
+              "</td>" +
+              '<td><div class="aksi">' +
+                '<button class="btn btn-lembut" data-gaji="' + esc(g.id) + '">Slip</button>' +
+                (g.status === "Dibayar"
+                  ? '<button class="btn btn-lembut" data-gajibayar="' + esc(g.id) + '">Buka Semula</button>'
+                  : '<button class="btn btn-ok" data-gajibayar="' + esc(g.id) + '">Bayar</button>') +
+              "</div></td></tr>";
+          }).join("") + "</tbody></table>"
+        : kosong("Belum ada rekod gaji untuk bulan ini. Tekan “Jana Gaji Semua Staf”.")) +
+      "</div>" +
+      (belumJana.length
+        ? '<div class="tajuk-seksyen">Jana Satu-satu</div><div class="senarai-cuti">' +
+          belumJana.map(function (s) {
+            return '<button type="button" class="btn btn-lembut btn-kecil" data-gajistaf="' +
+              esc(s.id) + '">+ ' + esc(s.nama) + "</button>";
+          }).join("") + "</div>"
+        : "") +
+    "</div>";
+
+  $("#btnJanaGaji").onclick = function () { janaGajiSemua(bulan); };
+  $("#fBulanGaji").onchange = function (e) { gajiBulan = e.target.value; lukisGaji(bekas); };
+  $("#btnResetGaji").onclick = function () { gajiBulan = ""; gajiCari = ""; lukisGaji(bekas); };
+  var kotak = $("#fCariGaji");
+  kotak.oninput = function (e) {
+    gajiCari = e.target.value;
+    clearTimeout(kotak._t);
+    kotak._t = setTimeout(function () {
+      lukisGaji(bekas);
+      var b2 = $("#fCariGaji");
+      if (b2) { b2.focus(); b2.setSelectionRange(b2.value.length, b2.value.length); }
+    }, 260);
+  };
+  $("#btnEksportGaji").onclick = function () {
+    csv("gaji-" + bulan,
+      ["Staf", "Jawatan", "No. Slip", "Gaji Pokok", "Elaun", "Komisen", "Elaun Site", "Tambahan",
+       "Gaji Kasar", "KWSP Pekerja", "PERKESO Pekerja", "EIS Pekerja", "PCB", "Potongan Lain",
+       "Jumlah Potongan", "Claim", "Gaji Bersih", "KWSP Majikan", "PERKESO Majikan", "EIS Majikan",
+       "Kos Majikan", "Status", "Tarikh Bayar"],
+      senarai.map(function (g) {
+        var k = kiraGaji(g);
+        return [g.nama, g.jawatan, g.no, nom(g.gajiPokok), k.elaun, nom(g.komisen), nom(g.elaunSite),
+                k.tambahan, k.kasar, nom(g.epfPekerja), nom(g.socsoPekerja), nom(g.eisPekerja),
+                nom(g.pcb), k.potonganLain, k.jumlahPotongan, k.claim, k.bersih,
+                nom(g.epfMajikan), nom(g.socsoMajikan), nom(g.eisMajikan), k.kosMajikan,
+                g.status, g.tarikhBayar];
+      }));
+  };
+  $$("[data-gaji]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatSlip(b.getAttribute("data-gaji")); };
+  });
+  $$("[data-gajibayar]", bekas).forEach(function (b) {
+    b.onclick = function () { bayarGaji(b.getAttribute("data-gajibayar")); };
+  });
+  $$("[data-gajistaf]", bekas).forEach(function (b) {
+    b.onclick = function () { borangGaji(null, b.getAttribute("data-gajistaf"), bulan); };
+  });
+}
+
 var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -9235,6 +10174,7 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  gaji: '<svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 6.5C17 4.6 14.8 3.5 12 3.5S7 4.6 7 6.5s2.2 2.8 5 3.3 5 1.4 5 3.4-2.2 3.3-5 3.3-5-1.1-5-3"/></svg>',
   pasukan: '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M2.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 14.5a4.5 4.5 0 0 1 5.5 4.5"/></svg>',
   belanja: '<svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 14h3"/></svg>',
   marketing: '<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg>',
@@ -9261,6 +10201,7 @@ var HALAMAN = [
   { id: "alat",    label: "Alat & Stok",  ikon: IKON.alat,    lukis: lukisAlat },
   { id: "komitmen", label: "Komitmen",    ikon: IKON.komitmen, lukis: lukisKomitmen },
   { id: "belanja", label: "Perbelanjaan", ikon: IKON.belanja, lukis: lukisBelanja },
+  { id: "gaji",    label: "Gaji",         ikon: IKON.gaji,    lukis: lukisGaji },
   { id: "todo",    label: "To Do",        ikon: IKON.todo,    lukis: lukisTugas },
   { id: "pasukan", label: "Team",         ikon: IKON.pasukan, lukis: lukisPasukan },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
@@ -9280,6 +10221,7 @@ var MENU = [
            { id: "belanja", sub: "semua", label: "Perbelanjaan" },
            { id: "belanja", sub: "marketing", label: "Marketing" },
            { id: "belanja", sub: "claim", label: "Claim Staf" },
+           { id: "gaji" },
            { id: "komitmen" }] },
   { kumpulan: "aset", label: "Aset & Stok", ikon: IKON.alat,
     anak: [{ id: "alat", sub: "alat", label: "Alat" },

@@ -19,7 +19,7 @@ Sale and Schedule
 Operasi
 Sub Job
 Tool ▸ Quotation · Invois · Resit
-Kewangan ▸ Tunggakan · Perbelanjaan · Marketing · Claim Staf · Komitmen
+Kewangan ▸ Tunggakan · Perbelanjaan · Marketing · Claim Staf · Gaji · Komitmen
 Aset & Stok ▸ Alat · Sticker & Bahan · Calibration Tool
 To Do
 Team & Staf ▸ Team · Staf
@@ -42,6 +42,7 @@ ditutup, nombor itu naik ke tajuk kumpulan.
 | **Tunggakan** | Semua baki yang belum dikutip — jualan, sub job dan invois manual — disusun ikut umur hutang, dengan butang kejar bayaran WhatsApp |
 | **Alat & Stok** | Tiga tab: Alat (siapa ambil, siapa pulang), Sticker & Bahan Pakai, dan Calibration Tool (sijil SIRIM & tarikh luput) |
 | **Perbelanjaan** | Semua duit keluar: perbelanjaan syarikat, marketing (Ads, campaign, flyers) dan claim staf — dengan resit |
+| **Gaji** | Payroll bulanan: gaji pokok, elaun, komisen, elaun site, claim staf, potongan KWSP/PERKESO/EIS/PCB dan slip gaji A4 |
 | **Komitmen** | Transport, pinjaman dan komitmen bulanan lain — bila kena bayar, sudah bayar atau belum |
 | **To Do** | Senarai kerja: apa perlu buat, siapa buat, bila kena siap, boleh berulang |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
@@ -507,8 +508,27 @@ dieksport ke CSV.
 Menu **Team & Staf → Team** untuk set up pasukan kerja.
 
 Setiap team ada: **nama team**, **ketua**, **ahli** (tandakan dari senarai staf —
-tidak wajib, nama team sahaja pun boleh), **alat kit team** (alat yang team ini
-pegang tetap), status aktif dan nota.
+tidak wajib, nama team sahaja pun boleh), **kit team**, **kenderaan team**,
+status aktif dan nota.
+
+### Kit team menolak stok
+
+Dalam borang team, bahagian **Kit Team** ialah senarai barang + kuantiti.
+Pilihannya termasuk **semua barang** dalam Alat & Stok — alat mahupun bahan
+pakai seperti sticker. Setiap pilihan menunjukkan berapa banyak lagi *di rak*.
+
+Bila disimpan, barang itu **ditolak dari stok** — ia dikira sedang dipegang
+team tersebut, dan masuk dalam sejarah barang sebagai *Ambil (Kit Team)*.
+Kurangkan kuantiti atau buang baris untuk **pulangkan** semula ke stok
+(*Pulang (Kit Team)* dalam sejarah). Kuantiti yang melebihi baki di rak akan
+dihadkan automatik dan sistem beritahu berapa yang sebenarnya boleh diambil.
+
+Untuk barang yang memang sentiasa berada dalam kit (contoh tangga 2 unit yang
+dua-duanya sentiasa keluar), tandakan **Abaikan amaran stok** pada barang itu
+supaya baki 0 tidak keluar sebagai amaran.
+
+**Kenderaan team** diambil dari Kewangan → Komitmen → Transport (kenderaan
+tidak menolak stok kerana ia bukan barang stok).
 
 Bila staf ambil alat, borang **Ambil** ada pilihan **Untuk Team**. Kalau nama
 staf itu sudah ada dalam sesuatu team, team itu dipilih automatik. Sejarah alat
@@ -627,6 +647,54 @@ kalau ada claim belum dibayar.
 Tekan **Eksport CSV** — fail mengandungi tarikh, kategori, perkara, pembekal,
 jumlah, cara bayar, no. rujukan, penanda *boleh tuntut cukai* dan nama fail
 resit. Resit sebenar disimpan dalam sistem dan ikut dalam backup.
+
+## Gaji
+
+Menu **Kewangan → Gaji** untuk payroll bulanan.
+
+### Sediakan maklumat staf dahulu
+
+Dalam **Team & Staf → Staf**, setiap staf ada bahagian *Maklumat Gaji*:
+gaji pokok, **komisen jualan (%)**, **elaun site (RM/site)**, elaun tetap
+(nama | jumlah), bank, no. akaun, no. KP, no. KWSP, no. PERKESO, dan
+tanda caruman KWSP / PERKESO / EIS.
+
+### Jana gaji
+
+Tekan **Jana Gaji Semua Staf** untuk bulan berkenaan. Sistem mencadangkan:
+
+| Baris | Dari mana |
+|---|---|
+| Gaji pokok & elaun tetap | Rekod staf |
+| Komisen jualan | Jualan bulan itu yang *Closed By* staf tersebut × peratus komisen |
+| Elaun site | Bilangan site staf itu ditugaskan × kadar seunit |
+| Claim staf | Semua claim **belum bayar** staf itu (dari menu Claim Staf) |
+| KWSP / PERKESO / EIS | Peratus dalam Tetapan → Gaji |
+
+Semua nombor **boleh diubah** sebelum slip dikeluarkan, dan boleh tambah
+baris sendiri untuk OT, bonus, pendahuluan gaji atau potongan lain.
+
+> **Penting:** KWSP, PERKESO dan EIS sebenarnya mengikut **jadual rasmi**
+> ikut julat gaji. Sistem hanya mengira **anggaran peratus** — sila semak
+> dengan jadual rasmi dan betulkan jumlah pada slip jika berbeza.
+
+### Slip gaji
+
+Tekan **Slip** untuk pratonton slip A4 (logo, maklumat pekerja, pendapatan,
+potongan, bayaran balik claim, gaji bersih, caruman majikan, tandatangan) dan
+**Cetak / PDF** untuk simpan atau cetak.
+
+### Bila ditanda dibayar
+
+Tekan **Bayar** → isi tarikh, kaedah, rujukan dan boleh lampirkan bukti bayaran.
+Sistem kemudian:
+
+- Tanda semua **claim** dalam slip itu sebagai *Sudah Bayar*
+- Rekod satu **perbelanjaan** kategori *Gaji & Elaun* bersamaan
+  **gaji kasar + caruman majikan** — jadi ia masuk kiraan duit keluar
+  (claim tidak dikira dua kali kerana sudah direkod semasa claim dibuat)
+
+Eksport CSV disediakan untuk penyata gaji bulanan.
 
 ## Komitmen
 
