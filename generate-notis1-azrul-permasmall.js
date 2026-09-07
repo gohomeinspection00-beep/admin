@@ -283,7 +283,7 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Perhatian khusus diberikan kepada item No. 138, 178 dan 195 — kelembapan tinggi akibat resapan air dari dinding luar dikesan di TIGA bilik berasingan (Bedroom 1, 2 dan 3), berserta kebocoran siling (item No. 180). Ini menunjukkan kegagalan sistem kalis air / dinding luar bangunan. Kami menuntut agar pihak tuan menyiasat dan membaiki PUNCA resapan air dari bahagian luar bangunan, dan bukan sekadar kerja kemasan semula pada permukaan dalaman unit.`
+  `Perhatian khusus diberikan kepada item No. 138, 178 dan 195 — kelembapan tinggi akibat resapan air dari dinding luar dikesan di TIGA bilik berasingan (Bedroom 1, 2 dan 3), berserta kebocoran siling (item No. 180). Ini menunjukkan kegagalan sistem kalis air / dinding luar bangunan. Kami menuntut agar pihak tuan menyiasat dan membaiki PUNCA resapan air dari bahagian luar bangunan, dan bukan sekadar kerja kemasan semula pada permukaan dalaman unit. Selain itu, unit ini turut mempunyai banyak isu ketidakjajaran (alignment issues) pada dinding dan kemasan di beberapa lokasi; pihak tuan dituntut memperbetulkan kesemua permukaan dinding dan kemasan yang tidak sejajar mengikut piawaian kerja yang sepatutnya.`
 );
 y += 4;
 
