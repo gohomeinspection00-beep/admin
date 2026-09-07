@@ -482,6 +482,7 @@ var TETAPAN_ASAL = {
   targetBulan: {},                            // { "2026-09": 20000 } — ganti target bulan tertentu
   kategoriAlat: ["Alat Ukur", "Alat Tangan", "Elektrik", "Bahan Habis", "Keselamatan"],
   amaran: { kalibrasi: 30, komitmen: 7, tugasan: 3 },
+  waktuKerja: { mula: "9.00am", tamat: "6.00pm", toleransi: 15, jamSehari: 8 },
   gaji: {
     epfPekerja: 11, epfMajikan: 13, epfMajikanTinggi: 12,
     socsoPekerja: 0.5, socsoMajikan: 1.75,
@@ -631,6 +632,7 @@ function baca() {
   mentah.tetapan.targetBulan = mentah.tetapan.targetBulan || {};
   mentah.tetapan.kategoriAlat = mentah.tetapan.kategoriAlat || TETAPAN_ASAL.kategoriAlat.slice();
   mentah.tetapan.amaran = Object.assign({}, TETAPAN_ASAL.amaran, mentah.tetapan.amaran || {});
+  mentah.tetapan.waktuKerja = Object.assign({}, TETAPAN_ASAL.waktuKerja, mentah.tetapan.waktuKerja || {});
   mentah.tetapan.gaji = Object.assign({}, TETAPAN_ASAL.gaji, mentah.tetapan.gaji || {});
   mentah.tetapan.peruntukan = mentah.tetapan.peruntukan ||
     JSON.parse(JSON.stringify(TETAPAN_ASAL.peruntukan));
@@ -4925,8 +4927,12 @@ function kiraSub(j) {
   var agih = (j.agihan || []).reduce(function (t, a) { return t + nom(a.jumlah); }, 0);
   var dibayar = (j.bayaran || []).reduce(function (t, b) { return t + nom(b.jumlah); }, 0);
   var baki = Math.round((harga - dibayar) * 100) / 100;
+  var agihDibayar = (j.agihan || []).filter(function (a) { return a.dibayar; })
+    .reduce(function (t, a) { return t + nom(a.jumlah); }, 0);
   return {
     harga: harga, agih: agih,
+    agihDibayar: agihDibayar,
+    agihBaki: Math.round((agih - agihDibayar) * 100) / 100,
     syarikat: Math.round((harga - agih) * 100) / 100,
     dibayar: dibayar, baki: baki,
     statusBayar: harga > 0 && baki <= 0.005 ? "lunas" : (dibayar > 0 ? "deposit" : "belum")
@@ -4941,6 +4947,10 @@ function barisAgihan(a, i) {
       esc(a.jumlah !== undefined ? a.jumlah : "") + '">') +
     medan("Peranan / Catatan", '<input type="text" class="agihNota" placeholder="Contoh: buat inspection" value="' +
       esc(a.nota || "") + '">') +
+    medan("Sudah Dibayar", '<label class="chip pilih-chip" style="margin:0"><input type="checkbox" ' +
+      'class="agihBayar"' + (a.dibayar ? " checked" : "") + '><span class="kecil">' +
+      (a.dibayar && a.tarikhBayar ? esc(fmtTarikh(a.tarikhBayar)) : "belum") + "</span></label>") +
+    '<input type="hidden" class="agihTarikhBayar" value="' + esc(a.tarikhBayar || "") + '">' +
     '<button type="button" class="btn-buang-baris" data-buang-baris title="Buang baris">&times;</button>' +
   "</div>";
 }
@@ -5012,9 +5022,13 @@ function borangSubJob(subId, tarikhAsal, awalData) {
 
   function bacaAgihan() {
     return $$("[data-baris]", m.el).map(function (b) {
+      var dibayar = $(".agihBayar", b) ? $(".agihBayar", b).checked : false;
+      var tarikhLama = $(".agihTarikhBayar", b) ? $(".agihTarikhBayar", b).value : "";
       return { nama: $(".agihNama", b).value.trim(),
                jumlah: nom($(".agihJumlah", b).value),
-               nota: $(".agihNota", b).value.trim() };
+               nota: $(".agihNota", b).value.trim(),
+               dibayar: dibayar,
+               tarikhBayar: dibayar ? (tarikhLama || kunciTarikh()) : "" };
     }).filter(function (a) { return a.nama || a.jumlah; });
   }
   function kiraPapar() {
@@ -5122,11 +5136,23 @@ function lihatSubJob(subId) {
     "</dl>" +
     '<div class="tajuk-seksyen">Agihan</div>' +
     '<div class="jumlah-baris"><span>Harga client</span><b>' + esc(rm(k.harga)) + "</b></div>" +
-    (j.agihan || []).map(function (a) {
+    (j.agihan || []).map(function (a, i) {
       return '<div class="jumlah-baris"><span>' + esc(a.nama || "-") +
-        (a.nota ? ' <span class="kecil">' + esc(a.nota) + "</span>" : "") + "</span><b>" +
-        esc(rm(a.jumlah)) + "</b></div>";
+        (a.nota ? ' <span class="kecil">' + esc(a.nota) + "</span>" : "") +
+        '<div class="kecil">' + (a.dibayar
+          ? '<span class="badge badge-ok">Sudah dibayar</span>' +
+            (a.tarikhBayar ? " " + esc(fmtTarikh(a.tarikhBayar)) : "")
+          : '<span class="badge badge-warn">Belum dibayar staf</span>') + "</div></span><span><b>" +
+        esc(rm(a.jumlah)) + "</b> " +
+        '<button type="button" class="btn btn-lembut btn-kecil" data-agihbayar="' + i + '">' +
+        (a.dibayar ? "Buka Semula" : "Tanda Bayar") + "</button></span></div>";
     }).join("") +
+    '<div class="jumlah-baris"><span>Sudah dibayar kepada staf</span><b>' +
+      esc(rm(k.agihDibayar)) + "</b></div>" +
+    (k.agihBaki > 0.005
+      ? '<div class="jumlah-baris"><span>Belum dibayar kepada staf</span><b style="color:var(--bad)">' +
+        esc(rm(k.agihBaki)) + "</b></div>"
+      : "") +
     '<div class="jumlah-baris"><span><b>Bahagian syarikat</b></span><b>' + esc(rm(k.syarikat)) + "</b></div>" +
 
     '<div class="tajuk-seksyen" style="display:flex;justify-content:space-between;align-items:center">' +
@@ -5166,6 +5192,23 @@ function lihatSubJob(subId) {
   });
   $("#btnTutupSub", m.el).onclick = m.tutup;
   $("#btnSuntingSub", m.el).onclick = function () { m.tutup(); borangSubJob(subId); };
+  $$("[data-agihbayar]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      var i = parseInt(b.getAttribute("data-agihbayar"), 10);
+      var d = baca();
+      var rekod = d.subjob.filter(function (x) { return x.id === subId; })[0];
+      var a = (rekod.agihan || [])[i];
+      if (!a) return;
+      a.dibayar = !a.dibayar;
+      a.tarikhBayar = a.dibayar ? kunciTarikh() : "";
+      rekod.updatedAt = new Date().toISOString();
+      if (!simpan(d)) return;
+      m.tutup();
+      toast(a.dibayar ? a.nama + " ditanda sudah dibayar." : "Ditanda belum dibayar.", "ok");
+      lihatSubJob(subId);
+      lukis();
+    };
+  });
   if ($("#btnQuoteSub", m.el)) {
     $("#btnQuoteSub", m.el).onclick = function () { m.tutup(); lihatQuotation(j.quoteId); };
   }
@@ -5260,7 +5303,12 @@ function lukisSubJob(bekas) {
               ? "<b style='color:var(--bad)'>" + esc(rm(k.baki)) + "</b>"
               : '<span class="badge badge-ok">Lunas</span>') + "</td>" +
             '<td class="bungkus kecil">' + ((j.agihan || []).length
-              ? esc(j.agihan.map(function (a) { return a.nama + " " + rmPendek(a.jumlah); }).join(", "))
+              ? esc(j.agihan.map(function (a) {
+                  return a.nama + " " + rmPendek(a.jumlah) + (a.dibayar ? " ✓" : "");
+                }).join(", ")) +
+                (k.agihBaki > 0.005
+                  ? '<div><span class="badge badge-warn">' + esc(rmPendek(k.agihBaki)) +
+                    " belum bayar staf</span></div>" : "")
               : "belum diagih") + "</td>" +
             '<td class="num"><b>' + esc(rm(k.syarikat)) + "</b></td>" +
             "<td>" + lencanaKerja(j.statusKerja, data.tetapan) +
@@ -6028,6 +6076,21 @@ function lukisTetapan(bekas) {
               "</span><b>" + esc(rm(targetBulan(bulan, data))) + "</b></div>" +
             '<div class="jumlah-baris" style="margin-bottom:14px"><span>Hari bekerja bulan ini</span><b>' +
               hariBekerjaBulan(bulan, data) + "</b></div>" +
+            '<div class="tajuk-seksyen">Waktu Kerja Staf</div>' +
+            '<div class="baris-medan">' +
+              medan("Masuk", '<input type="text" name="wkMula" placeholder="9.00am" value="' +
+                esc((t.waktuKerja || {}).mula || "") + '">') +
+              medan("Keluar", '<input type="text" name="wkTamat" placeholder="6.00pm" value="' +
+                esc((t.waktuKerja || {}).tamat || "") + '">') +
+            "</div>" +
+            '<div class="baris-medan">' +
+              medan("Toleransi Lewat (minit)", '<input type="number" min="0" name="wkToleransi" value="' +
+                esc((t.waktuKerja || {}).toleransi || 0) + '">') +
+              medan("Jam Sehari Dijangka", '<input type="number" step="0.5" min="0" name="wkJam" value="' +
+                esc((t.waktuKerja || {}).jamSehari || 8) + '">') +
+            "</div>" +
+            '<p class="kecil" style="margin:-6px 0 12px">Aplikasi staf guna waktu ini untuk ' +
+            "tanda <b>lewat masuk</b> atau <b>keluar awal</b>, dan untuk kira jam kerja bulanan.</p>" +
             '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan</button></div>' +
           "</form>" +
         "</div>" +
@@ -6439,6 +6502,10 @@ function lukisTetapan(bekas) {
       d.tetapan.targetHarian = nom(nilai.targetHarian);
       d.tetapan.hariBekerja = $$(".hariBekerja").filter(function (c) { return c.checked; })
         .map(function (c) { return parseInt(c.value, 10); });
+      d.tetapan.waktuKerja = {
+        mula: nilai.wkMula || "9.00am", tamat: nilai.wkTamat || "6.00pm",
+        toleransi: Math.max(0, nom(nilai.wkToleransi)), jamSehari: nom(nilai.wkJam) || 8
+      };
       if (!simpan(d)) return;
       toast("Tetapan syarikat disimpan.", "ok");
       lukis();
@@ -11149,6 +11216,7 @@ var AKSES_SENARAI = [
   { id: "slip", label: "Lihat slip gaji sendiri", lalai: true },
   { id: "alat", label: "Ambil & pulang alat", lalai: false },
   { id: "telefonClient", label: "Lihat nombor telefon client", lalai: true },
+  { id: "subjob", label: "Lihat sub job sendiri & status bayaran", lalai: true },
   { id: "harga", label: "Lihat harga job & jumlah bayaran", lalai: false }
 ];
 
@@ -11540,6 +11608,8 @@ function pekUntukStaf(data, stafId) {
     jenisPek: "admin", dijana: new Date().toISOString(), untuk: nama,
     tetapan: {
       namaSyarikat: data.tetapan.namaSyarikat,
+      waktuKerja: data.tetapan.waktuKerja,
+      hariBekerja: data.tetapan.hariBekerja,
       kategoriBelanja: data.tetapan.kategoriBelanja,
       statusKerja: data.tetapan.statusKerja,
       gaji: { kadarOt: (data.tetapan.gaji || {}).kadarOt || 15 },
@@ -11570,10 +11640,31 @@ function pekUntukStaf(data, stafId) {
     belanja: (data.belanja || []).filter(function (b) {
       return b.jenis === "Claim Staf" && b.staf === nama;
     }),
+    subjobStaf: akses.subjob
+      ? (data.subjob || []).filter(function (j) {
+          return (j.agihan || []).some(function (a) {
+            return String(a.nama).toLowerCase() === String(nama).toLowerCase();
+          });
+        }).map(function (j) {
+          return { id: j.id, tarikh: j.tarikh, nama: j.nama, projek: j.projek, unit: j.unit,
+                   statusKerja: j.statusKerja, masaMula: j.masaMula, masaTamat: j.masaTamat,
+                   agihan: (j.agihan || []).filter(function (a) {
+                     return String(a.nama).toLowerCase() === String(nama).toLowerCase();
+                   }) };
+        })
+      : [],
     ot: (data.ot || []).filter(function (o) { return o.stafId === stafId || o.nama === nama; }),
     kehadiran: (data.kehadiran || []).filter(function (k) { return k.stafId === stafId; }),
     subjob: [], invois: [], resit: [], quotation: [], komitmen: [], akaun: [],
-    pasukan: [], kalibrasi: [], nota: {}, tanda: {},
+    kalibrasi: [], nota: {}, tanda: {},
+    pasukan: akses.alat
+      ? (data.pasukan || []).filter(function (t) {
+          return t.aktif !== false &&
+            (t.ketua === nama || (t.ahli || []).indexOf(nama) !== -1);
+        }).map(function (t) {
+          return { id: t.id, nama: t.nama, ketua: t.ketua, ahli: t.ahli || [], aktif: t.aktif };
+        })
+      : [],
     lampiranFail: {}
   };
 

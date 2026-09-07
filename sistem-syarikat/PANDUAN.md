@@ -525,7 +525,8 @@ Menu **Team & Staf → Staf** → sunting staf → bahagian **Akaun Aplikasi Sta
 | Hantar claim | Boleh hantar tuntutan + gambar resit |
 | Hantar OT | Boleh hantar rekod OT |
 | Slip gaji | Boleh lihat & cetak slip gaji sendiri |
-| Ambil & pulang alat | Boleh rekod ambil / pulang alat |
+| Ambil & pulang alat | Boleh rekod ambil / pulang alat, termasuk untuk kit team |
+| Lihat sub job sendiri | Boleh lihat sub job dia dan status bayaran bahagian dia |
 | Lihat nombor telefon client | Kalau tidak ditanda, nombor client disembunyikan |
 | **Lihat harga job** | Kalau **tidak** ditanda, staf **tidak nampak** harga atau bayaran langsung |
 
@@ -535,10 +536,49 @@ Menu **Team & Staf → Staf** → sunting staf → bahagian **Akaun Aplikasi Sta
 |---|---|
 | **Hari Ini** | Tugasan hari ini & esok, butang punch besar, senarai perkara menunggu |
 | **Jadual** | Kalendar bulanan tugasan sendiri; tekan tarikh untuk lihat kerja hari itu; butang buka peta & WhatsApp client |
-| **Punch** | Punch masuk / keluar dengan **gambar** dan nota; rekod & jumlah jam bulan itu |
+| **Punch** | Punch masuk / keluar dengan **gambar**; sejarah kehadiran bulanan penuh (lihat di bawah) |
 | **Claim** | Hantar tuntutan dengan gambar resit; lihat status Menunggu / Lulus / Dibayar |
 | **OT** | Hantar rekod OT (tarikh, masa, jam, sebab); lihat status kelulusan |
-| **Lain** | Slip gaji (boleh cetak), To Do, Alat Saya, hantar/terima fail data, log keluar |
+| **Lain** | Slip gaji (boleh cetak), To Do, **Alat & Kit Team**, **Sub Job Saya**, hantar/terima fail data, log keluar |
+
+### Sejarah kehadiran & waktu kerja
+
+Admin tetapkan waktu kerja di Tetapan → **Syarikat & Target** → *Waktu Kerja Staf*:
+masa masuk, masa keluar, **toleransi lewat** (minit) dan **jam sehari dijangka**.
+
+Dalam aplikasi staf, skrin **Punch** memaparkan bulan demi bulan (boleh tekan
+‹ dan › untuk bulan lain):
+
+- Hari kerja, jumlah jam, dan **berapa kali lewat**
+- Jam dijangka (hari kerja × jam sehari) dan **beza** — lebih atau kurang
+- Sejarah setiap hari: masa masuk, masa keluar, jumlah jam, dan tanda
+  **Lewat X minit**, **Keluar awal X minit**, **Belum punch keluar** atau **Penuh**
+- Gambar punch boleh dibuka semula
+
+Admin pula lihat semua staf dalam menu **Team & Staf → Punch Card**.
+
+### Alat & Kit Team dari telefon staf
+
+Skrin **Lain → Alat & Kit Team**:
+
+- **Sedang Dipegang** — alat yang staf itu ambil, dan juga **kit team** yang dia
+  ada dalam team itu. Tekan *Pulang* untuk pulangkan ke stok
+- **Ambil Barang** — pilih mana-mana barang (alat atau bahan pakai seperti
+  sticker), pilih **ambil untuk diri sendiri atau untuk kit team**, isi kuantiti
+
+Stok dalam sistem utama **ditolak serta-merta**, dan sejarah barang merekod
+*Ambil (Kit Team)* dengan nama staf dan nama team. Kuantiti dihadkan mengikut
+baki di rak.
+
+### Sub Job Saya
+
+Skrin **Lain → Sub Job Saya** memaparkan semua sub job yang staf itu terlibat:
+tarikh, client, projek, status kerja, **berapa bahagian dia**, dan status
+bayaran — **Sudah masuk** atau **Belum masuk**.
+
+Admin menanda bayaran itu dalam menu **Sub Job** → buka sub job → pada baris
+agihan tekan **Tanda Bayar**. Senarai sub job juga memaparkan amaran
+*"RM x belum bayar staf"* supaya tidak terlepas pandang.
 
 ### Apa admin nampak
 

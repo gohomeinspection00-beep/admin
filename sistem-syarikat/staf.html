@@ -229,8 +229,8 @@ function baca() {
   try {
     var mentah = JSON.parse(localStorage.getItem(KUNCI) || "null");
     if (!mentah) return null;
-    ["staf", "sale", "subjob", "belanja", "gaji", "tugasan", "alat", "kehadiran", "ot",
-     "pasukan", "komitmen"].forEach(function (k) {
+    ["staf", "sale", "subjob", "subjobStaf", "belanja", "gaji", "tugasan", "alat", "kehadiran",
+     "ot", "pasukan", "komitmen"].forEach(function (k) {
       mentah[k] = mentah[k] || [];
     });
     mentah.tetapan = mentah.tetapan || {};
@@ -358,6 +358,28 @@ function pasangGambar(inputEl, kotak, pratontonEl) {
 var STAF = null;          // rekod staf yang log masuk
 var HALAMAN_STAF = "hari";
 var kalBulan = bulanKini();
+var punchBulan = bulanKini();
+
+function waktuKerja(data) {
+  return Object.assign({ mula: "9.00am", tamat: "6.00pm", toleransi: 15, jamSehari: 8 },
+    (data.tetapan || {}).waktuKerja || {});
+}
+
+// Status masuk: lewat berapa minit berbanding waktu kerja.
+function nilaiKehadiran(data, senarai) {
+  var w = waktuKerja(data);
+  var masuk = senarai.filter(function (k) { return k.jenis === "Masuk"; })[0];
+  var keluar = senarai.filter(function (k) { return k.jenis === "Keluar"; }).slice(-1)[0];
+  var lewat = masuk ? masaMinit(masuk.masa) - masaMinit(w.mula) - nom(w.toleransi) : 0;
+  var awal = keluar ? masaMinit(w.tamat) - masaMinit(keluar.masa) : 0;
+  return {
+    masuk: masuk, keluar: keluar,
+    jam: jamHari(senarai),
+    lewat: masuk && lewat > 0 ? lewat : 0,
+    keluarAwal: keluar && awal > 0 ? awal : 0,
+    belumKeluar: !!masuk && !keluar
+  };
+}
 
 function aksesAda(kunci) {
   if (!STAF) return false;
@@ -727,49 +749,91 @@ function borangPunch(jenis) {
 }
 
 function halamanPunch(bekas, data) {
-  var bulan = bulanKini();
+  var w = waktuKerja(data);
   var rekod = (data.kehadiran || []).filter(function (k) {
-    return k.stafId === STAF.id && String(k.tarikh).slice(0, 7) === bulan;
-  }).sort(function (a, b) {
-    return String(b.tarikh).localeCompare(String(a.tarikh)) || masaMinit(a.masa) - masaMinit(b.masa);
+    return k.stafId === STAF.id && String(k.tarikh).slice(0, 7) === punchBulan;
   });
   var ikutHari = {};
   rekod.forEach(function (k) { (ikutHari[k.tarikh] = ikutHari[k.tarikh] || []).push(k); });
   var hari = Object.keys(ikutHari).sort().reverse();
-  var jumJam = hari.reduce(function (t, h) { return t + jamHari(ikutHari[h]); }, 0);
+  var nilai = {};
+  hari.forEach(function (h) { nilai[h] = nilaiKehadiran(data, ikutHari[h]); });
+
+  var jumJam = hari.reduce(function (t, h) { return t + nilai[h].jam; }, 0);
+  var bilLewat = hari.filter(function (h) { return nilai[h].lewat > 0; }).length;
+  var minitLewat = hari.reduce(function (t, h) { return t + nilai[h].lewat; }, 0);
+  var jangka = hari.length * nom(w.jamSehari);
   var p = statusPunch(data);
 
   bekas.innerHTML =
-    '<div class="grid grid-3">' +
-      '<div class="stat"><div class="stat-label">Hari Kerja</div><div class="stat-nilai">' +
-        hari.length + "</div></div>" +
-      '<div class="stat"><div class="stat-label">Jumlah Jam</div><div class="stat-nilai">' +
-        (Math.round(jumJam * 10) / 10) + "</div></div>" +
-      '<div class="stat"><div class="stat-label">Status</div><div class="stat-nilai" style="font-size:14px">' +
-        (p.dalam ? "Dalam" : "Keluar") + "</div></div>" +
-    "</div>" +
     '<div class="kad">' +
-      '<div style="display:flex;gap:8px">' +
-        '<button class="btn btn-ok penuh" id="btnMasuk"' + (p.dalam ? " disabled" : "") + ">Punch Masuk</button>" +
-        '<button class="btn btn-bad penuh" id="btnKeluar"' + (p.dalam ? "" : " disabled") + ">Punch Keluar</button>" +
+      '<div class="kad-tajuk">' +
+        '<button class="btn btn-kecil" id="pBulanTolak">‹</button>' +
+        "<h3>" + esc(fmtBulan(punchBulan)) + "</h3>" +
+        '<button class="btn btn-kecil" id="pBulanTambah">›</button>' +
       "</div>" +
-      '<p class="kecil" style="margin:10px 0 0">Gambar disimpan dalam sistem dan admin boleh lihat.</p>' +
+      '<div class="grid grid-3" style="margin:0">' +
+        '<div class="stat"><div class="stat-label">Hari Kerja</div><div class="stat-nilai">' +
+          hari.length + "</div></div>" +
+        '<div class="stat"><div class="stat-label">Jumlah Jam</div><div class="stat-nilai">' +
+          (Math.round(jumJam * 10) / 10) + "</div></div>" +
+        '<div class="stat"><div class="stat-label">Kali Lewat</div><div class="stat-nilai">' +
+          bilLewat + "</div></div>" +
+      "</div>" +
+      '<div class="baris"><span class="kecil">Waktu kerja syarikat</span><b>' +
+        esc(w.mula) + " – " + esc(w.tamat) + "</b></div>" +
+      '<div class="baris"><span class="kecil">Jam dijangka (' + hari.length + " hari x " +
+        nom(w.jamSehari) + " jam)</span><b>" + (Math.round(jangka * 10) / 10) + "</b></div>" +
+      '<div class="baris"><span class="kecil">Beza</span><b style="color:' +
+        (jumJam >= jangka ? "var(--ok)" : "var(--bad)") + '">' +
+        (jumJam - jangka >= 0 ? "+" : "") + (Math.round((jumJam - jangka) * 10) / 10) + " jam</b></div>" +
+      (minitLewat > 0
+        ? '<div class="baris"><span class="kecil">Jumlah lewat</span><b>' + minitLewat + " minit</b></div>"
+        : "") +
     "</div>" +
+
+    (punchBulan === bulanKini()
+      ? '<div class="kad">' +
+          '<div style="display:flex;gap:8px">' +
+            '<button class="btn btn-ok penuh" id="btnMasuk"' + (p.dalam ? " disabled" : "") +
+              ">Punch Masuk</button>" +
+            '<button class="btn btn-bad penuh" id="btnKeluar"' + (p.dalam ? "" : " disabled") +
+              ">Punch Keluar</button>" +
+          "</div>" +
+          '<p class="kecil" style="margin:10px 0 0">Waktu kerja: <b>' + esc(w.mula) + " – " +
+          esc(w.tamat) + "</b> (toleransi lewat " + nom(w.toleransi) + " minit). " +
+          "Gambar disimpan dan admin boleh lihat.</p>" +
+        "</div>"
+      : "") +
+
     '<div class="kad">' +
-      '<div class="kad-tajuk"><h3>Rekod ' + esc(fmtBulan(bulan)) + "</h3></div>" +
+      '<div class="kad-tajuk"><h3>Sejarah Kehadiran</h3><span class="kecil">' +
+        hari.length + " hari</span></div>" +
       (hari.length
         ? hari.map(function (h) {
-            var senarai = ikutHari[h];
-            return '<div class="baris"><span><b>' + esc(fmtTarikh(h)) + "</b>" +
-              '<div class="kecil">' + senarai.map(function (k) {
-                return k.jenis + " " + k.masa + (k.lampiran
-                  ? ' <button class="btn btn-kecil" data-lampiran="' + esc(k.lampiran.kunci) +
-                    '">gambar</button>' : "");
-              }).join(" · ") + "</div></span><b>" + jamHari(senarai) + " jam</b></div>";
+            var n = nilai[h];
+            return '<div class="baris"><span><b>' + esc(fmtTarikh(h)) + "</b> " +
+              '<span class="kecil">' + esc(namaHari(h)) + "</span>" +
+              '<div class="kecil">Masuk ' + esc(n.masuk ? n.masuk.masa : "-") +
+              " · Keluar " + esc(n.keluar ? n.keluar.masa : "-") + "</div>" +
+              '<div class="kecil">' +
+              (n.lewat > 0 ? '<span class="badge badge-warn">Lewat ' + n.lewat + " minit</span> " : "") +
+              (n.keluarAwal > 0 ? '<span class="badge badge-warn">Keluar awal ' + n.keluarAwal +
+                " minit</span> " : "") +
+              (n.belumKeluar ? '<span class="badge badge-bad">Belum punch keluar</span> ' : "") +
+              (n.lewat === 0 && !n.belumKeluar && n.keluarAwal === 0
+                ? '<span class="badge badge-ok">Penuh</span> ' : "") +
+              ikutHari[h].filter(function (k) { return k.lampiran; }).map(function (k) {
+                return '<button class="btn btn-kecil" data-lampiran="' + esc(k.lampiran.kunci) +
+                  '">' + esc(k.jenis) + "</button>";
+              }).join(" ") +
+              "</div></span><b>" + n.jam + " jam</b></div>";
           }).join("")
-        : '<div class="kosong">Belum ada rekod bulan ini.</div>') +
+        : '<div class="kosong">Tiada rekod bulan ini.</div>') +
     "</div>";
 
+  $("#pBulanTolak").onclick = function () { punchBulan = alihBulan(punchBulan, -1); lukisStaf(); };
+  $("#pBulanTambah").onclick = function () { punchBulan = alihBulan(punchBulan, 1); lukisStaf(); };
   if ($("#btnMasuk")) $("#btnMasuk").onclick = function () { borangPunch("Masuk"); };
   if ($("#btnKeluar")) $("#btnKeluar").onclick = function () { borangPunch("Keluar"); };
 }
@@ -970,7 +1034,8 @@ function halamanLain(bekas, data) {
   var pilihan = [];
   if (aksesAda("slip")) pilihan.push(["slip", "Slip Gaji", IKON_S.slip]);
   if (aksesAda("todo")) pilihan.push(["todo", "Senarai To Do", IKON_S.todo]);
-  if (aksesAda("alat")) pilihan.push(["alat", "Alat Saya", IKON_S.alat]);
+  if (aksesAda("alat")) pilihan.push(["alat", "Alat & Kit Team", IKON_S.alat]);
+  if (aksesAda("subjob")) pilihan.push(["subjob", "Sub Job Saya", IKON_S.claim]);
 
   bekas.innerHTML =
     '<div class="kad">' +
@@ -1008,6 +1073,7 @@ function halamanLain(bekas, data) {
       var pilih = b.getAttribute("data-lain");
       if (pilih === "slip") halamanSlip();
       else if (pilih === "todo") halamanTodo();
+      else if (pilih === "subjob") halamanSubJobSaya();
       else halamanAlatSaya();
     };
   });
@@ -1158,45 +1224,67 @@ function halamanTodo() {
   });
 }
 
-/* ---------------------------- alat saya ------------------------------- */
+/* ------------------------ alat & kit team ----------------------------- */
+
+function bakiRak(a) {
+  var dipinjam = (a.pinjam || []).filter(function (p) { return !p.tarikhPulang; })
+    .reduce(function (t, p) { return t + nom(p.kuantiti); }, 0);
+  return Math.max(0, nom(a.jumlah) - nom(a.rosak) - nom(a.hilang) - dipinjam);
+}
+
+function teamSaya(data) {
+  return (data.pasukan || []).filter(function (p) {
+    return p.aktif !== false &&
+      (p.ketua === STAF.nama || (p.ahli || []).indexOf(STAF.nama) !== -1);
+  });
+}
 
 function halamanAlatSaya() {
   var data = baca();
+  var team = teamSaya(data);
   var pegang = [];
   (data.alat || []).forEach(function (a) {
     (a.pinjam || []).forEach(function (p) {
-      if (!p.tarikhPulang && p.nama === STAF.nama) pegang.push({ alat: a, pinjam: p });
+      if (p.tarikhPulang) return;
+      var sayaAmbil = p.nama === STAF.nama;
+      var kitTeam = p.kit && team.some(function (t) { return t.id === p.pasukanId; });
+      if (sayaAmbil || kitTeam) pegang.push({ alat: a, pinjam: p, kit: !!p.kit });
     });
   });
-  var boleh = (data.alat || []).filter(function (a) {
-    var dipinjam = (a.pinjam || []).filter(function (p) { return !p.tarikhPulang; })
-      .reduce(function (t, p) { return t + nom(p.kuantiti); }, 0);
-    var ada = Math.max(0, nom(a.jumlah) - nom(a.rosak) - nom(a.hilang) - dipinjam);
-    a._ada = ada;
-    return ada > 0;
-  });
+  var boleh = (data.alat || []).filter(function (a) { return bakiRak(a) > 0; });
 
-  var m = modal("Alat Saya",
-    '<h3 style="font-size:13px">Sedang Saya Pegang</h3>' +
+  var m = modal("Alat & Kit Team",
+    '<h3 style="font-size:13px">Sedang Dipegang</h3>' +
     (pegang.length
       ? pegang.map(function (x) {
           return '<div class="baris"><span><b>' + esc(x.alat.nama) + "</b>" +
+            (x.kit ? ' <span class="badge badge-muted">Kit ' + esc(x.pinjam.pasukan || "team") +
+              "</span>" : "") +
             '<div class="kecil">' + nom(x.pinjam.kuantiti) + " " + esc(x.alat.unit) +
-            " · ambil " + esc(fmtTarikh(x.pinjam.tarikhAmbil)) + "</div></span>" +
+            " · ambil " + esc(fmtTarikh(x.pinjam.tarikhAmbil)) +
+            (x.pinjam.nama !== STAF.nama ? " · oleh " + esc(x.pinjam.nama) : "") + "</div></span>" +
             '<button class="btn btn-kecil btn-ok" data-pulang="' + esc(x.alat.id) + '|' +
             esc(x.pinjam.id) + '">Pulang</button></div>';
         }).join("")
       : '<div class="kosong">Tiada alat dipegang.</div>') +
-    '<h3 style="font-size:13px;margin-top:16px">Ambil Alat</h3>' +
+
+    '<h3 style="font-size:13px;margin-top:16px">Ambil Barang</h3>' +
     (boleh.length
-      ? '<select id="alatPilih">' + boleh.map(function (a) {
-          return "<option value='" + esc(a.id) + "'>" + esc(a.nama) + " · " + a._ada +
+      ? "<label>Barang</label><select id='alatPilih'>" + boleh.map(function (a) {
+          return "<option value='" + esc(a.id) + "'>" + esc(a.nama) + " · " + bakiRak(a) +
             " " + esc(a.unit) + " di rak</option>";
         }).join("") + "</select>" +
-        "<label>Kuantiti</label><input type='number' min='1' value='1' id='alatKuantiti'>" +
+        "<label>Ambil Untuk</label><select id='alatUntuk'>" +
+          "<option value=''>Diri sendiri (" + esc(STAF.nama) + ")</option>" +
+          team.map(function (t) {
+            return "<option value='" + esc(t.id) + "'>Kit " + esc(t.nama) + "</option>";
+          }).join("") + "</select>" +
+        "<label>Kuantiti</label><input type='number' min='1' value='1' id='alatKuantiti' inputmode='numeric'>" +
         "<label>Untuk apa</label><input type='text' id='alatNota' placeholder='Contoh: inspection Setia Alam'>" +
-        '<button class="btn btn-utama penuh" style="margin-top:12px" id="btnAmbilAlat">Rekod Ambil</button>'
-      : '<div class="kosong">Tiada alat kosong di rak.</div>'));
+        '<button class="btn btn-utama penuh" style="margin-top:12px" id="btnAmbilAlat">Rekod Ambil</button>' +
+        '<p class="kecil" style="margin-top:8px">Stok akan ditolak dalam sistem utama, dan nama ' +
+        "awak masuk sejarah barang itu.</p>"
+      : '<div class="kosong">Tiada barang kosong di rak.</div>'));
 
   $$("[data-pulang]", m.el).forEach(function (b) {
     b.onclick = function () {
@@ -1208,37 +1296,103 @@ function halamanAlatSaya() {
       p.tarikhPulang = kunciTarikh();
       p.keadaan = "Baik";
       a.log = a.log || [];
-      a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(), jenis: "Pulang",
-        kuantiti: nom(p.kuantiti), oleh: STAF.nama, nota: "dari aplikasi staf" });
+      a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(),
+        jenis: p.kit ? "Pulang (Kit Team)" : "Pulang", kuantiti: nom(p.kuantiti),
+        oleh: STAF.nama, nota: "dari aplikasi staf" });
+      a.updatedAt = new Date().toISOString();
       if (!simpan(d)) return;
       m.tutup();
-      toast("Alat dipulangkan.", "ok");
+      toast(a.nama + " dipulangkan ke stok.", "ok");
       lukisStaf();
     };
   });
+
   if ($("#btnAmbilAlat", m.el)) {
     $("#btnAmbilAlat", m.el).onclick = function () {
       var alatId = $("#alatPilih", m.el).value;
+      var untuk = $("#alatUntuk", m.el).value;
       var q = nom($("#alatKuantiti", m.el).value);
       var d = baca();
       var a = d.alat.filter(function (x) { return x.id === alatId; })[0];
       if (!a || q <= 0) return;
-      var dipinjam = (a.pinjam || []).filter(function (p) { return !p.tarikhPulang; })
-        .reduce(function (t, p) { return t + nom(p.kuantiti); }, 0);
-      var ada = Math.max(0, nom(a.jumlah) - nom(a.rosak) - nom(a.hilang) - dipinjam);
+      var ada = bakiRak(a);
       if (q > ada) return toast("Hanya " + ada + " " + a.unit + " di rak.", "bad", 4000);
+      var t = untuk ? (d.pasukan || []).filter(function (x) { return x.id === untuk; })[0] : null;
       a.pinjam = a.pinjam || [];
-      a.pinjam.unshift({ id: id(), nama: STAF.nama, kuantiti: q, tarikhAmbil: kunciTarikh(),
-        tarikhPulang: null, nota: $("#alatNota", m.el).value.trim(), dariStaf: true });
+      a.pinjam.unshift({
+        id: id(), nama: STAF.nama, kuantiti: q, tarikhAmbil: kunciTarikh(), tarikhPulang: null,
+        nota: $("#alatNota", m.el).value.trim(),
+        pasukanId: t ? t.id : "", pasukan: t ? t.nama : "", kit: !!t, dariStaf: true
+      });
       a.log = a.log || [];
-      a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(), jenis: "Ambil",
-        kuantiti: q, oleh: STAF.nama, nota: "dari aplikasi staf" });
+      a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(),
+        jenis: t ? "Ambil (Kit Team)" : "Ambil", kuantiti: q,
+        oleh: STAF.nama + (t ? " (" + t.nama + ")" : ""), nota: "dari aplikasi staf" });
+      a.updatedAt = new Date().toISOString();
       if (!simpan(d)) return;
       m.tutup();
-      toast("Alat direkod: " + a.nama + " x" + q, "ok");
+      toast(a.nama + " x" + q + " direkod" + (t ? " untuk kit " + t.nama : "") + ".", "ok", 4500);
       lukisStaf();
     };
   }
+}
+
+/* ---------------------------- sub job saya ---------------------------- */
+
+function halamanSubJobSaya() {
+  var data = baca();
+  var sumber = (data.subjobStaf && data.subjobStaf.length) ? data.subjobStaf : (data.subjob || []);
+  var senarai = sumber.filter(function (j) {
+    return (j.agihan || []).some(function (a) {
+      return String(a.nama).toLowerCase() === String(STAF.nama).toLowerCase();
+    });
+  }).sort(function (a, b) { return String(b.tarikh).localeCompare(String(a.tarikh)); });
+
+  var bahagian = function (j) {
+    return (j.agihan || []).filter(function (a) {
+      return String(a.nama).toLowerCase() === String(STAF.nama).toLowerCase();
+    });
+  };
+  var jumlah = senarai.reduce(function (t, j) {
+    return t + bahagian(j).reduce(function (a, x) { return a + nom(x.jumlah); }, 0);
+  }, 0);
+  var belum = senarai.reduce(function (t, j) {
+    return t + bahagian(j).filter(function (x) { return !x.dibayar; })
+      .reduce(function (a, x) { return a + nom(x.jumlah); }, 0);
+  }, 0);
+
+  modal("Sub Job Saya",
+    '<div class="grid grid-3" style="margin-bottom:12px">' +
+      '<div class="stat"><div class="stat-label">Sub Job</div><div class="stat-nilai">' +
+        senarai.length + "</div></div>" +
+      '<div class="stat"><div class="stat-label">Jumlah</div><div class="stat-nilai" style="font-size:15px">' +
+        esc(rm(jumlah)) + "</div></div>" +
+      '<div class="stat"><div class="stat-label">Belum Masuk</div><div class="stat-nilai" style="font-size:15px;color:' +
+        (belum > 0 ? "var(--bad)" : "var(--ok)") + '">' + esc(rm(belum)) + "</div></div>" +
+    "</div>" +
+    (senarai.length
+      ? senarai.map(function (j) {
+          var saya = bahagian(j);
+          var nilai = saya.reduce(function (t, x) { return t + nom(x.jumlah); }, 0);
+          var dibayar = saya.every(function (x) { return x.dibayar; });
+          var tarikhBayar = (saya.filter(function (x) { return x.tarikhBayar; })[0] || {}).tarikhBayar;
+          return '<div class="baris"><span><b>' + esc(j.nama || "Tanpa nama") + "</b>" +
+            '<div class="kecil">' + esc(fmtTarikh(j.tarikh)) + " · " +
+            esc([j.projek, j.unit].filter(Boolean).join(" · ") || "-") + "</div>" +
+            '<div class="kecil">' + esc(saya.map(function (x) {
+              return x.nota || "bahagian saya";
+            }).join(", ")) + "</div>" +
+            '<div class="kecil" style="margin-top:4px"><span class="badge badge-muted">' +
+            esc(j.statusKerja || "Tempahan") + "</span></div></span>" +
+            '<span style="text-align:right"><b>' + esc(rm(nilai)) + "</b>" +
+            '<div><span class="badge badge-' + (dibayar ? "ok" : "warn") + '">' +
+            (dibayar ? "Sudah masuk" : "Belum masuk") + "</span></div>" +
+            (dibayar && tarikhBayar ? '<div class="kecil">' + esc(fmtTarikh(tarikhBayar)) + "</div>" : "") +
+            "</span></div>";
+        }).join("") +
+        '<p class="kecil" style="margin-top:12px">“Sudah masuk” bermakna admin sudah tanda ' +
+        "bayaran bahagian awak sebagai dibayar. Kalau ada masalah, rujuk admin.</p>"
+      : '<div class="kosong">Awak belum ada sub job.</div>'));
 }
 
 /* --------------------- hantar / terima data --------------------------- */
