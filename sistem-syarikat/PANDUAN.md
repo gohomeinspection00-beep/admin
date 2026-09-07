@@ -22,7 +22,7 @@ Tool ▸ Quotation · Invois · Resit
 Kewangan ▸ Tunggakan · Perbelanjaan · Marketing · Claim Staf · Komitmen
 Aset & Stok ▸ Alat · Sticker & Bahan · Calibration Tool
 To Do
-Staf
+Team & Staf ▸ Team · Staf
 Tetapan
 ```
 
@@ -45,6 +45,7 @@ ditutup, nombor itu naik ke tajuk kumpulan.
 | **Komitmen** | Transport, pinjaman dan komitmen bulanan lain — bila kena bayar, sudah bayar atau belum |
 | **To Do** | Senarai kerja: apa perlu buat, siapa buat, bila kena siap, boleh berulang |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
+| **Team** | Set up team kerja: nama team, ketua, ahli (tidak wajib) dan alat yang dipegang team |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Terbahagi kepada 5 tab: Syarikat & Target, Jualan & Status, Resit & Invois, Quotation, Data & Backup |
 
@@ -501,6 +502,23 @@ Papan utama pula memaparkan jalur **Tunggakan Bayaran** bila ada rekod yang
 sudah lewat, dan menu sisi menunjukkan bilangannya. Semua senarai boleh
 dieksport ke CSV.
 
+## Team
+
+Menu **Team & Staf → Team** untuk set up pasukan kerja.
+
+Setiap team ada: **nama team**, **ketua**, **ahli** (tandakan dari senarai staf —
+tidak wajib, nama team sahaja pun boleh), **alat kit team** (alat yang team ini
+pegang tetap), status aktif dan nota.
+
+Bila staf ambil alat, borang **Ambil** ada pilihan **Untuk Team**. Kalau nama
+staf itu sudah ada dalam sesuatu team, team itu dipilih automatik. Sejarah alat
+kemudiannya menunjukkan **siapa ambil dan team mana** — contoh
+*"Zaim (Team A)"* — dan jadual *Siapa Pegang Apa* memaparkan nama team di bawah
+nama staf.
+
+Buka mana-mana team untuk lihat ahli, kit tetap team, dan alat yang sedang
+diambil atas nama team itu.
+
 ## Alat & Stok
 
 Menu ini ada **tiga tab**.
@@ -531,6 +549,18 @@ sejarah. **+ Stok** untuk top up bila beli baharu.
 
 Status: **Baik** → **Hampir habis** (bila baki sampai paras minimum) →
 **Habis**. Paras minimum ditetapkan setiap barang.
+
+### Abaikan amaran stok
+
+Ada barang yang memang digunakan sepenuhnya — contoh tangga 2 unit dan
+dua-duanya sentiasa keluar, atau bahan yang memang tidak di-top up. Untuk
+barang begini, tandakan **Abaikan amaran stok** dalam borang barang.
+
+- Amaran *Hampir habis* dan *Habis* tidak lagi keluar (status jadi
+  **Guna sepenuhnya**), dan barang itu tidak dikira dalam nombor merah pada
+  menu atau papan utama
+- **Rosak** dan **hilang** tetap dilaporkan seperti biasa
+- Baris barang itu bertanda *stok diabaikan* supaya awak tahu sebab ia senyap
 
 ### Tab 3 — Calibration Tool
 
