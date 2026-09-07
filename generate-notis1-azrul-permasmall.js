@@ -48,6 +48,9 @@ const data = {
   tempohNotis2: "15",
 
   kecacatan: [
+    { tag: "2", lokasi: "S&P Review — Wall", kecacatan: "Isu Pelan Lantai — dinding tidak dibina mengikut pelan lantai yang dibekalkan bersama S&P (Wall not built as per floor plan provided with S&P)", status: "Untuk Semakan Pemaju" },
+    { tag: "3", lokasi: "S&P Review — M&E", kecacatan: "Kekurangan 1 fan point — mengikut Building Specification SPA, unit A3 sepatutnya mempunyai 6 fan point; hanya 5 dijumpai (Missing 1 fan point)", status: "Untuk Semakan Pemaju" },
+    { tag: "4", lokasi: "S&P Review — M&E", kecacatan: "Kekurangan 2 unit 13A power point — mengikut Building Specification SPA, unit A3 sepatutnya mempunyai 25 unit; hanya 23 dijumpai (Missing 2 units of 13A power points)", status: "Untuk Semakan Pemaju" },
     { tag: "59", lokasi: "Master Bedroom — Wall", kecacatan: "Kelembapan tinggi pada permukaan dinding (High moisture on wall surface — bukti kamera termal)", status: "Belum Dibaiki" },
     { tag: "68", lokasi: "Master Bathroom — Floor", kecacatan: "Air bertakung pada jubin lantai (Water stagnant on floor tiles)", status: "Belum Dibaiki" },
     { tag: "80", lokasi: "Master Bathroom — Plumbing & Sanitary", kecacatan: "Air masih keluar walaupun tidak flush (Water still come out even not flushing — Major defects)", status: "Belum Dibaiki" },
@@ -288,11 +291,16 @@ numPara(4,
 y += 4;
 
 numPara(5,
+  `Bagi item No. 2, 3 dan 4 (S&P Review), kami meminta pihak tuan mengambil perhatian dan membuat semakan semula (double check): (a) sama ada dinding unit dibina mengikut pelan lantai yang dibekalkan bersama S&P atau terdapat pindaan reka bentuk; dan (b) sama ada bilangan fan point dan 13A power point yang dipasang (5 fan point dan 23 power point) adalah betul berbanding Building Specification SPA (6 fan point dan 25 power point). Sekiranya spesifikasi S&P yang silap, ATAU unit memang dibekalkan sebagaimana yang sedia ada, ATAU reka bentuk dinding telah dipinda, pihak tuan dituntut memberikan penjelasan rasmi kepada pemilik dan mengeluarkan dokumen rasmi (official documentation) mengenainya.`
+);
+y += 4;
+
+numPara(6,
   `Dengan ini, kami mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari.`
 );
 y += 4;
 
-numPara(6, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, kami akan:");
+numPara(7, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, kami akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -300,7 +308,7 @@ bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak t
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
-numPara(7,
+numPara(8,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -313,7 +321,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(8,
+numPara(9,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, kami akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
