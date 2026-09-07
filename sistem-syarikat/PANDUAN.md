@@ -557,6 +557,26 @@ keutamaan (Biasa / Penting / Segera) dan status.
 - Tapis ikut *Belum siap*, *Sudah lewat*, *Sudah siap*, atau ikut orang
 - Tugasan lewat atau hampir sampai tarikh naik di papan utama
 
+## Muat naik gambar / resit
+
+Lima tempat boleh dilampirkan gambar atau fail PDF. Tekan **Muat Naik**,
+pilih gambar (boleh terus dari kamera telefon) atau PDF, kemudian **Simpan**.
+
+| Tempat | Untuk apa |
+|---|---|
+| Rekod bayaran client (jualan & sub job) | Resit atau screenshot transfer client |
+| Bayaran komitmen (transport, pinjaman, lain) | Resit bayaran bulanan |
+| Ambil barang | Gambar barang masa diambil |
+| Pulang barang | Gambar keadaan barang masa dipulangkan |
+| Tambah stok / guna stok | Resit pembelian atau bukti penggunaan |
+
+Selepas disimpan, butang kecil (**Bukti**, **Resit** atau **Gambar**) muncul
+pada baris itu — tekan untuk buka fail.
+
+Gambar dikecilkan automatik kepada maksimum 1400px sebelum disimpan, jadi
+gambar telefon 4 MB biasanya tinggal beberapa ratus KB sahaja. Semua fail ini
+disimpan dalam sistem (bukan link luar) dan **ikut sekali dalam backup**.
+
 ## Peringatan di papan utama
 
 Papan utama mengumpul semua yang perlu tindakan di bahagian atas:

@@ -2351,6 +2351,7 @@ function lihatSale(rekodId) {
   if ($("#btnLihatQuoteSale", m.el)) {
     $("#btnLihatQuoteSale", m.el).onclick = function () { m.tutup(); lihatQuotation(s.quoteId); };
   }
+  pasangButangLampiran(m.el);
   $("#btnTambahBayar", m.el).onclick = function () { m.tutup(); borangBayaran(rekodId, null); };
   $$("[data-sunting-bayar]", m.el).forEach(function (b) {
     b.onclick = function () { m.tutup(); borangBayaran(rekodId, b.getAttribute("data-sunting-bayar")); };
@@ -2402,7 +2403,8 @@ function jadualBayaran(s) {
         "<td>" + esc(b.jenis) + "</td>" +
         '<td class="num"><b>' + esc(rm(b.jumlah)) + "</b></td>" +
         "<td>" + esc(b.kaedah || "-") +
-          (b.rujukan ? '<div class="kecil">' + esc(b.rujukan) + "</div>" : "") + "</td>" +
+          (b.rujukan ? '<div class="kecil">' + esc(b.rujukan) + "</div>" : "") +
+          (b.lampiran ? "<div>" + butangLampiran(b.lampiran, "Bukti") + "</div>" : "") + "</td>" +
         "<td>" + (resit
           ? '<button class="btn btn-lembut btn-kecil" data-buka-resit="' + esc(resit.id) + '">' +
             esc(resit.no) + "</button>"
@@ -2458,6 +2460,7 @@ function borangBayaran(saleId, bayaranId, opsi) {
         medan("Rujukan / No. Transaksi", '<input type="text" name="rujukan" value="' + esc(b.rujukan || "") + '">') +
       "</div>" +
       medan("Catatan", '<input type="text" name="catatan" value="' + esc(b.catatan || "") + '">') +
+      kotakLampiran("failBayar", b.lampiran || null, "Resit / Bukti Bayaran Client") +
       '<div id="bakiSelepas" class="jumlah-baris" style="margin-bottom:8px"></div>' +
       '<div class="baris-butang modal-kaki">' +
         (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamBayar">Padam</button>') +
@@ -2468,6 +2471,9 @@ function borangBayaran(saleId, bayaranId, opsi) {
     "</form>", 560);
 
   var borang = $("#borangBayaran", m.el);
+  var kotakB = {};
+  pasangLampiran($("#failBayar", m.el), kotakB);
+  pasangButangLampiran(m.el);
   function kiraPapar() {
     var v = ambilNilai(borang);
     var baki = Math.max(bakiSemasa - nom(v.jumlah), 0);
@@ -2505,6 +2511,7 @@ function borangBayaran(saleId, bayaranId, opsi) {
     e.preventDefault();
     var v = ambilNilai(borang);
     if (nom(v.jumlah) <= 0) return toast("Jumlah bayaran mesti lebih daripada sifar.", "bad");
+    simpanLampiranBaharu(kotakB.fail).then(function (meta) {
     var d = baca();
     var idBaru = bayaranId || id();
     var senaraiSimpan = (subMod ? d.subjob : d.sale).map(function (x) {
@@ -2512,6 +2519,7 @@ function borangBayaran(saleId, bayaranId, opsi) {
       x.bayaran = x.bayaran || [];
       var rekod = { id: idBaru, tarikh: v.tarikh, jenis: v.jenis, jumlah: nom(v.jumlah),
         kaedah: v.kaedah, rujukan: v.rujukan, catatan: v.catatan,
+        lampiran: meta || b.lampiran || null,
         resitId: b.resitId || null };
       if (bayaranId) {
         x.bayaran = x.bayaran.map(function (y) { return y.id === bayaranId ? rekod : y; });
@@ -2528,6 +2536,7 @@ function borangBayaran(saleId, bayaranId, opsi) {
     if (subMod) lihatSubJob(saleId);
     else if (bayaranId) lihatSale(saleId);
     else borangDok("resit", { saleId: saleId, bayaranId: idBaru, invoisId: opsi.invoisId || null });
+    }).catch(function (err) { toast("Gagal simpan bukti bayaran: " + err.message, "bad", 6000); });
   };
 }
 
@@ -5026,7 +5035,8 @@ function lihatSubJob(subId) {
           return String(a.tarikh).localeCompare(String(b.tarikh));
         }).map(function (b) {
           return "<tr><td>" + esc(fmtTarikh(b.tarikh)) + "</td><td>" + esc(b.jenis) + "</td>" +
-            '<td class="num"><b>' + esc(rm(b.jumlah)) + "</b></td><td>" + esc(b.kaedah || "-") + "</td>" +
+            '<td class="num"><b>' + esc(rm(b.jumlah)) + "</b></td><td>" + esc(b.kaedah || "-") +
+            (b.lampiran ? " " + butangLampiran(b.lampiran, "Bukti") : "") + "</td>" +
             '<td><button class="btn btn-lembut btn-kecil" data-sunting-bayar-sub="' + esc(b.id) +
             '">Sunting</button></td></tr>';
         }).join("") + "</tbody></table></div>"
@@ -5043,6 +5053,7 @@ function lihatSubJob(subId) {
     m.tutup();
     borangBayaran(subId, null, { jenisRekod: "subjob" });
   };
+  pasangButangLampiran(m.el);
   $$("[data-sunting-bayar-sub]", m.el).forEach(function (b) {
     b.onclick = function () {
       m.tutup();
@@ -5716,6 +5727,7 @@ function buangFailYatim(d) {
   failKunci().then(function (kunci) {
     (kunci || []).forEach(function (k) {
       if (String(k).indexOf("cal-") === 0) return;      // fail sijil kalibrasi
+      if (String(k).indexOf("lamp-") === 0) return;     // gambar / resit pada rekod
       if (sah.indexOf(k) === -1) failBuang(k).catch(function () {});
     });
   }).catch(function () {});
@@ -6612,6 +6624,109 @@ function logAlat(a, jenis, kuantiti, oleh, nota) {
   if (a.log.length > 200) a.log = a.log.slice(0, 200);
 }
 
+/* ======================================================================
+   LAMPIRAN — gambar / resit yang boleh dimuat naik pada rekod
+   Gambar dikecilkan automatik supaya fail tidak membesar.
+   ================================================================== */
+
+function sediakanFail(fail) {
+  var jenis = fail.type || "";
+  if (jenis.indexOf("image/") !== 0) {
+    return fail.arrayBuffer().then(function (buf) {
+      return { nama: fail.name, saiz: fail.size, jenis: jenis || "application/octet-stream",
+               bait: new Uint8Array(buf) };
+    });
+  }
+  return new Promise(function (ok, gagal) {
+    var url = URL.createObjectURL(fail);
+    var gambar = new Image();
+    gambar.onload = function () {
+      var maks = 1400;
+      var w = gambar.width, h = gambar.height;
+      if (Math.max(w, h) > maks) {
+        var skala = maks / Math.max(w, h);
+        w = Math.round(w * skala); h = Math.round(h * skala);
+      }
+      var kanvas = document.createElement("canvas");
+      kanvas.width = w; kanvas.height = h;
+      kanvas.getContext("2d").drawImage(gambar, 0, 0, w, h);
+      kanvas.toBlob(function (blob) {
+        URL.revokeObjectURL(url);
+        if (!blob) return gagal(new Error("Gagal proses gambar."));
+        blob.arrayBuffer().then(function (buf) {
+          ok({ nama: String(fail.name || "gambar").replace(/\.[^.]+$/, "") + ".jpg",
+               saiz: blob.size, jenis: "image/jpeg", bait: new Uint8Array(buf) });
+        });
+      }, "image/jpeg", 0.82);
+    };
+    gambar.onerror = function () { URL.revokeObjectURL(url); gagal(new Error("Fail gambar tidak sah.")); };
+    gambar.src = url;
+  });
+}
+
+function kotakLampiran(idInput, sedia, label) {
+  return '<div class="jumlah-baris" style="margin-bottom:12px"><span>' + esc(label || "Gambar / Resit") +
+    (sedia
+      ? "<div class='kecil'><b>" + esc(sedia.nama) + "</b> · " + esc(saizTeks(sedia.saiz)) + "</div>"
+      : "<div class='kecil'>Pilihan — ambil gambar atau pilih fail PDF</div>") +
+    "</span><span>" +
+      (sedia ? '<button type="button" class="btn btn-lembut btn-kecil" data-lampiran="' +
+        esc(sedia.kunci) + '">Lihat</button> ' : "") +
+      '<label class="btn btn-lembut btn-kecil" style="display:inline-block;margin:0">' +
+        (sedia ? "Ganti" : "Muat Naik") +
+        '<input type="file" accept="image/*,application/pdf" id="' + esc(idInput) + '" hidden></label>' +
+    "</span></div>";
+}
+
+// Pasang input fail; simpan hasil dalam kotak sementara sehingga borang disimpan.
+function pasangLampiran(inputEl, simpanKe) {
+  if (!inputEl) return;
+  inputEl.onchange = function () {
+    var fail = inputEl.files && inputEl.files[0];
+    inputEl.value = "";
+    if (!fail) return;
+    if (fail.size > 20 * 1024 * 1024) return toast("Fail terlalu besar (maksimum 20 MB).", "bad", 5000);
+    toast("Memproses fail…", "ok", 2000);
+    sediakanFail(fail).then(function (hasil) {
+      simpanKe.fail = hasil;
+      toast("Sedia: " + hasil.nama + " (" + saizTeks(hasil.saiz) + "). Tekan Simpan.", "ok", 5000);
+    }).catch(function (e) { toast("Gagal baca fail: " + e.message, "bad", 5000); });
+  };
+}
+
+function simpanLampiranBaharu(hasil) {
+  if (!hasil) return Promise.resolve(null);
+  var kunci = "lamp-" + id();
+  return failSimpan(kunci, { nama: hasil.nama, saiz: hasil.saiz, jenis: hasil.jenis, bait: hasil.bait })
+    .then(function () {
+      return { kunci: kunci, nama: hasil.nama, saiz: hasil.saiz, jenis: hasil.jenis };
+    });
+}
+
+function bukaLampiran(kunci) {
+  failAmbil(kunci).then(function (r) {
+    if (!r || !r.bait) return toast("Fail tidak dijumpai.", "warn");
+    var url = URL.createObjectURL(new Blob([r.bait], { type: r.jenis || "application/octet-stream" }));
+    window.open(url, "_blank");
+    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+  }).catch(function (e) { toast("Gagal buka fail: " + e.message, "bad", 5000); });
+}
+
+function butangLampiran(meta, label) {
+  if (!meta || !meta.kunci) return "";
+  return '<button type="button" class="btn btn-lembut btn-kecil" data-lampiran="' + esc(meta.kunci) +
+    '" title="' + esc(meta.nama || "") + '">' + esc(label || "Gambar") + "</button>";
+}
+
+function pasangButangLampiran(bekas) {
+  $$("[data-lampiran]", bekas || document).forEach(function (b) {
+    b.onclick = function (e) {
+      e.stopPropagation();
+      bukaLampiran(b.getAttribute("data-lampiran"));
+    };
+  });
+}
+
 /* ---------------------- pinjam / ambil barang ------------------------- */
 
 function pinjamTerbuka(a) {
@@ -6629,7 +6744,7 @@ function semuaPinjaman(data) {
     pinjamTerbuka(a).forEach(function (p) {
       hasil.push({ alatId: a.id, alat: a.nama, unit: a.unit, pinjamId: p.id,
         nama: p.nama, kuantiti: nom(p.kuantiti), tarikh: p.tarikhAmbil, nota: p.nota,
-        hari: hariSejak(p.tarikhAmbil) });
+        lampiran: p.lampiran, hari: hariSejak(p.tarikhAmbil) });
     });
   });
   return hasil.sort(function (x, y) { return y.hari - x.hari; });
@@ -6660,32 +6775,40 @@ function borangAmbil(alatId) {
       '<datalist id="senaraiStafAmbil">' + data.staf.filter(function (x) { return x.status === "aktif"; })
         .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
       medan("Untuk Apa / Nota", '<input type="text" name="nota" placeholder="Contoh: inspection Setia Alam">') +
+      kotakLampiran("failAmbil", null, "Gambar Barang / Bukti Ambil") +
       '<div class="baris-butang modal-kaki">' +
         '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
         '<button type="submit" class="btn btn-utama">Rekod Ambil</button>' +
       "</div>" +
     "</form>", 520);
 
+  var kotak = {};
+  pasangLampiran($("#failAmbil", m.el), kotak);
   $("[data-batal]", m.el).onclick = m.tutup;
   $("#borangAmbil", m.el).onsubmit = function (e) {
     e.preventDefault();
     var v = ambilNilai($("#borangAmbil", m.el));
     var q = Math.max(0, nom(v.kuantiti));
     if (!v.nama) return toast("Sila isi nama orang yang ambil.", "bad");
-    var d = baca();
-    var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
-    if (q <= 0 || q > kiraAlat(rekod).adaUntukAmbil) {
-      return toast("Hanya " + kiraAlat(rekod).adaUntukAmbil + " " + rekod.unit + " boleh diambil.", "bad", 5000);
+    var semak = baca().alat.filter(function (x) { return x.id === alatId; })[0];
+    if (q <= 0 || q > kiraAlat(semak).adaUntukAmbil) {
+      return toast("Hanya " + kiraAlat(semak).adaUntukAmbil + " " + semak.unit + " boleh diambil.", "bad", 5000);
     }
-    rekod.pinjam = rekod.pinjam || [];
-    rekod.pinjam.unshift({ id: id(), nama: v.nama, kuantiti: q,
-      tarikhAmbil: v.tarikhAmbil || kunciTarikh(), tarikhPulang: null, nota: v.nota || "" });
-    logAlat(rekod, "Ambil", q, v.nama, v.nota);
-    rekod.updatedAt = new Date().toISOString();
-    if (!simpan(d)) return;
-    m.tutup();
-    toast(v.nama + " ambil " + q + " " + rekod.unit + " " + rekod.nama + ".", "ok", 5000);
-    lukis();
+    simpanLampiranBaharu(kotak.fail).then(function (meta) {
+      var d = baca();
+      var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
+      rekod.pinjam = rekod.pinjam || [];
+      rekod.pinjam.unshift({ id: id(), nama: v.nama, kuantiti: q,
+        tarikhAmbil: v.tarikhAmbil || kunciTarikh(), tarikhPulang: null, nota: v.nota || "",
+        lampiran: meta });
+      logAlat(rekod, "Ambil", q, v.nama, v.nota);
+      if (meta) rekod.log[0].lampiran = meta;
+      rekod.updatedAt = new Date().toISOString();
+      if (!simpan(d)) return;
+      m.tutup();
+      toast(v.nama + " ambil " + q + " " + rekod.unit + " " + rekod.nama + ".", "ok", 5000);
+      lukis();
+    }).catch(function (err) { toast("Gagal simpan gambar: " + err.message, "bad", 6000); });
   };
 }
 
@@ -6708,33 +6831,41 @@ function pulangBarang(alatId, pinjamId) {
           "<option>Hilang</option></select>") +
       "</div>" +
       medan("Nota", '<input type="text" name="nota" placeholder="Contoh: bateri kena tukar">') +
+      kotakLampiran("failPulang", null, "Gambar Keadaan Barang") +
       '<div class="baris-butang modal-kaki">' +
         '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
         '<button type="submit" class="btn btn-utama">Rekod Pulang</button>' +
       "</div>" +
     "</form>", 520);
 
+  var kotakP = {};
+  pasangLampiran($("#failPulang", m.el), kotakP);
+  pasangButangLampiran(m.el);
   $("[data-batal]", m.el).onclick = m.tutup;
   $("#borangPulang", m.el).onsubmit = function (e) {
     e.preventDefault();
     var v = ambilNilai($("#borangPulang", m.el));
-    var d = baca();
-    var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
-    var pp = (rekod.pinjam || []).filter(function (x) { return x.id === pinjamId; })[0];
-    if (!pp) return;
-    var q = nom(pp.kuantiti);
-    pp.tarikhPulang = v.tarikhPulang || kunciTarikh();
-    pp.keadaan = v.keadaan;
-    if (v.nota) pp.nota = (pp.nota ? pp.nota + " · " : "") + v.nota;
-    var kk = kiraAlat(rekod);
-    if (v.keadaan === "Rosak") rekod.rosak = Math.min(kk.jumlah, kk.rosak + q);
-    if (v.keadaan === "Hilang") rekod.hilang = Math.min(kk.jumlah, kk.hilang + q);
-    logAlat(rekod, "Pulang" + (v.keadaan !== "Baik" ? " (" + v.keadaan + ")" : ""), q, pp.nama, v.nota);
-    rekod.updatedAt = new Date().toISOString();
-    if (!simpan(d)) return;
-    m.tutup();
-    toast(pp.nama + " pulangkan " + q + " " + rekod.unit + ".", "ok");
-    lukis();
+    simpanLampiranBaharu(kotakP.fail).then(function (meta) {
+      var d = baca();
+      var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
+      var pp = (rekod.pinjam || []).filter(function (x) { return x.id === pinjamId; })[0];
+      if (!pp) return;
+      var q = nom(pp.kuantiti);
+      pp.tarikhPulang = v.tarikhPulang || kunciTarikh();
+      pp.keadaan = v.keadaan;
+      if (meta) pp.lampiranPulang = meta;
+      if (v.nota) pp.nota = (pp.nota ? pp.nota + " · " : "") + v.nota;
+      var kk = kiraAlat(rekod);
+      if (v.keadaan === "Rosak") rekod.rosak = Math.min(kk.jumlah, kk.rosak + q);
+      if (v.keadaan === "Hilang") rekod.hilang = Math.min(kk.jumlah, kk.hilang + q);
+      logAlat(rekod, "Pulang" + (v.keadaan !== "Baik" ? " (" + v.keadaan + ")" : ""), q, pp.nama, v.nota);
+      if (meta) rekod.log[0].lampiran = meta;
+      rekod.updatedAt = new Date().toISOString();
+      if (!simpan(d)) return;
+      m.tutup();
+      toast(pp.nama + " pulangkan " + q + " " + rekod.unit + ".", "ok");
+      lukis();
+    }).catch(function (err) { toast("Gagal simpan gambar: " + err.message, "bad", 6000); });
   };
 }
 
@@ -6870,12 +7001,16 @@ function gerakAlat(alatId, kunciGerak) {
       '<datalist id="senaraiStafGerak">' + data.staf.filter(function (x) { return x.status === "aktif"; })
         .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
       medan("Nota", '<input type="text" name="nota" placeholder="Contoh: guna untuk site Setia Alam">') +
+      kotakLampiran("failGerak", null,
+        kunciGerak === "tambah" ? "Resit Pembelian" : "Gambar / Bukti") +
       '<div class="baris-butang modal-kaki">' +
         '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
         '<button type="submit" class="btn btn-utama">Simpan</button>' +
       "</div>" +
     "</form>", 520);
 
+  var kotakG = {};
+  pasangLampiran($("#failGerak", m.el), kotakG);
   $("[data-batal]", m.el).onclick = m.tutup;
   $("#borangGerak", m.el).onsubmit = function (e) {
     e.preventDefault();
@@ -6909,10 +7044,13 @@ function gerakAlat(alatId, kunciGerak) {
     logAlat(rekod, g.label, q, v.oleh, v.nota);
     if (v.tarikh) rekod.log[0].tarikh = v.tarikh;
     rekod.updatedAt = new Date().toISOString();
-    if (!simpan(d)) return;
-    m.tutup();
-    toast(g.label + " direkod: " + q + " " + rekod.unit + ".", "ok");
-    lukis();
+    simpanLampiranBaharu(kotakG.fail).then(function (meta) {
+      if (meta) rekod.log[0].lampiran = meta;
+      if (!simpan(d)) return;
+      m.tutup();
+      toast(g.label + " direkod: " + q + " " + rekod.unit + ".", "ok");
+      lukis();
+    }).catch(function (err) { toast("Gagal simpan gambar: " + err.message, "bad", 6000); });
   };
 }
 
@@ -6952,7 +7090,8 @@ function lihatAlat(alatId) {
             '<td class="num">' + nom(x.kuantiti) + "</td>" +
             "<td>" + esc(fmtTarikh(x.tarikhAmbil)) + '<div class="kecil">' +
               Math.max(0, hariSejak(x.tarikhAmbil)) + " hari</div></td>" +
-            '<td class="bungkus kecil">' + esc(x.nota || "-") + "</td>" +
+            '<td class="bungkus kecil">' + esc(x.nota || "-") +
+              (x.lampiran ? " " + butangLampiran(x.lampiran, "Gambar") : "") + "</td>" +
             '<td><button type="button" class="btn btn-ok btn-kecil" data-pulang="' + esc(x.id) +
               '">Pulang</button></td></tr>';
         }).join("") + "</tbody></table></div>"
@@ -6967,7 +7106,8 @@ function lihatAlat(alatId) {
             '<td class="num">' + nom(x.kuantiti) + "</td>" +
             "<td>" + esc(fmtTarikh(x.tarikhAmbil)) + "</td>" +
             "<td>" + esc(fmtTarikh(x.tarikhPulang)) + "</td>" +
-            "<td>" + esc(x.keadaan || "Baik") + "</td></tr>";
+            "<td>" + esc(x.keadaan || "Baik") + " " +
+              butangLampiran(x.lampiranPulang || x.lampiran, "Gambar") + "</td></tr>";
         }).join("") + "</tbody></table></div>"
       : "") +
 
@@ -6978,7 +7118,8 @@ function lihatAlat(alatId) {
         a.log.slice(0, 20).map(function (l) {
           return "<tr><td>" + esc(fmtTarikh(l.tarikh)) + "</td><td>" + esc(l.jenis) + "</td>" +
             '<td class="num">' + esc(l.kuantiti) + "</td><td>" + esc(l.oleh || "-") + "</td>" +
-            '<td class="bungkus kecil">' + esc(l.nota || "-") + "</td></tr>";
+            '<td class="bungkus kecil">' + esc(l.nota || "-") +
+              (l.lampiran ? " " + butangLampiran(l.lampiran, "Gambar") : "") + "</td></tr>";
         }).join("") + "</tbody></table></div>"
       : kosong("Belum ada rekod pergerakan.")) +
 
@@ -7001,6 +7142,7 @@ function lihatAlat(alatId) {
   $$("[data-pulang]", m.el).forEach(function (b) {
     b.onclick = function () { m.tutup(); pulangBarang(alatId, b.getAttribute("data-pulang")); };
   });
+  pasangButangLampiran(m.el);
   if ($("#btnAmbilAlat", m.el)) {
     $("#btnAmbilAlat", m.el).onclick = function () { m.tutup(); borangAmbil(alatId); };
   }
@@ -7353,7 +7495,8 @@ function lukisAlat(bekas) {
                 '<td class="num">' + x.kuantiti + "</td>" +
                 "<td>" + esc(fmtTarikh(x.tarikh)) + '<div class="kecil">' +
                   Math.max(0, x.hari) + " hari</div></td>" +
-                '<td class="bungkus kecil">' + esc(x.nota || "-") + "</td>" +
+                '<td class="bungkus kecil">' + esc(x.nota || "-") +
+                  (x.lampiran ? " " + butangLampiran(x.lampiran, "Gambar") : "") + "</td>" +
                 '<td><button class="btn btn-ok" data-pulangbaris="' + esc(x.pinjamId) +
                   '" data-alatpulang="' + esc(x.alatId) + '">Pulang</button></td></tr>';
             }).join("") + "</tbody></table></div>" +
@@ -7481,6 +7624,7 @@ function lukisAlat(bekas) {
       pulangBarang(b.getAttribute("data-alatpulang"), b.getAttribute("data-pulangbaris"));
     };
   });
+  pasangButangLampiran(bekas);
   $$("[data-sijil]", bekas).forEach(function (b) {
     b.onclick = function () { bukaSijil(b.getAttribute("data-sijil")); };
   });
@@ -7731,29 +7875,35 @@ function bayarKomitmen(komitId) {
         medan("Untuk Tempoh", '<input type="text" name="tempoh" value="' + esc(s.tempoh) + '">') +
       "</div>" +
       medan("Nota", '<input type="text" name="nota" placeholder="Contoh: auto debit Maybank">') +
+      kotakLampiran("failBayarKomit", null, "Resit / Bukti Bayaran") +
       '<div class="baris-butang modal-kaki">' +
         '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
         '<button type="submit" class="btn btn-utama">Simpan Bayaran</button>' +
       "</div>" +
     "</form>", 560);
 
+  var kotakK = {};
+  pasangLampiran($("#failBayarKomit", m.el), kotakK);
   $("[data-batal]", m.el).onclick = m.tutup;
   $("#borangBayarKomit", m.el).onsubmit = function (e) {
     e.preventDefault();
     var v = ambilNilai($("#borangBayarKomit", m.el));
-    var d = baca();
-    var rekod = d.komitmen.filter(function (x) { return x.id === komitId; })[0];
-    rekod.bayar = rekod.bayar || [];
-    if (rekod.bayar.some(function (b) { return b.tempoh === v.tempoh; })) {
+    var semak = baca().komitmen.filter(function (x) { return x.id === komitId; })[0];
+    if ((semak.bayar || []).some(function (b) { return b.tempoh === v.tempoh; })) {
       return toast("Tempoh " + v.tempoh + " sudah ada rekod bayaran.", "warn", 5000);
     }
-    rekod.bayar.unshift({ id: id(), tarikh: v.tarikh || kunciTarikh(), jumlah: nom(v.jumlah),
-      tempoh: v.tempoh, nota: v.nota || "" });
-    rekod.updatedAt = new Date().toISOString();
-    if (!simpan(d)) return;
-    m.tutup();
-    toast("Bayaran " + rm(v.jumlah) + " direkod untuk " + v.tempoh + ".", "ok", 5000);
-    lukis();
+    simpanLampiranBaharu(kotakK.fail).then(function (meta) {
+      var d = baca();
+      var rekod = d.komitmen.filter(function (x) { return x.id === komitId; })[0];
+      rekod.bayar = rekod.bayar || [];
+      rekod.bayar.unshift({ id: id(), tarikh: v.tarikh || kunciTarikh(), jumlah: nom(v.jumlah),
+        tempoh: v.tempoh, nota: v.nota || "", lampiran: meta });
+      rekod.updatedAt = new Date().toISOString();
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Bayaran " + rm(v.jumlah) + " direkod untuk " + v.tempoh + ".", "ok", 5000);
+      lukis();
+    }).catch(function (err) { toast("Gagal simpan resit: " + err.message, "bad", 6000); });
   };
 }
 
@@ -7786,12 +7936,13 @@ function lihatKomitmen(komitId) {
     '<div class="tajuk-seksyen">Sejarah Bayaran</div>' +
     ((k.bayar || []).length
       ? '<div class="jadual-bungkus"><table><thead><tr><th>Tarikh</th><th>Tempoh</th>' +
-        "<th class='num'>Jumlah</th><th>Nota</th><th></th></tr></thead><tbody>" +
+        "<th class='num'>Jumlah</th><th>Nota</th><th>Resit</th></tr></thead><tbody>" +
         k.bayar.slice(0, 24).map(function (b) {
           return "<tr><td>" + esc(fmtTarikh(b.tarikh)) + "</td><td>" + esc(b.tempoh) + "</td>" +
             '<td class="num">' + esc(rm(b.jumlah)) + "</td>" +
             '<td class="bungkus kecil">' + esc(b.nota || "-") + "</td>" +
-            '<td><button type="button" class="btn btn-lembut btn-kecil" data-buangbayar="' +
+            "<td>" + butangLampiran(b.lampiran, "Resit") +
+              ' <button type="button" class="btn btn-lembut btn-kecil" data-buangbayar="' +
               esc(b.id) + '">Buang</button></td></tr>';
         }).join("") + "</tbody></table></div>"
       : kosong("Belum ada rekod bayaran.")) +
@@ -7800,6 +7951,7 @@ function lihatKomitmen(komitId) {
       '<button type="button" class="btn btn-utama" id="btnBayarKomit">Rekod Bayaran</button>' +
     "</div>", 720);
 
+  pasangButangLampiran(m.el);
   $("#btnSuntingKomit", m.el).onclick = function () { m.tutup(); borangKomitmen(komitId); };
   $("#btnBayarKomit", m.el).onclick = function () { m.tutup(); bayarKomitmen(komitId); };
   $$("[data-buangbayar]", m.el).forEach(function (b) {
