@@ -8,12 +8,33 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 2. Klik dua kali fail tersebut — ia terus terbuka dalam pelayar (Chrome / Edge).
 3. Untuk akses cepat, simpan sebagai bookmark atau letak di desktop.
 
+## Susunan menu
+
+Menu sisi disusun ikut kategori. Kumpulan boleh dibuka atau ditutup dengan
+menekan tajuknya.
+
+```
+Papan Utama
+Sale and Schedule
+Operasi
+Sub Job
+Tool ▸ Quotation · Invois · Resit
+Kewangan ▸ Tunggakan · Komitmen
+Aset & Stok ▸ Alat · Sticker & Bahan · Calibration Tool
+To Do
+Staf
+Tetapan
+```
+
+Nombor merah pada menu menunjukkan perkara yang perlu tindakan. Bila kumpulan
+ditutup, nombor itu naik ke tajuk kumpulan.
+
 ## Modul sedia ada
 
 | Menu | Kegunaan |
 |---|---|
 | **Papan Utama** | **Jalur amaran tugasan tertunggak di atas sekali**, jualan bulan ini, deposit, baki, % capai target, bilangan site, **carta 12 bulan (boleh tukar Jualan RM ↔ bilangan Site)**, job hari ini, kerja tertunggak, prestasi ikut sales & projek |
-| **Key-in Sale** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
+| **Sale and Schedule** | Paparan **Kalendar** atau **Senarai**. Rekod setiap tempahan: tarikh, masa inspection, client, unit, harga, water, electric, deposit, closed by, sumber lead, status kerja, invois, catatan. Baki dikira automatik |
 | **Operasi** | Siapa bergerak hari ini: jadual mengikut masa, staf ditugaskan, job belum ditugaskan, beban kerja 7 hari, **carta tugasan inspector bulan ini**, **nilai site setiap inspector**, tugasan report & submission, tukar status terus dari jadual |
 | **Quotation** | Jana sebut harga A4, pautan Syarat & Terma untuk client, mesej WhatsApp, dan tukar quotation yang diterima menjadi sale |
 | **Sub Job** | Kerja yang disubkan — direkod berasingan daripada jualan syarikat, dengan agihan RM kepada setiap staf/rakan dan baki bahagian syarikat |
@@ -26,7 +47,7 @@ Satu fail sahaja: **`index.html`**. Tiada pemasangan, tiada internet, tiada Fire
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Terbahagi kepada 5 tab: Syarikat & Target, Jualan & Status, Resit & Invois, Quotation, Data & Backup |
 
-## Kalendar Key-in Sale
+## Kalendar Sale and Schedule
 
 Setiap kotak tarikh memaparkan nama client, **masa inspection (dari–hingga)**, jumlah,
 serta jumlah jualan hari itu. Warna jalur mengikut status kerja.
@@ -155,7 +176,7 @@ AMOUNT DUE                             RM 450.00
 - Status juga boleh **ditetapkan manual** (Belum Bayar / Bayar Sebahagian /
   Sudah Bayar / Batal) jika perlu
 - Invois boleh dijana dari butiran jualan **atau** terus dari baris dalam
-  paparan Senarai Key-in Sale
+  paparan Senarai dalam Sale and Schedule
 
 ## Ayat hantar WhatsApp
 
@@ -187,7 +208,7 @@ kembali kepada kiraan automatik.
 
 ## Isi auto dari WhatsApp
 
-Dalam **Key-in Sale** tekan **Isi Auto (WhatsApp)**:
+Dalam **Sale and Schedule** tekan **Isi Auto (WhatsApp)**:
 
 1. **Salin Format Kosong** (atau **Hantar Format ke WhatsApp**) — hantar kepada admin.
 2. Admin isi maklumat dalam WhatsApp dan hantar balik.
@@ -272,12 +293,12 @@ Nota:
 
 ### Jadikan Sale / Jadikan Sub Job
 
-Tekan **Jadikan Sale** pada quotation — borang Key-in Sale terus terbuka dengan
+Tekan **Jadikan Sale** pada quotation — borang key-in sale terus terbuka dengan
 nama, telefon, alamat (No. Unit), jenis hartanah, harga dan catatan sudah terisi;
 *Dari* diisi **Quotation**. Tinggal isi **tarikh, masa inspection dan staf**,
 kemudian **Simpan Sale**. Bila disimpan:
 
-- Rekod terus masuk **Key-in Sale** dan muncul dalam kalendar
+- Rekod terus masuk **Sale and Schedule** dan muncul dalam kalendar
 - Quotation ditukar status kepada **Diterima**
 - Quotation dan sale terpaut — butang **Lihat Sale** muncul pada quotation, dan
   butiran jualan pula memaparkan baris **Quotation** dengan butang *Buka*
@@ -449,7 +470,7 @@ Butang **Hantar** juga ada pada setiap baris jadual dalam menu Operasi.
 Menu Operasi memaparkan jadual *Tugasan Report & Submission* — berapa report dan
 submission tertunggak bagi setiap staf, termasuk yang **belum ditugaskan**.
 
-Nombor merah pada menu **Key-in Sale** = bilangan job yang belum selesai.
+Nombor merah pada menu **Sale and Schedule** = bilangan job yang belum selesai.
 
 ## Tunggakan (aging)
 

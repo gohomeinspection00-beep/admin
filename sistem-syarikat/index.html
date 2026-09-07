@@ -67,6 +67,12 @@ input[type=checkbox]{width:auto;margin:0 8px 0 0;vertical-align:middle}
 .nav-item.aktif{background:var(--utama);color:#fff}
 .nav-ikon{width:20px;text-align:center}
 .lencana-menu{margin-left:auto;background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;font-weight:700}
+.nav-tajuk{width:100%;background:none;border:0;font:inherit;cursor:pointer;text-align:left}
+.nav-tajuk .nav-anak-panah{margin-left:auto;font-size:10px;color:#64748b}
+.nav-tajuk .lencana-menu+.nav-anak-panah{margin-left:6px}
+.nav-anak-senarai{margin:0 0 4px 14px;border-left:1px solid #1e293b;padding-left:8px}
+.nav-item.nav-anak{padding:8px 10px;font-size:13px;font-weight:500;color:#94a3b8}
+.nav-item.nav-anak.aktif{color:#fff}
 .sisi-bawah{padding:14px;border-top:1px solid #1e293b}
 .pengguna{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .avatar{width:36px;height:36px;border-radius:50%;background:var(--utama);color:#fff;display:grid;place-items:center;font-weight:700;flex:0 0 36px}
@@ -8353,6 +8359,8 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  tool: '<svg viewBox="0 0 24 24"><path d="M4 4h10l4 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M13 4v5h5"/><path d="M7 13h7M7 17h4"/><path d="M18.5 2.5 21 5l-4.5 4.5H14V7z"/></svg>',
+  wang: '<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 12h.01M17.5 12h.01"/></svg>',
   komitmen: '<svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M6 15h4"/></svg>',
   todo: '<svg viewBox="0 0 24 24"><path d="M9 5h11M9 12h11M9 19h11"/><path d="m3 5 1.6 1.6L7.5 3.7"/><path d="m3 12 1.6 1.6L7.5 10.7"/><path d="m3 19 1.6 1.6L7.5 17.7"/></svg>',
   alat: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1 5.4 5.2l-8.6 8.6a2 2 0 0 1-2.8-2.8l8.6-8.6"/><path d="M9.5 4.5 4 10l3.5 3.5"/></svg>',
@@ -8363,7 +8371,7 @@ var IKON = {
 
 var HALAMAN = [
   { id: "papan",   label: "Papan Utama",  ikon: IKON.papan,   lukis: lukisPapan },
-  { id: "sale",    label: "Key-in Sale",  ikon: IKON.sale,    lukis: lukisSale },
+  { id: "sale",    label: "Sale and Schedule", ikon: IKON.sale, lukis: lukisSale },
   { id: "operasi", label: "Operasi",      ikon: IKON.operasi, lukis: lukisOperasi },
   { id: "quote",   label: "Quotation",    ikon: IKON.quote,   lukis: lukisQuotation },
   { id: "subjob",  label: "Sub Job",      ikon: IKON.subjob,  lukis: lukisSubJob },
@@ -8377,9 +8385,49 @@ var HALAMAN = [
   { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
 ];
 
+// Menu sisi disusun ikut kategori. Kumpulan boleh dibuka / tutup.
+var MENU = [
+  { id: "papan" },
+  { id: "sale" },
+  { id: "operasi" },
+  { id: "subjob" },
+  { kumpulan: "tool", label: "Tool", ikon: IKON.tool,
+    anak: [{ id: "quote" }, { id: "invois" }, { id: "resit" }] },
+  { kumpulan: "kewangan", label: "Kewangan", ikon: IKON.wang,
+    anak: [{ id: "tunggak" }, { id: "komitmen" }] },
+  { kumpulan: "aset", label: "Aset & Stok", ikon: IKON.alat,
+    anak: [{ id: "alat", sub: "alat", label: "Alat" },
+           { id: "alat", sub: "sticker", label: "Sticker & Bahan" },
+           { id: "alat", sub: "kalibrasi", label: "Calibration Tool" }] },
+  { id: "todo" },
+  { id: "staf" },
+  { id: "tetapan" }
+];
+
+var menuTutup = {};        // kumpulan yang ditutup oleh pengguna
+var HASH_SUB = "";
+
+function halamanIkutId(idHalaman) {
+  return HALAMAN.filter(function (x) { return x.id === idHalaman; })[0];
+}
+
 function halamanSemasa() {
   var h = (location.hash || "").replace(/^#\/?/, "") || "papan";
-  return HALAMAN.filter(function (x) { return x.id === h; })[0] || HALAMAN[0];
+  var bhg = h.split("/");
+  HASH_SUB = bhg[1] || "";
+  return halamanIkutId(bhg[0]) || HALAMAN[0];
+}
+
+// Sub-halaman dari pautan menu (contoh #/alat/sticker).
+function pasangSubHalaman(idHalaman) {
+  if (!HASH_SUB) return;
+  if (idHalaman === "alat" && ["alat", "sticker", "kalibrasi"].indexOf(HASH_SUB) !== -1) {
+    tabAlat = HASH_SUB;
+  }
+  if (idHalaman === "komitmen") {
+    var peta = { transport: "Transport", pinjaman: "Pinjaman", lain: "Lain" };
+    if (peta[HASH_SUB]) tabKomitmen = peta[HASH_SUB];
+  }
 }
 
 function binaMenu() {
@@ -8395,19 +8443,49 @@ function binaMenu() {
   var bilKomit = komitmenPerluPerhatian(data).length;
   var bilTugas = tugasPerluPerhatian(data).length;
 
-  $("#navMenu").innerHTML = HALAMAN.map(function (h) {
-    var lencana = (h.id === "sale" && perluTindakan) ? perluTindakan
-      : ((h.id === "tunggak" && bilLewat) ? bilLewat
-      : ((h.id === "alat" && bilAlat) ? bilAlat
-      : ((h.id === "komitmen" && bilKomit) ? bilKomit
-      : ((h.id === "todo" && bilTugas) ? bilTugas : 0))));
-    return '<a class="nav-item" href="#/' + h.id + '" data-nav="' + h.id + '">' +
-      '<span class="nav-ikon">' + h.ikon + "</span><span>" + esc(h.label) + "</span>" +
+  var lencanaHalaman = { sale: perluTindakan, tunggak: bilLewat, alat: bilAlat,
+    komitmen: bilKomit, todo: bilTugas };
+  var semasa = halamanSemasa();
+
+  var pautan = function (x, dalam) {
+    var h = halamanIkutId(x.id);
+    if (!h) return "";
+    var lencana = dalam && x.sub ? 0 : (lencanaHalaman[x.id] || 0);
+    var aktif = semasa.id === x.id && (!x.sub || HASH_SUB === x.sub ||
+      (!HASH_SUB && x.sub === (x.id === "alat" ? tabAlat : "")));
+    return '<a class="nav-item' + (dalam ? " nav-anak" : "") + (aktif ? " aktif" : "") +
+      '" href="#/' + x.id + (x.sub ? "/" + x.sub : "") + '" data-nav="' + x.id + '">' +
+      (dalam ? "" : '<span class="nav-ikon">' + h.ikon + "</span>") +
+      "<span>" + esc(x.label || h.label) + "</span>" +
       (lencana ? '<span class="lencana-menu">' + lencana + "</span>" : "") +
       "</a>";
+  };
+
+  $("#navMenu").innerHTML = MENU.map(function (m) {
+    if (!m.kumpulan) return pautan(m, false);
+    var kiraKumpulan = m.anak.reduce(function (t, x) { return t + (lencanaHalaman[x.id] || 0); }, 0);
+    var adaAktif = m.anak.some(function (x) { return x.id === semasa.id; });
+    var buka = adaAktif || !menuTutup[m.kumpulan];
+    return '<div class="nav-kumpulan' + (buka ? " buka" : "") + '">' +
+      '<button type="button" class="nav-item nav-tajuk" data-kumpulan="' + m.kumpulan + '">' +
+        '<span class="nav-ikon">' + m.ikon + "</span><span>" + esc(m.label) + "</span>" +
+        (kiraKumpulan && !buka ? '<span class="lencana-menu">' + kiraKumpulan + "</span>" : "") +
+        '<span class="nav-anak-panah">' + (buka ? "&#9662;" : "&#9656;") + "</span>" +
+      "</button>" +
+      '<div class="nav-anak-senarai"' + (buka ? "" : ' hidden') + ">" +
+        m.anak.map(function (x) { return pautan(x, true); }).join("") +
+      "</div></div>";
   }).join("");
+
   $$("#navMenu a").forEach(function (a) {
     a.onclick = function () { $("#sisi").classList.remove("buka"); };
+  });
+  $$("#navMenu [data-kumpulan]").forEach(function (b) {
+    b.onclick = function () {
+      var k = b.getAttribute("data-kumpulan");
+      menuTutup[k] = !menuTutup[k];
+      binaMenu();
+    };
   });
   $("#sisiSyarikat").textContent = data.tetapan.namaSyarikat;
 }
@@ -8415,10 +8493,8 @@ function binaMenu() {
 function lukis() {
   CFG = null;                     // tetapan mungkin berubah antara paparan
   var h = halamanSemasa();
+  pasangSubHalaman(h.id);
   binaMenu();
-  $$("[data-nav]").forEach(function (a) {
-    a.classList.toggle("aktif", a.getAttribute("data-nav") === h.id);
-  });
   $("#tajukHalaman").textContent = h.label;
   var bekas = $("#kandungan");
   bekas.innerHTML = "";
