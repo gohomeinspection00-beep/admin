@@ -613,6 +613,7 @@ function baca() {
   mentah.komitmen = mentah.komitmen || [];  // transport, pinjaman, komitmen lain
   mentah.tugasan = mentah.tugasan || [];    // senarai to do
   mentah.belanja = mentah.belanja || [];    // perbelanjaan, marketing & claim staf
+  mentah.pasukan = mentah.pasukan || [];    // team kerja
   mentah.tetapan.quote = Object.assign({}, TETAPAN_ASAL.quote, mentah.tetapan.quote || {});
   // Setiap servis perlu id tetap — kunci untuk fail lampiran PDF dalam storan.
   mentah.tetapan.quote.servis = (mentah.tetapan.quote.servis || []).map(function (x) {
@@ -6665,7 +6666,7 @@ function kiraAlat(a) {
   var berfungsi = Math.max(0, jumlah - rosak - hilang);
   var minimum = Math.max(0, nom(a.minimum));
   // Bahan pakai: amaran bila sampai paras minimum. Alat: amaran bila kurang dari paras minimum.
-  var rendah = minimum > 0 &&
+  var rendah = !a.abaikanStok && minimum > 0 &&
     (a.jenis === "Bahan Pakai" ? berfungsi <= minimum : berfungsi < minimum);
   var dipinjam = (a.pinjam || []).filter(function (x) { return !x.tarikhPulang; })
     .reduce(function (t, x) { return t + nom(x.kuantiti); }, 0);
@@ -6681,7 +6682,11 @@ function kiraAlat(a) {
 
 function statusAlat(a) {
   var k = kiraAlat(a);
-  if (k.habis) {
+  if (a.abaikanStok && k.rosak <= 0 && k.hilang <= 0) {
+    return { teks: k.habis ? "Guna sepenuhnya" : "Baik", warna: k.habis ? "muted" : "ok",
+             perhatian: false };
+  }
+  if (k.habis && !a.abaikanStok) {
     return { teks: a.jenis === "Bahan Pakai" ? "Habis" : "Tiada yang berfungsi", warna: "bad", perhatian: true };
   }
   if (k.rendah) return { teks: "Hampir habis", warna: "warn", perhatian: true };
@@ -6824,7 +6829,8 @@ function semuaPinjaman(data) {
   (data.alat || []).forEach(function (a) {
     pinjamTerbuka(a).forEach(function (p) {
       hasil.push({ alatId: a.id, alat: a.nama, unit: a.unit, pinjamId: p.id,
-        nama: p.nama, kuantiti: nom(p.kuantiti), tarikh: p.tarikhAmbil, nota: p.nota,
+        nama: p.nama, pasukan: p.pasukan || "", kuantiti: nom(p.kuantiti),
+        tarikh: p.tarikhAmbil, nota: p.nota,
         lampiran: p.lampiran, hari: hariSejak(p.tarikhAmbil) });
     });
   });
@@ -6849,9 +6855,16 @@ function borangAmbil(alatId) {
       '<div class="baris-medan">' +
         medan("Siapa Ambil *", '<input list="senaraiStafAmbil" name="nama" required ' +
           'placeholder="Nama staf">') +
+        medan("Untuk Team", "<select name='pasukanId'><option value=''>— tiada team —</option>" +
+          (data.pasukan || []).filter(function (x) { return x.aktif !== false; }).map(function (x) {
+            return "<option value='" + esc(x.id) + "'>" + esc(x.nama) + "</option>";
+          }).join("") + "</select>") +
         medan("Berapa Unit *", '<input type="number" step="1" min="1" max="' + k.adaUntukAmbil +
           '" name="kuantiti" value="1" required>') +
+      "</div>" +
+      '<div class="baris-medan">' +
         medan("Tarikh Ambil", '<input type="date" name="tarikhAmbil" value="' + esc(kunciTarikh()) + '">') +
+        medan("&nbsp;", "<div></div>") +
       "</div>" +
       '<datalist id="senaraiStafAmbil">' + data.staf.filter(function (x) { return x.status === "aktif"; })
         .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
@@ -6865,6 +6878,13 @@ function borangAmbil(alatId) {
 
   var kotak = {};
   pasangLampiran($("#failAmbil", m.el), kotak);
+  // Bila nama staf dipilih, cadangkan team dia secara automatik.
+  $("[name=nama]", m.el).onchange = function (e) {
+    var pilih = $("[name=pasukanId]", m.el);
+    if (!pilih || pilih.value) return;
+    var team = pasukanStaf(baca(), e.target.value)[0];
+    if (team) pilih.value = team.id;
+  };
   $("[data-batal]", m.el).onclick = m.tutup;
   $("#borangAmbil", m.el).onsubmit = function (e) {
     e.preventDefault();
@@ -6879,10 +6899,12 @@ function borangAmbil(alatId) {
       var d = baca();
       var rekod = d.alat.filter(function (x) { return x.id === alatId; })[0];
       rekod.pinjam = rekod.pinjam || [];
+      var namaTeam = v.pasukanId ? namaPasukan(d, v.pasukanId) : "";
       rekod.pinjam.unshift({ id: id(), nama: v.nama, kuantiti: q,
+        pasukanId: v.pasukanId || "", pasukan: namaTeam,
         tarikhAmbil: v.tarikhAmbil || kunciTarikh(), tarikhPulang: null, nota: v.nota || "",
         lampiran: meta });
-      logAlat(rekod, "Ambil", q, v.nama, v.nota);
+      logAlat(rekod, "Ambil", q, v.nama + (namaTeam ? " (" + namaTeam + ")" : ""), v.nota);
       if (meta) rekod.log[0].lampiran = meta;
       rekod.updatedAt = new Date().toISOString();
       if (!simpan(d)) return;
@@ -6980,6 +7002,8 @@ function borangAlat(alatId) {
         medan("Paras Minimum", '<input type="number" step="1" min="0" name="minimum" value="' +
           esc(a.minimum || 0) + '">') +
       "</div>" +
+      '<label class="chip pilih-chip" style="margin-bottom:10px"><input type="checkbox" ' +
+        'id="abaikanStok"' + (a.abaikanStok ? " checked" : "") + ">Abaikan amaran stok untuk barang ini</label>" +
       '<datalist id="senaraiUnitAlat">' + UNIT_ALAT.map(function (x) {
         return "<option>" + esc(x) + "</option>";
       }).join("") + "</datalist>" +
@@ -7003,7 +7027,10 @@ function borangAlat(alatId) {
 
       '<p class="kecil" style="margin:-6px 0 12px">Paras minimum ialah amaran stok: ' +
       "bahan pakai habis akan ditanda <b>Hampir habis</b> bila baki sampai paras ini, " +
-      "manakala alat ditanda bila baki <b>kurang</b> dari paras ini. Isi 0 kalau tak perlu amaran.</p>" +
+      "manakala alat ditanda bila baki <b>kurang</b> dari paras ini. Isi 0 kalau tak perlu amaran.<br>" +
+      "Tandakan <b>Abaikan amaran stok</b> untuk barang yang memang digunakan sepenuhnya " +
+      "(contoh: tangga 2 unit dan dua-duanya sentiasa keluar) — amaran habis tidak akan " +
+      "keluar, tetapi rosak dan hilang tetap dilaporkan.</p>" +
       medan("Nota", '<textarea name="nota" style="min-height:56px">' + esc(a.nota || "") + "</textarea>") +
       '<div class="baris-butang modal-kaki">' +
         (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamAlat">Padam</button>') +
@@ -7041,6 +7068,8 @@ function borangAlat(alatId) {
       id: alatId || id(),
       nama: v.nama, kategori: v.kategori, jenis: v.jenis, unit: v.unit || "unit",
       jumlah: nom(v.jumlah), rosak: nom(v.rosak), hilang: nom(v.hilang), minimum: nom(v.minimum),
+      abaikanStok: $("#abaikanStok", m.el) ? $("#abaikanStok", m.el).checked : !!a.abaikanStok,
+      pasukan: a.pasukan || [],
       harga: nom(v.harga), lokasi: v.lokasi, pegang: v.pegang, tarikhBeli: v.tarikhBeli, nota: v.nota,
       log: a.log || [],
       pinjam: a.pinjam || [],
@@ -7157,7 +7186,10 @@ function lihatAlat(alatId) {
     '<div class="tajuk-seksyen">Butiran</div>' +
     '<dl class="kunci-nilai">' +
       baris("Kategori", a.kategori) + baris("Jenis", a.jenis) +
+      baris("Kit team", ((a.pasukan || []).map(function (k) { return namaPasukan(data, k); })
+        .filter(Boolean).join(", "))) +
       baris("Simpan di", a.lokasi) + baris("Dipegang oleh", a.pegang) +
+      baris("Amaran stok", a.abaikanStok ? "Diabaikan (barang guna sepenuhnya)" : "") +
       baris("Tarikh beli", a.tarikhBeli ? fmtTarikh(a.tarikhBeli) : "") +
       baris("Nota", a.nota) +
     "</dl>" +
@@ -7167,7 +7199,8 @@ function lihatAlat(alatId) {
         '<div class="jadual-bungkus"><table><thead><tr><th>Nama</th><th class="num">Unit</th>' +
         "<th>Ambil</th><th>Nota</th><th></th></tr></thead><tbody>" +
         pinjamTerbuka(a).map(function (x) {
-          return "<tr><td><b>" + esc(x.nama) + "</b></td>" +
+          return "<tr><td><b>" + esc(x.nama) + "</b>" +
+              (x.pasukan ? '<div class="kecil">' + esc(x.pasukan) + "</div>" : "") + "</td>" +
             '<td class="num">' + nom(x.kuantiti) + "</td>" +
             "<td>" + esc(fmtTarikh(x.tarikhAmbil)) + '<div class="kecil">' +
               Math.max(0, hariSejak(x.tarikhAmbil)) + " hari</div></td>" +
@@ -7455,7 +7488,8 @@ function jadualBarang(senarai, bahan) {
         '<td class="num">' + (k.rosak || k.hilang
           ? "<b style='color:var(--bad)'>" + k.rosak + " / " + k.hilang + "</b>"
           : '<span class="kecil">0 / 0</span>') + "</td>" +
-        '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span></td>" +
+        '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span>" +
+          (a.abaikanStok ? '<div class="kecil">stok diabaikan</div>' : "") + "</td>" +
         '<td><div class="aksi">' +
           '<button class="btn btn-lembut" data-alat="' + esc(a.id) + '">Buka</button>' +
           (bahan
@@ -7571,7 +7605,8 @@ function lukisAlat(bekas) {
             '<div class="jadual-bungkus"><table><thead><tr><th>Nama</th><th>Barang</th>' +
             "<th class='num'>Unit</th><th>Ambil</th><th>Nota</th><th></th></tr></thead><tbody>" +
             pinjaman.map(function (x) {
-              return "<tr><td><b>" + esc(x.nama) + "</b></td>" +
+              return "<tr><td><b>" + esc(x.nama) + "</b>" +
+                  (x.pasukan ? '<div class="kecil">' + esc(x.pasukan) + "</div>" : "") + "</td>" +
                 '<td class="bungkus">' + esc(x.alat) + "</td>" +
                 '<td class="num">' + x.kuantiti + "</td>" +
                 "<td>" + esc(fmtTarikh(x.tarikh)) + '<div class="kecil">' +
@@ -8893,6 +8928,305 @@ function lukisBelanja(bekas) {
   pasangButangLampiran(bekas);
 }
 
+/* ======================================================================
+   TEAM — kumpulan kerja, ahli dan alat yang dipegang
+   ================================================================== */
+
+var pasukanCari = "";
+
+function namaPasukan(data, pasukanId) {
+  var p = (data.pasukan || []).filter(function (x) { return x.id === pasukanId; })[0];
+  return p ? p.nama : "";
+}
+
+function pasukanStaf(data, nama) {
+  return (data.pasukan || []).filter(function (p) {
+    return p.ketua === nama || (p.ahli || []).indexOf(nama) !== -1;
+  });
+}
+
+// Alat yang dipegang satu team: kit tetap + yang sedang diambil atas nama team.
+function alatPasukan(data, pasukanId) {
+  var kit = (data.alat || []).filter(function (a) {
+    return (a.pasukan || []).indexOf(pasukanId) !== -1;
+  });
+  var pinjam = [];
+  (data.alat || []).forEach(function (a) {
+    pinjamTerbuka(a).forEach(function (p) {
+      if (p.pasukanId === pasukanId) {
+        pinjam.push({ alat: a, pinjam: p });
+      }
+    });
+  });
+  return { kit: kit, pinjam: pinjam };
+}
+
+function borangPasukan(pasukanId) {
+  var data = baca();
+  var p = pasukanId ? data.pasukan.filter(function (x) { return x.id === pasukanId; })[0] : null;
+  var baru = !p;
+  p = p || { nama: "", ahli: [], alat: [], aktif: true };
+
+  var stafAktif = data.staf.filter(function (x) { return x.status === "aktif"; });
+  var alatSemua = (data.alat || []).filter(function (x) { return x.jenis === "Alat"; });
+
+  var m = modal(baru ? "Team Baharu" : "Sunting Team",
+    '<form id="borangPasukan">' +
+      '<div class="baris-medan">' +
+        medan("Nama Team *", '<input type="text" name="nama" value="' + esc(p.nama || "") +
+          '" placeholder="Contoh: Team A" required>') +
+        medan("Ketua Team", '<input list="senaraiKetua" name="ketua" value="' + esc(p.ketua || "") + '">') +
+        medan("Aktif", "<select name='aktif'><option value='ya'" +
+          (p.aktif !== false ? " selected" : "") + ">Ya</option><option value='tidak'" +
+          (p.aktif === false ? " selected" : "") + ">Tidak</option></select>") +
+      "</div>" +
+      '<datalist id="senaraiKetua">' + stafAktif.map(function (x) {
+        return "<option>" + esc(x.nama) + "</option>";
+      }).join("") + "</datalist>" +
+
+      "<label>Ahli Team <span class='kecil'>(tidak wajib)</span></label>" +
+      '<div class="senarai-cuti" style="margin-bottom:14px">' +
+        (stafAktif.length
+          ? stafAktif.map(function (x) {
+              return '<label class="chip pilih-chip"><input type="checkbox" class="ahliPilih" value="' +
+                esc(x.nama) + '"' + ((p.ahli || []).indexOf(x.nama) !== -1 ? " checked" : "") +
+                ">" + esc(x.nama) + "</label>";
+            }).join("")
+          : '<span class="kecil">Belum ada staf aktif. Team boleh disimpan tanpa ahli.</span>') +
+      "</div>" +
+
+      "<label>Alat Dipegang Team <span class='kecil'>(kit tetap team ini)</span></label>" +
+      '<div class="senarai-cuti" style="margin-bottom:14px">' +
+        (alatSemua.length
+          ? alatSemua.map(function (x) {
+              return '<label class="chip pilih-chip"><input type="checkbox" class="alatPilih" value="' +
+                esc(x.id) + '"' + ((p.alat || []).indexOf(x.id) !== -1 ? " checked" : "") +
+                ">" + esc(x.nama) + "</label>";
+            }).join("")
+          : '<span class="kecil">Belum ada alat dalam sistem.</span>') +
+      "</div>" +
+
+      medan("Nota", '<textarea name="nota" style="min-height:56px">' + esc(p.nota || "") + "</textarea>") +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamPasukan">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan Team" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 680);
+
+  var borang = $("#borangPasukan", m.el);
+  $("[data-batal]", m.el).onclick = m.tutup;
+
+  if ($("#btnPadamPasukan", m.el)) {
+    $("#btnPadamPasukan", m.el).onclick = function () {
+      sahkan("Padam team " + p.nama + "? Rekod alat dan sejarah tidak dipadam.").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.pasukan = d.pasukan.filter(function (x) { return x.id !== pasukanId; });
+        d.alat = d.alat.map(function (a) {
+          a.pasukan = (a.pasukan || []).filter(function (k) { return k !== pasukanId; });
+          return a;
+        });
+        simpan(d);
+        m.tutup();
+        toast("Team dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai(borang);
+    if (!v.nama) return toast("Sila isi nama team.", "bad");
+    var ahli = $$(".ahliPilih:checked", m.el).map(function (c) { return c.value; });
+    var alatPilih = $$(".alatPilih:checked", m.el).map(function (c) { return c.value; });
+    var d = baca();
+    var rekodId = pasukanId || id();
+    var rekod = {
+      id: rekodId, nama: v.nama, ketua: v.ketua, ahli: ahli, alat: alatPilih,
+      aktif: v.aktif !== "tidak", nota: v.nota,
+      createdAt: p.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    if (pasukanId) d.pasukan = d.pasukan.map(function (x) { return x.id === pasukanId ? rekod : x; });
+    else d.pasukan.push(rekod);
+    // Simpan pegangan pada rekod alat juga supaya senang dipapar dalam senarai alat.
+    d.alat = d.alat.map(function (a) {
+      var ada = (a.pasukan || []).indexOf(rekodId) !== -1;
+      var patut = alatPilih.indexOf(a.id) !== -1;
+      if (patut && !ada) a.pasukan = (a.pasukan || []).concat([rekodId]);
+      if (!patut && ada) a.pasukan = (a.pasukan || []).filter(function (k) { return k !== rekodId; });
+      return a;
+    });
+    if (!simpan(d)) return;
+    m.tutup();
+    toast(pasukanId ? "Team dikemas kini." : "Team ditambah.", "ok");
+    lukis();
+  };
+}
+
+function lihatPasukan(pasukanId) {
+  var data = baca();
+  var p = data.pasukan.filter(function (x) { return x.id === pasukanId; })[0];
+  if (!p) return;
+  var alat = alatPasukan(data, pasukanId);
+  var orang = (p.ketua ? [p.ketua] : []).concat((p.ahli || []).filter(function (x) {
+    return x !== p.ketua;
+  }));
+
+  var m = modal("Team " + p.nama,
+    '<div class="grid grid-4" style="margin-bottom:4px">' +
+      kadStat("Ahli", String(orang.length), p.ketua ? "ketua: " + p.ketua : "tiada ketua ditetapkan") +
+      kadStat("Alat Kit Team", String(alat.kit.length), "dipegang tetap") +
+      kadStat("Sedang Diambil", String(alat.pinjam.length), "belum dipulangkan") +
+      kadStat("Status", p.aktif === false ? "Tidak aktif" : "Aktif", p.nota || "") +
+    "</div>" +
+
+    '<div class="tajuk-seksyen">Ahli Team</div>' +
+    (orang.length
+      ? '<div class="senarai-cuti">' + orang.map(function (n) {
+          return '<span class="chip">' + esc(n) + (n === p.ketua ? " · ketua" : "") + "</span>";
+        }).join("") + "</div>"
+      : kosong("Team ini belum ada ahli. Tidak mengapa — nama team masih boleh digunakan.")) +
+
+    '<div class="tajuk-seksyen">Alat Kit Team</div>' +
+    (alat.kit.length
+      ? '<div class="jadual-bungkus"><table><thead><tr><th>Alat</th><th class="num">Boleh Guna</th>' +
+        "<th>Status</th><th></th></tr></thead><tbody>" +
+        alat.kit.map(function (a) {
+          var k = kiraAlat(a), st = statusAlat(a);
+          return "<tr><td class='bungkus'><b>" + esc(a.nama) + "</b>" +
+            '<div class="kecil">' + esc(a.kategori || "-") + "</div></td>" +
+            '<td class="num">' + k.berfungsi + " " + esc(a.unit) + "</td>" +
+            '<td><span class="badge badge-' + st.warna + '">' + esc(st.teks) + "</span></td>" +
+            '<td><button type="button" class="btn btn-lembut btn-kecil" data-alatteam="' +
+              esc(a.id) + '">Buka</button></td></tr>';
+        }).join("") + "</tbody></table></div>"
+      : kosong("Belum ada alat ditetapkan sebagai kit team ini.")) +
+
+    '<div class="tajuk-seksyen">Sedang Diambil Atas Nama Team</div>' +
+    (alat.pinjam.length
+      ? '<div class="jadual-bungkus"><table><thead><tr><th>Alat</th><th>Diambil Oleh</th>' +
+        "<th class='num'>Unit</th><th>Tarikh</th></tr></thead><tbody>" +
+        alat.pinjam.map(function (x) {
+          return "<tr><td class='bungkus'>" + esc(x.alat.nama) + "</td>" +
+            "<td>" + esc(x.pinjam.nama || "-") + "</td>" +
+            '<td class="num">' + nom(x.pinjam.kuantiti) + "</td>" +
+            "<td>" + esc(fmtTarikh(x.pinjam.tarikhAmbil)) + '<div class="kecil">' +
+              Math.max(0, hariSejak(x.pinjam.tarikhAmbil)) + " hari</div></td></tr>";
+        }).join("") + "</tbody></table></div>"
+      : kosong("Tiada alat sedang diambil atas nama team ini.")) +
+
+    '<div class="baris-butang modal-kaki">' +
+      '<button type="button" class="btn btn-utama" id="btnSuntingPasukan">Sunting Team</button>' +
+    "</div>", 720);
+
+  $("#btnSuntingPasukan", m.el).onclick = function () { m.tutup(); borangPasukan(pasukanId); };
+  $$("[data-alatteam]", m.el).forEach(function (b) {
+    b.onclick = function () { m.tutup(); lihatAlat(b.getAttribute("data-alatteam")); };
+  });
+}
+
+function lukisPasukan(bekas) {
+  var data = baca();
+  var teks = pasukanCari.trim().toLowerCase();
+  var semua = data.pasukan || [];
+  var senarai = semua.filter(function (p) {
+    if (!teks) return true;
+    var gabung = [p.nama, p.ketua, (p.ahli || []).join(" "), p.nota].join(" ").toLowerCase();
+    return gabung.indexOf(teks) !== -1;
+  }).sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); });
+
+  var stafAktif = data.staf.filter(function (x) { return x.status === "aktif"; });
+  var dalamTeam = {};
+  semua.forEach(function (p) {
+    (p.ketua ? [p.ketua] : []).concat(p.ahli || []).forEach(function (n) { dalamTeam[n] = true; });
+  });
+  var luarTeam = stafAktif.filter(function (x) { return !dalamTeam[x.nama]; });
+  var jumlahAlat = semua.reduce(function (t, p) { return t + (p.alat || []).length; }, 0);
+
+  bekas.innerHTML =
+    '<div class="grid grid-4">' +
+      kadStat("Team", String(semua.length),
+        semua.filter(function (p) { return p.aktif !== false; }).length + " aktif") +
+      kadStat("Staf Dalam Team", String(Object.keys(dalamTeam).length),
+        stafAktif.length + " staf aktif") +
+      kadStat("Belum Ada Team", String(luarTeam.length),
+        luarTeam.length ? luarTeam.map(function (x) { return x.nama; }).slice(0, 3).join(", ") : "semua sudah ada team") +
+      kadStat("Alat Dipegang Team", String(jumlahAlat), "kit tetap semua team") +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Senarai Team</h3>' +
+        '<div class="aksi">' +
+          '<button class="btn btn-utama" id="btnPasukanBaru">Tambah Team</button>' +
+          '<button class="btn btn-lembut" id="btnEksportPasukan">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<p class="kecil" style="margin:-4px 0 12px">Ahli team tidak wajib — nama team sahaja pun ' +
+      "boleh. Bila staf ambil alat, boleh pilih team supaya sejarah alat menunjukkan " +
+      "<b>team mana yang pegang</b>.</p>" +
+      '<div class="penapis">' +
+        '<label style="min-width:220px">Cari<input type="search" id="fCariPasukan" ' +
+          'placeholder="Nama team, ketua, ahli…" value="' + esc(pasukanCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetPasukan">Reset</button>' +
+      "</div>" +
+      '<div class="jadual-bungkus">' +
+      (senarai.length
+        ? "<table><thead><tr><th>Team</th><th>Ketua</th><th>Ahli</th><th>Alat Kit</th>" +
+          "<th>Sedang Diambil</th><th></th></tr></thead><tbody>" +
+          senarai.map(function (p) {
+            var alat = alatPasukan(data, p.id);
+            return "<tr" + (p.aktif === false ? ' style="opacity:.6"' : "") + ">" +
+              '<td class="bungkus"><b>' + esc(p.nama) + "</b>" +
+                (p.aktif === false ? '<div class="kecil">tidak aktif</div>' : "") +
+                (p.nota ? '<div class="kecil">' + esc(p.nota) + "</div>" : "") + "</td>" +
+              "<td>" + esc(p.ketua || "-") + "</td>" +
+              '<td class="bungkus kecil">' + ((p.ahli || []).length ? esc(p.ahli.join(", ")) : "-") + "</td>" +
+              '<td class="bungkus kecil">' + (alat.kit.length
+                ? esc(alat.kit.map(function (a) { return a.nama; }).join(", ")) : "-") + "</td>" +
+              "<td>" + (alat.pinjam.length
+                ? '<span class="badge badge-warn">' + alat.pinjam.length + " alat</span>"
+                : '<span class="kecil">tiada</span>') + "</td>" +
+              '<td><div class="aksi">' +
+                '<button class="btn btn-lembut" data-pasukan="' + esc(p.id) + '">Buka</button>' +
+                '<button class="btn btn-lembut" data-suntingpasukan="' + esc(p.id) + '">Sunting</button>' +
+              "</div></td></tr>";
+          }).join("") + "</tbody></table>"
+        : kosong("Belum ada team. Tekan “Tambah Team” untuk mula.")) +
+      "</div>" +
+    "</div>";
+
+  $("#btnPasukanBaru").onclick = function () { borangPasukan(null); };
+  $("#btnResetPasukan").onclick = function () { pasukanCari = ""; lukisPasukan(bekas); };
+  var kotak = $("#fCariPasukan");
+  kotak.oninput = function (e) {
+    pasukanCari = e.target.value;
+    clearTimeout(kotak._t);
+    kotak._t = setTimeout(function () {
+      lukisPasukan(bekas);
+      var b2 = $("#fCariPasukan");
+      if (b2) { b2.focus(); b2.setSelectionRange(b2.value.length, b2.value.length); }
+    }, 260);
+  };
+  $("#btnEksportPasukan").onclick = function () {
+    csv("team", ["Team", "Ketua", "Ahli", "Alat Kit", "Aktif", "Nota"],
+      senarai.map(function (p) {
+        var alat = alatPasukan(data, p.id);
+        return [p.nama, p.ketua, (p.ahli || []).join(", "),
+                alat.kit.map(function (a) { return a.nama; }).join(", "),
+                p.aktif === false ? "Tidak" : "Ya", p.nota];
+      }));
+  };
+  $$("[data-pasukan]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatPasukan(b.getAttribute("data-pasukan")); };
+  });
+  $$("[data-suntingpasukan]", bekas).forEach(function (b) {
+    b.onclick = function () { borangPasukan(b.getAttribute("data-suntingpasukan")); };
+  });
+}
+
 var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -8901,6 +9235,7 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  pasukan: '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M2.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 14.5a4.5 4.5 0 0 1 5.5 4.5"/></svg>',
   belanja: '<svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 14h3"/></svg>',
   marketing: '<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg>',
   claim: '<svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg>',
@@ -8927,6 +9262,7 @@ var HALAMAN = [
   { id: "komitmen", label: "Komitmen",    ikon: IKON.komitmen, lukis: lukisKomitmen },
   { id: "belanja", label: "Perbelanjaan", ikon: IKON.belanja, lukis: lukisBelanja },
   { id: "todo",    label: "To Do",        ikon: IKON.todo,    lukis: lukisTugas },
+  { id: "pasukan", label: "Team",         ikon: IKON.pasukan, lukis: lukisPasukan },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
   { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
 ];
@@ -8950,7 +9286,8 @@ var MENU = [
            { id: "alat", sub: "sticker", label: "Sticker & Bahan" },
            { id: "alat", sub: "kalibrasi", label: "Calibration Tool" }] },
   { id: "todo" },
-  { id: "staf" },
+  { kumpulan: "orang", label: "Team & Staf", ikon: IKON.pasukan,
+    anak: [{ id: "pasukan" }, { id: "staf" }] },
   { id: "tetapan" }
 ];
 
