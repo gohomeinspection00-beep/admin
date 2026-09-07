@@ -19,7 +19,7 @@ Sale and Schedule
 Operasi
 Sub Job
 Tool ▸ Quotation · Invois · Resit
-Kewangan ▸ Tunggakan · Komitmen
+Kewangan ▸ Tunggakan · Perbelanjaan · Marketing · Claim Staf · Komitmen
 Aset & Stok ▸ Alat · Sticker & Bahan · Calibration Tool
 To Do
 Staf
@@ -41,6 +41,7 @@ ditutup, nombor itu naik ke tajuk kumpulan.
 | **Invois** | Jana invois A4 untuk minta bayaran — tarikh akhir bayaran, bayaran diterima ditolak, status automatik (Belum Bayar / Bayar Sebahagian / Sudah Bayar / Lewat) |
 | **Tunggakan** | Semua baki yang belum dikutip — jualan, sub job dan invois manual — disusun ikut umur hutang, dengan butang kejar bayaran WhatsApp |
 | **Alat & Stok** | Tiga tab: Alat (siapa ambil, siapa pulang), Sticker & Bahan Pakai, dan Calibration Tool (sijil SIRIM & tarikh luput) |
+| **Perbelanjaan** | Semua duit keluar: perbelanjaan syarikat, marketing (Ads, campaign, flyers) dan claim staf — dengan resit |
 | **Komitmen** | Transport, pinjaman dan komitmen bulanan lain — bila kena bayar, sudah bayar atau belum |
 | **To Do** | Senarai kerja: apa perlu buat, siapa buat, bila kena siap, boleh berulang |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
@@ -549,6 +550,54 @@ tekan **Kalibrasi Semula** — rekod lama kekal sebagai sejarah.
 
 Semua nombor stok, sejarah ambil/pulang dan fail sijil masuk dalam **backup**.
 
+## Perbelanjaan
+
+Satu menu untuk semua duit keluar, dengan tiga tab.
+
+### Tab 1 — Semua Perbelanjaan
+
+Setiap rekod ada: tarikh, jenis (**Syarikat** atau **Claim Staf**), jumlah,
+kategori, saluran/sub-kategori, pembekal, cara bayar, no. rujukan, nota,
+**resit** (gambar atau PDF) dan penanda **boleh tuntut cukai** untuk LHDN.
+
+Kad atas memaparkan belanja bulan itu, **duit masuk** (semua bayaran client),
+**duit keluar** (perbelanjaan + bayaran komitmen) dan **baki bulan ini**.
+Di bawahnya carta belanja ikut kategori.
+
+### Tab 2 — Marketing
+
+Semua rekod berkategori **Marketing** — Facebook Ads, Google Ads, TikTok,
+print flyers, banner, kempen, booth, influencer dan lain-lain (senarai saluran
+boleh diubah dalam Tetapan).
+
+Selain jumlah belanja bulan dan tahun, tab ini memaparkan:
+
+- **Peratus dari jualan** — berapa peratus jualan bulan itu dibelanjakan untuk marketing
+- **Carta belanja ikut saluran**
+- **Belanja vs Jualan Ikut Saluran** — nisbah pulangan setiap saluran
+
+Nisbah dikira dengan memadankan **nama saluran** dengan **sumber lead** pada
+rekod jualan. Contoh: belanja *Facebook Ads* RM 450 dan jualan dari sumber
+*Facebook Ads* RM 1,400 → nisbah **3.1x**. Sebab itu guna nama yang sama
+di kedua-dua senarai (Tetapan → Jualan & Status untuk sumber lead,
+Tetapan → Perbelanjaan untuk saluran).
+
+### Tab 3 — Claim Staf
+
+Claim staf direkod sama seperti perbelanjaan lain, cuma jenisnya **Claim Staf**
+dan perlu nama staf. Setiap claim ada status **Belum Bayar** / **Sudah Bayar** —
+tekan **Tanda Bayar** bila sudah dibayar kepada staf.
+
+Kad atas memaparkan jumlah claim yang belum dibayar, claim bulan ini, yang
+sudah dibayar, dan siapa paling banyak claim. Papan utama juga mengingatkan
+kalau ada claim belum dibayar.
+
+### Untuk LHDN
+
+Tekan **Eksport CSV** — fail mengandungi tarikh, kategori, perkara, pembekal,
+jumlah, cara bayar, no. rujukan, penanda *boleh tuntut cukai* dan nama fail
+resit. Resit sebenar disimpan dalam sistem dan ikut dalam backup.
+
 ## Komitmen
 
 Tiga tab: **Transport**, **Pinjaman** dan **Komitmen Lain** (sewa, internet,
@@ -621,6 +670,7 @@ Tetapan dibahagikan kepada tab supaya senang cari:
 | **Syarikat & Target** | Nama syarikat, target jualan harian, hari bekerja, target ikut bulan, hari cuti / offday |
 | **Jualan & Status** | Senarai projek/daerah, sumber lead, senarai status kerja, status "selesai" & "batal", tempoh pending |
 | **Resit & Invois** | Maklumat syarikat pada dokumen, prefix & nombor resit/invois, bank, logo & tandatangan, ayat hantar WhatsApp |
+| **Perbelanjaan** | Senarai kategori perbelanjaan dan saluran marketing |
 | **Peringatan** | Berapa hari awal amaran kalibrasi, komitmen dan tugasan To Do keluar |
 | **Quotation** | Prefix & nombor quotation, tempoh sah, URL Syarat & Terma, senarai servis + fail katalog PDF, pecahan harga lalai, jenis hartanah |
 | **Data & Backup** | Muat turun backup, pulih dari fail, padam semua data, ringkasan bilangan rekod |

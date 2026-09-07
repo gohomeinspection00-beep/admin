@@ -460,6 +460,11 @@ var TETAPAN_ASAL = {
   targetBulan: {},                            // { "2026-09": 20000 } — ganti target bulan tertentu
   kategoriAlat: ["Alat Ukur", "Alat Tangan", "Elektrik", "Bahan Habis", "Keselamatan"],
   amaran: { kalibrasi: 30, komitmen: 7, tugasan: 3 },
+  kategoriBelanja: ["Marketing", "Operasi", "Pejabat", "Kenderaan", "Alat & Stok",
+                    "Gaji & Elaun", "Yuran & Lesen", "Lain-lain"],
+  saluranMarketing: ["Facebook Ads", "Google Ads", "TikTok Ads", "Instagram",
+                     "Print Flyers", "Banner", "Kempen / Campaign", "Booth / Roadshow",
+                     "Influencer", "Website / SEO"],
   statusKerja: ["Tempahan", "Inspection Siap", "Report Siap", "Submit Report",
                 "Submit App", "Minta Bayaran", "Selesai", "Batal"],
   quote: {
@@ -587,6 +592,8 @@ function baca() {
   mentah.tetapan.targetBulan = mentah.tetapan.targetBulan || {};
   mentah.tetapan.kategoriAlat = mentah.tetapan.kategoriAlat || TETAPAN_ASAL.kategoriAlat.slice();
   mentah.tetapan.amaran = Object.assign({}, TETAPAN_ASAL.amaran, mentah.tetapan.amaran || {});
+  mentah.tetapan.kategoriBelanja = mentah.tetapan.kategoriBelanja || TETAPAN_ASAL.kategoriBelanja.slice();
+  mentah.tetapan.saluranMarketing = mentah.tetapan.saluranMarketing || TETAPAN_ASAL.saluranMarketing.slice();
   mentah.staf = (mentah.staf || []).map(function (x) {
     // Rekod lama tiada kumpulan — teka dari jawatan.
     if (!x.kumpulan) {
@@ -605,6 +612,7 @@ function baca() {
   mentah.kalibrasi = mentah.kalibrasi || [];
   mentah.komitmen = mentah.komitmen || [];  // transport, pinjaman, komitmen lain
   mentah.tugasan = mentah.tugasan || [];    // senarai to do
+  mentah.belanja = mentah.belanja || [];    // perbelanjaan, marketing & claim staf
   mentah.tetapan.quote = Object.assign({}, TETAPAN_ASAL.quote, mentah.tetapan.quote || {});
   // Setiap servis perlu id tetap — kunci untuk fail lampiran PDF dalam storan.
   mentah.tetapan.quote.servis = (mentah.tetapan.quote.servis || []).map(function (x) {
@@ -1102,6 +1110,33 @@ function lukisPapan(bekas) {
       "</div>" +
     "</div>" +
 
+    (function () {
+      var masuk = duitMasukBulan(data, papanBulan);
+      var keluar = duitKeluarBulan(data, papanBulan);
+      var belanjaBln = belanjaBulanIni(data, papanBulan);
+      var mkt = belanjaBln.filter(function (b) { return (b.kategori || "") === "Marketing"; });
+      var claimBelum = claimBelumBayar(data);
+      if (!belanjaBln.length && !keluar.komitmen && !masuk) return "";
+      return '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Kewangan — ' + esc(fmtBulan(papanBulan)) + "</h3>" +
+          '<div class="aksi"><button class="btn btn-lembut btn-kecil" id="bukaBelanja">' +
+          "Buka Perbelanjaan</button></div></div>" +
+        '<div class="grid grid-4" style="margin-bottom:0">' +
+          kadStat("Duit Masuk", rm(masuk), "bayaran client diterima") +
+          kadStat("Duit Keluar", rm(keluar.jumlah),
+            rmPendek(keluar.belanja) + " belanja + " + rmPendek(keluar.komitmen) + " komitmen") +
+          kadStat("Baki Tunai", rm(masuk - keluar.jumlah),
+            masuk - keluar.jumlah >= 0 ? "lebihan bulan ini" : "kurangan bulan ini") +
+          kadStat("Belanja Marketing", rm(kiraBelanja(mkt)), mkt.length + " rekod bulan ini") +
+        "</div>" +
+        (claimBelum.length
+          ? '<p class="kecil" style="margin:12px 0 0"><b>' + claimBelum.length + " claim staf</b> " +
+            "belum dibayar (jumlah " + esc(rm(kiraBelanja(claimBelum))) + ") — " +
+            "buka tab Claim Staf dalam Perbelanjaan.</p>"
+          : "") +
+      "</div>";
+    })() +
+
     (subBulanIni.length || subBakiSemua.length
       ? '<div class="kad">' +
           '<div class="kad-tajuk"><h3>Sub Job — ' + esc(fmtBulan(papanBulan)) + "</h3>" +
@@ -1234,6 +1269,7 @@ function lukisPapan(bekas) {
   if ($("#bukaSubJob")) $("#bukaSubJob").onclick = function () { location.hash = "#/subjob"; };
   if ($("#bukaTunggak")) $("#bukaTunggak").onclick = function () { location.hash = "#/tunggak"; };
   if ($("#bukaAlat")) $("#bukaAlat").onclick = function () { location.hash = "#/alat"; };
+  if ($("#bukaBelanja")) $("#bukaBelanja").onclick = function () { location.hash = "#/belanja"; };
   $$("[data-peringatan]", bekas).forEach(function (b) {
     b.onclick = function () { location.hash = b.getAttribute("data-peringatan"); };
   });
@@ -5676,6 +5712,7 @@ var TAB_TETAPAN = [
   { id: "jualan",   label: "Jualan & Status" },
   { id: "dokumen",  label: "Resit & Invois" },
   { id: "quote",    label: "Quotation" },
+  { id: "belanja",  label: "Perbelanjaan" },
   { id: "amaran",   label: "Peringatan" },
   { id: "data",     label: "Data & Backup" }
 ];
@@ -6007,6 +6044,30 @@ function lukisTetapan(bekas) {
       "</div>";
   }
 
+  /* ---------------- PERBELANJAAN ---------------- */
+  if (tabTetapan === "belanja") {
+    isi =
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Kategori Perbelanjaan &amp; Saluran Marketing</h3></div>' +
+        '<p class="kecil">Senarai ini muncul sebagai cadangan bila merekod perbelanjaan. ' +
+        "Kategori atau saluran baharu yang ditaip akan masuk senarai ini sendiri.</p>" +
+        '<form id="borangBelanjaTetapan">' +
+          '<div class="baris-medan">' +
+            medan("Kategori Perbelanjaan (satu baris satu)",
+              '<textarea name="kategoriBelanja" style="min-height:170px">' +
+              esc((t.kategoriBelanja || []).join("\n")) + "</textarea>") +
+            medan("Saluran Marketing (satu baris satu)",
+              '<textarea name="saluranMarketing" style="min-height:170px">' +
+              esc((t.saluranMarketing || []).join("\n")) + "</textarea>") +
+          "</div>" +
+          '<p class="kecil" style="margin:-6px 0 12px">Untuk perbandingan <b>belanja vs jualan</b> ' +
+          "dalam tab Marketing berfungsi, guna nama saluran yang sama dengan " +
+          "<b>sumber lead</b> dalam Tetapan → Jualan & Status (contoh: <i>Facebook Ads</i>).</p>" +
+          '<div class="baris-butang"><button type="submit" class="btn btn-utama">Simpan</button></div>' +
+        "</form>" +
+      "</div>";
+  }
+
   /* ---------------- PERINGATAN ---------------- */
   if (tabTetapan === "amaran") {
     var am = t.amaran || {};
@@ -6065,6 +6126,7 @@ function lukisTetapan(bekas) {
           '<div class="jumlah-baris"><span>Resit</span><b>' + data.resit.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Alat &amp; stok</span><b>' + data.alat.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Komitmen</span><b>' + data.komitmen.length + "</b></div>" +
+          '<div class="jumlah-baris"><span>Perbelanjaan</span><b>' + data.belanja.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Tugasan</span><b>' + data.tugasan.length + "</b></div>" +
           '<div class="jumlah-baris"><span>Staf</span><b>' + data.staf.length + "</b></div>" +
         "</div>" +
@@ -6179,6 +6241,19 @@ function lukisTetapan(bekas) {
     $("#borangQuoteTetapan").onsubmit = function (e) {
       e.preventDefault();
       if (simpanQuoteTetapan(null, null)) toast("Tetapan quotation disimpan.", "ok");
+    };
+  }
+
+  if ($("#borangBelanjaTetapan")) {
+    $("#borangBelanjaTetapan").onsubmit = function (e) {
+      e.preventDefault();
+      var nilai = ambilNilai($("#borangBelanjaTetapan"));
+      var d = baca();
+      d.tetapan.kategoriBelanja = pecahBaris(nilai.kategoriBelanja);
+      d.tetapan.saluranMarketing = pecahBaris(nilai.saluranMarketing);
+      if (!simpan(d)) return;
+      toast("Tetapan perbelanjaan disimpan.", "ok");
+      lukis();
     };
   }
 
@@ -8351,6 +8426,473 @@ function lukisTugas(bekas) {
   });
 }
 
+/* ======================================================================
+   PERBELANJAAN — marketing, claim staf dan semua duit keluar syarikat
+   ================================================================== */
+
+var tabBelanja = "semua";
+var belanjaBulan = "";
+var belanjaCari = "";
+var belanjaKategori = "";
+
+var JENIS_BELANJA = ["Syarikat", "Claim Staf"];
+var KAEDAH_BELANJA = ["Bank Transfer", "Tunai", "Kad Kredit", "Kad Debit", "e-Wallet", "Auto Debit"];
+
+function kiraBelanja(senarai) {
+  return senarai.reduce(function (t, b) { return t + nom(b.jumlah); }, 0);
+}
+
+function belanjaBulanIni(data, bulan) {
+  return (data.belanja || []).filter(function (b) {
+    return !bulan || String(b.tarikh).slice(0, 7) === bulan;
+  });
+}
+
+function claimBelumBayar(data) {
+  return (data.belanja || []).filter(function (b) {
+    return b.jenis === "Claim Staf" && b.statusClaim !== "Sudah Bayar";
+  });
+}
+
+// Duit masuk bulan tertentu: semua bayaran client (jualan + sub job).
+function duitMasukBulan(data, bulan) {
+  var jum = 0;
+  (data.sale || []).forEach(function (s) {
+    (s.bayaran || []).forEach(function (b) {
+      if (String(b.tarikh).slice(0, 7) === bulan) jum += nom(b.jumlah);
+    });
+  });
+  (data.subjob || []).forEach(function (j) {
+    (j.bayaran || []).forEach(function (b) {
+      if (String(b.tarikh).slice(0, 7) === bulan) jum += nom(b.jumlah);
+    });
+  });
+  return jum;
+}
+
+// Duit keluar bulan tertentu: perbelanjaan + bayaran komitmen.
+function duitKeluarBulan(data, bulan) {
+  var belanja = kiraBelanja(belanjaBulanIni(data, bulan));
+  var komit = (data.komitmen || []).reduce(function (t, k) {
+    return t + (k.bayar || []).filter(function (b) {
+      return String(b.tarikh).slice(0, 7) === bulan;
+    }).reduce(function (a, b) { return a + nom(b.jumlah); }, 0);
+  }, 0);
+  return { belanja: belanja, komitmen: komit, jumlah: belanja + komit };
+}
+
+function borangBelanja(belanjaId, awal) {
+  var data = baca();
+  var b = belanjaId ? data.belanja.filter(function (x) { return x.id === belanjaId; })[0] : null;
+  var baru = !b;
+  b = b || Object.assign({ tarikh: kunciTarikh(), jenis: "Syarikat", kaedah: KAEDAH_BELANJA[0],
+        kategori: "Marketing", cukai: true, statusClaim: "Belum Bayar" }, awal || {});
+
+  var m = modal(baru ? "Rekod Perbelanjaan" : "Sunting Perbelanjaan",
+    '<form id="borangBelanja">' +
+      '<div class="baris-medan">' +
+        medan("Tarikh *", '<input type="date" name="tarikh" value="' + esc(b.tarikh || "") + '" required>') +
+        medan("Jenis", "<select name='jenis'>" + JENIS_BELANJA.map(function (x) {
+          return "<option" + (b.jenis === x ? " selected" : "") + ">" + esc(x) + "</option>";
+        }).join("") + "</select>") +
+        medan("Jumlah (RM) *", '<input type="number" step="0.01" min="0" name="jumlah" value="' +
+          esc(b.jumlah || "") + '" required>') +
+      "</div>" +
+      '<div class="baris-medan">' +
+        medan("Kategori", '<input list="senaraiKategoriBelanja" name="kategori" value="' +
+          esc(b.kategori || "") + '">') +
+        medan("Saluran / Sub-kategori", '<input list="senaraiSaluran" name="saluran" value="' +
+          esc(b.saluran || "") + '" placeholder="Contoh: Facebook Ads">') +
+        medan("Pembekal / Kedai", '<input type="text" name="pembekal" value="' + esc(b.pembekal || "") + '">') +
+      "</div>" +
+      '<datalist id="senaraiKategoriBelanja">' + (data.tetapan.kategoriBelanja || []).map(function (x) {
+        return "<option>" + esc(x) + "</option>";
+      }).join("") + "</datalist>" +
+      '<datalist id="senaraiSaluran">' + (data.tetapan.saluranMarketing || []).map(function (x) {
+        return "<option>" + esc(x) + "</option>";
+      }).join("") + "</datalist>" +
+
+      medan("Perkara *", '<input type="text" name="perkara" value="' + esc(b.perkara || "") +
+        '" placeholder="Contoh: Facebook Ads kempen Ogos" required>') +
+
+      '<div class="baris-medan">' +
+        medan("Dibayar Guna", '<input list="senaraiKaedahBelanja" name="kaedah" value="' +
+          esc(b.kaedah || "") + '">') +
+        medan("No. Rujukan / Resit", '<input type="text" name="rujukan" value="' + esc(b.rujukan || "") + '">') +
+        medan("Untuk Staf (jika claim)", '<input list="senaraiStafBelanja" name="staf" value="' +
+          esc(b.staf || "") + '">') +
+      "</div>" +
+      '<datalist id="senaraiKaedahBelanja">' + KAEDAH_BELANJA.map(function (x) {
+        return "<option>" + esc(x) + "</option>";
+      }).join("") + "</datalist>" +
+      '<datalist id="senaraiStafBelanja">' + data.staf.filter(function (x) { return x.status === "aktif"; })
+        .map(function (x) { return "<option>" + esc(x.nama) + "</option>"; }).join("") + "</datalist>" +
+
+      '<div class="baris-medan">' +
+        medan("Status Claim", "<select name='statusClaim'><option>Belum Bayar</option>" +
+          "<option" + (b.statusClaim === "Sudah Bayar" ? " selected" : "") + ">Sudah Bayar</option></select>") +
+        medan("Tarikh Bayar Claim", '<input type="date" name="tarikhBayar" value="' +
+          esc(b.tarikhBayar || "") + '">') +
+        medan("Boleh Tuntut Cukai", "<select name='cukai'><option value='ya'" +
+          (b.cukai !== false ? " selected" : "") + ">Ya</option><option value='tidak'" +
+          (b.cukai === false ? " selected" : "") + ">Tidak</option></select>") +
+      "</div>" +
+      '<p class="kecil" style="margin:-6px 0 12px">Status claim hanya digunakan bila jenis ' +
+      "ialah <b>Claim Staf</b>. Tandakan <b>Boleh Tuntut Cukai</b> untuk perbelanjaan yang " +
+      "akan dimasukkan dalam penyata LHDN.</p>" +
+
+      medan("Nota", '<textarea name="nota" style="min-height:56px">' + esc(b.nota || "") + "</textarea>") +
+      kotakLampiran("failBelanja", b.lampiran || null, "Resit / Invois Pembelian") +
+      '<div class="baris-butang modal-kaki">' +
+        (baru ? "" : '<button type="button" class="btn btn-bad" id="btnPadamBelanja">Padam</button>') +
+        '<button type="button" class="btn btn-lembut" data-batal>Batal</button>' +
+        '<button type="submit" class="btn btn-utama">' + (baru ? "Simpan" : "Kemas Kini") + "</button>" +
+      "</div>" +
+    "</form>", 720);
+
+  var borang = $("#borangBelanja", m.el);
+  var kotak = {};
+  pasangLampiran($("#failBelanja", m.el), kotak);
+  pasangButangLampiran(m.el);
+  $("[data-batal]", m.el).onclick = m.tutup;
+
+  if ($("#btnPadamBelanja", m.el)) {
+    $("#btnPadamBelanja", m.el).onclick = function () {
+      sahkan("Padam rekod perbelanjaan ini?").then(function (ya) {
+        if (!ya) return;
+        var d = baca();
+        d.belanja = d.belanja.filter(function (x) { return x.id !== belanjaId; });
+        simpan(d);
+        m.tutup();
+        toast("Perbelanjaan dipadam.", "ok");
+        lukis();
+      });
+    };
+  }
+
+  borang.onsubmit = function (e) {
+    e.preventDefault();
+    var v = ambilNilai(borang);
+    if (!v.perkara) return toast("Sila isi perkara.", "bad");
+    if (nom(v.jumlah) <= 0) return toast("Jumlah mesti lebih daripada sifar.", "bad");
+    if (v.jenis === "Claim Staf" && !v.staf) return toast("Claim perlu nama staf.", "bad", 5000);
+    simpanLampiranBaharu(kotak.fail).then(function (meta) {
+      var d = baca();
+      var rekod = {
+        id: belanjaId || id(),
+        tarikh: v.tarikh, jenis: v.jenis, jumlah: nom(v.jumlah),
+        kategori: v.kategori, saluran: v.saluran, pembekal: v.pembekal, perkara: v.perkara,
+        kaedah: v.kaedah, rujukan: v.rujukan, staf: v.staf,
+        statusClaim: v.jenis === "Claim Staf" ? v.statusClaim : "",
+        tarikhBayar: v.tarikhBayar, cukai: v.cukai !== "tidak", nota: v.nota,
+        lampiran: meta || b.lampiran || null,
+        createdAt: b.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      ["kategoriBelanja", "saluranMarketing"].forEach(function (senarai, i) {
+        var nilai = (i === 0 ? v.kategori : v.saluran) || "";
+        if (nilai && (d.tetapan[senarai] || []).indexOf(nilai) === -1) {
+          d.tetapan[senarai] = (d.tetapan[senarai] || []).concat([nilai]);
+        }
+      });
+      if (belanjaId) d.belanja = d.belanja.map(function (x) { return x.id === belanjaId ? rekod : x; });
+      else d.belanja.push(rekod);
+      if (!simpan(d)) return;
+      m.tutup();
+      toast(belanjaId ? "Perbelanjaan dikemas kini." : "Perbelanjaan direkod.", "ok");
+      lukis();
+    }).catch(function (err) { toast("Gagal simpan resit: " + err.message, "bad", 6000); });
+  };
+}
+
+function bayarClaim(belanjaId) {
+  var d = baca();
+  var b = d.belanja.filter(function (x) { return x.id === belanjaId; })[0];
+  if (!b) return;
+  b.statusClaim = b.statusClaim === "Sudah Bayar" ? "Belum Bayar" : "Sudah Bayar";
+  b.tarikhBayar = b.statusClaim === "Sudah Bayar" ? kunciTarikh() : "";
+  b.updatedAt = new Date().toISOString();
+  if (!simpan(d)) return;
+  toast(b.statusClaim === "Sudah Bayar"
+    ? "Claim " + b.staf + " ditanda sudah dibayar."
+    : "Claim dibuka semula.", "ok", 4500);
+  lukis();
+}
+
+function jadualBelanja(senarai, papar) {
+  if (!senarai.length) return kosong("Tiada rekod perbelanjaan.");
+  return '<div class="jadual-bungkus"><table><thead><tr><th>Tarikh</th><th>Perkara</th>' +
+    (papar === "claim" ? "<th>Staf</th>" : "<th>Kategori</th>") +
+    "<th class='num'>Jumlah</th><th>" + (papar === "claim" ? "Status" : "Bayar Guna") +
+    "</th><th>Resit</th><th></th></tr></thead><tbody>" +
+    senarai.map(function (b) {
+      return "<tr>" +
+        "<td>" + esc(fmtTarikh(b.tarikh)) + "</td>" +
+        '<td class="bungkus"><b>' + esc(b.perkara) + "</b>" +
+          '<div class="kecil">' + esc([b.saluran, b.pembekal].filter(Boolean).join(" · ") || "-") +
+          (b.cukai ? "" : " · tidak dituntut cukai") + "</div></td>" +
+        (papar === "claim"
+          ? "<td>" + esc(b.staf || "-") + "</td>"
+          : '<td class="bungkus">' + esc(b.kategori || "-") +
+            (b.jenis === "Claim Staf" ? '<div class="kecil">Claim ' + esc(b.staf || "") + "</div>" : "") +
+            "</td>") +
+        '<td class="num"><b>' + esc(rm(b.jumlah)) + "</b></td>" +
+        "<td>" + (papar === "claim"
+          ? '<span class="badge badge-' + (b.statusClaim === "Sudah Bayar" ? "ok" : "warn") + '">' +
+            esc(b.statusClaim || "Belum Bayar") + "</span>"
+          : esc(b.kaedah || "-")) + "</td>" +
+        "<td>" + (b.lampiran ? butangLampiran(b.lampiran, "Resit") : '<span class="kecil">-</span>') + "</td>" +
+        '<td><div class="aksi">' +
+          '<button class="btn btn-lembut" data-belanja="' + esc(b.id) + '">Buka</button>' +
+          (b.jenis === "Claim Staf"
+            ? '<button class="btn btn-ok" data-claimbayar="' + esc(b.id) + '">' +
+              (b.statusClaim === "Sudah Bayar" ? "Buka Semula" : "Tanda Bayar") + "</button>"
+            : "") +
+        "</div></td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
+
+function lukisBelanja(bekas) {
+  var data = baca();
+  var bulan = belanjaBulan || bulanKini();
+  var teks = belanjaCari.trim().toLowerCase();
+  var semua = data.belanja || [];
+
+  var asas = semua.filter(function (b) {
+    if (tabBelanja === "marketing" && (b.kategori || "") !== "Marketing") return false;
+    if (tabBelanja === "claim" && b.jenis !== "Claim Staf") return false;
+    return true;
+  });
+
+  var senarai = asas.filter(function (b) {
+    if (belanjaBulan && String(b.tarikh).slice(0, 7) !== belanjaBulan) return false;
+    if (belanjaKategori && (b.kategori || "") !== belanjaKategori) return false;
+    if (teks) {
+      var gabung = [b.perkara, b.kategori, b.saluran, b.pembekal, b.staf, b.nota].join(" ").toLowerCase();
+      if (gabung.indexOf(teks) === -1) return false;
+    }
+    return true;
+  }).sort(function (a, b) { return String(b.tarikh).localeCompare(String(a.tarikh)); });
+
+  var kategoriAda = [];
+  semua.forEach(function (b) {
+    if (b.kategori && kategoriAda.indexOf(b.kategori) === -1) kategoriAda.push(b.kategori);
+  });
+  kategoriAda.sort();
+
+  var isi = "";
+  var tajuk = "Semua Perbelanjaan";
+
+  if (tabBelanja === "semua") {
+    var bulanIni = belanjaBulanIni(data, bulan);
+    var masuk = duitMasukBulan(data, bulan);
+    var keluar = duitKeluarBulan(data, bulan);
+    var ikutKategori = {};
+    bulanIni.forEach(function (b) {
+      var k = b.kategori || "Lain-lain";
+      ikutKategori[k] = (ikutKategori[k] || 0) + nom(b.jumlah);
+    });
+    var barisKategori = Object.keys(ikutKategori).map(function (k) {
+      return { nama: k, nilai: ikutKategori[k], teks: rm(ikutKategori[k]) };
+    }).sort(function (a, b) { return b.nilai - a.nilai; });
+
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat("Belanja " + fmtBulan(bulan), rm(kiraBelanja(bulanIni)), bulanIni.length + " rekod") +
+        kadStat("Duit Masuk", rm(masuk), "bayaran client bulan ini") +
+        kadStat("Duit Keluar", rm(keluar.jumlah),
+          "belanja + komitmen (" + rmPendek(keluar.komitmen) + " komitmen)") +
+        kadStat("Baki Bulan Ini", rm(masuk - keluar.jumlah),
+          masuk - keluar.jumlah >= 0 ? "lebihan" : "kurangan") +
+      "</div>" +
+      '<div class="kad">' +
+        '<div class="kad-tajuk"><h3>Belanja Ikut Kategori — ' + esc(fmtBulan(bulan)) + "</h3>" +
+          '<span class="kecil">jumlah ' + esc(rm(kiraBelanja(bulanIni))) + "</span></div>" +
+        (barisKategori.length ? cartaMendatar(barisKategori)
+          : kosong("Belum ada perbelanjaan direkod untuk bulan ini.")) +
+      "</div>";
+  }
+
+  if (tabBelanja === "marketing") {
+    tajuk = "Marketing";
+    var mktBulan = asas.filter(function (b) { return String(b.tarikh).slice(0, 7) === bulan; });
+    var mktTahun = asas.filter(function (b) {
+      return String(b.tarikh).slice(0, 4) === bulan.slice(0, 4);
+    });
+    var jualanBulan = ringkasan(saleBulan(data, bulan));
+    var peratus = jualanBulan.total > 0
+      ? Math.round((kiraBelanja(mktBulan) / jualanBulan.total) * 100) : 0;
+
+    var ikutSaluran = {};
+    mktBulan.forEach(function (b) {
+      var k = b.saluran || "Tidak dinyatakan";
+      ikutSaluran[k] = (ikutSaluran[k] || 0) + nom(b.jumlah);
+    });
+    var barisSaluran = Object.keys(ikutSaluran).map(function (k) {
+      return { nama: k, nilai: ikutSaluran[k], teks: rm(ikutSaluran[k]) };
+    }).sort(function (a, b) { return b.nilai - a.nilai; });
+
+    // Bandingkan belanja saluran dengan jualan yang datang dari sumber sama.
+    var jualanSumber = {};
+    saleBulan(data, bulan).forEach(function (s) {
+      if ((s.statusKerja || "") === data.tetapan.statusBatal) return;
+      var k = String(s.sumber || "Tidak dinyatakan").trim().toLowerCase();
+      jualanSumber[k] = jualanSumber[k] || { bil: 0, total: 0 };
+      jualanSumber[k].bil++;
+      jualanSumber[k].total += kiraSale(s).total;
+    });
+
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat("Belanja Marketing", rm(kiraBelanja(mktBulan)), fmtBulan(bulan)) +
+        kadStat("Belanja Tahun " + bulan.slice(0, 4), rm(kiraBelanja(mktTahun)),
+          mktTahun.length + " rekod") +
+        kadStat("Peratus dari Jualan", peratus + "%",
+          "jualan " + rmPendek(jualanBulan.total) + " bulan ini") +
+        kadStat("Saluran Terbanyak", barisSaluran.length ? barisSaluran[0].nama : "-",
+          barisSaluran.length ? rm(barisSaluran[0].nilai) : "belum ada rekod") +
+      "</div>" +
+      '<div class="grid grid-2">' +
+        '<div class="kad tanpa-margin">' +
+          '<div class="kad-tajuk"><h3>Belanja Ikut Saluran</h3>' +
+            '<span class="kecil">' + esc(fmtBulan(bulan)) + "</span></div>" +
+          (barisSaluran.length ? cartaMendatar(barisSaluran)
+            : kosong("Belum ada belanja marketing bulan ini.")) +
+        "</div>" +
+        '<div class="kad tanpa-margin">' +
+          '<div class="kad-tajuk"><h3>Belanja vs Jualan Ikut Saluran</h3>' +
+            '<span class="kecil">padanan nama saluran dengan sumber lead</span></div>' +
+          (barisSaluran.length
+            ? '<div class="jadual-bungkus"><table><thead><tr><th>Saluran</th>' +
+              "<th class='num'>Belanja</th><th class='num'>Jualan</th><th class='num'>Nisbah</th>" +
+              "</tr></thead><tbody>" +
+              barisSaluran.map(function (x) {
+                var padan = jualanSumber[String(x.nama).trim().toLowerCase()];
+                var jual = padan ? padan.total : 0;
+                return "<tr><td class='bungkus'>" + esc(x.nama) +
+                  (padan ? '<div class="kecil">' + padan.bil + " job</div>" : "") + "</td>" +
+                  '<td class="num">' + esc(rm(x.nilai)) + "</td>" +
+                  '<td class="num">' + (padan ? esc(rm(jual)) : '<span class="kecil">-</span>') + "</td>" +
+                  '<td class="num">' + (jual > 0 && x.nilai > 0
+                    ? "<b>" + (jual / x.nilai).toFixed(1) + "x</b>"
+                    : '<span class="kecil">-</span>') + "</td></tr>";
+              }).join("") + "</tbody></table></div>" +
+              '<p class="kecil" style="margin-top:8px">Nisbah dikira bila nama saluran sama ' +
+              "dengan <b>sumber lead</b> pada rekod jualan (contoh saluran <i>Facebook Ads</i> " +
+              "dengan sumber <i>Facebook Ads</i>).</p>"
+            : kosong("Belum ada data untuk dibandingkan.")) +
+        "</div>" +
+      "</div>";
+  }
+
+  if (tabBelanja === "claim") {
+    tajuk = "Claim Staf";
+    var belum = claimBelumBayar(data);
+    var claimBulan = asas.filter(function (b) { return String(b.tarikh).slice(0, 7) === bulan; });
+    var dibayarBulan = asas.filter(function (b) {
+      return b.statusClaim === "Sudah Bayar" && String(b.tarikhBayar).slice(0, 7) === bulan;
+    });
+    var ikutStaf = {};
+    claimBulan.forEach(function (b) {
+      var k = b.staf || "Tanpa nama";
+      ikutStaf[k] = (ikutStaf[k] || 0) + nom(b.jumlah);
+    });
+    var barisStaf = Object.keys(ikutStaf).map(function (k) {
+      return { nama: k, nilai: ikutStaf[k], teks: rm(ikutStaf[k]) };
+    }).sort(function (a, b) { return b.nilai - a.nilai; });
+
+    isi =
+      '<div class="grid grid-4">' +
+        kadStat("Claim Belum Bayar", rm(kiraBelanja(belum)), belum.length + " claim menunggu") +
+        kadStat("Claim " + fmtBulan(bulan), rm(kiraBelanja(claimBulan)), claimBulan.length + " rekod") +
+        kadStat("Sudah Dibayar", rm(kiraBelanja(dibayarBulan)), "dibayar bulan ini") +
+        kadStat("Staf Terbanyak", barisStaf.length ? barisStaf[0].nama : "-",
+          barisStaf.length ? rm(barisStaf[0].nilai) : "belum ada claim") +
+      "</div>" +
+      (barisStaf.length
+        ? '<div class="kad"><div class="kad-tajuk"><h3>Claim Ikut Staf</h3>' +
+          '<span class="kecil">' + esc(fmtBulan(bulan)) + "</span></div>" +
+          cartaMendatar(barisStaf) + "</div>"
+        : "");
+  }
+
+  bekas.innerHTML =
+    '<div class="suis" style="margin-bottom:16px;flex-wrap:wrap">' +
+      [["semua", "Semua Perbelanjaan"], ["marketing", "Marketing"], ["claim", "Claim Staf"]]
+        .map(function (x) {
+          return '<button type="button" data-tabbelanja="' + x[0] + '"' +
+            (tabBelanja === x[0] ? ' class="aktif"' : "") + ">" + esc(x[1]) + "</button>";
+        }).join("") +
+    "</div>" + isi +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Rekod ' + esc(tajuk) + "</h3>" +
+        '<div class="aksi">' +
+          '<span class="kecil">Dipapar: <b>' + esc(rm(kiraBelanja(senarai))) + "</b></span>" +
+          '<button class="btn btn-utama" id="btnBelanjaBaru">Rekod Perbelanjaan</button>' +
+          '<button class="btn btn-lembut" id="btnEksportBelanja">Eksport CSV</button>' +
+        "</div>" +
+      "</div>" +
+      '<div class="penapis">' +
+        '<label>Bulan<input type="month" id="fBulanBelanja" value="' + esc(belanjaBulan) + '"></label>' +
+        (tabBelanja === "semua"
+          ? "<label>Kategori<select id='fKategoriBelanja'><option value=''>Semua kategori</option>" +
+            kategoriAda.map(function (x) {
+              return "<option" + (belanjaKategori === x ? " selected" : "") + ">" + esc(x) + "</option>";
+            }).join("") + "</select></label>"
+          : "") +
+        '<label style="min-width:200px">Cari<input type="search" id="fCariBelanja" ' +
+          'placeholder="Perkara, saluran, staf…" value="' + esc(belanjaCari) + '"></label>' +
+        '<button class="btn btn-lembut" id="btnResetBelanja">Reset</button>' +
+      "</div>" +
+      jadualBelanja(senarai, tabBelanja === "claim" ? "claim" : "biasa") +
+      '<p class="kecil" style="margin-top:10px">Setiap rekod boleh dilampirkan resit. ' +
+      "Rekod yang ditanda <b>boleh tuntut cukai</b> keluar dalam eksport CSV untuk LHDN.</p>" +
+    "</div>";
+
+  $$("[data-tabbelanja]", bekas).forEach(function (b) {
+    b.onclick = function () { tabBelanja = b.getAttribute("data-tabbelanja"); lukisBelanja(bekas); };
+  });
+  $("#btnBelanjaBaru").onclick = function () {
+    borangBelanja(null, tabBelanja === "marketing" ? { kategori: "Marketing" }
+      : (tabBelanja === "claim" ? { jenis: "Claim Staf", kategori: "Operasi" } : null));
+  };
+  $("#fBulanBelanja").onchange = function (e) { belanjaBulan = e.target.value; lukisBelanja(bekas); };
+  if ($("#fKategoriBelanja")) {
+    $("#fKategoriBelanja").onchange = function (e) { belanjaKategori = e.target.value; lukisBelanja(bekas); };
+  }
+  $("#btnResetBelanja").onclick = function () {
+    belanjaBulan = ""; belanjaKategori = ""; belanjaCari = ""; lukisBelanja(bekas);
+  };
+  var kotak = $("#fCariBelanja");
+  kotak.oninput = function (e) {
+    belanjaCari = e.target.value;
+    clearTimeout(kotak._t);
+    kotak._t = setTimeout(function () {
+      lukisBelanja(bekas);
+      var b2 = $("#fCariBelanja");
+      if (b2) { b2.focus(); b2.setSelectionRange(b2.value.length, b2.value.length); }
+    }, 260);
+  };
+  $("#btnEksportBelanja").onclick = function () {
+    csv("perbelanjaan" + (belanjaBulan ? "-" + belanjaBulan : ""),
+      ["Tarikh", "Jenis", "Kategori", "Saluran", "Perkara", "Pembekal", "Jumlah", "Bayar Guna",
+       "Rujukan", "Staf", "Status Claim", "Tarikh Bayar", "Boleh Tuntut Cukai", "Ada Resit", "Nota"],
+      senarai.map(function (b) {
+        return [b.tarikh, b.jenis, b.kategori, b.saluran, b.perkara, b.pembekal, nom(b.jumlah),
+                b.kaedah, b.rujukan, b.staf, b.statusClaim, b.tarikhBayar,
+                b.cukai ? "Ya" : "Tidak", b.lampiran ? b.lampiran.nama : "", b.nota];
+      }));
+  };
+  $$("[data-belanja]", bekas).forEach(function (b) {
+    b.onclick = function () { borangBelanja(b.getAttribute("data-belanja")); };
+  });
+  $$("[data-claimbayar]", bekas).forEach(function (b) {
+    b.onclick = function () { bayarClaim(b.getAttribute("data-claimbayar")); };
+  });
+  pasangButangLampiran(bekas);
+}
+
 var IKON = {
   papan: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
   sale: '<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15l-2.5-1.5L14 21l-2.5-1.5L9 21l-2.5-1.5L4 21V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -8359,6 +8901,9 @@ var IKON = {
   subjob: '<svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M8 13h8"/></svg>',
   invois: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>',
   resit: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+  belanja: '<svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 14h3"/></svg>',
+  marketing: '<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg>',
+  claim: '<svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg>',
   tool: '<svg viewBox="0 0 24 24"><path d="M4 4h10l4 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M13 4v5h5"/><path d="M7 13h7M7 17h4"/><path d="M18.5 2.5 21 5l-4.5 4.5H14V7z"/></svg>',
   wang: '<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 12h.01M17.5 12h.01"/></svg>',
   komitmen: '<svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M6 15h4"/></svg>',
@@ -8380,6 +8925,7 @@ var HALAMAN = [
   { id: "tunggak", label: "Tunggakan",    ikon: IKON.tunggak, lukis: lukisTunggak },
   { id: "alat",    label: "Alat & Stok",  ikon: IKON.alat,    lukis: lukisAlat },
   { id: "komitmen", label: "Komitmen",    ikon: IKON.komitmen, lukis: lukisKomitmen },
+  { id: "belanja", label: "Perbelanjaan", ikon: IKON.belanja, lukis: lukisBelanja },
   { id: "todo",    label: "To Do",        ikon: IKON.todo,    lukis: lukisTugas },
   { id: "staf",    label: "Staf",         ikon: IKON.staf,    lukis: lukisStaf },
   { id: "tetapan", label: "Tetapan",      ikon: IKON.tetapan, lukis: lukisTetapan }
@@ -8394,7 +8940,11 @@ var MENU = [
   { kumpulan: "tool", label: "Tool", ikon: IKON.tool,
     anak: [{ id: "quote" }, { id: "invois" }, { id: "resit" }] },
   { kumpulan: "kewangan", label: "Kewangan", ikon: IKON.wang,
-    anak: [{ id: "tunggak" }, { id: "komitmen" }] },
+    anak: [{ id: "tunggak" },
+           { id: "belanja", sub: "semua", label: "Perbelanjaan" },
+           { id: "belanja", sub: "marketing", label: "Marketing" },
+           { id: "belanja", sub: "claim", label: "Claim Staf" },
+           { id: "komitmen" }] },
   { kumpulan: "aset", label: "Aset & Stok", ikon: IKON.alat,
     anak: [{ id: "alat", sub: "alat", label: "Alat" },
            { id: "alat", sub: "sticker", label: "Sticker & Bahan" },
@@ -8424,6 +8974,9 @@ function pasangSubHalaman(idHalaman) {
   if (idHalaman === "alat" && ["alat", "sticker", "kalibrasi"].indexOf(HASH_SUB) !== -1) {
     tabAlat = HASH_SUB;
   }
+  if (idHalaman === "belanja" && ["semua", "marketing", "claim"].indexOf(HASH_SUB) !== -1) {
+    tabBelanja = HASH_SUB;
+  }
   if (idHalaman === "komitmen") {
     var peta = { transport: "Transport", pinjaman: "Pinjaman", lain: "Lain" };
     if (peta[HASH_SUB]) tabKomitmen = peta[HASH_SUB];
@@ -8452,7 +9005,7 @@ function binaMenu() {
     if (!h) return "";
     var lencana = dalam && x.sub ? 0 : (lencanaHalaman[x.id] || 0);
     var aktif = semasa.id === x.id && (!x.sub || HASH_SUB === x.sub ||
-      (!HASH_SUB && x.sub === (x.id === "alat" ? tabAlat : "")));
+      (!HASH_SUB && x.sub === (x.id === "alat" ? tabAlat : (x.id === "belanja" ? tabBelanja : ""))));
     return '<a class="nav-item' + (dalam ? " nav-anak" : "") + (aktif ? " aktif" : "") +
       '" href="#/' + x.id + (x.sub ? "/" + x.sub : "") + '" data-nav="' + x.id + '">' +
       (dalam ? "" : '<span class="nav-ikon">' + h.ikon + "</span>") +
