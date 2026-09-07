@@ -22,7 +22,7 @@ Tool ▸ Quotation · Invois · Resit
 Kewangan ▸ Laporan Kewangan · Tunggakan · Perbelanjaan · Marketing · Claim Staf · Gaji · Komitmen
 Aset & Stok ▸ Alat · Sticker & Bahan · Calibration Tool
 To Do
-Team & Staf ▸ Team · Staf
+Team & Staf ▸ Team · Staf · Punch Card · OT · Kelulusan Claim
 Tetapan
 ```
 
@@ -47,6 +47,7 @@ ditutup, nombor itu naik ke tajuk kumpulan.
 | **Komitmen** | Transport, pinjaman dan komitmen bulanan lain — bila kena bayar, sudah bayar atau belum |
 | **To Do** | Senarai kerja: apa perlu buat, siapa buat, bila kena siap, boleh berulang |
 | **Resit** | Jana resit A4 mengikut format syarikat — nombor resit automatik & unik, cetak/simpan PDF, salin teks atau hantar WhatsApp |
+| **Kehadiran & Kelulusan** | Punch card staf, permohonan OT dan kelulusan claim yang dihantar dari aplikasi staf |
 | **Team** | Set up team kerja: nama team, ketua, ahli (tidak wajib) dan alat yang dipegang team |
 | **Staf** | Tambah / sunting / padam staf, termasuk **kumpulan** (Operasi / Management). Staf aktif muncul dalam pilihan "Closed By" dan jualan bulanan mereka dipaparkan |
 | **Tetapan** | Terbahagi kepada 5 tab: Syarikat & Target, Jualan & Status, Resit & Invois, Quotation, Data & Backup |
@@ -503,6 +504,69 @@ Boleh guna: `{nama} {syarikat} {tarikh} {tarikhAkhir} {projek} {unit} {jumlah}
 Papan utama pula memaparkan jalur **Tunggakan Bayaran** bila ada rekod yang
 sudah lewat, dan menu sisi menunjukkan bilangannya. Semua senarai boleh
 dieksport ke CSV.
+
+## Aplikasi Staf (staf.html)
+
+Fail kedua dalam projek ini, **khas untuk staf**. Staf log masuk dengan ID dan
+PIN, dan hanya nampak apa yang admin benarkan.
+
+### Buat akaun staf
+
+Menu **Team & Staf → Staf** → sunting staf → bahagian **Akaun Aplikasi Staf**:
+
+- **ID Pengguna** (contoh `zaim`) dan **PIN** (4–8 angka)
+- **Staf Ini Boleh Akses** — tandakan satu-satu:
+
+| Kebenaran | Kalau ditanda |
+|---|---|
+| Jadual & kalendar | Nampak tugasan sendiri dalam kalendar |
+| Senarai To Do | Nampak dan boleh tanda siap tugasan sendiri |
+| Punch card | Boleh punch masuk / keluar dengan gambar |
+| Hantar claim | Boleh hantar tuntutan + gambar resit |
+| Hantar OT | Boleh hantar rekod OT |
+| Slip gaji | Boleh lihat & cetak slip gaji sendiri |
+| Ambil & pulang alat | Boleh rekod ambil / pulang alat |
+| Lihat nombor telefon client | Kalau tidak ditanda, nombor client disembunyikan |
+| **Lihat harga job** | Kalau **tidak** ditanda, staf **tidak nampak** harga atau bayaran langsung |
+
+### Apa staf boleh buat
+
+| Skrin | Fungsi |
+|---|---|
+| **Hari Ini** | Tugasan hari ini & esok, butang punch besar, senarai perkara menunggu |
+| **Jadual** | Kalendar bulanan tugasan sendiri; tekan tarikh untuk lihat kerja hari itu; butang buka peta & WhatsApp client |
+| **Punch** | Punch masuk / keluar dengan **gambar** dan nota; rekod & jumlah jam bulan itu |
+| **Claim** | Hantar tuntutan dengan gambar resit; lihat status Menunggu / Lulus / Dibayar |
+| **OT** | Hantar rekod OT (tarikh, masa, jam, sebab); lihat status kelulusan |
+| **Lain** | Slip gaji (boleh cetak), To Do, Alat Saya, hantar/terima fail data, log keluar |
+
+### Apa admin nampak
+
+Menu **Team & Staf → Punch Card / OT / Kelulusan Claim**:
+
+- **Punch Card** — siapa masuk pukul berapa, keluar pukul berapa, jumlah jam
+  sebulan, dan gambar yang diambil
+- **OT** — luluskan atau tolak. OT yang **diluluskan** masuk sendiri sebagai
+  baris tambahan bila gaji bulan itu dijana
+- **Kelulusan Claim** — luluskan atau tolak claim. Hanya claim **yang diluluskan**
+  masuk dalam slip gaji
+
+### Dua komputer / telefon berasingan
+
+Kalau staf guna telefon sendiri:
+
+1. Admin: Tetapan → Data & Backup → pilih staf → **Hantar Pek** — fail JSON
+   dijana mengandungi **hanya** apa yang staf itu dibenarkan lihat
+2. Staf: buka `staf.html` di telefon → **Lain → Muat Fail Admin**
+3. Selepas kerja: staf tekan **Hantar ke Admin** — fail rekod (punch, claim, OT)
+   dihantar balik melalui WhatsApp atau email
+4. Admin: Tetapan → Data & Backup → **Terima Fail Staf** — rekod digabungkan
+
+> **Had keselamatan:** PIN disimpan dalam pelayar, bukan pelayan. Ia menghalang
+> staf biasa daripada membuka menu yang tidak dibenarkan, tetapi sesiapa yang
+> mahir teknikal dan ada fail itu boleh melihat data di dalamnya. Untuk
+> keselamatan sebenar (satu pangkalan data, log masuk sebenar, sync automatik),
+> sistem perlu dipindahkan ke pelayan — itu fasa seterusnya.
 
 ## Team
 

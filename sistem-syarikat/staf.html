@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Aplikasi Staf — GoXpert</title>
+<style>
+:root{
+  --bg:#f1f5f9; --kad:#fff; --teks:#0f172a; --lembut:#64748b; --garis:#e2e8f0;
+  --utama:#2563eb; --utama2:#1d4ed8; --gelap:#0f172a;
+  --ok:#16a34a; --okbg:#dcfce7; --warn:#d97706; --warnbg:#fef3c7; --bad:#dc2626; --badbg:#fee2e2;
+  --bayang:0 1px 3px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.06); --bulat:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--teks);font:15px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+h1,h2,h3{margin:0 0 10px;line-height:1.25}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit}
+.tengah{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:20px}
+.kotak-log{background:var(--kad);border-radius:18px;box-shadow:var(--bayang);padding:26px 22px;width:100%;max-width:380px}
+.jenama{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.jenama .bulat{width:44px;height:44px;border-radius:12px;background:var(--utama);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+label{display:block;font-size:12px;font-weight:600;color:var(--lembut);margin:10px 0 5px;text-transform:none}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--garis);border-radius:11px;background:#fff;color:var(--teks)}
+input:focus,select:focus,textarea:focus{outline:2px solid #bfdbfe;border-color:var(--utama)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 15px;border-radius:11px;border:1px solid var(--garis);background:#fff;color:var(--teks);font-weight:600;cursor:pointer}
+.btn-utama{background:var(--utama);border-color:var(--utama);color:#fff}
+.btn-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn-bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn-besar{width:100%;padding:16px;font-size:16px;border-radius:14px}
+.btn-kecil{padding:7px 11px;font-size:13px;border-radius:9px}
+.penuh{width:100%}
+.bar{position:sticky;top:0;z-index:20;background:var(--gelap);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.bar b{font-size:15px}
+.bar .kecil{color:#94a3b8}
+.bar .keluar{margin-left:auto;background:none;border:1px solid #334155;color:#cbd5e1;border-radius:9px;padding:6px 10px;font-size:12px;cursor:pointer}
+.kandungan{padding:14px 14px 92px;max-width:760px;margin:0 auto}
+.kad{background:var(--kad);border-radius:var(--bulat);box-shadow:var(--bayang);padding:16px;margin-bottom:14px}
+.kad-tajuk{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.kad-tajuk h3{margin:0;font-size:15px}
+.kecil{font-size:12px;color:var(--lembut)}
+.stat{background:var(--kad);border-radius:12px;box-shadow:var(--bayang);padding:12px}
+.stat-label{font-size:11px;color:var(--lembut);text-transform:uppercase;letter-spacing:.04em}
+.stat-nilai{font-size:20px;font-weight:700;margin-top:2px}
+.grid{display:grid;gap:10px;margin-bottom:14px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.baris{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--garis)}
+.baris:last-child{border-bottom:0}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.badge-ok{background:var(--okbg);color:var(--ok)}
+.badge-warn{background:var(--warnbg);color:var(--warn)}
+.badge-bad{background:var(--badbg);color:var(--bad)}
+.badge-muted{background:var(--bg);color:var(--lembut)}
+.job{display:block;width:100%;text-align:left;background:#f8fafc;border:1px solid var(--garis);border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer}
+.job b{display:block}
+.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--garis);display:flex;z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+.nav button{flex:1;background:none;border:0;padding:9px 2px 8px;color:var(--lembut);font-size:10.5px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav button.aktif{color:var(--utama)}
+.nav svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.kal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.kal-tajuk{font-size:10px;color:var(--lembut);text-align:center;font-weight:700;padding:4px 0}
+.kal-hari{min-height:52px;border:1px solid var(--garis);border-radius:9px;padding:4px;font-size:11px;background:#fff;cursor:pointer}
+.kal-hari.luar{background:#f8fafc;color:#cbd5e1}
+.kal-hari.ada{border-color:#bfdbfe;background:#eff6ff}
+.kal-hari.kini{outline:2px solid var(--utama)}
+.kal-bil{display:inline-block;margin-top:3px;background:var(--utama);color:#fff;border-radius:999px;padding:0 6px;font-size:10px;font-weight:700}
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:flex-end;justify-content:center;z-index:60;padding:0}
+.modal-kad{background:#fff;border-radius:18px 18px 0 0;width:100%;max-width:640px;max-height:92vh;overflow:auto;padding:16px 16px 24px}
+.modal-tajuk{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.modal-tutup{background:none;border:0;font-size:24px;line-height:1;color:var(--lembut);cursor:pointer}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:var(--gelap);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;z-index:80;box-shadow:var(--bayang);max-width:92vw;text-align:center}
+.toast.ok{background:var(--ok)} .toast.bad{background:var(--bad)} .toast.warn{background:var(--warn)}
+.kosong{padding:18px;text-align:center;color:var(--lembut);font-size:13px;background:#f8fafc;border:1px dashed var(--garis);border-radius:12px}
+.gambar-pratonton{width:100%;max-height:190px;object-fit:cover;border-radius:12px;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--garis);text-align:left}
+th{font-size:11px;color:var(--lembut);text-transform:uppercase}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.slip{background:#fff;color:#222;padding:16px;border:1px solid var(--garis);border-radius:12px;font-size:13px}
+.slip table{font-size:12.5px}
+.slip h2{font-size:16px;margin:0 0 4px}
+@media print{
+  .bar,.nav,.btn,.tapis{display:none!important}
+  .kandungan{padding:0;max-width:none}
+  .kad{box-shadow:none;border:0;margin:0}
+  .slip{border:0}
+}
+@media(min-width:700px){
+  .modal-bg{align-items:center;padding:20px}
+  .modal-kad{border-radius:18px}
+}
+</style>
+</head>
+<body>
+<!-- skrin log masuk -->
+<div id="skrinLog" class="tengah">
+  <form class="kotak-log" id="borangLog">
+    <div class="jenama"><span class="bulat" id="jenamaHuruf">GX</span>
+      <div><b id="jenamaNama">Aplikasi Staf</b><div class="kecil">Log masuk untuk staf</div></div>
+    </div>
+    <div id="amaranData" class="kosong" hidden></div>
+    <label for="idPengguna">ID Pengguna</label>
+    <input type="text" id="idPengguna" autocomplete="username" autocapitalize="none" placeholder="contoh: zaim">
+    <label for="pinPengguna">PIN</label>
+    <input type="password" id="pinPengguna" inputmode="numeric" autocomplete="current-password" placeholder="••••">
+    <div style="margin-top:16px"><button class="btn btn-utama btn-besar" type="submit">Log Masuk</button></div>
+    <p class="kecil" style="margin-top:14px">Lupa ID atau PIN? Minta admin tetapkan semula dalam
+      menu <b>Staf</b> pada sistem utama.</p>
+  </form>
+</div>
+
+<!-- aplikasi -->
+<div id="apl" hidden>
+  <div class="bar">
+    <div><b id="barNama">Staf</b><div class="kecil" id="barJawatan">—</div></div>
+    <button class="keluar" id="btnKeluar">Log Keluar</button>
+  </div>
+  <div class="kandungan" id="kandungan"></div>
+  <nav class="nav" id="nav"></nav>
+</div>
+<div id="kertasCetak" hidden></div>
+<script>
+/* ======================================================================
+   APLIKASI STAF — GoXpert
+   Fail ini berkongsi data dengan sistem utama (index.html) apabila
+   kedua-duanya dibuka dari pelayar yang sama. Untuk telefon staf yang
+   berasingan, guna butang "Hantar ke Admin" dan "Muat Fail Admin".
+   ================================================================== */
+
+var KUNCI = "sps_data_v1";
+var DB_NAMA = "sps_fail_v1";
+var DB_STOR = "lampiran";
+var SESI = "sps_sesi_staf";
+
+/* ------------------------------ asas ---------------------------------- */
+function $(s, r) { return (r || document).querySelector(s); }
+function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function id() { return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function esc(v) {
+  return String(v === undefined || v === null ? "" : v)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function nom(v) {
+  if (typeof v === "number") return isFinite(v) ? v : 0;
+  var n = parseFloat(String(v === undefined || v === null ? "" : v).replace(/[^\d.-]/g, ""));
+  return isFinite(n) ? n : 0;
+}
+function rm(v) {
+  return "RM " + nom(v).toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function duaAngka(n) { return String(n).padStart(2, "0"); }
+function kunciTarikh(d) {
+  d = d || new Date();
+  return d.getFullYear() + "-" + duaAngka(d.getMonth() + 1) + "-" + duaAngka(d.getDate());
+}
+function bulanKini() { return kunciTarikh().slice(0, 7); }
+function keDate(t) { var d = new Date(t + "T00:00:00"); return isNaN(d) ? null : d; }
+var NAMA_BULAN = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos",
+  "September", "Oktober", "November", "Disember"];
+var NAMA_HARI = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
+function fmtTarikh(t) {
+  var d = keDate(t);
+  if (!d) return t || "-";
+  return d.getDate() + " " + NAMA_BULAN[d.getMonth()].slice(0, 3) + " " + d.getFullYear();
+}
+function fmtBulan(b) {
+  var bhg = String(b || "").split("-");
+  return bhg.length < 2 ? b : NAMA_BULAN[parseInt(bhg[1], 10) - 1] + " " + bhg[0];
+}
+function namaHari(t) { var d = keDate(t); return d ? NAMA_HARI[d.getDay()] : ""; }
+function masaMinit(teks) {
+  var m = String(teks || "").trim().toLowerCase().match(/^(\d{1,2})[.:]?(\d{2})?\s*(am|pm)?$/);
+  if (!m) return 0;
+  var jam = parseInt(m[1], 10), minit = parseInt(m[2] || "0", 10);
+  if (m[3] === "pm" && jam < 12) jam += 12;
+  if (m[3] === "am" && jam === 12) jam = 0;
+  return jam * 60 + minit;
+}
+function masaSekarang() {
+  var d = new Date();
+  var jam = d.getHours(), ap = jam >= 12 ? "pm" : "am";
+  var j12 = jam % 12; if (j12 === 0) j12 = 12;
+  return j12 + "." + duaAngka(d.getMinutes()) + ap;
+}
+function hashPin(teks) {
+  var h = 5381, s = "gx:" + String(teks || "");
+  for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return "h" + h.toString(36);
+}
+
+function toast(mesej, jenis, tempoh) {
+  var el = document.createElement("div");
+  el.className = "toast " + (jenis || "");
+  el.textContent = mesej;
+  document.body.appendChild(el);
+  setTimeout(function () { el.remove(); }, tempoh || 3000);
+}
+
+function modal(tajuk, kandungan) {
+  var bg = document.createElement("div");
+  bg.className = "modal-bg";
+  bg.innerHTML = '<div class="modal-kad"><div class="modal-tajuk"><h3>' + esc(tajuk) +
+    '</h3><button class="modal-tutup" type="button">&times;</button></div>' +
+    '<div class="modal-isi"></div></div>';
+  $(".modal-isi", bg).innerHTML = kandungan;
+  var tutup = function () { bg.remove(); };
+  $(".modal-tutup", bg).onclick = tutup;
+  bg.addEventListener("click", function (e) { if (e.target === bg) tutup(); });
+  document.body.appendChild(bg);
+  return { el: bg, tutup: tutup };
+}
+
+function sahkan(mesej) {
+  return new Promise(function (ok) {
+    var m = modal("Pengesahan", '<p>' + esc(mesej) + "</p>" +
+      '<div style="display:flex;gap:8px;margin-top:14px">' +
+      '<button class="btn penuh" data-batal>Batal</button>' +
+      '<button class="btn btn-bad penuh" data-ok>Ya</button></div>');
+    $("[data-batal]", m.el).onclick = function () { m.tutup(); ok(false); };
+    $("[data-ok]", m.el).onclick = function () { m.tutup(); ok(true); };
+  });
+}
+
+/* ---------------------------- storan ---------------------------------- */
+
+function baca() {
+  try {
+    var mentah = JSON.parse(localStorage.getItem(KUNCI) || "null");
+    if (!mentah) return null;
+    ["staf", "sale", "subjob", "belanja", "gaji", "tugasan", "alat", "kehadiran", "ot",
+     "pasukan", "komitmen"].forEach(function (k) {
+      mentah[k] = mentah[k] || [];
+    });
+    mentah.tetapan = mentah.tetapan || {};
+    return mentah;
+  } catch (e) { return null; }
+}
+
+function simpan(data) {
+  try {
+    localStorage.setItem(KUNCI, JSON.stringify(data));
+    return true;
+  } catch (e) {
+    toast("Gagal simpan: " + e.message, "bad", 5000);
+    return false;
+  }
+}
+
+function dbBuka() {
+  return new Promise(function (ok, gagal) {
+    if (!window.indexedDB) return gagal(new Error("Tiada IndexedDB."));
+    var r = indexedDB.open(DB_NAMA, 1);
+    r.onupgradeneeded = function () {
+      if (!r.result.objectStoreNames.contains(DB_STOR)) r.result.createObjectStore(DB_STOR);
+    };
+    r.onsuccess = function () { ok(r.result); };
+    r.onerror = function () { gagal(r.error); };
+  });
+}
+function dbKerja(mod, kerja) {
+  return dbBuka().then(function (db) {
+    return new Promise(function (ok, gagal) {
+      var tx = db.transaction(DB_STOR, mod);
+      var permintaan = kerja(tx.objectStore(DB_STOR));
+      tx.oncomplete = function () { db.close(); ok(permintaan ? permintaan.result : null); };
+      tx.onerror = function () { db.close(); gagal(tx.error); };
+    });
+  });
+}
+function failSimpan(kunci, rekod) {
+  return dbKerja("readwrite", function (s) { return s.put(rekod, kunci); });
+}
+function failAmbil(kunci) {
+  return dbKerja("readonly", function (s) { return s.get(kunci); });
+}
+function saizTeks(b) {
+  b = nom(b);
+  if (b >= 1048576) return (b / 1048576).toFixed(1) + " MB";
+  if (b >= 1024) return Math.round(b / 1024) + " KB";
+  return b + " bait";
+}
+
+/* --------------------- gambar & lampiran ------------------------------ */
+
+function sediakanFail(fail) {
+  var jenis = fail.type || "";
+  if (jenis.indexOf("image/") !== 0) {
+    return fail.arrayBuffer().then(function (buf) {
+      return { nama: fail.name, saiz: fail.size, jenis: jenis || "application/octet-stream",
+               bait: new Uint8Array(buf) };
+    });
+  }
+  return new Promise(function (ok, gagal) {
+    var url = URL.createObjectURL(fail);
+    var g = new Image();
+    g.onload = function () {
+      var maks = 1400, w = g.width, h = g.height;
+      if (Math.max(w, h) > maks) {
+        var sk = maks / Math.max(w, h);
+        w = Math.round(w * sk); h = Math.round(h * sk);
+      }
+      var c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      c.getContext("2d").drawImage(g, 0, 0, w, h);
+      c.toBlob(function (blob) {
+        URL.revokeObjectURL(url);
+        if (!blob) return gagal(new Error("Gagal proses gambar."));
+        blob.arrayBuffer().then(function (buf) {
+          ok({ nama: String(fail.name || "gambar").replace(/\.[^.]+$/, "") + ".jpg",
+               saiz: blob.size, jenis: "image/jpeg", bait: new Uint8Array(buf) });
+        });
+      }, "image/jpeg", 0.82);
+    };
+    g.onerror = function () { URL.revokeObjectURL(url); gagal(new Error("Fail gambar tidak sah.")); };
+    g.src = url;
+  });
+}
+
+function simpanLampiran(hasil) {
+  if (!hasil) return Promise.resolve(null);
+  var kunci = "lamp-" + id();
+  return failSimpan(kunci, { nama: hasil.nama, saiz: hasil.saiz, jenis: hasil.jenis, bait: hasil.bait })
+    .then(function () {
+      return { kunci: kunci, nama: hasil.nama, saiz: hasil.saiz, jenis: hasil.jenis };
+    });
+}
+
+function bukaLampiran(kunci) {
+  failAmbil(kunci).then(function (r) {
+    if (!r || !r.bait) return toast("Fail tidak dijumpai.", "warn");
+    var url = URL.createObjectURL(new Blob([r.bait], { type: r.jenis || "image/jpeg" }));
+    window.open(url, "_blank");
+    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+  }).catch(function (e) { toast("Gagal buka: " + e.message, "bad"); });
+}
+
+function pasangGambar(inputEl, kotak, pratontonEl) {
+  inputEl.onchange = function () {
+    var fail = inputEl.files && inputEl.files[0];
+    if (!fail) return;
+    toast("Memproses gambar…", "", 1500);
+    sediakanFail(fail).then(function (hasil) {
+      kotak.fail = hasil;
+      if (pratontonEl) {
+        var url = URL.createObjectURL(new Blob([hasil.bait], { type: hasil.jenis }));
+        pratontonEl.src = url;
+        pratontonEl.hidden = false;
+      }
+      toast("Gambar sedia (" + saizTeks(hasil.saiz) + ")", "ok");
+    }).catch(function (e) { toast("Gagal: " + e.message, "bad", 5000); });
+  };
+}
+
+/* --------------------------- log masuk -------------------------------- */
+
+var STAF = null;          // rekod staf yang log masuk
+var HALAMAN_STAF = "hari";
+var kalBulan = bulanKini();
+
+function aksesAda(kunci) {
+  if (!STAF) return false;
+  var a = STAF.akses || {};
+  return a[kunci] !== false;      // kalau admin belum set, benarkan asas
+}
+
+function cariStaf(data, idPengguna) {
+  return (data.staf || []).filter(function (s) {
+    return s.akaun && String(s.akaun.id || "").toLowerCase() === String(idPengguna).toLowerCase();
+  })[0];
+}
+
+function mulaLog() {
+  var data = baca();
+  var amaran = $("#amaranData");
+  if (!data) {
+    amaran.hidden = false;
+    amaran.innerHTML = "Tiada data sistem dalam pelayar ini. Buka <b>index.html</b> " +
+      "(sistem utama) dahulu pada komputer yang sama, atau minta admin hantar fail data " +
+      "dan guna butang di bawah.<br><br>" +
+      '<label class="btn btn-kecil" style="display:inline-block">Muat Fail Admin' +
+      '<input type="file" id="failAwal" accept="application/json" hidden></label>';
+    $("#failAwal").onchange = function (e) { muatFailAdmin(e.target.files[0]); };
+    return;
+  }
+  var nama = (data.tetapan.namaSyarikat || "GoXpert");
+  $("#jenamaNama").textContent = nama;
+  $("#jenamaHuruf").textContent = nama.replace(/[^A-Za-z ]/g, "").split(/\s+/)
+    .map(function (x) { return x.charAt(0); }).join("").slice(0, 2).toUpperCase() || "GX";
+}
+
+function cubaLog(e) {
+  e.preventDefault();
+  var data = baca();
+  if (!data) return toast("Tiada data sistem dalam pelayar ini.", "bad", 5000);
+  var idP = $("#idPengguna").value.trim();
+  var pin = $("#pinPengguna").value.trim();
+  if (!idP || !pin) return toast("Sila isi ID dan PIN.", "bad");
+  var s = cariStaf(data, idP);
+  if (!s || s.akaun.pin !== hashPin(pin)) return toast("ID atau PIN tidak betul.", "bad", 4000);
+  if (s.akaun.aktif === false || s.status !== "aktif") {
+    return toast("Akaun ini tidak aktif. Sila hubungi admin.", "bad", 5000);
+  }
+  sessionStorage.setItem(SESI, s.id);
+  bukaApl(s.id);
+}
+
+function bukaApl(stafId) {
+  var data = baca();
+  STAF = (data.staf || []).filter(function (x) { return x.id === stafId; })[0];
+  if (!STAF) { keluar(); return; }
+  $("#skrinLog").hidden = true;
+  $("#apl").hidden = false;
+  $("#barNama").textContent = STAF.nama;
+  $("#barJawatan").textContent = (STAF.jawatan || "Staf") +
+    (STAF.kumpulan ? " · " + STAF.kumpulan : "");
+  binaNav();
+  lukisStaf();
+}
+
+function keluar() {
+  sessionStorage.removeItem(SESI);
+  STAF = null;
+  $("#apl").hidden = true;
+  $("#skrinLog").hidden = false;
+  $("#pinPengguna").value = "";
+}
+
+/* ------------------------------ navigasi ------------------------------ */
+
+var IKON_S = {
+  hari: '<svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
+  jadual: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>',
+  punch: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  claim: '<svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>',
+  ot: '<svg viewBox="0 0 24 24"><path d="M12 3v9l5 3"/><circle cx="12" cy="12" r="9"/></svg>',
+  slip: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>',
+  todo: '<svg viewBox="0 0 24 24"><path d="M9 5h11M9 12h11M9 19h11"/><path d="m3 5 1.6 1.6L7.5 3.7"/><path d="m3 12 1.6 1.6L7.5 10.7"/></svg>',
+  alat: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1 5.4 5.2l-8.6 8.6a2 2 0 0 1-2.8-2.8l8.6-8.6"/><path d="M9.5 4.5 4 10l3.5 3.5"/></svg>',
+  lain: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/><circle cx="5" cy="12" r="1.6"/></svg>'
+};
+
+function menuStaf() {
+  var m = [{ id: "hari", label: "Hari Ini", ikon: IKON_S.hari }];
+  if (aksesAda("jadual")) m.push({ id: "jadual", label: "Jadual", ikon: IKON_S.jadual });
+  if (aksesAda("punch")) m.push({ id: "punch", label: "Punch", ikon: IKON_S.punch });
+  if (aksesAda("claim")) m.push({ id: "claim", label: "Claim", ikon: IKON_S.claim });
+  if (aksesAda("ot")) m.push({ id: "ot", label: "OT", ikon: IKON_S.ot });
+  m.push({ id: "lain", label: "Lain", ikon: IKON_S.lain });
+  return m;
+}
+
+function binaNav() {
+  $("#nav").innerHTML = menuStaf().map(function (x) {
+    return '<button type="button" data-hal="' + x.id + '"' +
+      (HALAMAN_STAF === x.id ? ' class="aktif"' : "") + ">" + x.ikon +
+      "<span>" + esc(x.label) + "</span></button>";
+  }).join("");
+  $$("#nav button").forEach(function (b) {
+    b.onclick = function () { HALAMAN_STAF = b.getAttribute("data-hal"); binaNav(); lukisStaf(); };
+  });
+}
+
+/* ----------------------------- data staf ------------------------------ */
+
+function jobStaf(data, tarikh) {
+  return (data.sale || []).filter(function (s) {
+    if (tarikh && s.tarikh !== tarikh) return false;
+    var nama = STAF.nama;
+    return (s.inspector || []).indexOf(nama) !== -1 || s.tugasReport === nama ||
+      s.tugasSubmit === nama;
+  }).sort(function (a, b) { return masaMinit(a.masaMula) - masaMinit(b.masaMula); });
+}
+
+function peranan(s) {
+  var senarai = [];
+  if ((s.inspector || []).indexOf(STAF.nama) !== -1) senarai.push("Inspection");
+  if (s.tugasReport === STAF.nama) senarai.push("Report");
+  if (s.tugasSubmit === STAF.nama) senarai.push("Submission");
+  return senarai.join(" · ") || "Tugasan";
+}
+
+function kadJob(s) {
+  return '<button type="button" class="job" data-job="' + esc(s.id) + '">' +
+    "<b>" + esc(s.nama || "Tanpa nama") + "</b>" +
+    '<div class="kecil">' + esc(fmtTarikh(s.tarikh)) + " · " +
+    esc((s.masaMula || "-") + (s.masaTamat ? " – " + s.masaTamat : "")) + "</div>" +
+    '<div class="kecil">' + esc([s.projek, s.unit].filter(Boolean).join(" · ") || "-") + "</div>" +
+    '<div class="kecil" style="margin-top:4px"><span class="badge badge-muted">' +
+    esc(peranan(s)) + "</span> <span class=\"badge badge-warn\">" +
+    esc(s.statusKerja || "Tempahan") + "</span></div></button>";
+}
+
+function lihatJob(saleId) {
+  var data = baca();
+  var s = (data.sale || []).filter(function (x) { return x.id === saleId; })[0];
+  if (!s) return;
+  var barisan = function (label, nilai) {
+    return nilai ? '<div class="baris"><span class="kecil">' + esc(label) +
+      "</span><span>" + esc(nilai) + "</span></div>" : "";
+  };
+  var alamat = [s.unit, s.projek].filter(Boolean).join(", ");
+  var m = modal(s.nama || "Tugasan",
+    barisan("Tarikh", fmtTarikh(s.tarikh) + " (" + namaHari(s.tarikh) + ")") +
+    barisan("Masa", (s.masaMula || "-") + (s.masaTamat ? " – " + s.masaTamat : "")) +
+    barisan("Peranan saya", peranan(s)) +
+    barisan("Status", s.statusKerja || "Tempahan") +
+    barisan("Projek", s.projek) + barisan("Unit", s.unit) + barisan("Size", s.size) +
+    (aksesAda("telefonClient") ? barisan("Telefon client", s.telefon) : "") +
+    (aksesAda("harga") ? barisan("Harga", rm(s.harga)) : "") +
+    barisan("Inspector", (s.inspector || []).join(", ")) +
+    barisan("Report oleh", s.tugasReport) +
+    barisan("Submission oleh", s.tugasSubmit) +
+    barisan("Jenis submission", s.jenisSubmit) +
+    barisan("Catatan", s.catatan) +
+    '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">' +
+      (alamat ? '<button class="btn btn-kecil" id="btnPeta">Buka Peta</button>' : "") +
+      (aksesAda("telefonClient") && s.telefon
+        ? '<button class="btn btn-kecil" id="btnWaClient">WhatsApp Client</button>' : "") +
+    "</div>");
+  if ($("#btnPeta", m.el)) {
+    $("#btnPeta", m.el).onclick = function () {
+      window.open("https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(alamat), "_blank");
+    };
+  }
+  if ($("#btnWaClient", m.el)) {
+    $("#btnWaClient", m.el).onclick = function () {
+      var no = String(s.telefon || "").replace(/[^\d]/g, "");
+      if (no.charAt(0) === "0") no = "6" + no;
+      window.open("https://wa.me/" + no, "_blank");
+    };
+  }
+}
+
+/* ------------------------------ halaman ------------------------------- */
+
+function lukisStaf() {
+  var bekas = $("#kandungan");
+  bekas.innerHTML = "";
+  var data = baca();
+  if (!data) { keluar(); return; }
+  STAF = (data.staf || []).filter(function (x) { return x.id === STAF.id; })[0] || STAF;
+
+  if (HALAMAN_STAF === "hari") halamanHari(bekas, data);
+  else if (HALAMAN_STAF === "jadual") halamanJadual(bekas, data);
+  else if (HALAMAN_STAF === "punch") halamanPunch(bekas, data);
+  else if (HALAMAN_STAF === "claim") halamanClaim(bekas, data);
+  else if (HALAMAN_STAF === "ot") halamanOt(bekas, data);
+  else halamanLain(bekas, data);
+
+  $$("[data-job]", bekas).forEach(function (b) {
+    b.onclick = function () { lihatJob(b.getAttribute("data-job")); };
+  });
+  $$("[data-lampiran]", bekas).forEach(function (b) {
+    b.onclick = function () { bukaLampiran(b.getAttribute("data-lampiran")); };
+  });
+  window.scrollTo(0, 0);
+}
+
+function rekodHadirHariIni(data) {
+  return (data.kehadiran || []).filter(function (k) {
+    return k.tarikh === kunciTarikh() && k.stafId === STAF.id;
+  }).sort(function (a, b) { return masaMinit(a.masa) - masaMinit(b.masa); });
+}
+
+function statusPunch(data) {
+  var r = rekodHadirHariIni(data);
+  var akhir = r[r.length - 1];
+  return { rekod: r, dalam: akhir && akhir.jenis === "Masuk", akhir: akhir };
+}
+
+function halamanHari(bekas, data) {
+  var hariIni = kunciTarikh();
+  var job = jobStaf(data, hariIni);
+  var esokKunci = kunciTarikh(new Date(Date.now() + 86400000));
+  var esok = jobStaf(data, esokKunci);
+  var p = statusPunch(data);
+  var tugas = (data.tugasan || []).filter(function (t) {
+    return t.untuk === STAF.nama && t.status !== "Siap";
+  });
+  var claimTunggu = (data.belanja || []).filter(function (b) {
+    return b.jenis === "Claim Staf" && b.staf === STAF.nama &&
+      (b.statusLulus || "Menunggu") === "Menunggu";
+  });
+  var otTunggu = (data.ot || []).filter(function (o) {
+    return o.nama === STAF.nama && (o.status || "Menunggu") === "Menunggu";
+  });
+
+  bekas.innerHTML =
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>' + esc(namaHari(hariIni)) + ", " + esc(fmtTarikh(hariIni)) + "</h3>" +
+        '<span class="badge badge-' + (p.dalam ? "ok" : "muted") + '">' +
+        (p.dalam ? "Sedang bekerja" : "Belum punch masuk") + "</span></div>" +
+      (aksesAda("punch")
+        ? '<button class="btn ' + (p.dalam ? "btn-bad" : "btn-ok") + ' btn-besar" id="btnPunchCepat">' +
+          (p.dalam ? "Punch Keluar" : "Punch Masuk") + "</button>" +
+          (p.akhir ? '<p class="kecil" style="margin:8px 0 0">Terakhir: ' + esc(p.akhir.jenis) +
+            " jam " + esc(p.akhir.masa) + "</p>" : "")
+        : "") +
+    "</div>" +
+
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Tugasan Hari Ini</h3><span class="kecil">' +
+        job.length + " kerja</span></div>" +
+      (job.length ? job.map(kadJob).join("") : '<div class="kosong">Tiada tugasan hari ini.</div>') +
+    "</div>" +
+
+    (esok.length
+      ? '<div class="kad"><div class="kad-tajuk"><h3>Esok</h3><span class="kecil">' +
+        esc(fmtTarikh(esokKunci)) + "</span></div>" + esok.map(kadJob).join("") + "</div>"
+      : "") +
+
+    ((tugas.length || claimTunggu.length || otTunggu.length)
+      ? '<div class="kad"><div class="kad-tajuk"><h3>Perlu Perhatian</h3></div>' +
+        (tugas.length ? '<div class="baris"><span>To Do belum siap</span><b>' +
+          tugas.length + "</b></div>" : "") +
+        (claimTunggu.length ? '<div class="baris"><span>Claim menunggu kelulusan</span><b>' +
+          esc(rm(claimTunggu.reduce(function (t, b) { return t + nom(b.jumlah); }, 0))) + "</b></div>" : "") +
+        (otTunggu.length ? '<div class="baris"><span>OT menunggu kelulusan</span><b>' +
+          otTunggu.length + " rekod</b></div>" : "") +
+        "</div>"
+      : "");
+
+  if ($("#btnPunchCepat")) {
+    $("#btnPunchCepat").onclick = function () { borangPunch(p.dalam ? "Keluar" : "Masuk"); };
+  }
+}
+
+function halamanJadual(bekas, data) {
+  var mula = keDate(kalBulan + "-01");
+  var hariPertama = (mula.getDay() + 6) % 7;      // Isnin = 0
+  var jumHari = new Date(mula.getFullYear(), mula.getMonth() + 1, 0).getDate();
+  var semua = jobStaf(data);
+  var peta = {};
+  semua.forEach(function (s) { (peta[s.tarikh] = peta[s.tarikh] || []).push(s); });
+  var bulanJob = semua.filter(function (s) { return String(s.tarikh).slice(0, 7) === kalBulan; });
+
+  var sel = "";
+  for (var i = 0; i < hariPertama; i++) sel += '<div class="kal-hari luar"></div>';
+  for (var d = 1; d <= jumHari; d++) {
+    var kunci = kalBulan + "-" + duaAngka(d);
+    var senarai = peta[kunci] || [];
+    sel += '<div class="kal-hari' + (senarai.length ? " ada" : "") +
+      (kunci === kunciTarikh() ? " kini" : "") + '" data-tarikh="' + kunci + '">' +
+      "<b>" + d + "</b>" +
+      (senarai.length ? '<div><span class="kal-bil">' + senarai.length + "</span></div>" : "") +
+      "</div>";
+  }
+
+  bekas.innerHTML =
+    '<div class="kad">' +
+      '<div class="kad-tajuk">' +
+        '<button class="btn btn-kecil" id="bulanTolak">‹</button>' +
+        "<h3>" + esc(fmtBulan(kalBulan)) + "</h3>" +
+        '<button class="btn btn-kecil" id="bulanTambah">›</button>' +
+      "</div>" +
+      '<div class="kal">' + ["Isn", "Sel", "Rab", "Kha", "Jum", "Sab", "Ahd"].map(function (h) {
+        return '<div class="kal-tajuk">' + h + "</div>";
+      }).join("") + sel + "</div>" +
+      '<p class="kecil" style="margin:10px 0 0">Tekan tarikh untuk lihat tugasan hari itu.</p>' +
+    "</div>" +
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Semua Tugasan ' + esc(fmtBulan(kalBulan)) + "</h3>" +
+        '<span class="kecil">' + bulanJob.length + " kerja</span></div>" +
+      (bulanJob.length ? bulanJob.map(kadJob).join("")
+        : '<div class="kosong">Tiada tugasan bulan ini.</div>') +
+    "</div>";
+
+  $("#bulanTolak").onclick = function () { kalBulan = alihBulan(kalBulan, -1); lukisStaf(); };
+  $("#bulanTambah").onclick = function () { kalBulan = alihBulan(kalBulan, 1); lukisStaf(); };
+  $$("[data-tarikh]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      var t = b.getAttribute("data-tarikh");
+      var senarai = peta[t] || [];
+      modal(namaHari(t) + ", " + fmtTarikh(t),
+        senarai.length ? senarai.map(kadJob).join("")
+          : '<div class="kosong">Tiada tugasan pada tarikh ini.</div>');
+      $$("[data-job]").forEach(function (x) {
+        x.onclick = function () { lihatJob(x.getAttribute("data-job")); };
+      });
+    };
+  });
+}
+
+function alihBulan(bulan, n) {
+  var d = keDate(bulan + "-01");
+  d.setMonth(d.getMonth() + n);
+  return d.getFullYear() + "-" + duaAngka(d.getMonth() + 1);
+}
+
+function borangPunch(jenis) {
+  var kotak = {};
+  var m = modal("Punch " + jenis,
+    '<div class="baris"><span class="kecil">Tarikh</span><b>' + esc(fmtTarikh(kunciTarikh())) + "</b></div>" +
+    '<div class="baris"><span class="kecil">Masa sekarang</span><b id="masaPunch">' +
+      esc(masaSekarang()) + "</b></div>" +
+    '<label>Gambar (selfie / lokasi)</label>' +
+    '<label class="btn penuh" style="display:block;text-align:center">Ambil Gambar' +
+      '<input type="file" accept="image/*" capture="environment" id="gambarPunch" hidden></label>' +
+    '<img class="gambar-pratonton" id="pratontonPunch" hidden alt="">' +
+    "<label>Nota (pilihan)</label><input type=\"text\" id=\"notaPunch\" placeholder=\"Contoh: sampai site Setia Alam\">" +
+    '<div style="display:flex;gap:8px;margin-top:16px">' +
+      '<button class="btn penuh" data-batal>Batal</button>' +
+      '<button class="btn ' + (jenis === "Masuk" ? "btn-ok" : "btn-bad") +
+      ' penuh" id="btnSimpanPunch">Punch ' + jenis + "</button></div>");
+
+  pasangGambar($("#gambarPunch", m.el), kotak, $("#pratontonPunch", m.el));
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#btnSimpanPunch", m.el).onclick = function () {
+    var nota = $("#notaPunch", m.el).value.trim();
+    simpanLampiran(kotak.fail).then(function (meta) {
+      var d = baca();
+      d.kehadiran = d.kehadiran || [];
+      d.kehadiran.push({
+        id: id(), stafId: STAF.id, nama: STAF.nama, tarikh: kunciTarikh(),
+        masa: masaSekarang(), jenis: jenis, nota: nota, lampiran: meta,
+        dariStaf: true, createdAt: new Date().toISOString()
+      });
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Punch " + jenis + " direkod jam " + masaSekarang() + ".", "ok", 4000);
+      lukisStaf();
+    }).catch(function (e) { toast("Gagal simpan: " + e.message, "bad", 5000); });
+  };
+}
+
+function halamanPunch(bekas, data) {
+  var bulan = bulanKini();
+  var rekod = (data.kehadiran || []).filter(function (k) {
+    return k.stafId === STAF.id && String(k.tarikh).slice(0, 7) === bulan;
+  }).sort(function (a, b) {
+    return String(b.tarikh).localeCompare(String(a.tarikh)) || masaMinit(a.masa) - masaMinit(b.masa);
+  });
+  var ikutHari = {};
+  rekod.forEach(function (k) { (ikutHari[k.tarikh] = ikutHari[k.tarikh] || []).push(k); });
+  var hari = Object.keys(ikutHari).sort().reverse();
+  var jumJam = hari.reduce(function (t, h) { return t + jamHari(ikutHari[h]); }, 0);
+  var p = statusPunch(data);
+
+  bekas.innerHTML =
+    '<div class="grid grid-3">' +
+      '<div class="stat"><div class="stat-label">Hari Kerja</div><div class="stat-nilai">' +
+        hari.length + "</div></div>" +
+      '<div class="stat"><div class="stat-label">Jumlah Jam</div><div class="stat-nilai">' +
+        (Math.round(jumJam * 10) / 10) + "</div></div>" +
+      '<div class="stat"><div class="stat-label">Status</div><div class="stat-nilai" style="font-size:14px">' +
+        (p.dalam ? "Dalam" : "Keluar") + "</div></div>" +
+    "</div>" +
+    '<div class="kad">' +
+      '<div style="display:flex;gap:8px">' +
+        '<button class="btn btn-ok penuh" id="btnMasuk"' + (p.dalam ? " disabled" : "") + ">Punch Masuk</button>" +
+        '<button class="btn btn-bad penuh" id="btnKeluar"' + (p.dalam ? "" : " disabled") + ">Punch Keluar</button>" +
+      "</div>" +
+      '<p class="kecil" style="margin:10px 0 0">Gambar disimpan dalam sistem dan admin boleh lihat.</p>' +
+    "</div>" +
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Rekod ' + esc(fmtBulan(bulan)) + "</h3></div>" +
+      (hari.length
+        ? hari.map(function (h) {
+            var senarai = ikutHari[h];
+            return '<div class="baris"><span><b>' + esc(fmtTarikh(h)) + "</b>" +
+              '<div class="kecil">' + senarai.map(function (k) {
+                return k.jenis + " " + k.masa + (k.lampiran
+                  ? ' <button class="btn btn-kecil" data-lampiran="' + esc(k.lampiran.kunci) +
+                    '">gambar</button>' : "");
+              }).join(" · ") + "</div></span><b>" + jamHari(senarai) + " jam</b></div>";
+          }).join("")
+        : '<div class="kosong">Belum ada rekod bulan ini.</div>') +
+    "</div>";
+
+  if ($("#btnMasuk")) $("#btnMasuk").onclick = function () { borangPunch("Masuk"); };
+  if ($("#btnKeluar")) $("#btnKeluar").onclick = function () { borangPunch("Keluar"); };
+}
+
+function jamHari(senarai) {
+  var jum = 0, masuk = null;
+  senarai.slice().sort(function (a, b) { return masaMinit(a.masa) - masaMinit(b.masa); })
+    .forEach(function (k) {
+      if (k.jenis === "Masuk") masuk = k.masa;
+      else if (k.jenis === "Keluar" && masuk) {
+        jum += Math.max(0, masaMinit(k.masa) - masaMinit(masuk));
+        masuk = null;
+      }
+    });
+  return Math.round((jum / 60) * 10) / 10;
+}
+
+/* ------------------------------ claim --------------------------------- */
+
+function halamanClaim(bekas, data) {
+  var senarai = (data.belanja || []).filter(function (b) {
+    return b.jenis === "Claim Staf" && b.staf === STAF.nama;
+  }).sort(function (a, b) { return String(b.tarikh).localeCompare(String(a.tarikh)); });
+  var menunggu = senarai.filter(function (b) { return (b.statusLulus || "Menunggu") === "Menunggu"; });
+  var belumBayar = senarai.filter(function (b) {
+    return (b.statusLulus || "Menunggu") === "Lulus" && b.statusClaim !== "Sudah Bayar";
+  });
+
+  bekas.innerHTML =
+    '<div class="grid grid-3">' +
+      '<div class="stat"><div class="stat-label">Menunggu</div><div class="stat-nilai">' +
+        menunggu.length + "</div></div>" +
+      '<div class="stat"><div class="stat-label">Lulus, Belum Bayar</div><div class="stat-nilai">' +
+        belumBayar.length + "</div></div>" +
+      '<div class="stat"><div class="stat-label">Jumlah Tuntutan</div><div class="stat-nilai" style="font-size:15px">' +
+        esc(rm(senarai.reduce(function (t, b) { return t + nom(b.jumlah); }, 0))) + "</div></div>" +
+    "</div>" +
+    '<div class="kad">' +
+      '<button class="btn btn-utama btn-besar" id="btnClaimBaru">+ Hantar Claim Baharu</button>' +
+      '<p class="kecil" style="margin:10px 0 0">Ambil gambar resit dan hantar. Admin akan ' +
+      "luluskan, dan jumlah yang lulus akan masuk dalam slip gaji.</p>" +
+    "</div>" +
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Claim Saya</h3></div>' +
+      (senarai.length
+        ? senarai.map(function (b) {
+            var st = b.statusLulus || "Menunggu";
+            return '<div class="baris"><span><b>' + esc(b.perkara) + "</b>" +
+              '<div class="kecil">' + esc(fmtTarikh(b.tarikh)) +
+              (b.kategori ? " · " + esc(b.kategori) : "") +
+              (b.lampiran ? ' · <button class="btn btn-kecil" data-lampiran="' +
+                esc(b.lampiran.kunci) + '">resit</button>' : "") + "</div></span>" +
+              '<span style="text-align:right"><b>' + esc(rm(b.jumlah)) + "</b>" +
+              '<div><span class="badge badge-' +
+              (st === "Lulus" ? "ok" : (st === "Tolak" ? "bad" : "warn")) + '">' + esc(st) + "</span>" +
+              (b.statusClaim === "Sudah Bayar"
+                ? ' <span class="badge badge-ok">Dibayar</span>' : "") + "</div></span></div>";
+          }).join("")
+        : '<div class="kosong">Belum ada claim.</div>') +
+    "</div>";
+
+  $("#btnClaimBaru").onclick = borangClaimStaf;
+}
+
+function borangClaimStaf() {
+  var data = baca();
+  var kotak = {};
+  var kategori = (data.tetapan.kategoriBelanja || ["Operasi", "Marketing", "Kenderaan", "Lain-lain"]);
+  var m = modal("Hantar Claim",
+    "<label>Tarikh</label><input type='date' id='cTarikh' value='" + esc(kunciTarikh()) + "'>" +
+    "<label>Perkara *</label><input type='text' id='cPerkara' placeholder='Contoh: Tol & petrol ke Seremban'>" +
+    "<label>Jumlah (RM) *</label><input type='number' step='0.01' min='0' id='cJumlah' inputmode='decimal'>" +
+    "<label>Kategori</label><select id='cKategori'>" +
+      kategori.map(function (x) {
+        return "<option" + (x === "Operasi" ? " selected" : "") + ">" + esc(x) + "</option>";
+      }).join("") + "</select>" +
+    "<label>Gambar Resit</label>" +
+    '<label class="btn penuh" style="display:block;text-align:center">Ambil / Pilih Gambar' +
+      "<input type='file' accept='image/*,application/pdf' capture='environment' id='cGambar' hidden></label>" +
+    '<img class="gambar-pratonton" id="cPratonton" hidden alt="">' +
+    "<label>Nota</label><input type='text' id='cNota' placeholder='Pilihan'>" +
+    '<div style="display:flex;gap:8px;margin-top:16px">' +
+      '<button class="btn penuh" data-batal>Batal</button>' +
+      '<button class="btn btn-utama penuh" id="btnHantarClaim">Hantar</button></div>');
+
+  pasangGambar($("#cGambar", m.el), kotak, $("#cPratonton", m.el));
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#btnHantarClaim", m.el).onclick = function () {
+    var perkara = $("#cPerkara", m.el).value.trim();
+    var jumlah = nom($("#cJumlah", m.el).value);
+    if (!perkara) return toast("Sila isi perkara.", "bad");
+    if (jumlah <= 0) return toast("Sila isi jumlah.", "bad");
+    simpanLampiran(kotak.fail).then(function (meta) {
+      var d = baca();
+      d.belanja = d.belanja || [];
+      d.belanja.push({
+        id: id(), tarikh: $("#cTarikh", m.el).value || kunciTarikh(), jenis: "Claim Staf",
+        jumlah: jumlah, kategori: $("#cKategori", m.el).value, saluran: "", pembekal: "",
+        perkara: perkara, kaedah: "", rujukan: "", staf: STAF.nama,
+        statusClaim: "Belum Bayar", statusLulus: "Menunggu", dariStaf: true,
+        tarikhBayar: "", cukai: true, nota: $("#cNota", m.el).value.trim(),
+        lampiran: meta, createdAt: new Date().toISOString()
+      });
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Claim dihantar. Menunggu kelulusan admin.", "ok", 4500);
+      lukisStaf();
+    }).catch(function (e) { toast("Gagal hantar: " + e.message, "bad", 5000); });
+  };
+}
+
+/* -------------------------------- OT ---------------------------------- */
+
+function halamanOt(bekas, data) {
+  var senarai = (data.ot || []).filter(function (o) { return o.nama === STAF.nama; })
+    .sort(function (a, b) { return String(b.tarikh).localeCompare(String(a.tarikh)); });
+  var bulan = bulanKini();
+  var bulanIni = senarai.filter(function (o) { return String(o.tarikh).slice(0, 7) === bulan; });
+  var lulus = bulanIni.filter(function (o) { return o.status === "Lulus"; });
+
+  bekas.innerHTML =
+    '<div class="grid grid-3">' +
+      '<div class="stat"><div class="stat-label">Jam OT ' + esc(fmtBulan(bulan).split(" ")[0]) +
+        '</div><div class="stat-nilai">' +
+        (Math.round(bulanIni.reduce(function (t, o) { return t + nom(o.jam); }, 0) * 10) / 10) +
+        "</div></div>" +
+      '<div class="stat"><div class="stat-label">Diluluskan</div><div class="stat-nilai">' +
+        lulus.length + "</div></div>" +
+      '<div class="stat"><div class="stat-label">Nilai Lulus</div><div class="stat-nilai" style="font-size:15px">' +
+        esc(rm(lulus.reduce(function (t, o) { return t + nom(o.jumlah); }, 0))) + "</div></div>" +
+    "</div>" +
+    '<div class="kad">' +
+      '<button class="btn btn-utama btn-besar" id="btnOtBaruStaf">+ Hantar Rekod OT</button>' +
+      '<p class="kecil" style="margin:10px 0 0">OT yang diluluskan admin akan masuk sendiri ' +
+      "dalam slip gaji bulan itu.</p>" +
+    "</div>" +
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Rekod OT Saya</h3></div>' +
+      (senarai.length
+        ? senarai.map(function (o) {
+            var st = o.status || "Menunggu";
+            return '<div class="baris"><span><b>' + esc(fmtTarikh(o.tarikh)) + "</b>" +
+              '<div class="kecil">' + esc((o.mula || "-") + (o.tamat ? " – " + o.tamat : "")) +
+              " · " + esc(nom(o.jam)) + " jam" + (o.sebab ? " · " + esc(o.sebab) : "") + "</div></span>" +
+              '<span style="text-align:right"><b>' + esc(rm(o.jumlah)) + "</b>" +
+              '<div><span class="badge badge-' +
+              (st === "Lulus" ? "ok" : (st === "Tolak" ? "bad" : "warn")) + '">' +
+              esc(st) + "</span></div></span></div>";
+          }).join("")
+        : '<div class="kosong">Belum ada rekod OT.</div>') +
+    "</div>";
+
+  $("#btnOtBaruStaf").onclick = borangOtStaf;
+}
+
+function borangOtStaf() {
+  var data = baca();
+  var kadar = nom((data.tetapan.gaji || {}).kadarOt) || 15;
+  var m = modal("Hantar Rekod OT",
+    "<label>Tarikh</label><input type='date' id='oTarikh' value='" + esc(kunciTarikh()) + "'>" +
+    '<div style="display:flex;gap:8px">' +
+      "<div style='flex:1'><label>Masa Mula</label><input type='text' id='oMula' placeholder='7.00pm'></div>" +
+      "<div style='flex:1'><label>Masa Tamat</label><input type='text' id='oTamat' placeholder='10.00pm'></div>" +
+    "</div>" +
+    "<label>Jumlah Jam *</label><input type='number' step='0.5' min='0' id='oJam' inputmode='decimal'>" +
+    "<label>Sebab / Kerja Apa *</label><input type='text' id='oSebab' placeholder='Contoh: siapkan report urgent'>" +
+    '<p class="kecil" style="margin-top:10px">Kadar OT semasa: <b>' + esc(rm(kadar)) + " sejam</b>. " +
+    "Admin boleh ubah bila meluluskan.</p>" +
+    '<div style="display:flex;gap:8px;margin-top:14px">' +
+      '<button class="btn penuh" data-batal>Batal</button>' +
+      '<button class="btn btn-utama penuh" id="btnHantarOt">Hantar</button></div>');
+
+  $("[data-batal]", m.el).onclick = m.tutup;
+  $("#btnHantarOt", m.el).onclick = function () {
+    var jam = nom($("#oJam", m.el).value);
+    var sebab = $("#oSebab", m.el).value.trim();
+    if (jam <= 0) return toast("Sila isi jumlah jam.", "bad");
+    if (!sebab) return toast("Sila isi sebab OT.", "bad");
+    var d = baca();
+    d.ot = d.ot || [];
+    d.ot.push({
+      id: id(), stafId: STAF.id, nama: STAF.nama,
+      tarikh: $("#oTarikh", m.el).value || kunciTarikh(),
+      mula: $("#oMula", m.el).value.trim(), tamat: $("#oTamat", m.el).value.trim(),
+      jam: jam, kadar: kadar, jumlah: Math.round(jam * kadar * 100) / 100,
+      sebab: sebab, status: "Menunggu", dariStaf: true, createdAt: new Date().toISOString()
+    });
+    if (!simpan(d)) return;
+    m.tutup();
+    toast("Rekod OT dihantar. Menunggu kelulusan.", "ok", 4500);
+    lukisStaf();
+  };
+}
+
+/* ------------------------- halaman "Lain" ----------------------------- */
+
+function halamanLain(bekas, data) {
+  var pilihan = [];
+  if (aksesAda("slip")) pilihan.push(["slip", "Slip Gaji", IKON_S.slip]);
+  if (aksesAda("todo")) pilihan.push(["todo", "Senarai To Do", IKON_S.todo]);
+  if (aksesAda("alat")) pilihan.push(["alat", "Alat Saya", IKON_S.alat]);
+
+  bekas.innerHTML =
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>' + esc(STAF.nama) + "</h3></div>" +
+      '<div class="baris"><span class="kecil">Jawatan</span><span>' +
+        esc(STAF.jawatan || "-") + "</span></div>" +
+      '<div class="baris"><span class="kecil">Kumpulan</span><span>' +
+        esc(STAF.kumpulan || "-") + "</span></div>" +
+      '<div class="baris"><span class="kecil">ID pengguna</span><span>' +
+        esc((STAF.akaun || {}).id || "-") + "</span></div>" +
+    "</div>" +
+    (pilihan.length
+      ? '<div class="kad"><div class="kad-tajuk"><h3>Menu Lain</h3></div>' +
+        pilihan.map(function (x) {
+          return '<button type="button" class="job" data-lain="' + x[0] + '">' + x[2] +
+            " <b style='display:inline'>" + esc(x[1]) + "</b></button>";
+        }).join("") + "</div>"
+      : "") +
+    '<div class="kad">' +
+      '<div class="kad-tajuk"><h3>Hantar / Terima Data</h3></div>' +
+      '<p class="kecil">Kalau telefon ini berasingan dari komputer admin, hantar rekod baharu ' +
+      "(punch card, claim, OT) sebagai fail, dan muat fail jadual terbaru dari admin.</p>" +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' +
+        '<button class="btn btn-utama" id="btnHantarAdmin">Hantar ke Admin</button>' +
+        '<label class="btn" style="margin:0">Muat Fail Admin' +
+          '<input type="file" accept="application/json" id="failAdmin" hidden></label>' +
+      "</div>" +
+    "</div>" +
+    '<div class="kad">' +
+      '<button class="btn btn-bad penuh" id="btnKeluarBawah">Log Keluar</button>' +
+    "</div>";
+
+  $$("[data-lain]", bekas).forEach(function (b) {
+    b.onclick = function () {
+      var pilih = b.getAttribute("data-lain");
+      if (pilih === "slip") halamanSlip();
+      else if (pilih === "todo") halamanTodo();
+      else halamanAlatSaya();
+    };
+  });
+  $("#btnHantarAdmin").onclick = hantarKeAdmin;
+  $("#failAdmin").onchange = function (e) { muatFailAdmin(e.target.files[0]); };
+  $("#btnKeluarBawah").onclick = keluar;
+}
+
+/* ---------------------------- slip gaji ------------------------------- */
+
+function halamanSlip() {
+  var data = baca();
+  var senarai = (data.gaji || []).filter(function (g) {
+    return g.stafId === STAF.id && g.status !== "Draf";
+  }).sort(function (a, b) { return String(b.bulan).localeCompare(String(a.bulan)); });
+
+  var m = modal("Slip Gaji",
+    senarai.length
+      ? senarai.map(function (g) {
+          return '<button type="button" class="job" data-slip="' + esc(g.id) + '">' +
+            "<b>" + esc(fmtBulan(g.bulan)) + "</b>" +
+            '<div class="kecil">' + esc(g.no || "-") + " · " + esc(g.status) +
+            (g.tarikhBayar ? " · dibayar " + esc(fmtTarikh(g.tarikhBayar)) : "") + "</div></button>";
+        }).join("")
+      : '<div class="kosong">Belum ada slip gaji. Slip hanya muncul selepas admin luluskan.</div>');
+
+  $$("[data-slip]", m.el).forEach(function (b) {
+    b.onclick = function () { m.tutup(); lihatSlipStaf(b.getAttribute("data-slip")); };
+  });
+}
+
+function kiraSlip(r) {
+  var jum = function (s) { return (s || []).reduce(function (t, x) { return t + nom(x.jumlah); }, 0); };
+  var kasar = nom(r.gajiPokok) + jum(r.elaun) + nom(r.komisen) + nom(r.elaunSite) + jum(r.tambahan);
+  var potong = nom(r.epfPekerja) + nom(r.socsoPekerja) + nom(r.eisPekerja) + nom(r.pcb) + jum(r.potongan);
+  var claim = jum(r.claim);
+  return { kasar: kasar, potong: potong, claim: claim, bersih: kasar - potong + claim };
+}
+
+function lihatSlipStaf(gajiId) {
+  var data = baca();
+  var r = (data.gaji || []).filter(function (x) { return x.id === gajiId; })[0];
+  if (!r) return;
+  var k = kiraSlip(r);
+  var c = r.syarikat || data.tetapan.resit || {};
+  var baris = function (label, nilai, tebal) {
+    return "<tr><td>" + (tebal ? "<b>" + esc(label) + "</b>" : esc(label)) + "</td>" +
+      "<td class='num'>" + (tebal ? "<b>" + esc(rm(nilai)) + "</b>" : esc(rm(nilai))) + "</td></tr>";
+  };
+  var pendapatan = [["Gaji Pokok", r.gajiPokok]]
+    .concat((r.elaun || []).map(function (x) { return [x.nama || "Elaun", x.jumlah]; }))
+    .concat(nom(r.komisen) ? [["Komisen Jualan", r.komisen]] : [])
+    .concat(nom(r.elaunSite) ? [["Elaun Site", r.elaunSite]] : [])
+    .concat((r.tambahan || []).map(function (x) { return [x.nama || "Tambahan", x.jumlah]; }));
+  var potongan = []
+    .concat(nom(r.epfPekerja) ? [["KWSP (Pekerja)", r.epfPekerja]] : [])
+    .concat(nom(r.socsoPekerja) ? [["PERKESO (Pekerja)", r.socsoPekerja]] : [])
+    .concat(nom(r.eisPekerja) ? [["EIS (Pekerja)", r.eisPekerja]] : [])
+    .concat(nom(r.pcb) ? [["PCB", r.pcb]] : [])
+    .concat((r.potongan || []).map(function (x) { return [x.nama || "Potongan", x.jumlah]; }));
+
+  var html =
+    '<div class="slip" id="slipCetak">' +
+      "<h2>" + esc(c.namaSyarikat || "Syarikat") + "</h2>" +
+      '<div class="kecil">' + esc(c.alamat || "") + "</div>" +
+      '<div style="display:flex;justify-content:space-between;margin:12px 0 6px">' +
+        "<b>SLIP GAJI</b><span class='kecil'>" + esc(r.no || "") + " · " +
+        esc(fmtBulan(r.bulan)) + "</span></div>" +
+      '<div class="baris"><span class="kecil">Pekerja</span><b>' + esc(r.nama) + "</b></div>" +
+      (r.bank ? '<div class="baris"><span class="kecil">Bayaran</span><span>' +
+        esc(r.bank) + " " + esc(r.noAkaun || "") + "</span></div>" : "") +
+      "<h3 style='margin:14px 0 4px;font-size:13px'>Pendapatan</h3><table>" +
+        pendapatan.map(function (x) { return baris(x[0], x[1]); }).join("") +
+        baris("Jumlah Pendapatan", k.kasar, true) + "</table>" +
+      "<h3 style='margin:14px 0 4px;font-size:13px'>Potongan</h3><table>" +
+        (potongan.length ? potongan.map(function (x) { return baris(x[0], x[1]); }).join("")
+          : "<tr><td>Tiada</td><td class='num'>RM 0.00</td></tr>") +
+        baris("Jumlah Potongan", k.potong, true) + "</table>" +
+      ((r.claim || []).length
+        ? "<h3 style='margin:14px 0 4px;font-size:13px'>Bayaran Balik Claim</h3><table>" +
+          r.claim.map(function (x) { return baris(x.perkara, x.jumlah); }).join("") +
+          baris("Jumlah Claim", k.claim, true) + "</table>"
+        : "") +
+      '<table style="margin-top:12px"><tr><td style="background:#f1f5f9"><b>GAJI BERSIH</b></td>' +
+        '<td class="num" style="background:#f1f5f9"><b>' + esc(rm(k.bersih)) + "</b></td></tr></table>" +
+      (r.nota ? '<p class="kecil" style="margin-top:10px">' + esc(r.nota) + "</p>" : "") +
+      '<p class="kecil" style="margin-top:8px">' + esc(r.notaSlip || "") + "</p>" +
+    "</div>" +
+    '<div style="display:flex;gap:8px;margin-top:14px">' +
+      '<button class="btn penuh" data-tutupSlip>Tutup</button>' +
+      '<button class="btn btn-utama penuh" id="btnCetakSlipStaf">Cetak / PDF</button></div>';
+
+  var m = modal("Slip " + fmtBulan(r.bulan), html);
+  $("[data-tutupSlip]", m.el).onclick = m.tutup;
+  $("#btnCetakSlipStaf", m.el).onclick = function () {
+    var kertas = $("#kertasCetak");
+    kertas.innerHTML = $("#slipCetak", m.el).outerHTML;
+    kertas.hidden = false;
+    $("#apl").hidden = true;
+    setTimeout(function () {
+      try { window.print(); } catch (e) { toast("Tidak dapat buka dialog cetak.", "bad"); }
+      setTimeout(function () {
+        kertas.hidden = true; kertas.innerHTML = ""; $("#apl").hidden = false;
+      }, 600);
+    }, 200);
+  };
+}
+
+/* ------------------------------ to do --------------------------------- */
+
+function halamanTodo() {
+  var data = baca();
+  var senarai = (data.tugasan || []).filter(function (t) { return t.untuk === STAF.nama; })
+    .sort(function (a, b) {
+      if ((a.status === "Siap") !== (b.status === "Siap")) return a.status === "Siap" ? 1 : -1;
+      return String(a.tarikh || "9999").localeCompare(String(b.tarikh || "9999"));
+    });
+
+  var m = modal("Senarai To Do",
+    senarai.length
+      ? senarai.map(function (t) {
+          var lewat = t.status !== "Siap" && t.tarikh && t.tarikh < kunciTarikh();
+          return '<div class="baris"><span><b>' + esc(t.tajuk) + "</b>" +
+            '<div class="kecil">' + (t.tarikh ? esc(fmtTarikh(t.tarikh)) : "tiada tarikh") +
+            (t.nota ? " · " + esc(t.nota) : "") + "</div></span>" +
+            "<span style='text-align:right'>" +
+            (t.status === "Siap"
+              ? '<span class="badge badge-ok">Siap</span>'
+              : '<button class="btn btn-kecil btn-ok" data-siap="' + esc(t.id) + '">Tanda Siap</button>' +
+                (lewat ? '<div><span class="badge badge-bad">Lewat</span></div>' : "")) +
+            "</span></div>";
+        }).join("")
+      : '<div class="kosong">Tiada tugasan untuk awak.</div>');
+
+  $$("[data-siap]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      var d = baca();
+      var t = d.tugasan.filter(function (x) { return x.id === b.getAttribute("data-siap"); })[0];
+      if (!t) return;
+      t.status = "Siap";
+      t.siapPada = kunciTarikh();
+      t.updatedAt = new Date().toISOString();
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Tugasan ditanda siap.", "ok");
+      lukisStaf();
+    };
+  });
+}
+
+/* ---------------------------- alat saya ------------------------------- */
+
+function halamanAlatSaya() {
+  var data = baca();
+  var pegang = [];
+  (data.alat || []).forEach(function (a) {
+    (a.pinjam || []).forEach(function (p) {
+      if (!p.tarikhPulang && p.nama === STAF.nama) pegang.push({ alat: a, pinjam: p });
+    });
+  });
+  var boleh = (data.alat || []).filter(function (a) {
+    var dipinjam = (a.pinjam || []).filter(function (p) { return !p.tarikhPulang; })
+      .reduce(function (t, p) { return t + nom(p.kuantiti); }, 0);
+    var ada = Math.max(0, nom(a.jumlah) - nom(a.rosak) - nom(a.hilang) - dipinjam);
+    a._ada = ada;
+    return ada > 0;
+  });
+
+  var m = modal("Alat Saya",
+    '<h3 style="font-size:13px">Sedang Saya Pegang</h3>' +
+    (pegang.length
+      ? pegang.map(function (x) {
+          return '<div class="baris"><span><b>' + esc(x.alat.nama) + "</b>" +
+            '<div class="kecil">' + nom(x.pinjam.kuantiti) + " " + esc(x.alat.unit) +
+            " · ambil " + esc(fmtTarikh(x.pinjam.tarikhAmbil)) + "</div></span>" +
+            '<button class="btn btn-kecil btn-ok" data-pulang="' + esc(x.alat.id) + '|' +
+            esc(x.pinjam.id) + '">Pulang</button></div>';
+        }).join("")
+      : '<div class="kosong">Tiada alat dipegang.</div>') +
+    '<h3 style="font-size:13px;margin-top:16px">Ambil Alat</h3>' +
+    (boleh.length
+      ? '<select id="alatPilih">' + boleh.map(function (a) {
+          return "<option value='" + esc(a.id) + "'>" + esc(a.nama) + " · " + a._ada +
+            " " + esc(a.unit) + " di rak</option>";
+        }).join("") + "</select>" +
+        "<label>Kuantiti</label><input type='number' min='1' value='1' id='alatKuantiti'>" +
+        "<label>Untuk apa</label><input type='text' id='alatNota' placeholder='Contoh: inspection Setia Alam'>" +
+        '<button class="btn btn-utama penuh" style="margin-top:12px" id="btnAmbilAlat">Rekod Ambil</button>'
+      : '<div class="kosong">Tiada alat kosong di rak.</div>'));
+
+  $$("[data-pulang]", m.el).forEach(function (b) {
+    b.onclick = function () {
+      var bhg = b.getAttribute("data-pulang").split("|");
+      var d = baca();
+      var a = d.alat.filter(function (x) { return x.id === bhg[0]; })[0];
+      var p = a && (a.pinjam || []).filter(function (x) { return x.id === bhg[1]; })[0];
+      if (!p) return;
+      p.tarikhPulang = kunciTarikh();
+      p.keadaan = "Baik";
+      a.log = a.log || [];
+      a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(), jenis: "Pulang",
+        kuantiti: nom(p.kuantiti), oleh: STAF.nama, nota: "dari aplikasi staf" });
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Alat dipulangkan.", "ok");
+      lukisStaf();
+    };
+  });
+  if ($("#btnAmbilAlat", m.el)) {
+    $("#btnAmbilAlat", m.el).onclick = function () {
+      var alatId = $("#alatPilih", m.el).value;
+      var q = nom($("#alatKuantiti", m.el).value);
+      var d = baca();
+      var a = d.alat.filter(function (x) { return x.id === alatId; })[0];
+      if (!a || q <= 0) return;
+      var dipinjam = (a.pinjam || []).filter(function (p) { return !p.tarikhPulang; })
+        .reduce(function (t, p) { return t + nom(p.kuantiti); }, 0);
+      var ada = Math.max(0, nom(a.jumlah) - nom(a.rosak) - nom(a.hilang) - dipinjam);
+      if (q > ada) return toast("Hanya " + ada + " " + a.unit + " di rak.", "bad", 4000);
+      a.pinjam = a.pinjam || [];
+      a.pinjam.unshift({ id: id(), nama: STAF.nama, kuantiti: q, tarikhAmbil: kunciTarikh(),
+        tarikhPulang: null, nota: $("#alatNota", m.el).value.trim(), dariStaf: true });
+      a.log = a.log || [];
+      a.log.unshift({ tarikh: kunciTarikh(), masa: new Date().toISOString(), jenis: "Ambil",
+        kuantiti: q, oleh: STAF.nama, nota: "dari aplikasi staf" });
+      if (!simpan(d)) return;
+      m.tutup();
+      toast("Alat direkod: " + a.nama + " x" + q, "ok");
+      lukisStaf();
+    };
+  }
+}
+
+/* --------------------- hantar / terima data --------------------------- */
+
+function baitKeB64(bait) {
+  var u = bait instanceof Uint8Array ? bait : new Uint8Array(bait);
+  var teks = "", n = 8192;
+  for (var i = 0; i < u.length; i += n) teks += String.fromCharCode.apply(null, u.subarray(i, i + n));
+  return btoa(teks);
+}
+function b64KeBait(b64) {
+  var teks = atob(b64), u = new Uint8Array(teks.length);
+  for (var i = 0; i < teks.length; i++) u[i] = teks.charCodeAt(i);
+  return u;
+}
+
+function muatTurunTeks(nama, teks) {
+  var blob = new Blob([teks], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = nama;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+
+// Kumpul rekod yang dibuat oleh staf ini, berserta gambar, untuk dihantar ke admin.
+function hantarKeAdmin() {
+  var data = baca();
+  var pek = {
+    jenisPek: "staf", nama: STAF.nama, stafId: STAF.id, dijana: new Date().toISOString(),
+    kehadiran: (data.kehadiran || []).filter(function (k) { return k.stafId === STAF.id; }),
+    ot: (data.ot || []).filter(function (o) { return o.stafId === STAF.id || o.nama === STAF.nama; }),
+    belanja: (data.belanja || []).filter(function (b) {
+      return b.jenis === "Claim Staf" && b.staf === STAF.nama && b.dariStaf;
+    }),
+    tugasan: (data.tugasan || []).filter(function (t) {
+      return t.untuk === STAF.nama && t.status === "Siap";
+    }),
+    fail: {}
+  };
+  var kunciFail = [];
+  ["kehadiran", "belanja"].forEach(function (bahagian) {
+    pek[bahagian].forEach(function (r) {
+      if (r.lampiran && r.lampiran.kunci) kunciFail.push(r.lampiran.kunci);
+    });
+  });
+  toast("Menyediakan fail…", "", 2000);
+  Promise.all(kunciFail.map(function (k) {
+    return failAmbil(k).then(function (r) { return { kunci: k, rekod: r }; }).catch(function () { return null; });
+  })).then(function (senarai) {
+    senarai.forEach(function (x) {
+      if (x && x.rekod && x.rekod.bait) {
+        pek.fail[x.kunci] = { nama: x.rekod.nama, saiz: x.rekod.saiz, jenis: x.rekod.jenis,
+          b64: baitKeB64(x.rekod.bait) };
+      }
+    });
+    muatTurunTeks("staf-" + String(STAF.nama).replace(/\s+/g, "-").toLowerCase() +
+      "-" + kunciTarikh() + ".json", JSON.stringify(pek));
+    toast("Fail siap. Hantar kepada admin (WhatsApp / email).", "ok", 6000);
+  });
+}
+
+// Muat fail data dari admin (jadual, slip gaji, tetapan terkini).
+function muatFailAdmin(fail) {
+  if (!fail) return;
+  var pembaca = new FileReader();
+  pembaca.onload = function () {
+    try {
+      var masuk = JSON.parse(pembaca.result);
+      if (!masuk || (!masuk.staf && !masuk.jenisPek)) throw new Error("Fail tidak dikenali.");
+      if (masuk.jenisPek === "staf") throw new Error("Ini fail staf, bukan fail dari admin.");
+      sahkan("Ganti data dalam telefon ini dengan fail dari admin? " +
+        "Rekod yang belum dihantar akan hilang.").then(function (ya) {
+        if (!ya) return;
+        var lampiran = masuk.lampiranFail || {};
+        delete masuk.lampiranFail;
+        localStorage.setItem(KUNCI, JSON.stringify(masuk));
+        var kunci = Object.keys(lampiran);
+        Promise.all(kunci.map(function (k) {
+          return failSimpan(k, { nama: lampiran[k].nama, saiz: lampiran[k].saiz,
+            jenis: lampiran[k].jenis, bait: b64KeBait(lampiran[k].b64) }).catch(function () {});
+        })).then(function () {
+          toast("Data dimuat. Sila log masuk semula.", "ok", 5000);
+          setTimeout(function () { location.reload(); }, 1200);
+        });
+      });
+    } catch (e) {
+      toast("Gagal baca fail: " + e.message, "bad", 6000);
+    }
+  };
+  pembaca.readAsText(fail);
+}
+
+/* ------------------------------ mula ---------------------------------- */
+
+function mula() {
+  mulaLog();
+  $("#borangLog").onsubmit = cubaLog;
+  $("#btnKeluar").onclick = keluar;
+  var sesi = sessionStorage.getItem(SESI);
+  if (sesi) {
+    var data = baca();
+    var s = data && (data.staf || []).filter(function (x) { return x.id === sesi; })[0];
+    if (s && s.status === "aktif" && s.akaun && s.akaun.aktif !== false) bukaApl(sesi);
+    else sessionStorage.removeItem(SESI);
+  }
+}
+mula();
+
+</script>
+</body>
+</html>

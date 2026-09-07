@@ -5,6 +5,7 @@ Projek ini ada **dua fail berasingan** yang perlu di-deploy berbeza:
 | Fail | Untuk siapa | Cara guna |
 |---|---|---|
 | `index.html` | **Admin sahaja** | Sistem pengurusan penuh. Simpan dalam komputer admin (buka terus), atau deploy ke pautan peribadi. Jangan kongsi dengan client — ada harga, gaji, password submission dan semua data syarikat. |
+| `staf.html` | **Staf** | Aplikasi staf: jadual, punch card, claim, OT, slip gaji. Simpan dalam komputer/telefon staf, atau deploy ke pautan peribadi. Staf perlu ID & PIN yang admin tetapkan. |
 | `tnc.html` | **Client** | Halaman Syarat & Terma + ringkasan quotation. **Mesti di-deploy secara awam** supaya boleh dihantar sebagai pautan kepada client. |
 
 ## Langkah deploy `tnc.html`
