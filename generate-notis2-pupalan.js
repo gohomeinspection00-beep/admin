@@ -12,7 +12,7 @@ const data = {
     "81750 Masai,",
     "Johor.",
   ],
-  emailPembeli: "pupalanpukay@gmail.com",
+  emailPembeli: "pupalanpukat@gmail.com",
   telefonPembeli: "012-243 5795",
   noKP: "900117-08-5399",
 
@@ -45,8 +45,8 @@ const data = {
 
   tarikhReInspection: "4 September 2026",
 
-  tarikhNotis2: "9 September 2026",
-  tarikhDeadlineNotis2: "24 September 2026",
+  tarikhNotis2: "10 September 2026",
+  tarikhDeadlineNotis2: "25 September 2026",
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "serahan tangan",
 
@@ -78,8 +78,8 @@ const data = {
     { tarikh: "5 Ogos 2026", peristiwa: "Notis Pertama (First Notice) — Ruj. NOTIS-1/2026/016 — diserahkan secara serahan tangan dan diakui terima oleh wakil pemaju, Cik Laynia Nabila binti Salikim (Customer Care), dengan cop rasmi 'RECEIVED' bertarikh 5 Ogos 2026 (rujuk Lampiran A)" },
     { tarikh: "20 Ogos 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
     { tarikh: "4 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 15 kecacatan masih belum dibaiki / kecacatan baru dikesan / belum disiapkan sepenuhnya" },
-    { tarikh: "9 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
-    { tarikh: "24 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "10 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
+    { tarikh: "25 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
