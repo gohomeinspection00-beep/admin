@@ -38,8 +38,8 @@ const data = {
   tarikhSerahanLaporan: "20 April 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy) kepada pejabat pengurusan (management office)",
 
-  tarikhNotis1: "11 Ogos 2026",
-  tarikhDeadlineNotis1: "26 Ogos 2026",
+  tarikhNotis1: "5 Ogos 2026",
+  tarikhDeadlineNotis1: "20 Ogos 2026",
   tempohNotis1: "15",
   kaedahPenghantaranNotis1: "serahan tangan",
 
@@ -74,8 +74,8 @@ const data = {
     { tarikh: "20 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "2 Julai 2026", peristiwa: "Susulan (follow-up) oleh pemilik melalui WhatsApp kepada wakil pemaju — wakil pemaju mengesahkan kecacatan (crack) masih belum dibaiki ('rumah masih pending defect crack')" },
     { tarikh: "19 Julai 2026", peristiwa: "Susulan terakhir oleh pemilik melalui WhatsApp — tiada maklum balas daripada pemaju" },
-    { tarikh: "11 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/016" },
-    { tarikh: "26 Ogos 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
+    { tarikh: "5 Ogos 2026", peristiwa: "Notis Pertama (First Notice) — Ruj. NOTIS-1/2026/016 — diserahkan secara serahan tangan dan diakui terima oleh wakil pemaju, Cik Laynia Nabila binti Salikim (Customer Care), dengan cop rasmi 'RECEIVED' bertarikh 5 Ogos 2026 (rujuk Lampiran A)" },
+    { tarikh: "20 Ogos 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
     { tarikh: "4 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 14 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
     { tarikh: "9 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "24 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
@@ -250,7 +250,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dihantar melalui ${data.kaedahPenghantaranNotis1}, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
+  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dihantar melalui ${data.kaedahPenghantaranNotis1}, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah diakui terima oleh wakil pihak tuan, Cik Laynia Nabila binti Salikim (Customer Care), dengan cop rasmi "RECEIVED" bertarikh 5 Ogos 2026 dan cop syarikat pihak tuan — salinan Akuan Terima tersebut dilampirkan sebagai Lampiran A bersama-sama notis ini.`
 );
 y += 4;
 
@@ -350,6 +350,34 @@ drawTable(
   data.kronologi.map(k => [k.tarikh, k.peristiwa]),
   krColW
 );
+
+// ============================================================
+// LAMPIRAN A — BUKTI AKUAN TERIMA NOTIS 1
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN A";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Akuan Terima Notis Pertama oleh Pemaju", pageW / 2, y, { align: "center" });
+y += 5;
+doc.text("(Proof of Developer's Acknowledgement of Receipt — First Notice)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const akuanImg = fs.readFileSync("/home/user/admin/pupalan-bukti-akuan.jpg");
+const akuanB64 = "data:image/jpeg;base64," + akuanImg.toString("base64");
+const imgW = 120; const imgH = 160;
+doc.addImage(akuanB64, "JPEG", (pageW - imgW) / 2, y, imgW, imgH);
+y += imgH + 6;
+
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const capText = "Akuan Terima Notis Pertama (Ruj: NOTIS-1/2026/016) bertarikh 5 Ogos 2026 — diterima dan ditandatangani oleh Cik Laynia Nabila binti Salikim (Customer Care) dengan cop 'RECEIVED' 05 AUG 2026 serta cop rasmi PARKLAND CITY SDN BHD.";
+const capLines = doc.splitTextToSize(capText, cW - 20);
+for (const cl of capLines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
