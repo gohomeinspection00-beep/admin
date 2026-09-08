@@ -60,6 +60,7 @@ const data = {
     { tag: "55", lokasi: "Master Bedroom — Wall", kecacatan: "Ketidakjajaran ketara pada dinding (Visible misalignment on wall)", status: "Belum Dibaiki" },
     { tag: "78", lokasi: "Water Tank Area — Floor", kecacatan: "Keretakan pada papak lantai (semua kawasan lantai) — masih retak selepas kerja pembaikan (Crack on floor slab, all floor area — still cracked after rectification work)", status: "Belum Dibaiki Sepenuhnya" },
     { tag: "80", lokasi: "Water Tank Area — Plumbing & Sanitary Fitting", kecacatan: "Tiada sokongan yang sempurna pada distribution pipe dan incoming pipe ke tangki air (Missing proper support on distribution pipe and incoming pipe connected to water tank)", status: "Belum Dibaiki" },
+    { tag: "81", lokasi: "Water Tank Area — Plumbing & Sanitary Fitting", kecacatan: "Paip saliran papak tersumbat (Clogged slab discharge pipe) — KECACATAN BARU yang berlaku akibat kerja pembaikan (New Defect from Rectification Work)", status: "Kecacatan Baru — Belum Dibaiki" },
     { tag: "82", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air kotor dan perlu dibersihkan (Water tank dirty and needs to be cleaned)", status: "Belum Dibaiki" },
     { tag: "85", lokasi: "RC Flat Roof — Floor", kecacatan: "Air bertakung pada papak lantai (Stagnant water on floor slab)", status: "Belum Dibaiki" },
     { tag: "86", lokasi: "RC Flat Roof — Floor", kecacatan: "Lubang, keretakan dan mengelupas pada papak lantai (Holes, crack and peel off on floor slab)", status: "Belum Dibaiki Sepenuhnya" },
@@ -76,7 +77,7 @@ const data = {
     { tarikh: "19 Julai 2026", peristiwa: "Susulan terakhir oleh pemilik melalui WhatsApp — tiada maklum balas daripada pemaju" },
     { tarikh: "5 Ogos 2026", peristiwa: "Notis Pertama (First Notice) — Ruj. NOTIS-1/2026/016 — diserahkan secara serahan tangan dan diakui terima oleh wakil pemaju, Cik Laynia Nabila binti Salikim (Customer Care), dengan cop rasmi 'RECEIVED' bertarikh 5 Ogos 2026 (rujuk Lampiran A)" },
     { tarikh: "20 Ogos 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
-    { tarikh: "4 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 14 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
+    { tarikh: "4 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 15 kecacatan masih belum dibaiki / kecacatan baru dikesan / belum disiapkan sepenuhnya" },
     { tarikh: "9 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "24 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
@@ -257,6 +258,11 @@ y += 4;
 numPara(2,
   `Namun, hasil daripada pemeriksaan semula (Re-Inspection) pada ${data.tarikhReInspection}, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya atau tidak dilakukan langsung. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan.`
 );
+y += 4;
+
+numPara(3,
+  `Lebih membimbangkan, pemeriksaan semula tersebut turut mengesan KECACATAN BARU yang berlaku akibat kerja pembaikan pihak tuan sendiri (New Defect from Rectification Work), iaitu paip saliran papak di Water Tank Area yang tersumbat (clogged slab discharge pipe — item 81). Kecacatan baru ini boleh menyebabkan air bertakung dan kebocoran ke dalam unit, dan dengan itu dituntut supaya ia dibaiki dengan SEGERA bersama-sama kecacatan lain dalam tempoh notis ini.`
+);
 y += 5;
 
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
@@ -280,12 +286,12 @@ const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
-numPara(3,
+numPara(4,
   `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}).`
 );
 y += 4;
 
-numPara(4,
+numPara(5,
   `Merujuk kepada Klausa Penyampaian Dokumen ${data.klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -298,7 +304,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(5,
+numPara(6,
   `Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Kedua (Final Notice) ini tamat tempohnya pada ${data.tarikhDeadlineNotis2}, saya akan tanpa berlengah lagi mengambil tindakan berikut:`
 );
 y += 2;
