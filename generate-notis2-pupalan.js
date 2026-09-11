@@ -287,7 +287,7 @@ for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(4,
-  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}). Untuk makluman, Notis Kedua ini juga telah diserahkan secara serahan tangan kepada pejabat pengurusan pihak tuan di Bandar Layangkasa pada 10 September 2026 dan telah diakui terima oleh wakil pihak tuan, Cik Syafiqa (Customer Care), dengan cop syarikat.`
+  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}). Untuk makluman, Notis Kedua ini juga telah diserahkan secara serahan tangan kepada pejabat pengurusan pihak tuan di Bandar Layangkasa pada 10 September 2026 dan telah diakui terima oleh wakil pihak tuan, Cik Syafiqa (Customer Care), dengan cop syarikat — salinan Akuan Terima tersebut dilampirkan sebagai Lampiran B.`
 );
 y += 4;
 
@@ -384,6 +384,34 @@ doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const capText = "Akuan Terima Notis Pertama (Ruj: NOTIS-1/2026/016) bertarikh 5 Ogos 2026 — diterima dan ditandatangani oleh Cik Laynia Nabila binti Salikim (Customer Care) dengan cop 'RECEIVED' 05 AUG 2026 serta cop rasmi PARKLAND CITY SDN BHD.";
 const capLines = doc.splitTextToSize(capText, cW - 20);
 for (const cl of capLines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN B — BUKTI AKUAN TERIMA NOTIS 2 (PEJABAT PENGURUSAN)
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT2 = "LAMPIRAN B";
+doc.text(lampT2, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT2) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT2) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Akuan Terima Notis Kedua oleh Pejabat Pengurusan Pemaju", pageW / 2, y, { align: "center" });
+y += 5;
+doc.text("(Proof of Developer's Acknowledgement of Receipt — Second Notice / Final Notice)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const akuan2Img = fs.readFileSync("/home/user/admin/pupalan-bukti-akuan-notis2.jpg");
+const akuan2B64 = "data:image/jpeg;base64," + akuan2Img.toString("base64");
+const img2W = 90; const img2H = 160;
+doc.addImage(akuan2B64, "JPEG", (pageW - img2W) / 2, y, img2W, img2H);
+y += img2H + 6;
+
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const cap2Text = "Akuan Terima Notis Kedua / Notis Akhir (Ruj: NOTIS-2/2026/016) — diterima dan ditandatangani oleh Cik Syafiqa (Customer Care) pada 10/9/2026 di pejabat pengurusan pemaju, Bandar Layangkasa, dengan cop rasmi PARKLAND CITY SDN BHD.";
+const cap2Lines = doc.splitTextToSize(cap2Text, cW - 20);
+for (const cl of cap2Lines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
