@@ -43,7 +43,7 @@ const data = {
   tarikhNotis1: "10 Ogos 2026",
   tarikhDeadlineNotis1: "25 Ogos 2026",
   tempohNotis1: "15",
-  kaedahPenghantaranNotis1: "pos",
+  kaedahPenghantaranNotis1: "pos daftar (AR Registered) dengan nombor RW214685527MY",
 
   tarikhNotis2: "11 September 2026",
   tarikhDeadlineNotis2: "26 September 2026",
@@ -68,7 +68,8 @@ const data = {
     { tarikh: "27 Jun 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "1 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan kepada pemaju melalui aplikasi ProFix" },
     { tarikh: "31 Julai 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum dilaksanakan" },
-    { tarikh: "10 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/022" },
+    { tarikh: "10 Ogos 2026", peristiwa: "Notis Pertama (First Notice) — Ruj. NOTIS-1/2026/022 — dihantar melalui pos daftar (AR Registered) No. RW214685527MY" },
+    { tarikh: "12 Ogos 2026", peristiwa: "Notis Pertama DITERIMA dan ditandatangani oleh wakil pemaju (rujuk Akuan Terima Pos Daftar — Lampiran A)" },
     { tarikh: "25 Ogos 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum dibaiki" },
     { tarikh: "11 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "26 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
@@ -243,7 +244,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dihantar melalui ${data.kaedahPenghantaranNotis1}, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
+  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dihantar melalui ${data.kaedahPenghantaranNotis1}, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah DITERIMA dan ditandatangani oleh wakil pihak tuan pada 12 Ogos 2026, sebagaimana dibuktikan oleh Akuan Terima Pos Daftar (AR Card) Pos Malaysia No. RW214685527MY — salinan bukti tersebut dilampirkan sebagai Lampiran A bersama-sama notis ini.`
 );
 y += 4;
 
@@ -343,6 +344,34 @@ drawTable(
   data.kronologi.map(k => [k.tarikh, k.peristiwa]),
   krColW
 );
+
+// ============================================================
+// LAMPIRAN A — BUKTI PENERIMAAN NOTIS 1 (AR CARD POS DAFTAR)
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN A";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Penerimaan Notis Pertama — Akuan Terima Pos Daftar (AR Card)", pageW / 2, y, { align: "center" });
+y += 5;
+doc.text("(Proof of Receipt of First Notice — Pos Malaysia Registered Mail Acknowledgement)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const arImg = fs.readFileSync("/home/user/admin/sukri-bukti-ar.jpg");
+const arB64 = "data:image/jpeg;base64," + arImg.toString("base64");
+const arW = 90; const arH = 160;
+doc.addImage(arB64, "JPEG", (pageW - arW) / 2, y, arW, arH);
+y += arH + 6;
+
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const capText = "Akuan Terima Pos Daftar (AR Card) Pos Malaysia No. RW214685527MY — Notis Pertama (Ruj: NOTIS-1/2026/022) dihantar pada 10 Ogos 2026 kepada UDA LAND (SOUTH) SDN. BHD., dan telah DITERIMA serta ditandatangani oleh wakil penerima pada 12 Ogos 2026.";
+const capLines = doc.splitTextToSize(capText, cW - 20);
+for (const cl of capLines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
