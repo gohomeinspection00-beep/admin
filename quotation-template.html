@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoInspect - Repair Quotation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #0f3c3a;
+            padding-bottom: 20px;
+        }
+
+        .company-info {
+            flex: 1;
+        }
+
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0f3c3a;
+            margin-bottom: 5px;
+        }
+
+        .company-tagline {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .company-details {
+            font-size: 11px;
+            color: #777;
+            line-height: 1.6;
+        }
+
+        .quotation-title {
+            text-align: right;
+            flex: 1;
+        }
+
+        .quotation-title h1 {
+            font-size: 32px;
+            color: #0f3c3a;
+            margin-bottom: 10px;
+        }
+
+        .quotation-meta {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* INFO SECTION */
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            font-size: 12px;
+        }
+
+        .info-block {
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #0f3c3a;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #0f3c3a;
+            font-size: 13px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-content {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .info-content input,
+        .info-content textarea {
+            width: 100%;
+            padding: 5px;
+            margin: 3px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 11px;
+            font-family: inherit;
+        }
+
+        /* ITEMS TABLE */
+        .items-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background: #0f3c3a;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+
+        .items-table thead {
+            background: #ecf0f1;
+        }
+
+        .items-table th {
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+            color: #0f3c3a;
+            border: 1px solid #ddd;
+        }
+
+        .items-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .items-table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .item-description {
+            color: #333;
+        }
+
+        .item-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 11px;
+            font-family: inherit;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* PHOTOS SECTION */
+        .photos-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px dashed #0f3c3a;
+            border-radius: 5px;
+        }
+
+        .photos-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #0f3c3a;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .photo-placeholder {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            background: #e8e8e8;
+            border: 2px dashed #999;
+            border-radius: 5px;
+            margin: 10px 10px 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder input[type="file"] {
+            display: none;
+        }
+
+        /* TOTALS SECTION */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+        }
+
+        .totals-box {
+            width: 300px;
+            font-size: 12px;
+        }
+
+        .total-row {
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            gap: 20px;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total-row.total-amount {
+            font-weight: bold;
+            font-size: 14px;
+            background: #0f3c3a;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+
+        .total-label {
+            text-align: left;
+        }
+
+        .total-value {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* NOTES SECTION */
+        .notes-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f0f8f8;
+            border-left: 4px solid #0f3c3a;
+        }
+
+        .notes-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #0f3c3a;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 11px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* SIGNATURE SECTION */
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid #ddd;
+        }
+
+        .signature-block {
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333;
+            margin: 40px 0 5px 0;
+            height: 40px;
+        }
+
+        .signature-label {
+            font-weight: bold;
+            color: #0f3c3a;
+            margin-top: 5px;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* BUTTONS */
+        .buttons {
+            text-align: center;
+            margin-bottom: 30px;
+            display: no-print;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: #0f3c3a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #0a2825;
+        }
+
+        .btn-add {
+            background: #27ae60;
+        }
+
+        .btn-add:hover {
+            background: #229954;
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            .buttons {
+                display: none !important;
+            }
+            .add-row-btn {
+                display: none !important;
+            }
+        }
+
+        .add-row-btn {
+            width: 100%;
+            padding: 8px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .add-row-btn:hover {
+            background: #229954;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="buttons no-print">
+        <button class="btn" onclick="addItemRow()">+ Add Item</button>
+        <button class="btn btn-add" onclick="generatePDF()">📥 Download PDF</button>
+        <button class="btn" onclick="window.print()">🖨️ Print</button>
+    </div>
+
+    <div class="container" id="quotationContent">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="company-info">
+                <div class="company-name">🏠 GoInspect</div>
+                <div class="company-tagline">Professional Property Inspection & Repair Quotations</div>
+                <div class="company-details">
+                    <strong>GoXpert Solutions Sdn. Bhd.</strong><br>
+                    Email: Team.gohomeinspection@gmail.com<br>
+                    Phone: +6011-3144-6591<br>
+                    Johor, Malaysia
+                </div>
+            </div>
+            <div class="quotation-title">
+                <h1>QUOTATION</h1>
+                <div class="quotation-meta">
+                    <strong>Quotation #:</strong> <input type="text" id="quoteNo" value="GI-2026-001" style="width: 100px;"><br>
+                    <strong>Date:</strong> <input type="date" id="quoteDate" style="width: 150px;"><br>
+                    <strong>Valid Until:</strong> <input type="date" id="validUntil" style="width: 150px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- CLIENT & PROPERTY INFO -->
+        <div class="info-section">
+            <div class="info-block">
+                <div class="info-label">Client Information</div>
+                <div class="info-content">
+                    <strong>Name:</strong><br>
+                    <input type="text" id="clientName" placeholder="Client Name"><br><br>
+                    <strong>Phone:</strong><br>
+                    <input type="tel" id="clientPhone" placeholder="Phone Number"><br><br>
+                    <strong>Email:</strong><br>
+                    <input type="email" id="clientEmail" placeholder="Email Address">
+                </div>
+            </div>
+            <div class="info-block">
+                <div class="info-label">Property Information</div>
+                <div class="info-content">
+                    <strong>Address:</strong><br>
+                    <input type="text" id="propertyAddress" placeholder="Property Address"><br><br>
+                    <strong>City:</strong><br>
+                    <input type="text" id="propertyCity" placeholder="City" value="Johor Bahru"><br><br>
+                    <strong>Inspection Date:</strong><br>
+                    <input type="date" id="inspectionDate">
+                </div>
+            </div>
+        </div>
+
+        <!-- REPAIR ITEMS -->
+        <div class="items-section">
+            <div class="section-title">Repair Items & Quotation</div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Description of Work</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 15%;">Unit (m/pcs/sqm)</th>
+                        <th style="width: 15%;">Unit Price (RM)</th>
+                        <th style="width: 15%;">Amount (RM)</th>
+                        <th style="width: 5%;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <tr class="item-row">
+                        <td>
+                            <select class="item-input" onchange="this.parentElement.firstChild.textContent = this.value">
+                                <option value="">-- Select or Type Below --</option>
+                                <optgroup label="ELECTRICAL WORK">
+                                    <option>Socket/Outlet Replacement - RM75/pcs</option>
+                                    <option>Light Switch Replacement - RM65/pcs</option>
+                                    <option>Electrical Rewiring - RM35/meter</option>
+                                    <option>Ceiling Fan Installation - RM150/unit</option>
+                                    <option>Electrical Panel Upgrade - RM2,000-3,000</option>
+                                </optgroup>
+                                <optgroup label="PLUMBING WORK">
+                                    <option>Tap/Faucet Replacement - RM200/unit</option>
+                                    <option>Toilet Repair/Replacement - RM300-500/unit</option>
+                                    <option>Pipe Repair/Replacement - RM100/meter</option>
+                                    <option>Drain Blockage Clearing - RM250-400</option>
+                                    <option>Water Heater Repair/Replace - RM800/unit</option>
+                                </optgroup>
+                                <optgroup label="CARPENTRY & STRUCTURE">
+                                    <option>Door Frame Repair - RM300/unit</option>
+                                    <option>Window Frame Repair - RM250/unit</option>
+                                    <option>Ceiling Repair - RM150/sqm</option>
+                                    <option>Wall Crack Repair - RM120/area</option>
+                                    <option>Floor Repair/Replacement - RM80/sqm</option>
+                                </optgroup>
+                                <optgroup label="PAINTING & FINISHING">
+                                    <option>Wall Painting - RM28/sqm</option>
+                                    <option>Ceiling Painting - RM32/sqm</option>
+                                    <option>Door/Frame Painting - RM150/unit</option>
+                                    <option>Touch-Up Work - RM100/area</option>
+                                </optgroup>
+                                <optgroup label="ROOFING">
+                                    <option>Roof Leak Repair - RM400-800</option>
+                                    <option>Tile Replacement - RM45/sqm</option>
+                                    <option>Full Roof Replacement - RM50/sqm</option>
+                                </optgroup>
+                                <optgroup label="MASONRY & CONCRETE">
+                                    <option>Crack Injection - RM300/area</option>
+                                    <option>Concrete Patching - RM200/area</option>
+                                    <option>Brick Repair - RM150/area</option>
+                                </optgroup>
+                            </select>
+                        </td>
+                        <td><input type="number" class="item-input qty-input" value="1" min="1" onchange="calculateTotal()"></td>
+                        <td><input type="text" class="item-input unit-input" placeholder="m/pcs/sqm" onchange="calculateTotal()"></td>
+                        <td><input type="number" class="item-input price-input" placeholder="0.00" step="0.01" onchange="calculateTotal()"></td>
+                        <td class="text-right"><span class="item-amount">0.00</span></td>
+                        <td class="text-right"><button class="remove-btn no-print" onclick="removeItemRow(this)">Remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="add-row-btn no-print" onclick="addItemRow()">+ Add Another Item</button>
+        </div>
+
+        <!-- PHOTOS/DEFECTS SECTION -->
+        <div class="photos-section no-print">
+            <div class="photos-title">📸 Attach Photos of Defects (Click to Upload)</div>
+            <div id="photoGallery">
+                <div class="photo-placeholder" onclick="this.querySelector('input[type=file]').click()">
+                    <input type="file" accept="image/*" onchange="previewImage(this)">
+                    <span>Click to add photo</span>
+                </div>
+            </div>
+            <button class="add-row-btn" onclick="addPhotoPlaceholder()" style="margin-top: 10px;">+ Add More Photo Slots</button>
+        </div>
+
+        <!-- NOTES/WARRANTY -->
+        <div class="notes-section">
+            <div class="notes-title">Notes & Warranty Information</div>
+            <textarea class="notes-textarea" id="notesArea" placeholder="E.g., Warranty period, payment terms, materials used, special conditions...">This quotation is valid for 30 days from the date above.
+Materials and workmanship are guaranteed for 12 months from completion date.
+Payment terms: 50% upon commencement, 50% upon completion.">
+            </textarea>
+        </div>
+
+        <!-- TOTALS -->
+        <div class="totals-section">
+            <div class="totals-box">
+                <div class="total-row">
+                    <div class="total-label">Subtotal:</div>
+                    <div class="total-value" id="subtotal">RM 0.00</div>
+                </div>
+                <div class="total-row">
+                    <div class="total-label">SST (6%):</div>
+                    <div class="total-value" id="sst">RM 0.00</div>
+                </div>
+                <div class="total-row total-amount">
+                    <div class="total-label">TOTAL AMOUNT:</div>
+                    <div class="total-value" id="totalAmount">RM 0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIGNATURE SECTION -->
+        <div class="signature-section">
+            <div class="signature-block">
+                <div style="font-size: 12px; margin-bottom: 30px;">Inspector/Surveyor Signature</div>
+                <div class="signature-line"></div>
+                <div class="signature-label" id="inspectorName">GoInspect Inspector</div>
+                <div style="font-size: 10px; color: #666;">Name & Date</div>
+            </div>
+            <div class="signature-block">
+                <div style="font-size: 12px; margin-bottom: 30px;">Client Acknowledgement</div>
+                <div class="signature-line"></div>
+                <div class="signature-label">Client Signature</div>
+                <div style="font-size: 10px; color: #666;">Name & Date</div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <strong>GoXpert Solutions Sdn. Bhd. | GoInspect™ Platform</strong><br>
+            Professional Property Inspection Services - Johor, Malaysia<br>
+            Email: Team.gohomeinspection@gmail.com | Phone: +6011-3144-6591<br>
+            This quotation is confidential and intended only for the named recipient.
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('quoteDate').valueAsDate = new Date();
+
+        // Set valid until to 30 days from now
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 30);
+        document.getElementById('validUntil').valueAsDate = futureDate;
+
+        function addItemRow() {
+            const tbody = document.getElementById('itemsBody');
+            const newRow = tbody.rows[0].cloneNode(true);
+
+            // Reset values
+            newRow.querySelector('.qty-input').value = '1';
+            newRow.querySelector('.unit-input').value = '';
+            newRow.querySelector('.price-input').value = '';
+            newRow.querySelector('.item-amount').textContent = '0.00';
+            newRow.querySelector('select').value = '';
+
+            tbody.appendChild(newRow);
+        }
+
+        function removeItemRow(button) {
+            if (document.getElementById('itemsBody').rows.length > 1) {
+                button.closest('tr').remove();
+                calculateTotal();
+            } else {
+                alert('Quotation must have at least one item');
+            }
+        }
+
+        function calculateTotal() {
+            let subtotal = 0;
+            const rows = document.getElementById('itemsBody').querySelectorAll('.item-row');
+
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                const price = parseFloat(row.querySelector('.price-input').value) || 0;
+                const amount = qty * price;
+                row.querySelector('.item-amount').textContent = amount.toFixed(2);
+                subtotal += amount;
+            });
+
+            const sst = subtotal * 0.06;
+            const total = subtotal + sst;
+
+            document.getElementById('subtotal').textContent = 'RM ' + subtotal.toFixed(2);
+            document.getElementById('sst').textContent = 'RM ' + sst.toFixed(2);
+            document.getElementById('totalAmount').textContent = 'RM ' + total.toFixed(2);
+        }
+
+        function addPhotoPlaceholder() {
+            const gallery = document.getElementById('photoGallery');
+            const placeholder = document.createElement('div');
+            placeholder.className = 'photo-placeholder';
+            placeholder.innerHTML = '<input type="file" accept="image/*" onchange="previewImage(this)"><span>Click to add photo</span>';
+            placeholder.onclick = function() {
+                this.querySelector('input[type=file]').click();
+            };
+            gallery.appendChild(placeholder);
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    input.parentElement.innerHTML = '<img src="' + e.target.result + '">';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('quotationContent');
+            const opt = {
+                margin: 10,
+                filename: 'GoInspect-Quotation-' + new Date().getTime() + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Keyboard shortcut - Ctrl+S to download PDF
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                generatePDF();
+            }
+        });
+
+        // Calculate on page load
+        calculateTotal();
+    </script>
+</body>
+</html>
