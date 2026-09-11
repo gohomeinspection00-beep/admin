@@ -19,10 +19,9 @@ const data = {
   namaPemaju: "PARKLAND CITY SDN BHD",
   noSyarikat: "(201201031906 / 1016393-K)",
   alamatPenerima: [
-    "Bangunan Parkland Group,",
-    "Persiaran Wau Kikik,",
-    "Bandar Layangkasa,",
-    "81700 Pasir Gudang, Johor.",
+    "(Parkland Headquarters Office)",
+    "No. 112, Jalan Tun Perak,",
+    "75300 Melaka.",
   ],
 
   alamatHartanah: "No. 6, Jalan Wau Barat 9, Bandar Layangkasa, 81700 Pasir Gudang, Johor",
