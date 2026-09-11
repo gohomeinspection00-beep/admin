@@ -16,7 +16,12 @@ const data = {
 
   namaPemaju: "BINTANG URUSJUTA (M) SDN. BHD.",
   noSyarikat: "(198901013798 / 191108-A)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "HQ") ? [
+    "(Ibu Pejabat / Headquarters Office)",
+    "Wisma GJH, No. 1, Jalan Anggerik 2,",
+    "Taman Raya Rumput Perdana,",
+    "76450 Melaka.",
+  ] : [
     "(Sales Gallery) Taman Anjung Gapam,",
     "Persiaran Anjung Gapam 1,",
     "77200 Bemban, Melaka.",
@@ -430,6 +435,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_AINA.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_AINA.pdf");
+const outName = (process.argv[2] === "HQ") ? "NOTIS_1_AINA_HQ.pdf" : "NOTIS_1_AINA.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
