@@ -61,7 +61,6 @@ const data = {
     { tag: "200", lokasi: "Living and Dining — Ceiling", kecacatan: "Kebocoran dan kelembapan tinggi pada siling di dalam ceiling manhole (Leaking and high moisture on ceiling inside ceiling manhole)", status: "Belum Dibaiki" },
     { tag: "243", lokasi: "Car Porch — Floor", kecacatan: "Keretakan dan shrinkage cracks pada keseluruhan papak lantai masih ada (Cracks and shrinkage cracks on all floor slab still observed)", status: "Belum Dibaiki Sepenuhnya" },
     { tag: "251", lokasi: "Car Porch — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Dibaiki" },
-    { tag: "256", lokasi: "Car Porch — M&E", kecacatan: "Rintangan elektrod bumi diukur 69 \u03a9 — melebihi had di bawah 10 \u03a9 yang diperlukan bagi pemasangan dengan SPD mengikut ST Domestic Electrical Installation Guidelines, Second Edition 2024, Klausa 10.8(b) — tidak patuh dan menjejaskan keberkesanan SPD (Measured earth electrode resistance 69 \u03a9, exceeds required limit — non-compliant)", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
@@ -69,7 +68,7 @@ const data = {
     { tarikh: "28 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "31 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara rasmi kepada pihak pemaju melalui WhatsApp" },
     { tarikh: "30 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
-    { tarikh: "8 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 16 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
+    { tarikh: "8 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 15 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
     { tarikh: "11 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "26 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
@@ -276,7 +275,7 @@ for (const f of fnL) { checkBreak(6); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus dan SEGERA diberikan kepada kecacatan elektrik yang melibatkan KESELAMATAN — item No. 100 (open ground pada soket 13A, sistem pembumian tidak berfungsi), item No. 162 (SPD tidak berfungsi) dan item No. 256 (rintangan elektrod bumi 69 \u03a9, jauh melebihi had di bawah 10 \u03a9 yang ditetapkan oleh ST Domestic Electrical Installation Guidelines, Second Edition 2024, Klausa 10.8(b) bagi pemasangan dengan SPD). Ketiga-tiga kecacatan ini menjadikan sistem perlindungan elektrik rumah tidak berfungsi dengan sempurna dan boleh mendatangkan risiko kejutan elektrik dan kebakaran kepada penghuni. Pembaikan oleh orang kompeten (competent person) dituntut dengan segera.`
+  `Perhatian khusus dan SEGERA diberikan kepada kecacatan elektrik yang melibatkan KESELAMATAN — item No. 100 (open ground pada soket 13A, sistem pembumian tidak berfungsi) dan item No. 162 (SPD tidak berfungsi). Kedua-dua kecacatan ini menjadikan sistem perlindungan elektrik rumah tidak berfungsi dengan sempurna dan boleh mendatangkan risiko kejutan elektrik dan kebakaran kepada penghuni. Pembaikan oleh orang kompeten (competent person) dituntut dengan segera.`
 );
 y += 4;
 
