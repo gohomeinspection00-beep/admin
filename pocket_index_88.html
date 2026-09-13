@@ -1719,6 +1719,10 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .vt-tag{font-size:9.5px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;flex:none}
 .vt-tag.off{background:var(--success-soft);color:var(--success)}
 .vt-tag.ai{background:var(--warning-soft);color:var(--warning)}
+.vt-tag.voice{background:var(--accent-soft);color:var(--accent)}
+.vt-tag.novoice{background:var(--surface);color:var(--muted)}
+.vt-bub .acts .vt-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.vt-novoice{font-size:10.5px;color:var(--muted);align-self:center}
 .vt-fld{margin-bottom:11px}
 .vt-fld label{display:block;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
 .vt-fld input,.vt-fld textarea{width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:14px}
@@ -15310,19 +15314,59 @@ function vtPhraseIn(p, k) {
 }
 
 // ---------- 1. SUARA ----------
-function vtSpeak(text, k, rate) {
-  if (!window.speechSynthesis || !text) return;
+// Peranti tidak menghantar suara untuk setiap bahasa. Telefon Malaysia biasanya
+// TIADA suara Bangla, Nepali, Myanmar atau Urdu — justeru ketiadaan suara adalah
+// keadaan biasa yang mesti dikendalikan, bukan ralat. Bila tiada suara, tool
+// jatuh balik kepada kad teks besar dan bukannya senyap sahaja.
+function vtVoiceFor(k) {
+  if (!window.speechSynthesis) return null;
+  // Dibaca semula setiap kali: Android Chrome pulangkan senarai kosong pada
+  // panggilan pertama, jadi satu gambaran awal tidak boleh dipercayai.
+  let list = [];
+  try { list = speechSynthesis.getVoices() || []; } catch (e) { return null; }
+  if (list.length) _vtVoices = list; else list = _vtVoices;
+  const bcp = vtL(k).bcp.toLowerCase();
+  const pre = bcp.split('-')[0];
+  let exact = null, loose = null;
+  for (let i = 0; i < list.length; i++) {
+    const lang = (list[i].lang || '').toLowerCase().replace('_', '-');
+    if (!lang) continue;
+    if (lang === bcp) { exact = list[i]; break; }
+    if (!loose && lang.split('-')[0] === pre) loose = list[i];
+  }
+  return exact || loose;
+}
+function vtHasVoice(k) { return !!vtVoiceFor(k); }
+
+// iOS menyekat speak() yang datang selepas await melainkan speechSynthesis
+// telah disentuh dahulu di dalam gerak isyarat pengguna sebenar. Sekali sahaja.
+let _vtPrimed = false;
+function vtPrimeSpeech() {
+  if (_vtPrimed || !window.speechSynthesis) return;
+  _vtPrimed = true;
   try {
-    speechSynthesis.cancel();
-    const lg = vtL(k);
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lg.bcp; u.volume = 1; u.rate = rate || 1; u.pitch = 1;
-    const pre = lg.bcp.split('-')[0].toLowerCase();
-    const v = _vtVoices.find(function(x) { return x.lang && x.lang.toLowerCase().indexOf(pre) === 0; });
-    if (v) u.voice = v;
-    else showToast('This phone has no ' + lg.n + ' voice — use Show instead');
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0;
     speechSynthesis.speak(u);
   } catch (e) {}
+}
+
+// Pulangkan true jika benar-benar dibaca, false jika peranti tiada suara.
+function vtSpeak(text, k, rate) {
+  if (!window.speechSynthesis || !text) return false;
+  const v = vtVoiceFor(k);
+  if (!v) return false;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.voice = v;
+    u.lang = v.lang || vtL(k).bcp;
+    u.volume = 1; u.rate = rate || 1; u.pitch = 1;
+    speechSynthesis.speak(u);
+    // Safari kadang-kadang meninggalkan barisan dalam keadaan dijeda.
+    setTimeout(function() { try { if (speechSynthesis.paused) speechSynthesis.resume(); } catch (e) {} }, 120);
+    return true;
+  } catch (e) { return false; }
 }
 
 // ---------- 2. TERJEMAHAN AI + CACHE ----------
@@ -15415,7 +15459,8 @@ function vtRender() {
   h += '<div class="vt-hd">' +
     '<button class="vt-ic" id="vtClose" aria-label="Close">' + vtSvg(VT_I.back) + '</button>' +
     '<div class="vt-hd-t"><h2>Voice Translator</h2><p>' + peEsc(me.n) + ' &#8644; ' + peEsc(wk.n) +
-      (wk.book ? ' &middot; offline pack' : ' &middot; AI only') + '</p></div>' +
+      (wk.book ? ' &middot; offline pack' : ' &middot; AI only') +
+      (vtHasVoice(wk.k) ? '' : ' &middot; no voice, use Show') + '</p></div>' +
     '<button class="vt-savebtn" id="vtSaveBtn"' + (VT.turns.length ? '' : ' disabled') + '>' +
       (VT.editId ? 'Update' : 'Save') + '</button>' +
   '</div>';
@@ -15470,9 +15515,12 @@ function vtViewTalk() {
       '<div class="out vt-scripts" dir="' + (VT_RTL[t.to] ? 'rtl' : 'auto') + '">' + peEsc(t.out) + '</div>' +
       (t.rom ? '<div class="rom">' + peEsc(t.rom) + '</div>' : '') +
       '<div class="acts">' +
-        '<button data-vtplay="' + i + '">' + vtSvg(VT_I.play, 12) + 'Play</button>' +
-        '<button data-vtslow="' + i + '">' + vtSvg(VT_I.slow, 12) + '0.6&times;</button>' +
-        '<button class="big" data-vtbig="' + i + '">' + vtSvg(VT_I.eye, 12) + 'Show</button>' +
+        (vtHasVoice(t.to)
+          ? '<button data-vtplay="' + i + '">' + vtSvg(VT_I.play, 12) + 'Play</button>' +
+            '<button data-vtslow="' + i + '">' + vtSvg(VT_I.slow, 12) + '0.6&times;</button>' +
+            '<button class="big" data-vtbig="' + i + '">' + vtSvg(VT_I.eye, 12) + 'Show</button>'
+          : '<button class="big vt-primary" data-vtbig="' + i + '">' + vtSvg(VT_I.eye, 12) + 'Show worker</button>' +
+            '<span class="vt-novoice">no ' + peEsc(vtL(t.to).n) + ' voice on this phone</span>') +
       '</div>' +
     '</div>';
   }
@@ -15517,7 +15565,20 @@ function vtViewBook() {
 function vtAddTurn(side, src, out, rom, from, to) {
   VT.turns.push({ side: side, src: src, out: out, rom: rom || '', from: from, to: to });
   vtRender();
-  vtSpeak(out, to, 1);
+  // Kalau peranti boleh sebut, sebut. Kalau tidak, terus tunjuk kad teks besar —
+  // jangan biarkan pengguna menekan Play dan dapat senyap.
+  if (!vtSpeak(out, to, 1)) {
+    vtOpenBig(VT.turns.length - 1);
+    vtWarnNoVoice(to);
+  }
+}
+
+// Beritahu sekali sahaja setiap bahasa, bukan setiap ayat.
+let _vtWarned = {};
+function vtWarnNoVoice(k) {
+  if (_vtWarned[k]) return;
+  _vtWarned[k] = 1;
+  showToast('This phone has no ' + vtL(k).n + ' voice — showing large text instead');
 }
 
 function vtStatus(t) {
@@ -15631,7 +15692,8 @@ function vtOpenPick(which) {
     if (l.k === other) continue;
     h += '<button class="vt-lg ' + (l.k === cur ? 'on' : '') + '" data-vtlang="' + l.k + '">' +
       '<span class="col"><span class="n">' + peEsc(l.n) + '</span><span class="s vt-scripts">' + peEsc(l.s) + '</span></span>' +
-      '<span class="vt-tag ' + (l.book ? 'off' : 'ai') + '">' + (l.book ? 'OFFLINE' : 'AI ONLY') + '</span></button>';
+      '<span class="vt-tag ' + (l.book ? 'off' : 'ai') + '">' + (l.book ? 'OFFLINE' : 'AI ONLY') + '</span>' +
+      '<span class="vt-tag ' + (vtHasVoice(l.k) ? 'voice' : 'novoice') + '">' + (vtHasVoice(l.k) ? 'VOICE' : 'NO VOICE') + '</span></button>';
   }
   h += '</div></div>';
   const sh = document.getElementById('vtSheet');
@@ -15650,7 +15712,7 @@ function vtOpenBig(i) {
     '<div class="txt vt-scripts" style="font-size:' + size + 'px" dir="' + (VT_RTL[t.to] ? 'rtl' : 'auto') + '">' + peEsc(t.out) + '</div>' +
     (t.rom ? '<div class="rom2">' + peEsc(t.rom) + '</div>' : '') +
     '<div class="row"><button data-vtbigclose="1">Close</button>' +
-    '<button class="pri" data-vtbigplay="' + i + '">Read aloud</button></div>';
+    (vtHasVoice(t.to) ? '<button class="pri" data-vtbigplay="' + i + '">Read aloud</button>' : '') + '</div>';
   big.classList.add('on');
 }
 
@@ -15823,6 +15885,7 @@ function vtWire() {
 
   document.addEventListener('click', function(e) {
     if (!document.getElementById('vtOverlay')) return;
+    vtPrimeSpeech();
     let el;
 
     if ((el = e.target.closest('[data-vtmode]'))) { VT.mode = el.dataset.vtmode; vtRender(); return; }
