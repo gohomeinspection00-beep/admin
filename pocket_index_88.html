@@ -12264,6 +12264,7 @@ let crEditId = null;
 // Paparan kanvas
 let crv = { cv:null, ctx:null, zoom:1, panX:0, panY:0, base:1, w:0, h:0 };
 let crDrag = -1, crLoupe = null, crPointers = {}, crPanning = false, crPinch = null;
+let crMoveFrom = { x:0, y:0 };
 
 function crHead(name, desc) {
   document.getElementById('toolModalIcon').innerHTML =
@@ -12441,14 +12442,19 @@ async function crPickPhoto(e) {
 }
 
 // ---------- 4. KANVAS ----------
+// Nisbah kad sebenar: 85.6 x 53.98 mm. Dikunci, supaya jika petak itu
+// muat pada kad, skalanya betul. Empat penjuru bebas boleh diseret jadi
+// bentuk yang bukan kad langsung tanpa disedari.
+const CR_CARD_RATIO = 53.98 / 85.6;
+
 function crDefaultHandles() {
   const W = crTask.img.width, H = crTask.img.height;
   const cx = W / 2, cy = H / 2;
   if (crTask.shape === 'quad') {
-    // Nisbah kad sebenar 85.6 x 53.98 mm
-    const w = W * 0.42, h = w * (53.98 / 85.6);
-    return [{x:cx-w/2,y:cy-h/2},{x:cx+w/2,y:cy-h/2},{x:cx+w/2,y:cy+h/2},{x:cx-w/2,y:cy+h/2}];
+    crTask.rect = { cx: cx, cy: cy, w: W * 0.42, rot: 0 };
+    return crRectCorners();
   }
+  crTask.rect = null;
   if (crTask.shape === 'circle') {
     const r = Math.min(W, H) * 0.16;
     return [{x:cx,y:cy},{x:cx+r,y:cy}];
@@ -12457,13 +12463,33 @@ function crDefaultHandles() {
   return [{x:cx-w/2,y:cy},{x:cx+w/2,y:cy}];
 }
 
+// Penjuru dikira dari pusat, lebar dan putaran. Urutan: TL, TR, BR, BL.
+function crRectCorners() {
+  const r = crTask.rect;
+  if (!r) return [];
+  const hw = r.w / 2, hh = (r.w * CR_CARD_RATIO) / 2;
+  const c = Math.cos(r.rot), si = Math.sin(r.rot);
+  return [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].map(function(q) {
+    return { x: r.cx + q[0]*c - q[1]*si, y: r.cy + q[0]*si + q[1]*c };
+  });
+}
+
+// Penunjuk di dalam petak? Digunakan untuk membezakan gerak dan seret pemegang.
+function crInRect(p) {
+  const r = crTask.rect;
+  if (!r) return false;
+  const c = Math.cos(-r.rot), si = Math.sin(-r.rot);
+  const dx = p.x - r.cx, dy = p.y - r.cy;
+  const lx = dx*c - dy*si, ly = dx*si + dy*c;
+  return Math.abs(lx) <= r.w/2 && Math.abs(ly) <= (r.w*CR_CARD_RATIO)/2;
+}
+
 function crRecalcScale() {
   const h = crTask.handles;
   if (crTask.shape === 'quad') {
-    if (h.length < 4) { crTask.pxPerMm = null; return; }
-    // Purata dua tepi panjang, supaya perspektif ringan tidak memihak satu sisi
-    const a = crDist(h[0], h[1]), b = crDist(h[3], h[2]);
-    crTask.pxPerMm = ((a + b) / 2) / crTask.refMm;
+    if (!crTask.rect) { crTask.pxPerMm = null; return; }
+    crTask.handles = crRectCorners();
+    crTask.pxPerMm = crTask.rect.w / crTask.refMm;
   } else if (crTask.shape === 'circle') {
     if (h.length < 2) { crTask.pxPerMm = null; return; }
     crTask.pxPerMm = (crDist(h[0], h[1]) * 2) / crTask.refMm;
@@ -12566,6 +12592,24 @@ function crDown(e) {
   }
   const d = crEvtCanvas(e);
   const img = crD2I(d);
+
+  // Kad: satu pemegang penjuru yang menskala dan memutar serentak,
+  // dan seret di dalam petak untuk menggerakkannya.
+  if (crPhase === 'calib' && crTask.shape === 'quad') {
+    const corners = crRectCorners();
+    if (crDist(crI2D(corners[1]), d) < 28) {
+      crDrag = 'handle'; crLoupe = img; crDraw(); return;
+    }
+    if (crInRect(img)) {
+      crDrag = 'move';
+      crMoveFrom = { x: img.x - crTask.rect.cx, y: img.y - crTask.rect.cy };
+      crLoupe = null; crDraw(); return;
+    }
+    crPanning = true;
+    crPointers.__start = { x: d.x, y: d.y, panX: crv.panX, panY: crv.panY };
+    return;
+  }
+
   const pts = crPhase === 'calib' ? crTask.handles : crTask.measPts;
   const tolD = 26;   // toleransi dalam piksel kanvas
   let hit = -1, best = tolD;
@@ -12609,7 +12653,27 @@ function crMove(e) {
     return;
   }
   const d = crEvtCanvas(e);
-  if (crDrag >= 0) {
+  if (crDrag === 'move') {
+    const img = crD2I(d);
+    crTask.rect.cx = img.x - crMoveFrom.x;
+    crTask.rect.cy = img.y - crMoveFrom.y;
+    crRecalcScale(); crDraw();
+    return;
+  }
+  if (crDrag === 'handle') {
+    const img = crD2I(d);
+    const r = crTask.rect;
+    const ang = Math.atan2(img.y - r.cy, img.x - r.cx);
+    // Penjuru kanan atas duduk pada sudut tetap relatif kepada putaran petak
+    const phi0 = Math.atan2(-CR_CARD_RATIO, 1);
+    r.rot = ang - phi0;
+    const half = crDist(img, { x: r.cx, y: r.cy });
+    r.w = Math.max(24, (2 * half) / Math.sqrt(1 + CR_CARD_RATIO * CR_CARD_RATIO));
+    crLoupe = img;
+    crRecalcScale(); crDraw();
+    return;
+  }
+  if (typeof crDrag === 'number' && crDrag >= 0) {
     const pts = crPhase === 'calib' ? crTask.handles : crTask.measPts;
     pts[crDrag] = crD2I(d);
     crLoupe = pts[crDrag];
@@ -12628,7 +12692,7 @@ function crUp(e) {
   delete crPointers[e.pointerId];
   const ids = Object.keys(crPointers).filter(function(k) { return k !== '__start'; });
   if (ids.length < 2) crPinch = null;
-  if (crDrag >= 0) { crDrag = -1; crLoupe = null; crDraw(); crFoot(); }
+  if (crDrag !== -1) { crDrag = -1; crLoupe = null; crDraw(); crFoot(); }
   if (crPanning && !ids.length) { crPanning = false; delete crPointers.__start; }
 }
 
@@ -12661,10 +12725,22 @@ function crDraw() {
     ctx.closePath();
     ctx.fillStyle = 'rgba(34,211,238,.12)'; ctx.fill();
     ctx.stroke();
-    // tandakan dua tepi panjang, iaitu yang menentukan skala
+    // tepi panjang menentukan skala, jadi ia ditebalkan
     ctx.lineWidth = 5;
     ctx.beginPath(); ctx.moveTo(D[0].x, D[0].y); ctx.lineTo(D[1].x, D[1].y);
     ctx.moveTo(D[3].x, D[3].y); ctx.lineTo(D[2].x, D[2].y); ctx.stroke();
+    // satu pemegang sahaja: skala dan putar
+    const hp = D[1], act = (crDrag === 'handle');
+    ctx.beginPath(); ctx.arc(hp.x, hp.y, act ? 16 : 13, 0, Math.PI * 2);
+    ctx.fillStyle = '#22d3ee'; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+    ctx.strokeStyle = '#08303a'; ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(hp.x, hp.y, 6.5, -0.6, Math.PI * 1.25);
+    ctx.stroke();
+    if (crLoupe) crDrawLoupe(crLoupe);
+    crUpdateHint();
+    return;
   } else if (calib && crTask.shape === 'circle' && D.length === 2) {
     const r = crDist(D[0], D[1]);
     ctx.beginPath(); ctx.arc(D[0].x, D[0].y, r, 0, Math.PI * 2);
@@ -12730,9 +12806,14 @@ function crUpdateHint() {
   if (!badge || !hint) return;
   if (crPhase === 'calib') {
     badge.textContent = 'REFERENCE';
-    hint.innerHTML = crTask.pxPerMm
-      ? 'Scale: <b>' + crTask.pxPerMm.toFixed(2) + ' px per mm</b> &middot; drag the handles to fit'
-      : 'Drag the handles onto the reference object.';
+    if (crTask.shape === 'quad') {
+      hint.innerHTML = 'Drag inside the box to move it, drag the <b>cyan corner</b> to size and rotate.' +
+        (crTask.pxPerMm ? '<br>Scale: <b>' + crTask.pxPerMm.toFixed(2) + ' px per mm</b>' : '');
+    } else {
+      hint.innerHTML = crTask.pxPerMm
+        ? 'Scale: <b>' + crTask.pxPerMm.toFixed(2) + ' px per mm</b> &middot; drag the handles to fit'
+        : 'Drag the handles onto the reference object.';
+    }
   } else {
     const mm = crPathMm(crTask.measPts);
     const n = crTask.measPts.length;
@@ -12756,36 +12837,62 @@ async function crAiDetect() {
   btn.innerHTML = '<span class="cr2-sp"></span>Looking';
 
   const r = CR_REFS.filter(function(x) { return x.id === crTask.refId; })[0];
-  const want = crTask.shape === 'quad'
-    ? 'Find the ' + r.name + '. Return its four corners in order: top-left, top-right, bottom-right, bottom-left, going around the card.\n\nReply ONLY with JSON: {"corners":[[x,y],[x,y],[x,y],[x,y]]}'
-    : crTask.shape === 'circle'
-      ? 'Find the coin. Return its centre and one point on its edge.\n\nReply ONLY with JSON: {"centre":[x,y],"edge":[x,y]}'
-      : 'Find the straight reference object and return its two end points.\n\nReply ONLY with JSON: {"ends":[[x,y],[x,y]]}';
+  const what = crTask.refId === 'coin' ? 'the coin'
+             : crTask.refId === 'card' ? 'the credit card or ID card'
+             : 'the reference object used for scale';
 
-  const prompt = want + '\n\nCoordinates are normalised from 0 to 1000, where x is across the image width and y is down the image height. No other text.';
+  // Format kotak sempadan rasmi Gemini: [ymin, xmin, ymax, xmax], ternormal
+  // 0-1000, y DAHULU. Meminta pasangan [x,y] sendiri menyebabkan paksi
+  // bertukar, yang meletakkan kotak di tempat yang salah sama sekali.
+  const prompt =
+    'Detect ' + what + ' in this photo.\n\n' +
+    'Return a JSON array with one entry for the single best match, in this exact form:\n' +
+    '[{"box_2d": [ymin, xmin, ymax, xmax], "label": "' + r.name + '"}]\n\n' +
+    'Coordinates must be integers from 0 to 1000, normalised to the image, ' +
+    'with y measured down from the top and x measured across from the left. ' +
+    'Output the JSON only, with no explanation and no code fences.';
 
   try {
     const txt = await callGemini([{ role:'user', content: prompt, image: crTask.dataUrl, mode:'consultant', timestamp: new Date() }], false);
-    const m = txt.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error('no coordinates returned');
-    const j = JSON.parse(m[0]);
-    const W = crTask.img.width, H = crTask.img.height;
-    const map = function(a) { return { x: (a[0] / 1000) * W, y: (a[1] / 1000) * H }; };
+    const m = txt.match(/\[[\s\S]*\]/);
+    if (!m) throw new Error('no box returned');
+    const arr = JSON.parse(m[0]);
+    const box = (Array.isArray(arr) ? arr[0] : arr);
+    const b = box && (box.box_2d || box.box || box.bbox);
+    if (!b || b.length !== 4) throw new Error('no box returned');
 
-    if (crTask.shape === 'quad' && j.corners && j.corners.length === 4) crTask.handles = j.corners.map(map);
-    else if (crTask.shape === 'circle' && j.centre && j.edge) crTask.handles = [map(j.centre), map(j.edge)];
-    else if (j.ends && j.ends.length === 2) crTask.handles = j.ends.map(map);
-    else throw new Error('unexpected shape');
+    const W = crTask.img.width, H = crTask.img.height;
+    const y0 = Math.min(b[0], b[2]) / 1000 * H;
+    const x0 = Math.min(b[1], b[3]) / 1000 * W;
+    const y1 = Math.max(b[0], b[2]) / 1000 * H;
+    const x1 = Math.max(b[1], b[3]) / 1000 * W;
+    const bw = x1 - x0, bh = y1 - y0;
+    if (!(bw > 4 && bh > 4)) throw new Error('box too small');
+
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+
+    if (crTask.shape === 'circle') {
+      crTask.handles = [{ x:cx, y:cy }, { x:cx + Math.min(bw, bh) / 2, y:cy }];
+    } else if (crTask.shape === 'quad') {
+      // Kotak ini sejajar paksi, jadi kad yang senget akan menghasilkan kotak
+      // yang lebih besar daripada kad itu sendiri. Ia kedudukan permulaan,
+      // bukan kalibrasi. Sisi panjang kotak dipakai sebagai lebar awal.
+      crTask.rect = { cx:cx, cy:cy, w: Math.max(bw, bh), rot: bw >= bh ? 0 : Math.PI / 2 };
+      crTask.handles = crRectCorners();
+    } else {
+      crTask.handles = [{ x:x0, y:cy }, { x:x1, y:cy }];
+    }
 
     crTask.aiPins = true;
     crRecalcScale();
     crDraw();
     crFoot();
-    btn.innerHTML = 'Found';
+    btn.innerHTML = 'Placed';
     if (flag) flag.innerHTML = '<div class="cr2-flag">' +
       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>' +
-      '<span><b>The AI placed these. Check them.</b> Drag each handle onto the exact corner before continuing. ' +
-      'A one percent error here is a one percent error in every measurement that follows, and nothing later will reveal it.</span></div>';
+      '<span><b>Starting position only.</b> The AI returns an upright box, so a tilted card will come out too large. ' +
+      'Move, rotate and scale it onto the card before continuing. A one percent error here is a one percent error in ' +
+      'every measurement after it, and nothing later will reveal it.</span></div>';
   } catch (err) {
     console.warn('[CrackRuler AI]', err.message);
     btn.disabled = false;
