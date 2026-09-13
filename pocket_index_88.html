@@ -6332,7 +6332,10 @@ body.on-tools .topbar{display:none}
 .nt-fav-empty b{color:var(--fg-dim)}
 
 .nt-none{padding:26px 16px;text-align:center;color:var(--muted);font-size:12.5px}
-.nt-spacer{height:112px}
+/* .tools-mode ialah bekas flex lajur, jadi 'height' pada anak boleh
+   mengecut sampai sifar. flex:none dan min-height menahannya, supaya
+   tile terakhir tidak tersembunyi di bawah nav terapung. */
+.nt-spacer{flex:none;height:auto;min-height:calc(118px + env(safe-area-inset-bottom))}
 
 
 /* ==========================================================
