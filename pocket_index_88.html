@@ -6566,6 +6566,83 @@ body.on-tools .topbar{display:none}
 .ds-std-load{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
 .ds-std-ask{font-size:11.5px;color:var(--accent);font-weight:600}
 
+
+/* ==========================================================
+   SPIRIT LEVEL (sl-) — satu alat, bacaan ditapis, boleh simpan
+========================================================== */
+.sl-modes{display:inline-flex;gap:2px;padding:3px;background:var(--surface);border:1px solid var(--line);border-radius:999px;width:100%}
+.sl-modes button{flex:1;padding:9px 4px;border-radius:999px;background:transparent;font-size:12px;font-weight:600;color:var(--muted)}
+.sl-modes button[aria-pressed="true"]{background:var(--bg);color:var(--fg);box-shadow:var(--shadow-1)}
+
+.sl-read{text-align:center;margin:20px 0 4px}
+.sl-deg{
+  font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:52px;font-weight:700;
+  letter-spacing:-.03em;line-height:1;color:var(--fg);
+}
+.sl-read.level .sl-deg{color:var(--success)}
+.sl-state{
+  font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin-top:7px;
+}
+.sl-read.level .sl-state{color:var(--success)}
+
+.sl-stage{position:relative;margin:16px auto 0;width:100%;max-width:290px}
+.sl-dial{
+  position:relative;width:100%;aspect-ratio:1;border-radius:50%;
+  background:var(--surface);border:2px solid var(--line-2);overflow:hidden;
+}
+.sl-dial.level{border-color:var(--success);background:var(--success-soft)}
+.sl-ring{position:absolute;border-radius:50%;border:1px dashed var(--line-2);left:50%;top:50%;transform:translate(-50%,-50%)}
+.sl-ring.r1{width:33%;height:33%} .sl-ring.r2{width:66%;height:66%}
+.sl-cross{position:absolute;background:var(--line-2)}
+.sl-cross.h{left:8%;right:8%;top:50%;height:1px}
+.sl-cross.v{top:8%;bottom:8%;left:50%;width:1px}
+.sl-target{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;border:2px solid var(--line-2)}
+.sl-dial.level .sl-target{border-color:var(--success)}
+.sl-bub{
+  position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;
+  border-radius:50%;background:var(--accent);opacity:.9;
+  box-shadow:inset 0 -3px 8px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.14);will-change:transform;
+}
+.sl-dial.level .sl-bub{background:var(--success)}
+
+.sl-edge{position:relative;width:100%;padding:20px 0}
+.sl-horizon{position:relative;height:115px;border-radius:16px;background:var(--surface);border:2px solid var(--line-2);overflow:hidden}
+.sl-horizon.level{border-color:var(--success);background:var(--success-soft)}
+.sl-hline{position:absolute;left:-10%;right:-10%;top:50%;height:3px;background:var(--accent);transform-origin:50% 50%;border-radius:3px;will-change:transform}
+.sl-horizon.level .sl-hline{background:var(--success)}
+.sl-href{position:absolute;left:14%;right:14%;top:50%;height:1px;background:var(--line-2)}
+.sl-htick{position:absolute;top:50%;width:1px;height:13px;background:var(--line-2);margin-top:-6.5px}
+.sl-vial{position:relative;height:44px;margin-top:13px;border-radius:22px;background:var(--surface);border:2px solid var(--line-2);overflow:hidden}
+.sl-vial.level{border-color:var(--success);background:var(--success-soft)}
+.sl-vmark{position:absolute;top:6px;bottom:6px;width:1px;background:var(--line-2)}
+.sl-vmark.a{left:calc(50% - 21px)} .sl-vmark.b{left:calc(50% + 21px)}
+.sl-vbub{
+  position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
+  background:var(--accent);opacity:.9;box-shadow:inset 0 -3px 8px rgba(0,0,0,.18);will-change:transform;
+}
+.sl-vial.level .sl-vbub{background:var(--success)}
+
+.sl-hint{margin-top:15px;text-align:center;font-size:12px;line-height:1.5;color:var(--muted);min-height:34px}
+.sl-zeroed{color:var(--success);font-weight:600}
+
+.sl-gate{padding:28px 20px;text-align:center}
+.sl-gate svg{color:var(--warning);margin-bottom:12px}
+.sl-gate h4{margin:0 0 6px;font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.sl-gate p{margin:0 auto 18px;font-size:12.5px;line-height:1.6;color:var(--muted);max-width:32ch}
+
+/* nilai bacaan pada borang simpan dan entri */
+.sl-cap{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:15px;margin-bottom:16px;background:var(--surface)}
+.sl-cap.level{background:var(--success-soft)}
+.sl-cap-n{
+  min-width:62px;padding:0 8px;height:50px;flex:none;border-radius:14px;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:19px;font-weight:700;color:var(--bg);background:var(--fg-dim);
+}
+.sl-cap.level .sl-cap-n{background:var(--success)}
+.sl-cap-t{min-width:0;flex:1}
+.sl-cap-t b{display:block;font-size:13.5px;font-weight:700;color:var(--fg)}
+.sl-cap-t span{display:block;font-size:10.5px;color:var(--fg-dim);margin-top:2px}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -11332,150 +11409,285 @@ async function dsDeleteEntry(id) {
 }
 
 // ---------- TOOL 4: SPIRIT LEVEL ----------
+// ---------- TOOL: SPIRIT LEVEL ----------
+// Satu alat yang kekal bentuknya. Bacaan mentah accelerometer terlalu
+// bising untuk dipapar terus, jadi ia ditapis. Entri disimpan di
+// pocketInspections/{uid}/levelReadings/{id}.
 let spiritOrientationHandler = null;
-let spiritCalibration = { beta: 0, gamma: 0 };
 
+const SL_TOL = 0.3;     // darjah dianggap rata
+const SL_ALPHA = 0.14;  // pekali penapis laluan rendah
+let slMode = 'auto';    // auto | flat | edge
+let slShown = 'flat';
+let slHeld = false;
+let slZero = { x: 0, y: 0, phi: 0 };
+let slZeroed = false;
+let slSm = { x: 0, y: 0, z: 9.81 };
+let slHave = false;
+let slWasLevel = false, slLastBuzz = 0;
+let slNow = { mode: 'flat', sub: null, degrees: 0, isLevel: false };
+let slEditId = null;
+let slEntries = [];
+
+function slHead(name, desc) {
+  document.getElementById('toolModalIcon').innerHTML =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="20" height="6" rx="2"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M9 9v6M15 9v6"/></svg>';
+  document.getElementById('toolModalName').textContent = name;
+  document.getElementById('toolModalDesc').textContent = desc;
+}
+
+// ---------- 1. PEMILIH ----------
 function openSpiritLevel() {
-  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="20" height="6" rx="2"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/></svg>';
-  document.getElementById('toolModalName').textContent = 'Spirit Level';
-  document.getElementById('toolModalDesc').textContent = 'Level & plumb using the motion sensor';
+  stopSpiritLevel();
+  slHead('Spirit Level', 'Measure level and plumb, or review saved readings');
 
-  spiritCalibration = { ax: 0, ay: 0, phi: 0 };
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="br-pick">' +
+      '<button class="br-pick-btn" id="slGoMeasure">' +
+        '<span class="br-pick-ico" style="background:var(--warning-soft);color:var(--warning)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="20" height="6" rx="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><path d="M9 9v6M15 9v6"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>Measure</b><span>Check a surface for level or plumb</span></span>' +
+      '</button>' +
+      '<button class="br-pick-btn" id="slGoHist">' +
+        '<span class="br-pick-ico" style="background:var(--surface);color:var(--fg-dim)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>Saved Readings</b><span>Measurements you have kept</span></span>' +
+        '<span class="br-pick-n" id="slHistN">&middot;</span>' +
+      '</button>' +
+    '</div>';
+
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="slClose">Close</button>';
+  document.getElementById('slClose').addEventListener('click', closeTool);
+  document.getElementById('slGoMeasure').addEventListener('click', slOpenMeasure);
+  document.getElementById('slGoHist').addEventListener('click', slOpenHistory);
+
+  slLoadEntries().then(function() {
+    const el = document.getElementById('slHistN');
+    if (el) el.textContent = slEntries.length;
+  });
+
+  showToolModal();
+}
+
+// ---------- 2. UKUR ----------
+function slOpenMeasure() {
+  slHead('Spirit Level', 'Level & plumb');
+  slMode = 'auto'; slShown = 'flat'; slHeld = false;
+  slZero = { x: 0, y: 0, phi: 0 }; slZeroed = false;
+  slHave = false; slSm = { x: 0, y: 0, z: 9.81 };
 
   if (typeof DeviceMotionEvent === 'undefined') {
-    renderSensorUnsupported('Spirit Level', 'Your device does not support motion sensors. Try opening Pocket on a mobile phone or tablet.');
+    renderSensorUnsupported('Spirit Level', 'This device has no motion sensor. Open Pocket on a phone or tablet.');
     return;
   }
 
   const needsPermission = typeof DeviceMotionEvent.requestPermission === 'function';
   if (needsPermission) {
-    renderSensorPermission('Spirit Level', 'Motion data is needed to measure level and plumb.', function() {
+    document.getElementById('toolModalBody').innerHTML =
+      '<div class="sl-gate">' +
+        '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="20" height="6" rx="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>' +
+        '<h4>Motion access needed</h4>' +
+        '<p id="slGateMsg">iPhone asks before an app may read the tilt sensor. Nothing leaves the phone.</p>' +
+        '<button class="tool-btn tool-btn-primary" id="slAllow" style="display:inline-block;padding:12px 24px">Allow motion</button>' +
+      '</div>';
+    document.getElementById('toolModalFoot').innerHTML =
+      '<button class="tool-btn tool-btn-primary" id="slGateBack">Back</button>';
+    document.getElementById('slGateBack').addEventListener('click', openSpiritLevel);
+    document.getElementById('slAllow').addEventListener('click', function() {
       DeviceMotionEvent.requestPermission().then(function(state) {
-        if (state === 'granted') renderSpiritLevelUI();
-        else showToast('Permission denied', 'error');
-      }).catch(function(err) { showToast('Sensor error: ' + err.message, 'error'); });
+        if (state === 'granted') slRenderMeasure();
+        else document.getElementById('slGateMsg').textContent =
+          'Permission denied. Turn it on in Settings, Safari, Motion & Orientation Access, then reopen this tool.';
+      }).catch(function() { slRenderMeasure(); });
     });
-  } else {
-    renderSpiritLevelUI();
+    return;
   }
-
-  showToolModal();
+  slRenderMeasure();
 }
 
-// Mode state: 'auto', 'horizontal', 'vertical'
-let spiritMode = 'auto';
-let spiritActiveMode = 'horizontal'; // actual UI mode (changes if auto)
-
-function renderSpiritLevelUI() {
+function slRenderMeasure() {
   document.getElementById('toolModalBody').innerHTML =
-    '<div class="lvl-wrap">' +
-      '<div class="lvl-stage" id="lvlStage"></div>' +
-      '<div class="lvl-hint" id="lvlHint">Lay the phone flat, or hold it against a wall</div>' +
-    '</div>';
+    '<div class="sl-modes" role="group" aria-label="Mode">' +
+      '<button type="button" id="slMAuto" aria-pressed="true">Auto</button>' +
+      '<button type="button" id="slMFlat" aria-pressed="false">Flat</button>' +
+      '<button type="button" id="slMEdge" aria-pressed="false">Edge</button>' +
+    '</div>' +
+    '<div class="sl-read" id="slRead">' +
+      '<div class="sl-deg" id="slDeg">0.0°</div>' +
+      '<div class="sl-state" id="slState">Waiting</div>' +
+    '</div>' +
+    '<div class="sl-stage">' +
+      '<div class="sl-dial" id="slDial">' +
+        '<div class="sl-ring r2"></div><div class="sl-ring r1"></div>' +
+        '<div class="sl-cross h"></div><div class="sl-cross v"></div>' +
+        '<div class="sl-target"></div><div class="sl-bub" id="slBub"></div>' +
+      '</div>' +
+      '<div class="sl-edge" id="slEdgeWrap" hidden>' +
+        '<div class="sl-horizon" id="slHorizon">' +
+          '<div class="sl-href"></div>' +
+          '<div class="sl-htick" style="left:14%"></div><div class="sl-htick" style="left:50%"></div><div class="sl-htick" style="right:14%"></div>' +
+          '<div class="sl-hline" id="slHline"></div>' +
+        '</div>' +
+        '<div class="sl-vial" id="slVial"><div class="sl-vmark a"></div><div class="sl-vmark b"></div><div class="sl-vbub" id="slVbub"></div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="sl-hint" id="slHint">Lay the phone on the surface, or stand an edge against it.</div>';
 
   document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-secondary" id="spiritCalibrateBtn">Set 0°</button>' +
-    '<button class="tool-btn tool-btn-primary" id="spiritDoneBtn">Done</button>';
+    '<button class="tool-btn tool-btn-secondary" id="slZeroBtn">Zero</button>' +
+    '<button class="tool-btn tool-btn-secondary" id="slHoldBtn">Hold</button>' +
+    '<button class="tool-btn tool-btn-primary" id="slSaveBtn">Save</button>';
 
-  document.getElementById('spiritCalibrateBtn').addEventListener('click', function() {
-    const ax = window._lastAx || 0, ay = window._lastAy || 0;
-    spiritCalibration = { ax: ax, ay: ay, phi: Math.atan2(ax, -ay) * 180 / Math.PI };
-    showToast('Calibrated · current position is now 0°');
-  });
-  document.getElementById('spiritDoneBtn').addEventListener('click', function() {
-    stopSpiritLevel();
-    closeTool();
-  });
+  document.getElementById('slMAuto').addEventListener('click', function() { slSetMode('auto'); });
+  document.getElementById('slMFlat').addEventListener('click', function() { slSetMode('flat'); });
+  document.getElementById('slMEdge').addEventListener('click', function() { slSetMode('edge'); });
+  document.getElementById('slZeroBtn').addEventListener('click', slDoZero);
+  document.getElementById('slHoldBtn').addEventListener('click', slToggleHold);
+  document.getElementById('slSaveBtn').addEventListener('click', function() { slOpenForm(); });
 
-  spiritActiveMode = 'edge';
-  renderSpiritUiForMode('edge');
   startSpiritLevel();
+
+  setTimeout(function() {
+    if (!slHave) {
+      const h = document.getElementById('slHint');
+      if (h) h.textContent = 'No motion readings yet. This tool needs a phone or tablet.';
+      const st = document.getElementById('slState');
+      if (st) st.textContent = 'No sensor';
+    }
+  }, 1500);
 }
 
-function renderSpiritUiForMode(mode) {
-  const stage = document.getElementById('lvlStage');
-  if (!stage) return;
-  if (mode === 'edge') {
-    stage.innerHTML =
-      '<div class="lvl-line-ref" id="lvlRef"></div>' +
-      '<div class="lvl-line" id="lvlLine"></div>' +
-      '<div class="lvl-deg" id="lvlDeg">0°</div>';
-  } else {
-    stage.innerHTML =
-      '<div class="lvl-ring-fixed"></div>' +
-      '<div class="lvl-ring-move" id="lvlMove"></div>' +
-      '<div class="lvl-deg" id="lvlDeg">0°</div>';
+function slSetMode(m) {
+  slMode = m;
+  document.getElementById('slMAuto').setAttribute('aria-pressed', String(m === 'auto'));
+  document.getElementById('slMFlat').setAttribute('aria-pressed', String(m === 'flat'));
+  document.getElementById('slMEdge').setAttribute('aria-pressed', String(m === 'edge'));
+  if (m !== 'auto') slShow(m);
+}
+
+function slShow(which) {
+  if (slShown === which) return;
+  slShown = which;
+  const d = document.getElementById('slDial');
+  const e = document.getElementById('slEdgeWrap');
+  if (d) d.hidden = which !== 'flat';
+  if (e) e.hidden = which !== 'edge';
+  const h = document.getElementById('slHint');
+  if (h && !slZeroed) {
+    h.textContent = which === 'flat'
+      ? 'Flat · phone lying on the surface'
+      : 'Edge · stand an edge against the surface';
   }
+}
+
+function slPhi() {
+  return Math.atan2(slSm.x, -slSm.y) * 180 / Math.PI;
+}
+
+function slDoZero() {
+  if (!slHave) { showToast('No sensor reading yet', 'error'); return; }
+  if (slShown === 'flat') { slZero.x = slSm.x; slZero.y = slSm.y; }
+  else {
+    const phi = slPhi();
+    slZero.phi = phi - Math.round(phi / 90) * 90;
+  }
+  slZeroed = true;
+  if (navigator.vibrate) navigator.vibrate(15);
+  const h = document.getElementById('slHint');
+  if (h) h.innerHTML = '<span class="sl-zeroed">Zeroed to this surface.</span> Tap Zero again on a surface you trust to reset.';
+  slRenderReading();
+}
+
+function slToggleHold() {
+  slHeld = !slHeld;
+  const b = document.getElementById('slHoldBtn');
+  b.textContent = slHeld ? 'Holding' : 'Hold';
+  b.style.color = slHeld ? 'var(--warning)' : '';
+  if (slHeld) {
+    const st = document.getElementById('slState');
+    if (st) st.textContent = 'Held';
+  } else slRenderReading();
+}
+
+function slRenderReading() {
+  if (slHeld) return;
+  const dial = document.getElementById('slDial');
+  if (!dial) return;
+
+  const x = slSm.x - slZero.x, y = slSm.y - slZero.y, z = slSm.z;
+  const horizMag = Math.sqrt(slSm.x * slSm.x + slSm.y * slSm.y);
+  const vertMag = Math.abs(slSm.z);
+
+  if (slMode === 'auto') {
+    if (vertMag > horizMag + 2.0) slShow('flat');
+    else if (horizMag > vertMag + 2.0) slShow('edge');
+  }
+
+  let isLevel, value, sub = null;
+  if (slShown === 'flat') {
+    value = Math.atan2(Math.sqrt(x * x + y * y), Math.abs(z)) * 180 / Math.PI;
+    isLevel = value < SL_TOL;
+    const MAXG = 3.2, MAXPX = 74;
+    const px = Math.max(-MAXPX, Math.min(MAXPX, (x / MAXG) * MAXPX));
+    const py = Math.max(-MAXPX, Math.min(MAXPX, (-y / MAXG) * MAXPX));
+    const bub = document.getElementById('slBub');
+    if (bub) bub.style.transform = 'translate(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px)';
+    dial.classList.toggle('level', isLevel);
+  } else {
+    const phi = slPhi() - slZero.phi;
+    const nearest = Math.round(phi / 90) * 90;
+    const dev = phi - nearest;
+    value = Math.abs(dev);
+    isLevel = value < SL_TOL;
+    sub = (Math.abs(nearest % 180) === 90) ? 'plumb' : 'level';
+    const hline = document.getElementById('slHline');
+    const vbub = document.getElementById('slVbub');
+    if (hline) hline.style.transform = 'rotate(' + (-dev).toFixed(2) + 'deg)';
+    if (vbub) vbub.style.transform = 'translateX(' + Math.max(-92, Math.min(92, dev * 9)).toFixed(1) + 'px)';
+    const hz = document.getElementById('slHorizon');
+    const vl = document.getElementById('slVial');
+    if (hz) hz.classList.toggle('level', isLevel);
+    if (vl) vl.classList.toggle('level', isLevel);
+    const h = document.getElementById('slHint');
+    if (h && !slZeroed) {
+      h.textContent = sub === 'plumb'
+        ? 'Plumb · side edge against the vertical surface'
+        : 'Level · bottom edge on the horizontal surface';
+    }
+  }
+
+  slNow = { mode: slShown, sub: sub, degrees: value, isLevel: isLevel };
+
+  const deg = document.getElementById('slDeg');
+  const st = document.getElementById('slState');
+  const rd = document.getElementById('slRead');
+  if (deg) deg.textContent = (isLevel ? '0.0' : value.toFixed(1)) + '°';
+  if (st) st.textContent = isLevel ? 'Level' : (value < 1 ? 'Almost' : 'Off');
+  if (rd) rd.classList.toggle('level', isLevel);
+
+  if (isLevel && !slWasLevel && navigator.vibrate) {
+    const n = Date.now();
+    if (n - slLastBuzz > 600) { navigator.vibrate(25); slLastBuzz = n; }
+  }
+  slWasLevel = isLevel;
 }
 
 function startSpiritLevel() {
-  if (spiritOrientationHandler) {
-    window.removeEventListener('devicemotion', spiritOrientationHandler);
-  }
-
-  let lastHaptic = 0, wasLevel = false, lastSub = null, isFlat = false;
-  const TOL = 0.6; // degrees considered level/plumb
-
-  function setHint(t) { const h = document.getElementById('lvlHint'); if (h) h.textContent = t; }
-  function haptic(is) {
-    if (is) { if (!wasLevel && navigator.vibrate) { const n = Date.now(); if (n - lastHaptic > 500) { navigator.vibrate(30); lastHaptic = n; } } wasLevel = true; }
-    else wasLevel = false;
-  }
-
+  stopSpiritLevel();
   spiritOrientationHandler = function(e) {
     const g = e.accelerationIncludingGravity;
     if (!g || g.x === null || g.x === undefined) return;
-    const ax = g.x, ay = g.y, az = g.z;
-    window._lastAx = ax; window._lastAy = ay; window._lastAz = az;
-
-    const horiz = Math.sqrt(ax * ax + ay * ay);
-    const vert = Math.abs(az);
-    // Flat (screen up) vs edge (screen vertical) — deadband to avoid flicker
-    if (vert > horiz + 1.5) isFlat = true;
-    else if (horiz > vert + 1.5) isFlat = false;
-
-    const stage = document.getElementById('lvlStage');
-    if (!stage) return;
-
-    if (isFlat) {
-      if (spiritActiveMode !== 'flat') { spiritActiveMode = 'flat'; renderSpiritUiForMode('flat'); }
-      const move = document.getElementById('lvlMove');
-      const dg = document.getElementById('lvlDeg');
-      const cax = ax - (spiritCalibration.ax || 0);
-      const cay = ay - (spiritCalibration.ay || 0);
-      const MAXG = 4.0, MAX_PX = 64;
-      const pxX = Math.max(-MAX_PX, Math.min(MAX_PX, (cax / MAXG) * MAX_PX));
-      const pxY = Math.max(-MAX_PX, Math.min(MAX_PX, (-cay / MAXG) * MAX_PX));
-      if (move) move.style.transform = 'translate(' + pxX + 'px,' + pxY + 'px)';
-      const tilt = Math.atan2(Math.sqrt(cax * cax + cay * cay), Math.abs(az)) * 180 / Math.PI;
-      const isLevel = tilt < TOL;
-      stage.classList.toggle('level', isLevel);
-      if (dg) dg.textContent = isLevel ? '0°' : tilt.toFixed(1) + '°';
-      haptic(isLevel);
-      if (lastSub !== 'flat') { lastSub = 'flat'; setHint('Flat · phone lying on the surface'); }
-    } else {
-      if (spiritActiveMode !== 'edge') { spiritActiveMode = 'edge'; renderSpiritUiForMode('edge'); }
-      const phi = Math.atan2(ax, -ay) * 180 / Math.PI - (spiritCalibration.phi || 0);
-      const nearest = Math.round(phi / 90) * 90;
-      const dev = phi - nearest;
-      const sub = (Math.abs(nearest % 180) === 90) ? 'level' : 'plumb';
-      const baseRot = (sub === 'plumb') ? 90 : 0;
-      const line = document.getElementById('lvlLine');
-      const ref = document.getElementById('lvlRef');
-      const dg = document.getElementById('lvlDeg');
-      if (line) line.style.transform = 'rotate(' + (baseRot + dev) + 'deg)';
-      if (ref) ref.style.transform = 'rotate(' + baseRot + 'deg)';
-      const isLevel = Math.abs(dev) < TOL;
-      stage.classList.toggle('level', isLevel);
-      if (dg) dg.textContent = isLevel ? '0°' : Math.abs(dev).toFixed(1) + '°';
-      haptic(isLevel);
-      if (lastSub !== sub) {
-        lastSub = sub;
-        setHint(sub === 'plumb' ? 'Plumb · rest the left/right edge on the vertical surface' : 'Level · rest the bottom edge on the horizontal surface');
-      }
+    if (!slHave) { slSm.x = g.x; slSm.y = g.y; slSm.z = g.z; slHave = true; }
+    else {
+      slSm.x += (g.x - slSm.x) * SL_ALPHA;
+      slSm.y += (g.y - slSm.y) * SL_ALPHA;
+      slSm.z += (g.z - slSm.z) * SL_ALPHA;
     }
+    slRenderReading();
   };
-
   window.addEventListener('devicemotion', spiritOrientationHandler);
 }
 
@@ -11483,6 +11695,221 @@ function stopSpiritLevel() {
   if (spiritOrientationHandler) {
     window.removeEventListener('devicemotion', spiritOrientationHandler);
     spiritOrientationHandler = null;
+  }
+}
+
+// ---------- 3. BORANG (cipta + edit) ----------
+function slCapCard(r) {
+  const cls = r.isLevel ? ' level' : '';
+  const what = r.mode === 'flat' ? 'Flat surface' : (r.sub === 'plumb' ? 'Plumb (vertical)' : 'Level (horizontal)');
+  const zt = r.zeroed ? 'Zeroed before reading' : 'Not zeroed';
+  return '<div class="sl-cap' + cls + '">' +
+    '<span class="sl-cap-n">' + (r.isLevel ? '0.0' : Number(r.degrees).toFixed(1)) + '°</span>' +
+    '<span class="sl-cap-t"><b>' + what + (r.isLevel ? ' · Level' : '') + '</b>' +
+    '<span>' + zt + '</span></span></div>';
+}
+
+function slOpenForm(entry) {
+  slEditId = entry ? entry.id : null;
+  // Bacaan dibekukan pada saat Save ditekan, supaya nilai tidak berubah
+  // sementara borang diisi.
+  const r = entry ? {
+    mode: entry.mode, sub: entry.sub, degrees: entry.degrees,
+    isLevel: entry.isLevel, zeroed: entry.zeroed
+  } : {
+    mode: slNow.mode, sub: slNow.sub, degrees: slNow.degrees,
+    isLevel: slNow.isLevel, zeroed: slZeroed
+  };
+  slCaptured = r;
+
+  stopSpiritLevel();
+  slHead(slEditId ? 'Edit reading' : 'Save reading', 'The measurement is fixed; the details are yours');
+
+  document.getElementById('toolModalBody').innerHTML =
+    slCapCard(r) +
+    '<div class="br-field"><label class="br-label" for="slTitle">Name <span class="req">*</span></label>' +
+      '<input type="text" class="br-input" id="slTitle" maxlength="90" placeholder="e.g. Living room floor fall"></div>' +
+    '<div class="br-field"><label class="br-label" for="slElem">Element</label>' +
+      '<input type="text" class="br-input" id="slElem" maxlength="90" placeholder="e.g. Floor screed"></div>' +
+    '<div class="br-field"><label class="br-label" for="slLoc">Location</label>' +
+      '<input type="text" class="br-input" id="slLoc" maxlength="90" placeholder="e.g. Block C, unit 3-2"></div>' +
+    '<div class="br-field"><label class="br-label" for="slDesc">Description</label>' +
+      '<textarea class="br-area" id="slDesc" maxlength="1000" placeholder="What you were checking and what it means for the report."></textarea></div>';
+
+  const set = function(id, v) { const el = document.getElementById(id); if (el) el.value = (v == null ? '' : v); };
+  if (entry) {
+    set('slTitle', entry.title); set('slElem', entry.element);
+    set('slLoc', entry.location); set('slDesc', entry.description);
+  }
+
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="slFormBack">' + (slEditId ? 'Cancel' : 'Back') + '</button>' +
+    '<button class="tool-btn tool-btn-primary" id="slDoSave">Save</button>';
+  document.getElementById('slFormBack').addEventListener('click', function() {
+    if (slEditId) { const id = slEditId; slEditId = null; slOpenEntry(id); }
+    else slOpenMeasure();
+  });
+  document.getElementById('slDoSave').addEventListener('click', slSave);
+  setTimeout(function() { document.getElementById('slTitle').focus(); }, 80);
+}
+
+let slCaptured = null;
+
+async function slSave() {
+  if (!currentUser) { showToast('Sign in to save', 'error'); return; }
+  const title = document.getElementById('slTitle').value.trim();
+  if (!title) {
+    showToast('Give it a name first', 'error');
+    document.getElementById('slTitle').focus();
+    return;
+  }
+  const btn = document.getElementById('slDoSave');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const r = slCaptured || { mode: 'flat', sub: null, degrees: 0, isLevel: false, zeroed: false };
+  const data = {
+    title: title,
+    element: document.getElementById('slElem').value.trim(),
+    location: document.getElementById('slLoc').value.trim(),
+    description: document.getElementById('slDesc').value.trim(),
+    mode: r.mode, sub: r.sub || null,
+    degrees: Math.round(Number(r.degrees) * 10) / 10,
+    isLevel: !!r.isLevel,
+    zeroed: !!r.zeroed,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    const col = db.collection('pocketInspections').doc(currentUser.uid).collection('levelReadings');
+    if (slEditId) {
+      await col.doc(slEditId).update(data);
+      showToast('Changes saved');
+      const id = slEditId;
+      slEditId = null; slEntries = [];
+      await slLoadEntries();
+      slOpenEntry(id);
+    } else {
+      data.inspectionId = (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null;
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await col.add(data);
+      showToast('Reading saved');
+      slEntries = [];
+      slOpenHistory();
+    }
+  } catch (e) {
+    console.warn('[Level save]', e.message);
+    btn.disabled = false; btn.textContent = 'Save';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// ---------- 4. SEJARAH ----------
+async function slLoadEntries() {
+  if (!currentUser) { slEntries = []; return slEntries; }
+  if (slEntries.length) return slEntries;
+  try {
+    const snap = await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('levelReadings').orderBy('createdAt', 'desc').limit(60).get();
+    slEntries = [];
+    snap.forEach(function(doc) {
+      const d = doc.data();
+      slEntries.push({
+        id: doc.id,
+        title: d.title || 'Untitled',
+        element: d.element || '', location: d.location || '',
+        description: d.description || '',
+        mode: d.mode || 'flat', sub: d.sub || null,
+        degrees: typeof d.degrees === 'number' ? d.degrees : 0,
+        isLevel: !!d.isLevel, zeroed: !!d.zeroed,
+        createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
+      });
+    });
+  } catch (e) {
+    console.warn('[Level load]', e.message);
+    slEntries = [];
+  }
+  return slEntries;
+}
+
+function slOpenHistory() {
+  slEditId = null;
+  stopSpiritLevel();
+  slHead('Saved Readings', 'Measurements you have kept');
+  document.getElementById('toolModalBody').innerHTML = '<div class="br-load">Loading...</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="slHistBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="slHistNew">New reading</button>';
+  document.getElementById('slHistBack').addEventListener('click', openSpiritLevel);
+  document.getElementById('slHistNew').addEventListener('click', slOpenMeasure);
+
+  slLoadEntries().then(function(list) {
+    const body = document.getElementById('toolModalBody');
+    if (!list.length) {
+      body.innerHTML = '<div class="br-empty" style="margin-top:0">Nothing saved yet. Take a measurement and tap <b>Save</b> to keep it here.</div>';
+      return;
+    }
+    let html = '';
+    list.forEach(function(en) {
+      const bits = [];
+      if (en.element) bits.push(en.element);
+      if (en.location) bits.push(en.location);
+      bits.push(formatRelativeTime(en.createdAt));
+      html += '<button class="br-item ' + (en.isLevel ? 'g' : '') + '" data-id="' + en.id + '">' +
+        '<span class="br-item-n" style="min-width:52px;width:auto;padding:0 7px' +
+          (en.isLevel ? '' : ';background:var(--surface-2);color:var(--fg-dim)') + '">' +
+          en.degrees.toFixed(1) + '°</span>' +
+        '<span class="br-item-t"><b>' + escapeHTML(en.title) + '</b>' +
+        '<span>' + escapeHTML(bits.join(' · ')) + '</span></span>' +
+      '</button>';
+    });
+    body.innerHTML = html;
+    body.querySelectorAll('.br-item').forEach(function(el) {
+      el.addEventListener('click', function() { slOpenEntry(el.dataset.id); });
+    });
+  });
+}
+
+function slOpenEntry(id) {
+  const en = slEntries.filter(function(x) { return x.id === id; })[0];
+  if (!en) { slOpenHistory(); return; }
+  slEditId = null;
+  slHead(en.title, formatRelativeTime(en.createdAt));
+
+  let html = slCapCard(en);
+  html += '<div class="br-res" style="margin-top:0"><div class="br-res-body" style="border-top:0">' +
+    '<div class="br-res-row"><em>Reading</em><span>' + en.degrees.toFixed(1) + '° ' +
+      (en.isLevel ? 'within tolerance' : 'out of ' + (en.mode === 'flat' ? 'level' : (en.sub === 'plumb' ? 'plumb' : 'level'))) + '</span></div>' +
+    (en.element ? '<div class="br-res-row"><em>Element</em><span>' + escapeHTML(en.element) + '</span></div>' : '') +
+    (en.location ? '<div class="br-res-row"><em>Location</em><span>' + escapeHTML(en.location) + '</span></div>' : '') +
+    '<div class="br-res-row"><em>Method</em><span>' + (en.zeroed ? 'Zeroed on a reference surface first' : 'Measured without zeroing') + '</span></div>' +
+  '</div></div>';
+
+  if (en.description) {
+    html += '<div class="ds-sec"><div class="ds-sec-h"><b>Description</b></div>' +
+      '<div class="ds-sec-b">' + escapeHTML(en.description) + '</div></div>';
+  }
+
+  document.getElementById('toolModalBody').innerHTML = html;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="slEntryBack">Back</button>' +
+    '<button class="tool-btn tool-btn-secondary" id="slEntryDel" style="color:var(--critical);flex:0 0 auto;padding:12px 16px">Delete</button>' +
+    '<button class="tool-btn tool-btn-primary" id="slEntryEdit">Edit</button>';
+  document.getElementById('slEntryBack').addEventListener('click', slOpenHistory);
+  document.getElementById('slEntryDel').addEventListener('click', function() { slDeleteEntry(en.id); });
+  document.getElementById('slEntryEdit').addEventListener('click', function() { slOpenForm(en); });
+}
+
+async function slDeleteEntry(id) {
+  if (!confirm('Delete this saved reading?')) return;
+  try {
+    await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('levelReadings').doc(id).delete();
+    slEntries = slEntries.filter(function(x) { return x.id !== id; });
+    showToast('Deleted');
+    slOpenHistory();
+  } catch (e) {
+    console.warn('[Level delete]', e.message);
+    showToast('Could not delete', 'error');
   }
 }
 
