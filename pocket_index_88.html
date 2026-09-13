@@ -6334,6 +6334,152 @@ body.on-tools .topbar{display:none}
 .nt-none{padding:26px 16px;text-align:center;color:var(--muted);font-size:12.5px}
 .nt-spacer{height:112px}
 
+
+/* ==========================================================
+   BARIS RATER (br-) — pemilih, matriks, borang simpan, sejarah
+========================================================== */
+.br-hint{display:flex;gap:8px;align-items:center;margin-bottom:14px;font-size:12px;line-height:1.45;color:var(--muted)}
+.br-hint svg{flex:none;color:var(--accent)}
+.br-hint b{color:var(--fg-2)}
+
+/* ---- pemilih ---- */
+.br-pick{display:flex;flex-direction:column;gap:10px}
+.br-pick-btn{
+  display:flex;align-items:center;gap:13px;padding:15px 14px;border-radius:16px;
+  background:var(--bg);border:1px solid var(--line);text-align:left;width:100%;color:var(--fg);
+}
+.br-pick-btn:active{background:var(--surface)}
+.br-pick-ico{width:46px;height:46px;flex:none;border-radius:14px;display:grid;place-items:center}
+.br-pick-txt{flex:1;min-width:0}
+.br-pick-txt b{display:block;font-size:15px;font-weight:700;letter-spacing:-.02em}
+.br-pick-txt span{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.br-pick-n{
+  flex:none;font-family:var(--font-mono);font-size:11px;font-weight:600;
+  color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:6px;
+}
+
+/* ---- matriks ---- */
+.br-axis{display:grid;grid-template-columns:76px repeat(4,1fr);gap:6px;margin-bottom:5px;align-items:end}
+.br-axis-name{
+  font-family:var(--font-mono);font-size:8.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);padding-bottom:3px;
+}
+.br-colh{text-align:center}
+.br-colh b{display:block;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--fg-2)}
+.br-colh span{display:block;font-size:8px;color:var(--muted);margin-top:1px}
+.br-row{display:grid;grid-template-columns:76px repeat(4,1fr);gap:6px;margin-bottom:6px}
+.br-rowh{display:flex;flex-direction:column;justify-content:center;padding-right:4px;min-width:0}
+.br-rowh b{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--fg-2);line-height:1.1}
+.br-rowh span{font-size:9px;color:var(--muted);line-height:1.2;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.br-cell{
+  aspect-ratio:1/.82;border-radius:11px;border:1px solid transparent;
+  display:grid;place-items:center;font-family:var(--font-mono);font-size:15px;font-weight:700;padding:0;
+}
+.br-cell.g{background:var(--success-soft);color:var(--success)}
+.br-cell.f{background:var(--warning-soft);color:var(--warning)}
+.br-cell.c{background:var(--critical-soft);color:var(--critical)}
+.br-cell.on{color:var(--bg);box-shadow:0 0 0 3px var(--bg),0 0 0 5px currentColor}
+.br-cell.on.g{background:var(--success);border-color:var(--success)}
+.br-cell.on.f{background:var(--warning);border-color:var(--warning)}
+.br-cell.on.c{background:var(--critical);border-color:var(--critical)}
+
+.br-legend{display:flex;gap:6px;margin-top:12px}
+.br-lg{flex:1;display:flex;flex-direction:column;gap:2px;padding:8px 9px;border-radius:10px;border:1px solid var(--line);background:var(--surface);min-width:0}
+.br-lg i{font-family:var(--font-mono);font-style:normal;font-size:8.5px;font-weight:600;color:var(--muted)}
+.br-lg b{font-size:11px;font-weight:600}
+.br-lg.g b{color:var(--success)} .br-lg.f b{color:var(--warning)} .br-lg.c b{color:var(--critical)}
+
+/* ---- keputusan ---- */
+.br-res{margin-top:16px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:var(--bg)}
+.br-res-top{display:flex;align-items:center;gap:13px;padding:14px 15px}
+.br-res.g .br-res-top{background:var(--success-soft)}
+.br-res.f .br-res-top{background:var(--warning-soft)}
+.br-res.c .br-res-top{background:var(--critical-soft)}
+.br-score{
+  width:56px;height:56px;flex:none;border-radius:15px;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:23px;font-weight:700;color:var(--bg);
+}
+.br-res.g .br-score{background:var(--success)} .br-res.f .br-score{background:var(--warning)} .br-res.c .br-score{background:var(--critical)}
+.br-res-txt{min-width:0;flex:1}
+.br-res-txt i{display:block;font-family:var(--font-mono);font-style:normal;font-size:8.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.br-res.g .br-res-txt i{color:var(--success)} .br-res.f .br-res-txt i{color:var(--warning)} .br-res.c .br-res-txt i{color:var(--critical)}
+.br-res-txt b{display:block;font-size:17px;font-weight:700;letter-spacing:-.02em;margin-top:2px;color:var(--fg)}
+.br-res-txt span{display:block;font-size:11.5px;color:var(--fg-dim);margin-top:2px}
+.br-res-body{padding:13px 15px 15px;border-top:1px solid var(--line)}
+.br-res-row{display:flex;gap:9px;font-size:12px;line-height:1.5;color:var(--fg-dim);margin-bottom:7px}
+.br-res-row em{flex:none;width:66px;font-style:normal;font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.br-res-action{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:var(--fg-dim)}
+.br-res-action b{color:var(--fg)}
+.br-empty{margin-top:16px;border:1.5px dashed var(--line);border-radius:16px;padding:22px 16px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.55}
+
+/* ---- borang ---- */
+.br-field{margin-bottom:14px}
+.br-label{display:block;font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.br-label .req{color:var(--critical)}
+.br-input,.br-area{
+  width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface);color:var(--fg);font-size:14px;font-family:var(--font-body);outline:none;
+}
+.br-input:focus,.br-area:focus{border-color:var(--accent)}
+.br-area{min-height:76px;resize:vertical;line-height:1.5}
+.br-loc{display:flex;gap:7px}
+.br-loc .br-input{flex:1;min-width:0}
+.br-gps{
+  flex:none;padding:0 13px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface);color:var(--accent);display:grid;place-items:center;
+}
+.br-gps.on{background:var(--accent-soft);border-color:var(--accent-line)}
+.br-gps-note{font-size:10.5px;color:var(--muted);margin-top:5px;font-family:var(--font-mono)}
+
+.br-drop{
+  border:1.5px dashed var(--line);border-radius:14px;padding:20px 14px;text-align:center;
+  color:var(--muted);background:var(--surface);width:100%;
+}
+.br-drop svg{color:var(--muted);margin-bottom:6px}
+.br-drop div{font-size:12px}
+.br-drop small{display:block;font-size:10px;margin-top:3px;opacity:.8}
+.br-photo{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.br-photo img{width:100%;display:block;max-height:200px;object-fit:cover}
+.br-photo-x{
+  position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,.62);color:#fff;display:grid;place-items:center;
+}
+
+/* ringkasan rating kecil di atas borang */
+.br-mini{
+  display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:14px;margin-bottom:16px;
+}
+.br-mini.g{background:var(--success-soft)} .br-mini.f{background:var(--warning-soft)} .br-mini.c{background:var(--critical-soft)}
+.br-mini-n{
+  width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:17px;font-weight:700;color:var(--bg);
+}
+.br-mini.g .br-mini-n{background:var(--success)} .br-mini.f .br-mini-n{background:var(--warning)} .br-mini.c .br-mini-n{background:var(--critical)}
+.br-mini-t{min-width:0;flex:1}
+.br-mini-t b{display:block;font-size:13.5px;font-weight:700;color:var(--fg)}
+.br-mini-t span{display:block;font-size:10.5px;color:var(--fg-dim);margin-top:1px}
+
+/* ---- sejarah ---- */
+.br-item{
+  display:flex;gap:11px;align-items:center;width:100%;text-align:left;padding:11px 12px;
+  border-radius:14px;border:1px solid var(--line);background:var(--bg);margin-bottom:8px;color:var(--fg);
+}
+.br-item-n{
+  width:44px;height:44px;flex:none;border-radius:13px;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--bg);
+}
+.br-item.g .br-item-n{background:var(--success)} .br-item.f .br-item-n{background:var(--warning)} .br-item.c .br-item-n{background:var(--critical)}
+.br-item-t{min-width:0;flex:1}
+.br-item-t b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.br-item-t span{display:block;font-family:var(--font-mono);font-size:9.5px;color:var(--muted);margin-top:3px;letter-spacing:.03em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.br-item-th{width:40px;height:40px;flex:none;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.br-item-th img{width:100%;height:100%;object-fit:cover;display:block}
+
+.br-detail-photo{width:100%;border-radius:14px;border:1px solid var(--line);display:block;margin-bottom:14px}
+.br-detail-txt{font-size:13px;line-height:1.6;color:var(--fg-dim);white-space:pre-wrap}
+
+.br-load{padding:30px 16px;text-align:center;color:var(--muted);font-size:12.5px}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -10095,114 +10241,430 @@ function showToolModal() {
 }
 
 // ---------- TOOL 1: BARIS RATER ----------
-let barisToolState = { condition: null, priority: null };
+// =======================================================
+// BARIS RATER — pemilih, matriks, simpan, sejarah
+// -------------------------------------------------------
+// Entri disimpan di pocketInspections/{uid}/barisEntries/{id}.
+// Path itu sudah dilindungi rules sedia ada (wildcard di bawah uid),
+// jadi tiada rules baharu perlu di-deploy.
+// =======================================================
+let brPick = null;        // { c, p }
+let brPhoto = null;       // dataURL
+let brGps = null;         // { lat, lng, accuracy }
+let brEntries = [];       // cache sejarah
 
+const BR_COND = [
+  { v:1, label:'New/As New',  short:'New',     desc:'Minor servicing' },
+  { v:2, label:'Fair',        short:'Fair',    desc:'Minor repair' },
+  { v:3, label:'Poor',        short:'Poor',    desc:'Major repair or replacement' },
+  { v:4, label:'Very Poor',   short:'V. Poor', desc:'Malfunction' },
+  { v:5, label:'Dilapidated', short:'Dilap.',  desc:'Damage or missing' }
+];
+const BR_PRIO = [
+  { v:1, code:'N1', name:'Normal',    tiny:'Normal',  desc:'Functional, cosmetic only' },
+  { v:2, code:'R2', name:'Routine',   tiny:'Routine', desc:'Minor defect, may worsen if unattended' },
+  { v:3, code:'U3', name:'Urgent',    tiny:'Urgent',  desc:'Serious defect, cannot function properly' },
+  { v:4, code:'E4', name:'Emergency', tiny:'Emerg.',  desc:'Non-functional; fatality or injury risk' }
+];
+const BR_BAND = {
+  g:{ label:'Good', action:'Plan Maintenance',
+      text:'Element is in acceptable condition. Continue the monitoring schedule and address it at the next maintenance cycle if needed.' },
+  f:{ label:'Fair', action:'Condition Monitoring',
+      text:'Observable deterioration requiring scheduled attention. Rectification recommended within six months.' },
+  c:{ label:'Dilapidated', action:'Serious Attention',
+      text:'Significant defect requiring formal action. Issue a defect notice and rectify within the DLP, or one month at most.' }
+};
+
+function brBandOf(score) { return score <= 4 ? 'g' : (score <= 12 ? 'f' : 'c'); }
+function brHead(name, desc) {
+  document.getElementById('toolModalIcon').innerHTML =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
+  document.getElementById('toolModalName').textContent = name;
+  document.getElementById('toolModalDesc').textContent = desc;
+}
+
+// ---------- 1. PEMILIH ----------
 function openBarisRater() {
-  barisToolState = { condition: null, priority: null };
-  
-  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
-  document.getElementById('toolModalName').textContent = 'BARIS Rater';
-  document.getElementById('toolModalDesc').textContent = 'Building Assessment Rating — Condition × Priority';
-  
-  let condHtml = '<div class="tool-field"><label class="tool-label">1. Condition (state of element)</label><div class="tool-radio-group" data-q="condition">';
-  BARIS_CONDITIONS.forEach(function(c) {
-    condHtml += '<button class="tool-radio" data-v="' + c.value + '"><span class="tool-radio-dot"></span><strong>' + c.value + '. ' + c.label + '</strong> — ' + c.desc + '</button>';
-  });
-  condHtml += '</div></div>';
-  
-  let prioHtml = '<div class="tool-field"><label class="tool-label">2. Priority (urgency level)</label><div class="tool-radio-group" data-q="priority">';
-  BARIS_PRIORITIES.forEach(function(p) {
-    prioHtml += '<button class="tool-radio" data-v="' + p.value + '"><span class="tool-radio-dot"></span><strong>' + p.label + ' ' + p.name + '</strong> — ' + p.desc + '</button>';
-  });
-  prioHtml += '</div></div>';
-  
-  document.getElementById('toolModalBody').innerHTML = condHtml + prioHtml + '<div id="barisResult"></div>';
-  
-  document.querySelectorAll('#toolModalBody .tool-radio-group').forEach(function(group) {
-    group.addEventListener('click', function(e) {
-      const radio = e.target.closest('.tool-radio');
-      if (!radio) return;
-      group.querySelectorAll('.tool-radio').forEach(function(r) { r.classList.remove('selected'); });
-      radio.classList.add('selected');
-      const q = group.dataset.q;
-      barisToolState[q] = parseInt(radio.dataset.v);
-      computeBarisToolResult();
-    });
-  });
-  
+  brHead('BARIS', 'Rate a defect, or review what you saved');
+
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="br-pick">' +
+      '<button class="br-pick-btn" id="brGoRate">' +
+        '<span class="br-pick-ico" style="background:var(--accent-soft);color:var(--accent)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>BARIS Rater</b><span>Tap the matrix to rate a defect</span></span>' +
+      '</button>' +
+      '<button class="br-pick-btn" id="brGoHist">' +
+        '<span class="br-pick-ico" style="background:var(--surface);color:var(--fg-dim)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>BARIS History</b><span>Ratings you have saved</span></span>' +
+        '<span class="br-pick-n" id="brHistN">&middot;</span>' +
+      '</button>' +
+    '</div>';
+
   document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-secondary" id="barisReset">Reset</button>' +
-    '<button class="tool-btn tool-btn-primary" id="barisAsk" disabled>Ask Pocket</button>';
-  document.getElementById('barisReset').addEventListener('click', openBarisRater);
-  document.getElementById('barisAsk').addEventListener('click', barisAskPocket);
-  
+    '<button class="tool-btn tool-btn-primary" id="brClose">Close</button>';
+  document.getElementById('brClose').addEventListener('click', closeTool);
+  document.getElementById('brGoRate').addEventListener('click', brOpenMatrix);
+  document.getElementById('brGoHist').addEventListener('click', brOpenHistory);
+
+  brLoadEntries().then(function() {
+    const el = document.getElementById('brHistN');
+    if (el) el.textContent = brEntries.length;
+  });
+
   showToolModal();
 }
 
-function computeBarisToolResult() {
-  const s = barisToolState;
-  if (!s.condition || !s.priority) {
-    document.getElementById('barisResult').innerHTML = '';
-    document.getElementById('barisAsk').disabled = true;
-    return;
-  }
-  
-  const score = calcBarisScore(s.condition, s.priority);
-  const rating = getBarisRating(score);
-  const ratingLabel = getBarisRatingLabel(rating);
-  const ratingFull = getBarisRatingFull(rating);
-  
-  // Get descriptions
-  const condInfo = BARIS_CONDITIONS.find(function(c) { return c.value === s.condition; });
-  const prioInfo = BARIS_PRIORITIES.find(function(p) { return p.value === s.priority; });
-  
-  const detailsByRating = {
-    good: 'Plan Maintenance — element in acceptable condition. Continue monitoring schedule, address at next maintenance cycle if needed.',
-    fair: 'Condition Monitoring — observable deterioration requiring scheduled attention. Rectification recommended within 6 months.',
-    dilapidated: 'Serious Attention — significant defect requiring formal action. Issue defect notice; rectify within DLP or 1 month maximum.'
-  };
-  
-  document.getElementById('barisResult').innerHTML =
-    '<div class="tool-result">' +
-      '<div class="tool-result-label">BARIS Score</div>' +
-      '<div class="tool-result-value">' + score + ' · ' + ratingLabel + '</div>' +
-      '<div class="tool-result-detail">' +
-        '<strong>' + ratingFull + '</strong><br>' +
-        'Condition ' + s.condition + ' (' + condInfo.label + ') × Priority ' + s.priority + ' (' + prioInfo.label + ' ' + prioInfo.name + ')<br><br>' +
-        detailsByRating[rating] +
-      '</div>' +
-    '</div>';
-  document.getElementById('barisAsk').disabled = false;
-  
-  window._lastBarisRating = {
-    condition: s.condition,
-    priority: s.priority,
-    score: score,
-    rating: rating,
-    ratingLabel: ratingLabel,
-    condLabel: condInfo.label,
-    prioLabel: prioInfo.label + ' ' + prioInfo.name
-  };
+// ---------- 2. MATRIKS ----------
+function brOpenMatrix() {
+  brPick = null;
+  brHead('BARIS Rater', 'Condition × Priority');
+
+  let html =
+    '<div class="br-hint">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' +
+      '<p style="margin:0">Tap the cell where <b>condition</b> meets <b>priority</b>.</p>' +
+    '</div>' +
+    '<div class="br-axis"><div class="br-axis-name">Priority →</div>';
+  BR_PRIO.forEach(function(p) {
+    html += '<div class="br-colh"><b>' + p.code + '</b><span>' + p.tiny + '</span></div>';
+  });
+  html += '</div><div id="brMatrix"></div>' +
+    '<div class="br-legend">' +
+      '<div class="br-lg g"><i>1–4</i><b>Good</b></div>' +
+      '<div class="br-lg f"><i>5–12</i><b>Fair</b></div>' +
+      '<div class="br-lg c"><i>13–20</i><b>Dilapidated</b></div>' +
+    '</div><div id="brOut"></div>';
+
+  document.getElementById('toolModalBody').innerHTML = html;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="brBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="brSaveBtn" disabled>Save BARIS</button>';
+  document.getElementById('brBack').addEventListener('click', openBarisRater);
+  document.getElementById('brSaveBtn').addEventListener('click', brOpenForm);
+  document.getElementById('brMatrix').addEventListener('click', function(e) {
+    const cell = e.target.closest('.br-cell');
+    if (!cell) return;
+    brPick = { c: parseInt(cell.dataset.c, 10), p: parseInt(cell.dataset.p, 10) };
+    brDrawMatrix(); brDrawResult();
+  });
+
+  brDrawMatrix(); brDrawResult();
 }
 
-function barisAskPocket() {
-  const data = window._lastBarisRating;
-  if (!data) return;
-  
-  const prompt = 'I assessed a defect using the BARIS Matrix:\n' +
-    '- Condition: ' + data.condition + ' (' + data.condLabel + ')\n' +
-    '- Priority: ' + data.prioLabel + '\n' +
-    '- Score: ' + data.score + ' = ' + data.ratingLabel + ' (' + getBarisRatingFull(data.rating) + ')\n\n' +
-    'Help me draft a defect description suitable for an inspection report, suggest possible causes, and reference relevant Malaysian/British standards. Provide next steps under Akta 118 Klausa 27 if needed.';
-  
-  closeTool();
-  switchTab('chat');
-  setTimeout(function() {
-    document.getElementById('msgInput').value = prompt;
-    autoSize();
-    updateSendBtn();
-    document.getElementById('msgInput').focus();
-  }, 100);
+function brDrawMatrix() {
+  let html = '';
+  BR_COND.forEach(function(c) {
+    html += '<div class="br-row"><div class="br-rowh"><b>' + c.v + ' ' + c.short + '</b><span>' + c.desc + '</span></div>';
+    BR_PRIO.forEach(function(p) {
+      const score = c.v * p.v;
+      const band = brBandOf(score);
+      const on = brPick && brPick.c === c.v && brPick.p === p.v;
+      html += '<button class="br-cell ' + band + (on ? ' on' : '') + '" type="button" data-c="' + c.v + '" data-p="' + p.v + '" ' +
+        'aria-pressed="' + (!!on) + '" aria-label="Condition ' + c.v + ' ' + c.label + ', priority ' + p.code + ', score ' + score + '">' + score + '</button>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('brMatrix').innerHTML = html;
+}
+
+function brCurrent() {
+  if (!brPick) return null;
+  const c = BR_COND.filter(function(x) { return x.v === brPick.c; })[0];
+  const p = BR_PRIO.filter(function(x) { return x.v === brPick.p; })[0];
+  const score = c.v * p.v;
+  const band = brBandOf(score);
+  return { c: c, p: p, score: score, band: band, B: BR_BAND[band] };
+}
+
+function brDrawResult() {
+  const out = document.getElementById('brOut');
+  const btn = document.getElementById('brSaveBtn');
+  const r = brCurrent();
+  if (!r) {
+    out.innerHTML = '<div class="br-empty">Pick a cell above to see the score, the band it falls in, and the action it calls for.</div>';
+    if (btn) btn.disabled = true;
+    return;
+  }
+  out.innerHTML =
+    '<div class="br-res ' + r.band + '">' +
+      '<div class="br-res-top">' +
+        '<span class="br-score">' + r.score + '</span>' +
+        '<span class="br-res-txt"><i>BARIS score</i><b>' + r.B.label + '</b><span>' + r.B.action + '</span></span>' +
+      '</div>' +
+      '<div class="br-res-body">' +
+        '<div class="br-res-row"><em>Condition</em><span>' + r.c.v + ' · ' + r.c.label + ' — ' + r.c.desc.toLowerCase() + '</span></div>' +
+        '<div class="br-res-row"><em>Priority</em><span>' + r.p.code + ' · ' + r.p.name + ' — ' + r.p.desc.toLowerCase() + '</span></div>' +
+        '<div class="br-res-action"><b>' + r.B.action + '.</b> ' + r.B.text + '</div>' +
+      '</div>' +
+    '</div>';
+  if (btn) btn.disabled = false;
+}
+
+// ---------- 3. BORANG SIMPAN ----------
+function brOpenForm() {
+  const r = brCurrent();
+  if (!r) return;
+  brPhoto = null; brGps = null;
+  brHead('Save BARIS', 'Add the details, then save');
+
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="br-mini ' + r.band + '">' +
+      '<span class="br-mini-n">' + r.score + '</span>' +
+      '<span class="br-mini-t"><b>' + r.B.label + ' · ' + r.B.action + '</b>' +
+      '<span>Condition ' + r.c.v + ' × Priority ' + r.p.code + '</span></span>' +
+    '</div>' +
+
+    '<div class="br-field"><label class="br-label" for="brTitle">Title <span class="req">*</span></label>' +
+      '<input type="text" class="br-input" id="brTitle" maxlength="80" placeholder="e.g. Spalling to ground beam"></div>' +
+
+    '<div class="br-field"><label class="br-label" for="brLoc">Location</label>' +
+      '<div class="br-loc">' +
+        '<input type="text" class="br-input" id="brLoc" maxlength="80" placeholder="e.g. Block C, ground floor">' +
+        '<button class="br-gps" id="brGpsBtn" type="button" aria-label="Use GPS">' +
+          '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.8"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="br-gps-note" id="brGpsNote" style="display:none"></div></div>' +
+
+    '<div class="br-field"><label class="br-label" for="brDesc">Description</label>' +
+      '<textarea class="br-area" id="brDesc" maxlength="1200" placeholder="What you observed, extent, and anything the report should note."></textarea></div>' +
+
+    '<div class="br-field"><label class="br-label">Photo</label>' +
+      '<div id="brPhotoSlot">' +
+        '<button class="br-drop" id="brPhotoBtn" type="button">' +
+          '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+          '<div>Take or choose a photo</div><small>Optional</small>' +
+        '</button>' +
+      '</div>' +
+      '<input type="file" id="brPhotoInput" accept="image/*" style="display:none"></div>';
+
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="brFormBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="brDoSave">Save</button>';
+
+  document.getElementById('brFormBack').addEventListener('click', brOpenMatrix);
+  document.getElementById('brDoSave').addEventListener('click', brSave);
+  document.getElementById('brPhotoBtn').addEventListener('click', function() {
+    document.getElementById('brPhotoInput').click();
+  });
+  document.getElementById('brPhotoInput').addEventListener('change', brPickPhoto);
+  document.getElementById('brGpsBtn').addEventListener('click', brGrabGps);
+  setTimeout(function() { document.getElementById('brTitle').focus(); }, 80);
+}
+
+async function brPickPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const slot = document.getElementById('brPhotoSlot');
+  slot.innerHTML = '<div class="br-load">Processing photo...</div>';
+  try {
+    brPhoto = await resizeImage(file, 1024);
+    slot.innerHTML =
+      '<div class="br-photo"><img src="' + brPhoto + '" alt="">' +
+      '<button class="br-photo-x" id="brPhotoX" type="button" aria-label="Remove photo">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+      '</button></div>';
+    document.getElementById('brPhotoX').addEventListener('click', function() {
+      brPhoto = null;
+      brOpenFormPhotoReset();
+    });
+  } catch (err) {
+    console.warn('[BARIS photo]', err.message);
+    brPhoto = null;
+    brOpenFormPhotoReset();
+    showToast('Could not read that photo', 'error');
+  }
+  e.target.value = '';
+}
+
+function brOpenFormPhotoReset() {
+  const slot = document.getElementById('brPhotoSlot');
+  if (!slot) return;
+  slot.innerHTML =
+    '<button class="br-drop" id="brPhotoBtn" type="button">' +
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+      '<div>Take or choose a photo</div><small>Optional</small>' +
+    '</button>';
+  document.getElementById('brPhotoBtn').addEventListener('click', function() {
+    document.getElementById('brPhotoInput').click();
+  });
+}
+
+async function brGrabGps() {
+  const btn = document.getElementById('brGpsBtn');
+  const note = document.getElementById('brGpsNote');
+  note.style.display = 'block';
+  note.textContent = 'Locating...';
+  const pos = await getGPS();
+  if (pos) {
+    brGps = pos;
+    btn.classList.add('on');
+    note.textContent = pos.lat.toFixed(5) + ', ' + pos.lng.toFixed(5) + '  ±' + Math.round(pos.accuracy) + 'm';
+  } else {
+    brGps = null;
+    btn.classList.remove('on');
+    note.textContent = 'Location unavailable';
+  }
+}
+
+async function brSave() {
+  const r = brCurrent();
+  if (!r) return;
+  if (!currentUser) { showToast('Sign in to save', 'error'); return; }
+
+  const title = document.getElementById('brTitle').value.trim();
+  if (!title) {
+    showToast('Give it a title first', 'error');
+    document.getElementById('brTitle').focus();
+    return;
+  }
+
+  const btn = document.getElementById('brDoSave');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const data = {
+    title: title,
+    location: document.getElementById('brLoc').value.trim(),
+    description: document.getElementById('brDesc').value.trim(),
+    photo: brPhoto || null,
+    gps: brGps || null,
+    condition: r.c.v,
+    priority: r.p.v,
+    score: r.score,
+    rating: r.band === 'g' ? 'good' : (r.band === 'f' ? 'fair' : 'dilapidated'),
+    inspectionId: (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('barisEntries').add(data);
+    showToast('BARIS saved');
+    brPick = null; brPhoto = null; brGps = null;
+    brEntries = [];
+    brOpenHistory();
+  } catch (e) {
+    console.warn('[BARIS save]', e.message);
+    btn.disabled = false;
+    btn.textContent = 'Save';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// ---------- 4. SEJARAH ----------
+async function brLoadEntries() {
+  if (!currentUser) { brEntries = []; return brEntries; }
+  if (brEntries.length) return brEntries;
+  try {
+    const snap = await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('barisEntries').orderBy('createdAt', 'desc').limit(60).get();
+    brEntries = [];
+    snap.forEach(function(doc) {
+      const d = doc.data();
+      brEntries.push({
+        id: doc.id,
+        title: d.title || 'Untitled',
+        location: d.location || '',
+        description: d.description || '',
+        photo: d.photo || null,
+        gps: d.gps || null,
+        condition: d.condition, priority: d.priority,
+        score: d.score || 0, rating: d.rating || null,
+        createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
+      });
+    });
+  } catch (e) {
+    console.warn('[BARIS load]', e.message);
+    brEntries = [];
+  }
+  return brEntries;
+}
+
+function brOpenHistory() {
+  brHead('BARIS History', 'Ratings you have saved');
+  document.getElementById('toolModalBody').innerHTML = '<div class="br-load">Loading...</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="brHistBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="brHistNew">New rating</button>';
+  document.getElementById('brHistBack').addEventListener('click', openBarisRater);
+  document.getElementById('brHistNew').addEventListener('click', brOpenMatrix);
+
+  brLoadEntries().then(function(list) {
+    const body = document.getElementById('toolModalBody');
+    if (!list.length) {
+      body.innerHTML = '<div class="br-empty" style="margin-top:0">Nothing saved yet. Rate a defect and tap <b>Save BARIS</b> to keep it here.</div>';
+      return;
+    }
+    let html = '';
+    list.forEach(function(en) {
+      const band = brBandOf(en.score);
+      const when = formatRelativeTime(en.createdAt);
+      const meta = (en.location ? en.location + ' · ' : '') + when;
+      html += '<button class="br-item ' + band + '" data-id="' + en.id + '">' +
+        '<span class="br-item-n">' + en.score + '</span>' +
+        '<span class="br-item-t"><b>' + escapeHTML(en.title) + '</b><span>' + escapeHTML(meta) + '</span></span>' +
+        (en.photo ? '<span class="br-item-th"><img src="' + en.photo + '" alt=""></span>' : '') +
+      '</button>';
+    });
+    body.innerHTML = html;
+    body.querySelectorAll('.br-item').forEach(function(el) {
+      el.addEventListener('click', function() { brOpenEntry(el.dataset.id); });
+    });
+  });
+}
+
+function brOpenEntry(id) {
+  const en = brEntries.filter(function(x) { return x.id === id; })[0];
+  if (!en) return;
+  const band = brBandOf(en.score);
+  const B = BR_BAND[band];
+  const c = BR_COND.filter(function(x) { return x.v === en.condition; })[0];
+  const p = BR_PRIO.filter(function(x) { return x.v === en.priority; })[0];
+
+  brHead(en.title, formatRelativeTime(en.createdAt));
+
+  let html =
+    '<div class="br-res ' + band + '" style="margin-top:0">' +
+      '<div class="br-res-top">' +
+        '<span class="br-score">' + en.score + '</span>' +
+        '<span class="br-res-txt"><i>BARIS score</i><b>' + B.label + '</b><span>' + B.action + '</span></span>' +
+      '</div>' +
+      '<div class="br-res-body">' +
+        (c ? '<div class="br-res-row"><em>Condition</em><span>' + c.v + ' · ' + c.label + '</span></div>' : '') +
+        (p ? '<div class="br-res-row"><em>Priority</em><span>' + p.code + ' · ' + p.name + '</span></div>' : '') +
+        (en.location ? '<div class="br-res-row"><em>Location</em><span>' + escapeHTML(en.location) + '</span></div>' : '') +
+        (en.gps ? '<div class="br-res-row"><em>GPS</em><span>' + en.gps.lat.toFixed(5) + ', ' + en.gps.lng.toFixed(5) + '</span></div>' : '') +
+      '</div>' +
+    '</div>';
+
+  if (en.photo) html += '<div style="margin-top:14px"><img class="br-detail-photo" src="' + en.photo + '" alt=""></div>';
+  if (en.description) html += '<div class="br-detail-txt" style="margin-top:12px">' + escapeHTML(en.description) + '</div>';
+
+  document.getElementById('toolModalBody').innerHTML = html;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="brEntryBack">Back</button>' +
+    '<button class="tool-btn tool-btn-secondary" id="brEntryDel" style="color:var(--critical)">Delete</button>';
+  document.getElementById('brEntryBack').addEventListener('click', brOpenHistory);
+  document.getElementById('brEntryDel').addEventListener('click', function() { brDeleteEntry(en.id); });
+}
+
+async function brDeleteEntry(id) {
+  if (!confirm('Delete this saved rating?')) return;
+  try {
+    await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('barisEntries').doc(id).delete();
+    brEntries = brEntries.filter(function(x) { return x.id !== id; });
+    showToast('Deleted');
+    brOpenHistory();
+  } catch (e) {
+    console.warn('[BARIS delete]', e.message);
+    showToast('Could not delete', 'error');
+  }
 }
 
 // ---------- TOOL 3: DEFECT SCAN ----------
