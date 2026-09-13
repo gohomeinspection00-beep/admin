@@ -197,10 +197,7 @@ y += 6;
 doc.setFont("helvetica", "bold");
 doc.setFontSize(SZ.BODY);
 bk();
-doc.text("PARKLAND GROUP", mL, y);
-y += LH_S;
-doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-doc.text(`(bagi pihak ${data.namaPemaju} ${data.noSyarikat})`, mL, y);
+doc.text(`${data.namaPemaju} ${data.noSyarikat}`, mL, y);
 y += LH_S;
 doc.setFontSize(SZ.BODY);
 
@@ -315,7 +312,7 @@ doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
 numPara(10,
-  `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan mengambil tindakan undang-undang selanjutnya, termasuk memfailkan tuntutan rasmi di Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) dan/atau mahkamah yang berbidang kuasa, bagi mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya sebagaimana diperuntukkan di bawah Perjanjian Jual Beli dan undang-undang.`
+  `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan mengambil tindakan undang-undang selanjutnya, termasuk memfailkan tuntutan rasmi di Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) dan/atau mahkamah yang berbidang kuasa, bagi mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya sebagaimana diperuntukkan di bawah Perjanjian Jual Beli dan undang-undang. Selain itu, sekiranya tarikh akhir notis ini tidak dipatuhi, saya berhak, selaras dengan Klausa 11.1, memberikan notis empat belas (14) hari terakhir kepada pihak tuan sebelum melantik kontraktor sendiri untuk melaksanakan kerja pembaikan, dan segala kos pembaikan tersebut akan dituntut sepenuhnya daripada pihak tuan.`
 );
 y += 4;
 
@@ -397,7 +394,7 @@ function drawAkuanTerima(copyLabel) {
   y += 12;
 
   doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
-  const akText = `Dengan ini diakui bahawa PARKLAND GROUP, bagi pihak ${data.namaPemaju} ${data.noSyarikat}, telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
+  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
   const ls = doc.splitTextToSize(akText, cW);
   for (const l of ls) { doc.text(l, mL, y); y += LH; }
 
