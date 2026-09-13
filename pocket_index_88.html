@@ -6538,6 +6538,34 @@ body.on-tools .topbar{display:none}
 .ds-err b{display:block;font-size:12px;font-weight:700;color:var(--critical);margin-bottom:4px}
 .ds-err span{font-size:12px;line-height:1.5;color:var(--fg-dim)}
 
+
+/* ---- Defect Scan: borang penuh boleh edit + standard boleh kembang ---- */
+.ds-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ds-sel{
+  width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface);color:var(--fg);font-size:14px;font-family:var(--font-body);
+  outline:none;-webkit-appearance:none;appearance:none;
+}
+.ds-sel:focus{border-color:var(--accent)}
+.ds-livescore{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;border-radius:12px}
+.ds-livescore.g{background:var(--success-soft)} .ds-livescore.f{background:var(--warning-soft)} .ds-livescore.c{background:var(--critical-soft)}
+.ds-livescore b{
+  width:36px;height:36px;flex:none;border-radius:11px;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--bg);
+}
+.ds-livescore.g b{background:var(--success)} .ds-livescore.f b{background:var(--warning)} .ds-livescore.c b{background:var(--critical)}
+.ds-livescore span{font-size:12.5px;font-weight:600;color:var(--fg)}
+.ds-livescore i{display:block;font-style:normal;font-size:10.5px;font-weight:400;color:var(--fg-dim);margin-top:1px}
+.ds-note{font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.ds-std{border:1px solid var(--line);border-radius:12px;margin-bottom:7px;overflow:hidden;background:var(--bg)}
+.ds-std-h{display:flex;align-items:center;gap:9px;width:100%;padding:11px 12px;text-align:left;color:var(--fg)}
+.ds-std-h b{flex:1;min-width:0;font-family:var(--font-mono);font-size:11.5px;font-weight:600}
+.ds-std-h svg{flex:none;color:var(--muted);transition:transform .18s ease}
+.ds-std.open .ds-std-h svg{transform:rotate(90deg)}
+.ds-std-b{padding:0 12px 12px;font-size:12.5px;line-height:1.6;color:var(--fg-dim);white-space:pre-wrap}
+.ds-std-load{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.ds-std-ask{font-size:11.5px;color:var(--accent);font-weight:600}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -10788,8 +10816,9 @@ function dsOpenScan() {
     '<div class="br-field"><label class="br-label">Defect photo <span class="req">*</span></label>' +
       '<div id="dsShotSlot"></div>' +
       '<input type="file" id="dsFile" accept="image/*" capture="environment" style="display:none"></div>' +
-    '<div class="br-field"><label class="br-label" for="dsLoc">Location or element</label>' +
-      '<input type="text" class="br-input" id="dsLoc" maxlength="80" placeholder="e.g. Master bedroom, north wall"></div>' +
+    '<div class="br-field"><label class="br-label" for="dsLoc">Description <span style="color:var(--muted);letter-spacing:0;text-transform:none;font-weight:400">(optional)</span></label>' +
+      '<textarea class="br-area" id="dsLoc" maxlength="600" style="min-height:64px" placeholder="What you see, which element, where it is."></textarea>' +
+      '<div class="ds-note">Passed to the AI as context, and kept with the result.</div></div>' +
     '<div id="dsOut"></div>';
 
   document.getElementById('toolModalFoot').innerHTML =
@@ -10857,14 +10886,17 @@ async function dsAnalyse() {
 
   // Format yang sama seperti triggerAIClassify, supaya parseAIAnalysis() boleh
   // digunakan semula dan rating jatuh pada matriks BARIS yang sama.
-  const prompt = 'Analyse this defect photo from a building inspection' + (loc ? ' at: ' + loc : '') +
-    '. Use the BARIS Matrix. Respond ONLY in this exact format with no extra text:\n\n' +
+  const prompt = 'Analyse this defect photo from a building inspection using the BARIS Matrix.' +
+    (loc ? '\n\nThe surveyor noted before the scan: "' + loc + '". Use it as context, and take the element and location from it where possible.' : '') +
+    '\n\nRespond ONLY in this exact format with no extra text:\n\n' +
     'DEFECT: [one short phrase, e.g. "Concrete spalling with exposed rebar"]\n' +
+    'ELEMENT: [the building element affected, e.g. "Concrete slab soffit"]\n' +
+    'LOCATION: [where it is, from the note above; write "Not stated" if unknown]\n' +
     'TYPE: [one of: concrete, render, damp, electrical, plumbing, finishing, other]\n' +
     'CONDITION: [1-5 where 1=New/As New, 2=Fair, 3=Poor, 4=Very Poor, 5=Dilapidated]\n' +
     'PRIORITY: [1-4 where 1=Normal/cosmetic, 2=Routine/minor, 3=Urgent/serious, 4=Emergency/safety]\n' +
     'CAUSES: [2-3 likely causes, comma-separated]\n' +
-    'STANDARDS: [1-2 relevant Malaysian/British standards, comma-separated]\n' +
+    'STANDARDS: [1-3 relevant Malaysian/British standards, comma-separated]\n' +
     'WRITEUP: [1-2 sentence formal write-up suitable for a defect report]';
 
   try {
@@ -10877,7 +10909,7 @@ async function dsAnalyse() {
     dsRenderResult();
     btn.textContent = 'Save Scan';
     btn.disabled = false;
-    btn.onclick = dsOpenForm;
+    btn.onclick = function() { dsOpenForm(); };
   } catch (err) {
     console.warn('[DefectScan]', err.message);
     out.innerHTML =
@@ -10930,38 +10962,121 @@ function dsRenderResult() {
   out.innerHTML = html;
 }
 
-// ---------- 3. BORANG SIMPAN ----------
-function dsOpenForm() {
-  const a = dsAnalysis || {};
-  dsHead('Save Scan', 'Check the details, then save');
+// ---------- 3. BORANG (cipta + edit) ----------
+// Satu borang melayan dua keadaan: simpan imbasan baharu, dan edit entri
+// yang sudah disimpan. dsEditId null bermakna cipta baharu.
+let dsEditId = null;
+const DS_TYPES = ['concrete','render','damp','electrical','plumbing','finishing','other'];
+
+function dsOpenForm(entry) {
+  const a = entry || dsAnalysis || {};
+  dsEditId = entry ? entry.id : null;
+
+  const pre = entry ? (entry.descBefore || '')
+    : (document.getElementById('dsLoc') ? document.getElementById('dsLoc').value.trim() : '');
+  const vals = {
+    title:    entry ? entry.title      : (a.defect || ''),
+    element:  entry ? entry.element    : (a.element || ''),
+    location: entry ? entry.location   : (a.location || ''),
+    type:     entry ? entry.defectType : (a.defectType || ''),
+    cond:     entry ? entry.condition  : (a.condition || 0),
+    prio:     entry ? entry.priority   : (a.priority || 0),
+    before:   pre,
+    after:    entry ? entry.descAfter  : (a.writeup || ''),
+    causes:   entry ? entry.causes     : (a.causes || ''),
+    standards:entry ? entry.standards  : (a.standards || '')
+  };
+  if (entry && entry.photo) dsPhoto = entry.photo;
+
+  dsHead(dsEditId ? 'Edit scan' : 'Save Scan', 'Everything here can be changed');
+
+  let typeOpts = '<option value="">—</option>';
+  DS_TYPES.forEach(function(t) { typeOpts += '<option value="' + t + '">' + t + '</option>'; });
+  let condOpts = '<option value="0">—</option>';
+  BR_COND.forEach(function(c) { condOpts += '<option value="' + c.v + '">' + c.v + ' · ' + c.label + '</option>'; });
+  let prioOpts = '<option value="0">—</option>';
+  BR_PRIO.forEach(function(x) { prioOpts += '<option value="' + x.v + '">' + x.code + ' · ' + x.name + '</option>'; });
 
   document.getElementById('toolModalBody').innerHTML =
     (dsPhoto ? '<div class="ds-shot" style="margin-bottom:16px"><img src="' + dsPhoto + '" alt=""></div>' : '') +
-    '<div class="br-field"><label class="br-label" for="dsTitle">Title <span class="req">*</span></label>' +
-      '<input type="text" class="br-input" id="dsTitle" maxlength="80" value="' + escapeHTML(a.defect || '') + '" placeholder="e.g. Concrete spalling with exposed rebar"></div>' +
-    '<div class="br-field"><label class="br-label" for="dsLoc2">Location</label>' +
-      '<input type="text" class="br-input" id="dsLoc2" maxlength="80" value="' + escapeHTML(document.getElementById('dsLoc') ? document.getElementById('dsLoc').value.trim() : '') + '" placeholder="e.g. Master bedroom, north wall"></div>' +
-    '<div class="br-field"><label class="br-label" for="dsDesc">Description</label>' +
-      '<textarea class="br-area" id="dsDesc" maxlength="1500" placeholder="Notes for the report.">' + escapeHTML(a.writeup || '') + '</textarea>' +
-      '<div class="br-gps-note">Prefilled with the AI write-up. Edit it freely.</div></div>';
+    '<div class="br-field"><label class="br-label" for="dsTitle">Defect <span class="req">*</span></label>' +
+      '<input type="text" class="br-input" id="dsTitle" maxlength="120"></div>' +
+    '<div class="br-field"><label class="br-label" for="dsElem">Element</label>' +
+      '<input type="text" class="br-input" id="dsElem" maxlength="90"></div>' +
+    '<div class="br-field"><label class="br-label" for="dsLocF">Location</label>' +
+      '<input type="text" class="br-input" id="dsLocF" maxlength="90"></div>' +
+    '<div class="br-field"><label class="br-label" for="dsType">Defect type</label>' +
+      '<select class="ds-sel" id="dsType">' + typeOpts + '</select></div>' +
+    '<div class="br-field"><label class="br-label">BARIS rating</label>' +
+      '<div class="ds-grid2">' +
+        '<select class="ds-sel" id="dsCond" aria-label="Condition">' + condOpts + '</select>' +
+        '<select class="ds-sel" id="dsPrio" aria-label="Priority">' + prioOpts + '</select>' +
+      '</div><div id="dsLive"></div>' +
+      '<div class="ds-note">The AI suggests this. Change it if you disagree.</div></div>' +
+    '<div class="br-field"><label class="br-label" for="dsBefore">Description before analysis</label>' +
+      '<textarea class="br-area" id="dsBefore" maxlength="600" style="min-height:64px"></textarea>' +
+      '<div class="ds-note">What you wrote before the scan, kept as the record of what the AI was told.</div></div>' +
+    '<div class="br-field"><label class="br-label" for="dsAfter">Description after analysis</label>' +
+      '<textarea class="br-area" id="dsAfter" maxlength="1500" style="min-height:100px"></textarea>' +
+      '<div class="ds-note">The AI write-up. Edit it into your own words for the report.</div></div>' +
+    '<div class="br-field"><label class="br-label" for="dsCauses">Likely causes</label>' +
+      '<textarea class="br-area" id="dsCauses" maxlength="600" style="min-height:64px"></textarea></div>' +
+    '<div class="br-field"><label class="br-label" for="dsStd">Standards</label>' +
+      '<input type="text" class="br-input" id="dsStd" maxlength="200">' +
+      '<div class="ds-note">Separate with commas. Expand each one in the saved scan to read what the AI says about it.</div></div>';
+
+  // Nilai ditetapkan melalui JS, bukan atribut HTML: escapeHTML tidak
+  // melindungi petikan, dan teks AI selalu mengandunginya.
+  const set = function(id, v) { const el = document.getElementById(id); if (el) el.value = (v == null ? '' : v); };
+  set('dsTitle', vals.title);
+  set('dsElem', vals.element);
+  set('dsLocF', vals.location);
+  set('dsType', DS_TYPES.indexOf(String(vals.type || '').toLowerCase()) !== -1 ? String(vals.type).toLowerCase() : '');
+  set('dsCond', vals.cond || 0);
+  set('dsPrio', vals.prio || 0);
+  set('dsBefore', vals.before);
+  set('dsAfter', vals.after);
+  set('dsCauses', vals.causes);
+  set('dsStd', vals.standards);
 
   document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-secondary" id="dsFormBack">Back</button>' +
+    '<button class="tool-btn tool-btn-secondary" id="dsFormBack">' + (dsEditId ? 'Cancel' : 'Back') + '</button>' +
     '<button class="tool-btn tool-btn-primary" id="dsDoSave">Save</button>';
   document.getElementById('dsFormBack').addEventListener('click', function() {
-    dsOpenScan();
-    // pulihkan foto dan hasil supaya kerja tak hilang
-    setTimeout(function() {
-      if (!dsPhoto) return;
-      const slot = document.getElementById('dsShotSlot');
-      slot.innerHTML = '<div class="ds-shot"><img src="' + dsPhoto + '" alt=""></div>';
-      const run = document.getElementById('dsRun');
-      run.disabled = false; run.textContent = 'Save Scan'; run.onclick = dsOpenForm;
-      dsRenderResult();
-    }, 20);
+    if (dsEditId) { const id = dsEditId; dsEditId = null; dsOpenEntry(id); }
+    else dsBackToScan();
   });
   document.getElementById('dsDoSave').addEventListener('click', dsSave);
+  document.getElementById('dsCond').addEventListener('change', dsLiveScore);
+  document.getElementById('dsPrio').addEventListener('change', dsLiveScore);
+  dsLiveScore();
   setTimeout(function() { document.getElementById('dsTitle').focus(); }, 80);
+}
+
+function dsLiveScore() {
+  const el = document.getElementById('dsLive');
+  if (!el) return;
+  const c = parseInt(document.getElementById('dsCond').value, 10);
+  const p = parseInt(document.getElementById('dsPrio').value, 10);
+  if (!c || !p) { el.innerHTML = ''; return; }
+  const score = c * p;
+  const band = brBandOf(score);
+  const B = BR_BAND[band];
+  el.innerHTML = '<div class="ds-livescore ' + band + '"><b>' + score + '</b>' +
+    '<span>' + B.label + '<i>' + B.action + '</i></span></div>';
+}
+
+// Kembali ke skrin imbas tanpa kehilangan foto atau hasil AI
+function dsBackToScan() {
+  dsOpenScan();
+  setTimeout(function() {
+    if (!dsPhoto) return;
+    document.getElementById('dsShotSlot').innerHTML = '<div class="ds-shot"><img src="' + dsPhoto + '" alt=""></div>';
+    const run = document.getElementById('dsRun');
+    run.disabled = false; run.textContent = 'Save Scan';
+    run.onclick = function() { dsOpenForm(); };
+    dsRenderResult();
+  }, 20);
 }
 
 async function dsSave() {
@@ -10972,38 +11087,48 @@ async function dsSave() {
     document.getElementById('dsTitle').focus();
     return;
   }
-
   const btn = document.getElementById('dsDoSave');
   btn.disabled = true; btn.textContent = 'Saving...';
 
-  const a = dsAnalysis || {};
-  const score = (a.condition && a.priority) ? a.condition * a.priority : null;
+  const cond = parseInt(document.getElementById('dsCond').value, 10) || null;
+  const prio = parseInt(document.getElementById('dsPrio').value, 10) || null;
+  const score = (cond && prio) ? cond * prio : null;
 
   const data = {
     title: title,
-    location: document.getElementById('dsLoc2').value.trim(),
-    description: document.getElementById('dsDesc').value.trim(),
-    photo: dsPhoto || null,
-    defectType: a.defectType || null,
-    condition: a.condition || null,
-    priority: a.priority || null,
-    score: score,
+    element: document.getElementById('dsElem').value.trim(),
+    location: document.getElementById('dsLocF').value.trim(),
+    defectType: document.getElementById('dsType').value || null,
+    condition: cond, priority: prio, score: score,
     rating: score ? (score <= 4 ? 'good' : (score <= 12 ? 'fair' : 'dilapidated')) : null,
-    causes: a.causes || '',
-    standards: a.standards || '',
-    writeup: a.writeup || '',
-    raw: dsRaw || '',
-    inspectionId: (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    descBefore: document.getElementById('dsBefore').value.trim(),
+    descAfter: document.getElementById('dsAfter').value.trim(),
+    causes: document.getElementById('dsCauses').value.trim(),
+    standards: document.getElementById('dsStd').value.trim(),
+    photo: dsPhoto || null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
   try {
-    await db.collection('pocketInspections').doc(currentUser.uid)
-      .collection('defectScans').add(data);
-    showToast('Scan saved');
-    dsPhoto = null; dsAnalysis = null; dsRaw = '';
-    dsEntries = [];
-    dsOpenHistory();
+    const col = db.collection('pocketInspections').doc(currentUser.uid).collection('defectScans');
+    if (dsEditId) {
+      await col.doc(dsEditId).update(data);
+      showToast('Changes saved');
+      const id = dsEditId;
+      dsEditId = null; dsEntries = [];
+      await dsLoadEntries();
+      dsOpenEntry(id);
+    } else {
+      data.raw = dsRaw || '';
+      data.standardNotes = {};
+      data.inspectionId = (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null;
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await col.add(data);
+      showToast('Scan saved');
+      dsPhoto = null; dsAnalysis = null; dsRaw = '';
+      dsEntries = [];
+      dsOpenHistory();
+    }
   } catch (e) {
     console.warn('[DefectScan save]', e.message);
     btn.disabled = false; btn.textContent = 'Save';
@@ -11011,7 +11136,7 @@ async function dsSave() {
   }
 }
 
-// ---------- 4. SEJARAH ----------
+// ---------- 4. SEJARAH + PAPARAN ENTRI ----------
 async function dsLoadEntries() {
   if (!currentUser) { dsEntries = []; return dsEntries; }
   if (dsEntries.length) return dsEntries;
@@ -11024,13 +11149,17 @@ async function dsLoadEntries() {
       dsEntries.push({
         id: doc.id,
         title: d.title || 'Untitled',
+        element: d.element || '',
         location: d.location || '',
-        description: d.description || '',
+        descBefore: d.descBefore || '',
+        // entri terawal hanya menyimpan satu medan "description"
+        descAfter: d.descAfter || d.description || '',
         photo: d.photo || null,
         defectType: d.defectType || '',
         condition: d.condition || null, priority: d.priority || null,
         score: d.score || null,
-        causes: d.causes || '', standards: d.standards || '', writeup: d.writeup || '',
+        causes: d.causes || '', standards: d.standards || '',
+        standardNotes: d.standardNotes || {},
         createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
       });
     });
@@ -11042,6 +11171,7 @@ async function dsLoadEntries() {
 }
 
 function dsOpenHistory() {
+  dsEditId = null;
   dsHead('Scan History', 'Scans you have saved');
   document.getElementById('toolModalBody').innerHTML = '<div class="br-load">Loading...</div>';
   document.getElementById('toolModalFoot').innerHTML =
@@ -11059,12 +11189,15 @@ function dsOpenHistory() {
     let html = '';
     list.forEach(function(en) {
       const band = en.score ? brBandOf(en.score) : null;
-      const meta = (en.location ? en.location + ' · ' : '') + formatRelativeTime(en.createdAt);
+      const bits = [];
+      if (en.element) bits.push(en.element);
+      if (en.location) bits.push(en.location);
+      bits.push(formatRelativeTime(en.createdAt));
       html += '<button class="br-item ' + (band || '') + '" data-id="' + en.id + '">' +
-        (en.score
-          ? '<span class="br-item-n">' + en.score + '</span>'
-          : '<span class="br-item-n" style="background:var(--surface-2);color:var(--muted)">&ndash;</span>') +
-        '<span class="br-item-t"><b>' + escapeHTML(en.title) + '</b><span>' + escapeHTML(meta) + '</span></span>' +
+        (en.score ? '<span class="br-item-n">' + en.score + '</span>'
+                  : '<span class="br-item-n" style="background:var(--surface-2);color:var(--muted)">&ndash;</span>') +
+        '<span class="br-item-t"><b>' + escapeHTML(en.title) + '</b>' +
+        '<span>' + escapeHTML(bits.join(' · ')) + '</span></span>' +
         (en.photo ? '<span class="br-item-th"><img src="' + en.photo + '" alt=""></span>' : '') +
       '</button>';
     });
@@ -11075,9 +11208,14 @@ function dsOpenHistory() {
   });
 }
 
+function dsSplitStandards(str) {
+  return (str || '').split(',').map(function(x) { return x.trim(); }).filter(Boolean);
+}
+
 function dsOpenEntry(id) {
   const en = dsEntries.filter(function(x) { return x.id === id; })[0];
-  if (!en) return;
+  if (!en) { dsOpenHistory(); return; }
+  dsEditId = null;
   dsHead(en.title, formatRelativeTime(en.createdAt));
 
   let html = '';
@@ -11097,22 +11235,86 @@ function dsOpenEntry(id) {
         '<div class="br-res-body">' +
           (c ? '<div class="br-res-row"><em>Condition</em><span>' + c.v + ' · ' + c.label + '</span></div>' : '') +
           (p ? '<div class="br-res-row"><em>Priority</em><span>' + p.code + ' · ' + p.name + '</span></div>' : '') +
+          (en.element ? '<div class="br-res-row"><em>Element</em><span>' + escapeHTML(en.element) + '</span></div>' : '') +
           (en.location ? '<div class="br-res-row"><em>Location</em><span>' + escapeHTML(en.location) + '</span></div>' : '') +
           (en.defectType ? '<div class="br-res-row"><em>Type</em><span>' + escapeHTML(en.defectType) + '</span></div>' : '') +
         '</div>' +
       '</div>';
   }
 
-  if (en.description) html += '<div class="ds-sec"><div class="ds-sec-h"><b>Description</b></div><div class="ds-sec-b">' + escapeHTML(en.description) + '</div></div>';
-  if (en.causes)      html += '<div class="ds-sec"><div class="ds-sec-h"><b>Likely causes</b></div><div class="ds-sec-b">' + escapeHTML(en.causes) + '</div></div>';
-  if (en.standards)   html += '<div class="ds-sec"><div class="ds-sec-h"><b>Standards</b></div><div class="ds-sec-b">' + escapeHTML(en.standards) + '</div></div>';
+  if (en.descBefore) html += '<div class="ds-sec"><div class="ds-sec-h"><b>Description before analysis</b></div><div class="ds-sec-b">' + escapeHTML(en.descBefore) + '</div></div>';
+  if (en.descAfter)  html += '<div class="ds-sec"><div class="ds-sec-h"><b>Description after analysis</b></div><div class="ds-sec-b">' + escapeHTML(en.descAfter) + '</div></div>';
+  if (en.causes)     html += '<div class="ds-sec"><div class="ds-sec-h"><b>Likely causes</b></div><div class="ds-sec-b">' + escapeHTML(en.causes) + '</div></div>';
+
+  const stds = dsSplitStandards(en.standards);
+  if (stds.length) {
+    html += '<div class="ds-sec"><div class="ds-sec-h"><b>Standards</b></div><div style="padding:11px 12px 4px">';
+    stds.forEach(function(name, i) {
+      const has = !!en.standardNotes[name];
+      html += '<div class="ds-std" data-std="' + i + '">' +
+        '<button class="ds-std-h" type="button" data-open="' + i + '">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>' +
+          '<b>' + escapeHTML(name) + '</b>' +
+          '<span class="ds-std-ask">' + (has ? 'Read' : 'Explain') + '</span>' +
+        '</button>' +
+        '<div class="ds-std-b" id="dsStdB' + i + '" hidden>' + (has ? escapeHTML(en.standardNotes[name]) : '') + '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+  }
 
   document.getElementById('toolModalBody').innerHTML = html;
   document.getElementById('toolModalFoot').innerHTML =
     '<button class="tool-btn tool-btn-secondary" id="dsEntryBack">Back</button>' +
-    '<button class="tool-btn tool-btn-secondary" id="dsEntryDel" style="color:var(--critical)">Delete</button>';
+    '<button class="tool-btn tool-btn-secondary" id="dsEntryDel" style="color:var(--critical);flex:0 0 auto;padding:12px 16px">Delete</button>' +
+    '<button class="tool-btn tool-btn-primary" id="dsEntryEdit">Edit</button>';
   document.getElementById('dsEntryBack').addEventListener('click', dsOpenHistory);
   document.getElementById('dsEntryDel').addEventListener('click', function() { dsDeleteEntry(en.id); });
+  document.getElementById('dsEntryEdit').addEventListener('click', function() { dsOpenForm(en); });
+
+  document.querySelectorAll('.ds-std-h').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const i = parseInt(btn.dataset.open, 10);
+      dsToggleStandard(en, i, stds[i]);
+    });
+  });
+}
+
+async function dsToggleStandard(en, i, name) {
+  const wrap = document.querySelector('.ds-std[data-std="' + i + '"]');
+  const body = document.getElementById('dsStdB' + i);
+  if (!wrap || !body) return;
+
+  if (wrap.classList.contains('open')) {
+    wrap.classList.remove('open');
+    body.hidden = true;
+    return;
+  }
+  wrap.classList.add('open');
+  body.hidden = false;
+  if (en.standardNotes[name]) return;   // sudah dicache
+
+  body.innerHTML = '<div class="ds-std-load"><span class="ds-spin" style="width:15px;height:15px;border-width:2px"></span>Asking the AI...</div>';
+
+  const prompt = 'In the context of a building inspection defect described as "' + (en.title || 'a defect') + '"' +
+    (en.element ? ' on the ' + en.element : '') + ', explain the standard "' + name + '".\n\n' +
+    'Cover, in under 120 words: what the standard governs, the requirement most relevant to this defect, ' +
+    'and what a surveyor should check against it. Plain prose, no headings, no markdown.';
+
+  try {
+    const txt = await callGemini([{ role:'user', content: prompt, mode:'consultant', timestamp: new Date() }], false);
+    en.standardNotes[name] = txt;
+    body.textContent = txt;
+    const ask = wrap.querySelector('.ds-std-ask');
+    if (ask) ask.textContent = 'Read';
+    // Cache supaya panggilan itu tak berulang untuk entri yang sama
+    try {
+      await db.collection('pocketInspections').doc(currentUser.uid)
+        .collection('defectScans').doc(en.id).update({ standardNotes: en.standardNotes });
+    } catch (err) { console.warn('[Standard cache]', err.message); }
+  } catch (err) {
+    body.innerHTML = '<span style="color:var(--critical)">Could not fetch: ' + escapeHTML(err.message || 'error') + '</span>';
+  }
 }
 
 async function dsDeleteEntry(id) {
@@ -14853,17 +15055,20 @@ function parseAIAnalysis(text) {
   const lines = text.split('\n');
   const result = {
     defect: '', defectType: '',
+    element: '', location: '',
     condition: null, priority: null,
     causes: '', standards: '', writeup: ''
   };
   
   lines.forEach(function(line) {
-    const m = line.match(/^(DEFECT|TYPE|CONDITION|PRIORITY|BARIS|CAUSES|STANDARDS|WRITEUP):\s*(.+)/i);
+    const m = line.match(/^(DEFECT|ELEMENT|LOCATION|TYPE|CONDITION|PRIORITY|BARIS|CAUSES|STANDARDS|WRITEUP):\s*(.+)/i);
     if (!m) return;
     const key = m[1].toUpperCase();
     const val = m[2].trim().replace(/^\[|\]$/g, '');
     
     if (key === 'DEFECT') result.defect = val;
+    else if (key === 'ELEMENT') result.element = val;
+    else if (key === 'LOCATION') result.location = (/^not stated$/i.test(val) ? '' : val);
     else if (key === 'TYPE') result.defectType = val.toLowerCase();
     else if (key === 'CONDITION') {
       const cMatch = val.match(/[1-5]/);
