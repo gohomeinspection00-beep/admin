@@ -7347,15 +7347,20 @@ body.site-mode-active .voice-mode{
 
 <script>
 // =======================================================
-// FIREBASE
+// FIREBASE — projek GoXpert Pocket SENDIRI
+// -------------------------------------------------------
+// Pocket dulu berkongsi projek "go-inspect---home-owner" dengan Go Inspect.
+// Ia kini berada pada projeknya sendiri, jadi deploy rules Pocket tak boleh
+// menjejaskan Go Inspect, dan bil serta kuota kedua-duanya berasingan.
+// Rujuk POCKET-SETUP.md untuk langkah penuh.
 // =======================================================
 const firebaseConfig = {
-  apiKey: "AIzaSyB31qMJXT9bNFe0b0r7TMrmkPCSz5ES2P0",
-  authDomain: "go-inspect---home-owner.firebaseapp.com",
-  projectId: "go-inspect---home-owner",
-  storageBucket: "go-inspect---home-owner.firebasestorage.app",
-  messagingSenderId: "1051260322496",
-  appId: "1:1051260322496:web:59aff3cf5648340f616325"
+  apiKey: "AIzaSyAkgcFsMhhk6MEZlRq0hh9fXCLIzw-Tx3A",
+  authDomain: "goxpert-pocket.firebaseapp.com",
+  projectId: "goxpert-pocket",
+  storageBucket: "goxpert-pocket.firebasestorage.app",
+  messagingSenderId: "601207638312",
+  appId: "1:601207638312:web:56f6db0a49c18f02b6e81d"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
