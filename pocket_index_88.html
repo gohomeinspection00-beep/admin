@@ -37,10 +37,13 @@
   --fg-dim:#525252;
   --muted:#737373;
   --muted-2:#a3a3a3;
-  --accent:#06b6d4;
-  --accent-fg:#042f2e;
-  --accent-soft:#ecfeff;
-  --accent-line:#a5f3fc;
+  --accent:#1B4FD8;
+  --accent-fg:#ffffff;
+  --accent-soft:#E9F0FD;
+  --accent-line:#B6CDF6;
+  --accent-deep:#12328F;
+  --hdr-a:#2F63E8;
+  --hdr-b:#12328F;
   --success:#15803d;
   --success-soft:#f0fdf4;
   --warning:#a16207;
@@ -65,10 +68,13 @@
   --fg-dim:#a3a3a3;
   --muted:#737373;
   --muted-2:#525252;
-  --accent:#22d3ee;
-  --accent-fg:#042f2e;
-  --accent-soft:#083344;
-  --accent-line:#0e7490;
+  --accent:#6FA0FF;
+  --accent-fg:#071A3A;
+  --accent-soft:#16243D;
+  --accent-line:#2A4675;
+  --accent-deep:#0B1F4D;
+  --hdr-a:#1E3A7A;
+  --hdr-b:#0A1730;
   --success:#22c55e;
   --success-soft:#0a2e1a;
   --warning:#eab308;
@@ -6071,6 +6077,177 @@ body.site-mode-active .voice-mode{
 .brief-chevron{color:var(--muted-2);flex-shrink:0;transition:color 0.15s ease}
 .brief-card-compact:hover .brief-chevron{color:var(--accent)}
 
+
+/* ==========================================================
+   NEW HOME (nh-) — susun atur Home yang diluluskan
+   Awalan nh- digunakan supaya tiada pertembungan dengan CSS lama.
+========================================================== */
+
+/* Home ada header sendiri, jadi topbar global disembunyikan di Home.
+   Consult bar dibuang terus — toggle Mode kini di Profile. */
+body.on-home .topbar{display:none}
+.consult-bar{display:none!important}
+
+.nh-wrap{display:flex;flex-direction:column;min-height:100%}
+
+/* ---------- header ---------- */
+.nh-hdr{
+  position:relative;overflow:hidden;flex:none;
+  background:linear-gradient(155deg,var(--hdr-a) 0%,var(--hdr-b) 100%);
+  padding:calc(16px + env(safe-area-inset-top)) 18px 40px;
+}
+.nh-hdr-bldg{position:absolute;right:-10px;top:0;width:170px;height:118px;opacity:.22;pointer-events:none}
+.nh-hdr-wave{position:absolute;left:0;right:0;bottom:0;width:100%;height:34px;display:block}
+.nh-hdr-row{position:relative;display:flex;align-items:center;gap:12px}
+.nh-mark{
+  width:38px;height:38px;border-radius:11px;flex:none;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+  display:grid;place-items:center;
+}
+.nh-wordmark{font-size:19px;font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.1}
+.nh-wordmark em{font-family:var(--font-display);font-style:italic;font-weight:500;color:rgba(255,255,255,.72)}
+.nh-tagline{
+  font-family:var(--font-mono);font-size:8.5px;font-weight:500;
+  letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.68);margin-top:3px;
+}
+.nh-hdr-acts{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nh-bell{position:relative;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff}
+.nh-bell i{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:#FF5D73;border:1.5px solid var(--hdr-a);display:none}
+.nh-bell.has i{display:block}
+.nh-avatar{
+  width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.55);
+  color:#fff;font-weight:600;font-size:14px;
+}
+
+/* ---------- body ---------- */
+.nh-body{padding:0 16px 130px;margin-top:-14px;position:relative;flex:1}
+.nh-greet{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.nh-greet h2{margin:0;font-size:27px;font-weight:700;letter-spacing:-.03em;line-height:1.15;color:var(--fg)}
+.nh-greet p{margin:5px 0 0;font-size:13.5px;line-height:1.45;color:var(--muted);max-width:30ch}
+.nh-mode{
+  margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:7px;
+  padding:8px 12px;border-radius:999px;background:var(--success-soft);
+  color:var(--success);font-size:12px;font-weight:600;white-space:nowrap;
+  border:1px solid var(--success-soft);
+}
+.nh-mode i{width:7px;height:7px;border-radius:50%;background:currentColor;display:block}
+.nh-mode.consult{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line)}
+
+/* ---------- hero ---------- */
+.nh-hero{
+  position:relative;display:flex;align-items:center;gap:14px;overflow:hidden;
+  padding:16px;border-radius:20px;margin-bottom:18px;width:100%;text-align:left;
+  background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--fg);
+}
+.nh-hero-ghost{position:absolute;right:-8px;bottom:-16px;width:140px;height:120px;opacity:.3;pointer-events:none}
+.nh-hero-ico{
+  width:54px;height:54px;flex:none;border-radius:15px;background:var(--bg);
+  display:grid;place-items:center;box-shadow:var(--shadow-1);color:var(--accent);
+}
+.nh-hero-txt{position:relative;min-width:0;flex:1}
+.nh-eyebrow{
+  display:block;font-family:var(--font-mono);font-size:9.5px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+}
+.nh-hero-txt h3{
+  margin:3px 0 2px;font-size:19px;font-weight:700;letter-spacing:-.02em;color:var(--fg);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.nh-hero-txt p{margin:0;font-size:12.5px;color:var(--fg-dim)}
+.nh-hero-go{
+  position:relative;flex:none;width:40px;height:40px;border-radius:50%;
+  background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;
+}
+
+/* ---------- quick tiles ---------- */
+.nh-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:20px}
+.nh-qa{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  padding:6px 2px;border-radius:14px;min-width:0;color:var(--fg);
+}
+.nh-qa-ico{width:54px;height:54px;border-radius:17px;display:grid;place-items:center}
+.nh-qa b{font-size:11.5px;font-weight:600;letter-spacing:-.01em;text-align:center;line-height:1.2}
+.nh-qa span{font-size:9.5px;color:var(--muted);text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.nh-qa.sep{border-left:1px solid var(--line);border-radius:0}
+.nh-ico-site{background:var(--accent-soft);color:var(--accent)}
+.nh-ico-scan{background:var(--success-soft);color:var(--success)}
+.nh-ico-lib{background:var(--surface);color:var(--fg-dim)}
+.nh-ico-sos{background:var(--critical-soft);color:var(--critical);border:1.5px solid var(--critical-soft)}
+.nh-sos-lbl{color:var(--critical);letter-spacing:.04em}
+
+/* ---------- card + todo ---------- */
+.nh-card{
+  background:var(--bg);border:1px solid var(--line);border-radius:18px;
+  padding:15px 16px;box-shadow:var(--shadow-1);margin-bottom:18px;
+}
+.nh-card-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;color:var(--accent)}
+.nh-card-hd h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.nh-card-hd a{margin-left:auto;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none}
+.nh-todo{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  padding:9px 0;border-radius:10px;color:var(--fg);
+}
+.nh-todo + .nh-todo{border-top:1px solid var(--line)}
+.nh-todo-ico{width:32px;height:32px;border-radius:10px;flex:none;display:grid;place-items:center}
+.nh-todo-txt{min-width:0;flex:1}
+.nh-todo-txt b{display:block;font-size:13px;font-weight:600;letter-spacing:-.01em;line-height:1.3}
+.nh-todo-txt span{display:block;font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nh-todo-n{flex:none;font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--fg-dim)}
+
+/* ---------- section head ---------- */
+.nh-sec{display:flex;align-items:center;gap:8px;margin:0 2px 11px;color:var(--fg-dim)}
+.nh-sec h3{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.nh-sec a{margin-left:auto;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none}
+
+/* ---------- inspection rows ---------- */
+.nh-insp{
+  display:flex;gap:12px;align-items:center;width:100%;text-align:left;color:var(--fg);
+  background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:11px 12px;
+  margin-bottom:9px;box-shadow:var(--shadow-1);
+}
+.nh-insp.on{border-color:var(--accent-line)}
+.nh-insp-thumb{
+  width:50px;height:50px;border-radius:13px;flex:none;display:grid;place-items:center;
+  background:var(--surface);border:1px solid var(--line);color:var(--muted);
+  overflow:hidden;position:relative;
+}
+.nh-insp-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.nh-insp.on .nh-insp-thumb{color:var(--accent)}
+.nh-insp-main{min-width:0;flex:1}
+.nh-insp-main b{display:block;font-size:14px;font-weight:600;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nh-insp-meta{
+  display:block;font-family:var(--font-mono);font-size:10px;color:var(--muted);
+  margin-top:3px;letter-spacing:.02em;text-transform:uppercase;
+}
+.nh-chips{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.nh-chip{
+  font-family:var(--font-mono);font-size:9.5px;font-weight:600;
+  padding:2.5px 7px;border-radius:6px;letter-spacing:.04em;white-space:nowrap;
+}
+.nh-chip.g{background:var(--success-soft);color:var(--success)}
+.nh-chip.f{background:var(--warning-soft);color:var(--warning)}
+.nh-chip.c{background:var(--critical-soft);color:var(--critical)}
+.nh-live{
+  flex:none;font-family:var(--font-mono);font-size:8.5px;font-weight:600;letter-spacing:.1em;
+  color:var(--accent);background:var(--accent-soft);padding:3px 6px;border-radius:5px;
+}
+
+/* ---------- empty ---------- */
+.nh-empty{
+  background:var(--bg);border:1px solid var(--line);border-radius:18px;
+  padding:20px 16px;text-align:center;box-shadow:var(--shadow-1);
+}
+.nh-empty h4{margin:10px 0 5px;font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.nh-empty p{margin:0 auto 15px;font-size:12.5px;color:var(--muted);line-height:1.5;max-width:30ch}
+.nh-btn{
+  display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--accent-fg);
+  border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;
+}
+
+/* ---------- bottom nav: FAB robot ---------- */
+.nav-fab svg{display:block}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -6184,100 +6361,141 @@ body.site-mode-active .voice-mode{
   
   <!-- HOME MODE -->
   <main class="home-mode show" id="homeMode">
-    <div class="home-content">
-      
-      <!-- Compact Greeting -->
-      <h1 class="home-greet-compact" id="homeGreetLine">Hi, <em>Fikri</em><span class="home-greet-compact-wave">👋</span></h1>
-      
-      <!-- Ongoing (compact, conditional) -->
-      <button class="ongoing-compact" id="ongoingCard" style="display:none">
-        <div class="ongoing-compact-dot"></div>
-        <div class="ongoing-compact-content">
-          <div class="ongoing-compact-title" id="ongoingCardTitle">Continue session</div>
-          <div class="ongoing-compact-meta" id="ongoingCardSub">7 captures · 14:30</div>
-        </div>
-        <svg class="ongoing-compact-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-      
-      <!-- Hero Buttons (2-col) -->
-      <div class="hero-buttons">
-        <button class="hero-btn" id="siteBanner">
-          <div class="hero-btn-icon hero-btn-icon-site">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <div class="nh-wrap">
+
+      <!-- ===== HEADER ===== -->
+      <header class="nh-hdr">
+        <svg class="nh-hdr-bldg" viewBox="0 0 170 118" fill="none" aria-hidden="true">
+          <path d="M18 118V52l40-22 40 22v66z" fill="#fff"/>
+          <path d="M98 118V66l38-20 34 20v52z" fill="#fff" opacity=".65"/>
+          <rect x="34" y="66" width="14" height="14" fill="var(--accent-deep)" opacity=".5"/>
+          <rect x="60" y="66" width="14" height="14" fill="var(--accent-deep)" opacity=".5"/>
+          <rect x="34" y="90" width="14" height="14" fill="var(--accent-deep)" opacity=".5"/>
+          <rect x="114" y="80" width="13" height="13" fill="var(--accent-deep)" opacity=".5"/>
+          <rect x="138" y="80" width="13" height="13" fill="var(--accent-deep)" opacity=".5"/>
+        </svg>
+        <svg class="nh-hdr-wave" viewBox="0 0 390 34" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 20C70 4 150 0 240 6c60 4 105 14 150 20v8H0z" fill="var(--bg)"/>
+        </svg>
+        <div class="nh-hdr-row">
+          <div class="nh-mark">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2.5 21 7v10l-9 4.5L3 17V7z"/><path d="M12 2.5V12l9-5M12 12l-9-5M12 12v9.5"/>
+            </svg>
           </div>
-          <div class="hero-btn-label">Site Mode</div>
-        </button>
-        <button class="hero-btn" id="askCard">
-          <div class="hero-btn-icon hero-btn-icon-ask">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <div>
+            <div class="nh-wordmark">GoXpert <em>Pocket</em></div>
+            <div class="nh-tagline">Surveyor Companion</div>
           </div>
-          <div class="hero-btn-label">Ask Pocket</div>
-        </button>
-      </div>
-
-      <!-- Stat strip (glanceable pulse) -->
-      <div class="home-stats" id="homeStats">
-        <button class="home-stat" id="statInsp" type="button">
-          <span class="home-stat-value" id="statInspVal">0</span>
-          <span class="home-stat-label">Active</span>
-        </button>
-        <div class="home-stat-div"></div>
-        <button class="home-stat" id="statPhotos" type="button">
-          <span class="home-stat-value" id="statPhotosVal">0</span>
-          <span class="home-stat-label">Photos</span>
-        </button>
-        <div class="home-stat-div"></div>
-        <button class="home-stat" id="statChats" type="button">
-          <span class="home-stat-value" id="statChatsVal">0</span>
-          <span class="home-stat-label">Chats</span>
-        </button>
-      </div>
-
-      <!-- Inspections (Phase 1) -->
-      <div class="home-section">
-        <div class="home-section-head">
-          <span class="home-section-label">Inspections</span>
-          <div class="home-section-line"></div>
-          <a class="home-section-action" id="newInspBtn">+ New</a>
-        </div>
-        <div id="inspList">
-          <div class="insp-home-empty">No inspections yet</div>
-        </div>
-      </div>
-
-      <!-- Daily Brief (compact) -->
-      <div class="home-section">
-        <div class="home-section-head">
-          <span class="home-section-label">Daily Brief</span>
-          <div class="home-section-line"></div>
-        </div>
-        <div class="brief-card brief-card-compact" id="briefCard">
-          <div class="brief-card-text">
-            <div class="brief-meta">
-              <span class="brief-meta-tag" id="briefTag">STANDARD</span>
-              <span id="briefRef">MS 1294-1:2015 · Cl. 7.3.2</span>
-            </div>
-            <h3 class="brief-title" id="briefTitle">Render adhesion test requirements</h3>
+          <div class="nh-hdr-acts">
+            <button class="nh-bell" id="nhBell" aria-label="Pemberitahuan">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+              </svg>
+              <i></i>
+            </button>
+            <button class="nh-avatar" id="nhAvatar" aria-label="Profil">U</button>
           </div>
-          <svg class="brief-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
-      </div>
+      </header>
 
-      <!-- Recent (compact) -->
-      <div class="home-section">
-        <div class="home-section-head">
-          <span class="home-section-label">Recent</span>
-          <div class="home-section-line"></div>
-          <a class="home-section-action" id="viewAllChatBtn">View all</a>
+      <!-- ===== BODY ===== -->
+      <div class="nh-body">
+
+        <div class="nh-greet">
+          <div>
+            <h2 id="nhGreet">Hi</h2>
+            <p id="nhSub">Sedia untuk inspection pertama awak?</p>
+          </div>
+          <button class="nh-mode" id="nhMode"><i></i><span id="nhModeTxt">Normal</span></button>
         </div>
-        <div id="recentList">
-          <div class="activity-empty">No activity yet</div>
+
+        <!-- Kad utama: sambung kerja, atau mula baharu -->
+        <button class="nh-hero" id="nhHero">
+          <svg class="nh-hero-ghost" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+            <path d="M20 120V56l34-20 34 20v64z" fill="var(--accent)" opacity=".28"/>
+            <path d="M88 120V72l28-16 24 16v48z" fill="var(--accent)" opacity=".18"/>
+          </svg>
+          <span class="nh-hero-ico">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>
+              <path d="M9 17v-3.2l3-2.4 3 2.4V17z"/>
+            </svg>
+          </span>
+          <span class="nh-hero-txt">
+            <span class="nh-eyebrow" id="nhHeroEyebrow">Mula di sini</span>
+            <h3 id="nhHeroTitle">Inspection Baharu</h3>
+            <p id="nhHeroSub">Cipta rekod untuk satu tapak</p>
+          </span>
+          <span class="nh-hero-go">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h13M13 6l6 6-6 6"/>
+            </svg>
+          </span>
+        </button>
+
+        <!-- Tindakan pantas -->
+        <div class="nh-quick">
+          <button class="nh-qa" id="nhSite">
+            <span class="nh-qa-ico nh-ico-site">
+              <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.8"/>
+              </svg>
+            </span>
+            <b>Site Mode</b><span>GPS &amp; foto</span>
+          </button>
+          <button class="nh-qa" id="nhScan">
+            <span class="nh-qa-ico nh-ico-scan">
+              <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16"/>
+                <circle cx="12" cy="12" r="3.2"/>
+              </svg>
+            </span>
+            <b>Defect Scan</b><span>Foto ke AI</span>
+          </button>
+          <button class="nh-qa" id="nhLib">
+            <span class="nh-qa-ico nh-ico-lib">
+              <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H11v18H5.5A2.5 2.5 0 0 1 3 18.5z"/><path d="M21 5.5A2.5 2.5 0 0 0 18.5 3H13v18h5.5a2.5 2.5 0 0 0 2.5-2.5z"/>
+              </svg>
+            </span>
+            <b>Library</b><span>Rujukan</span>
+          </button>
+          <button class="nh-qa sep" id="nhSos">
+            <span class="nh-qa-ico nh-ico-sos">
+              <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6.2 3.5h3l1.5 3.8-1.9 1.4a11.5 11.5 0 0 0 5.5 5.5l1.4-1.9 3.8 1.5v3a1.8 1.8 0 0 1-2 1.8A15.8 15.8 0 0 1 4.4 5.5a1.8 1.8 0 0 1 1.8-2z"/>
+              </svg>
+            </span>
+            <b class="nh-sos-lbl">SOS</b><span>Bantuan segera</span>
+          </button>
         </div>
+
+        <!-- Perlu tindakan (tersembunyi bila kosong) -->
+        <section class="nh-card" id="nhTodoCard" style="display:none">
+          <div class="nh-card-hd">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6.5 6 8.5 9.5 5"/><path d="M4 17.5 6 19.5 9.5 16"/><path d="M13 7h7M13 18h7"/>
+            </svg>
+            <h3>Perlu tindakan</h3>
+          </div>
+          <div id="nhTodoList"></div>
+        </section>
+
+        <!-- Inspection -->
+        <div class="nh-sec">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>
+          </svg>
+          <h3>Inspection terkini</h3>
+          <a id="newInspBtn">Baharu</a>
+        </div>
+        <div id="inspList"></div>
+
       </div>
-      
     </div>
   </main>
-  
+
   <!-- LIBRARY MODE -->
   <main class="library-mode" id="libraryMode">
     <div class="library-content">
@@ -7272,22 +7490,30 @@ body.site-mode-active .voice-mode{
       </span>
       <span class="nav-btn-label">Home</span>
     </button>
+    <button class="nav-btn" data-mode="inspections">
+      <span class="nav-btn-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4M9 10h6M9 14.5h4"/></svg>
+      </span>
+      <span class="nav-btn-label">Inspection</span>
+    </button>
+    <div class="nav-fab-wrap">
+      <button class="nav-fab" id="navFab" aria-label="Chat AI">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="2.6" r="1.15"/>
+          <path d="M12 3.75V6"/>
+          <rect x="4.2" y="6" width="15.6" height="12.4" rx="4.2"/>
+          <path d="M2.2 11.2v2.8M21.8 11.2v2.8"/>
+          <circle cx="9.2" cy="11.4" r="1.35" fill="currentColor" stroke="none"/>
+          <circle cx="14.8" cy="11.4" r="1.35" fill="currentColor" stroke="none"/>
+          <path d="M9.6 15.3h4.8"/>
+        </svg>
+      </button>
+    </div>
     <button class="nav-btn" data-mode="tools">
       <span class="nav-btn-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
       </span>
       <span class="nav-btn-label">Tools</span>
-    </button>
-    <div class="nav-fab-wrap">
-      <button class="nav-fab" id="navFab" aria-label="Start chat or voice">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </button>
-    </div>
-    <button class="nav-btn" data-mode="library">
-      <span class="nav-btn-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-      </span>
-      <span class="nav-btn-label">Library</span>
     </button>
     <button class="nav-btn" data-mode="profile">
       <span class="nav-btn-icon">
@@ -7634,6 +7860,12 @@ function showApp() {
     console.warn('[showApp]', e.message);
   }
   
+  // Home ada header sendiri; segarkan ucapan/avatar sebaik pengguna diketahui.
+  document.body.classList.add('on-home');
+  if (typeof initHome === 'function') {
+    try { initHome(); } catch (e) { console.warn('[showApp] home', e.message); }
+  }
+
   loadChatHistory().catch(e => console.warn('[showApp] history', e.message));
   if (typeof loadInspections === 'function') {
     loadInspections().catch(e => console.warn('[showApp] inspections', e.message));
@@ -9468,72 +9700,122 @@ const DAILY_BRIEFS = [
 // HOME TAB LOGIC
 // =======================================================
 function initHome() {
-  const name = (currentUser && currentUser.displayName ? currentUser.displayName.split(' ')[0] : null) ||
-               (currentUser && currentUser.email ? currentUser.email.split('@')[0] : null) ||
-               'there';
-  document.getElementById('homeGreetLine').innerHTML = 
-    'Hi, <em>' + escapeHTML(name) + '</em><span class="home-greet-compact-wave">👋</span>';
-  
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-  const brief = DAILY_BRIEFS[dayOfYear % DAILY_BRIEFS.length];
-  document.getElementById('briefTag').textContent = brief.tag;
-  document.getElementById('briefRef').textContent = brief.ref;
-  document.getElementById('briefTitle').textContent = brief.title;
-  document.getElementById('briefCard').onclick = function() {
-    switchTab('chat');
-    setTimeout(function() {
-      document.getElementById('msgInput').value = brief.askPrompt;
-      autoSize();
-      updateSendBtn();
-      document.getElementById('msgInput').focus();
-    }, 100);
-  };
-  
+  document.body.classList.add('on-home');
+
+  const full = (currentUser && currentUser.displayName) ||
+               (currentUser && currentUser.email ? currentUser.email.split('@')[0] : null) || 'there';
+  const first = String(full).split(' ')[0];
+
+  const g = document.getElementById('nhGreet');
+  if (g) g.textContent = 'Hi, ' + first;
+
+  const av = document.getElementById('nhAvatar');
+  if (av) av.textContent = first.charAt(0).toUpperCase();
+
+  nhSyncMode();
   renderOngoingCard();
-  renderRecentActivity();
-  renderHomeStats();
+  renderInspectionsHome();
+}
+
+// Pil Mode pada Home mencerminkan Normal / Consultant
+function nhSyncMode() {
+  const pill = document.getElementById('nhMode');
+  const txt = document.getElementById('nhModeTxt');
+  if (!pill || !txt) return;
+  const consult = (typeof currentMode !== 'undefined' && currentMode === 'consultant');
+  pill.classList.toggle('consult', consult);
+  txt.textContent = consult ? 'Consultant' : 'Normal';
 }
 
 // =======================================================
 // HOME STAT STRIP — glanceable pulse
 // =======================================================
 function renderHomeStats() {
+  const card = document.getElementById('nhTodoCard');
+  const list = document.getElementById('nhTodoList');
+  if (!card || !list) return;
+
   try {
     const insps = (typeof inspections !== 'undefined' && inspections) ? inspections : [];
-    const convos = (typeof conversations !== 'undefined' && conversations) ? conversations : [];
+    const items = [];
 
-    const activeCount = insps.filter(function(i) { return i.status === 'active'; }).length;
-
-    let photos = insps.reduce(function(s, i) { return s + (i.photoCount || 0); }, 0);
-    if (photos === 0) {
-      try {
-        const ss = JSON.parse(localStorage.getItem('pocket_site_session') || 'null');
-        if (ss && ss.captures) photos = ss.captures.length;
-      } catch (e) {}
+    // (a) Defect rating "dilapidated" — paling mendesak
+    let severe = 0, severeWhere = '';
+    insps.forEach(function(i) {
+      const bc = normalizeBarisCounts(i.barisCounts);
+      if (bc.dilapidated > 0) {
+        severe += bc.dilapidated;
+        if (!severeWhere) severeWhere = i.title;
+      }
+    });
+    if (severe > 0) {
+      items.push({
+        n: severe,
+        title: 'Defect teruk perlu disemak',
+        sub: severeWhere,
+        cls: 'critical',
+        icon: '<path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/>',
+        go: function() { const t = insps.find(function(x){ const b=normalizeBarisCounts(x.barisCounts); return b.dilapidated>0; }); if (t) openInspDetail(t.id); }
+      });
     }
 
-    const chatCount = convos.filter(function(c) { return (c.messageCount || 0) > 0; }).length;
+    // (b) Inspection siap tapi belum dieksport
+    const ready = insps.filter(function(i) {
+      return (i.photoCount || 0) > 0 && i.status === 'completed';
+    });
+    if (ready.length > 0) {
+      items.push({
+        n: ready.length,
+        title: 'Laporan belum dieksport',
+        sub: 'Siap, menunggu PDF',
+        cls: 'accent',
+        icon: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/>',
+        go: function() { openInspDetail(ready[0].id); }
+      });
+    }
 
-    const set = function(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set('statInspVal', activeCount);
-    set('statPhotosVal', photos);
-    set('statChatsVal', chatCount);
+    // (c) Inspection aktif yang masih kosong
+    const empty = insps.filter(function(i) {
+      return i.status === 'active' && (i.photoCount || 0) === 0;
+    });
+    if (empty.length > 0) {
+      items.push({
+        n: empty.length,
+        title: 'Inspection tanpa foto',
+        sub: 'Mula rakam di tapak',
+        cls: 'success',
+        icon: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+        go: function() { setActiveInspection(empty[0].id); enterSiteMode(); }
+      });
+    }
 
-    const inspBtn = document.getElementById('statInsp');
-    if (inspBtn) inspBtn.onclick = function() {
-      const el = document.getElementById('inspList');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
-    const photosBtn = document.getElementById('statPhotos');
-    if (photosBtn) photosBtn.onclick = function() {
-      if (typeof enterSiteMode === 'function') enterSiteMode();
-    };
-    const chatsBtn = document.getElementById('statChats');
-    if (chatsBtn) chatsBtn.onclick = function() {
-      if (typeof switchTab === 'function') switchTab('chat');
-    };
+    if (items.length === 0) { card.style.display = 'none'; list.innerHTML = ''; return; }
+
+    const bg = { critical: 'var(--critical-soft)', accent: 'var(--accent-soft)', success: 'var(--success-soft)' };
+    const fg = { critical: 'var(--critical)', accent: 'var(--accent)', success: 'var(--success)' };
+
+    let html = '';
+    items.forEach(function(it, idx) {
+      html += '<button class="nh-todo" data-i="' + idx + '">' +
+        '<span class="nh-todo-ico" style="background:' + bg[it.cls] + ';color:' + fg[it.cls] + '">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + it.icon + '</svg>' +
+        '</span>' +
+        '<span class="nh-todo-txt"><b>' + escapeHTML(it.title) + '</b><span>' + escapeHTML(it.sub || '') + '</span></span>' +
+        '<span class="nh-todo-n">' + it.n + '</span>' +
+      '</button>';
+    });
+    list.innerHTML = html;
+    card.style.display = 'block';
+
+    list.querySelectorAll('.nh-todo').forEach(function(el) {
+      el.addEventListener('click', function() {
+        const it = items[parseInt(el.dataset.i, 10)];
+        if (it && typeof it.go === 'function') it.go();
+      });
+    });
   } catch (e) {
-    console.warn('[HomeStats]', e.message);
+    console.warn('[HomeTodo]', e.message);
+    card.style.display = 'none';
   }
 }
 
@@ -9541,135 +9823,51 @@ function renderHomeStats() {
 // ONGOING CARD — compact version
 // =======================================================
 function renderOngoingCard() {
-  const card = document.getElementById('ongoingCard');
-  if (!card) return;
-  
-  // Priority 1: Active site session
-  let activeSession = null;
-  try {
-    const saved = localStorage.getItem('pocket_site_session');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (new Date(parsed.startedAt).toDateString() === new Date().toDateString() && parsed.captures && parsed.captures.length > 0) {
-        activeSession = parsed;
-      }
-    }
-  } catch (e) {}
-  
-  if (activeSession) {
-    const startTime = new Date(activeSession.startedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' });
-    const captureCount = activeSession.captures.length;
-    document.getElementById('ongoingCardTitle').textContent = 'Continue site session';
-    document.getElementById('ongoingCardSub').textContent = captureCount + ' capture' + (captureCount !== 1 ? 's' : '') + ' · ' + startTime;
-    card.style.display = 'flex';
-    card.onclick = function() {
-      if (typeof enterSiteMode === 'function') enterSiteMode();
+  const hero = document.getElementById('nhHero');
+  if (!hero) return;
+
+  const eye = document.getElementById('nhHeroEyebrow');
+  const ttl = document.getElementById('nhHeroTitle');
+  const sub = document.getElementById('nhHeroSub');
+  const subline = document.getElementById('nhSub');
+
+  const insps = (typeof inspections !== 'undefined' && inspections) ? inspections : [];
+
+  // Keutamaan 1: inspection aktif
+  let target = null;
+  if (activeInspectionId) target = insps.find(function(i) { return i.id === activeInspectionId; }) || null;
+  // Keutamaan 2: inspection berstatus aktif yang terkini
+  if (!target) {
+    target = insps.filter(function(i) { return i.status === 'active'; })
+                  .sort(function(a, b) { return b.updatedAt.getTime() - a.updatedAt.getTime(); })[0] || null;
+  }
+
+  if (target) {
+    const n = target.photoCount || 0;
+    eye.textContent = 'Sambung kerja';
+    ttl.textContent = target.title;
+    sub.textContent = n + ' foto · ' + formatRelativeTime(target.updatedAt);
+    if (subline) subline.textContent = target.title + ' masih terbuka.';
+    hero.onclick = function() {
+      setActiveInspection(target.id);
+      enterSiteMode();
     };
-    return;
+  } else {
+    eye.textContent = 'Mula di sini';
+    ttl.textContent = 'Inspection Baharu';
+    sub.textContent = 'Cipta rekod untuk satu tapak';
+    if (subline) subline.textContent = 'Sedia untuk inspection pertama awak?';
+    hero.onclick = function() { openNewInspModal(); };
   }
-  
-  // Priority 2: Recent chat (last 4h)
-  if (conversations && conversations.length > 0) {
-    const recent = conversations[0];
-    const updatedAt = recent.updatedAt instanceof Date ? recent.updatedAt : new Date(recent.updatedAt);
-    const hoursAgo = (Date.now() - updatedAt.getTime()) / 3600000;
-    
-    if (hoursAgo < 4 && recent.messageCount > 0) {
-      const title = recent.title || 'Untitled chat';
-      const titleShort = title.length > 36 ? title.substring(0, 36) + '...' : title;
-      document.getElementById('ongoingCardTitle').textContent = 'Continue chat · ' + titleShort;
-      document.getElementById('ongoingCardSub').textContent = recent.messageCount + ' messages · ' + formatRelativeTime(updatedAt);
-      card.style.display = 'flex';
-      card.onclick = function() {
-        loadConversationMessages(recent.id);
-        switchTab('chat');
-      };
-      return;
-    }
-  }
-  
-  card.style.display = 'none';
 }
 
 // =======================================================
 // RECENT — compact rows
 // =======================================================
 function renderRecentActivity() {
-  const list = document.getElementById('recentList');
-  
-  const activities = [];
-  
-  if (conversations && conversations.length > 0) {
-    conversations.slice(0, 8).forEach(function(c) {
-      if (c.messageCount > 0) {
-        activities.push({
-          type: 'chat',
-          title: c.title || 'Untitled chat',
-          timestamp: c.updatedAt instanceof Date ? c.updatedAt : new Date(c.updatedAt),
-          action: function() {
-            loadConversationMessages(c.id);
-            switchTab('chat');
-          }
-        });
-      }
-    });
-  }
-  
-  // Active site session
-  try {
-    const saved = localStorage.getItem('pocket_site_session');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.captures && parsed.captures.length > 0) {
-        activities.push({
-          type: 'session',
-          title: 'Site session · ' + parsed.captures.length + ' photo' + (parsed.captures.length !== 1 ? 's' : ''),
-          timestamp: new Date(parsed.startedAt),
-          action: function() {
-            if (typeof enterSiteMode === 'function') enterSiteMode();
-          }
-        });
-      }
-    }
-  } catch (e) {}
-  
-  activities.sort(function(a, b) { return b.timestamp.getTime() - a.timestamp.getTime(); });
-  const top = activities.slice(0, 5);
-  
-  if (top.length === 0) {
-    list.innerHTML = '<div class="activity-empty">No activity yet.</div>';
-    return;
-  }
-  
-  let html = '<div class="recent-rows">';
-  top.forEach(function(act, idx) {
-    let icon, iconClass;
-    if (act.type === 'chat') {
-      icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
-      iconClass = 'chat';
-    } else if (act.type === 'session') {
-      icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
-      iconClass = 'session';
-    }
-    
-    const time = formatRelativeTime(act.timestamp);
-    html += '<button class="recent-row" data-idx="' + idx + '">' +
-      '<div class="recent-row-icon ' + iconClass + '">' + icon + '</div>' +
-      '<div class="recent-row-content">' +
-        '<div class="recent-row-title">' + escapeHTML(act.title) + '</div>' +
-      '</div>' +
-      '<div class="recent-row-time">' + time + '</div>' +
-    '</button>';
-  });
-  html += '</div>';
-  list.innerHTML = html;
-  
-  list.querySelectorAll('.recent-row').forEach(function(el) {
-    const idx = parseInt(el.dataset.idx);
-    el.addEventListener('click', function() {
-      if (top[idx] && top[idx].action) top[idx].action();
-    });
-  });
+  // Seksyen "Recent" dibuang dalam susun atur Home baharu.
+  // Kekalkan fungsi ini supaya panggilan sedia ada tidak pecah.
+  return;
 }
 
 function formatRelativeTime(date) {
@@ -9688,8 +9886,35 @@ function formatRelativeTime(date) {
   return d.toLocaleDateString('en-MY', { day: 'numeric', month: 'short' });
 }
 
-document.getElementById('askCard').addEventListener('click', function() { switchTab('chat'); });
-document.getElementById('viewAllChatBtn').addEventListener('click', function() { switchTab('chat'); });
+// Tindakan pantas Home (susun atur baharu)
+(function wireNewHome() {
+  const on = function(id, fn) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', fn);
+  };
+
+  on('nhSite', function() {
+    if (typeof enterSiteMode === 'function') enterSiteMode();
+  });
+  on('nhScan', function() {
+    if (typeof openTool === 'function') openTool('defect');
+  });
+  on('nhLib', function() {
+    switchTab('library');
+  });
+  on('nhSos', function() {
+    // Fungsi SOS ditangguh sehingga ciri hubung pengguna berdekatan siap.
+    showToast('SOS akan datang');
+  });
+  on('nhMode', function() {
+    if (typeof setMode === 'function') {
+      setMode(currentMode === 'consultant' ? 'normal' : 'consultant');
+      nhSyncMode();
+    }
+  });
+  on('nhAvatar', function() { switchTab('profile'); });
+  on('nhBell', function() { showToast('Tiada pemberitahuan baharu'); });
+})();
 
 // =======================================================
 // LIBRARY TAB LOGIC
@@ -11367,11 +11592,18 @@ function renderSensorUnsupported(toolName, msg) {
 // BOTTOM NAV TAB SWITCHING
 // =======================================================
 function switchTab(mode) {
+  // Tab "inspections" tiada skrin sendiri — ia Home + helaian pilih inspection.
+  const wantInspSheet = (mode === 'inspections');
+  if (wantInspSheet) mode = 'home';
+
   // Bottom nav active state
   document.querySelectorAll('.nav-btn').forEach(function(t) {
-    t.classList.toggle('active', t.dataset.mode === mode);
+    t.classList.toggle('active', t.dataset.mode === (wantInspSheet ? 'inspections' : mode));
   });
-  
+
+  // Home sahaja yang ada header sendiri; sembunyikan topbar global di situ.
+  document.body.classList.toggle('on-home', mode === 'home');
+
   // Hide all modes
   document.getElementById('homeMode').classList.remove('show');
   document.getElementById('toolsMode').classList.remove('show');
@@ -11383,6 +11615,7 @@ function switchTab(mode) {
   if (mode === 'home') {
     document.getElementById('homeMode').classList.add('show');
     initHome();
+    if (wantInspSheet && typeof openInspSheet === 'function') openInspSheet();
     if (typeof voice_stopAll === 'function') voice_stopAll();
   } else if (mode === 'tools') {
     document.getElementById('toolsMode').classList.add('show');
@@ -11428,7 +11661,7 @@ function closeFabSheet() {
   fabSheet.classList.remove('show');
 }
 
-navFab.addEventListener('click', openFabSheet);
+navFab.addEventListener('click', function() { switchTab('chat'); });
 fabSheetOverlay.addEventListener('click', closeFabSheet);
 
 // FAB option handlers
@@ -14426,7 +14659,7 @@ document.getElementById('siteVoiceBtn').addEventListener('click', function() {
 document.getElementById('siteEndBtn').addEventListener('click', endSession);
 
 // ===== Banner trigger =====
-siteBanner.addEventListener('click', enterSiteMode);
+if (siteBanner) siteBanner.addEventListener('click', enterSiteMode);
 
 // ===== Exit button =====
 document.getElementById('siteExitBtn').addEventListener('click', exitSiteMode);
@@ -14921,86 +15154,74 @@ function updateSiteModeTopBar() {
 function renderInspectionsHome() {
   const list = document.getElementById('inspList');
   if (!list) return;
-  
-  if (inspections.length === 0) {
-    list.innerHTML = '<div class="insp-home-empty">No inspections yet</div>';
+
+  if (!inspections || inspections.length === 0) {
+    list.innerHTML =
+      '<div class="nh-empty">' +
+        '<svg width="88" height="66" viewBox="0 0 88 66" fill="none" aria-hidden="true">' +
+          '<rect x="20" y="6" width="40" height="52" rx="5" fill="var(--surface)" stroke="var(--accent-line)" stroke-width="1.6"/>' +
+          '<rect x="32" y="2" width="16" height="8" rx="2.5" fill="var(--accent-line)"/>' +
+          '<path d="M28 22h24M28 30h24M28 38h15" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"/>' +
+          '<circle cx="60" cy="44" r="13" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.6"/>' +
+          '<path d="M69.5 53.5 78 62" stroke="var(--accent)" stroke-width="3.4" stroke-linecap="round"/>' +
+          '<path d="M55 44h10M60 39v10" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>' +
+        '</svg>' +
+        '<h4>Belum ada inspection</h4>' +
+        '<p>Mula inspection pertama untuk simpan foto, rating BARIS dan laporan di satu tempat.</p>' +
+        '<span class="nh-btn" id="nhEmptyNew">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>' +
+          'Mula inspection' +
+        '</span>' +
+      '</div>';
+    const b = document.getElementById('nhEmptyNew');
+    if (b) b.addEventListener('click', function() { openNewInspModal(); });
     renderHomeStats();
     return;
   }
-  
-  // Show top 3 (active first, then by updated)
+
   const sorted = inspections.slice().sort(function(a, b) {
-    // Active inspection always first
     if (a.id === activeInspectionId) return -1;
     if (b.id === activeInspectionId) return 1;
-    // Then by status (active > completed > archived)
-    const statusOrder = { active: 0, completed: 1, archived: 2 };
-    const aS = statusOrder[a.status] ?? 99;
-    const bS = statusOrder[b.status] ?? 99;
+    const order = { active: 0, completed: 1, archived: 2 };
+    const aS = order[a.status] !== undefined ? order[a.status] : 99;
+    const bS = order[b.status] !== undefined ? order[b.status] : 99;
     if (aS !== bS) return aS - bS;
-    // Then by updated
     return b.updatedAt.getTime() - a.updatedAt.getTime();
   });
-  
-  const top = sorted.slice(0, 3);
-  
+
   let html = '';
-  top.forEach(function(insp) {
+  sorted.slice(0, 4).forEach(function(insp) {
     const isActive = insp.id === activeInspectionId;
-    const time = formatRelativeTime(insp.updatedAt);
-    const count = insp.photoCount || 0;
-    
-    // Thumb
-    let thumbHtml;
+    const n = insp.photoCount || 0;
+
+    let thumb;
     if (insp.coverPhoto) {
-      thumbHtml = '<img src="' + insp.coverPhoto + '" alt="">' +
-        '<div class="insp-home-thumb-count">' + count + '</div>';
+      thumb = '<img src="' + insp.coverPhoto + '" alt="">';
     } else {
-      thumbHtml = '<div class="insp-home-thumb-icon">' +
-        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
-      '</div>' +
-      '<div class="insp-home-thumb-count">' + count + '</div>';
+      thumb = '<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/><path d="M10 21v-6h4v6"/></svg>';
     }
-    
-    // Meta line
-    let metaStatus = '';
-    if (isActive) metaStatus = '<span class="insp-home-meta-active">● Active</span>';
-    else if (insp.status === 'completed') metaStatus = '<span>Completed</span>';
-    else if (insp.status === 'archived') metaStatus = '<span>Archived</span>';
-    else metaStatus = '<span>Open</span>';
-    
-    const meta = count > 0
-      ? metaStatus + ' · ' + count + ' photo' + (count !== 1 ? 's' : '') + ' · ' + time
-      : metaStatus + ' · ' + time;
-    
-    // BARIS strip
-    let barisHtml = '';
+
     const bc = normalizeBarisCounts(insp.barisCounts);
-    const ratingLabels = { good: 'Good', fair: 'Fair', dilapidated: 'Dilap' };
-    ['good', 'fair', 'dilapidated'].forEach(function(r) {
-      if (bc[r] && bc[r] > 0) {
-        barisHtml += '<span class="insp-home-baris-dot ' + r + '">' + ratingLabels[r] + ':' + bc[r] + '</span>';
-      }
-    });
-    
-    html += '<button class="insp-home-card ' + (isActive ? 'active' : '') + '" data-id="' + insp.id + '">' +
-      '<div class="insp-home-thumb">' + thumbHtml + '</div>' +
-      '<div class="insp-home-info">' +
-        '<div class="insp-home-title">' + escapeHTML(insp.title) + '</div>' +
-        '<div class="insp-home-meta">' + meta + '</div>' +
-        (barisHtml ? '<div class="insp-home-baris-strip">' + barisHtml + '</div>' : '') +
-      '</div>' +
-      '<svg class="insp-home-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>' +
+    let chips = '';
+    if (bc.good > 0)        chips += '<span class="nh-chip g">BAIK ' + bc.good + '</span>';
+    if (bc.fair > 0)        chips += '<span class="nh-chip f">SEDERHANA ' + bc.fair + '</span>';
+    if (bc.dilapidated > 0) chips += '<span class="nh-chip c">TERUK ' + bc.dilapidated + '</span>';
+
+    html += '<button class="nh-insp ' + (isActive ? 'on' : '') + '" data-id="' + insp.id + '">' +
+      '<span class="nh-insp-thumb">' + thumb + '</span>' +
+      '<span class="nh-insp-main">' +
+        '<b>' + escapeHTML(insp.title) + '</b>' +
+        '<span class="nh-insp-meta">' + n + ' foto · ' + formatRelativeTime(insp.updatedAt) + '</span>' +
+        (chips ? '<span class="nh-chips">' + chips + '</span>' : '') +
+      '</span>' +
+      (isActive ? '<span class="nh-live">AKTIF</span>' : '') +
     '</button>';
   });
-  
+
   list.innerHTML = html;
-  
-  // Wire up clicks
-  list.querySelectorAll('.insp-home-card').forEach(function(el) {
-    el.addEventListener('click', function() {
-      openInspDetail(el.dataset.id);
-    });
+  list.querySelectorAll('.nh-insp').forEach(function(el) {
+    el.addEventListener('click', function() { openInspDetail(el.dataset.id); });
   });
 
   renderHomeStats();
