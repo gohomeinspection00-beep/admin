@@ -6643,6 +6643,83 @@ body.on-tools .topbar{display:none}
 .sl-cap-t b{display:block;font-size:13.5px;font-weight:700;color:var(--fg)}
 .sl-cap-t span{display:block;font-size:10.5px;color:var(--fg-dim);margin-top:2px}
 
+
+/* ==========================================================
+   CRACK RULER (cr2-) — lebar / panjang / kedua-dua
+   Rujukan berbentuk: kad = 4 penjuru, syiling = bulatan, lain = garis
+========================================================== */
+.cr2-step{
+  font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:9px;
+}
+.cr2-opt{
+  display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:14px 13px;
+  border-radius:15px;background:var(--bg);border:1.5px solid var(--line);color:var(--fg);margin-bottom:9px;
+}
+.cr2-opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.cr2-opt-ico{width:44px;height:44px;flex:none;border-radius:13px;display:grid;place-items:center;background:var(--surface);color:var(--fg-dim)}
+.cr2-opt.sel .cr2-opt-ico{background:var(--accent);color:var(--accent-fg)}
+.cr2-opt-t{flex:1;min-width:0}
+.cr2-opt-t b{display:block;font-size:14.5px;font-weight:600;letter-spacing:-.015em}
+.cr2-opt-t span{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.cr2-opt-n{
+  flex:none;font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:.06em;
+  padding:3px 7px;border-radius:6px;background:var(--surface);color:var(--muted);
+}
+.cr2-opt.sel .cr2-opt-n{background:var(--accent);color:var(--accent-fg)}
+
+.cr2-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0b0f16;touch-action:none}
+.cr2-wrap canvas{display:block;width:100%;height:auto}
+.cr2-badge{
+  position:absolute;top:9px;left:9px;font-family:var(--font-mono);font-size:10px;font-weight:600;
+  letter-spacing:.06em;padding:5px 9px;border-radius:7px;background:rgba(10,15,25,.78);color:#fff;
+}
+.cr2-ai{
+  position:absolute;top:9px;right:9px;display:flex;align-items:center;gap:6px;
+  padding:7px 11px;border-radius:8px;background:rgba(10,15,25,.78);color:#fff;font-size:11px;font-weight:600;
+}
+.cr2-ai:disabled{opacity:.6}
+.cr2-sp{width:11px;height:11px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:cr2rot .8s linear infinite}
+@keyframes cr2rot{to{transform:rotate(360deg)}}
+.cr2-hint{margin-top:11px;font-size:12px;line-height:1.5;color:var(--muted);text-align:center;min-height:34px}
+.cr2-hint b{color:var(--fg-2)}
+.cr2-flag{
+  margin-top:9px;display:flex;gap:8px;align-items:flex-start;padding:9px 11px;border-radius:10px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);font-size:11.5px;line-height:1.45;color:var(--fg-dim);
+}
+.cr2-flag svg{flex:none;margin-top:1px;color:var(--accent)}
+.cr2-flag b{color:var(--fg)}
+
+.cr2-res{border-radius:16px;border:1px solid var(--line);overflow:hidden;background:var(--bg);margin-bottom:11px}
+.cr2-res-img{width:100%;display:block;border-bottom:1px solid var(--line)}
+.cr2-res-top{display:flex;align-items:center;gap:13px;padding:14px 15px}
+.cr2-res.g .cr2-res-top{background:var(--success-soft)}
+.cr2-res.f .cr2-res-top{background:var(--warning-soft)}
+.cr2-res.c .cr2-res-top{background:var(--critical-soft)}
+.cr2-res-n{
+  min-width:80px;padding:0 10px;height:54px;flex:none;border-radius:14px;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--bg);background:var(--fg-dim);
+}
+.cr2-res.g .cr2-res-n{background:var(--success)}
+.cr2-res.f .cr2-res-n{background:var(--warning)}
+.cr2-res.c .cr2-res-n{background:var(--critical)}
+.cr2-res-t{min-width:0;flex:1}
+.cr2-res-t i{display:block;font-family:var(--font-mono);font-style:normal;font-size:8.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cr2-res-t b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.02em;margin-top:2px;color:var(--fg)}
+.cr2-res-t span{display:block;font-size:11.5px;color:var(--fg-dim);margin-top:2px;line-height:1.45}
+.cr2-res-b{padding:11px 15px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.02em}
+.cr2-sum{
+  padding:13px 15px;border-radius:14px;background:var(--surface);border:1px solid var(--line);
+  font-size:12.5px;line-height:1.6;color:var(--fg-dim);
+}
+.cr2-sum b{color:var(--fg)}
+.cr2-mmin{display:flex;gap:8px;align-items:center;margin:-2px 0 12px}
+.cr2-mmin input{
+  flex:1;padding:11px 12px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface);color:var(--fg);font-size:14px;font-family:var(--font-body);outline:none;
+}
+.cr2-mmin span{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -12161,799 +12238,809 @@ function stopCompass() {
   }
 }
 
-// ---------- TOOL 6: CRACK RULER ----------
-let crState = {
-  measureMode: 'crack',  // 'crack' (small mm) | 'general' (any unit)
-  refType: 'card',
-  refLength: 85.6,
-  image: null,
-  imageDataUrl: null,
-  step: 'setup',
-  scalePoints: [],
-  measurePoints: [],
-  pixelsPerMm: null,
-  canvas: null,
-  ctx: null,
-  baseDisplayScale: 1,    // base ratio (display px / image px)
-  // Zoom + pan state
-  zoom: 1,
-  panX: 0,
-  panY: 0,
-  // Touch tracking
-  touchStartTime: 0,
-  touchStartX: 0,
-  touchStartY: 0,
-  isPanning: false,
-  isPinching: false,
-  pinchStartDist: 0,
-  pinchStartZoom: 1
-};
+// ---------- TOOL: CRACK RULER ----------
+// Ukur lebar, panjang, atau kedua-duanya. "Kedua-dua" bermakna dua foto,
+// setiap satu dikalibrasi dengan rujukannya sendiri, kerana skala berubah
+// sepenuhnya antara gambar dekat dan gambar jauh.
+//
+// Rujukan berbentuk, bukan dua titik: kad = empat penjuru (menampung putaran
+// dan perspektif), syiling = bulatan, tersuai = garis.
 
-const CR_REFERENCES = [
-  { id: 'card', name: 'Credit card / ID card', size: 85.6, unit: 'mm wide' },
-  { id: 'coin', name: 'Malaysian 50 sen coin', size: 21.0, unit: 'mm diameter' },
-  { id: 'custom', name: 'Custom (specify length)', size: null, unit: '' }
+const CR_REFS = [
+  { id:'card',  name:'Credit card / ID', mm:85.6, shape:'quad',   hint:'85.6 mm along the long edge' },
+  { id:'coin',  name:'50 sen coin',      mm:21.0, shape:'circle', hint:'21.0 mm across' },
+  { id:'custom',name:'Custom length',    mm:null, shape:'line',   hint:'measure between two points you know' }
 ];
 
+let crPlan = null;          // 'width' | 'length' | 'both'
+let crQueue = [], crQi = 0;
+let crResults = {};
+let crCustomMm = 100;
+let crTask = null;          // { kind, refId, refMm, shape, img, handles, measPts, pxPerMm, aiPins }
+let crPhase = 'calib';      // 'calib' | 'measure'
+let crEntries = [];
+let crEditId = null;
+
+// Paparan kanvas
+let crv = { cv:null, ctx:null, zoom:1, panX:0, panY:0, base:1, w:0, h:0 };
+let crDrag = -1, crLoupe = null, crPointers = {}, crPanning = false, crPinch = null;
+
+function crHead(name, desc) {
+  document.getElementById('toolModalIcon').innerHTML =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 20 4"/><path d="M7 12.5 9.5 15M11 8.5 13.5 11M15 4.5 17.5 7"/></svg>';
+  document.getElementById('toolModalName').textContent = name;
+  document.getElementById('toolModalDesc').textContent = desc;
+}
+
+function crDist(a, b) { const dx = b.x - a.x, dy = b.y - a.y; return Math.sqrt(dx * dx + dy * dy); }
+
+function crFmt(mm) {
+  if (mm >= 1000) return (mm / 1000).toFixed(2) + ' m';
+  if (mm >= 10) return (mm / 10).toFixed(1) + ' cm';
+  return mm.toFixed(1) + ' mm';
+}
+
+function crClassify(mm) {
+  if (mm < 1) return { k:'g', label:'Fine crack',   text:'Under 1 mm. Typically cosmetic. Monitor at the next visit.' };
+  if (mm < 3) return { k:'f', label:'Medium crack', text:'1 to 3 mm. Filler or sealant repair recommended.' };
+  if (mm < 5) return { k:'f', label:'Wide crack',   text:'3 to 5 mm. Structural investigation required.' };
+  return { k:'c', label:'Very wide', text:'Over 5 mm. Urgent structural evaluation needed.' };
+}
+
+// ---------- 1. PEMILIH ----------
 function openCrackRuler() {
-  // Reset state
-  crState = {
-    measureMode: 'crack',
-    refType: 'card',
-    refLength: 85.6,
-    image: null,
-    imageDataUrl: null,
-    step: 'setup',
-    scalePoints: [],
-    measurePoints: [],
-    pixelsPerMm: null,
-    canvas: null,
-    ctx: null,
-    baseDisplayScale: 1,
-    zoom: 1,
-    panX: 0,
-    panY: 0,
-    touchStartTime: 0,
-    touchStartX: 0,
-    touchStartY: 0,
-    isPanning: false,
-    isPinching: false,
-    pinchStartDist: 0,
-    pinchStartZoom: 1
-  };
-  
-  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="21" y2="21"/><line x1="3" y1="6" x2="5" y2="6"/><line x1="3" y1="10" x2="7" y2="10"/><line x1="3" y1="14" x2="5" y2="14"/><line x1="3" y1="18" x2="7" y2="18"/></svg>';
-  document.getElementById('toolModalName').textContent = 'Crack Ruler';
-  document.getElementById('toolModalDesc').textContent = 'Measure cracks using a reference object';
-  
-  renderCrSetupUI();
+  crHead('Crack Ruler', 'Measure from a photo, or review saved measurements');
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="br-pick">' +
+      '<button class="br-pick-btn" id="crGoNew">' +
+        '<span class="br-pick-ico" style="background:var(--success-soft);color:var(--success)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 20 4"/><path d="M7 12.5 9.5 15M11 8.5 13.5 11M15 4.5 17.5 7"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>New measurement</b><span>Width, length, or both</span></span>' +
+      '</button>' +
+      '<button class="br-pick-btn" id="crGoHist">' +
+        '<span class="br-pick-ico" style="background:var(--surface);color:var(--fg-dim)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>Saved measurements</b><span>Cracks you have recorded</span></span>' +
+        '<span class="br-pick-n" id="crHistN">&middot;</span>' +
+      '</button>' +
+    '</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="crClose">Close</button>';
+  document.getElementById('crClose').addEventListener('click', closeTool);
+  document.getElementById('crGoNew').addEventListener('click', crScreenPlan);
+  document.getElementById('crGoHist').addEventListener('click', crOpenHistory);
+  crLoadEntries().then(function() {
+    const el = document.getElementById('crHistN');
+    if (el) el.textContent = crEntries.length;
+  });
   showToolModal();
 }
 
-function renderCrSetupUI() {
-  let optionsHtml = '';
-  CR_REFERENCES.forEach(function(ref) {
-    const selected = ref.id === crState.refType;
-    optionsHtml += '<button class="cr-ref-option ' + (selected ? 'selected' : '') + '" data-ref="' + ref.id + '">' +
-      '<div class="cr-ref-option-radio"></div>' +
-      '<div class="cr-ref-option-text">' +
-        '<div class="cr-ref-option-name">' + ref.name + '</div>' +
-        '<div class="cr-ref-option-size">' + (ref.size !== null ? ref.size + ' ' + ref.unit : 'enter custom length') + '</div>' +
-      '</div>' +
-    '</button>';
-  });
-  
-  // Mode selector options
-  const modes = [
-    { id: 'crack', name: 'Crack width', desc: 'Small measurements (mm), with crack classification' },
-    { id: 'general', name: 'General length', desc: 'Any size — tiles, gaps, dimensions, joints' }
+// ---------- 2. APA NAK DIUKUR ----------
+function crScreenPlan() {
+  crHead('Crack Ruler', 'What do you want to measure?');
+  const opts = [
+    { id:'width',  n:'1 photo',  t:'Crack width',  d:'How wide the crack opens. Gives the severity class.',
+      ico:'<path d="M7 4v16M17 4v16"/><path d="M7 12h10"/>' },
+    { id:'length', n:'1 photo',  t:'Crack length', d:'How far it runs, tapped along the crack rather than end to end.',
+      ico:'<path d="M4 20 20 4"/><path d="M4 20l3-1M20 4l-1 3"/>' },
+    { id:'both',   n:'2 photos', t:'Both',         d:'A close-up for width and a wider shot for length, each with its own reference.',
+      ico:'<rect x="3" y="4" width="8" height="7" rx="1.5"/><rect x="13" y="13" width="8" height="7" rx="1.5"/><path d="M11 7.5h2M11 16.5h2"/>' }
   ];
-  let modesHtml = '';
-  modes.forEach(function(m) {
-    const selected = m.id === crState.measureMode;
-    modesHtml += '<button class="cr-ref-option ' + (selected ? 'selected' : '') + '" data-mode="' + m.id + '">' +
-      '<div class="cr-ref-option-radio"></div>' +
-      '<div class="cr-ref-option-text">' +
-        '<div class="cr-ref-option-name">' + m.name + '</div>' +
-        '<div class="cr-ref-option-size">' + m.desc + '</div>' +
-      '</div>' +
+  let html = '<div class="cr2-step">Step 1 &middot; what to measure</div>';
+  opts.forEach(function(o) {
+    html += '<button class="cr2-opt ' + (crPlan === o.id ? 'sel' : '') + '" data-plan="' + o.id + '">' +
+      '<span class="cr2-opt-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + o.ico + '</svg></span>' +
+      '<span class="cr2-opt-t"><b>' + o.t + '</b><span>' + o.d + '</span></span>' +
+      '<span class="cr2-opt-n">' + o.n + '</span></button>';
+  });
+  document.getElementById('toolModalBody').innerHTML = html;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="crPlanBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="crPlanNext"' + (crPlan ? '' : ' disabled') + '>Continue</button>';
+  document.getElementById('toolModalBody').querySelectorAll('[data-plan]').forEach(function(b) {
+    b.addEventListener('click', function() { crPlan = b.dataset.plan; crScreenPlan(); });
+  });
+  document.getElementById('crPlanBack').addEventListener('click', openCrackRuler);
+  document.getElementById('crPlanNext').addEventListener('click', function() {
+    crQueue = crPlan === 'both' ? ['width', 'length'] : [crPlan];
+    crQi = 0; crResults = {}; crStartTask();
+  });
+}
+
+// ---------- 3. RUJUKAN + FOTO ----------
+function crStartTask() {
+  crTask = { kind: crQueue[crQi], refId:'card', refMm:85.6, shape:'quad',
+             img:null, dataUrl:null, handles:[], measPts:[], pxPerMm:null, aiPins:false };
+  crScreenRef();
+}
+
+function crScreenRef() {
+  const k = crTask.kind;
+  crHead(k === 'width' ? 'Crack width' : 'Crack length',
+         crQueue.length > 1 ? ('Photo ' + (crQi + 1) + ' of ' + crQueue.length) : 'Reference and photo');
+
+  let html = '<div class="cr2-step">Step 2 &middot; reference object</div>';
+  CR_REFS.forEach(function(r) {
+    const ico = r.shape === 'circle' ? '<circle cx="12" cy="12" r="8"/>'
+              : r.shape === 'quad'   ? '<rect x="3" y="6" width="18" height="12" rx="2"/>'
+                                     : '<path d="M4 12h16"/><path d="M4 9v6M20 9v6"/>';
+    html += '<button class="cr2-opt ' + (crTask.refId === r.id ? 'sel' : '') + '" data-ref="' + r.id + '">' +
+      '<span class="cr2-opt-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + ico + '</svg></span>' +
+      '<span class="cr2-opt-t"><b>' + r.name + '</b><span>' + r.hint + '</span></span></button>';
+  });
+  if (crTask.refId === 'custom') {
+    html += '<div class="cr2-mmin"><input type="number" id="crCustomMm" min="1" step="0.1" value="' + crCustomMm + '"><span>mm</span></div>';
+  }
+  html += '<div class="cr2-step" style="margin-top:6px">Photo</div>' +
+    '<div id="crShotSlot"></div>' +
+    '<input type="file" id="crFile" accept="image/*" capture="environment" style="display:none">';
+
+  document.getElementById('toolModalBody').innerHTML = html;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="crRefBack">Back</button>';
+
+  document.getElementById('toolModalBody').querySelectorAll('[data-ref]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      const r = CR_REFS.filter(function(x) { return x.id === b.dataset.ref; })[0];
+      crTask.refId = r.id; crTask.shape = r.shape;
+      crTask.refMm = r.mm !== null ? r.mm : crCustomMm;
+      crScreenRef();
+    });
+  });
+  const cm = document.getElementById('crCustomMm');
+  if (cm) cm.addEventListener('input', function() {
+    crCustomMm = parseFloat(cm.value) || 100;
+    crTask.refMm = crCustomMm;
+  });
+  document.getElementById('crRefBack').addEventListener('click', function() {
+    if (crQi > 0) { crQi--; crStartTask(); } else crScreenPlan();
+  });
+  document.getElementById('crFile').addEventListener('change', crPickPhoto);
+  crRenderShot();
+}
+
+function crRenderShot() {
+  const slot = document.getElementById('crShotSlot');
+  if (!slot) return;
+  slot.innerHTML =
+    '<button class="br-drop" id="crShotBtn" type="button">' +
+      '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+      '<div>Take or choose a photo</div>' +
+      '<small>' + (crTask.kind === 'width'
+        ? 'Close up, with the reference beside the crack'
+        : 'Step back so the whole crack and the reference are in frame') + '</small>' +
     '</button>';
+  document.getElementById('crShotBtn').addEventListener('click', function() {
+    document.getElementById('crFile').click();
   });
-  
-  document.getElementById('toolModalBody').innerHTML =
-    '<div class="cr-step-indicator">' +
-      '<div class="cr-step-num">1</div>' +
-      '<div class="cr-step-text">Pick measurement type, reference &amp; upload photo</div>' +
-    '</div>' +
-    '<div class="tool-field">' +
-      '<label class="tool-label">Measurement Type</label>' +
-      '<div class="cr-ref-options" id="crModeOptions">' + modesHtml + '</div>' +
-    '</div>' +
-    '<div class="tool-field">' +
-      '<label class="tool-label">Reference Object</label>' +
-      '<div class="cr-ref-options" id="crRefOptions">' + optionsHtml + '</div>' +
-      '<div class="cr-custom-input ' + (crState.refType === 'custom' ? 'show' : '') + '" id="crCustomInput">' +
-        '<input type="number" id="crCustomLength" placeholder="100" step="0.1" min="1" value="' + (crState.refType === 'custom' ? crState.refLength : '') + '">' +
-        '<span>mm</span>' +
-      '</div>' +
-    '</div>' +
-    '<div class="tool-field">' +
-      '<label class="tool-label">Photo</label>' +
-      '<div class="cr-upload-area" id="crUploadArea">' +
-        '<div class="cr-upload-icon">' +
-          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
-        '</div>' +
-        '<div class="cr-upload-text">Tap to take photo or upload</div>' +
-        '<div class="cr-upload-hint">Include the reference object in frame</div>' +
-        '<input type="file" id="crFileInput" accept="image/*" capture="environment" style="display:none">' +
-      '</div>' +
-    '</div>';
-  
-  document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-primary" id="crCloseBtn">Close</button>';
-  document.getElementById('crCloseBtn').addEventListener('click', closeTool);
-  
-  // Wire mode options
-  document.querySelectorAll('#crModeOptions .cr-ref-option').forEach(function(opt) {
-    opt.addEventListener('click', function() {
-      document.querySelectorAll('#crModeOptions .cr-ref-option').forEach(function(o) { o.classList.remove('selected'); });
-      opt.classList.add('selected');
-      crState.measureMode = opt.dataset.mode;
-    });
-  });
-  
-  // Wire reference options
-  document.querySelectorAll('#crRefOptions .cr-ref-option').forEach(function(opt) {
-    opt.addEventListener('click', function() {
-      document.querySelectorAll('#crRefOptions .cr-ref-option').forEach(function(o) { o.classList.remove('selected'); });
-      opt.classList.add('selected');
-      crState.refType = opt.dataset.ref;
-      
-      const customInput = document.getElementById('crCustomInput');
-      if (crState.refType === 'custom') {
-        customInput.classList.add('show');
-      } else {
-        customInput.classList.remove('show');
-        const ref = CR_REFERENCES.find(function(r) { return r.id === crState.refType; });
-        crState.refLength = ref.size;
-      }
-    });
-  });
-  
-  // Wire upload
-  const uploadArea = document.getElementById('crUploadArea');
-  const fileInput = document.getElementById('crFileInput');
-  
-  uploadArea.addEventListener('click', function() { fileInput.click(); });
-  
-  fileInput.addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    // Validate custom length if needed
-    if (crState.refType === 'custom') {
-      const val = parseFloat(document.getElementById('crCustomLength').value);
-      if (!val || val <= 0) {
-        showToast('Please enter custom length first', 'error');
-        return;
-      }
-      crState.refLength = val;
-    }
-    
-    // Load image
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      const img = new Image();
-      img.onload = function() {
-        crState.image = img;
-        crState.imageDataUrl = ev.target.result;
-        crState.step = 'scale';
-        crState.scalePoints = [];
-        crState.zoom = 1;
-        crState.panX = 0;
-        crState.panY = 0;
-        renderCrMeasureUI();
-      };
-      img.onerror = function() {
-        showToast('Failed to load image', 'error');
-      };
-      img.src = ev.target.result;
+}
+
+async function crPickPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const slot = document.getElementById('crShotSlot');
+  slot.innerHTML = '<div class="br-load">Processing photo...</div>';
+  try {
+    const url = await resizeImage(file, 1400);
+    const img = new Image();
+    img.onload = function() {
+      crTask.img = img; crTask.dataUrl = url;
+      crScreenCanvas('calib');
     };
-    reader.readAsDataURL(file);
-  });
+    img.onerror = function() { crRenderShot(); showToast('Could not read that photo', 'error'); };
+    img.src = url;
+  } catch (err) {
+    console.warn('[CrackRuler photo]', err.message);
+    crRenderShot();
+    showToast('Could not read that photo', 'error');
+  }
+  e.target.value = '';
 }
 
-function renderCrMeasureUI() {
-  const isScale = crState.step === 'scale';
-  const refLabel = isScale ? 'Tap the two edges of the reference object' : 
-    (crState.measureMode === 'crack' ? 'Tap the two edges of the crack (width)' : 'Tap the start and end of the measurement');
-  const stepNum = isScale ? 1 : 2;
-  const pointsArr = isScale ? crState.scalePoints : crState.measurePoints;
-  
-  let scaleInfoHtml = '';
-  if (!isScale && crState.pixelsPerMm) {
-    scaleInfoHtml = '<div class="cr-scale-info">' +
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-      '<div class="cr-scale-info-text">Scale set</div>' +
-      '<div class="cr-scale-info-value">' + (1/crState.pixelsPerMm).toFixed(3) + ' mm/px</div>' +
-    '</div>';
+// ---------- 4. KANVAS ----------
+function crDefaultHandles() {
+  const W = crTask.img.width, H = crTask.img.height;
+  const cx = W / 2, cy = H / 2;
+  if (crTask.shape === 'quad') {
+    // Nisbah kad sebenar 85.6 x 53.98 mm
+    const w = W * 0.42, h = w * (53.98 / 85.6);
+    return [{x:cx-w/2,y:cy-h/2},{x:cx+w/2,y:cy-h/2},{x:cx+w/2,y:cy+h/2},{x:cx-w/2,y:cy+h/2}];
   }
-  
-  // Reset zoom when entering measure step (fresh view)
-  crState.zoom = 1;
-  crState.panX = 0;
-  crState.panY = 0;
-  
+  if (crTask.shape === 'circle') {
+    const r = Math.min(W, H) * 0.16;
+    return [{x:cx,y:cy},{x:cx+r,y:cy}];
+  }
+  const w = W * 0.35;
+  return [{x:cx-w/2,y:cy},{x:cx+w/2,y:cy}];
+}
+
+function crRecalcScale() {
+  const h = crTask.handles;
+  if (crTask.shape === 'quad') {
+    if (h.length < 4) { crTask.pxPerMm = null; return; }
+    // Purata dua tepi panjang, supaya perspektif ringan tidak memihak satu sisi
+    const a = crDist(h[0], h[1]), b = crDist(h[3], h[2]);
+    crTask.pxPerMm = ((a + b) / 2) / crTask.refMm;
+  } else if (crTask.shape === 'circle') {
+    if (h.length < 2) { crTask.pxPerMm = null; return; }
+    crTask.pxPerMm = (crDist(h[0], h[1]) * 2) / crTask.refMm;
+  } else {
+    if (h.length < 2) { crTask.pxPerMm = null; return; }
+    crTask.pxPerMm = crDist(h[0], h[1]) / crTask.refMm;
+  }
+}
+
+function crScreenCanvas(phase) {
+  crPhase = phase;
+  const k = crTask.kind;
+  crHead(phase === 'calib' ? 'Calibrate' : (k === 'width' ? 'Measure width' : 'Measure length'),
+         phase === 'calib'
+           ? (crTask.shape === 'quad' ? 'Fit the box to the card' :
+              crTask.shape === 'circle' ? 'Fit the circle to the coin' : 'Set the two known points')
+           : (k === 'width' ? 'Tap straight across the crack' : 'Tap along the crack, then Done'));
+
+  if (phase === 'calib' && !crTask.handles.length) crTask.handles = crDefaultHandles();
+
   document.getElementById('toolModalBody').innerHTML =
-    scaleInfoHtml +
-    '<div class="cr-step-indicator">' +
-      '<div class="cr-step-num">' + stepNum + '</div>' +
-      '<div class="cr-step-text">' + refLabel + '</div>' +
-      '<div class="cr-step-counter" id="crPointCounter">' + pointsArr.length + '/2</div>' +
+    '<div class="cr2-step">Step ' + (phase === 'calib' ? 3 : 4) + ' &middot; ' + (phase === 'calib' ? 'calibrate' : 'measure') + '</div>' +
+    '<div class="cr2-wrap" id="crWrap"><canvas id="crCv"></canvas>' +
+      '<div class="cr2-badge" id="crBadge"></div>' +
+      (phase === 'calib' ? '<button class="cr2-ai" id="crAiBtn">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.9 4.8L19 9.5l-4.4 3 .9 5.3-3.5-2.6L8.5 18l.9-5.3-4.4-3 5.1-1.7z"/></svg>Detect</button>' : '') +
     '</div>' +
-    '<div style="font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:0.04em;margin-bottom:6px;text-align:center">' +
-      '💡 Pinch to zoom · drag to pan' +
-    '</div>' +
-    '<div class="cr-canvas-wrap" id="crCanvasWrap">' +
-      '<canvas id="crCanvas"></canvas>' +
-      '<div class="cr-zoom-badge" id="crZoomBadge">1.0×</div>' +
-    '</div>' +
-    '<div class="cr-actions-row">' +
-      '<button class="cr-action-btn" id="crZoomResetBtn">Reset zoom</button>' +
-      '<button class="cr-action-btn" id="crUndoBtn">Undo last</button>' +
-      '<button class="cr-action-btn" id="crResetBtn">Restart</button>' +
-    '</div>';
-  
+    '<div class="cr2-hint" id="crHint"></div>' +
+    (phase === 'calib' ? '<div id="crFlag"></div>' : '');
+
+  const cv = document.getElementById('crCv');
+  crv.cv = cv; crv.ctx = cv.getContext('2d');
+  crv.w = 700;
+  crv.h = Math.round(crv.w * crTask.img.height / crTask.img.width);
+  cv.width = crv.w; cv.height = crv.h;
+  crv.base = crv.w / crTask.img.width;
+  crv.zoom = 1; crv.panX = 0; crv.panY = 0;
+  crDrag = -1; crLoupe = null; crPointers = {}; crPanning = false; crPinch = null;
+
+  cv.addEventListener('pointerdown', crDown);
+  cv.addEventListener('pointermove', crMove);
+  cv.addEventListener('pointerup', crUp);
+  cv.addEventListener('pointercancel', crUp);
+
+  const ai = document.getElementById('crAiBtn');
+  if (ai) ai.addEventListener('click', crAiDetect);
+
+  crRecalcScale();
+  crDraw();
+  crFoot();
+}
+
+function crFoot() {
+  const pts = crPhase === 'calib' ? crTask.handles : crTask.measPts;
+  const ready = crPhase === 'calib' ? !!crTask.pxPerMm : pts.length >= 2;
   document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-secondary" id="crBackBtn">Back</button>' +
-    '<button class="tool-btn tool-btn-primary" id="crCloseBtn">Done</button>';
-  
-  document.getElementById('crCloseBtn').addEventListener('click', closeTool);
-  document.getElementById('crBackBtn').addEventListener('click', function() {
-    crState.step = 'setup';
-    renderCrSetupUI();
+    '<button class="tool-btn tool-btn-secondary" id="crCvBack">Back</button>' +
+    (crPhase === 'measure' && pts.length
+      ? '<button class="tool-btn tool-btn-secondary" id="crUndo">Undo</button>' : '') +
+    '<button class="tool-btn tool-btn-primary" id="crGo"' + (ready ? '' : ' disabled') + '>' +
+      (crPhase === 'calib' ? 'Next' : 'Done') + '</button>';
+  document.getElementById('crCvBack').addEventListener('click', function() {
+    if (crPhase === 'measure') { crTask.measPts = []; crScreenCanvas('calib'); }
+    else crScreenRef();
   });
-  document.getElementById('crZoomResetBtn').addEventListener('click', function() {
-    crState.zoom = 1;
-    crState.panX = 0;
-    crState.panY = 0;
-    drawCrCanvas();
-    document.getElementById('crZoomBadge').textContent = '1.0×';
+  const u = document.getElementById('crUndo');
+  if (u) u.addEventListener('click', function() { crTask.measPts.pop(); crDraw(); crFoot(); });
+  document.getElementById('crGo').addEventListener('click', function() {
+    if (crPhase === 'calib') crScreenCanvas('measure');
+    else crFinishMeasure();
   });
-  document.getElementById('crUndoBtn').addEventListener('click', function() {
-    const pts = isScale ? crState.scalePoints : crState.measurePoints;
-    if (pts.length > 0) {
-      pts.pop();
-      drawCrCanvas();
-      document.getElementById('crPointCounter').textContent = pts.length + '/2';
+}
+
+// koordinat imej <-> paparan kanvas
+function crI2D(p) {
+  const s = crv.base * crv.zoom;
+  return { x: p.x * s + crv.panX, y: p.y * s + crv.panY };
+}
+function crD2I(p) {
+  const s = crv.base * crv.zoom;
+  return { x: (p.x - crv.panX) / s, y: (p.y - crv.panY) / s };
+}
+function crEvtCanvas(e) {
+  const r = crv.cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * (crv.cv.width / r.width),
+           y: (e.clientY - r.top) * (crv.cv.height / r.height) };
+}
+
+function crDown(e) {
+  crv.cv.setPointerCapture(e.pointerId);
+  crPointers[e.pointerId] = crEvtCanvas(e);
+  const ids = Object.keys(crPointers);
+  if (ids.length === 2) {
+    const a = crPointers[ids[0]], b = crPointers[ids[1]];
+    crPinch = { d: crDist(a, b), zoom: crv.zoom,
+                mid: { x:(a.x+b.x)/2, y:(a.y+b.y)/2 },
+                panX: crv.panX, panY: crv.panY };
+    crDrag = -1; crPanning = false; crLoupe = null; crDraw();
+    return;
+  }
+  const d = crEvtCanvas(e);
+  const img = crD2I(d);
+  const pts = crPhase === 'calib' ? crTask.handles : crTask.measPts;
+  const tolD = 26;   // toleransi dalam piksel kanvas
+  let hit = -1, best = tolD;
+  pts.forEach(function(q, i) {
+    const dd = crDist(crI2D(q), d);
+    if (dd < best) { best = dd; hit = i; }
+  });
+  if (hit >= 0) { crDrag = hit; crLoupe = img; crDraw(); return; }
+
+  if (crPhase === 'measure') {
+    const max = crTask.kind === 'width' ? 2 : 99;
+    if (crTask.measPts.length < max) {
+      crTask.measPts.push(img);
+      crDrag = crTask.measPts.length - 1;
+      crLoupe = img;
+      crDraw(); crFoot();
+      return;
     }
-  });
-  document.getElementById('crResetBtn').addEventListener('click', function() {
-    crState.scalePoints = [];
-    crState.measurePoints = [];
-    crState.pixelsPerMm = null;
-    crState.zoom = 1;
-    crState.panX = 0;
-    crState.panY = 0;
-    crState.step = 'scale';
-    renderCrMeasureUI();
-  });
-  
-  // Setup canvas
-  setupCrCanvas();
-}
-
-function setupCrCanvas() {
-  const canvas = document.getElementById('crCanvas');
-  if (!canvas || !crState.image) return;
-  
-  const wrap = canvas.parentElement;
-  const wrapWidth = wrap.clientWidth;
-  
-  const img = crState.image;
-  const aspectRatio = img.height / img.width;
-  
-  // Canvas internal resolution = display resolution (for sharp rendering, we'll handle zoom in drawing)
-  // Setting canvas pixel size = display size, draw image scaled
-  const displayHeight = wrapWidth * aspectRatio;
-  
-  // High DPI support
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = wrapWidth * dpr;
-  canvas.height = displayHeight * dpr;
-  canvas.style.width = wrapWidth + 'px';
-  canvas.style.height = displayHeight + 'px';
-  
-  crState.canvas = canvas;
-  crState.ctx = canvas.getContext('2d');
-  crState.ctx.scale(dpr, dpr);
-  
-  // Base scale: display pixels per image pixel (at zoom 1)
-  crState.baseDisplayScale = wrapWidth / img.width;
-  crState.displayWidth = wrapWidth;
-  crState.displayHeight = displayHeight;
-  crState.dpr = dpr;
-  
-  drawCrCanvas();
-  
-  // Touch event handlers
-  canvas.addEventListener('touchstart', handleCrTouchStart, { passive: false });
-  canvas.addEventListener('touchmove', handleCrTouchMove, { passive: false });
-  canvas.addEventListener('touchend', handleCrTouchEnd, { passive: false });
-  
-  // Mouse handlers (desktop / fallback)
-  canvas.addEventListener('mousedown', handleCrMouseDown);
-  canvas.addEventListener('mousemove', handleCrMouseMove);
-  canvas.addEventListener('mouseup', handleCrMouseUp);
-  canvas.addEventListener('wheel', handleCrWheel, { passive: false });
-}
-
-// ========== Coordinate transforms ==========
-// Display = how pixels appear on screen
-// Image = original image pixel coords (used for scale calculations)
-// Transform: image_x → display_x: (image_x * baseDisplayScale * zoom) + panX
-// Reverse: display_x → image_x: (display_x - panX) / (baseDisplayScale * zoom)
-
-function imageToDisplay(imgPt) {
-  const s = crState.baseDisplayScale * crState.zoom;
-  return {
-    x: imgPt.x * s + crState.panX,
-    y: imgPt.y * s + crState.panY
-  };
-}
-
-function displayToImage(dispPt) {
-  const s = crState.baseDisplayScale * crState.zoom;
-  return {
-    x: (dispPt.x - crState.panX) / s,
-    y: (dispPt.y - crState.panY) / s
-  };
-}
-
-// Constrain pan so we don't drag image completely off-screen
-function clampPan() {
-  const s = crState.baseDisplayScale * crState.zoom;
-  const imgDisplayW = crState.image.width * s;
-  const imgDisplayH = crState.image.height * s;
-  const wrapW = crState.displayWidth;
-  const wrapH = crState.displayHeight;
-  
-  // If zoomed out smaller than wrap, center
-  if (imgDisplayW <= wrapW) {
-    crState.panX = (wrapW - imgDisplayW) / 2;
-  } else {
-    crState.panX = Math.min(0, Math.max(wrapW - imgDisplayW, crState.panX));
   }
-  if (imgDisplayH <= wrapH) {
-    crState.panY = (wrapH - imgDisplayH) / 2;
-  } else {
-    crState.panY = Math.min(0, Math.max(wrapH - imgDisplayH, crState.panY));
+  crPanning = true;
+  crPointers.__start = { x: d.x, y: d.y, panX: crv.panX, panY: crv.panY };
+}
+
+function crMove(e) {
+  if (!crPointers[e.pointerId] && !crPinch) return;
+  crPointers[e.pointerId] = crEvtCanvas(e);
+
+  if (crPinch) {
+    const ids = Object.keys(crPointers).filter(function(k) { return k !== '__start'; });
+    if (ids.length >= 2) {
+      const a = crPointers[ids[0]], b = crPointers[ids[1]];
+      const nd = crDist(a, b);
+      const z = Math.max(1, Math.min(8, crPinch.zoom * (nd / crPinch.d)));
+      const m = crPinch.mid;
+      const k = z / crPinch.zoom;
+      crv.zoom = z;
+      crv.panX = m.x - (m.x - crPinch.panX) * k;
+      crv.panY = m.y - (m.y - crPinch.panY) * k;
+      crClampPan(); crDraw();
+    }
+    return;
+  }
+  const d = crEvtCanvas(e);
+  if (crDrag >= 0) {
+    const pts = crPhase === 'calib' ? crTask.handles : crTask.measPts;
+    pts[crDrag] = crD2I(d);
+    crLoupe = pts[crDrag];
+    if (crPhase === 'calib') crRecalcScale();
+    crDraw();
+    return;
+  }
+  if (crPanning && crPointers.__start) {
+    crv.panX = crPointers.__start.panX + (d.x - crPointers.__start.x);
+    crv.panY = crPointers.__start.panY + (d.y - crPointers.__start.y);
+    crClampPan(); crDraw();
   }
 }
 
-// ========== Drawing ==========
-function drawCrCanvas() {
-  const ctx = crState.ctx;
-  if (!ctx || !crState.image) return;
-  
-  clampPan();
-  
-  // Clear
-  ctx.clearRect(0, 0, crState.displayWidth, crState.displayHeight);
-  
-  // Background
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, crState.displayWidth, crState.displayHeight);
-  
-  // Draw image with zoom + pan
-  const s = crState.baseDisplayScale * crState.zoom;
-  ctx.drawImage(
-    crState.image,
-    crState.panX, crState.panY,
-    crState.image.width * s, crState.image.height * s
-  );
-  
-  // Draw scale points/line in display coords
-  if (crState.scalePoints.length > 0) {
-    drawPointsLine(ctx, crState.scalePoints, '#06b6d4', 'A', 'B', false);
-  }
-  
-  // Draw measure points/line
-  if (crState.measurePoints.length > 0) {
-    const showLength = (crState.pixelsPerMm !== null);
-    drawPointsLine(ctx, crState.measurePoints, '#ef4444', '1', '2', showLength);
-  }
-  
-  // Update zoom badge
-  const badge = document.getElementById('crZoomBadge');
-  if (badge) badge.textContent = crState.zoom.toFixed(1) + '×';
+function crUp(e) {
+  delete crPointers[e.pointerId];
+  const ids = Object.keys(crPointers).filter(function(k) { return k !== '__start'; });
+  if (ids.length < 2) crPinch = null;
+  if (crDrag >= 0) { crDrag = -1; crLoupe = null; crDraw(); crFoot(); }
+  if (crPanning && !ids.length) { crPanning = false; delete crPointers.__start; }
 }
 
-function drawPointsLine(ctx, imgPts, color, labelA, labelB, showLength) {
-  // Constant on-screen sizes (don't shrink/grow with zoom)
-  const RADIUS = 11;
-  const STROKE = 3;
-  const FONT_SIZE = 14;
-  
-  // Convert image pts to display pts
-  const dispPts = imgPts.map(imageToDisplay);
-  
-  ctx.save();
-  
-  // Draw line
-  if (dispPts.length === 2) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = STROKE;
-    ctx.lineCap = 'round';
+function crClampPan() {
+  const s = crv.base * crv.zoom;
+  const iw = crTask.img.width * s, ih = crTask.img.height * s;
+  crv.panX = iw <= crv.w ? (crv.w - iw) / 2 : Math.min(0, Math.max(crv.w - iw, crv.panX));
+  crv.panY = ih <= crv.h ? (crv.h - ih) / 2 : Math.min(0, Math.max(crv.h - ih, crv.panY));
+}
+
+function crDraw() {
+  const ctx = crv.ctx;
+  ctx.fillStyle = '#0b0f16';
+  ctx.fillRect(0, 0, crv.w, crv.h);
+  const s = crv.base * crv.zoom;
+  ctx.drawImage(crTask.img, crv.panX, crv.panY, crTask.img.width * s, crTask.img.height * s);
+
+  const calib = crPhase === 'calib';
+  const pts = calib ? crTask.handles : crTask.measPts;
+  const col = calib ? '#22d3ee' : '#ff5d73';
+  const D = pts.map(crI2D);
+
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.strokeStyle = col; ctx.lineWidth = 3;
+
+  if (calib && crTask.shape === 'quad' && D.length === 4) {
     ctx.beginPath();
-    ctx.moveTo(dispPts[0].x, dispPts[0].y);
-    ctx.lineTo(dispPts[1].x, dispPts[1].y);
+    ctx.moveTo(D[0].x, D[0].y);
+    for (let i = 1; i < 4; i++) ctx.lineTo(D[i].x, D[i].y);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(34,211,238,.12)'; ctx.fill();
+    ctx.stroke();
+    // tandakan dua tepi panjang, iaitu yang menentukan skala
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(D[0].x, D[0].y); ctx.lineTo(D[1].x, D[1].y);
+    ctx.moveTo(D[3].x, D[3].y); ctx.lineTo(D[2].x, D[2].y); ctx.stroke();
+  } else if (calib && crTask.shape === 'circle' && D.length === 2) {
+    const r = crDist(D[0], D[1]);
+    ctx.beginPath(); ctx.arc(D[0].x, D[0].y, r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(34,211,238,.12)'; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(D[0].x, D[0].y); ctx.lineTo(D[1].x, D[1].y); ctx.stroke();
+  } else if (D.length > 1) {
+    ctx.beginPath(); ctx.moveTo(D[0].x, D[0].y);
+    for (let i = 1; i < D.length; i++) ctx.lineTo(D[i].x, D[i].y);
     ctx.stroke();
   }
-  
-  // Draw dots
-  dispPts.forEach(function(p, idx) {
-    // White halo
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, RADIUS + STROKE, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Inner dot
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, RADIUS, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Label
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold ' + FONT_SIZE + 'px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(idx === 0 ? labelA : labelB, p.x, p.y);
+
+  D.forEach(function(p, i) {
+    const active = (i === crDrag);
+    ctx.beginPath(); ctx.arc(p.x, p.y, active ? 14 : 11, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,.94)'; ctx.fill();
+    ctx.lineWidth = active ? 5 : 4; ctx.strokeStyle = col; ctx.stroke();
+    if (crTask.aiPins && calib) {
+      ctx.setLineDash([4, 4]); ctx.lineWidth = 2; ctx.strokeStyle = '#fff';
+      ctx.beginPath(); ctx.arc(p.x, p.y, 19, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    }
+    if (!calib || crTask.shape === 'line') {
+      ctx.fillStyle = '#0b1220'; ctx.font = '700 15px ui-monospace,monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(i + 1), p.x, p.y + 1);
+    }
   });
-  
-  // Length pill on midpoint (use image distance for accurate calc)
-  if (showLength && dispPts.length === 2 && crState.pixelsPerMm) {
-    const dx = imgPts[1].x - imgPts[0].x;
-    const dy = imgPts[1].y - imgPts[0].y;
-    const pxDist = Math.sqrt(dx * dx + dy * dy);
-    const mm = pxDist / crState.pixelsPerMm;
-    
-    const text = formatMeasurement(mm, false);
-    ctx.font = 'bold 15px sans-serif';
-    const textW = ctx.measureText(text).width;
-    const padX = 10, padY = 6;
-    
-    const midX = (dispPts[0].x + dispPts[1].x) / 2;
-    const midY = (dispPts[0].y + dispPts[1].y) / 2;
-    
-    // Background pill
-    ctx.fillStyle = 'rgba(0,0,0,0.82)';
-    const pillX = midX - (textW/2) - padX;
-    const pillY = midY - 8 - padY - 15/2;
-    const pillW = textW + padX*2;
-    const pillH = 15 + padY*2;
-    const r = pillH/2;
-    ctx.beginPath();
-    ctx.moveTo(pillX + r, pillY);
-    ctx.arcTo(pillX + pillW, pillY, pillX + pillW, pillY + pillH, r);
-    ctx.arcTo(pillX + pillW, pillY + pillH, pillX, pillY + pillH, r);
-    ctx.arcTo(pillX, pillY + pillH, pillX, pillY, r);
-    ctx.arcTo(pillX, pillY, pillX + pillW, pillY, r);
-    ctx.closePath();
-    ctx.fill();
-    
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(text, midX, pillY + pillH/2);
-  }
-  
+
+  if (crLoupe) crDrawLoupe(crLoupe);
+  crUpdateHint();
+}
+
+// Jari menutup titik yang sedang diletakkan, jadi kawasan di bawahnya
+// dipaparkan besar di penjuru bertentangan.
+function crDrawLoupe(imgPt) {
+  const ctx = crv.ctx;
+  const R = Math.round(crv.w * 0.17), Z = 3.4;
+  const d = crI2D(imgPt);
+  const cx = (d.x < crv.w / 2) ? crv.w - R - 14 : R + 14;
+  const cy = R + 14;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.closePath();
+  ctx.fillStyle = '#0b0f16'; ctx.fill(); ctx.clip();
+  const srcR = R / (Z * crv.base * crv.zoom);
+  ctx.drawImage(crTask.img, imgPt.x - srcR, imgPt.y - srcR, srcR * 2, srcR * 2, cx - R, cy - R, R * 2, R * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(cx - 18, cy); ctx.lineTo(cx + 18, cy);
+  ctx.moveTo(cx, cy - 18); ctx.lineTo(cx, cy + 18); ctx.stroke();
   ctx.restore();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.92)'; ctx.stroke();
 }
 
-// Format a measurement based on mode
-function formatMeasurement(mm, longForm) {
-  if (crState.measureMode === 'crack') {
-    // Always mm with 1 decimal
-    return mm.toFixed(1) + ' mm';
-  }
-  // General mode — smart unit
-  if (mm < 10) return mm.toFixed(1) + ' mm';
-  if (mm < 1000) return (mm/10).toFixed(2) + ' cm';
-  return (mm/1000).toFixed(2) + ' m';
+function crPathMm(pts) {
+  if (!crTask.pxPerMm || pts.length < 2) return 0;
+  let t = 0;
+  for (let i = 1; i < pts.length; i++) t += crDist(pts[i - 1], pts[i]);
+  return t / crTask.pxPerMm;
 }
 
-// ========== Touch handlers ==========
-function getCanvasOffset(e) {
-  const rect = crState.canvas.getBoundingClientRect();
-  return { left: rect.left, top: rect.top };
-}
-
-function pinchDistance(t1, t2) {
-  const dx = t2.clientX - t1.clientX;
-  const dy = t2.clientY - t1.clientY;
-  return Math.sqrt(dx*dx + dy*dy);
-}
-
-function handleCrTouchStart(e) {
-  e.preventDefault();
-  if (e.touches.length === 2) {
-    crState.isPinching = true;
-    crState.isPanning = false;
-    crState.pinchStartDist = pinchDistance(e.touches[0], e.touches[1]);
-    crState.pinchStartZoom = crState.zoom;
-  } else if (e.touches.length === 1) {
-    crState.isPinching = false;
-    crState.touchStartTime = Date.now();
-    crState.touchStartX = e.touches[0].clientX;
-    crState.touchStartY = e.touches[0].clientY;
-    crState.panStartPanX = crState.panX;
-    crState.panStartPanY = crState.panY;
-    crState.isPanning = false; // becomes true if movement detected
-  }
-}
-
-function handleCrTouchMove(e) {
-  e.preventDefault();
-  if (crState.isPinching && e.touches.length === 2) {
-    const dist = pinchDistance(e.touches[0], e.touches[1]);
-    const newZoom = Math.max(1, Math.min(8, crState.pinchStartZoom * (dist / crState.pinchStartDist)));
-    
-    // Zoom around pinch center
-    const offset = getCanvasOffset();
-    const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - offset.left;
-    const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - offset.top;
-    
-    // Image coord at pinch center (before zoom)
-    const imgPt = displayToImage({ x: centerX, y: centerY });
-    
-    crState.zoom = newZoom;
-    
-    // After zoom, pan so imgPt is still at centerX/centerY
-    const s = crState.baseDisplayScale * crState.zoom;
-    crState.panX = centerX - imgPt.x * s;
-    crState.panY = centerY - imgPt.y * s;
-    
-    drawCrCanvas();
-  } else if (e.touches.length === 1 && crState.zoom > 1) {
-    // Only pan when zoomed
-    const dx = e.touches[0].clientX - crState.touchStartX;
-    const dy = e.touches[0].clientY - crState.touchStartY;
-    
-    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-      crState.isPanning = true;
-      crState.panX = crState.panStartPanX + dx;
-      crState.panY = crState.panStartPanY + dy;
-      drawCrCanvas();
-    }
-  }
-}
-
-function handleCrTouchEnd(e) {
-  e.preventDefault();
-  
-  if (crState.isPinching && e.touches.length < 2) {
-    crState.isPinching = false;
-    return;
-  }
-  
-  if (!crState.isPanning && !crState.isPinching && e.changedTouches.length === 1) {
-    // Brief tap — register as point
-    const touch = e.changedTouches[0];
-    const duration = Date.now() - crState.touchStartTime;
-    const dx = Math.abs(touch.clientX - crState.touchStartX);
-    const dy = Math.abs(touch.clientY - crState.touchStartY);
-    
-    if (duration < 500 && dx < 8 && dy < 8) {
-      const offset = getCanvasOffset();
-      const dispX = touch.clientX - offset.left;
-      const dispY = touch.clientY - offset.top;
-      registerCrPoint(dispX, dispY);
-    }
-  }
-  
-  crState.isPanning = false;
-}
-
-// ========== Mouse handlers (desktop) ==========
-function handleCrMouseDown(e) {
-  crState.touchStartTime = Date.now();
-  crState.touchStartX = e.clientX;
-  crState.touchStartY = e.clientY;
-  crState.panStartPanX = crState.panX;
-  crState.panStartPanY = crState.panY;
-  crState.isPanning = false;
-  crState.mouseDown = true;
-}
-
-function handleCrMouseMove(e) {
-  if (!crState.mouseDown || crState.zoom <= 1) return;
-  const dx = e.clientX - crState.touchStartX;
-  const dy = e.clientY - crState.touchStartY;
-  if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-    crState.isPanning = true;
-    crState.panX = crState.panStartPanX + dx;
-    crState.panY = crState.panStartPanY + dy;
-    drawCrCanvas();
-  }
-}
-
-function handleCrMouseUp(e) {
-  if (!crState.mouseDown) return;
-  crState.mouseDown = false;
-  
-  if (!crState.isPanning) {
-    const offset = getCanvasOffset();
-    const dispX = e.clientX - offset.left;
-    const dispY = e.clientY - offset.top;
-    registerCrPoint(dispX, dispY);
-  }
-  crState.isPanning = false;
-}
-
-function handleCrWheel(e) {
-  e.preventDefault();
-  const offset = getCanvasOffset();
-  const centerX = e.clientX - offset.left;
-  const centerY = e.clientY - offset.top;
-  
-  const delta = -e.deltaY * 0.002;
-  const factor = Math.exp(delta);
-  const newZoom = Math.max(1, Math.min(8, crState.zoom * factor));
-  
-  // Zoom around mouse position
-  const imgPt = displayToImage({ x: centerX, y: centerY });
-  crState.zoom = newZoom;
-  const s = crState.baseDisplayScale * crState.zoom;
-  crState.panX = centerX - imgPt.x * s;
-  crState.panY = centerY - imgPt.y * s;
-  
-  drawCrCanvas();
-}
-
-// Register a tap point — converts display coords to image coords
-function registerCrPoint(dispX, dispY) {
-  const imgPt = displayToImage({ x: dispX, y: dispY });
-  
-  // Validate within image bounds
-  if (imgPt.x < 0 || imgPt.x > crState.image.width || 
-      imgPt.y < 0 || imgPt.y > crState.image.height) {
-    return;
-  }
-  
-  const pts = crState.step === 'scale' ? crState.scalePoints : crState.measurePoints;
-  
-  if (pts.length >= 2) {
-    showToast('Tap "Undo" or "Restart" to change points');
-    return;
-  }
-  
-  pts.push(imgPt);
-  drawCrCanvas();
-  
-  const counter = document.getElementById('crPointCounter');
-  if (counter) counter.textContent = pts.length + '/2';
-  
-  if (pts.length === 2) {
-    if (crState.step === 'scale') {
-      const dx = pts[1].x - pts[0].x;
-      const dy = pts[1].y - pts[0].y;
-      const pxDist = Math.sqrt(dx * dx + dy * dy);
-      crState.pixelsPerMm = pxDist / crState.refLength;
-      
-      setTimeout(function() {
-        crState.step = 'measure';
-        renderCrMeasureUI();
-      }, 600);
-    } else {
-      setTimeout(function() {
-        renderCrResultUI();
-      }, 600);
-    }
-  }
-}
-
-function classifyCrack(mm) {
-  if (mm < 1) return { id: 'hairline', label: 'Fine crack', desc: 'Width less than 1mm — typically cosmetic, monitor only' };
-  if (mm < 3) return { id: 'minor', label: 'Medium crack', desc: 'Width 1mm to 3mm — filler/sealant repair recommended' };
-  if (mm < 5) return { id: 'moderate', label: 'Wide crack', desc: 'Width 3mm to 5mm — structural investigation required' };
-  return { id: 'severe', label: 'Very wide', desc: 'Width exceeds 5mm — urgent structural evaluation needed' };
-}
-
-function renderCrResultUI() {
-  const pts = crState.measurePoints;
-  const dx = pts[1].x - pts[0].x;
-  const dy = pts[1].y - pts[0].y;
-  const pxDist = Math.sqrt(dx * dx + dy * dy);
-  const mm = pxDist / crState.pixelsPerMm;
-  
-  const refName = CR_REFERENCES.find(function(r) { return r.id === crState.refType; }).name;
-  
-  let valueHtml, secondaryHtml, classificationHtml = '', descHtml = '';
-  
-  if (crState.measureMode === 'crack') {
-    // Crack mode — show mm + classification
-    const cls = classifyCrack(mm);
-    const inches = mm / 25.4;
-    
-    valueHtml = '<div class="cr-result-value">' + mm.toFixed(1) + '<em>mm</em></div>';
-    secondaryHtml = '<div class="cr-result-secondary">≈ ' + inches.toFixed(2) + ' inches · ' + (mm/10).toFixed(2) + ' cm</div>';
-    classificationHtml = '<div class="cr-result-classification ' + cls.id + '">' + cls.label + '</div>';
-    descHtml = '<div style="font-size:11.5px;color:var(--fg-dim);margin-top:8px;line-height:1.5">' + cls.desc + '</div>';
+function crUpdateHint() {
+  const badge = document.getElementById('crBadge');
+  const hint = document.getElementById('crHint');
+  if (!badge || !hint) return;
+  if (crPhase === 'calib') {
+    badge.textContent = 'REFERENCE';
+    hint.innerHTML = crTask.pxPerMm
+      ? 'Scale: <b>' + crTask.pxPerMm.toFixed(2) + ' px per mm</b> &middot; drag the handles to fit'
+      : 'Drag the handles onto the reference object.';
   } else {
-    // General mode — smart unit, no classification
-    let primaryText, primaryUnit, secondary;
-    if (mm < 10) {
-      primaryText = mm.toFixed(1);
-      primaryUnit = 'mm';
-      secondary = '≈ ' + (mm/25.4).toFixed(3) + ' inches';
-    } else if (mm < 1000) {
-      primaryText = (mm/10).toFixed(2);
-      primaryUnit = 'cm';
-      secondary = '≈ ' + (mm/25.4).toFixed(2) + ' inches · ' + mm.toFixed(0) + ' mm';
+    const mm = crPathMm(crTask.measPts);
+    const n = crTask.measPts.length;
+    if (crTask.kind === 'width') {
+      badge.textContent = 'WIDTH  ' + n + '/2';
+      hint.innerHTML = n < 2 ? 'Tap the two <b>edges of the crack</b>, straight across.'
+                             : 'Width: <b>' + mm.toFixed(2) + ' mm</b> &middot; drag a pin to fine-tune';
     } else {
-      primaryText = (mm/1000).toFixed(2);
-      primaryUnit = 'm';
-      secondary = '≈ ' + (mm/304.8).toFixed(2) + ' ft · ' + (mm/10).toFixed(1) + ' cm';
+      badge.textContent = 'LENGTH  ' + n + ' pts';
+      hint.innerHTML = n < 2 ? 'Tap <b>along the crack</b>. Add as many points as it bends.'
+                             : 'So far: <b>' + crFmt(mm) + '</b> over ' + n + ' points. Keep tapping, drag to adjust, or Done.';
     }
-    
-    valueHtml = '<div class="cr-result-value">' + primaryText + '<em>' + primaryUnit + '</em></div>';
-    secondaryHtml = '<div class="cr-result-secondary">' + secondary + '</div>';
   }
-  
-  document.getElementById('toolModalBody').innerHTML =
-    '<div class="cr-canvas-wrap" id="crCanvasWrap">' +
-      '<canvas id="crCanvas"></canvas>' +
-      '<div class="cr-zoom-badge" id="crZoomBadge">1.0×</div>' +
-    '</div>' +
-    '<div class="cr-result-card">' +
-      '<div class="cr-result-label">Measured ' + (crState.measureMode === 'crack' ? 'Width' : 'Length') + '</div>' +
-      valueHtml +
-      secondaryHtml +
-      classificationHtml +
-      descHtml +
-    '</div>' +
-    '<div style="font-size:10.5px;color:var(--muted);font-family:var(--font-mono);letter-spacing:0.04em;margin-top:8px;text-align:center">Ref: ' + refName + ' (' + crState.refLength + ' mm)</div>';
-  
-  document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-secondary" id="crMeasureAgainBtn">Measure another</button>' +
-    '<button class="tool-btn tool-btn-primary" id="crAskBtn">Ask Pocket</button>';
-  
-  document.getElementById('crMeasureAgainBtn').addEventListener('click', function() {
-    crState.measurePoints = [];
-    crState.zoom = 1;
-    crState.panX = 0;
-    crState.panY = 0;
-    crState.step = 'measure';
-    renderCrMeasureUI();
-  });
-  
-  document.getElementById('crAskBtn').addEventListener('click', function() {
-    closeTool();
-    switchTab('chat');
-    setTimeout(function() {
-      let prompt;
-      if (crState.measureMode === 'crack') {
-        const cls = classifyCrack(mm);
-        prompt = 'I measured a crack at ' + mm.toFixed(1) + 'mm wide using a ' + refName.toLowerCase() + ' as reference. Classification: ' + cls.label + '. Suggest the appropriate BARIS rating (Condition × Priority), likely causes, and write-up draft for my inspection report.';
-      } else {
-        let measureText = mm < 10 ? mm.toFixed(1) + 'mm' : (mm < 1000 ? (mm/10).toFixed(2) + 'cm' : (mm/1000).toFixed(2) + 'm');
-        prompt = 'I measured a defect/feature at ' + measureText + ' using a ' + refName.toLowerCase() + ' as reference. Help me describe this in my inspection notes and recommend any relevant standards or follow-up.';
-      }
-      document.getElementById('msgInput').value = prompt;
-      autoSize();
-      updateSendBtn();
-      document.getElementById('msgInput').focus();
-    }, 100);
-  });
-  
-  // Re-setup canvas
-  setupCrCanvas();
 }
 
-// ---------- SHARED: Sensor UI helpers ----------
+// ---------- AI kesan rujukan ----------
+async function crAiDetect() {
+  const btn = document.getElementById('crAiBtn');
+  const flag = document.getElementById('crFlag');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="cr2-sp"></span>Looking';
+
+  const r = CR_REFS.filter(function(x) { return x.id === crTask.refId; })[0];
+  const want = crTask.shape === 'quad'
+    ? 'Find the ' + r.name + '. Return its four corners in order: top-left, top-right, bottom-right, bottom-left, going around the card.\n\nReply ONLY with JSON: {"corners":[[x,y],[x,y],[x,y],[x,y]]}'
+    : crTask.shape === 'circle'
+      ? 'Find the coin. Return its centre and one point on its edge.\n\nReply ONLY with JSON: {"centre":[x,y],"edge":[x,y]}'
+      : 'Find the straight reference object and return its two end points.\n\nReply ONLY with JSON: {"ends":[[x,y],[x,y]]}';
+
+  const prompt = want + '\n\nCoordinates are normalised from 0 to 1000, where x is across the image width and y is down the image height. No other text.';
+
+  try {
+    const txt = await callGemini([{ role:'user', content: prompt, image: crTask.dataUrl, mode:'consultant', timestamp: new Date() }], false);
+    const m = txt.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('no coordinates returned');
+    const j = JSON.parse(m[0]);
+    const W = crTask.img.width, H = crTask.img.height;
+    const map = function(a) { return { x: (a[0] / 1000) * W, y: (a[1] / 1000) * H }; };
+
+    if (crTask.shape === 'quad' && j.corners && j.corners.length === 4) crTask.handles = j.corners.map(map);
+    else if (crTask.shape === 'circle' && j.centre && j.edge) crTask.handles = [map(j.centre), map(j.edge)];
+    else if (j.ends && j.ends.length === 2) crTask.handles = j.ends.map(map);
+    else throw new Error('unexpected shape');
+
+    crTask.aiPins = true;
+    crRecalcScale();
+    crDraw();
+    crFoot();
+    btn.innerHTML = 'Found';
+    if (flag) flag.innerHTML = '<div class="cr2-flag">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>' +
+      '<span><b>The AI placed these. Check them.</b> Drag each handle onto the exact corner before continuing. ' +
+      'A one percent error here is a one percent error in every measurement that follows, and nothing later will reveal it.</span></div>';
+  } catch (err) {
+    console.warn('[CrackRuler AI]', err.message);
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.9 4.8L19 9.5l-4.4 3 .9 5.3-3.5-2.6L8.5 18l.9-5.3-4.4-3 5.1-1.7z"/></svg>Detect';
+    showToast('Could not detect: ' + (err.message || 'error'), 'error');
+  }
+}
+
+// ---------- 5. KEPUTUSAN ----------
+function crFinishMeasure() {
+  const pts = crTask.measPts;
+  if (pts.length < 2) return;
+  const r = CR_REFS.filter(function(x) { return x.id === crTask.refId; })[0];
+  crResults[crTask.kind] = {
+    mm: crPathMm(pts),
+    pts: pts.length,
+    pxPerMm: crTask.pxPerMm,
+    ref: r.name,
+    refMm: crTask.refMm,
+    photo: crTask.dataUrl
+  };
+  if (crQi < crQueue.length - 1) { crQi++; crStartTask(); }
+  else crScreenResult();
+}
+
+function crResultHtml() {
+  let html = '';
+  if (crResults.width) {
+    const w = crResults.width, c = crClassify(w.mm);
+    html += '<div class="cr2-res ' + c.k + '">' +
+      (w.photo ? '<img class="cr2-res-img" src="' + w.photo + '" alt="">' : '') +
+      '<div class="cr2-res-top"><span class="cr2-res-n">' + w.mm.toFixed(2) + ' mm</span>' +
+      '<span class="cr2-res-t"><i>Crack width</i><b>' + c.label + '</b><span>' + c.text + '</span></span></div>' +
+      '<div class="cr2-res-b">' + w.ref + ' &middot; ' + w.refMm + ' mm &middot; ' + w.pxPerMm.toFixed(2) + ' px/mm</div></div>';
+  }
+  if (crResults.length) {
+    const l = crResults.length;
+    html += '<div class="cr2-res">' +
+      (l.photo ? '<img class="cr2-res-img" src="' + l.photo + '" alt="">' : '') +
+      '<div class="cr2-res-top"><span class="cr2-res-n">' + crFmt(l.mm) + '</span>' +
+      '<span class="cr2-res-t"><i>Crack length</i><b>Measured along the crack</b>' +
+      '<span>' + l.pts + ' points followed the crack path, so bends are counted.</span></span></div>' +
+      '<div class="cr2-res-b">' + l.ref + ' &middot; ' + l.refMm + ' mm &middot; ' + l.pxPerMm.toFixed(2) + ' px/mm</div></div>';
+  }
+  if (crResults.width && crResults.length) {
+    const c = crClassify(crResults.width.mm);
+    html += '<div class="cr2-sum"><b>Summary.</b> ' + c.label.toLowerCase() + ', ' +
+      crResults.width.mm.toFixed(2) + ' mm wide, running ' + crFmt(crResults.length.mm) + '. ' + c.text + '</div>';
+  }
+  return html;
+}
+
+function crScreenResult() {
+  crHead('Result', crQueue.length > 1 ? 'Width and length' : 'Measurement');
+  document.getElementById('toolModalBody').innerHTML = crResultHtml();
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="crAgain">Restart</button>' +
+    '<button class="tool-btn tool-btn-primary" id="crSaveBtn">Save</button>';
+  document.getElementById('crAgain').addEventListener('click', function() { crPlan = null; crScreenPlan(); });
+  document.getElementById('crSaveBtn').addEventListener('click', function() { crOpenForm(); });
+}
+
+// ---------- 6. BORANG ----------
+function crOpenForm(entry) {
+  crEditId = entry ? entry.id : null;
+  if (entry) crResults = entry.results || {};
+  crHead(crEditId ? 'Edit measurement' : 'Save measurement', 'The numbers are fixed; the details are yours');
+
+  document.getElementById('toolModalBody').innerHTML =
+    crResultHtml() +
+    '<div class="br-field" style="margin-top:16px"><label class="br-label" for="crTitle">Name <span class="req">*</span></label>' +
+      '<input type="text" class="br-input" id="crTitle" maxlength="90" placeholder="e.g. Diagonal crack to gable wall"></div>' +
+    '<div class="br-field"><label class="br-label" for="crElem">Element</label>' +
+      '<input type="text" class="br-input" id="crElem" maxlength="90" placeholder="e.g. Brick gable wall"></div>' +
+    '<div class="br-field"><label class="br-label" for="crLoc">Location</label>' +
+      '<input type="text" class="br-input" id="crLoc" maxlength="90" placeholder="e.g. Block C, east elevation"></div>' +
+    '<div class="br-field"><label class="br-label" for="crDesc">Description</label>' +
+      '<textarea class="br-area" id="crDesc" maxlength="1200" placeholder="What you observed and what it means for the report."></textarea></div>';
+
+  const set = function(id, v) { const el = document.getElementById(id); if (el) el.value = (v == null ? '' : v); };
+  if (entry) { set('crTitle', entry.title); set('crElem', entry.element); set('crLoc', entry.location); set('crDesc', entry.description); }
+
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="crFormBack">' + (crEditId ? 'Cancel' : 'Back') + '</button>' +
+    '<button class="tool-btn tool-btn-primary" id="crDoSave">Save</button>';
+  document.getElementById('crFormBack').addEventListener('click', function() {
+    if (crEditId) { const id = crEditId; crEditId = null; crOpenEntry(id); }
+    else crScreenResult();
+  });
+  document.getElementById('crDoSave').addEventListener('click', crSave);
+  setTimeout(function() { document.getElementById('crTitle').focus(); }, 80);
+}
+
+async function crSave() {
+  if (!currentUser) { showToast('Sign in to save', 'error'); return; }
+  const title = document.getElementById('crTitle').value.trim();
+  if (!title) {
+    showToast('Give it a name first', 'error');
+    document.getElementById('crTitle').focus();
+    return;
+  }
+  const btn = document.getElementById('crDoSave');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const clean = function(r) {
+    if (!r) return null;
+    return { mm: Math.round(r.mm * 100) / 100, pts: r.pts,
+             pxPerMm: Math.round(r.pxPerMm * 100) / 100,
+             ref: r.ref, refMm: r.refMm, photo: r.photo || null };
+  };
+  const data = {
+    title: title,
+    element: document.getElementById('crElem').value.trim(),
+    location: document.getElementById('crLoc').value.trim(),
+    description: document.getElementById('crDesc').value.trim(),
+    width: clean(crResults.width),
+    length: clean(crResults.length),
+    widthMm: crResults.width ? Math.round(crResults.width.mm * 100) / 100 : null,
+    lengthMm: crResults.length ? Math.round(crResults.length.mm * 100) / 100 : null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    const col = db.collection('pocketInspections').doc(currentUser.uid).collection('crackMeasurements');
+    if (crEditId) {
+      await col.doc(crEditId).update(data);
+      showToast('Changes saved');
+      const id = crEditId; crEditId = null; crEntries = [];
+      await crLoadEntries(); crOpenEntry(id);
+    } else {
+      data.inspectionId = (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null;
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await col.add(data);
+      showToast('Measurement saved');
+      crEntries = [];
+      crOpenHistory();
+    }
+  } catch (e) {
+    console.warn('[CrackRuler save]', e.message);
+    btn.disabled = false; btn.textContent = 'Save';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// ---------- 7. SEJARAH ----------
+async function crLoadEntries() {
+  if (!currentUser) { crEntries = []; return crEntries; }
+  if (crEntries.length) return crEntries;
+  try {
+    const snap = await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('crackMeasurements').orderBy('createdAt', 'desc').limit(60).get();
+    crEntries = [];
+    snap.forEach(function(doc) {
+      const d = doc.data();
+      crEntries.push({
+        id: doc.id,
+        title: d.title || 'Untitled',
+        element: d.element || '', location: d.location || '',
+        description: d.description || '',
+        results: { width: d.width || null, length: d.length || null },
+        widthMm: d.widthMm, lengthMm: d.lengthMm,
+        createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
+      });
+    });
+  } catch (e) {
+    console.warn('[CrackRuler load]', e.message);
+    crEntries = [];
+  }
+  return crEntries;
+}
+
+function crOpenHistory() {
+  crEditId = null;
+  crHead('Saved measurements', 'Cracks you have recorded');
+  document.getElementById('toolModalBody').innerHTML = '<div class="br-load">Loading...</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="crHistBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="crHistNew">New</button>';
+  document.getElementById('crHistBack').addEventListener('click', openCrackRuler);
+  document.getElementById('crHistNew').addEventListener('click', function() { crPlan = null; crScreenPlan(); });
+
+  crLoadEntries().then(function(list) {
+    const body = document.getElementById('toolModalBody');
+    if (!list.length) {
+      body.innerHTML = '<div class="br-empty" style="margin-top:0">Nothing saved yet. Measure a crack and tap <b>Save</b> to keep it here.</div>';
+      return;
+    }
+    let html = '';
+    list.forEach(function(en) {
+      const band = en.widthMm != null ? crClassify(en.widthMm).k : null;
+      const big = en.widthMm != null ? en.widthMm.toFixed(1) + 'mm' : crFmt(en.lengthMm || 0);
+      const bits = [];
+      if (en.widthMm != null && en.lengthMm != null) bits.push(crFmt(en.lengthMm) + ' long');
+      if (en.element) bits.push(en.element);
+      if (en.location) bits.push(en.location);
+      bits.push(formatRelativeTime(en.createdAt));
+      const thumb = (en.results.width && en.results.width.photo) || (en.results.length && en.results.length.photo);
+      html += '<button class="br-item ' + (band || '') + '" data-id="' + en.id + '">' +
+        '<span class="br-item-n" style="min-width:56px;width:auto;padding:0 7px;font-size:13px' +
+          (band ? '' : ';background:var(--surface-2);color:var(--fg-dim)') + '">' + big + '</span>' +
+        '<span class="br-item-t"><b>' + escapeHTML(en.title) + '</b>' +
+        '<span>' + escapeHTML(bits.join(' · ')) + '</span></span>' +
+        (thumb ? '<span class="br-item-th"><img src="' + thumb + '" alt=""></span>' : '') +
+      '</button>';
+    });
+    body.innerHTML = html;
+    body.querySelectorAll('.br-item').forEach(function(el) {
+      el.addEventListener('click', function() { crOpenEntry(el.dataset.id); });
+    });
+  });
+}
+
+function crOpenEntry(id) {
+  const en = crEntries.filter(function(x) { return x.id === id; })[0];
+  if (!en) { crOpenHistory(); return; }
+  crEditId = null;
+  crResults = en.results || {};
+  crHead(en.title, formatRelativeTime(en.createdAt));
+
+  let html = crResultHtml();
+  if (en.element || en.location) {
+    html += '<div class="br-res" style="margin-top:11px"><div class="br-res-body" style="border-top:0">' +
+      (en.element ? '<div class="br-res-row"><em>Element</em><span>' + escapeHTML(en.element) + '</span></div>' : '') +
+      (en.location ? '<div class="br-res-row"><em>Location</em><span>' + escapeHTML(en.location) + '</span></div>' : '') +
+    '</div></div>';
+  }
+  if (en.description) {
+    html += '<div class="ds-sec"><div class="ds-sec-h"><b>Description</b></div>' +
+      '<div class="ds-sec-b">' + escapeHTML(en.description) + '</div></div>';
+  }
+
+  document.getElementById('toolModalBody').innerHTML = html;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="crEntryBack">Back</button>' +
+    '<button class="tool-btn tool-btn-secondary" id="crEntryDel" style="color:var(--critical);flex:0 0 auto;padding:12px 16px">Delete</button>' +
+    '<button class="tool-btn tool-btn-primary" id="crEntryEdit">Edit</button>';
+  document.getElementById('crEntryBack').addEventListener('click', crOpenHistory);
+  document.getElementById('crEntryDel').addEventListener('click', function() { crDeleteEntry(en.id); });
+  document.getElementById('crEntryEdit').addEventListener('click', function() { crOpenForm(en); });
+}
+
+async function crDeleteEntry(id) {
+  if (!confirm('Delete this saved measurement?')) return;
+  try {
+    await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('crackMeasurements').doc(id).delete();
+    crEntries = crEntries.filter(function(x) { return x.id !== id; });
+    showToast('Deleted');
+    crOpenHistory();
+  } catch (e) {
+    console.warn('[CrackRuler delete]', e.message);
+    showToast('Could not delete', 'error');
+  }
+}
+
 function renderSensorPermission(toolName, desc, onGrant) {
   document.getElementById('toolModalBody').innerHTML =
     '<div class="sensor-tool-body">' +
