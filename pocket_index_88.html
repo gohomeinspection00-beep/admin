@@ -1611,31 +1611,133 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .pe-plan-date{font-size:11px;color:#6b7280}
 .pe-plan-del{background:none;border:none;font-size:16px}
 
-/* Voice Translator */
-.vt-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:#0f141a;color:#e5e7eb;font-family:var(--font-body)}
-.vt-top{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:#0a0d12}
-.vt-title{flex:1;font-size:15px;font-weight:700;text-align:center}
-.vt-top button{padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.12);color:#fff;font-size:13px;font-weight:700;border:1px solid rgba(255,255,255,0.18)}
-.vt-langs{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:#0a0d12}
-.vt-chip{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,0.08);color:#cbd5e1;font-size:13px;font-weight:600;border:1px solid transparent}
-.vt-chip.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.vt-convo{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
-.vt-empty{margin:auto;color:#6b7280;font-size:13px;text-align:center;line-height:1.5;max-width:280px}
-.vt-msg{max-width:82%;padding:10px 12px;border-radius:14px;font-size:14px;line-height:1.4}
-.vt-msg .vt-orig{opacity:0.65;font-size:12px;margin-bottom:3px}
-.vt-msg .vt-trans{font-weight:600}
-.vt-replay{margin-top:6px;font-size:11px;background:rgba(255,255,255,0.15);border:none;color:#fff;padding:3px 10px;border-radius:999px}
-.vt-worker{align-self:flex-start;background:#1e293b;border-bottom-left-radius:4px}
-.vt-me{align-self:flex-end;background:var(--accent);color:var(--accent-fg);border-bottom-right-radius:4px}
-.vt-me .vt-replay{background:rgba(0,0,0,0.18);color:var(--accent-fg)}
-.vt-status{padding:2px 14px;min-height:18px;font-size:12px;color:var(--accent);text-align:center}
-.vt-mics{display:flex;gap:10px;padding:12px 12px calc(env(safe-area-inset-bottom) + 14px);background:#0a0d12}
-.vt-mic{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px;border-radius:14px;border:2px solid transparent;font-size:12.5px;font-weight:600}
-.vt-mic-worker{background:#13202e;color:#7dd3fc;border-color:#1e3a5f}
-.vt-mic-me{background:#15201a;color:#86efac;border-color:#1f3d2b}
-.vt-mic.listening{animation:vt-pulse 1s infinite}
-.vt-mic-ic{display:flex;align-items:center;justify-content:center;line-height:0}
+/* Voice Translator — tema app (terang/gelap), bukan overlay hitam */
+.vt-scripts{font-family:'Noto Sans Bengali','Noto Sans Tamil','Noto Sans Devanagari','Noto Naskh Arabic','Noto Sans Myanmar','Noto Sans Thai',var(--font-body)}
+.vt-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:var(--font-body)}
+
+.vt-hd{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 12px) 14px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
+.vt-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--fg);flex:none}
+.vt-ic:active{background:var(--surface-2)}
+.vt-hd-t{flex:1;min-width:0}
+.vt-hd-t h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em}
+.vt-hd-t p{margin:1px 0 0;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-savebtn{padding:0 13px;height:34px;border-radius:10px;background:var(--accent);color:var(--accent-fg);font-size:13px;font-weight:600;flex:none}
+.vt-savebtn:disabled{background:var(--surface);color:var(--muted-2);cursor:default}
+
+.vt-pair{display:flex;align-items:stretch;gap:8px;padding:12px 14px 10px;background:var(--bg)}
+.vt-side{flex:1;min-width:0;text-align:left;padding:9px 12px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line)}
+.vt-side:active{background:var(--surface)}
+.vt-side .r{display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px}
+.vt-side.me{border-color:var(--accent-line)}
+.vt-side.me .r{color:var(--accent)}
+.vt-side.wk{border-color:var(--success)}
+.vt-side.wk .r{color:var(--success)}
+.vt-side .n{display:block;font-size:15px;font-weight:700;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-side .sub{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.vt-swap{width:38px;border-radius:12px;background:var(--surface);border:1px solid var(--line);color:var(--fg-dim);display:grid;place-items:center;flex:none;transition:transform 0.25s ease}
+.vt-swap:active{transform:rotate(180deg);color:var(--fg)}
+
+.vt-seg{display:flex;gap:4px;margin:0 14px 10px;padding:4px;background:var(--surface);border-radius:11px;border:1px solid var(--line)}
+.vt-seg button{flex:1;padding:8px 4px;border-radius:8px;color:var(--fg-dim);font-size:12.5px;font-weight:600}
+.vt-seg button.on{background:var(--bg);color:var(--fg);box-shadow:var(--shadow-1)}
+
+.vt-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 14px 12px}
+.vt-turns{display:flex;flex-direction:column;gap:12px}
+.vt-bub{max-width:88%;border-radius:14px;padding:11px 13px;border:1px solid var(--line);background:var(--bg-2);animation:vt-pop 0.22s ease both}
+@keyframes vt-pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.vt-bub.wk{align-self:flex-start;border-bottom-left-radius:4px;border-color:var(--success);background:var(--success-soft)}
+.vt-bub.me{align-self:flex-end;border-bottom-right-radius:4px;border-color:var(--accent-line);background:var(--accent-soft)}
+.vt-bub .who{font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;margin-bottom:6px}
+.vt-bub.wk .who{color:var(--success)}
+.vt-bub.me .who{color:var(--accent)}
+.vt-bub .src{font-size:12.5px;line-height:1.45;color:var(--fg-dim)}
+.vt-bub .hr{height:1px;background:var(--line-2);margin:8px 0;opacity:0.7}
+.vt-bub .out{font-size:16px;line-height:1.5;font-weight:600;color:var(--fg);word-break:break-word}
+.vt-bub .rom{font-size:11.5px;line-height:1.4;color:var(--muted);margin-top:4px;font-style:italic}
+.vt-bub .acts{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.vt-bub .acts button{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:8px;background:var(--bg);border:1px solid var(--line);color:var(--fg);font-size:11px;font-weight:600}
+.vt-bub .acts button:active{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.vt-bub .acts .big{border-color:var(--accent-line);color:var(--accent)}
+
+.vt-empty{margin:auto;text-align:center;padding:34px 10px;color:var(--muted)}
+.vt-empty svg{color:var(--line-2);margin-bottom:10px}
+.vt-empty h3{margin:0 0 6px;font-size:15px;color:var(--fg);font-weight:700}
+.vt-empty p{margin:0 auto;font-size:12.5px;line-height:1.55;max-width:250px}
+
+.vt-search{position:relative;margin-bottom:10px}
+.vt-search input{width:100%;padding:10px 12px 10px 34px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:13.5px}
+.vt-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.vt-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px}
+.vt-cats button{flex:0 0 auto;padding:6px 12px;border-radius:999px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg-dim);font-size:12px;font-weight:600}
+.vt-cats button.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.vt-note{display:flex;gap:8px;padding:9px 11px;border-radius:10px;background:var(--warning-soft);border:1px solid var(--warning);color:var(--warning);font-size:11.5px;line-height:1.45;margin-bottom:10px}
+.vt-note svg{flex:none;margin-top:1px}
+.vt-list{display:flex;flex-direction:column;gap:7px}
+.vt-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line);text-align:left;width:100%}
+.vt-row:active{border-color:var(--accent)}
+.vt-row .col{flex:1;min-width:0;display:flex;flex-direction:column}
+.vt-row .a{display:block;font-size:13.5px;font-weight:600;color:var(--fg);line-height:1.35}
+.vt-row .b{display:block;font-size:13px;color:var(--fg-dim);margin-top:3px;line-height:1.4}
+.vt-row .play{width:34px;height:34px;border-radius:10px;background:var(--surface);display:grid;place-items:center;color:var(--accent);flex:none}
+
+.vt-sv{display:flex;gap:11px;align-items:center;padding:12px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line);margin-bottom:8px}
+.vt-sv:active{border-color:var(--accent)}
+.vt-sv .dot{width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none;font-weight:700;font-size:12px}
+.vt-sv .col{flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;align-items:flex-start}
+.vt-sv .t{display:block;max-width:100%;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-sv .m{display:block;max-width:100%;font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-sv .del{background:none;color:var(--muted-2);line-height:0;padding:6px;flex:none}
+
+.vt-ft{padding:10px 14px calc(env(safe-area-inset-bottom) + 14px);background:var(--bg);border-top:1px solid var(--line)}
+.vt-status{min-height:16px;text-align:center;font-size:11.5px;color:var(--accent);margin-bottom:8px;line-height:1.35}
+.vt-typewrap{display:flex;gap:7px;margin-bottom:9px}
+.vt-typewrap input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:13.5px}
+.vt-typewrap button{width:42px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--fg-dim);display:grid;place-items:center}
+.vt-mics{display:flex;gap:9px}
+.vt-mic{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 6px;border-radius:14px;border:1.5px solid}
+.vt-mic .lab{display:block;font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;opacity:0.8}
+.vt-mic .nm{display:block;font-size:13.5px;font-weight:700}
+.vt-mic-wk{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.vt-mic-me{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.vt-mic.listening{animation:vt-pulse 1.1s ease-in-out infinite}
 @keyframes vt-pulse{0%,100%{opacity:1}50%{opacity:0.45}}
+
+.vt-sheet{position:fixed;inset:0;z-index:3300;display:none}
+.vt-sheet.on{display:block}
+.vt-sheet .scrim{position:absolute;inset:0;background:var(--overlay)}
+.vt-sheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:86%;display:flex;flex-direction:column;background:var(--bg);border-radius:18px 18px 0 0;border-top:1px solid var(--line);animation:vt-up 0.25s ease both}
+@keyframes vt-up{from{transform:translateY(16px);opacity:0.5}to{transform:none;opacity:1}}
+.vt-sheet h3{margin:0;padding:15px 16px 11px;font-size:14.5px;font-weight:700;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.vt-sheet h3 span{flex:1}
+.vt-sheet h3 button{color:var(--muted);padding:2px;line-height:0}
+.vt-sheet .inner{overflow-y:auto;padding:12px 16px calc(env(safe-area-inset-bottom) + 18px)}
+.vt-lg{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border-radius:11px;background:var(--bg-2);border:1px solid var(--line);margin-bottom:7px;text-align:left}
+.vt-lg.on{border-color:var(--accent);background:var(--accent-soft)}
+.vt-lg .col{flex:1;min-width:0;display:flex;flex-direction:column}
+.vt-lg .n{display:block;font-size:14px;font-weight:600}
+.vt-lg .s{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.vt-tag{font-size:9.5px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;flex:none}
+.vt-tag.off{background:var(--success-soft);color:var(--success)}
+.vt-tag.ai{background:var(--warning-soft);color:var(--warning)}
+.vt-fld{margin-bottom:11px}
+.vt-fld label{display:block;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.vt-fld input,.vt-fld textarea{width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:14px}
+.vt-fld textarea{min-height:66px;resize:vertical;line-height:1.5}
+.vt-two{display:flex;gap:9px}
+.vt-two>*{flex:1;min-width:0}
+.vt-btn{width:100%;padding:13px;border-radius:12px;background:var(--accent);color:var(--accent-fg);font-size:14px;font-weight:700;margin-top:4px}
+.vt-btn:disabled{opacity:0.6}
+.vt-btn.ghost{background:var(--surface);color:var(--fg);border:1px solid var(--line);margin-top:8px}
+
+/* Kad tunjuk — sengaja kekal putih supaya terang di luar, bukan ikut tema */
+.vt-big{position:fixed;inset:0;z-index:3400;display:none;flex-direction:column;background:#F7F9FC;color:#0B1016;padding:calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 20px)}
+.vt-big.on{display:flex}
+.vt-big .cap{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5C6879}
+.vt-big .txt{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;line-height:1.35;padding:14px 0;word-break:break-word}
+.vt-big .rom2{text-align:center;font-size:14px;color:#5C6879;font-style:italic;margin-bottom:14px}
+.vt-big .row{display:flex;gap:9px}
+.vt-big .row button{flex:1;padding:14px;border-radius:13px;font-size:14px;font-weight:700;background:#E4E9F1;color:#1A2230}
+.vt-big .row button.pri{background:#1B4FD8;color:#fff}
 
 /* Converter & Calc */
 .cv-tabs{display:flex;gap:8px;margin-bottom:14px}
@@ -15000,39 +15102,261 @@ function peToolBtn(tool, label, paths) {
 }
 
 // =======================================================
-// TOOL: VOICE TRANSLATOR (Web Speech + Gemini + TTS)
+// TOOL: VOICE TRANSLATOR
+// Overlay penuh dengan tiga tab — Talk, Phrasebook, Saved.
+// Perbualan disimpan di pocketInspections/{uid}/voiceTalks/{id}
+// (teks sahaja, jadi tiada isu had 1 MiB seperti tool bergambar).
 // =======================================================
 let _vtVoices = [];
-const VT_LANGS = {
-  'bn-BD': { name: 'Bangla', label: 'Bangla' },
-  'zh-CN': { name: 'Mandarin Chinese', label: '中文' },
-  'ta-IN': { name: 'Tamil', label: 'தமிழ்' },
-  'ur-PK': { name: 'Urdu', label: 'اردو' },
-  'ms-MY': { name: 'Malay', label: 'BM' },
-  'en-US': { name: 'English', label: 'EN' }
+
+const VT_LANGS = [
+  { k:'ms',  n:'Malay',      s:'Bahasa Melayu',    bcp:'ms-MY',  book:1 },
+  { k:'en',  n:'English',    s:'English',          bcp:'en-US',  book:1 },
+  { k:'bn',  n:'Bangla',     s:'বাংলা', bcp:'bn-BD', book:1 },
+  { k:'ne',  n:'Nepali',     s:'नेपाली', bcp:'ne-NP', book:1 },
+  { k:'id',  n:'Indonesian', s:'Bahasa Indonesia', bcp:'id-ID',  book:1 },
+  { k:'zh',  n:'Mandarin',   s:'中文',      bcp:'zh-CN',  book:1 },
+  { k:'ta',  n:'Tamil',      s:'தமிழ்', bcp:'ta-IN', book:1 },
+  { k:'ur',  n:'Urdu',       s:'اردو',  bcp:'ur-PK',  book:1 },
+  { k:'my',  n:'Myanmar',    s:'မြန်မာ', bcp:'my-MM', book:1 },
+  { k:'vi',  n:'Vietnamese', s:'Tiếng Việt', bcp:'vi-VN', book:1 },
+  { k:'hi',  n:'Hindi',      s:'हिन्दी', bcp:'hi-IN', book:0 },
+  { k:'th',  n:'Thai',       s:'ไทย',  bcp:'th-TH',  book:0 },
+  { k:'fil', n:'Filipino',   s:'Filipino',         bcp:'fil-PH', book:0 },
+  { k:'km',  n:'Khmer',      s:'ខ្មែរ', bcp:'km-KH', book:0 }
+];
+const VT_RTL = { ur:1 };
+function vtL(k) {
+  for (let i = 0; i < VT_LANGS.length; i++) if (VT_LANGS[i].k === k) return VT_LANGS[i];
+  return VT_LANGS[0];
+}
+
+/* Buku frasa luar talian — 16 arahan tapak, tiada internet diperlukan.
+   Format setiap bahasa: [tulisan asal, rumi]. ms/en duduk di luar t. */
+const VT_BOOK = [
+{c:'Safety', en:'Stop — this is dangerous.', ms:'Berhenti — ini bahaya.', t:{
+  bn:['থামুন — এটা বিপজ্জনক।','thamun — eta bipojjonok'],
+  ne:['रोक्नुहोस् — यो खतरनाक छ।','roknuhos — yo khataranak cha'],
+  id:['Berhenti — ini berbahaya.',''],
+  zh:['停下 — 这里很危险。','ting xia — zheli hen weixian'],
+  ta:['நிறுத்துங்கள் — இது ஆபத்தானது.','niruttungal — ithu aabaththaanathu'],
+  ur:['رُکیں — یہ خطرناک ہے۔','rukein — yeh khatarnak hai'],
+  my:['ရပ်ပါ — ဒါ အန္တရာယ်ရှိတယ်။','yat pa — da andaraye shi deh'],
+  vi:['Dừng lại — chỗ này nguy hiểm.','']}},
+
+{c:'Safety', en:'Please wear your safety helmet.', ms:'Sila pakai topi keledar.', t:{
+  bn:['অনুগ্রহ করে হেলমেট পরুন।','onugroho kore helmet porun'],
+  ne:['कृपया हेल्मेट लगाउनुहोस्।','kripaya helmet lagaunuhos'],
+  id:['Tolong pakai helm keselamatan.',''],
+  zh:['请戴好安全帽。','qing dai hao anquan mao'],
+  ta:['தயவுசெய்து பாதுகாப்பு தலைக்கவசம் அணியுங்கள்.','thayavuseithu paathukaappu thalaikkavasam aniyungal'],
+  ur:['براہِ کرم حفاظتی ہیلمٹ پہنیں۔','barah-e-karam hifazati helmet pehnein'],
+  my:['ကျေးဇူးပြု၍ ဦးထုပ် ဆောင်းပါ။','kyeizu pyu-ywe oukhote saung ba'],
+  vi:['Vui lòng đội mũ bảo hộ.','']}},
+
+{c:'Safety', en:'Do not stand under the scaffolding.', ms:'Jangan berdiri bawah perancah.', t:{
+  bn:['ভারার নিচে দাঁড়াবেন না।','bharar niche darhaben na'],
+  ne:['स्क्याफोल्डिङमुनि नउभिनुहोस्।','skyafolding muni na-ubhinuhos'],
+  id:['Jangan berdiri di bawah perancah.',''],
+  zh:['不要站在脚手架下面。','buyao zhan zai jiaoshoujia xiamian'],
+  ta:['சாரக்கட்டுக்கு அடியில் நிற்க வேண்டாம்.','saarakkattukku adiyil nirka vendaam'],
+  ur:['داربست کے نیچے کھڑے نہ ہوں۔','darbast ke neeche kharay na hon'],
+  my:['စင်အောက်တွင် မရပ်ပါနှင့်။','sin auk hmar ma-yat pa nhin'],
+  vi:['Không đứng dưới giàn giáo.','']}},
+
+{c:'Safety', en:'Switch off the power first.', ms:'Tutup bekalan elektrik dahulu.', t:{
+  bn:['আগে বিদ্যুৎ বন্ধ করুন।','age bidyut bondho korun'],
+  ne:['पहिले बिजुली बन्द गर्नुहोस्।','pahile bijuli banda garnuhos'],
+  id:['Matikan listrik dulu.',''],
+  zh:['请先关掉电源。','qing xian guan diao dianyuan'],
+  ta:['முதலில் மின்சாரத்தை அணைக்கவும்.','muthalil minsaaraththai anaikkavum'],
+  ur:['پہلے بجلی بند کریں۔','pehle bijli band karein'],
+  my:['အရင် မီးခလုတ် ပိတ်ပါ။','a-yin mi-khalot peik pa'],
+  vi:['Tắt điện trước đã.','']}},
+
+{c:'Safety', en:'Everyone come out — we are testing now.', ms:'Semua keluar — kami sedang uji sekarang.', t:{
+  bn:['সবাই বেরিয়ে আসুন — আমরা এখন পরীক্ষা করছি।','shobai beriye ashun — amra ekhon porikkha korchi'],
+  ne:['सबै बाहिर आउनुहोस् — हामी अहिले परीक्षण गर्दैछौं।','sabai bahira aaunuhos — hami ahile parikshan gardaichhaum'],
+  id:['Semua keluar — kami sedang menguji sekarang.',''],
+  zh:['大家出来 — 我们现在要测试。','dajia chulai — women xianzai yao ceshi'],
+  ta:['அனைவரும் வெளியே வாருங்கள் — நாங்கள் இப்போது சோதனை செய்கிறோம்.','anaivarum veliye vaarungal — naangal ippothu sothanai seykirom'],
+  ur:['سب باہر آ جائیں — ہم ابھی ٹیسٹ کر رہے ہیں۔','sab bahar aa jayen — hum abhi test kar rahe hain'],
+  my:['အားလုံး အပြင်ထွက်ပါ — ကျွန်တော်တို့ အခု စမ်းသပ်နေပါတယ်။','a-lone apyin htwet pa — kyanaw-do akhu san-that ne ba deh'],
+  vi:['Mọi người ra ngoài — chúng tôi đang thử nghiệm.','']}},
+
+{c:'Access', en:'Please open this door.', ms:'Tolong buka pintu ini.', t:{
+  bn:['অনুগ্রহ করে এই দরজাটা খুলুন।','onugroho kore ei dorjata khulun'],
+  ne:['कृपया यो ढोका खोल्नुहोस्।','kripaya yo dhoka kholnuhos'],
+  id:['Tolong buka pintu ini.',''],
+  zh:['请打开这扇门。','qing dakai zhe shan men'],
+  ta:['தயவுசெய்து இந்தக் கதவைத் திறங்கள்.','thayavuseithu inthak kathavaith thirangal'],
+  ur:['براہِ کرم یہ دروازہ کھولیں۔','barah-e-karam yeh darwaza kholein'],
+  my:['ကျေးဇူးပြု၍ ဒီတံခါး ဖွင့်ပေးပါ။','kyeizu pyu-ywe di tan-ga hpwin pe ba'],
+  vi:['Vui lòng mở cửa này.','']}},
+
+{c:'Access', en:'Where is the key?', ms:'Mana kunci?', t:{
+  bn:['চাবি কোথায়?','chabi kothay?'],
+  ne:['साँचो कहाँ छ?','saancho kahaan cha?'],
+  id:['Di mana kuncinya?',''],
+  zh:['钥匙在哪里？','yaoshi zai nali?'],
+  ta:['சாவி எங்கே?','saavi engey?'],
+  ur:['چابی کہاں ہے؟','chaabi kahan hai?'],
+  my:['သော့ ဘယ်မှာလဲ။','thaw beh hmar leh?'],
+  vi:['Chìa khóa ở đâu?','']}},
+
+{c:'Access', en:'Can I go up to the roof?', ms:'Boleh saya naik ke bumbung?', t:{
+  bn:['আমি কি ছাদে উঠতে পারি?','ami ki chhade uthte pari?'],
+  ne:['म छतमा जान सक्छु?','ma chhatma jaana sakchhu?'],
+  id:['Boleh saya naik ke atap?',''],
+  zh:['我可以上屋顶吗？','wo keyi shang wuding ma?'],
+  ta:['நான் மேற்கூரைக்கு போகலாமா?','naan merkooraikku pogalaamaa?'],
+  ur:['کیا میں چھت پر جا سکتا ہوں؟','kya main chhat par ja sakta hoon?'],
+  my:['အမိုးပေါ် တက်လို့ရမလား။','a-mo paw tet-lo ya-ma-lar?'],
+  vi:['Tôi có thể lên mái không?','']}},
+
+{c:'Access', en:'Show me the electrical room.', ms:'Tunjukkan bilik elektrik.', t:{
+  bn:['আমাকে বিদ্যুতের রুমটা দেখান।','amake bidyuter room-ta dekhan'],
+  ne:['मलाई बिजुली कोठा देखाउनुहोस्।','malai bijuli kotha dekhaunuhos'],
+  id:['Tunjukkan ruang listrik.',''],
+  zh:['带我去配电房。','dai wo qu peidianfang'],
+  ta:['மின்சார அறையைக் காட்டுங்கள்.','minsaara araiyaik kaattungal'],
+  ur:['مجھے بجلی کا کمرہ دکھائیں۔','mujhe bijli ka kamra dikhayen'],
+  my:['လျှပ်စစ်ခန်းကို ပြပေးပါ။','hlyat-sit khan ko pya pe ba'],
+  vi:['Chỉ cho tôi phòng điện.','']}},
+
+{c:'Work', en:'This crack must be repaired.', ms:'Retak ini kena baiki.', t:{
+  bn:['এই ফাটলটা মেরামত করতে হবে।','ei fatolta meramot korte hobe'],
+  ne:['यो चिरा मर्मत गर्नुपर्छ।','yo chira marmat garnuparcha'],
+  id:['Retak ini harus diperbaiki.',''],
+  zh:['这道裂缝必须修补。','zhe dao liefeng bixu xiubu'],
+  ta:['இந்த விரிசலைச் சரிசெய்ய வேண்டும்.','intha virisalaich sariseyya vendum'],
+  ur:['یہ دراڑ ٹھیک کرنی ہوگی۔','yeh daraar theek karni hogi'],
+  my:['ဒီအက်ကြောင်းကို ပြင်ရမယ်။','di et-kyaung ko pyin ya meh'],
+  vi:['Vết nứt này phải được sửa.','']}},
+
+{c:'Work', en:'Do not paint over this yet.', ms:'Jangan cat atas ini dulu.', t:{
+  bn:['এখনই এর উপর রং করবেন না।','ekhoni er upor rong korben na'],
+  ne:['अहिले नै यसमा रङ नलगाउनुहोस्।','ahile nai yasma rang na-lagaunuhos'],
+  id:['Jangan dicat dulu.',''],
+  zh:['先不要刷漆盖住。','xian buyao shuaqi gaizhu'],
+  ta:['இதை இப்போது பெயிண்ட் அடிக்க வேண்டாம்.','ithai ippothu paint adikka vendaam'],
+  ur:['ابھی اس پر پینٹ نہ کریں۔','abhi is par paint na karein'],
+  my:['ဒါကို အခု ဆေးမသုတ်ပါနဲ့။','da ko akhu say ma-thote pa neh'],
+  vi:['Chưa sơn phủ lên chỗ này.','']}},
+
+{c:'Work', en:'When did this start leaking?', ms:'Bila ini mula bocor?', t:{
+  bn:['এটা কবে থেকে লিক করছে?','eta kobe theke leak korche?'],
+  ne:['यो कहिलेदेखि चुहिन थालेको हो?','yo kahiledekhi chuhina thaaleko ho?'],
+  id:['Sejak kapan ini mulai bocor?',''],
+  zh:['这里从什么时候开始漏水的？','zheli cong shenme shihou kaishi loushui de?'],
+  ta:['இது எப்போது கசிய ஆரம்பித்தது?','ithu eppothu kasiya aarambiththathu?'],
+  ur:['یہ کب سے لیک ہو رہا ہے؟','yeh kab se leak ho raha hai?'],
+  my:['ဒါ ဘယ်တုန်းကစ ယိုနေတာလဲ။','da beh-toun-ka sa yo ne ta leh?'],
+  vi:['Chỗ này bắt đầu rò rỉ từ khi nào?','']}},
+
+{c:'Work', en:'Who did this work?', ms:'Siapa buat kerja ini?', t:{
+  bn:['এই কাজটা কে করেছে?','ei kajta ke koreche?'],
+  ne:['यो काम कसले गरेको हो?','yo kaam kasle gareko ho?'],
+  id:['Siapa yang mengerjakan ini?',''],
+  zh:['这个工程是谁做的？','zhege gongcheng shi shui zuo de?'],
+  ta:['இந்த வேலையை யார் செய்தார்?','intha velaiyai yaar seythaar?'],
+  ur:['یہ کام کس نے کیا؟','yeh kaam kis ne kiya?'],
+  my:['ဒီအလုပ်ကို ဘယ်သူ လုပ်ခဲ့တာလဲ။','di alote ko beh-thu lote-kheh ta leh?'],
+  vi:['Ai đã làm phần việc này?','']}},
+
+{c:'Courtesy', en:'I am the building surveyor.', ms:'Saya juruukur bangunan.', t:{
+  bn:['আমি ভবন সার্ভেয়ার।','ami bhobon surveyor'],
+  ne:['म भवन सर्भेयर हुँ।','ma bhavan surveyor hun'],
+  id:['Saya surveyor bangunan.',''],
+  zh:['我是建筑测量师。','wo shi jianzhu celiangshi'],
+  ta:['நான் கட்டிட சர்வேயர்.','naan kattida surveyor'],
+  ur:['میں بلڈنگ سرویئر ہوں۔','main building surveyor hoon'],
+  my:['ကျွန်တော်က အဆောက်အအုံ စစ်ဆေးသူပါ။','kyanaw ka asauk-a-oun sit-se-thu ba'],
+  vi:['Tôi là kỹ sư khảo sát công trình.','']}},
+
+{c:'Courtesy', en:'Please wait ten minutes.', ms:'Tunggu sepuluh minit.', t:{
+  bn:['দশ মিনিট অপেক্ষা করুন।','dosh minute opekkha korun'],
+  ne:['दस मिनेट पर्खनुहोस्।','das minet parkhanuhos'],
+  id:['Tolong tunggu sepuluh menit.',''],
+  zh:['请等十分钟。','qing deng shi fenzhong'],
+  ta:['பத்து நிமிடம் காத்திருங்கள்.','paththu nimidam kaaththirungal'],
+  ur:['دس منٹ انتظار کریں۔','das minute intezaar karein'],
+  my:['ဆယ်မိနစ် စောင့်ပေးပါ။','seh minit saung pe ba'],
+  vi:['Vui lòng đợi mười phút.','']}},
+
+{c:'Courtesy', en:'Thank you for your help.', ms:'Terima kasih atas bantuan.', t:{
+  bn:['আপনার সাহায্যের জন্য ধন্যবাদ।','apnar shahajjer jonno dhonnobad'],
+  ne:['तपाईंको सहयोगको लागि धन्यवाद।','tapaiko sahayogko laagi dhanyabaad'],
+  id:['Terima kasih atas bantuannya.',''],
+  zh:['谢谢你的帮助。','xiexie ni de bangzhu'],
+  ta:['உங்கள் உதவிக்கு நன்றி.','ungal uthavikku nandri'],
+  ur:['آپ کی مدد کا شکریہ۔','aap ki madad ka shukriya'],
+  my:['ကူညီပေးလို့ ကျေးဇူးတင်ပါတယ်။','ku-nyi pe-lo kyeizu tin ba deh'],
+  vi:['Cảm ơn sự giúp đỡ của bạn.','']}}
+];
+
+const VT_CATS = ['All', 'Safety', 'Access', 'Work', 'Courtesy'];
+
+// Keadaan tool. Disimpan di peringkat modul supaya fungsi sejarah boleh capai.
+let VT = {
+  me:'ms', wk:'bn', mode:'talk', turns:[], cat:'All', q:'',
+  entries:[], editId:null, listening:false, side:null
 };
 
-function vtSpeak(text, lang) {
+function vtPhraseIn(p, k) {
+  if (k === 'ms') return [p.ms, ''];
+  if (k === 'en') return [p.en, ''];
+  return p.t[k] || ['', ''];
+}
+
+// ---------- 1. SUARA ----------
+function vtSpeak(text, k, rate) {
   if (!window.speechSynthesis || !text) return;
   try {
     speechSynthesis.cancel();
+    const lg = vtL(k);
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;
-    u.volume = 1; u.rate = 1; u.pitch = 1;
-    const pre = lang.split('-')[0].toLowerCase();
+    u.lang = lg.bcp; u.volume = 1; u.rate = rate || 1; u.pitch = 1;
+    const pre = lg.bcp.split('-')[0].toLowerCase();
     const v = _vtVoices.find(function(x) { return x.lang && x.lang.toLowerCase().indexOf(pre) === 0; });
     if (v) u.voice = v;
+    else showToast('This phone has no ' + lg.n + ' voice — use Show instead');
     speechSynthesis.speak(u);
   } catch (e) {}
 }
 
-async function vtTranslate(text, toName) {
+// ---------- 2. TERJEMAHAN AI + CACHE ----------
+// Sekali diterjemah, disimpan dalam telefon. Kali kedua ia berfungsi luar talian.
+function vtCacheKey(text, toKey) { return 'pv_tr_' + toKey + '|' + text; }
+function vtCacheGet(text, toKey) {
+  try {
+    const raw = localStorage.getItem(vtCacheKey(text, toKey));
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function vtCacheSet(text, toKey, val) {
+  try { localStorage.setItem(vtCacheKey(text, toKey), JSON.stringify(val)); } catch (e) {}
+}
+
+async function vtTranslate(text, toKey) {
+  const cached = vtCacheGet(text, toKey);
+  if (cached) return cached;
+
+  const lg = vtL(toKey);
   const apiKey = (typeof getApiKey === 'function') ? getApiKey() : '';
   if (!apiKey) throw new Error('AI key not set');
   const model = (typeof getModel === 'function') ? getModel() : 'gemini-2.5-flash';
   const genConfig = { temperature: 0.1, maxOutputTokens: 1024 };
   if (model.indexOf('2.5') !== -1) genConfig.thinkingConfig = { thinkingBudget: 0 };
-  const prompt = 'You are a translator for a construction site. Translate the text into ' + toName + '. Output ONLY the translation in ' + toName + ' — no quotes, no notes, no romanization, no original text.\n\nText: ' + text;
+
+  const prompt =
+    'You are a translator for a building inspection site. Translate the text into ' + lg.n + '.\n' +
+    'Reply with exactly two lines and nothing else:\n' +
+    'Line 1: the translation in ' + lg.n + ', in its normal script. No quotes, no notes.\n' +
+    'Line 2: ROMAN: a simple Latin-letter pronunciation of line 1 that a Malay speaker can read aloud. ' +
+    'If ' + lg.n + ' already uses Latin letters, write exactly "ROMAN: -".\n\n' +
+    'Text: ' + text;
+
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
   const res = await fetch(url, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -15044,132 +15368,555 @@ async function vtTranslate(text, toName) {
     throw new Error((e && e.error && e.error.message) || ('API ' + res.status));
   }
   const data = await res.json();
-  return ((data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '').trim();
+  const raw = ((data.candidates && data.candidates[0] && data.candidates[0].content &&
+    data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
+    data.candidates[0].content.parts[0].text) || '').trim();
+
+  const lines = raw.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+  let out = '', rom = '';
+  for (let i = 0; i < lines.length; i++) {
+    if (/^roman\s*:/i.test(lines[i])) rom = lines[i].replace(/^roman\s*:/i, '').trim();
+    else if (!out) out = lines[i];
+  }
+  if (!out) out = raw;
+  if (rom === '-' || rom.toLowerCase() === out.toLowerCase()) rom = '';
+  const val = { out: out, rom: rom };
+  vtCacheSet(text, toKey, val);
+  return val;
 }
 
+// ---------- 3. IKON ----------
+const VT_I = {
+  back:'<path d="M15 18l-6-6 6-6"/>',
+  swap:'<path d="M7 16V4m0 0L4 7m3-3l3 3"/><path d="M17 8v12m0 0l3-3m-3 3l-3-3"/>',
+  mic:'<path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>',
+  play:'<polygon points="6 4 20 12 6 20 6 4"/>',
+  slow:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  eye:'<path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z"/><circle cx="12" cy="12" r="2.5"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>',
+  warn:'<path d="M12 3l9 16H3l9-16z"/><path d="M12 9v4M12 16v.5"/>',
+  send:'<path d="M4 12h14M13 6l6 6-6 6"/>',
+  chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h7M8 11h7"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'
+};
+function vtSvg(p, sz) {
+  return '<svg viewBox="0 0 24 24" width="' + (sz || 18) + '" height="' + (sz || 18) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+}
+
+// ---------- 4. PAPARAN ----------
+function vtRender() {
+  const ov = document.getElementById('vtOverlay');
+  if (!ov) return;
+  const me = vtL(VT.me), wk = vtL(VT.wk);
+  let h = '';
+
+  h += '<div class="vt-hd">' +
+    '<button class="vt-ic" id="vtClose" aria-label="Close">' + vtSvg(VT_I.back) + '</button>' +
+    '<div class="vt-hd-t"><h2>Voice Translator</h2><p>' + peEsc(me.n) + ' &#8644; ' + peEsc(wk.n) +
+      (wk.book ? ' &middot; offline pack' : ' &middot; AI only') + '</p></div>' +
+    '<button class="vt-savebtn" id="vtSaveBtn"' + (VT.turns.length ? '' : ' disabled') + '>' +
+      (VT.editId ? 'Update' : 'Save') + '</button>' +
+  '</div>';
+
+  h += '<div class="vt-pair">' +
+    '<button class="vt-side me" data-vtpick="me"><span class="r">You</span><span class="n">' + peEsc(me.n) + '</span><span class="sub vt-scripts">' + peEsc(me.s) + '</span></button>' +
+    '<button class="vt-swap" id="vtSwap" aria-label="Swap languages">' + vtSvg(VT_I.swap, 17) + '</button>' +
+    '<button class="vt-side wk" data-vtpick="wk"><span class="r">Worker</span><span class="n">' + peEsc(wk.n) + '</span><span class="sub vt-scripts">' + peEsc(wk.s) + '</span></button>' +
+  '</div>';
+
+  h += '<div class="vt-seg">' +
+    '<button data-vtmode="talk" class="' + (VT.mode === 'talk' ? 'on' : '') + '">Talk</button>' +
+    '<button data-vtmode="book" class="' + (VT.mode === 'book' ? 'on' : '') + '">Phrasebook</button>' +
+    '<button data-vtmode="saved" class="' + (VT.mode === 'saved' ? 'on' : '') + '">Saved</button>' +
+  '</div>';
+
+  h += '<div class="vt-body" id="vtBody">' +
+    (VT.mode === 'talk' ? vtViewTalk() : VT.mode === 'book' ? vtViewBook() : '<div class="br-load">Loading...</div>') +
+  '</div>';
+
+  if (VT.mode === 'talk') {
+    h += '<div class="vt-ft">' +
+      '<div class="vt-status" id="vtStatus"></div>' +
+      '<div class="vt-typewrap"><input id="vtType" placeholder="Too noisy? Type here…"><button id="vtSend" aria-label="Send">' + vtSvg(VT_I.send, 17) + '</button></div>' +
+      '<div class="vt-mics">' +
+        '<button class="vt-mic vt-mic-wk" id="vtMicWk">' + vtSvg(VT_I.mic, 21) + '<span class="lab">Worker</span><span class="nm">' + peEsc(wk.n) + '</span></button>' +
+        '<button class="vt-mic vt-mic-me" id="vtMicMe">' + vtSvg(VT_I.mic, 21) + '<span class="lab">You</span><span class="nm">' + peEsc(me.n) + '</span></button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  ov.innerHTML = h;
+  vtWire();
+  if (VT.mode === 'saved') vtRenderSaved();
+  const b = document.getElementById('vtBody');
+  if (b && VT.mode === 'talk') b.scrollTop = b.scrollHeight;
+}
+
+function vtViewTalk() {
+  if (!VT.turns.length) {
+    return '<div class="vt-empty">' + vtSvg(VT_I.chat, 44) +
+      '<h3>No conversation yet</h3>' +
+      '<p>Tap the worker mic and let them speak. The translation appears here, is read aloud, and can be shown as large text.</p></div>';
+  }
+  let h = '<div class="vt-turns">';
+  for (let i = 0; i < VT.turns.length; i++) {
+    const t = VT.turns[i];
+    h += '<div class="vt-bub ' + t.side + '">' +
+      '<div class="who">' + (t.side === 'wk' ? 'Worker' : 'You') + ' &middot; ' + peEsc(vtL(t.from).n) + '</div>' +
+      '<div class="src vt-scripts" dir="auto">' + peEsc(t.src) + '</div>' +
+      '<div class="hr"></div>' +
+      '<div class="out vt-scripts" dir="' + (VT_RTL[t.to] ? 'rtl' : 'auto') + '">' + peEsc(t.out) + '</div>' +
+      (t.rom ? '<div class="rom">' + peEsc(t.rom) + '</div>' : '') +
+      '<div class="acts">' +
+        '<button data-vtplay="' + i + '">' + vtSvg(VT_I.play, 12) + 'Play</button>' +
+        '<button data-vtslow="' + i + '">' + vtSvg(VT_I.slow, 12) + '0.6&times;</button>' +
+        '<button class="big" data-vtbig="' + i + '">' + vtSvg(VT_I.eye, 12) + 'Show</button>' +
+      '</div>' +
+    '</div>';
+  }
+  return h + '</div>';
+}
+
+function vtViewBook() {
+  const wk = vtL(VT.wk);
+  let h = '<div class="vt-search">' + vtSvg(VT_I.search, 15) +
+    '<input id="vtQ" placeholder="Search phrases…" value="' + peEsc(VT.q) + '"></div>';
+  h += '<div class="vt-cats">';
+  for (let i = 0; i < VT_CATS.length; i++) {
+    h += '<button data-vtcat="' + VT_CATS[i] + '" class="' + (VT.cat === VT_CATS[i] ? 'on' : '') + '">' + VT_CATS[i] + '</button>';
+  }
+  h += '</div>';
+
+  if (!wk.book) {
+    h += '<div class="vt-note">' + vtSvg(VT_I.warn, 14) +
+      '<div><b>' + peEsc(wk.n) + '</b> has no offline pack yet. These phrases are translated by AI the first time, then kept on this phone — so the second time they work with no internet.</div></div>';
+  }
+
+  const q = VT.q.toLowerCase().trim();
+  let rows = '', n = 0;
+  for (let j = 0; j < VT_BOOK.length; j++) {
+    const p = VT_BOOK[j];
+    if (VT.cat !== 'All' && p.c !== VT.cat) continue;
+    const src = vtPhraseIn(p, VT.me)[0] || p.en;
+    if (q && src.toLowerCase().indexOf(q) === -1 && p.en.toLowerCase().indexOf(q) === -1) continue;
+    n++;
+    const tr = wk.book ? vtPhraseIn(p, VT.wk) : ['', ''];
+    rows += '<button class="vt-row" data-vtph="' + j + '">' +
+      '<span class="col"><span class="a">' + peEsc(src) + '</span>' +
+      (tr[0] ? '<span class="b vt-scripts" dir="' + (VT_RTL[VT.wk] ? 'rtl' : 'auto') + '">' + peEsc(tr[0]) + '</span>'
+             : '<span class="b">Tap &mdash; AI will translate and keep it</span>') +
+      '</span><span class="play">' + vtSvg(VT_I.play, 13) + '</span></button>';
+  }
+  if (!n) rows = '<div class="vt-empty"><p>No phrase matches &ldquo;' + peEsc(VT.q) + '&rdquo;.</p></div>';
+  return h + '<div class="vt-list">' + rows + '</div>';
+}
+
+// ---------- 5. TINDAKAN ----------
+function vtAddTurn(side, src, out, rom, from, to) {
+  VT.turns.push({ side: side, src: src, out: out, rom: rom || '', from: from, to: to });
+  vtRender();
+  vtSpeak(out, to, 1);
+}
+
+function vtStatus(t) {
+  const el = document.getElementById('vtStatus');
+  if (el) el.textContent = t || '';
+}
+
+function vtSetMic(side, on) {
+  const w = document.getElementById('vtMicWk'), m = document.getElementById('vtMicMe');
+  if (w) w.classList.toggle('listening', !!on && side === 'wk');
+  if (m) m.classList.toggle('listening', !!on && side === 'me');
+}
+
+// Hantar teks dari satu pihak: terjemah ke bahasa pihak lagi satu.
+function vtSend(side, text) {
+  const from = (side === 'wk') ? VT.wk : VT.me;
+  const to   = (side === 'wk') ? VT.me : VT.wk;
+  if (!text) return;
+
+  // Padanan buku frasa dahulu — serta-merta, tiada internet perlu.
+  for (let i = 0; i < VT_BOOK.length; i++) {
+    const a = vtPhraseIn(VT_BOOK[i], from)[0];
+    if (a && a.toLowerCase() === text.toLowerCase()) {
+      const tr = vtPhraseIn(VT_BOOK[i], to);
+      if (tr[0]) { vtAddTurn(side, text, tr[0], tr[1], from, to); return; }
+    }
+  }
+
+  vtStatus('Translating…');
+  vtTranslate(text, to).then(function(r) {
+    vtStatus('');
+    vtAddTurn(side, text, r.out, r.rom, from, to);
+  }).catch(function(e) {
+    vtStatus('');
+    showToast('Could not translate. ' + e.message, 'error');
+  });
+}
+
+function vtSendPhrase(idx) {
+  const p = VT_BOOK[idx];
+  const src = vtPhraseIn(p, VT.me)[0] || p.en;
+  const tr = vtPhraseIn(p, VT.wk);
+  VT.mode = 'talk';
+  if (tr[0]) { vtAddTurn('me', src, tr[0], tr[1], VT.me, VT.wk); return; }
+  vtRender();
+  vtSend('me', src);
+}
+
+function vtSendTyped() {
+  const el = document.getElementById('vtType');
+  if (!el) return;
+  const v = el.value.trim();
+  if (!v) return;
+  el.value = '';
+  vtSend('me', v);
+}
+
+// ---------- 6. MIKROFON ----------
+let _vtRecog = null;
+let _vtFinal = '';
+function vtInitRecog() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+  r.continuous = false;
+  r.onstart = function() { VT.listening = true; vtSetMic(VT.side, true); vtStatus('Listening… speak now'); };
+  r.onresult = function(e) {
+    let f = '', interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) f += t; else interim += t;
+    }
+    if (f) _vtFinal += f;
+    vtStatus('“' + (_vtFinal || interim) + '”');
+  };
+  r.onerror = function(e) {
+    vtStatus('Mic: ' + e.error + (e.error === 'not-allowed' ? ' — allow microphone access' : ''));
+  };
+  r.onend = function() {
+    VT.listening = false; vtSetMic(VT.side, false);
+    const t = _vtFinal.trim(); _vtFinal = '';
+    if (t) { vtStatus(''); vtSend(VT.side, t); } else vtStatus('');
+  };
+  return r;
+}
+
+function vtListen(side) {
+  if (!_vtRecog) _vtRecog = vtInitRecog();
+  if (!_vtRecog) {
+    vtStatus('Voice input is not supported here. Use the Phrasebook or type instead.');
+    return;
+  }
+  if (VT.listening) { try { _vtRecog.stop(); } catch (e) {} return; }
+  VT.side = side;
+  _vtFinal = '';
+  _vtRecog.lang = vtL(side === 'wk' ? VT.wk : VT.me).bcp;
+  try { _vtRecog.start(); } catch (e) { try { _vtRecog.stop(); } catch (_) {} }
+}
+
+// ---------- 7. HELAI BAHASA ----------
+function vtOpenPick(which) {
+  const cur = which === 'me' ? VT.me : VT.wk;
+  const other = which === 'me' ? VT.wk : VT.me;
+  let h = '<div class="scrim" data-vtclose="1"></div><div class="panel">' +
+    '<h3><span>' + (which === 'me' ? 'Your language' : 'Worker language') + '</span>' +
+    '<button data-vtclose="1">' + vtSvg(VT_I.x, 17) + '</button></h3><div class="inner">';
+  for (let i = 0; i < VT_LANGS.length; i++) {
+    const l = VT_LANGS[i];
+    if (l.k === other) continue;
+    h += '<button class="vt-lg ' + (l.k === cur ? 'on' : '') + '" data-vtlang="' + l.k + '">' +
+      '<span class="col"><span class="n">' + peEsc(l.n) + '</span><span class="s vt-scripts">' + peEsc(l.s) + '</span></span>' +
+      '<span class="vt-tag ' + (l.book ? 'off' : 'ai') + '">' + (l.book ? 'OFFLINE' : 'AI ONLY') + '</span></button>';
+  }
+  h += '</div></div>';
+  const sh = document.getElementById('vtSheet');
+  sh.innerHTML = h; sh.dataset.which = which; sh.classList.add('on');
+}
+
+// ---------- 8. KAD TUNJUK ----------
+function vtOpenBig(i) {
+  const t = VT.turns[i];
+  if (!t) return;
+  const len = (t.out || '').length;
+  const size = len < 26 ? 42 : len < 60 ? 32 : len < 110 ? 25 : 20;
+  const big = document.getElementById('vtBig');
+  big.innerHTML =
+    '<div class="cap">Show this screen &middot; ' + peEsc(vtL(t.to).n) + '</div>' +
+    '<div class="txt vt-scripts" style="font-size:' + size + 'px" dir="' + (VT_RTL[t.to] ? 'rtl' : 'auto') + '">' + peEsc(t.out) + '</div>' +
+    (t.rom ? '<div class="rom2">' + peEsc(t.rom) + '</div>' : '') +
+    '<div class="row"><button data-vtbigclose="1">Close</button>' +
+    '<button class="pri" data-vtbigplay="' + i + '">Read aloud</button></div>';
+  big.classList.add('on');
+}
+
+// ---------- 9. SIMPAN ----------
+function vtOpenSave() {
+  if (!VT.turns.length) { showToast('Nothing to save yet'); return; }
+  const cur = VT.editId ? (VT.entries.filter(function(e) { return e.id === VT.editId; })[0] || {}) : {};
+  const sh = document.getElementById('vtSheet');
+  sh.innerHTML = '<div class="scrim" data-vtclose="1"></div><div class="panel">' +
+    '<h3><span>' + (VT.editId ? 'Update conversation' : 'Save conversation') + '</span>' +
+    '<button data-vtclose="1">' + vtSvg(VT_I.x, 17) + '</button></h3><div class="inner">' +
+    '<div class="vt-fld"><label>Title</label><input id="vtFT"></div>' +
+    '<div class="vt-fld"><label>Location</label><input id="vtFL" placeholder="e.g. Block B, Level 3, pump room"></div>' +
+    '<div class="vt-fld"><div class="vt-two">' +
+      '<div><label>Worker name</label><input id="vtFN" placeholder="e.g. Rahman"></div>' +
+      '<div><label>Trade</label><input id="vtFR" placeholder="e.g. Plumber"></div>' +
+    '</div></div>' +
+    '<div class="vt-fld"><label>Notes</label><textarea id="vtFD" placeholder="What was agreed / what you instructed"></textarea></div>' +
+    '<button class="vt-btn" id="vtDoSave">' + (VT.editId ? 'Update' : 'Save') + ' (' + VT.turns.length + ' turns)</button>' +
+    '<button class="vt-btn ghost" data-vtclose="1">Cancel</button>' +
+    '</div></div>';
+  sh.classList.add('on');
+  // Nilai diletak dalam JS, bukan atribut — peEsc tidak melarikan petik tunggal.
+  document.getElementById('vtFT').value = cur.title || ('Talk with ' + vtL(VT.wk).n + ' worker');
+  document.getElementById('vtFL').value = cur.location || '';
+  document.getElementById('vtFN').value = cur.workerName || '';
+  document.getElementById('vtFR').value = cur.workerTrade || '';
+  document.getElementById('vtFD').value = cur.notes || '';
+  document.getElementById('vtFT').focus();
+}
+
+async function vtDoSave() {
+  if (!currentUser) { showToast('Sign in to save', 'error'); return; }
+  const g = function(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const title = g('vtFT');
+  if (!title) { showToast('Give it a title first'); document.getElementById('vtFT').focus(); return; }
+
+  const btn = document.getElementById('vtDoSave');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const data = {
+    title: title,
+    location: g('vtFL'),
+    workerName: g('vtFN'),
+    workerTrade: g('vtFR'),
+    notes: g('vtFD'),
+    meLang: VT.me,
+    wkLang: VT.wk,
+    turns: VT.turns.map(function(t) {
+      return { side: t.side, src: t.src, out: t.out, rom: t.rom || '', from: t.from, to: t.to };
+    }),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    const col = db.collection('pocketInspections').doc(currentUser.uid).collection('voiceTalks');
+    if (VT.editId) {
+      await col.doc(VT.editId).update(data);
+      showToast('Changes saved');
+    } else {
+      data.inspectionId = (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null;
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await col.add(data);
+      VT.editId = ref.id;
+      showToast('Conversation saved');
+    }
+    document.getElementById('vtSheet').classList.remove('on');
+    VT.entries = [];
+    VT.mode = 'saved';
+    vtRender();
+  } catch (e) {
+    console.warn('[Voice save]', e.message);
+    btn.disabled = false; btn.textContent = 'Save';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// ---------- 10. SEJARAH ----------
+async function vtLoadEntries() {
+  if (!currentUser) { VT.entries = []; return VT.entries; }
+  if (VT.entries.length) return VT.entries;
+  try {
+    const snap = await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('voiceTalks').orderBy('createdAt', 'desc').limit(60).get();
+    VT.entries = [];
+    snap.forEach(function(doc) {
+      const d = doc.data();
+      VT.entries.push({
+        id: doc.id,
+        title: d.title || 'Untitled',
+        location: d.location || '',
+        workerName: d.workerName || '',
+        workerTrade: d.workerTrade || '',
+        notes: d.notes || '',
+        meLang: d.meLang || 'ms',
+        wkLang: d.wkLang || 'bn',
+        turns: Array.isArray(d.turns) ? d.turns : [],
+        createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
+      });
+    });
+  } catch (e) {
+    console.warn('[Voice load]', e.message);
+    VT.entries = [];
+  }
+  return VT.entries;
+}
+
+function vtRenderSaved() {
+  const body = document.getElementById('vtBody');
+  if (!body) return;
+  vtLoadEntries().then(function(list) {
+    const b = document.getElementById('vtBody');
+    if (!b || VT.mode !== 'saved') return;
+    if (!list.length) {
+      b.innerHTML = '<div class="vt-empty">' + vtSvg(VT_I.book, 42) +
+        '<h3>Nothing saved yet</h3><p>Have a conversation, then tap <b>Save</b> to keep it as a record of what you instructed.</p></div>';
+      return;
+    }
+    let h = '';
+    for (let i = 0; i < list.length; i++) {
+      const s = list[i];
+      const who = (s.workerName || 'Worker') + (s.workerTrade ? ' · ' + s.workerTrade : '');
+      h += '<div class="vt-sv">' +
+        '<button class="dot" data-vtopen="' + s.id + '">' + peEsc(vtL(s.wkLang).n.substring(0, 2).toUpperCase()) + '</button>' +
+        '<button class="col" data-vtopen="' + s.id + '">' +
+          '<span class="t">' + peEsc(s.title) + '</span>' +
+          '<span class="m">' + peEsc(s.location || 'No location') + ' &middot; ' + peEsc(who) + '</span>' +
+          '<span class="m">' + s.turns.length + ' turn' + (s.turns.length === 1 ? '' : 's') + ' &middot; ' + s.createdAt.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' }) + '</span>' +
+        '</button>' +
+        '<button class="del" data-vtdel="' + s.id + '" aria-label="Delete">' + vtSvg(VT_I.trash, 16) + '</button>' +
+      '</div>';
+    }
+    b.innerHTML = h;
+  });
+}
+
+function vtOpenEntry(id) {
+  const e = VT.entries.filter(function(x) { return x.id === id; })[0];
+  if (!e) return;
+  VT.editId = id;
+  VT.me = e.meLang; VT.wk = e.wkLang;
+  VT.turns = e.turns.slice();
+  VT.mode = 'talk';
+  vtRender();
+  showToast('Opened — carry on talking, or tap Update');
+}
+
+async function vtDeleteEntry(id) {
+  if (!confirm('Delete this conversation?')) return;
+  try {
+    await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('voiceTalks').doc(id).delete();
+    if (VT.editId === id) { VT.editId = null; VT.turns = []; }
+    VT.entries = [];
+    showToast('Deleted');
+    vtRender();
+  } catch (e) {
+    showToast('Could not delete. ' + e.message, 'error');
+  }
+}
+
+// ---------- 11. PENDAWAIAN ----------
+// Delegasi klik dipasang sekali sahaja seumur hidup halaman; setiap panggilan
+// vtRender() menulis semula innerHTML, jadi pendengar pada nod dalam akan hilang.
+let _vtWired = false;
+function vtWire() {
+  vtWireInputs();
+  if (_vtWired) return;
+  _vtWired = true;
+
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('vtOverlay')) return;
+    let el;
+
+    if ((el = e.target.closest('[data-vtmode]'))) { VT.mode = el.dataset.vtmode; vtRender(); return; }
+    if ((el = e.target.closest('[data-vtpick]'))) { vtOpenPick(el.dataset.vtpick); return; }
+    if (e.target.closest('#vtSwap')) {
+      const a = VT.me; VT.me = VT.wk; VT.wk = a;
+      vtRender(); showToast(vtL(VT.me).n + ' ⇄ ' + vtL(VT.wk).n); return;
+    }
+    if (e.target.closest('#vtSaveBtn')) { vtOpenSave(); return; }
+    if (e.target.closest('#vtDoSave')) { vtDoSave(); return; }
+    if (e.target.closest('#vtMicWk')) { vtListen('wk'); return; }
+    if (e.target.closest('#vtMicMe')) { vtListen('me'); return; }
+    if (e.target.closest('#vtSend')) { vtSendTyped(); return; }
+    if (e.target.closest('#vtClose')) { vtCloseAll(); return; }
+
+    if ((el = e.target.closest('[data-vtplay]'))) { const t = VT.turns[+el.dataset.vtplay]; if (t) vtSpeak(t.out, t.to, 1); return; }
+    if ((el = e.target.closest('[data-vtslow]'))) { const t = VT.turns[+el.dataset.vtslow]; if (t) vtSpeak(t.out, t.to, 0.6); return; }
+    if ((el = e.target.closest('[data-vtbig]'))) { vtOpenBig(+el.dataset.vtbig); return; }
+    if ((el = e.target.closest('[data-vtbigplay]'))) { const t = VT.turns[+el.dataset.vtbigplay]; if (t) vtSpeak(t.out, t.to, 1); return; }
+    if (e.target.closest('[data-vtbigclose]')) { document.getElementById('vtBig').classList.remove('on'); return; }
+
+    if ((el = e.target.closest('[data-vtcat]'))) { VT.cat = el.dataset.vtcat; vtRender(); return; }
+    if ((el = e.target.closest('[data-vtph]'))) { vtSendPhrase(+el.dataset.vtph); return; }
+    if ((el = e.target.closest('[data-vtopen]'))) { vtOpenEntry(el.dataset.vtopen); return; }
+    if ((el = e.target.closest('[data-vtdel]'))) { vtDeleteEntry(el.dataset.vtdel); return; }
+
+    if ((el = e.target.closest('[data-vtlang]'))) {
+      const sh = document.getElementById('vtSheet');
+      if (sh.dataset.which === 'me') VT.me = el.dataset.vtlang; else VT.wk = el.dataset.vtlang;
+      sh.classList.remove('on');
+      vtRender(); return;
+    }
+    if (e.target.closest('[data-vtclose]')) {
+      const s = e.target.closest('.vt-sheet');
+      if (s) s.classList.remove('on');
+      return;
+    }
+  });
+
+}
+
+// Dipasang semula setiap render kerana nodnya dicipta semula.
+function vtWireInputs() {
+  const q = document.getElementById('vtQ');
+  if (q) q.addEventListener('input', function() {
+    VT.q = q.value;
+    const b = document.getElementById('vtBody');
+    const pos = b.scrollTop;
+    b.innerHTML = vtViewBook();
+    b.scrollTop = pos;
+    const q2 = document.getElementById('vtQ');
+    if (q2) { q2.focus(); q2.setSelectionRange(q2.value.length, q2.value.length); }
+  });
+  const ti = document.getElementById('vtType');
+  if (ti) ti.addEventListener('keydown', function(e) { if (e.key === 'Enter') vtSendTyped(); });
+}
+
+function vtCloseAll() {
+  try { if (_vtRecog) _vtRecog.abort(); } catch (e) {}
+  try { speechSynthesis.cancel(); } catch (e) {}
+  VT.listening = false;
+  ['vtOverlay', 'vtSheet', 'vtBig'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+}
+
+// ---------- 12. MASUK ----------
 function openVoiceTranslator() {
   if (typeof closeTool === 'function') closeTool();
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  vtCloseAll();
 
-  let ov = document.getElementById('vtOverlay');
-  if (ov) ov.remove();
-  ov = document.createElement('div');
+  VT.mode = 'talk'; VT.turns = []; VT.editId = null;
+  VT.cat = 'All'; VT.q = ''; VT.listening = false; VT.entries = [];
+
+  const ov = document.createElement('div');
   ov.id = 'vtOverlay';
   ov.className = 'vt-overlay';
-  const workers = ['bn-BD', 'zh-CN', 'ta-IN', 'ur-PK'];
-  const chips = workers.map(function(code) { return '<button class="vt-chip" data-lang="' + code + '">' + VT_LANGS[code].label + '</button>'; }).join('');
-  ov.innerHTML =
-    '<div class="vt-top">' +
-      '<button id="vtClose">Close</button>' +
-      '<div class="vt-title">Voice Translator</div>' +
-      '<button id="vtMyLang">BM</button>' +
-    '</div>' +
-    '<div class="vt-langs">' + chips + '</div>' +
-    '<div class="vt-convo" id="vtConvo"><div class="vt-empty">Pick the worker\'s language, tap a mic and speak. The translation appears here and is spoken aloud. Tap the other mic to reply.</div></div>' +
-    '<div class="vt-status" id="vtStatus"></div>' +
-    '<div class="vt-mics">' +
-      '<button class="vt-mic vt-mic-worker" id="vtMicWorker"><span class="vt-mic-ic"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></span><span>Worker · <b id="vtWorkerLabel">Bangla</b></span></button>' +
-      '<button class="vt-mic vt-mic-me" id="vtMicMe"><span class="vt-mic-ic"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></span><span>Me · <b id="vtMeLabel">BM</b></span></button>' +
-    '</div>';
   document.body.appendChild(ov);
+
+  const sh = document.createElement('div');
+  sh.id = 'vtSheet'; sh.className = 'vt-sheet';
+  document.body.appendChild(sh);
+
+  const big = document.createElement('div');
+  big.id = 'vtBig'; big.className = 'vt-big';
+  document.body.appendChild(big);
 
   if (window.speechSynthesis) {
     _vtVoices = speechSynthesis.getVoices();
     speechSynthesis.onvoiceschanged = function() { _vtVoices = speechSynthesis.getVoices(); };
   }
 
-  let workerLang = 'bn-BD';
-  let myLang = 'ms-MY';
-
-  function refreshLabels() {
-    ov.querySelector('#vtWorkerLabel').textContent = VT_LANGS[workerLang].label;
-    ov.querySelector('#vtMeLabel').textContent = VT_LANGS[myLang].label;
-    ov.querySelector('#vtMyLang').textContent = VT_LANGS[myLang].label;
-  }
-  ov.querySelectorAll('.vt-chip').forEach(function(c) {
-    c.addEventListener('click', function() {
-      workerLang = c.dataset.lang;
-      ov.querySelectorAll('.vt-chip').forEach(function(x) { x.classList.toggle('active', x === c); });
-      refreshLabels();
-    });
-  });
-  ov.querySelector('.vt-chip[data-lang="bn-BD"]').classList.add('active');
-  ov.querySelector('#vtMyLang').addEventListener('click', function() {
-    myLang = (myLang === 'ms-MY') ? 'en-US' : 'ms-MY';
-    refreshLabels();
-  });
-  refreshLabels();
-
-  const statusEl = ov.querySelector('#vtStatus');
-  function status(t) { statusEl.textContent = t || ''; }
-
-  function setMic(which, on) {
-    ov.querySelector('#vtMicWorker').classList.toggle('listening', on && which === 'worker');
-    ov.querySelector('#vtMicMe').classList.toggle('listening', on && which === 'me');
-  }
-
-  function addBubble(side, original, translated, speakLang) {
-    const convo = ov.querySelector('#vtConvo');
-    const empty = convo.querySelector('.vt-empty');
-    if (empty) empty.remove();
-    const div = document.createElement('div');
-    div.className = 'vt-msg ' + (side === 'worker' ? 'vt-worker' : 'vt-me');
-    div.innerHTML = '<div class="vt-orig">' + peEsc(original) + '</div><div class="vt-trans">' + peEsc(translated) + '</div><button class="vt-replay"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>Play</button>';
-    convo.appendChild(div);
-    convo.scrollTop = convo.scrollHeight;
-    div.querySelector('.vt-replay').onclick = function() { vtSpeak(translated, speakLang); };
-    vtSpeak(translated, speakLang);
-  }
-
-  function processSpeech(side, text) {
-    const toLang = (side === 'worker') ? myLang : workerLang;
-    status('Translating…');
-    vtTranslate(text, VT_LANGS[toLang].name).then(function(tr) {
-      status('');
-      addBubble(side, text, tr, toLang);
-    }).catch(function(e) { status('Translate error: ' + e.message); });
-  }
-
-  let recog = null, listening = false, side = null, finalText = '';
-  if (SR) {
-    recog = new SR();
-    recog.interimResults = true;
-    recog.maxAlternatives = 1;
-    recog.continuous = false;
-    recog.onstart = function() { listening = true; setMic(side, true); status('Listening… speak now'); };
-    recog.onresult = function(e) {
-      let f = '', interim = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const tr = e.results[i][0].transcript;
-        if (e.results[i].isFinal) f += tr; else interim += tr;
-      }
-      if (f) finalText += f;
-      status('“' + (finalText || interim) + '”');
-    };
-    recog.onerror = function(e) { status('Mic: ' + e.error + (e.error === 'not-allowed' ? ' — allow microphone access' : '')); };
-    recog.onend = function() {
-      listening = false; setMic(side, false);
-      const t = finalText.trim(); finalText = '';
-      if (t) processSpeech(side, t); else status('');
-    };
-  }
-
-  function startListen(s) {
-    if (!SR) { status('Voice input not supported on this browser. Use Chrome on Android.'); return; }
-    if (listening) { recog.stop(); return; }
-    side = s;
-    finalText = '';
-    recog.lang = (s === 'worker') ? workerLang : myLang;
-    try { recog.start(); } catch (e) { try { recog.stop(); } catch (_) {} }
-  }
-  ov.querySelector('#vtMicWorker').addEventListener('click', function() { startListen('worker'); });
-  ov.querySelector('#vtMicMe').addEventListener('click', function() { startListen('me'); });
-
-  ov.querySelector('#vtClose').addEventListener('click', function() {
-    try { if (recog) recog.abort(); } catch (e) {}
-    try { speechSynthesis.cancel(); } catch (e) {}
-    ov.remove();
-  });
+  vtRender();
 }
 
 // =======================================================
@@ -15498,7 +16245,7 @@ const NT_TOOLS = [
   { id:'arfloorplan',    name:'AR Floor Plan',    cat:'measure', req:'AR',     kw:'overlay plan floor' },
   { id:'sketch2real',    name:'Sketch to Real',   cat:'plan',    req:'AI',     kw:'drawing clean vector plan' },
   { id:'planeditor',     name:'Plan Editor',      cat:'plan',    kw:'draw annotate canvas markup' },
-  { id:'voicetranslate', name:'Voice Translator', cat:'util',    req:'AI',     kw:'speak language contractor' },
+  { id:'voicetranslate', name:'Voice Translator', cat:'util',    req:'AI',     kw:'speak language contractor phrasebook worker bangla tamil nepali offline' },
   { id:'converter',      name:'Converter',        cat:'util',    kw:'unit calculator metric imperial' },
   { id:'counter',        name:'Tally Counter',    cat:'util',    kw:'count tally quantity' }
 ];
