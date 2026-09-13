@@ -11428,6 +11428,7 @@ let slWasLevel = false, slLastBuzz = 0;
 let slNow = { mode: 'flat', sub: null, degrees: 0, isLevel: false };
 let slEditId = null;
 let slEntries = [];
+let slPhoto = null;   // dataURL foto pada borang semasa
 
 function slHead(name, desc) {
   document.getElementById('toolModalIcon').innerHTML =
@@ -11734,13 +11735,19 @@ function slOpenForm(entry) {
     '<div class="br-field"><label class="br-label" for="slLoc">Location</label>' +
       '<input type="text" class="br-input" id="slLoc" maxlength="90" placeholder="e.g. Block C, unit 3-2"></div>' +
     '<div class="br-field"><label class="br-label" for="slDesc">Description</label>' +
-      '<textarea class="br-area" id="slDesc" maxlength="1000" placeholder="What you were checking and what it means for the report."></textarea></div>';
+      '<textarea class="br-area" id="slDesc" maxlength="1000" placeholder="What you were checking and what it means for the report."></textarea></div>' +
+    '<div class="br-field"><label class="br-label">Photo</label>' +
+      '<div id="slPhotoSlot"></div>' +
+      '<input type="file" id="slPhotoInput" accept="image/*" style="display:none"></div>';
 
   const set = function(id, v) { const el = document.getElementById(id); if (el) el.value = (v == null ? '' : v); };
+  slPhoto = entry ? (entry.photo || null) : null;
   if (entry) {
     set('slTitle', entry.title); set('slElem', entry.element);
     set('slLoc', entry.location); set('slDesc', entry.description);
   }
+  slRenderPhoto();
+  document.getElementById('slPhotoInput').addEventListener('change', slPickPhoto);
 
   document.getElementById('toolModalFoot').innerHTML =
     '<button class="tool-btn tool-btn-secondary" id="slFormBack">' + (slEditId ? 'Cancel' : 'Back') + '</button>' +
@@ -11754,6 +11761,45 @@ function slOpenForm(entry) {
 }
 
 let slCaptured = null;
+
+function slRenderPhoto() {
+  const slot = document.getElementById('slPhotoSlot');
+  if (!slot) return;
+  if (slPhoto) {
+    slot.innerHTML =
+      '<div class="br-photo"><img src="' + slPhoto + '" alt="">' +
+      '<button class="br-photo-x" id="slPhotoX" type="button" aria-label="Remove photo">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+      '</button></div>';
+    document.getElementById('slPhotoX').addEventListener('click', function() {
+      slPhoto = null; slRenderPhoto();
+    });
+  } else {
+    slot.innerHTML =
+      '<button class="br-drop" id="slPhotoBtn" type="button">' +
+        '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+        '<div>Take or choose a photo</div><small>Optional</small>' +
+      '</button>';
+    document.getElementById('slPhotoBtn').addEventListener('click', function() {
+      document.getElementById('slPhotoInput').click();
+    });
+  }
+}
+
+async function slPickPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('slPhotoSlot').innerHTML = '<div class="br-load">Processing photo...</div>';
+  try {
+    slPhoto = await resizeImage(file, 1024);
+  } catch (err) {
+    console.warn('[Level photo]', err.message);
+    slPhoto = null;
+    showToast('Could not read that photo', 'error');
+  }
+  slRenderPhoto();
+  e.target.value = '';
+}
 
 async function slSave() {
   if (!currentUser) { showToast('Sign in to save', 'error'); return; }
@@ -11776,6 +11822,7 @@ async function slSave() {
     degrees: Math.round(Number(r.degrees) * 10) / 10,
     isLevel: !!r.isLevel,
     zeroed: !!r.zeroed,
+    photo: slPhoto || null,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
@@ -11821,6 +11868,7 @@ async function slLoadEntries() {
         mode: d.mode || 'flat', sub: d.sub || null,
         degrees: typeof d.degrees === 'number' ? d.degrees : 0,
         isLevel: !!d.isLevel, zeroed: !!d.zeroed,
+        photo: d.photo || null,
         createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
       });
     });
@@ -11860,6 +11908,7 @@ function slOpenHistory() {
           en.degrees.toFixed(1) + '°</span>' +
         '<span class="br-item-t"><b>' + escapeHTML(en.title) + '</b>' +
         '<span>' + escapeHTML(bits.join(' · ')) + '</span></span>' +
+        (en.photo ? '<span class="br-item-th"><img src="' + en.photo + '" alt=""></span>' : '') +
       '</button>';
     });
     body.innerHTML = html;
@@ -11875,7 +11924,9 @@ function slOpenEntry(id) {
   slEditId = null;
   slHead(en.title, formatRelativeTime(en.createdAt));
 
-  let html = slCapCard(en);
+  let html = '';
+  if (en.photo) html += '<div class="ds-shot" style="margin-bottom:14px"><img src="' + en.photo + '" alt=""></div>';
+  html += slCapCard(en);
   html += '<div class="br-res" style="margin-top:0"><div class="br-res-body" style="border-top:0">' +
     '<div class="br-res-row"><em>Reading</em><span>' + en.degrees.toFixed(1) + '° ' +
       (en.isLevel ? 'within tolerance' : 'out of ' + (en.mode === 'flat' ? 'level' : (en.sub === 'plumb' ? 'plumb' : 'level'))) + '</span></div>' +
