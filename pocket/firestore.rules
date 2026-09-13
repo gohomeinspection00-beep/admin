@@ -1,0 +1,67 @@
+rules_version = '2';
+
+// =============================================================================
+// GoXpert Pocket — Firestore Rules (projek Firebase SENDIRI, berasingan
+// daripada Go Inspect)
+// -----------------------------------------------------------------------------
+// Semua data Pocket disimpan di bawah UID pengguna, jadi rules ini ringkas:
+// setiap orang hanya boleh baca/tulis cabang miliknya sendiri.
+//
+// Ini menggantikan rules lama yang terbuka (allow read, write: if true) dan
+// sekali gus membetulkan tiga isu yang direkod dalam POCKET-README.md:
+//   P1 — data Pocket terdedah kepada umum
+//   P2 — settings/pocketConfig tak boleh dibaca pengguna biasa
+//   P3 — users/{uid} ditolak kerana rules lama menjangka users/{email}
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Pemilik cabang data: UID dalam path mesti sama dengan UID yang log masuk.
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // ---- Inspection + foto + BARIS ----
+    match /pocketInspections/{uid}/{rest=**} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ---- Sejarah chat AI ----
+    match /pocketChats/{uid}/{rest=**} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ---- Arkib sesi Site Mode ----
+    match /siteSessions/{uid}/{rest=**} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ---- Profil sendiri ----
+    // Pocket menulis users/{uid} semasa signup. Rules ini sepadan dengan itu.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+      match /{sub=**} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ---- Konfigurasi app ----
+    // Dibaca oleh app (pocketConfig, ayieConfig). Tulis HANYA dari Firebase
+    // Console atau Admin SDK — 'if false' tidak menghalang kedua-duanya kerana
+    // keduanya memintas rules sepenuhnya.
+    match /settings/{doc} {
+      allow read:  if signedIn();
+      allow write: if false;
+    }
+
+    // ---- Tolak semua yang lain ----
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
