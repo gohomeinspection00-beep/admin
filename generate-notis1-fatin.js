@@ -17,7 +17,13 @@ const data = {
 
   namaPemaju: "METACORP PROPERTIES SDN. BHD.",
   noSyarikat: "(198301002311 / 97547-U)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "HQ") ? [
+    "(Alamat Berdaftar / Registered Office)",
+    "L5-01, Level 5, Menara Kenari @ Canary Tower,",
+    "No. 1, Jalan Tun Mohd Fuad,",
+    "Taman Tun Dr. Ismail,",
+    "60000 Wilayah Persekutuan Kuala Lumpur.",
+  ] : [
     "No. 42A, Jalan TU 2,",
     "Taman Tasik Utama,",
     "Ayer Keroh,",
@@ -435,6 +441,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_FATIN.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_FATIN.pdf");
+const outName = (process.argv[2] === "HQ") ? "NOTIS_1_FATIN_HQ.pdf" : "NOTIS_1_FATIN.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
