@@ -45,18 +45,22 @@ const data = {
   tempohNotis1: "15",
   kaedahPenghantaranNotis1: "pos daftar (AR Registered)",
 
+  tarikhReInspection: "3 September 2026",
+
   tarikhNotis2: "14 September 2026",
   tarikhDeadlineNotis2: "29 September 2026",
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "pos daftar (AR Registered)",
 
   kecacatan: [
-    { tag: "233", lokasi: "Ceiling Area (Bedroom 2 & 3) — Wall", kecacatan: "Kecacatan honeycomb dan RC terdedah pada dinding (Honeycomb defect and exposed RC on wall — Major defect)", status: "Belum Dibaiki" },
-    { tag: "245", lokasi: "Water Tank Area — Floor", kecacatan: "Kulat dan tanda air bertakung pada papak lantai (Moldy and sign of stagnant water on floor slab)", status: "Belum Dibaiki" },
-    { tag: "249", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Sokongan sempurna untuk paip agihan yang disambung ke tangki air tiada (Missing proper support for distribution pipe connected to water tank)", status: "Belum Dibaiki" },
-    { tag: "250", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air dalam keadaan kotor dan perlu dibersihkan (Water tank in dirty condition — need to be cleaned)", status: "Belum Dibaiki" },
-    { tag: "263", lokasi: "RC Flat Roof — Plumbing & Sanitary", kecacatan: "Sistem saliran tidak sempurna (Poor Drainage System) — sisa binaan di dalam kedua-dua paip saliran (Construction leftover inside both drain pipes)", status: "Belum Dibaiki" },
-    { tag: "266", lokasi: "Top Roof — Roof", kecacatan: "Keretakan dan chipping pada genting bumbung (Crack and chipping on roof tiles)", status: "Belum Dibaiki" },
+    { tag: "108", lokasi: "Ceiling Area (Master Bathroom) — M&E", kecacatan: "Penutup flexible conduit terlalu pendek (Flexible conduit cover too short — still observed)", status: "Belum Dibaiki" },
+    { tag: "109", lokasi: "Ceiling Area (Master Bedroom) — M&E", kecacatan: "Penutup trunking hilang (Missing trunking cover — still missing)", status: "Belum Dibaiki" },
+    { tag: "110", lokasi: "Ceiling Area (Master Bedroom) — M&E", kecacatan: "Wayar terdedah (Exposed wire — still observed)", status: "Belum Dibaiki" },
+    { tag: "111", lokasi: "Water Tank Area — Floor", kecacatan: "Kulat dan tanda air bertakung pada papak lantai (Moldy and sign of stagnant water on floor slab — still observed)", status: "Belum Dibaiki" },
+    { tag: "116", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air dalam keadaan kotor dan perlu dibersihkan (Water tank in dirty condition — still observed)", status: "Belum Dibaiki" },
+    { tag: "127", lokasi: "RC Flat Roof — Plumbing & Sanitary", kecacatan: "Sistem saliran tidak sempurna — sisa binaan masih ada di dalam kedua-dua paip saliran (Poor Drainage System — construction leftover inside both drain pipes still observed)", status: "Belum Dibaiki" },
+    { tag: "128", lokasi: "Top Roof — Roof", kecacatan: "Sisa binaan masih ada di atas genting bumbung (Construction left over on roof tiles — still observed)", status: "Belum Dibaiki" },
+    { tag: "129", lokasi: "Top Roof — Roof", kecacatan: "Keretakan dan chipping pada genting bumbung masih ada (Crack and chipping on roof tiles — still observed)", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
@@ -68,6 +72,7 @@ const data = {
     { tarikh: "22 Ogos 2026", peristiwa: "Notis Pertama dihantar melalui pos daftar (AR Registered) kepada Ibu Pejabat Melaka (No. RW214685283MY) dan pejabat Bandar Layangkasa" },
     { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama DITERIMA dan ditandatangani oleh wakil pemaju di kedua-dua alamat — Ibu Pejabat Melaka (Jennifer, cop Pusat Mel Melaka) dan Bandar Layangkasa (Zulaika) — rujuk Lampiran A & B" },
     { tarikh: "4 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum dibaiki" },
+    { tarikh: "3 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 8 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
     { tarikh: "14 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "29 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
@@ -247,7 +252,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh Notis Kedua ini dikeluarkan, pemantauan berterusan oleh pemilik mendapati bahawa kerja pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan atau belum disempurnakan oleh pihak tuan. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan.`
+  `Namun, hasil daripada Pemeriksaan Semula (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection}, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya atau tidak dilakukan langsung. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan.`
 );
 y += 5;
 
