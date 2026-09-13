@@ -6085,7 +6085,8 @@ body.site-mode-active .voice-mode{
 
 /* Home ada header sendiri, jadi topbar global disembunyikan di Home.
    Consult bar dibuang terus — toggle Mode kini di Profile. */
-body.on-home .topbar{display:none}
+body.on-home .topbar,
+body.on-tools .topbar{display:none}
 .consult-bar{display:none!important}
 
 .nh-wrap{display:flex;flex-direction:column;min-height:100%;background:var(--bg)}
@@ -6094,7 +6095,7 @@ body.on-home .topbar{display:none}
 .nh-hdr{
   position:relative;overflow:hidden;flex:none;
   background:linear-gradient(155deg,var(--hdr-a) 0%,var(--hdr-b) 100%);
-  padding:calc(16px + env(safe-area-inset-top)) 18px 40px;
+  padding:calc(16px + env(safe-area-inset-top)) 18px 46px;
 }
 .nh-hdr-bldg{position:absolute;right:-10px;top:0;width:170px;height:118px;opacity:.22;pointer-events:none}
 .nh-hdr-wave{position:absolute;left:0;right:0;bottom:0;width:100%;height:34px;display:block}
@@ -6121,7 +6122,7 @@ body.on-home .topbar{display:none}
 }
 
 /* ---------- body ---------- */
-.nh-body{padding:0 16px 130px;margin-top:-14px;position:relative;flex:1}
+.nh-body{padding:0 16px 130px;margin-top:-10px;position:relative;flex:1}
 .nh-greet{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
 .nh-greet h2{margin:0;font-size:27px;font-weight:700;letter-spacing:-.03em;line-height:1.15;color:var(--fg)}
 .nh-greet p{margin:5px 0 0;font-size:13.5px;line-height:1.45;color:var(--muted);max-width:30ch}
@@ -6258,7 +6259,11 @@ body.on-home .topbar{display:none}
 }
 .nt-hdr h2{margin:0 0 2px;font-size:22px;font-weight:700;letter-spacing:-.03em;color:var(--fg)}
 .nt-hdr h2 em{font-family:var(--font-display);font-style:italic;font-weight:500;color:var(--accent)}
-.nt-hdr p{margin:0;font-size:11.5px;color:var(--muted)}
+.nt-titlerow{display:flex;align-items:baseline;gap:9px}
+.nt-total{
+  font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap;
+}
 .nt-search{
   display:flex;align-items:center;gap:9px;background:var(--surface);
   border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-top:11px;color:var(--muted);
@@ -6456,7 +6461,7 @@ body.on-home .topbar{display:none}
           <rect x="138" y="80" width="13" height="13" fill="var(--accent-deep)" opacity=".5"/>
         </svg>
         <svg class="nh-hdr-wave" viewBox="0 0 390 34" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 20C70 4 150 0 240 6c60 4 105 14 150 20v8H0z" fill="var(--bg)"/>
+          <path d="M0 34V12C70 2 140 0 195 0s125 2 195 12v22z" fill="var(--bg)"/>
         </svg>
         <div class="nh-hdr-row">
           <div class="nh-mark">
@@ -6660,8 +6665,10 @@ body.on-home .topbar{display:none}
   <main class="tools-mode" id="toolsMode">
 
     <div class="nt-hdr">
-      <h2>Field <em>tools</em></h2>
-      <p><span id="ntCount">12</span> tools</p>
+      <div class="nt-titlerow">
+        <h2>Field <em>tools</em></h2>
+        <span class="nt-total"><span id="ntCount">12</span> tools</span>
+      </div>
       <div class="nt-search" id="ntSearchWrap">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>
@@ -11510,6 +11517,7 @@ function switchTab(mode) {
 
   // Home sahaja yang ada header sendiri; sembunyikan topbar global di situ.
   document.body.classList.toggle('on-home', mode === 'home');
+  document.body.classList.toggle('on-tools', mode === 'tools');
 
   // Hide all modes
   document.getElementById('homeMode').classList.remove('show');
