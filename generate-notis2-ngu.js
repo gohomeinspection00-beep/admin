@@ -53,6 +53,12 @@ const data = {
   kaedahPenghantaranNotis2: "pos daftar (AR Registered)",
 
   kecacatan: [
+    { tag: "1", lokasi: "Carporch — Floor", kecacatan: "Hollowness pada jubin lantai masih ada (Hollowness on floor tile — still observed)", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "7", lokasi: "Carporch — Plumbing & Sanitary", kecacatan: "Sistem saliran tidak sempurna — air bertakung di dalam saliran masih ada (Poor Drainage System — water stagnant inside drainage still observed)", status: "Belum Dibaiki" },
+    { tag: "104", lokasi: "Ceiling Area (Bedroom 2 & 3) — Wall", kecacatan: "Kecacatan honeycomb dan RC terdedah pada dinding masih ada (Honeycomb defect and exposed RC on wall — Major defect, still observed)", status: "Belum Dibaiki" },
+    { tag: "105", lokasi: "Ceiling Area (Bedroom 2 & 3) — Ceiling", kecacatan: "Sisa binaan masih ada (Construction left over — still observed)", status: "Belum Dibaiki" },
+    { tag: "106", lokasi: "Ceiling Area (Bedroom 2 & 3) — M&E", kecacatan: "Penutup flexible conduit terlalu pendek menyebabkan wayar terdedah (Flexible conduit cover too short and causes of exposed wire — still observed)", status: "Belum Dibaiki" },
+    { tag: "107", lokasi: "Ceiling Area (Bath 2) — M&E", kecacatan: "Penutup flexible conduit terlalu pendek (Flexible conduit cover too short — still observed)", status: "Belum Dibaiki" },
     { tag: "108", lokasi: "Ceiling Area (Master Bathroom) — M&E", kecacatan: "Penutup flexible conduit terlalu pendek (Flexible conduit cover too short — still observed)", status: "Belum Dibaiki" },
     { tag: "109", lokasi: "Ceiling Area (Master Bedroom) — M&E", kecacatan: "Penutup trunking hilang (Missing trunking cover — still missing)", status: "Belum Dibaiki" },
     { tag: "110", lokasi: "Ceiling Area (Master Bedroom) — M&E", kecacatan: "Wayar terdedah (Exposed wire — still observed)", status: "Belum Dibaiki" },
@@ -72,7 +78,7 @@ const data = {
     { tarikh: "22 Ogos 2026", peristiwa: "Notis Pertama dihantar melalui pos daftar (AR Registered) kepada Ibu Pejabat Melaka (No. RW214685283MY) dan pejabat Bandar Layangkasa" },
     { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama DITERIMA dan ditandatangani oleh wakil pemaju di kedua-dua alamat — Ibu Pejabat Melaka (Jennifer, cop Pusat Mel Melaka) dan Bandar Layangkasa (Zulaika) — rujuk Lampiran A & B" },
     { tarikh: "4 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum dibaiki" },
-    { tarikh: "3 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 8 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
+    { tarikh: "3 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 14 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
     { tarikh: "14 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "29 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
