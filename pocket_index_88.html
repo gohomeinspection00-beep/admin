@@ -6713,6 +6713,12 @@ body.on-tools .topbar{display:none}
   font-size:12.5px;line-height:1.6;color:var(--fg-dim);
 }
 .cr2-sum b{color:var(--fg)}
+.cr2-adjust{
+  display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
+  padding:10px;border-top:1px solid var(--line);background:var(--surface);
+  color:var(--accent);font-size:12.5px;font-weight:600;
+}
+.cr2-adjust svg{flex:none}
 .cr2-mmin{display:flex;gap:8px;align-items:center;margin:-2px 0 12px}
 .cr2-mmin input{
   flex:1;padding:11px 12px;border-radius:11px;border:1px solid var(--line);
@@ -12260,6 +12266,8 @@ let crTask = null;          // { kind, refId, refMm, shape, img, handles, measPt
 let crPhase = 'calib';      // 'calib' | 'measure'
 let crEntries = [];
 let crEditId = null;
+let crFlow = 'new';      // 'new' = giliran foto biasa, 'edit' = laras tanda sedia ada
+let crEditKind = null;   // ukuran mana yang sedang dilaras
 
 // Paparan kanvas
 let crv = { cv:null, ctx:null, zoom:1, panX:0, panY:0, base:1, w:0, h:0 };
@@ -12552,7 +12560,10 @@ function crFoot() {
     '<button class="tool-btn tool-btn-primary" id="crGo"' + (ready ? '' : ' disabled') + '>' +
       (crPhase === 'calib' ? 'Next' : 'Done') + '</button>';
   document.getElementById('crCvBack').addEventListener('click', function() {
-    if (crPhase === 'measure') { crTask.measPts = []; crScreenCanvas('calib'); }
+    // Kembali ke kalibrasi tidak memadam ukuran. Melaras rujukan hanya
+    // mengira semula skala; titik yang sudah diketik kekal.
+    if (crPhase === 'measure') crScreenCanvas('calib');
+    else if (crFlow === 'edit') crOpenForm();
     else crScreenRef();
   });
   const u = document.getElementById('crUndo');
@@ -12711,6 +12722,9 @@ function crDraw() {
   ctx.drawImage(crTask.img, crv.panX, crv.panY, crTask.img.width * s, crTask.img.height * s);
 
   const calib = crPhase === 'calib';
+  // Rujukan kekal di skrin semasa mengukur, supaya jelas skala itu datang
+  // dari mana, dan ia boleh dilaras semula tanpa hilang konteks.
+  if (!calib) crDrawRefGhost();
   const pts = calib ? crTask.handles : crTask.measPts;
   const col = calib ? '#22d3ee' : '#ff5d73';
   const D = pts.map(crI2D);
@@ -12770,6 +12784,29 @@ function crDraw() {
 
   if (crLoupe) crDrawLoupe(crLoupe);
   crUpdateHint();
+}
+
+// Rujukan dilukis samar semasa fasa mengukur.
+function crDrawRefGhost() {
+  const ctx = crv.ctx;
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  ctx.strokeStyle = '#22d3ee';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([7, 5]);
+  if (crTask.shape === 'quad' && crTask.rect) {
+    const D = crRectCorners().map(crI2D);
+    ctx.beginPath(); ctx.moveTo(D[0].x, D[0].y);
+    for (let i = 1; i < 4; i++) ctx.lineTo(D[i].x, D[i].y);
+    ctx.closePath(); ctx.stroke();
+  } else if (crTask.shape === 'circle' && crTask.handles.length === 2) {
+    const c = crI2D(crTask.handles[0]), e = crI2D(crTask.handles[1]);
+    ctx.beginPath(); ctx.arc(c.x, c.y, crDist(c, e), 0, Math.PI * 2); ctx.stroke();
+  } else if (crTask.handles.length === 2) {
+    const a = crI2D(crTask.handles[0]), b = crI2D(crTask.handles[1]);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  ctx.restore();
 }
 
 // Jari menutup titik yang sedang diletakkan, jadi kawasan di bawahnya
@@ -12912,13 +12949,32 @@ function crFinishMeasure() {
     pxPerMm: crTask.pxPerMm,
     ref: r.name,
     refMm: crTask.refMm,
-    photo: crTask.dataUrl
+    photo: crTask.dataUrl,
+    // Tanda disimpan supaya ukuran boleh dilaras semula kemudian
+    // tanpa memuat naik gambar sekali lagi.
+    marks: {
+      refId: crTask.refId,
+      shape: crTask.shape,
+      rect: crTask.rect ? { cx:crTask.rect.cx, cy:crTask.rect.cy, w:crTask.rect.w, rot:crTask.rect.rot } : null,
+      handles: crTask.handles.map(function(q) { return { x:q.x, y:q.y }; }),
+      measPts: pts.map(function(q) { return { x:q.x, y:q.y }; }),
+      imgW: crTask.img.width, imgH: crTask.img.height
+    }
   };
+  if (crFlow === 'edit') { crFlow = 'new'; crEditKind = null; crOpenForm(); return; }
   if (crQi < crQueue.length - 1) { crQi++; crStartTask(); }
   else crScreenResult();
 }
 
-function crResultHtml() {
+// showAdjust: benarkan tanda dilaras semula terus dari borang simpan,
+// menggunakan gambar yang sudah ada.
+function crResultHtml(showAdjust) {
+  const adj = function(kind) {
+    if (!showAdjust) return '';
+    return '<button class="cr2-adjust" data-adjust="' + kind + '">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5 8 19l11-11a2.4 2.4 0 0 0-3.4-3.4L4.6 15.6z"/><path d="M14 6.5 17.5 10"/></svg>' +
+      'Adjust the markings</button>';
+  };
   let html = '';
   if (crResults.width) {
     const w = crResults.width, c = crClassify(w.mm);
@@ -12926,7 +12982,8 @@ function crResultHtml() {
       (w.photo ? '<img class="cr2-res-img" src="' + w.photo + '" alt="">' : '') +
       '<div class="cr2-res-top"><span class="cr2-res-n">' + w.mm.toFixed(2) + ' mm</span>' +
       '<span class="cr2-res-t"><i>Crack width</i><b>' + c.label + '</b><span>' + c.text + '</span></span></div>' +
-      '<div class="cr2-res-b">' + w.ref + ' &middot; ' + w.refMm + ' mm &middot; ' + w.pxPerMm.toFixed(2) + ' px/mm</div></div>';
+      '<div class="cr2-res-b">' + w.ref + ' &middot; ' + w.refMm + ' mm &middot; ' + w.pxPerMm.toFixed(2) + ' px/mm</div>' +
+      adj('width') + '</div>';
   }
   if (crResults.length) {
     const l = crResults.length;
@@ -12935,7 +12992,8 @@ function crResultHtml() {
       '<div class="cr2-res-top"><span class="cr2-res-n">' + crFmt(l.mm) + '</span>' +
       '<span class="cr2-res-t"><i>Crack length</i><b>Measured along the crack</b>' +
       '<span>' + l.pts + ' points followed the crack path, so bends are counted.</span></span></div>' +
-      '<div class="cr2-res-b">' + l.ref + ' &middot; ' + l.refMm + ' mm &middot; ' + l.pxPerMm.toFixed(2) + ' px/mm</div></div>';
+      '<div class="cr2-res-b">' + l.ref + ' &middot; ' + l.refMm + ' mm &middot; ' + l.pxPerMm.toFixed(2) + ' px/mm</div>' +
+      adj('length') + '</div>';
   }
   if (crResults.width && crResults.length) {
     const c = crClassify(crResults.width.mm);
@@ -12962,7 +13020,7 @@ function crOpenForm(entry) {
   crHead(crEditId ? 'Edit measurement' : 'Save measurement', 'The numbers are fixed; the details are yours');
 
   document.getElementById('toolModalBody').innerHTML =
-    crResultHtml() +
+    crResultHtml(true) +
     '<div class="br-field" style="margin-top:16px"><label class="br-label" for="crTitle">Name <span class="req">*</span></label>' +
       '<input type="text" class="br-input" id="crTitle" maxlength="90" placeholder="e.g. Diagonal crack to gable wall"></div>' +
     '<div class="br-field"><label class="br-label" for="crElem">Element</label>' +
@@ -12983,7 +13041,50 @@ function crOpenForm(entry) {
     else crScreenResult();
   });
   document.getElementById('crDoSave').addEventListener('click', crSave);
+  document.getElementById('toolModalBody').querySelectorAll('[data-adjust]').forEach(function(b) {
+    b.addEventListener('click', function() { crAdjustMarks(b.dataset.adjust); });
+  });
   setTimeout(function() { document.getElementById('crTitle').focus(); }, 80);
+}
+
+// Buka semula kanvas dengan gambar dan tanda yang tersimpan. Tiada muat
+// naik semula: gambar sudah ada pada rekod.
+function crAdjustMarks(kind) {
+  const r = crResults[kind];
+  if (!r || !r.photo) { showToast('No photo stored for that measurement', 'error'); return; }
+  const m = r.marks || {};
+  crFlow = 'edit';
+  crEditKind = kind;
+
+  crHead('Loading', 'Restoring the photo');
+  document.getElementById('toolModalBody').innerHTML = '<div class="br-load">Loading photo...</div>';
+  document.getElementById('toolModalFoot').innerHTML = '';
+
+  const img = new Image();
+  img.onload = function() {
+    const ref = CR_REFS.filter(function(x) { return x.id === (m.refId || 'card'); })[0] || CR_REFS[0];
+    crTask = {
+      kind: kind,
+      refId: ref.id,
+      refMm: r.refMm || ref.mm || 100,
+      shape: m.shape || ref.shape,
+      img: img,
+      dataUrl: r.photo,
+      rect: m.rect ? { cx:m.rect.cx, cy:m.rect.cy, w:m.rect.w, rot:m.rect.rot } : null,
+      handles: (m.handles || []).map(function(q) { return { x:q.x, y:q.y }; }),
+      measPts: (m.measPts || []).map(function(q) { return { x:q.x, y:q.y }; }),
+      pxPerMm: r.pxPerMm || null,
+      aiPins: false
+    };
+    if (crTask.shape === 'quad' && !crTask.rect) crTask.handles = [];
+    crScreenCanvas('calib');
+  };
+  img.onerror = function() {
+    crFlow = 'new'; crEditKind = null;
+    showToast('Could not reopen that photo', 'error');
+    crOpenForm();
+  };
+  img.src = r.photo;
 }
 
 async function crSave() {
@@ -13001,7 +13102,8 @@ async function crSave() {
     if (!r) return null;
     return { mm: Math.round(r.mm * 100) / 100, pts: r.pts,
              pxPerMm: Math.round(r.pxPerMm * 100) / 100,
-             ref: r.ref, refMm: r.refMm, photo: r.photo || null };
+             ref: r.ref, refMm: r.refMm, photo: r.photo || null,
+             marks: r.marks || null };
   };
   const data = {
     title: title,
@@ -13052,7 +13154,7 @@ async function crLoadEntries() {
         title: d.title || 'Untitled',
         element: d.element || '', location: d.location || '',
         description: d.description || '',
-        results: { width: d.width || null, length: d.length || null },
+        results: { width: d.width || null, length: d.length || null },   // termasuk marks
         widthMm: d.widthMm, lengthMm: d.lengthMm,
         createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
       });
@@ -13110,6 +13212,7 @@ function crOpenEntry(id) {
   if (!en) { crOpenHistory(); return; }
   crEditId = null;
   crResults = en.results || {};
+  crFlow = 'new'; crEditKind = null;
   crHead(en.title, formatRelativeTime(en.createdAt));
 
   let html = crResultHtml();
