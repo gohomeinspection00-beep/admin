@@ -45,8 +45,8 @@ const data = {
   tempohNotis1: "15",
   kaedahPenghantaranNotis1: "pos daftar (AR Registered) dengan nombor RW214685527MY",
 
-  tarikhNotis2: "11 September 2026",
-  tarikhDeadlineNotis2: "26 September 2026",
+  tarikhNotis2: "14 September 2026",
+  tarikhDeadlineNotis2: "29 September 2026",
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "pos",
 
@@ -71,8 +71,8 @@ const data = {
     { tarikh: "10 Ogos 2026", peristiwa: "Notis Pertama (First Notice) — Ruj. NOTIS-1/2026/022 — dihantar melalui pos daftar (AR Registered) No. RW214685527MY" },
     { tarikh: "12 Ogos 2026", peristiwa: "Notis Pertama DITERIMA dan ditandatangani oleh wakil pemaju (rujuk Akuan Terima Pos Daftar — Lampiran A)" },
     { tarikh: "25 Ogos 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum dibaiki" },
-    { tarikh: "11 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
-    { tarikh: "26 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "14 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
+    { tarikh: "29 September 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
