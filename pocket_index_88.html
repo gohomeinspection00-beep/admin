@@ -2336,6 +2336,18 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 }
 
 .input-row{display:flex;align-items:flex-end;gap:8px}
+.chat-consult{display:flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:var(--bg-2);
+  border:1px solid var(--line);color:var(--fg-dim);font-size:11px;font-weight:600;flex:none;margin-right:4px}
+.chat-consult-sw{width:26px;height:15px;border-radius:999px;background:var(--line);position:relative;transition:background 0.18s;flex:none}
+.chat-consult-sw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:var(--bg);transition:transform 0.18s}
+.chat-consult.on{background:var(--warning-soft);border-color:var(--warning);color:var(--warning)}
+.chat-consult.on .chat-consult-sw{background:var(--warning)}
+.chat-consult.on .chat-consult-sw::after{transform:translateX(11px)}
+.msg-acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.msg-acts button{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;background:var(--bg-2);
+  border:1px solid var(--line);color:var(--fg);font-size:11.5px;font-weight:600}
+.msg-acts button:active{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.msg-acts button.done{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
 .input-attach{
   width:40px;height:40px;flex-shrink:0;
   background:var(--bg);
@@ -2382,10 +2394,11 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
    VOICE MODE
 ============================================ */
 .voice-mode{
-  flex:1;
+  /* Lapisan di atas chat, bukan skrin berasingan — apa yang disebut
+     masuk ke thread yang sama dan kekal di sana selepas ditutup. */
+  position:fixed;inset:0;z-index:2400;
   display:none;flex-direction:column;
   background:var(--bg);
-  position:relative;
 }
 .voice-mode.show{display:flex}
 
@@ -7563,6 +7576,9 @@ body.on-tools .topbar{display:none}
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
+      <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
+        <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
+      </button>
       <button class="chat-new-btn" id="chatNewBtn" aria-label="New chat">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       </button>
@@ -7633,6 +7649,9 @@ body.on-tools .topbar{display:none}
         <div class="input-wrap">
           <textarea id="msgInput" placeholder="Ask about defects, standards, or legal references..." rows="1"></textarea>
         </div>
+        <button class="input-attach" id="voiceOpenBtn" title="Speak instead">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+        </button>
         <button class="input-send" id="sendBtn" disabled>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
@@ -8603,6 +8622,11 @@ function updateConsultUI() {
   // Update home indicator if visible
   const modeIndicator = document.getElementById('homeModeIndicator');
   if (modeIndicator) modeIndicator.textContent = 'Mode: ' + (isConsultant ? 'Consultant' : 'Normal');
+
+  const hdrBtn = document.getElementById('chatConsult');
+  const hdrLbl = document.getElementById('chatConsultLbl');
+  if (hdrBtn) hdrBtn.classList.toggle('on', isConsultant);
+  if (hdrLbl) hdrLbl.textContent = isConsultant ? 'Consultant' : 'Normal';
   
   // Update welcome text based on mode
   const wTitle = document.getElementById('welcomeTitle');
@@ -8623,6 +8647,13 @@ document.getElementById('consultToggle').addEventListener('click', () => {
   setMode(currentMode === 'consultant' ? 'normal' : 'consultant');
   showToast(currentMode === 'consultant' ? 'Consultant mode active' : 'Normal mode active');
 });
+document.getElementById('chatConsult').addEventListener('click', () => {
+  setMode(currentMode === 'consultant' ? 'normal' : 'consultant');
+  showToast(currentMode === 'consultant'
+    ? 'Consultant mode — structured answers with citations'
+    : 'Normal mode — quick conversational answers');
+});
+document.getElementById('voiceOpenBtn').addEventListener('click', () => switchTab('voice'));
 
 // =======================================================
 // (Tab navigation now handled by bottom nav — see bottom of script)
@@ -8957,6 +8988,13 @@ function appendMessage(msg, animate = true) {
     bodyHTML += formatPlainContent(msg.content);
   }
   
+  // Jawapan yang tidak boleh dibuat apa-apa hanyalah teks untuk disalin
+  // sendiri. Letakkan tindakan terus di bawahnya.
+  const actsHTML = isAI ? '<div class="msg-acts">' +
+    '<button data-msgact="copy"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>' +
+    '<button data-msgact="speak"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>Read aloud</button>' +
+    '</div>' : '';
+
   wrap.innerHTML = `
     <div class="msg-header">
       <span class="msg-author ${isAI ? 'ai' : ''}">${author}</span>
@@ -8964,7 +9002,27 @@ function appendMessage(msg, animate = true) {
       <span class="msg-time">${time}</span>
     </div>
     <div class="msg-body">${bodyHTML}</div>
+    ${actsHTML}
   `;
+
+  wrap.querySelectorAll('[data-msgact]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (btn.dataset.msgact === 'copy') {
+        const plain = String(msg.content || '')
+          .replace(/\[([A-Z\s]+)\]/g, '').replace(/\*\*/g, '').replace(/`/g, '').trim();
+        if (navigator.clipboard) navigator.clipboard.writeText(plain).catch(function() {});
+        btn.classList.add('done');
+        btn.lastChild.textContent = 'Copied';
+      } else {
+        if (typeof voice_speak === 'function') {
+          const plain = String(msg.content || '')
+            .replace(/\[([A-Z\s]+)\]/g, '').replace(/\*\*/g, '').replace(/`/g, '')
+            .replace(/\n{2,}/g, '. ').replace(/\n/g, ' ');
+          voice_speak(plain);
+        }
+      }
+    });
+  });
   
   if (!animate) wrap.style.animation = 'none';
   chatMessagesEl.appendChild(wrap);
@@ -9453,7 +9511,7 @@ voiceStopBtn.addEventListener('click', function() {
 // Back button — return to previous tab
 voiceBackBtn.addEventListener('click', function() {
   voice_stopAll();
-  switchTab('home');
+  switchTab('chat');
 });
 
 // Menu button — open chat history sidebar
@@ -9550,6 +9608,7 @@ async function voice_processQuery(query) {
   const userMsg = { role: 'user', content: query, image: null, mode: currentMode, timestamp: new Date() };
   chatHistory.push(userMsg);
   saveMessage('user', query, null, currentMode);
+  renderChat();
   
   try {
     const aiText = await callGemini(chatHistory, true);
@@ -9572,6 +9631,7 @@ async function voice_processQuery(query) {
     const aiMsg = { role: 'assistant', content: aiText, image: null, mode: currentMode, timestamp: new Date() };
     chatHistory.push(aiMsg);
     saveMessage('assistant', aiText, null, currentMode);
+    renderChat();   // thread di belakang lapisan sentiasa terkini
     
     voice_speak(cleanText);
   } catch (err) {
@@ -13705,6 +13765,9 @@ function switchTab(mode) {
     document.getElementById('chatMode').classList.remove('hidden');
     if (typeof voice_stopAll === 'function') voice_stopAll();
   } else if (mode === 'voice') {
+    // Chat kekal di belakang lapisan suara supaya thread tidak hilang.
+    document.getElementById('chatMode').classList.remove('hidden');
+    renderChat();
     document.getElementById('voiceMode').classList.add('show');
   }
 }
