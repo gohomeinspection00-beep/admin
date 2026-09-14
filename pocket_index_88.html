@@ -17961,10 +17961,12 @@ function cvCalc() {
       '<div class="cv-inline">' + cvF('tTw', 'Tile width', 'mm') + cvF('tTh', 'Tile height', 'mm') + '</div>' +
       '<div class="cv-pill" id="tPre">' + ['300x300', '300x600', '600x600', '800x800'].map(function(p) {
         return '<button data-t="' + p + '">' + p + '</button>'; }).join('') + '</div>' +
-      '<div class="cv-inline">' + cvF('tWa', 'Wastage', '%') + cvF('tBox', 'Tiles per box') + '</div>' +
+      '<div class="cv-inline">' + cvF('tWa', 'Wastage', '%') + cvF('tBox', 'Tiles per box', 'optional') + '</div>' +
       '<div id="tOut"></div>' +
       '<div class="cv-note">10% wastage for a straight lay, <b>15% for diagonal</b> or a room with many corners. Buy the spare boxes from the same batch — a later batch is usually a shade off.</div>';
-    cvSet({ tL:'', tW:'', tTw:600, tTh:600, tWa:10, tBox:4 });
+    // Tiles per box berbeza ikut jenama dan saiz, jadi jangan diandaikan —
+    // biar kosong, dan bagi jawapan dalam keping sehingga ia diisi.
+    cvSet({ tL:'', tW:'', tTw:600, tTh:600, tWa:10, tBox:'' });
     b.querySelector('#tPre').addEventListener('click', function(e) {
       const q = e.target.closest('[data-t]');
       if (!q) return;
@@ -17977,15 +17979,27 @@ function cvCalc() {
       const a = cvNum('tL') * cvNum('tW');
       const tw = cvNum('tTw') / 1000, th = cvNum('tTh') / 1000;
       const per = (tw > 0 && th > 0) ? 1 / (tw * th) : 0;
-      const need = a * per * (1 + cvNum('tWa') / 100);
-      const box = cvNum('tBox') > 0 ? Math.ceil(need / cvNum('tBox')) : 0;
-      document.getElementById('tOut').innerHTML = cvRes('Buy this many', box + ' boxes', [
+      const bare = Math.ceil(a * per);
+      const need = Math.ceil(a * per * (1 + cvNum('tWa') / 100));
+      const perBox = cvNum('tBox');
+      const rows = [
         ['Floor area', cvFmt(a) + ' m²  (' + cvFmt(a / 0.092903, 0) + ' sq ft)'],
         ['Tiles per m²', cvFmt(per, 1)],
-        ['Tiles incl. wastage', Math.ceil(need)],
-        ['Tiles in ' + box + ' boxes', box * cvNum('tBox')],
-        ['Spare after laying', Math.max(0, box * cvNum('tBox') - Math.ceil(a * per)) + ' tiles']
-      ]);
+        ['To cover the floor', bare + ' tiles'],
+        ['Plus ' + cvNum('tWa') + '% wastage', need + ' tiles']
+      ];
+      if (perBox > 0) {
+        const box = Math.ceil(need / perBox);
+        rows.push(['Tiles in ' + box + ' box' + (box === 1 ? '' : 'es'), box * perBox]);
+        rows.push(['Spare after laying', Math.max(0, box * perBox - bare) + ' tiles']);
+        document.getElementById('tOut').innerHTML =
+          cvRes('Buy this many', box + ' box' + (box === 1 ? '' : 'es'), rows);
+      } else {
+        document.getElementById('tOut').innerHTML =
+          cvRes('You need', need + ' tile' + (need === 1 ? '' : 's'), rows) +
+          '<div class="cv-note">Read <b>tiles per box</b> off the carton and put it in above &mdash; ' +
+          'it changes with brand and size &mdash; and this turns into a number of boxes.</div>';
+      }
     }
     cvBind(['tL', 'tW', 'tTw', 'tTh', 'tWa', 'tBox'], go);
   }
