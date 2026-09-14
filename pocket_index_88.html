@@ -6440,7 +6440,8 @@ body.site-mode-active .voice-mode{
 /* Home ada header sendiri, jadi topbar global disembunyikan di Home.
    Consult bar dibuang terus — toggle Mode kini di Profile. */
 body.on-home .topbar,
-body.on-tools .topbar{display:none}
+body.on-tools .topbar,
+body.on-chat .topbar{display:none}
 .consult-bar{display:none!important}
 
 .nh-wrap{display:flex;flex-direction:column;min-height:100%;background:var(--bg)}
@@ -7546,7 +7547,7 @@ body.on-tools .topbar{display:none}
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.5 · build 14 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.6 · build 14 Sep 2026</div>
           </div>
         </div>
         
@@ -7570,14 +7571,14 @@ body.on-tools .topbar{display:none}
   <main class="chat-mode hidden" id="chatMode">
     
     <!-- Chat header -->
-    <div class="chat-header" id="chatHeader" style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--bg);flex-shrink:0">
+    <div class="chat-header" id="chatHeader" style="display:flex;align-items:center;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;border-bottom:1px solid var(--line);background:var(--bg);flex-shrink:0">
       <button class="chat-hamburger" id="chatHamburger" aria-label="Open chat history">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v0.5</span>
+      <span class="chat-build" title="Build">v0.6</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -7649,7 +7650,7 @@ body.on-tools .topbar{display:none}
         </button>
         <input type="file" id="imgInput" accept="image/*" style="display:none">
         <div class="input-wrap">
-          <textarea id="msgInput" placeholder="Ask about defects, standards, or legal references..." rows="1"></textarea>
+          <textarea id="msgInput" placeholder="Ask anything…" rows="1"></textarea>
         </div>
         <button class="input-attach" id="voiceOpenBtn" title="Speak instead">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
@@ -8637,11 +8638,11 @@ function updateConsultUI() {
   if (isConsultant) {
     if (wTitle) wTitle.innerHTML = 'Consultant <em>session</em>.';
     if (wDesc) wDesc.textContent = 'Structured technical responses with citations from Malaysian standards, British Standards, and statutory provisions. Suited for report drafting and formal write-ups.';
-    if (inp) inp.placeholder = 'Brief the consultant — defect, legal query, or methodology...';
+    if (inp) inp.placeholder = 'Brief the consultant…';
   } else {
     if (wTitle) wTitle.innerHTML = 'Ready when <em>you are</em>.';
     if (wDesc) wDesc.textContent = 'Quick conversational answers. Toggle Consultant Mode for structured technical responses with full citations.';
-    if (inp) inp.placeholder = 'Ask about defects, standards, or legal references...';
+    if (inp) inp.placeholder = 'Ask anything…';
   }
 }
 
@@ -13737,6 +13738,7 @@ function switchTab(mode) {
   // Home sahaja yang ada header sendiri; sembunyikan topbar global di situ.
   document.body.classList.toggle('on-home', mode === 'home');
   document.body.classList.toggle('on-tools', mode === 'tools');
+  document.body.classList.toggle('on-chat', mode === 'chat' || mode === 'voice');
 
   // Hide all modes
   document.getElementById('homeMode').classList.remove('show');
