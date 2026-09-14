@@ -2336,6 +2336,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 }
 
 .input-row{display:flex;align-items:flex-end;gap:8px}
+.chat-build{font-size:9.5px;font-weight:700;letter-spacing:.05em;color:var(--muted-2);margin-right:6px;flex:none}
 .chat-consult{display:flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:var(--bg-2);
   border:1px solid var(--line);color:var(--fg-dim);font-size:11px;font-weight:600;flex:none;margin-right:4px}
 .chat-consult-sw{width:26px;height:15px;border-radius:999px;background:var(--line);position:relative;transition:background 0.18s;flex:none}
@@ -7545,7 +7546,7 @@ body.on-tools .topbar{display:none}
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub">GoXpert Pocket · v0.4 Beta</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.5 · build 14 Sep 2026</div>
           </div>
         </div>
         
@@ -7576,6 +7577,7 @@ body.on-tools .topbar{display:none}
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
+      <span class="chat-build" title="Build">v0.5</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
