@@ -1820,23 +1820,43 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .qs-catkg:empty{display:none}
 #qfWt{font-family:var(--font-mono);font-weight:600}
 
-/* Converter & Calc */
-.cv-tabs{display:flex;gap:8px;margin-bottom:14px}
-.cv-tab{flex:1;padding:10px;border-radius:10px;background:rgba(127,127,127,0.08);color:var(--fg-dim);font-size:14px;font-weight:600;border:1px solid var(--border);text-align:center}
-.cv-tab.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.cv-chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}
-.cv-chip{flex:0 0 auto;padding:7px 13px;border-radius:999px;background:rgba(127,127,127,0.08);color:var(--fg-dim);font-size:13px;font-weight:600;border:1px solid transparent}
-.cv-chip.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.cv-field{margin-bottom:12px}
-.cv-label{font-size:12px;color:var(--fg-dim);margin-bottom:5px;font-weight:600}
-.cv-input,.cv-select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(127,127,127,0.05);color:inherit;font-size:15px;box-sizing:border-box;font-family:inherit}
-.cv-inline{display:flex;gap:8px}
-.cv-inline>*{flex:1}
-.cv-result{margin-top:6px;padding:14px;border-radius:12px;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:15px;text-align:center;line-height:1.55}
+/* Converter & Calc — kalkulator kerja tapak */
+.cv-tabs{display:flex;gap:4px;padding:4px;background:var(--surface);border-radius:11px;border:1px solid var(--line);margin-bottom:2px}
+.cv-tab{flex:1;padding:9px 4px;border-radius:8px;color:var(--fg-dim);font-size:13px;font-weight:600;text-align:center}
+.cv-tab.active{background:var(--bg);color:var(--fg);box-shadow:var(--shadow-1)}
+.cv-chips{display:flex;gap:6px;overflow-x:auto;margin:12px -4px 4px;padding:0 4px 4px}
+.cv-chips::-webkit-scrollbar{height:0}
+.cv-chip{flex:0 0 auto;padding:7px 12px;border-radius:999px;background:var(--bg-2);color:var(--fg-dim);font-size:12.5px;font-weight:600;border:1px solid var(--line)}
+.cv-chip.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line)}
+.cv-field{margin-bottom:10px}
+.cv-label{font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.cv-input,.cv-select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg);font-size:15px;font-weight:600;font-family:var(--font-mono);box-sizing:border-box}
+.cv-select{font-family:var(--font-body);font-size:14px}
+.cv-inline{display:flex;gap:9px}
+.cv-inline>*{flex:1;min-width:0}
+.cv-pill{display:flex;gap:5px;flex-wrap:wrap;margin:-2px 0 10px}
+.cv-pill button{padding:5px 10px;border-radius:999px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg-dim);font-size:11.5px;font-weight:600}
+.cv-pill button.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+
+.cv-res{margin:12px 0 4px;padding:14px;border-radius:14px;background:var(--accent-soft);border:1px solid var(--accent-line)}
+.cv-res-cap{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);opacity:0.75;margin-bottom:5px}
+.cv-res-big{font-family:var(--font-mono);font-size:30px;font-weight:700;color:var(--accent);line-height:1.05;letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+.cv-res-sub{margin-top:9px;padding-top:9px;border-top:1px solid var(--accent-line);display:flex;flex-direction:column;gap:5px}
+.cv-res-sub div{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--fg)}
+.cv-res-sub b{font-family:var(--font-mono);font-weight:600;text-align:right}
+
+.cv-verdict{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:12.5px;line-height:1.5}
+.cv-verdict.ok{background:var(--success-soft);border:1px solid var(--success);color:var(--success)}
+.cv-verdict.no{background:var(--warning-soft);border:1px solid var(--warning);color:var(--warning)}
+
 .cv-list{display:flex;flex-direction:column;gap:6px;margin-top:4px}
-.cv-list-row{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border-radius:10px;background:rgba(127,127,127,0.06);font-size:14px}
-.cv-list-row b{font-family:var(--font-mono);font-size:15px}
-.cv-note{font-size:11.5px;color:var(--fg-dim);margin-top:10px;line-height:1.45}
+.cv-list-row{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);font-size:14px}
+.cv-list-row.hi{background:var(--accent-soft);border-color:var(--accent-line)}
+.cv-list-row span{color:var(--fg-dim);font-weight:600}
+.cv-list-row.hi span{color:var(--accent)}
+.cv-list-row b{font-family:var(--font-mono);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.cv-note{font-size:11.5px;color:var(--fg-dim);margin-top:10px;line-height:1.5;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.cv-note b{color:var(--fg)}
 
 /* Tally Counter */
 .cnt-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:#0f141a;color:#e5e7eb;font-family:var(--font-body)}
@@ -17103,199 +17123,425 @@ async function qsDeleteEntry(id) {
 
 // =======================================================
 // TOOL: CONVERTER & CALCULATOR
+// Penukar unit ada dalam setiap telefon, jadi ia bukan sebab
+// untuk buka app ini. Yang tiada ialah kalkulator yang tahu
+// kerja tapak: berapa kotak jubin, berapa beg simen, berapa
+// tan besi. Setiap satu memberi jawapan yang boleh dibeli.
 // =======================================================
 const CV_UNITS = {
-  Length: { list: [['mm', 0.001], ['cm', 0.01], ['m', 1], ['inch', 0.0254], ['ft', 0.3048], ['yd', 0.9144]] },
-  Area: { list: [['mm²', 1e-6], ['cm²', 1e-4], ['m²', 1], ['ft²', 0.092903], ['in²', 0.00064516], ['yd²', 0.836127], ['acre', 4046.8564], ['hectare', 10000]] },
-  Volume: { list: [['ml', 0.001], ['litre', 1], ['m³', 1000], ['cm³', 0.001], ['ft³', 28.3168], ['gallon (US)', 3.78541]] },
-  Weight: { list: [['g', 0.001], ['kg', 1], ['tonne', 1000], ['lb', 0.453592], ['oz', 0.0283495]] }
+  Length:   [['mm', 0.001], ['cm', 0.01], ['m', 1], ['inch', 0.0254], ['ft', 0.3048], ['yd', 0.9144]],
+  Area:     [['m²', 1], ['sq ft', 0.092903], ['acre', 4046.8564], ['hectare', 10000], ['cm²', 1e-4]],
+  Volume:   [['litre', 0.001], ['m³', 1], ['ft³', 0.0283168], ['gallon (UK)', 0.00454609]],
+  Weight:   [['kg', 1], ['tonne', 1000], ['g', 0.001], ['lb', 0.453592]],
+  Pressure: [['N/mm²', 1], ['MPa', 1], ['psi', 0.00689476], ['kPa', 0.001], ['bar', 0.1]]
 };
-const CV_DEF = { Length: 'm', Area: 'm²', Volume: 'm³', Weight: 'kg', Temperature: '°C' };
-const CV_LEN = { m: 1, cm: 0.01, mm: 0.001, ft: 0.3048, in: 0.0254 };
+const CV_DEF = { Length:'m', Area:'m²', Volume:'m³', Weight:'kg', Pressure:'N/mm²' };
+const CV_CALCS = [
+  ['tiles','Tiles'], ['paint','Paint'], ['concrete','Concrete'], ['bricks','Bricks'],
+  ['plaster','Plaster'], ['rebar','Rebar'], ['fall','Fall'], ['stairs','Stairs'],
+  ['area','Area'], ['volume','Volume']
+];
+let CV = { tab:'calc', calc:'tiles', conv:'Length' };
 
-function cvFmt(n) {
-  if (!isFinite(n)) return '—';
-  const a = Math.abs(n);
-  if (a !== 0 && (a >= 1e6 || a < 1e-4)) return n.toExponential(3);
-  return String(Math.round(n * 1000) / 1000);
+function cvNum(id) { const e = document.getElementById(id); return e ? (parseFloat(e.value) || 0) : 0; }
+function cvFmt(v, d) {
+  if (!isFinite(v)) return '—';
+  d = (d == null) ? 2 : d;
+  const r = Math.round(v * Math.pow(10, d)) / Math.pow(10, d);
+  return r.toLocaleString('en-MY', { maximumFractionDigits: d });
 }
-function cvNum(id) { const el = document.getElementById(id); return el ? (parseFloat(el.value) || 0) : 0; }
-function cvSetVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
-function cvBind(ids, fn) { ids.forEach(function(id) { const el = document.getElementById(id); if (el) { el.addEventListener('input', fn); el.addEventListener('change', fn); } }); fn(); }
-function cvLenOpts(sel) { return Object.keys(CV_LEN).map(function(u) { return '<option' + (u === sel ? ' selected' : '') + '>' + u + '</option>'; }).join(''); }
-function cvField1(id, label) { return '<div class="cv-field"><div class="cv-label">' + label + '</div><input class="cv-input" type="number" inputmode="decimal" id="' + id + '"></div>'; }
-function cvField2(id1, l1, id2, l2) { return '<div class="cv-inline">' + cvField1(id1, l1) + cvField1(id2, l2) + '</div>'; }
+function cvBind(ids, fn) {
+  ids.forEach(function(id) {
+    const e = document.getElementById(id);
+    if (e) { e.addEventListener('input', fn); e.addEventListener('change', fn); }
+  });
+  fn();
+}
+function cvF(id, label, unit) {
+  return '<div class="cv-field"><div class="cv-label">' + label + (unit ? ' (' + unit + ')' : '') + '</div>' +
+    '<input class="cv-input" id="' + id + '" type="number" inputmode="decimal"></div>';
+}
+function cvS(id, label, opts, sel) {
+  return '<div class="cv-field"><div class="cv-label">' + label + '</div><select class="cv-select" id="' + id + '">' +
+    opts.map(function(o) {
+      const v = (o instanceof Array) ? o[0] : o, t = (o instanceof Array) ? o[1] : o;
+      return '<option value="' + peEsc(String(v)) + '"' + (String(v) === String(sel) ? ' selected' : '') + '>' + peEsc(String(t)) + '</option>';
+    }).join('') + '</select></div>';
+}
+function cvSet(vals) {
+  Object.keys(vals).forEach(function(id) {
+    const e = document.getElementById(id);
+    if (e) e.value = vals[id];
+  });
+}
+function cvRes(cap, big, subs, verdict) {
+  let h = '<div class="cv-res"><div class="cv-res-cap">' + cap + '</div><div class="cv-res-big">' + big + '</div>';
+  if (subs && subs.length) {
+    h += '<div class="cv-res-sub">' + subs.map(function(s) {
+      return '<div><span>' + s[0] + '</span><b>' + s[1] + '</b></div>';
+    }).join('') + '</div>';
+  }
+  h += '</div>';
+  if (verdict) h += '<div class="cv-verdict ' + verdict[0] + '">' + verdict[1] + '</div>';
+  return h;
+}
 
 function openConverter() {
-  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="16" y2="19"/><line x1="8" y1="19" x2="12" y2="19"/></svg>';
-  document.getElementById('toolModalName').textContent = 'Converter & Calc';
-  document.getElementById('toolModalDesc').textContent = 'Convert units & run on-site calculations';
+  document.getElementById('toolModalIcon').innerHTML =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4"/></svg>';
+  document.getElementById('toolModalName').textContent = 'Site Calculator';
+  document.getElementById('toolModalDesc').textContent = 'Quantities, checks and unit conversions';
   document.getElementById('toolModalBody').innerHTML =
     '<div class="cv-tabs">' +
-      '<button class="cv-tab active" data-cvtab="convert">Convert</button>' +
       '<button class="cv-tab" data-cvtab="calc">Calculate</button>' +
-    '</div>' +
-    '<div id="cvBody"></div>';
-  document.getElementById('toolModalFoot').innerHTML = '<button class="tool-btn tool-btn-primary" id="cvClose">Close</button>';
+      '<button class="cv-tab" data-cvtab="convert">Convert</button>' +
+    '</div><div id="cvBody"></div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="cvClose">Close</button>';
   showToolModal();
   document.getElementById('cvClose').addEventListener('click', function() { if (typeof closeTool === 'function') closeTool(); });
   document.querySelectorAll('.cv-tab').forEach(function(t) {
-    t.addEventListener('click', function() {
-      document.querySelectorAll('.cv-tab').forEach(function(x) { x.classList.toggle('active', x === t); });
-      if (t.dataset.cvtab === 'convert') renderConvertTab(); else renderCalcTab();
-    });
+    t.addEventListener('click', function() { CV.tab = t.dataset.cvtab; cvRenderTab(); });
   });
-  renderConvertTab();
+  cvRenderTab();
 }
 
-function renderConvertTab() {
+function cvRenderTab() {
+  document.querySelectorAll('.cv-tab').forEach(function(x) { x.classList.toggle('active', x.dataset.cvtab === CV.tab); });
+  if (CV.tab === 'convert') cvRenderConvert(); else cvRenderCalc();
+}
+
+// ---------- TUKAR UNIT ----------
+function cvRenderConvert() {
+  const cats = Object.keys(CV_UNITS).concat(['Temperature']);
   const body = document.getElementById('cvBody');
-  let cat = 'Length';
-  const cats = ['Length', 'Area', 'Volume', 'Weight', 'Temperature'];
   body.innerHTML =
-    '<div class="cv-chips" id="cvCats">' + cats.map(function(c) { return '<button class="cv-chip' + (c === cat ? ' active' : '') + '" data-cat="' + c + '">' + c + '</button>'; }).join('') + '</div>' +
-    '<div class="cv-field"><div class="cv-label">Value</div><input class="cv-input" id="cvValue" type="number" inputmode="decimal" value="1"></div>' +
-    '<div class="cv-field"><div class="cv-label">From unit</div><select class="cv-select" id="cvFrom"></select></div>' +
-    '<div class="cv-list" id="cvList"></div>';
-  const fromSel = body.querySelector('#cvFrom');
-  const valIn = body.querySelector('#cvValue');
-  const listEl = body.querySelector('#cvList');
-  function unitNames() { return (cat === 'Temperature') ? ['°C', '°F', 'K'] : CV_UNITS[cat].list.map(function(u) { return u[0]; }); }
-  function fillFrom() {
-    fromSel.innerHTML = unitNames().map(function(n) { return '<option>' + n + '</option>'; }).join('');
-    fromSel.value = CV_DEF[cat];
-  }
-  function recompute() {
-    const v = parseFloat(valIn.value) || 0;
-    const from = fromSel.value;
-    let rows;
-    if (cat === 'Temperature') {
-      const c = (from === '°C') ? v : (from === '°F') ? (v - 32) * 5 / 9 : v - 273.15;
-      rows = [['°C', c], ['°F', c * 9 / 5 + 32], ['K', c + 273.15]];
-    } else {
-      const list = CV_UNITS[cat].list;
-      const ff = list.find(function(u) { return u[0] === from; })[1];
-      const base = v * ff;
-      rows = list.map(function(u) { return [u[0], base / u[1]]; });
-    }
-    listEl.innerHTML = rows.map(function(r) { return '<div class="cv-list-row"><span>' + r[0] + '</span><b>' + cvFmt(r[1]) + '</b></div>'; }).join('');
-  }
+    '<div class="cv-chips" id="cvCats">' + cats.map(function(c) {
+      return '<button class="cv-chip' + (CV.conv === c ? ' active' : '') + '" data-cat="' + c + '">' + c + '</button>';
+    }).join('') + '</div>' +
+    '<div class="cv-inline">' + cvF('cvV', 'Value') +
+      (CV.conv === 'Temperature'
+        ? cvS('cvU', 'From', ['°C', '°F', 'K'], '°C')
+        : cvS('cvU', 'From', CV_UNITS[CV.conv].map(function(u) { return u[0]; }), CV_DEF[CV.conv])) +
+    '</div>' +
+    '<div class="cv-list" id="cvOut"></div>' +
+    (CV.conv === 'Area' ? '<div class="cv-note">Built-up area in Malaysia is normally quoted in <b>sq ft</b> and land in <b>acres</b>, so both sit here next to m².</div>' : '') +
+    (CV.conv === 'Pressure' ? '<div class="cv-note">Older drawings give concrete strength in <b>psi</b> (e.g. 3000 psi); newer ones use <b>N/mm²</b> (C25 = 25 N/mm²). Use this to read the old ones.</div>' : '');
+  cvSet({ cvV: 1 });
   body.querySelector('#cvCats').addEventListener('click', function(e) {
-    const b = e.target.closest('.cv-chip'); if (!b) return;
-    cat = b.dataset.cat;
-    body.querySelectorAll('#cvCats .cv-chip').forEach(function(x) { x.classList.toggle('active', x === b); });
-    fillFrom(); recompute();
+    const b = e.target.closest('.cv-chip');
+    if (!b) return;
+    CV.conv = b.dataset.cat;
+    cvRenderConvert();
   });
-  valIn.addEventListener('input', recompute);
-  fromSel.addEventListener('change', recompute);
-  fillFrom();
-  recompute();
+  cvBind(['cvV', 'cvU'], cvDoConvert);
 }
 
-function renderCalcTab() {
-  const body = document.getElementById('cvBody');
-  const types = [['area', 'Area'], ['volume', 'Volume'], ['tiles', 'Tiles'], ['paint', 'Paint'], ['slope', 'Slope/Fall'], ['diagonal', 'Diagonal']];
-  let cur = 'area';
-  body.innerHTML = '<div class="cv-chips" id="cvCalcTypes">' + types.map(function(t) { return '<button class="cv-chip' + (t[0] === cur ? ' active' : '') + '" data-ct="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div><div id="cvCalcBody"></div>';
-  body.querySelector('#cvCalcTypes').addEventListener('click', function(e) {
-    const b = e.target.closest('.cv-chip'); if (!b) return;
-    cur = b.dataset.ct;
-    body.querySelectorAll('#cvCalcTypes .cv-chip').forEach(function(x) { x.classList.toggle('active', x === b); });
-    renderCalc(cur);
-  });
-  renderCalc(cur);
+function cvDoConvert() {
+  const out = document.getElementById('cvOut');
+  if (!out) return;
+  const v = cvNum('cvV'), from = document.getElementById('cvU').value;
+  let rows;
+  if (CV.conv === 'Temperature') {
+    const c = (from === '°C') ? v : (from === '°F') ? (v - 32) * 5 / 9 : v - 273.15;
+    rows = [['°C', c], ['°F', c * 9 / 5 + 32], ['K', c + 273.15]];
+  } else {
+    const list = CV_UNITS[CV.conv];
+    const ff = list.filter(function(u) { return u[0] === from; })[0][1];
+    const base = v * ff;
+    rows = list.map(function(u) { return [u[0], base / u[1]]; });
+  }
+  out.innerHTML = rows.map(function(r) {
+    return '<div class="cv-list-row' + (r[0] === from ? ' hi' : '') + '"><span>' + r[0] + '</span><b>' +
+      cvFmt(r[1], Math.abs(r[1]) < 10 ? 3 : 2) + '</b></div>';
+  }).join('');
 }
 
-function renderCalc(type) {
+// ---------- KALKULATOR ----------
+function cvRenderCalc() {
+  document.getElementById('cvBody').innerHTML =
+    '<div class="cv-chips" id="cvCalcs">' + CV_CALCS.map(function(c) {
+      return '<button class="cv-chip' + (CV.calc === c[0] ? ' active' : '') + '" data-ct="' + c[0] + '">' + c[1] + '</button>';
+    }).join('') + '</div><div id="cvCalcBody"></div>';
+  document.getElementById('cvCalcs').addEventListener('click', function(e) {
+    const b = e.target.closest('.cv-chip');
+    if (!b) return;
+    CV.calc = b.dataset.ct;
+    cvRenderCalc();
+  });
+  cvCalc();
+}
+
+function cvCalc() {
   const b = document.getElementById('cvCalcBody');
-  if (type === 'area') {
+  const t = CV.calc;
+
+  if (t === 'tiles') {
     b.innerHTML =
-      '<div class="cv-inline"><div class="cv-field"><div class="cv-label">Shape</div><select class="cv-select" id="cvAreaShape"><option>Rectangle</option><option>Triangle</option><option>Circle</option></select></div>' +
-      '<div class="cv-field"><div class="cv-label">Unit</div><select class="cv-select" id="cvAreaUnit">' + cvLenOpts('m') + '</select></div></div>' +
-      '<div id="cvAreaFields"></div>' +
-      '<div class="cv-result" id="cvAreaResult">—</div>';
-    const ss = document.getElementById('cvAreaShape');
-    function comp() {
-      const u = CV_LEN[document.getElementById('cvAreaUnit').value]; const s = ss.value; let m2 = 0;
-      if (s === 'Rectangle') m2 = (cvNum('cvA1') * u) * (cvNum('cvA2') * u);
-      else if (s === 'Triangle') m2 = 0.5 * (cvNum('cvA1') * u) * (cvNum('cvA2') * u);
-      else { const r = cvNum('cvA1') * u; m2 = Math.PI * r * r; }
-      document.getElementById('cvAreaResult').innerHTML = 'Area: ' + cvFmt(m2) + ' m²<br>' + cvFmt(m2 / 0.092903) + ' ft²';
-    }
-    function bf() {
-      const s = ss.value; const f = document.getElementById('cvAreaFields');
-      if (s === 'Rectangle') f.innerHTML = cvField2('cvA1', 'Length', 'cvA2', 'Width');
-      else if (s === 'Triangle') f.innerHTML = cvField2('cvA1', 'Base', 'cvA2', 'Height');
-      else f.innerHTML = cvField1('cvA1', 'Radius');
-      cvBind(['cvA1', 'cvA2', 'cvAreaUnit'], comp);
-    }
-    ss.addEventListener('change', bf); bf();
-  } else if (type === 'volume') {
-    b.innerHTML =
-      '<div class="cv-inline"><div class="cv-field"><div class="cv-label">Shape</div><select class="cv-select" id="cvVolShape"><option>Box</option><option>Cylinder</option></select></div>' +
-      '<div class="cv-field"><div class="cv-label">Unit</div><select class="cv-select" id="cvVolUnit">' + cvLenOpts('m') + '</select></div></div>' +
-      '<div id="cvVolFields"></div>' +
-      '<div class="cv-result" id="cvVolResult">—</div>';
-    const ss = document.getElementById('cvVolShape');
-    function comp() {
-      const u = CV_LEN[document.getElementById('cvVolUnit').value]; const s = ss.value; let m3 = 0;
-      if (s === 'Box') m3 = (cvNum('cvV1') * u) * (cvNum('cvV2') * u) * (cvNum('cvV3') * u);
-      else { const r = cvNum('cvV1') * u, h = cvNum('cvV2') * u; m3 = Math.PI * r * r * h; }
-      document.getElementById('cvVolResult').innerHTML = 'Volume: ' + cvFmt(m3) + ' m³<br>' + cvFmt(m3 * 1000) + ' L &nbsp;·&nbsp; ' + cvFmt(m3 / 0.0283168) + ' ft³';
-    }
-    function bf() {
-      const s = ss.value; const f = document.getElementById('cvVolFields');
-      if (s === 'Box') f.innerHTML = cvField2('cvV1', 'Length', 'cvV2', 'Width') + cvField1('cvV3', 'Height');
-      else f.innerHTML = cvField2('cvV1', 'Radius', 'cvV2', 'Height');
-      cvBind(['cvV1', 'cvV2', 'cvV3', 'cvVolUnit'], comp);
-    }
-    ss.addEventListener('change', bf); bf();
-  } else if (type === 'tiles') {
-    b.innerHTML =
-      cvField2('cvT_L', 'Room length (m)', 'cvT_W', 'Room width (m)') +
-      cvField2('cvT_tw', 'Tile width (cm)', 'cvT_th', 'Tile height (cm)') +
-      cvField1('cvT_waste', 'Wastage %') +
-      '<div class="cv-result" id="cvT_res">—</div>' +
-      '<div class="cv-note">Adds wastage for cuts. Round up to full boxes at the shop.</div>';
-    cvSetVal('cvT_tw', 30); cvSetVal('cvT_th', 30); cvSetVal('cvT_waste', 10);
-    cvBind(['cvT_L', 'cvT_W', 'cvT_tw', 'cvT_th', 'cvT_waste'], function() {
-      const roomA = cvNum('cvT_L') * cvNum('cvT_W');
-      const tileA = (cvNum('cvT_tw') / 100) * (cvNum('cvT_th') / 100);
-      let tiles = 0; if (tileA > 0) tiles = Math.ceil(roomA / tileA * (1 + cvNum('cvT_waste') / 100));
-      document.getElementById('cvT_res').innerHTML = 'Tiles needed: ' + tiles + '<br>Room area: ' + cvFmt(roomA) + ' m²';
+      '<div class="cv-inline">' + cvF('tL', 'Room length', 'm') + cvF('tW', 'Room width', 'm') + '</div>' +
+      '<div class="cv-inline">' + cvF('tTw', 'Tile width', 'mm') + cvF('tTh', 'Tile height', 'mm') + '</div>' +
+      '<div class="cv-pill" id="tPre">' + ['300x300', '300x600', '600x600', '800x800'].map(function(p) {
+        return '<button data-t="' + p + '">' + p + '</button>'; }).join('') + '</div>' +
+      '<div class="cv-inline">' + cvF('tWa', 'Wastage', '%') + cvF('tBox', 'Tiles per box') + '</div>' +
+      '<div id="tOut"></div>' +
+      '<div class="cv-note">10% wastage for a straight lay, <b>15% for diagonal</b> or a room with many corners. Buy the spare boxes from the same batch — a later batch is usually a shade off.</div>';
+    cvSet({ tL:'', tW:'', tTw:600, tTh:600, tWa:10, tBox:4 });
+    b.querySelector('#tPre').addEventListener('click', function(e) {
+      const q = e.target.closest('[data-t]');
+      if (!q) return;
+      const p = q.dataset.t.split('x');
+      cvSet({ tTw:p[0], tTh:p[1] });
+      b.querySelectorAll('#tPre button').forEach(function(x) { x.classList.toggle('on', x === q); });
+      go();
     });
-  } else if (type === 'paint') {
+    function go() {
+      const a = cvNum('tL') * cvNum('tW');
+      const tw = cvNum('tTw') / 1000, th = cvNum('tTh') / 1000;
+      const per = (tw > 0 && th > 0) ? 1 / (tw * th) : 0;
+      const need = a * per * (1 + cvNum('tWa') / 100);
+      const box = cvNum('tBox') > 0 ? Math.ceil(need / cvNum('tBox')) : 0;
+      document.getElementById('tOut').innerHTML = cvRes('Buy this many', box + ' boxes', [
+        ['Floor area', cvFmt(a) + ' m²  (' + cvFmt(a / 0.092903, 0) + ' sq ft)'],
+        ['Tiles per m²', cvFmt(per, 1)],
+        ['Tiles incl. wastage', Math.ceil(need)],
+        ['Tiles in ' + box + ' boxes', box * cvNum('tBox')],
+        ['Spare after laying', Math.max(0, box * cvNum('tBox') - Math.ceil(a * per)) + ' tiles']
+      ]);
+    }
+    cvBind(['tL', 'tW', 'tTw', 'tTh', 'tWa', 'tBox'], go);
+  }
+
+  else if (t === 'paint') {
     b.innerHTML =
-      cvField1('cvP_area', 'Wall area (m²)') +
-      cvField2('cvP_cov', 'Coverage (m²/L)', 'cvP_coats', 'Coats') +
-      '<div class="cv-result" id="cvP_res">—</div>' +
-      '<div class="cv-note">Typical emulsion ≈ 10–12 m²/L per coat. Round up when buying.</div>';
-    cvSetVal('cvP_cov', 11); cvSetVal('cvP_coats', 2);
-    cvBind(['cvP_area', 'cvP_cov', 'cvP_coats'], function() {
-      const cov = cvNum('cvP_cov'); let L = 0; if (cov > 0) L = cvNum('cvP_area') * cvNum('cvP_coats') / cov;
-      document.getElementById('cvP_res').innerHTML = 'Paint needed: ' + cvFmt(L) + ' L';
-    });
-  } else if (type === 'slope') {
+      '<div class="cv-inline">' + cvF('pW', 'Wall run', 'm') + cvF('pH', 'Height', 'm') + '</div>' +
+      '<div class="cv-inline">' + cvF('pDoor', 'Doors') + cvF('pWin', 'Windows') + '</div>' +
+      '<div class="cv-inline">' + cvF('pCo', 'Coats') + cvF('pCov', 'Coverage', 'm²/L') + '</div>' +
+      '<div id="pOut"></div>' +
+      '<div class="cv-note">12 m²/L is ordinary emulsion on plaster that is already painted. <b>Bare or porous walls drink more</b> — drop it to 8–10. A door counts as 1.8 m², a window 1.5 m².</div>';
+    cvSet({ pW:'', pH:'', pDoor:0, pWin:0, pCo:2, pCov:12 });
+    function go() {
+      const gross = cvNum('pW') * cvNum('pH');
+      const ded = cvNum('pDoor') * 1.8 + cvNum('pWin') * 1.5;
+      const net = Math.max(0, gross - ded);
+      const lit = cvNum('pCov') > 0 ? net * cvNum('pCo') / cvNum('pCov') : 0;
+      let t5 = Math.floor(lit / 5), rem = lit - t5 * 5, t1 = Math.ceil(rem);
+      if (t1 >= 5) { t5 += 1; t1 = 0; }
+      const buy = (t5 ? t5 + ' × 5L' : '') + (t1 ? (t5 ? ' + ' : '') + t1 + ' × 1L' : '');
+      document.getElementById('pOut').innerHTML = cvRes('You need', cvFmt(lit, 1) + ' litres', [
+        ['Gross wall', cvFmt(gross) + ' m²'],
+        ['Less openings', '−' + cvFmt(ded) + ' m²'],
+        ['Paint area × ' + cvNum('pCo') + ' coats', cvFmt(net * cvNum('pCo')) + ' m²'],
+        ['Buy', buy || '—']
+      ]);
+    }
+    cvBind(['pW', 'pH', 'pDoor', 'pWin', 'pCo', 'pCov'], go);
+  }
+
+  else if (t === 'concrete') {
     b.innerHTML =
-      cvField2('cvS_rise', 'Rise', 'cvS_run', 'Run') +
-      '<div class="cv-result" id="cvS_res">—</div>' +
-      '<div class="cv-note">Rise &amp; run in the same unit. Common drainage fall ≈ 1:80 to 1:40.</div>';
-    cvBind(['cvS_rise', 'cvS_run'], function() {
-      const rise = cvNum('cvS_rise'), run = cvNum('cvS_run');
-      if (run <= 0 || rise <= 0) { document.getElementById('cvS_res').innerHTML = '—'; return; }
-      const pct = rise / run * 100, ratio = run / rise, deg = Math.atan2(rise, run) * 180 / Math.PI;
-      document.getElementById('cvS_res').innerHTML = 'Gradient: ' + cvFmt(pct) + '%<br>1 : ' + cvFmt(ratio) + ' &nbsp;·&nbsp; ' + cvFmt(deg) + '°';
-    });
-  } else if (type === 'diagonal') {
+      '<div class="cv-inline">' + cvF('cL', 'Length', 'm') + cvF('cW', 'Width', 'm') + cvF('cD', 'Thickness', 'mm') + '</div>' +
+      cvS('cMix', 'Mix ratio', [['1:1.5:3', '1:1.5:3  (grade 25/30)'], ['1:2:4', '1:2:4  (grade 20)'], ['1:3:6', '1:3:6  (mass / blinding)']], '1:2:4') +
+      '<div id="cOut"></div>' +
+      '<div class="cv-note">A 50 kg cement bag is 0.0347 m³. The bag figures use a dry bulking factor of <b>1.54</b>, the usual assumption. For ready-mix, order the <b>m³</b> and ignore the bag rows.</div>';
+    cvSet({ cL:'', cW:'', cD:150 });
+    function go() {
+      const vol = cvNum('cL') * cvNum('cW') * (cvNum('cD') / 1000);
+      const r = document.getElementById('cMix').value.split(':').map(Number);
+      const tot = r[0] + r[1] + r[2], dry = vol * 1.54;
+      const cem = dry * r[0] / tot, san = dry * r[1] / tot, agg = dry * r[2] / tot;
+      const bags = Math.ceil(cem / 0.0347);
+      document.getElementById('cOut').innerHTML = cvRes('Order', cvFmt(vol, 2) + ' m³', [
+        ['Cement', bags + ' bags  (' + cvFmt(bags * 50, 0) + ' kg)'],
+        ['Sand', cvFmt(san, 2) + ' m³'],
+        ['Aggregate', cvFmt(agg, 2) + ' m³'],
+        ['Water (approx)', cvFmt(bags * 50 * 0.5, 0) + ' litres']
+      ]);
+    }
+    cvBind(['cL', 'cW', 'cD', 'cMix'], go);
+  }
+
+  else if (t === 'bricks') {
     b.innerHTML =
-      '<div class="cv-field"><div class="cv-label">Unit</div><select class="cv-select" id="cvD_unit">' + cvLenOpts('m') + '</select></div>' +
-      cvField2('cvD_a', 'Side A', 'cvD_b', 'Side B') +
-      '<div class="cv-result" id="cvD_res">—</div>' +
-      '<div class="cv-note">Diagonal of a rectangle (Pythagoras). For a true 90° corner the measured diagonal should match this (3-4-5 rule).</div>';
-    cvBind(['cvD_a', 'cvD_b', 'cvD_unit'], function() {
-      const a = cvNum('cvD_a'), bb = cvNum('cvD_b'); const d = Math.sqrt(a * a + bb * bb);
-      document.getElementById('cvD_res').innerHTML = 'Diagonal: ' + cvFmt(d) + ' ' + document.getElementById('cvD_unit').value;
+      '<div class="cv-inline">' + cvF('bL', 'Wall length', 'm') + cvF('bH', 'Wall height', 'm') + '</div>' +
+      cvS('bType', 'Unit', [['brick', 'Clay brick 215×102×65'], ['block', 'Cement block 390×190×190']], 'brick') +
+      '<div class="cv-inline">' + cvF('bOp', 'Openings', 'm²') + cvF('bWa', 'Wastage', '%') + '</div>' +
+      '<div id="bOut"></div>' +
+      '<div class="cv-note">Worked with a 10 mm mortar joint on a <b>half-brick wall</b> (one leaf). For a full-brick wall, double it.</div>';
+    cvSet({ bL:'', bH:'', bOp:0, bWa:5 });
+    function go() {
+      const net = Math.max(0, cvNum('bL') * cvNum('bH') - cvNum('bOp'));
+      const type = document.getElementById('bType').value;
+      const faceW = type === 'brick' ? 0.225 : 0.400;
+      const faceH = type === 'brick' ? 0.075 : 0.200;
+      const per = 1 / (faceW * faceH);
+      const need = Math.ceil(net * per * (1 + cvNum('bWa') / 100));
+      const mortar = net * (type === 'brick' ? 0.03 : 0.02);
+      const bags = Math.ceil(mortar * 1.3 / 5 / 0.0347);
+      document.getElementById('bOut').innerHTML = cvRes('You need', cvFmt(need, 0) + ' ' + (type === 'brick' ? 'bricks' : 'blocks'), [
+        ['Net wall area', cvFmt(net) + ' m²'],
+        ['Per m²', cvFmt(per, 1)],
+        ['Mortar volume', cvFmt(mortar, 2) + ' m³'],
+        ['Cement for mortar (1:4)', '≈ ' + bags + ' bags']
+      ]);
+    }
+    cvBind(['bL', 'bH', 'bType', 'bOp', 'bWa'], go);
+  }
+
+  else if (t === 'plaster') {
+    b.innerHTML =
+      '<div class="cv-inline">' + cvF('sA', 'Area', 'm²') + cvF('sT', 'Thickness', 'mm') + '</div>' +
+      cvS('sMix', 'Mix', [['4', '1:4  (wall plaster)'], ['3', '1:3  (floor screed)'], ['5', '1:5  (internal)']], '4') +
+      '<div id="sOut"></div>' +
+      '<div class="cv-note">Usual thickness: wall plaster <b>12–15 mm</b>, floor screed <b>40–50 mm</b>. A dry bulking factor of 1.27 is applied.</div>';
+    cvSet({ sA:'', sT:15 });
+    function go() {
+      const wet = cvNum('sA') * (cvNum('sT') / 1000), dry = wet * 1.27;
+      const nn = parseFloat(document.getElementById('sMix').value);
+      const cem = dry / (1 + nn), san = dry * nn / (1 + nn);
+      const bags = Math.ceil(cem / 0.0347);
+      document.getElementById('sOut').innerHTML = cvRes('Mortar needed', cvFmt(wet, 2) + ' m³', [
+        ['Dry volume', cvFmt(dry, 2) + ' m³'],
+        ['Cement', bags + ' bags'],
+        ['Sand', cvFmt(san, 2) + ' m³']
+      ]);
+    }
+    cvBind(['sA', 'sT', 'sMix'], go);
+  }
+
+  else if (t === 'rebar') {
+    b.innerHTML =
+      '<div class="cv-inline">' + cvS('rD', 'Bar size', [6, 8, 10, 12, 16, 20, 25, 32, 40].map(function(d) { return [d, 'T' + d]; }), 12) +
+        cvF('rL', 'Length each', 'm') + '</div>' +
+      cvF('rN', 'How many bars') +
+      '<div id="rOut"></div>' +
+      '<div class="cv-note">Weight is 0.006165 × d² kg/m (steel at 7850 kg/m³). That reproduces the standard table: T12 = 0.888, T16 = 1.579, T25 = 3.854 kg/m.</div>';
+    cvSet({ rL:12, rN:100 });
+    function go() {
+      const d = parseFloat(document.getElementById('rD').value);
+      const kgm = 0.006165 * d * d;
+      const tot = kgm * cvNum('rL') * cvNum('rN');
+      document.getElementById('rOut').innerHTML = cvRes('Total weight',
+        (tot >= 1000 ? cvFmt(tot / 1000, 3) + ' tonnes' : cvFmt(tot, 1) + ' kg'), [
+        ['Per metre', cvFmt(kgm, 3) + ' kg/m'],
+        ['Per bar', cvFmt(kgm * cvNum('rL'), 2) + ' kg'],
+        ['Total length', cvFmt(cvNum('rL') * cvNum('rN'), 1) + ' m'],
+        ['In kg', cvFmt(tot, 1) + ' kg']
+      ]);
+    }
+    cvBind(['rD', 'rL', 'rN'], go);
+  }
+  else cvCalc2(t);
+}
+
+function cvCalc2(t) {
+  const b = document.getElementById('cvCalcBody');
+
+  if (t === 'fall') {
+    b.innerHTML =
+      cvF('fL', 'Run length', 'm') +
+      '<div class="cv-inline">' + cvF('fR', 'Fall 1 : X') + cvF('fD', 'or Drop', 'mm') + '</div>' +
+      '<div class="cv-pill" id="fPre">' + [['40', 'Shower 1:40'], ['80', 'Drain 1:80'], ['100', 'Flat roof 1:100'], ['150', '150mm drain 1:150']]
+        .map(function(p) { return '<button data-r="' + p[0] + '">' + p[1] + '</button>'; }).join('') + '</div>' +
+      '<div id="fOut"></div>' +
+      '<div class="cv-note">Those presets are <b>common values, not regulation</b>. Always check the project spec and the authority’s requirement — they change with pipe size and type of work.</div>';
+    cvSet({ fL:6, fR:80 });
+    let lastDrop = false;
+    b.querySelector('#fPre').addEventListener('click', function(e) {
+      const q = e.target.closest('[data-r]');
+      if (!q) return;
+      cvSet({ fR:q.dataset.r });
+      lastDrop = false;
+      b.querySelectorAll('#fPre button').forEach(function(x) { x.classList.toggle('on', x === q); });
+      go();
     });
+    document.getElementById('fD').addEventListener('input', function() { lastDrop = true; });
+    document.getElementById('fR').addEventListener('input', function() { lastDrop = false; });
+    function go() {
+      const L = cvNum('fL');
+      let ratio = cvNum('fR'), drop = cvNum('fD');
+      if (lastDrop && drop > 0 && L > 0) { ratio = L * 1000 / drop; cvSet({ fR:cvFmt(ratio, 1) }); }
+      else if (ratio > 0) { drop = L * 1000 / ratio; cvSet({ fD:cvFmt(drop, 1) }); }
+      const pct = ratio > 0 ? 100 / ratio : 0;
+      document.getElementById('fOut').innerHTML = cvRes('Drop over ' + cvFmt(L, 2) + ' m', cvFmt(drop, 1) + ' mm', [
+        ['Gradient', '1 : ' + cvFmt(ratio, 1)],
+        ['Percent', cvFmt(pct, 2) + ' %'],
+        ['Per metre', cvFmt(drop / (L || 1), 1) + ' mm/m']
+      ]);
+    }
+    cvBind(['fL', 'fR', 'fD'], go);
+  }
+
+  else if (t === 'stairs') {
+    b.innerHTML =
+      '<div class="cv-inline">' + cvF('stR', 'Total rise', 'mm') + cvF('stG', 'Going (tread)', 'mm') + '</div>' +
+      '<div class="cv-inline">' + cvF('stMaxR', 'Max riser', 'mm') + cvF('stMinG', 'Min going', 'mm') + '</div>' +
+      '<div id="stOut"></div>' +
+      '<div class="cv-note">The <b>2R + G</b> between 550 and 700 mm check is the widely accepted comfort rule. The riser and going limits above are <b>yours to set</b> — put in what UBBL or your project spec requires rather than trusting my defaults.</div>';
+    cvSet({ stR:2700, stG:275, stMaxR:180, stMinG:255 });
+    function go() {
+      const R = cvNum('stR'), G = cvNum('stG');
+      const num = Math.max(1, Math.round(R / 175));
+      const riser = R / num, k = 2 * riser + G;
+      const probs = [];
+      if (riser > cvNum('stMaxR')) probs.push('riser ' + cvFmt(riser, 1) + ' mm is over the ' + cvNum('stMaxR') + ' limit');
+      if (G < cvNum('stMinG')) probs.push('going ' + cvFmt(G, 0) + ' mm is under ' + cvNum('stMinG'));
+      if (k < 550) probs.push('2R+G is ' + cvFmt(k, 0) + ' mm, too tight');
+      if (k > 700) probs.push('2R+G is ' + cvFmt(k, 0) + ' mm, too loose');
+      document.getElementById('stOut').innerHTML = cvRes('Stair works out to', num + ' risers', [
+        ['Each riser', cvFmt(riser, 1) + ' mm'],
+        ['Going', cvFmt(G, 0) + ' mm'],
+        ['2R + G', cvFmt(k, 0) + ' mm'],
+        ['Total run', cvFmt((num - 1) * G / 1000, 2) + ' m']
+      ], probs.length
+        ? ['no', '<b>Check this:</b> ' + probs.join('; ') + '.']
+        : ['ok', '<b>Passes</b> the checks you set — riser, going and 2R+G are all in range.']);
+    }
+    cvBind(['stR', 'stG', 'stMaxR', 'stMinG'], go);
+  }
+
+  else if (t === 'area') {
+    b.innerHTML =
+      cvS('aS', 'Shape', [['rect', 'Rectangle'], ['tri', 'Triangle'], ['circ', 'Circle'], ['trap', 'Trapezium']], 'rect') +
+      '<div id="aF"></div><div id="aOut"></div>';
+    function go() {
+      const s = document.getElementById('aS').value;
+      let m2 = 0;
+      if (s === 'rect') m2 = cvNum('a1') * cvNum('a2');
+      else if (s === 'tri') m2 = 0.5 * cvNum('a1') * cvNum('a2');
+      else if (s === 'circ') { const r = cvNum('a1') / 2; m2 = Math.PI * r * r; }
+      else m2 = 0.5 * (cvNum('a1') + cvNum('a2')) * cvNum('a3');
+      document.getElementById('aOut').innerHTML = cvRes('Area', cvFmt(m2) + ' m²', [
+        ['Square feet', cvFmt(m2 / 0.092903, 1) + ' sq ft'],
+        ['Acres', cvFmt(m2 / 4046.8564, 4)],
+        ['Hectares', cvFmt(m2 / 10000, 4)]
+      ]);
+    }
+    function fields() {
+      const s = document.getElementById('aS').value, f = document.getElementById('aF');
+      if (s === 'rect') f.innerHTML = '<div class="cv-inline">' + cvF('a1', 'Length', 'm') + cvF('a2', 'Width', 'm') + '</div>';
+      else if (s === 'tri') f.innerHTML = '<div class="cv-inline">' + cvF('a1', 'Base', 'm') + cvF('a2', 'Height', 'm') + '</div>';
+      else if (s === 'circ') f.innerHTML = cvF('a1', 'Diameter', 'm');
+      else f.innerHTML = '<div class="cv-inline">' + cvF('a1', 'Side a', 'm') + cvF('a2', 'Side b', 'm') + cvF('a3', 'Height', 'm') + '</div>';
+      cvBind(['a1', 'a2', 'a3'], go);
+    }
+    document.getElementById('aS').addEventListener('change', fields);
+    fields();
+  }
+
+  else if (t === 'volume') {
+    b.innerHTML =
+      '<div class="cv-inline">' + cvF('vL', 'Length', 'm') + cvF('vW', 'Width', 'm') + cvF('vD', 'Depth', 'm') + '</div>' +
+      '<div id="vOut"></div>' +
+      '<div class="cv-note">For a water tank, 1 m³ is 1000 litres. For excavation, allow a bulking factor of <b>1.2–1.3</b> when working out lorry loads.</div>';
+    function go() {
+      const v = cvNum('vL') * cvNum('vW') * cvNum('vD');
+      document.getElementById('vOut').innerHTML = cvRes('Volume', cvFmt(v, 3) + ' m³', [
+        ['Litres', cvFmt(v * 1000, 0)],
+        ['Cubic feet', cvFmt(v / 0.0283168, 1)],
+        ['Loose spoil (×1.25)', cvFmt(v * 1.25, 2) + ' m³']
+      ]);
+    }
+    cvBind(['vL', 'vW', 'vD'], go);
   }
 }
 
@@ -17430,7 +17676,7 @@ const NT_TOOLS = [
   { id:'sketch2real',    name:'Sketch to Real',   cat:'plan',    req:'AI',     kw:'drawing clean vector plan' },
   { id:'planeditor',     name:'Plan Editor',      cat:'plan',    kw:'draw annotate canvas markup' },
   { id:'voicetranslate', name:'Voice Translator', cat:'util',    req:'AI',     kw:'speak language contractor phrasebook worker bangla tamil nepali offline' },
-  { id:'converter',      name:'Converter',        cat:'util',    kw:'unit calculator metric imperial' },
+  { id:'converter',      name:'Site Calculator',  cat:'util',    kw:'unit metric imperial convert tiles paint concrete cement bricks plaster rebar stairs fall area volume quantity' },
   { id:'counter',        name:'Tally Counter',    cat:'util',    kw:'count tally quantity' }
 ];
 
