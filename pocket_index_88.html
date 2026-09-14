@@ -6594,6 +6594,207 @@ body.on-chat .topbar{display:none}
 /* ---------- bottom nav: FAB robot ---------- */
 .nav-fab svg{display:block}
 
+/* ==========================================================
+   TASKS (tk-) — kad di Home + skrin penuh + helai borang
+   Tugasan surveyor hampir selalu terikat pada satu tapak dan
+   satu tarikh, jadi Task dikaitkan dengan Inspection dan
+   dikumpulkan ikut masa, bukan ikut projek. Home hanya papar
+   yang lewat dan hari ini supaya halaman kekal ringan.
+========================================================== */
+.tk-card{
+  background:var(--bg-2);border:1px solid var(--line);border-radius:17px;
+  padding:13px 13px 6px;margin-bottom:20px;box-shadow:var(--shadow-1);
+}
+.tk-hd{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.tk-ring{width:38px;height:38px;flex:none;position:relative}
+.tk-ring svg{width:38px;height:38px;transform:rotate(-90deg);display:block}
+.tk-ring b{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:-.04em;color:var(--fg);
+}
+.tk-hd-txt{min-width:0;flex:1}
+.tk-hd-txt h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.tk-hd-txt p{
+  margin:2px 0 0;font-size:11.5px;color:var(--muted);
+  display:flex;align-items:center;gap:5px;flex-wrap:wrap;
+}
+.tk-late{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;
+  background:var(--critical-soft);color:var(--critical);font-size:10px;font-weight:700;letter-spacing:-.01em;
+}
+.tk-all{
+  flex:none;font-size:11.5px;font-weight:600;color:var(--accent);
+  display:flex;align-items:center;gap:2px;
+}
+.tk-row{
+  display:flex;align-items:flex-start;gap:10px;padding:9px 2px;width:100%;
+  text-align:left;border-top:1px solid var(--line);
+}
+.tk-box{
+  width:21px;height:21px;flex:none;border-radius:7px;border:1.8px solid var(--line-2);
+  display:grid;place-items:center;margin-top:1px;color:transparent;background:var(--bg);
+  transition:background-color .16s,border-color .16s,color .16s;
+}
+.tk-box.done{background:var(--success);border-color:var(--success);color:#fff}
+.tk-row.late .tk-box{border-color:var(--critical)}
+.tk-main{min-width:0;flex:1;text-align:left}
+.tk-t{
+  font-size:13.5px;font-weight:600;letter-spacing:-.015em;line-height:1.35;color:var(--fg);
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tk-row.done .tk-t{text-decoration:line-through;color:var(--muted-2);text-decoration-thickness:1.5px}
+.tk-sub{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:10.5px;color:var(--muted);flex-wrap:wrap}
+.tk-site{display:inline-flex;align-items:center;gap:3px;color:var(--accent);font-weight:600}
+.tk-dot{width:2.5px;height:2.5px;border-radius:50%;background:var(--muted-2);flex:none}
+.tk-when.late{color:var(--critical);font-weight:700}
+.tk-when.today{color:var(--warning);font-weight:600}
+.tk-flag{flex:none;margin-top:2px;color:var(--critical)}
+.tk-sublist{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:-.02em}
+.tk-add{
+  display:flex;align-items:center;gap:9px;width:100%;padding:10px 2px;
+  border-top:1px solid var(--line);color:var(--accent);font-size:12.5px;font-weight:600;text-align:left;
+}
+.tk-add span{
+  width:21px;height:21px;border-radius:7px;border:1.5px dashed var(--accent-line);
+  display:grid;place-items:center;flex:none;
+}
+.tk-none{padding:16px 4px 20px;text-align:center}
+.tk-none p{margin:7px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ---------- skrin penuh ---------- */
+.tk-screen{
+  position:fixed;inset:0;z-index:2300;background:var(--bg);
+  display:none;flex-direction:column;
+}
+.tk-screen.show{display:flex}
+.tk-shd{flex:none;padding:calc(14px + env(safe-area-inset-top)) 15px 0;background:var(--bg)}
+.tk-stop{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.tk-back{
+  width:32px;height:32px;border-radius:10px;background:var(--surface);
+  display:grid;place-items:center;flex:none;color:var(--fg-2);
+}
+.tk-stop h2{margin:0;font-size:21px;font-weight:700;letter-spacing:-.03em;color:var(--fg)}
+.tk-stop h2 em{font-family:var(--font-display);font-style:italic;font-weight:500;color:var(--accent)}
+.tk-new{
+  margin-left:auto;flex:none;display:flex;align-items:center;gap:5px;
+  padding:7px 12px;border-radius:10px;background:var(--accent);color:var(--accent-fg);
+  font-size:12px;font-weight:600;
+}
+.tk-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:13px}
+.tk-stat{padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2)}
+.tk-stat b{
+  display:block;font-family:var(--font-mono);font-size:19px;font-weight:600;
+  letter-spacing:-.04em;line-height:1;color:var(--fg);
+}
+.tk-stat span{
+  display:block;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);margin-top:4px;
+}
+.tk-stat.bad{border-color:var(--critical);background:var(--critical-soft)}
+.tk-stat.bad b{color:var(--critical)}
+.tk-stat.warn b{color:var(--warning)}
+.tk-stat.ok b{color:var(--success)}
+.tk-tabs{
+  display:flex;gap:6px;overflow-x:auto;padding:0 15px 12px;margin:0 -15px;
+  -webkit-overflow-scrolling:touch;
+}
+.tk-tabs::-webkit-scrollbar{height:0}
+.tk-tabs button{
+  flex:none;padding:7px 13px;border-radius:999px;border:1px solid var(--line);
+  background:var(--bg);font-size:12px;font-weight:600;color:var(--fg-dim);white-space:nowrap;
+}
+.tk-tabs button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.tk-tabs button em{font-style:normal;font-family:var(--font-mono);font-size:10.5px;opacity:.75;margin-left:4px}
+.tk-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tk-scroll::-webkit-scrollbar{width:0}
+.tk-body{padding:2px 15px calc(30px + env(safe-area-inset-bottom))}
+.tk-grp{margin-bottom:16px}
+.tk-grp-hd{display:flex;align-items:center;gap:8px;margin:0 2px 7px}
+.tk-grp-hd b{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.tk-grp-hd.bad b{color:var(--critical)}
+.tk-grp-hd i{flex:1;height:1px;background:var(--line)}
+.tk-grp-hd span{font-family:var(--font-mono);font-size:10.5px;color:var(--muted-2)}
+.tk-item{
+  display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;padding:11px;
+  border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:7px;
+  position:relative;overflow:hidden;
+}
+.tk-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent}
+.tk-item.late::before{background:var(--critical)}
+.tk-item.today::before{background:var(--warning)}
+.tk-item.done{opacity:.55}
+.tk-item.done .tk-t{text-decoration:line-through;color:var(--muted-2)}
+.tk-item .tk-t{white-space:normal}
+.tk-note{
+  font-size:11px;color:var(--muted);line-height:1.45;margin-top:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.tk-bar{height:3px;border-radius:999px;background:var(--surface-2);margin-top:7px;overflow:hidden}
+.tk-bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.tk-rep{display:inline-flex;align-items:center;gap:3px;color:var(--accent);font-weight:600}
+
+/* ---------- helai borang ---------- */
+.tk-sheet{position:fixed;inset:0;z-index:2450;display:none}
+.tk-sheet.show{display:block}
+.tk-scrim{position:absolute;inset:0;background:var(--overlay)}
+.tk-panel{
+  position:absolute;left:0;right:0;bottom:0;max-height:92%;background:var(--bg);
+  border-radius:20px 20px 0 0;display:flex;flex-direction:column;box-shadow:var(--shadow-3);
+}
+.tk-grip{width:36px;height:4px;border-radius:999px;background:var(--line-2);margin:9px auto 0;flex:none}
+.tk-phd{
+  display:flex;align-items:center;gap:10px;padding:11px 16px 10px;
+  border-bottom:1px solid var(--line);flex:none;
+}
+.tk-phd h3{margin:0;font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.tk-phd button{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted)}
+.tk-pbd{overflow-y:auto;padding:14px 16px 6px;-webkit-overflow-scrolling:touch}
+.tk-pbd::-webkit-scrollbar{width:0}
+.tk-pft{
+  flex:none;padding:11px 16px calc(14px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);display:flex;gap:8px;
+}
+.tk-fld{margin-bottom:14px}
+.tk-fld > label{
+  display:block;font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:6px;
+}
+.tk-fld input[type=text],.tk-fld textarea,.tk-fld select,.tk-fld input[type=date]{
+  width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;
+  background:var(--bg-2);font-size:14px;outline:none;color:var(--fg);
+}
+.tk-fld input[type=text]:focus,.tk-fld textarea:focus,.tk-fld select:focus{border-color:var(--accent);background:var(--bg)}
+.tk-fld textarea{resize:vertical;min-height:62px;font-size:13px;line-height:1.5}
+.tk-fld .tk-big{font-size:16px;font-weight:600;letter-spacing:-.02em;padding:12px}
+.tk-chips{display:flex;gap:6px;flex-wrap:wrap}
+.tk-chips button{
+  padding:8px 12px;border:1px solid var(--line);border-radius:10px;
+  background:var(--bg-2);font-size:12.5px;font-weight:600;color:var(--fg-dim);
+}
+.tk-chips button.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.tk-chips button.on.tk-red{background:var(--critical-soft);border-color:var(--critical);color:var(--critical)}
+.tk-subrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}
+.tk-subrow .tk-box{width:19px;height:19px;border-radius:6px;margin:0}
+.tk-subrow input{flex:1;min-width:0;border:none;background:none;outline:none;font-size:13px;padding:2px 0;color:var(--fg)}
+.tk-subrow > button:last-child{color:var(--muted-2);flex:none}
+.tk-addsub{display:flex;align-items:center;gap:7px;padding:9px 0 0;color:var(--accent);font-size:12.5px;font-weight:600}
+.tk-btn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;text-align:center}
+.tk-btn.p{background:var(--accent);color:var(--accent-fg)}
+.tk-btn.d{background:var(--critical-soft);color:var(--critical);flex:none;padding-inline:16px}
+.tk-btn:disabled{opacity:.55}
+.tk-pack{
+  display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;padding:12px;
+  border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:8px;
+}
+.tk-pack-ico{
+  width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none;
+  background:var(--accent-soft);color:var(--accent);
+}
+.tk-pack b{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.015em;color:var(--fg)}
+.tk-pack p{margin:3px 0 0;font-size:11.5px;color:var(--muted);line-height:1.45}
+.tk-pack em{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--accent);font-weight:600}
+
+
 
 /* ==========================================================
    NEW TOOLS (nt-) — grid + kegemaran manual
@@ -7322,6 +7523,33 @@ body.on-chat .topbar{display:none}
           </button>
         </div>
 
+
+        <!-- ===== TUGASAN ===== -->
+        <section class="tk-card" id="tkCard" style="display:none">
+          <div class="tk-hd">
+            <div class="tk-ring">
+              <svg viewBox="0 0 38 38" aria-hidden="true">
+                <circle cx="19" cy="19" r="15.5" fill="none" stroke="var(--surface-2)" stroke-width="4"/>
+                <circle id="tkRingArc" cx="19" cy="19" r="15.5" fill="none" stroke="var(--accent)" stroke-width="4"
+                        stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="97.4"
+                        style="transition:stroke-dashoffset .35s"/>
+              </svg>
+              <b id="tkRingTxt">0/0</b>
+            </div>
+            <div class="tk-hd-txt">
+              <h3>Tasks</h3>
+              <p id="tkMeta"></p>
+            </div>
+            <button class="tk-all" id="tkAllBtn">All
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <div id="tkHomeList"></div>
+          <button class="tk-add" id="tkAddBtn">
+            <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add a task
+          </button>
+        </section>
+
         <!-- Perlu tindakan (tersembunyi bila kosong) -->
         <section class="nh-card" id="nhTodoCard" style="display:none">
           <div class="nh-card-hd">
@@ -7537,7 +7765,7 @@ body.on-chat .topbar{display:none}
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.7 · build 14 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.8 · build 14 Sep 2026</div>
           </div>
         </div>
         
@@ -7568,7 +7796,7 @@ body.on-chat .topbar{display:none}
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v0.7</span>
+      <span class="chat-build" title="Build">v0.8</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -8257,6 +8485,85 @@ body.on-chat .topbar{display:none}
 
 <div class="toast" id="toast"></div>
 
+
+<!-- ===== TASK SCREEN ===== -->
+<div class="tk-screen" id="tkScreen">
+  <div class="tk-shd">
+    <div class="tk-stop">
+      <button class="tk-back" id="tkBack" aria-label="Back">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <h2>Your <em>tasks</em></h2>
+      <button class="tk-new" id="tkNewBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New
+      </button>
+    </div>
+    <div class="tk-stats">
+      <div class="tk-stat bad"><b id="tkStLate">0</b><span>Overdue</span></div>
+      <div class="tk-stat warn"><b id="tkStToday">0</b><span>Today</span></div>
+      <div class="tk-stat ok"><b id="tkStDone">0</b><span>Done</span></div>
+    </div>
+    <div class="tk-tabs" id="tkTabs">
+      <button data-f="open" class="on">Open <em id="tkCOpen">0</em></button>
+      <button data-f="today">Today <em id="tkCToday">0</em></button>
+      <button data-f="site">By site</button>
+      <button data-f="done">Done <em id="tkCDone">0</em></button>
+      <button data-f="pack">Ready packs</button>
+    </div>
+  </div>
+  <div class="tk-scroll"><div class="tk-body" id="tkListBody"></div></div>
+</div>
+
+<!-- ===== TASK SHEET ===== -->
+<div class="tk-sheet" id="tkSheet">
+  <div class="tk-scrim" data-tkx="1"></div>
+  <div class="tk-panel">
+    <div class="tk-grip"></div>
+    <div class="tk-phd"><h3 id="tkShTitle">New task</h3><button data-tkx="1">Cancel</button></div>
+    <div class="tk-pbd">
+      <div class="tk-fld"><label>Task</label><input type="text" id="tkfTitle" class="tk-big" placeholder="e.g. Photograph Block A roof"></div>
+      <div class="tk-fld"><label>When</label>
+        <div class="tk-chips" id="tkfWhen">
+          <button type="button" data-w="0">Today</button>
+          <button type="button" data-w="1">Tomorrow</button>
+          <button type="button" data-w="3">In 3 days</button>
+          <button type="button" data-w="7">Next week</button>
+          <button type="button" data-w="-1">No date</button>
+        </div>
+        <input type="date" id="tkfDate" style="margin-top:7px">
+      </div>
+      <div class="tk-fld"><label>Site / inspection</label><select id="tkfSite"></select></div>
+      <div class="tk-fld"><label>Priority &amp; repeat</label>
+        <div class="tk-chips">
+          <button type="button" id="tkfFlag" class="tk-red">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" style="vertical-align:-1px"><path d="M5 21V4h11l-2 3.5L16 11H5z"/></svg>
+            Important
+          </button>
+          <select id="tkfRep" style="width:auto;padding:8px 10px;border-radius:10px">
+            <option value="">One-off</option>
+            <option value="d">Repeat daily</option>
+            <option value="w">Repeat weekly</option>
+            <option value="m">Repeat monthly</option>
+          </select>
+        </div>
+      </div>
+      <div class="tk-fld"><label>Steps (checklist)</label>
+        <div id="tkfSubs"></div>
+        <button type="button" class="tk-addsub" id="tkAddSub">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add a step
+        </button>
+      </div>
+      <div class="tk-fld"><label>Notes</label><textarea id="tkfNote" placeholder="Details, phone number, drawing reference…"></textarea></div>
+    </div>
+    <div class="tk-pft">
+      <button class="tk-btn d" id="tkShDel" style="display:none" aria-label="Delete task">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>
+      </button>
+      <button class="tk-btn p" id="tkShSave">Save task</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // =======================================================
 // FIREBASE — projek GoXpert Pocket SENDIRI
@@ -8555,6 +8862,9 @@ function showApp() {
   loadChatHistory().catch(e => console.warn('[showApp] history', e.message));
   if (typeof loadInspections === 'function') {
     loadInspections().catch(e => console.warn('[showApp] inspections', e.message));
+  }
+  if (typeof tkLoad === 'function') {
+    tkLoad().catch(e => console.warn('[showApp] tasks', e.message));
   }
 }
 
@@ -10640,7 +10950,14 @@ function formatRelativeTime(date) {
     }
   });
   on('nhAvatar', function() { switchTab('profile'); });
-  on('nhBell', function() { showToast('No new notifications'); });
+  on('nhBell', function() {
+    const late = (typeof TK !== 'undefined')
+      ? TK.items.filter(function(t) { return !t.done && tkGrp(t) === 'late'; }).length : 0;
+    if (!late) { showToast('No new notifications'); return; }
+    TK.filter = 'today';
+    document.querySelectorAll('#tkTabs button').forEach(function(x) { x.classList.toggle('on', x.dataset.f === 'today'); });
+    tkOpenScreen();
+  });
 })();
 
 // =======================================================
@@ -21901,8 +22218,597 @@ async function updateInspectionCounts(inspId) {
 
 
 
+// =======================================================
+// TASKS
+// Senarai tugasan biasa tidak cukup untuk surveyor: hampir
+// setiap kerja terikat pada satu tapak dan satu tarikh. Jadi
+// setiap task boleh dipaut ke satu inspection, dikumpulkan
+// ikut masa (lewat / hari ini / esok) dan bukan ikut projek.
+// Home hanya papar yang lewat dan hari ini — maksimum empat —
+// supaya halaman itu tidak tenggelam selepas beberapa minggu.
+// Disimpan di pocketInspections/{uid}/tasks/{id}
+// =======================================================
+const TK_CACHE = 'pocket_tasks_v1';
+const TK_DAY = 86400000;
+
+let TK = { items: [], filter: 'open', editId: null, subDraft: [], loaded: false, busy: false };
+
+const TK_PACKS = [
+  { n:'Before the site visit', ico:'<path d="M3 21V9l9-6 9 6v12z"/><path d="M9 21v-7h6v7"/>',
+    items:['Confirm access and keys','Charge camera and phone','Read the previous report for this site','Pack PPE — helmet, vest, boots','Print site forms','Check weather and travel time'] },
+  { n:'After the site visit', ico:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/>',
+    items:['Upload every photo','Label defects against BARIS','Enter measurements and quantities','Check the site name spelling','Generate the draft PDF'] },
+  { n:'Before sending the report', ico:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+    items:['Every photo has a caption','Confirm UBBL / MS references','Check repair recommendations and costs','Sign it','Send to the client'] }
+];
+
+const TK_REPT = { d:'daily', w:'weekly', m:'monthly' };
+
+function tkDay(n) {
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  return new Date(t.getTime() + (n || 0) * TK_DAY);
+}
+function tkISO(d) {
+  if (!d) return '';
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function tkParse(s) {
+  if (!s) return null;
+  const p = String(s).split('-');
+  if (p.length !== 3) return null;
+  const d = new Date(+p[0], +p[1] - 1, +p[2]);
+  return isNaN(d) ? null : d;
+}
+function tkEsc(s) { return (typeof escapeHTML === 'function') ? escapeHTML(s == null ? '' : s) : String(s == null ? '' : s); }
+
+// Kumpulan masa. Ini yang menentukan susunan skrin dan apa yang naik ke Home.
+function tkGrp(t) {
+  if (t.done) return 'done';
+  const d = tkParse(t.due);
+  if (!d) return 'none';
+  const diff = Math.round((d - tkDay(0)) / TK_DAY);
+  if (diff < 0) return 'late';
+  if (diff === 0) return 'today';
+  if (diff === 1) return 'tmr';
+  if (diff <= 7) return 'week';
+  return 'later';
+}
+function tkWhen(t) {
+  const d = tkParse(t.due);
+  if (!d) return 'No date';
+  const diff = Math.round((d - tkDay(0)) / TK_DAY);
+  if (diff < 0) return diff === -1 ? '1 day overdue' : Math.abs(diff) + ' days overdue';
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  if (diff <= 7) return 'In ' + diff + ' days';
+  return d.toLocaleDateString('en-MY', { day:'numeric', month:'short' });
+}
+
+// ---------- 1. STOR ----------
+function tkCacheSave() {
+  try { localStorage.setItem(TK_CACHE, JSON.stringify(TK.items.slice(0, 250))); } catch (e) {}
+}
+function tkCacheLoad() {
+  try {
+    const a = JSON.parse(localStorage.getItem(TK_CACHE) || 'null');
+    if (Array.isArray(a)) TK.items = a;
+  } catch (e) {}
+}
+function tkCol() {
+  return db.collection('pocketInspections').doc(currentUser.uid).collection('tasks');
+}
+function tkClean(d, id) {
+  return {
+    id: id,
+    title: d.title || 'Untitled task',
+    note: d.note || '',
+    due: d.due || '',
+    siteId: d.siteId || '',
+    siteName: d.siteName || '',
+    flag: d.flag ? 1 : 0,
+    done: d.done ? 1 : 0,
+    doneOn: d.doneOn || '',
+    rep: d.rep || '',
+    subs: Array.isArray(d.subs) ? d.subs.map(function(s) { return { t: s.t || '', d: s.d ? 1 : 0 }; }) : [],
+    createdAt: (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate().getTime() : Date.now()
+  };
+}
+async function tkLoad() {
+  tkCacheLoad();
+  tkRenderHome();
+  if (!currentUser) return;
+  try {
+    const snap = await tkCol().orderBy('createdAt', 'desc').limit(250).get();
+    const list = [];
+    snap.forEach(function(doc) { list.push(tkClean(doc.data(), doc.id)); });
+    TK.items = list;
+    TK.loaded = true;
+    tkCacheSave();
+    tkRenderHome();
+    if (document.getElementById('tkScreen').classList.contains('show')) tkRenderScreen();
+  } catch (e) {
+    console.warn('[Tasks load]', e.message);
+  }
+}
+
+// ---------- 2. IKON ----------
+function tkTick() {
+  return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg>';
+}
+function tkPin() {
+  return '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/></svg>';
+}
+function tkFlagI() {
+  return '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 21V4h11l-2 3.5L16 11H5z"/></svg>';
+}
+function tkRepI() {
+  return '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a8 8 0 0 1 13.7-5.7L20 8"/><path d="M20 4v4h-4"/><path d="M21 13a8 8 0 0 1-13.7 5.7L4 16"/><path d="M4 20v-4h4"/></svg>';
+}
+function tkSubLine(t) {
+  if (!t.subs || !t.subs.length) return '';
+  const n = t.subs.filter(function(s) { return s.d; }).length;
+  return '<span class="tk-dot"></span><span class="tk-sublist">' + n + '/' + t.subs.length + '</span>';
+}
+function tkSubMeta(t) {
+  const g = tkGrp(t);
+  return '<span class="tk-sub">' +
+    (t.siteName ? '<span class="tk-site">' + tkPin() + tkEsc(t.siteName) + '</span><span class="tk-dot"></span>' : '') +
+    '<span class="tk-when ' + (g === 'late' ? 'late' : g === 'today' ? 'today' : '') + '">' + tkWhen(t) + '</span>' +
+    (t.rep ? '<span class="tk-dot"></span><span class="tk-rep">' + tkRepI() + TK_REPT[t.rep] + '</span>' : '') +
+  '</span>';
+}
+
+// ---------- 3. KAD DI HOME ----------
+function tkBuckets() {
+  const today = tkISO(tkDay(0));
+  const open = TK.items.filter(function(t) { return !t.done; });
+  const late = open.filter(function(t) { return tkGrp(t) === 'late'; });
+  const now = open.filter(function(t) { return tkGrp(t) === 'today'; });
+  const doneToday = TK.items.filter(function(t) { return t.done && t.doneOn === today; });
+  const ahead = open.length - late.length - now.length;
+  return { open:open, late:late, now:now, doneToday:doneToday, ahead:ahead };
+}
+
+function tkRenderHome() {
+  const card = document.getElementById('tkCard');
+  if (!card) return;
+  card.style.display = '';
+
+  const b = tkBuckets();
+  const total = b.late.length + b.now.length + b.doneToday.length;
+  const frac = total ? b.doneToday.length / total : 0;
+
+  const arc = document.getElementById('tkRingArc');
+  if (arc) {
+    arc.setAttribute('stroke-dashoffset', String(97.4 * (1 - frac)));
+    arc.setAttribute('stroke', b.late.length ? 'var(--critical)' : total && frac === 1 ? 'var(--success)' : 'var(--accent)');
+  }
+  const rt = document.getElementById('tkRingTxt');
+  if (rt) rt.textContent = b.doneToday.length + '/' + total;
+
+  const meta = document.getElementById('tkMeta');
+  if (meta) {
+    let bits = '';
+    if (b.late.length) bits += '<span class="tk-late">' + b.late.length + ' overdue</span>';
+    if (b.now.length || !b.late.length) bits += '<span>' + b.now.length + ' for today</span>';
+    if (b.ahead > 0) bits += (bits ? '<span class="tk-dot"></span>' : '') + '<span>' + b.ahead + ' upcoming</span>';
+    meta.innerHTML = bits;
+  }
+
+  // Titik pada loceng ialah isyarat yang sama, supaya sekali pandang sudah cukup.
+  const bell = document.getElementById('nhBell');
+  if (bell) bell.classList.toggle('has', b.late.length > 0);
+
+  const pick = b.late.concat(b.now).sort(function(a, c) { return (c.flag || 0) - (a.flag || 0); }).slice(0, 4);
+  const list = document.getElementById('tkHomeList');
+  if (!list) return;
+  if (!pick.length) {
+    list.innerHTML = '<div class="tk-none">' +
+      '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 3v3M16 3v3M3.5 9.5h17"/><path d="M8.5 14.5l2.2 2.2 4.5-4.5"/></svg>' +
+      '<p>' + (TK.items.length ? 'Nothing overdue or due today.' : 'Nothing waiting.<br>Add a task when work comes in.') + '</p></div>';
+    return;
+  }
+  list.innerHTML = pick.map(function(t) {
+    const g = tkGrp(t);
+    return '<div class="tk-row ' + (g === 'late' ? 'late ' : '') + (t.done ? 'done' : '') + '">' +
+      '<button class="tk-box ' + (t.done ? 'done' : '') + '" data-tktick="' + t.id + '" aria-label="Mark done">' + tkTick() + '</button>' +
+      '<button class="tk-main" data-tkedit="' + t.id + '"><span class="tk-t">' + tkEsc(t.title) + '</span>' +
+        '<span class="tk-sub">' +
+          (t.siteName ? '<span class="tk-site">' + tkPin() + tkEsc(t.siteName) + '</span><span class="tk-dot"></span>' : '') +
+          '<span class="tk-when ' + (g === 'late' ? 'late' : g === 'today' ? 'today' : '') + '">' + tkWhen(t) + '</span>' +
+          tkSubLine(t) +
+        '</span>' +
+      '</button>' +
+      (t.flag ? '<span class="tk-flag">' + tkFlagI() + '</span>' : '') +
+    '</div>';
+  }).join('');
+}
+
+// ---------- 4. SKRIN PENUH ----------
+function tkItemHTML(t) {
+  const g = tkGrp(t);
+  const subs = t.subs || [];
+  const dn = subs.filter(function(s) { return s.d; }).length;
+  return '<div class="tk-item ' + g + ' ' + (t.done ? 'done' : '') + '">' +
+    '<button class="tk-box ' + (t.done ? 'done' : '') + '" data-tktick="' + t.id + '" aria-label="Mark done">' + tkTick() + '</button>' +
+    '<button class="tk-main" data-tkedit="' + t.id + '">' +
+      '<span class="tk-t">' + tkEsc(t.title) + '</span>' +
+      tkSubMeta(t) +
+      (t.note ? '<span class="tk-note">' + tkEsc(t.note) + '</span>' : '') +
+      (subs.length
+        ? '<span class="tk-bar"><i style="width:' + Math.round(dn / subs.length * 100) + '%"></i></span>' +
+          '<span class="tk-sub"><span class="tk-sublist">' + dn + ' / ' + subs.length + ' steps</span></span>'
+        : '') +
+    '</button>' +
+    (t.flag ? '<span class="tk-flag">' + tkFlagI() + '</span>' : '') +
+  '</div>';
+}
+
+function tkRenderScreen() {
+  const b = tkBuckets();
+  const set = function(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('tkStLate', b.late.length);
+  set('tkStToday', b.now.length);
+  set('tkStDone', b.doneToday.length);
+  set('tkCOpen', b.open.length);
+  set('tkCToday', b.late.length + b.now.length);
+  set('tkCDone', TK.items.filter(function(t) { return t.done; }).length);
+
+  const body = document.getElementById('tkListBody');
+  if (!body) return;
+  let html = '';
+
+  if (TK.filter === 'pack') {
+    html += '<p style="margin:2px 2px 12px;font-size:12.5px;color:var(--muted);line-height:1.55">' +
+      'One tap drops a standard checklist into your list. Edit or delete anything you do not need.</p>';
+    TK_PACKS.forEach(function(p, i) {
+      html += '<button class="tk-pack" data-tkpack="' + i + '">' +
+        '<span class="tk-pack-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + p.ico + '</svg></span>' +
+        '<span style="min-width:0;flex:1"><b>' + tkEsc(p.n) + '</b>' +
+        '<p>' + tkEsc(p.items.slice(0, 3).join(' · ')) + '…</p>' +
+        '<em>+ ' + p.items.length + ' steps</em></span></button>';
+    });
+  } else if (TK.filter === 'site') {
+    const groups = {};
+    b.open.forEach(function(t) {
+      const k = t.siteName || 'No site';
+      (groups[k] = groups[k] || []).push(t);
+    });
+    Object.keys(groups).sort().forEach(function(k) {
+      html += '<div class="tk-grp"><div class="tk-grp-hd"><b>' + tkEsc(k) + '</b><i></i><span>' + groups[k].length + '</span></div>' +
+        groups[k].map(tkItemHTML).join('') + '</div>';
+    });
+  } else {
+    let src;
+    if (TK.filter === 'done') {
+      src = TK.items.filter(function(t) { return t.done; })
+        .sort(function(a, c) { return (c.doneOn || '').localeCompare(a.doneOn || ''); }).slice(0, 60);
+    } else if (TK.filter === 'today') {
+      src = b.late.concat(b.now);
+    } else {
+      src = b.open;
+    }
+    const order = [['late','Overdue'],['today','Today'],['tmr','Tomorrow'],['week','This week'],['later','Later'],['none','No date'],['done','Done']];
+    order.forEach(function(o) {
+      const rows = src.filter(function(t) { return tkGrp(t) === o[0]; });
+      if (!rows.length) return;
+      rows.sort(function(a, c) {
+        if ((c.flag || 0) !== (a.flag || 0)) return (c.flag || 0) - (a.flag || 0);
+        return (a.due || '9999').localeCompare(c.due || '9999');
+      });
+      html += '<div class="tk-grp"><div class="tk-grp-hd ' + (o[0] === 'late' ? 'bad' : '') + '"><b>' + o[1] + '</b><i></i>' +
+        '<span>' + rows.length + '</span></div>' + rows.map(tkItemHTML).join('') + '</div>';
+    });
+  }
+
+  if (!html) html = '<div class="tk-none"><p>Nothing here yet.</p></div>';
+  body.innerHTML = html;
+}
+
+function tkOpenScreen() {
+  document.getElementById('tkScreen').classList.add('show');
+  tkRenderScreen();
+  if (!TK.loaded) tkLoad();
+}
+function tkCloseScreen() {
+  document.getElementById('tkScreen').classList.remove('show');
+}
+
+// ---------- 5. TANDA SIAP ----------
+// Tugasan berulang menjadual sendiri pusingan berikut supaya
+// lawatan mingguan tidak perlu ditaip semula setiap kali.
+async function tkToggle(id) {
+  const t = TK.items.filter(function(x) { return x.id === id; })[0];
+  if (!t || TK.busy) return;
+  const nowDone = t.done ? 0 : 1;
+  t.done = nowDone;
+  t.doneOn = nowDone ? tkISO(tkDay(0)) : '';
+  tkCacheSave();
+  tkRenderHome();
+  if (document.getElementById('tkScreen').classList.contains('show')) tkRenderScreen();
+
+  let spawned = null;
+  if (nowDone && t.rep) {
+    const base = tkParse(t.due) || tkDay(0);
+    const nx = new Date(base);
+    if (t.rep === 'd') nx.setDate(nx.getDate() + 1);
+    else if (t.rep === 'w') nx.setDate(nx.getDate() + 7);
+    else nx.setMonth(nx.getMonth() + 1);
+    spawned = {
+      title: t.title, note: t.note, due: tkISO(nx), siteId: t.siteId, siteName: t.siteName,
+      flag: t.flag, done: 0, doneOn: '', rep: t.rep,
+      subs: (t.subs || []).map(function(s) { return { t: s.t, d: 0 }; })
+    };
+  }
+
+  if (!currentUser) { showToast(nowDone ? 'Done' : 'Reopened'); return; }
+  try {
+    await tkCol().doc(id).update({
+      done: nowDone, doneOn: t.doneOn,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    if (spawned) {
+      spawned.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      spawned.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await tkCol().add(spawned);
+      const local = tkClean(spawned, ref.id);
+      local.createdAt = Date.now();
+      TK.items.unshift(local);
+      tkCacheSave();
+      tkRenderHome();
+      if (document.getElementById('tkScreen').classList.contains('show')) tkRenderScreen();
+      showToast('Done — next ' + TK_REPT[t.rep] + ' one scheduled');
+    } else if (nowDone) {
+      showToast('Task done');
+    }
+  } catch (e) {
+    console.warn('[Tasks toggle]', e.message);
+    showToast('Saved on this phone only', 'error');
+  }
+}
+
+// ---------- 6. HELAI BORANG ----------
+function tkPaintSubs() {
+  const box = document.getElementById('tkfSubs');
+  if (!box) return;
+  box.innerHTML = TK.subDraft.map(function(s, i) {
+    return '<div class="tk-subrow">' +
+      '<button type="button" class="tk-box ' + (s.d ? 'done' : '') + '" data-tksub="' + i + '" aria-label="Step done">' + tkTick() + '</button>' +
+      '<input value="' + tkEsc(s.t).replace(/"/g, '&quot;') + '" data-tksubi="' + i + '" placeholder="Step">' +
+      '<button type="button" data-tksubdel="' + i + '" aria-label="Remove step">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+      '</button></div>';
+  }).join('');
+}
+function tkMarkWhen() {
+  const v = document.getElementById('tkfDate').value;
+  document.querySelectorAll('#tkfWhen button').forEach(function(b) {
+    const n = +b.dataset.w;
+    b.classList.toggle('on', n < 0 ? !v : v === tkISO(tkDay(n)));
+  });
+}
+function tkFillSites(sel) {
+  const s = document.getElementById('tkfSite');
+  if (!s) return;
+  let html = '<option value="">— No site —</option>';
+  const list = (typeof inspections !== 'undefined' && inspections) ? inspections : [];
+  list.forEach(function(i) {
+    html += '<option value="' + i.id + '">' + tkEsc(i.title) + '</option>';
+  });
+  // Tapak yang sudah dipadam masih perlu kelihatan pada task lama.
+  if (sel && !list.some(function(i) { return i.id === sel.id; }) && sel.id) {
+    html += '<option value="' + tkEsc(sel.id) + '">' + tkEsc(sel.name) + '</option>';
+  }
+  s.innerHTML = html;
+  s.value = sel && sel.id ? sel.id : '';
+}
+function tkOpenSheet(id) {
+  const t = id ? TK.items.filter(function(x) { return x.id === id; })[0] : null;
+  TK.editId = t ? t.id : null;
+  TK.subDraft = t ? (t.subs || []).map(function(s) { return { t: s.t, d: s.d }; }) : [];
+
+  document.getElementById('tkShTitle').textContent = t ? 'Edit task' : 'New task';
+  document.getElementById('tkfTitle').value = t ? t.title : '';
+  document.getElementById('tkfDate').value = t ? t.due : tkISO(tkDay(0));
+  document.getElementById('tkfRep').value = t ? t.rep : '';
+  document.getElementById('tkfNote').value = t ? t.note : '';
+  document.getElementById('tkfFlag').classList.toggle('on', !!(t && t.flag));
+  tkFillSites(t ? { id: t.siteId, name: t.siteName } :
+    (typeof activeInspectionId !== 'undefined' && activeInspectionId
+      ? { id: activeInspectionId, name: '' } : null));
+  tkPaintSubs();
+  tkMarkWhen();
+  const del = document.getElementById('tkShDel');
+  del.style.display = t ? '' : 'none';
+  const save = document.getElementById('tkShSave');
+  save.disabled = false; save.textContent = t ? 'Update task' : 'Save task';
+  document.getElementById('tkSheet').classList.add('show');
+  if (!t) setTimeout(function() { document.getElementById('tkfTitle').focus(); }, 120);
+}
+function tkCloseSheet() { document.getElementById('tkSheet').classList.remove('show'); }
+
+async function tkSaveSheet() {
+  const title = document.getElementById('tkfTitle').value.trim();
+  if (!title) { showToast('Give the task a name'); document.getElementById('tkfTitle').focus(); return; }
+  const btn = document.getElementById('tkShSave');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const siteSel = document.getElementById('tkfSite');
+  const data = {
+    title: title,
+    note: document.getElementById('tkfNote').value.trim(),
+    due: document.getElementById('tkfDate').value || '',
+    siteId: siteSel.value || '',
+    siteName: siteSel.value ? (siteSel.options[siteSel.selectedIndex].textContent || '') : '',
+    flag: document.getElementById('tkfFlag').classList.contains('on') ? 1 : 0,
+    rep: document.getElementById('tkfRep').value || '',
+    subs: TK.subDraft.filter(function(s) { return s.t.trim(); }).map(function(s) { return { t: s.t.trim(), d: s.d ? 1 : 0 }; }),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  if (!currentUser) {
+    btn.disabled = false; btn.textContent = 'Save task';
+    showToast('Sign in to save tasks', 'error');
+    return;
+  }
+  try {
+    if (TK.editId) {
+      await tkCol().doc(TK.editId).update(data);
+      const t = TK.items.filter(function(x) { return x.id === TK.editId; })[0];
+      if (t) Object.keys(data).forEach(function(k) { if (k !== 'updatedAt') t[k] = data[k]; });
+      showToast('Task updated');
+    } else {
+      data.done = 0; data.doneOn = '';
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await tkCol().add(data);
+      const local = tkClean(data, ref.id);
+      local.createdAt = Date.now();
+      TK.items.unshift(local);
+      showToast('Task added');
+    }
+    tkCacheSave();
+    tkCloseSheet();
+    tkRenderHome();
+    if (document.getElementById('tkScreen').classList.contains('show')) tkRenderScreen();
+  } catch (e) {
+    console.warn('[Tasks save]', e.message);
+    btn.disabled = false; btn.textContent = TK.editId ? 'Update task' : 'Save task';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+async function tkDelete() {
+  if (!TK.editId) return;
+  const id = TK.editId;
+  TK.items = TK.items.filter(function(x) { return x.id !== id; });
+  tkCacheSave();
+  tkCloseSheet();
+  tkRenderHome();
+  if (document.getElementById('tkScreen').classList.contains('show')) tkRenderScreen();
+  if (!currentUser) return;
+  try {
+    await tkCol().doc(id).delete();
+    showToast('Task deleted');
+  } catch (e) {
+    console.warn('[Tasks delete]', e.message);
+    showToast('Could not delete. ' + e.message, 'error');
+  }
+}
+
+async function tkAddPack(i) {
+  const pack = TK_PACKS[i];
+  if (!pack || !currentUser) { if (!currentUser) showToast('Sign in to save tasks', 'error'); return; }
+  const due = tkISO(tkDay(0));
+  const site = (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : '';
+  let siteName = '';
+  if (site && typeof inspections !== 'undefined') {
+    const f = inspections.filter(function(x) { return x.id === site; })[0];
+    if (f) siteName = f.title;
+  }
+  try {
+    const batch = db.batch();
+    const made = [];
+    pack.items.forEach(function(name) {
+      const ref = tkCol().doc();
+      const d = {
+        title: name, note: '', due: due, siteId: site, siteName: siteName,
+        flag: 0, done: 0, doneOn: '', rep: '', subs: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      batch.set(ref, d);
+      const local = tkClean(d, ref.id);
+      local.createdAt = Date.now();
+      made.push(local);
+    });
+    await batch.commit();
+    TK.items = made.concat(TK.items);
+    tkCacheSave();
+    TK.filter = 'open';
+    document.querySelectorAll('#tkTabs button').forEach(function(x) { x.classList.toggle('on', x.dataset.f === 'open'); });
+    const tabs = document.getElementById('tkTabs');
+    if (tabs) tabs.scrollLeft = 0;
+    tkRenderHome();
+    tkRenderScreen();
+    showToast(pack.items.length + ' tasks added');
+  } catch (e) {
+    console.warn('[Tasks pack]', e.message);
+    showToast('Could not add. ' + e.message, 'error');
+  }
+}
+
+// ---------- 7. PENDAWAIAN ----------
+function tkWire() {
+  const on = function(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); };
+  on('tkAllBtn', tkOpenScreen);
+  on('tkAddBtn', function() { tkOpenSheet(null); });
+  on('tkBack', tkCloseScreen);
+  on('tkNewBtn', function() { tkOpenSheet(null); });
+  on('tkShSave', tkSaveSheet);
+  on('tkShDel', tkDelete);
+  on('tkAddSub', function() {
+    TK.subDraft.push({ t:'', d:0 });
+    tkPaintSubs();
+    const ins = document.querySelectorAll('#tkfSubs input');
+    if (ins.length) ins[ins.length - 1].focus();
+  });
+
+  const tabs = document.getElementById('tkTabs');
+  if (tabs) tabs.addEventListener('click', function(e) {
+    const b = e.target.closest('button');
+    if (!b) return;
+    TK.filter = b.dataset.f;
+    tabs.querySelectorAll('button').forEach(function(x) { x.classList.toggle('on', x === b); });
+    tkRenderScreen();
+  });
+
+  const whenRow = document.getElementById('tkfWhen');
+  if (whenRow) whenRow.addEventListener('click', function(e) {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const n = +b.dataset.w;
+    document.getElementById('tkfDate').value = n < 0 ? '' : tkISO(tkDay(n));
+    tkMarkWhen();
+  });
+  const dateIn = document.getElementById('tkfDate');
+  if (dateIn) dateIn.addEventListener('change', tkMarkWhen);
+  const flagBtn = document.getElementById('tkfFlag');
+  if (flagBtn) flagBtn.addEventListener('click', function() { this.classList.toggle('on'); });
+
+  const subs = document.getElementById('tkfSubs');
+  if (subs) {
+    subs.addEventListener('click', function(e) {
+      const t = e.target.closest('[data-tksub]');
+      if (t) { const i = +t.dataset.tksub; TK.subDraft[i].d = TK.subDraft[i].d ? 0 : 1; tkPaintSubs(); return; }
+      const x = e.target.closest('[data-tksubdel]');
+      if (x) { TK.subDraft.splice(+x.dataset.tksubdel, 1); tkPaintSubs(); }
+    });
+    subs.addEventListener('input', function(e) {
+      if (e.target.dataset.tksubi !== undefined) TK.subDraft[+e.target.dataset.tksubi].t = e.target.value;
+    });
+  }
+
+  const sheet = document.getElementById('tkSheet');
+  if (sheet) sheet.addEventListener('click', function(e) {
+    if (e.target.closest('[data-tkx]')) tkCloseSheet();
+  });
+
+  // Satu pendengar untuk kad Home dan skrin penuh.
+  document.addEventListener('click', function(e) {
+    const tick = e.target.closest('[data-tktick]');
+    if (tick) { tkToggle(tick.dataset.tktick); return; }
+    const ed = e.target.closest('[data-tkedit]');
+    if (ed) { tkOpenSheet(ed.dataset.tkedit); return; }
+    const pk = e.target.closest('[data-tkpack]');
+    if (pk) { tkAddPack(+pk.dataset.tkpack); }
+  });
+}
+
+try { tkWire(); } catch (e) { console.warn('[Tasks wire]', e.message); }
+
 // Console banner
-console.log('%cGoXpert Pocket v0.4', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v0.8', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
