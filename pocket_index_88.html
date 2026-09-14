@@ -1743,6 +1743,75 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .vt-big .row button{flex:1;padding:14px;border-radius:13px;font-size:14px;font-weight:700;background:#E4E9F1;color:#1A2230}
 .vt-big .row button.pri{background:#1B4FD8;color:#fff}
 
+/* Quantity Scanner — kira dari gambar, cucuk atau auto-kesan */
+.qs-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:var(--font-body)}
+.qs-hd{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 12px) 13px 11px;border-bottom:1px solid var(--line);background:var(--bg)}
+.qs-ic{width:33px;height:33px;border-radius:10px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--fg);flex:none}
+.qs-ic:active{background:var(--surface-2)}
+.qs-hd-t{flex:1;min-width:0}
+.qs-hd-t h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em}
+.qs-hd-t p{margin:1px 0 0;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qs-savebtn{padding:0 13px;height:33px;border-radius:10px;background:var(--accent);color:var(--accent-fg);font-size:13px;font-weight:600;flex:none}
+.qs-savebtn:disabled{background:var(--surface);color:var(--muted-2)}
+
+.qs-total{display:flex;align-items:baseline;gap:9px;padding:10px 14px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line)}
+.qs-total .n{font-family:var(--font-mono);font-size:30px;font-weight:700;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.qs-total .l{font-size:12px;font-weight:600;color:var(--accent);flex:1}
+.qs-total .sp{font-size:11.5px;color:var(--fg-dim);text-align:right;line-height:1.35}
+.qs-total .sp b{font-family:var(--font-mono);color:var(--fg)}
+
+.qs-stage{flex:1;position:relative;background:var(--surface-2);overflow:hidden;touch-action:none}
+.qs-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.qs-hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(10,14,20,0.82);color:#fff;font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:999px;pointer-events:none;max-width:88%;text-align:center;line-height:1.35}
+.qs-zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.qs-zoom button{width:34px;height:34px;border-radius:9px;background:var(--bg);border:1px solid var(--line);color:var(--fg);font-size:17px;font-weight:700;display:grid;place-items:center;box-shadow:var(--shadow-1)}
+.qs-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--fg-dim);padding:24px;text-align:center}
+.qs-empty p{margin:0;font-size:12.5px;line-height:1.55;max-width:240px}
+.qs-pick{padding:11px 18px;border-radius:11px;background:var(--accent);color:var(--accent-fg);font-size:13.5px;font-weight:700}
+.qs-pick.alt{background:var(--surface);color:var(--fg);border:1px solid var(--line)}
+
+.qs-cats{display:flex;gap:6px;overflow-x:auto;padding:9px 12px;border-top:1px solid var(--line);background:var(--bg)}
+.qs-cats::-webkit-scrollbar{height:0}
+.qs-cat{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:var(--bg-2);border:1.5px solid var(--line);font-size:12.5px;font-weight:600;color:var(--fg-dim)}
+.qs-cat .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.qs-cat .cnt{font-family:var(--font-mono);font-weight:600;font-size:12px}
+.qs-cat.on{color:var(--fg)}
+.qs-addcat{flex:0 0 auto;padding:7px 11px;border-radius:999px;background:none;border:1.5px dashed var(--line);color:var(--muted);font-size:12.5px;font-weight:600}
+
+.qs-acts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:9px 12px calc(env(safe-area-inset-bottom) + 13px);border-top:1px solid var(--line);background:var(--bg)}
+.qs-act{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:11px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:10.5px;font-weight:600}
+.qs-act:disabled{opacity:0.4}
+.qs-act.pri{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.qs-act.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+
+.qs-sheet{position:fixed;inset:0;z-index:3300;display:none}
+.qs-sheet.on{display:block}
+.qs-sheet .scrim{position:absolute;inset:0;background:var(--overlay)}
+.qs-sheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:88%;display:flex;flex-direction:column;background:var(--bg);border-radius:18px 18px 0 0;border-top:1px solid var(--line);animation:qs-up 0.24s ease both}
+.qs-sheet .panel.compact{max-height:58%}
+@keyframes qs-up{from{transform:translateY(16px);opacity:0.5}to{transform:none;opacity:1}}
+.qs-sheet h3{margin:0;padding:15px 16px 11px;font-size:14.5px;font-weight:700;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.qs-sheet h3 span{flex:1}
+.qs-sheet h3 button{color:var(--muted);padding:2px;line-height:0}
+.qs-sheet .inner{overflow-y:auto;padding:13px 16px calc(env(safe-area-inset-bottom) + 20px)}
+.qs-fld{margin-bottom:11px}
+.qs-fld label{display:block;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.qs-fld input,.qs-fld textarea{width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:14px}
+.qs-fld input[type="range"]{padding:0;background:none;border:none}
+.qs-fld textarea{min-height:60px;resize:vertical;line-height:1.5}
+.qs-two{display:flex;gap:9px}
+.qs-two>*{flex:1;min-width:0}
+.qs-btn{width:100%;padding:13px;border-radius:12px;background:var(--accent);color:var(--accent-fg);font-size:14px;font-weight:700;margin-top:4px}
+.qs-btn:disabled{opacity:0.6}
+.qs-btn.ghost{background:var(--surface);color:var(--fg);border:1px solid var(--line);margin-top:8px}
+.qs-btn.sel{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.qs-sumrow{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);margin-bottom:6px;font-size:13px}
+.qs-sumrow .l{display:flex;align-items:center;gap:8px;font-weight:600}
+.qs-sumrow .d{width:10px;height:10px;border-radius:50%}
+.qs-sumrow .v{font-family:var(--font-mono);font-weight:600}
+.qs-note{font-size:11.5px;line-height:1.5;color:var(--fg-dim);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
+.qs-note b{color:var(--fg)}
+
 /* Converter & Calc */
 .cv-tabs{display:flex;gap:8px;margin-bottom:14px}
 .cv-tab{flex:1;padding:10px;border-radius:10px;background:rgba(127,127,127,0.08);color:var(--fg-dim);font-size:14px;font-weight:600;border:1px solid var(--border);text-align:center}
@@ -10590,6 +10659,7 @@ function openTool(toolKey) {
   else if (toolKey === 'arfloorplan') openARFloorPlan();
   else if (toolKey === 'sketch2real') openSketchToReal();
   else if (toolKey === 'planeditor') openPlanEditor();
+  else if (toolKey === 'quantity') openQuantityScanner();
   else if (toolKey === 'voicetranslate') openVoiceTranslator();
   else if (toolKey === 'converter') openConverter();
   else if (toolKey === 'counter') openCounter();
@@ -15983,6 +16053,930 @@ function openVoiceTranslator() {
 }
 
 // =======================================================
+// TOOL: QUANTITY SCANNER
+// Kira barang dari gambar — cucuk sendiri, atau biar peranti
+// kesan bulatan / batang selari. Tiada AI: untuk 300 bulatan
+// serupa, pemprosesan imej biasa jauh lebih boleh dipercayai.
+// Disimpan di pocketInspections/{uid}/quantityCounts/{id}
+// =======================================================
+const QS_PAL = ['#1B4FD8', '#E08A00', '#0E9E7A', '#C2359E', '#B91C1C', '#6D28D9'];
+
+let QS = {
+  img: null, imgData: null, pins: [], active: 0,
+  cats: [{ name:'Main bars', color:QS_PAL[0] }, { name:'Distribution', color:QS_PAL[1] }],
+  scale: null, scaleTmp: [], spec: 150,
+  mode: 'pin', region: null, regTmp: null, autoOpen: false,
+  det: { r:10, thr:18, dark:false, kind:'ends', dir:'v' },
+  view: { z:1, tx:0, ty:0 },
+  entries: [], editId: null
+};
+let qsCv = null, qsCtx = null;
+const QS_DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+const QS_I = {
+  back:'<path d="M15 18l-6-6 6-6"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  ruler:'<rect x="2" y="7" width="20" height="10" rx="2"/><path d="M7 7v4M12 7v6M17 7v4"/>',
+  wand:'<path d="M12 3l1.9 4.6L18.5 9l-4.6 1.4L12 15l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+  img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-5 5-2-2-5 5"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>'
+};
+function qsSvg(p, s) {
+  return '<svg viewBox="0 0 24 24" width="' + (s || 17) + '" height="' + (s || 17) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+}
+function qsF1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+
+// ---------- 1. PEMILIH ----------
+function qsHead(name, desc) {
+  document.getElementById('toolModalIcon').innerHTML =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg>';
+  document.getElementById('toolModalName').textContent = name;
+  document.getElementById('toolModalDesc').textContent = desc;
+}
+
+function openQuantityScanner() {
+  qsHead('Quantity Scanner', 'Count from a photo, or review saved counts');
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="br-pick">' +
+      '<button class="br-pick-btn" id="qsGoNew">' +
+        '<span class="br-pick-ico" style="background:var(--accent-soft);color:var(--accent)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>New count</b><span>Bars in a bundle, or spacing in a mat</span></span>' +
+      '</button>' +
+      '<button class="br-pick-btn" id="qsGoHist">' +
+        '<span class="br-pick-ico" style="background:var(--surface);color:var(--fg-dim)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>Saved counts</b><span>Counts you have recorded</span></span>' +
+        '<span class="br-pick-n" id="qsHistN">&middot;</span>' +
+      '</button>' +
+    '</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="qsClose0">Close</button>';
+  document.getElementById('qsClose0').addEventListener('click', closeTool);
+  document.getElementById('qsGoNew').addEventListener('click', function() { qsOpenScan(null); });
+  document.getElementById('qsGoHist').addEventListener('click', qsOpenHistory);
+  qsLoadEntries().then(function() {
+    const el = document.getElementById('qsHistN');
+    if (el) el.textContent = QS.entries.length;
+  });
+  showToolModal();
+}
+
+// ---------- 2. SKRIN IMBAS ----------
+function qsOpenScan(entry) {
+  if (typeof closeTool === 'function') closeTool();
+  qsCloseAll();
+
+  QS.pins = []; QS.scale = null; QS.scaleTmp = []; QS.region = null; QS.regTmp = null;
+  QS.mode = 'pin'; QS.autoOpen = false; QS.active = 0; QS.editId = null;
+  QS.img = null; QS.imgData = null; QS.spec = 150;
+  QS.cats = [{ name:'Main bars', color:QS_PAL[0] }, { name:'Distribution', color:QS_PAL[1] }];
+  QS.det = { r:10, thr:18, dark:false, kind:'ends', dir:'v' };
+
+  const ov = document.createElement('div');
+  ov.id = 'qsOverlay'; ov.className = 'qs-overlay';
+  document.body.appendChild(ov);
+  const sh = document.createElement('div');
+  sh.id = 'qsSheet'; sh.className = 'qs-sheet';
+  document.body.appendChild(sh);
+
+  if (entry) {
+    QS.editId = entry.id;
+    QS.pins = (entry.pins || []).slice();
+    QS.cats = (entry.cats && entry.cats.length) ? entry.cats.slice() : QS.cats;
+    QS.scale = entry.scale || null;
+    QS.spec = entry.spec || 150;
+    if (entry.det) QS.det = Object.assign(QS.det, entry.det);
+    if (entry.photo) {
+      const im = new Image();
+      im.onload = function() { QS.img = im; QS.imgData = entry.photo; qsFit(); qsRender(); };
+      im.src = entry.photo;
+    }
+  }
+  qsRender();
+}
+
+function qsCloseAll() {
+  ['qsOverlay', 'qsSheet'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+  qsCv = null; qsCtx = null;
+}
+
+// ---------- 3. PANDANGAN ----------
+function qsFit() {
+  if (!QS.img || !qsCv) return;
+  const r = qsCv.getBoundingClientRect();
+  const z = Math.min(r.width / QS.img.width, r.height / QS.img.height);
+  QS.view.z = z;
+  QS.view.tx = (r.width - QS.img.width * z) / 2;
+  QS.view.ty = (r.height - QS.img.height * z) / 2;
+}
+function qsToImg(sx, sy) { return { x:(sx - QS.view.tx) / QS.view.z, y:(sy - QS.view.ty) / QS.view.z }; }
+function qsToScr(ix, iy) { return { x:ix * QS.view.z + QS.view.tx, y:iy * QS.view.z + QS.view.ty }; }
+
+function qsSpacing() {
+  if (!QS.scale) return null;
+  const dx = QS.scale.bx - QS.scale.ax, dy = QS.scale.by - QS.scale.ay;
+  const pxLen = Math.hypot(dx, dy);
+  if (pxLen < 5) return null;
+  const mmPerPx = QS.scale.mm / pxLen, ux = dx / pxLen, uy = dy / pxLen;
+  const pts = QS.pins.filter(function(p) { return p.c === QS.active; });
+  if (pts.length < 2) return null;
+  // Spacing hanya bermakna untuk SATU BARIS batang. Pin ikatan tersusun 2D,
+  // jadi mengunjurkannya ke satu garis memberi jurang hampir sifar — nombor
+  // yang nampak yakin tapi karut. Tolak bila pin bukan satu barisan.
+  const proj = [], perp = [];
+  pts.forEach(function(p) {
+    proj.push((p.x - QS.scale.ax) * ux + (p.y - QS.scale.ay) * uy);
+    perp.push(-(p.x - QS.scale.ax) * uy + (p.y - QS.scale.ay) * ux);
+  });
+  const span = Math.max.apply(null, proj) - Math.min.apply(null, proj);
+  const spread = Math.max.apply(null, perp) - Math.min.apply(null, perp);
+  if (span <= 0) return null;
+  if (spread > span * 0.25) return { notARow: true };
+
+  proj.sort(function(a, b) { return a - b; });
+  const gaps = [];
+  for (let i = 1; i < proj.length; i++) gaps.push((proj[i] - proj[i - 1]) * mmPerPx);
+  if (!gaps.length) return null;
+  const sum = gaps.reduce(function(a, b) { return a + b; }, 0);
+  return { n:pts.length, avg:sum / gaps.length, min:Math.min.apply(null, gaps), max:Math.max.apply(null, gaps) };
+}
+
+// ---------- 4. LUKIS ----------
+function qsDraw() {
+  if (!qsCv || !qsCtx) return;
+  const r = qsCv.getBoundingClientRect();
+  qsCv.width = Math.round(r.width * QS_DPR);
+  qsCv.height = Math.round(r.height * QS_DPR);
+  qsCtx.setTransform(QS_DPR, 0, 0, QS_DPR, 0, 0);
+  qsCtx.clearRect(0, 0, r.width, r.height);
+  if (!QS.img) return;
+  qsCtx.imageSmoothingQuality = 'high';
+  qsCtx.drawImage(QS.img, QS.view.tx, QS.view.ty, QS.img.width * QS.view.z, QS.img.height * QS.view.z);
+
+  // Gelang pratonton saiz — saiz batang ialah tetapan visual, jangan diteka.
+  if (QS.autoOpen && QS.det.kind !== 'bars') {
+    const pvr = QS.det.r * QS.view.z;
+    const ry = r.height * 0.17, rx0 = r.width / 2 - pvr * 3.4;
+    for (let k = 0; k < 3; k++) {
+      qsCtx.beginPath(); qsCtx.arc(rx0 + k * pvr * 3.4, ry, pvr, 0, 6.284);
+      qsCtx.strokeStyle = '#FFC24B'; qsCtx.lineWidth = 2.5; qsCtx.stroke();
+      qsCtx.strokeStyle = 'rgba(0,0,0,0.55)'; qsCtx.lineWidth = 1; qsCtx.stroke();
+    }
+    qsCtx.font = '600 11px system-ui'; qsCtx.textAlign = 'center';
+    qsCtx.fillStyle = 'rgba(10,14,20,0.85)';
+    qsCtx.fillRect(r.width / 2 - 82, ry + pvr + 8, 164, 18);
+    qsCtx.fillStyle = '#FFC24B';
+    qsCtx.fillText('match these to your smallest bar', r.width / 2, ry + pvr + 21);
+  }
+
+  const rg = QS.regTmp || QS.region;
+  if (rg) {
+    const q1 = qsToScr(rg.x, rg.y), q2 = qsToScr(rg.x + rg.w, rg.y + rg.h);
+    qsCtx.save();
+    qsCtx.fillStyle = 'rgba(10,16,26,0.45)';
+    qsCtx.beginPath(); qsCtx.rect(0, 0, r.width, r.height);
+    qsCtx.rect(q1.x, q1.y, q2.x - q1.x, q2.y - q1.y); qsCtx.fill('evenodd');
+    qsCtx.restore();
+    qsCtx.strokeStyle = '#FFC24B'; qsCtx.lineWidth = 2.5;
+    qsCtx.strokeRect(q1.x, q1.y, q2.x - q1.x, q2.y - q1.y);
+  }
+
+  if (QS.scale) {
+    const a = qsToScr(QS.scale.ax, QS.scale.ay), b = qsToScr(QS.scale.bx, QS.scale.by);
+    qsCtx.strokeStyle = '#00E0B0'; qsCtx.lineWidth = 3; qsCtx.setLineDash([7, 5]);
+    qsCtx.beginPath(); qsCtx.moveTo(a.x, a.y); qsCtx.lineTo(b.x, b.y); qsCtx.stroke();
+    qsCtx.setLineDash([]);
+    [a, b].forEach(function(p) {
+      qsCtx.fillStyle = '#00E0B0'; qsCtx.beginPath(); qsCtx.arc(p.x, p.y, 7, 0, 6.284); qsCtx.fill();
+      qsCtx.strokeStyle = '#06251F'; qsCtx.lineWidth = 2; qsCtx.stroke();
+    });
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, lbl = QS.scale.mm + ' mm';
+    qsCtx.font = '600 12px system-ui';
+    const tw = qsCtx.measureText(lbl).width;
+    qsCtx.fillStyle = 'rgba(6,37,31,0.9)'; qsCtx.fillRect(mx - tw / 2 - 6, my - 22, tw + 12, 19);
+    qsCtx.fillStyle = '#00E0B0'; qsCtx.textAlign = 'center'; qsCtx.fillText(lbl, mx, my - 8.5);
+  }
+  if (QS.mode === 'scale' && QS.scaleTmp.length === 1) {
+    const t = qsToScr(QS.scaleTmp[0].x, QS.scaleTmp[0].y);
+    qsCtx.fillStyle = '#00E0B0'; qsCtx.beginPath(); qsCtx.arc(t.x, t.y, 7, 0, 6.284); qsCtx.fill();
+  }
+
+  // Pin mengecut ikut saiz batang di skrin. Dengan 300 pin, bulatan bersaiz
+  // tetap menutup gambar sepenuhnya dan tiada apa boleh disemak.
+  const pr = Math.max(3, Math.min(12, QS.det.r * QS.view.z * 0.62));
+  const showN = pr >= 8;
+  const per = {};
+  QS.pins.forEach(function(p) {
+    per[p.c] = (per[p.c] || 0) + 1;
+    const s = qsToScr(p.x, p.y);
+    if (s.x < -20 || s.y < -20 || s.x > r.width + 20 || s.y > r.height + 20) return;
+    const col = QS.cats[p.c] ? QS.cats[p.c].color : QS_PAL[0];
+    qsCtx.beginPath(); qsCtx.arc(s.x, s.y, pr, 0, 6.284);
+    qsCtx.fillStyle = col; qsCtx.fill();
+    qsCtx.lineWidth = Math.max(1, pr * 0.2); qsCtx.strokeStyle = 'rgba(255,255,255,0.95)'; qsCtx.stroke();
+    if (showN) {
+      qsCtx.fillStyle = '#fff'; qsCtx.font = '700 ' + Math.round(pr * 0.92) + 'px system-ui';
+      qsCtx.textAlign = 'center'; qsCtx.textBaseline = 'middle';
+      qsCtx.fillText(String(per[p.c]), s.x, s.y + 0.5);
+    }
+  });
+  qsCtx.textBaseline = 'alphabetic';
+}
+
+function qsRender() {
+  const ov = document.getElementById('qsOverlay');
+  if (!ov) return;
+  const sp = qsSpacing(), total = QS.pins.length;
+  let h = '';
+
+  h += '<div class="qs-hd">' +
+    '<button class="qs-ic" id="qsBack">' + qsSvg(QS_I.back) + '</button>' +
+    '<div class="qs-hd-t"><h2>Quantity Scanner</h2><p>' +
+      (QS.img ? 'Tap each item to count' : 'Load a photo to begin') + '</p></div>' +
+    '<button class="qs-savebtn" id="qsSaveBtn"' + (total ? '' : ' disabled') + '>' +
+      (QS.editId ? 'Update' : 'Save') + '</button>' +
+  '</div>';
+
+  h += '<div class="qs-total"><span class="n">' + total + '</span>' +
+    '<span class="l">' + (total === 1 ? 'item' : 'items') + ' counted</span>' +
+    '<span class="sp">' +
+      (sp && sp.notARow ? 'Spacing needs one row<br>of bars, not a bundle'
+        : sp ? 'c/c avg <b>' + qsF1(sp.avg) + '</b> mm<br>min ' + qsF1(sp.min) + ' &middot; max ' + qsF1(sp.max)
+        : (QS.scale ? 'Add 2+ pins for spacing' : 'Set a scale for spacing')) +
+    '</span></div>';
+
+  h += '<div class="qs-stage" id="qsStage"><canvas id="qsCanvas"></canvas>' +
+    (QS.img ? '' :
+      '<div class="qs-empty">' + qsSvg(QS_I.img, 40) +
+      '<p>Photograph the bundle end, the rebar mat, or whatever you need to count.</p>' +
+      '<button class="qs-pick" id="qsTake">Take a photo</button>' +
+      '<button class="qs-pick alt" id="qsPickFile">Choose from gallery</button>' +
+      '<input type="file" id="qsFile" accept="image/*" capture="environment" style="display:none">' +
+      '<input type="file" id="qsFile2" accept="image/*" style="display:none"></div>') +
+    '<div class="qs-zoom"><button data-qsz="in">+</button><button data-qsz="out">&minus;</button>' +
+      '<button data-qsz="fit" style="font-size:11px">fit</button></div>' +
+    '<div class="qs-hint" id="qsHint"></div></div>';
+
+  h += '<div class="qs-cats">';
+  QS.cats.forEach(function(c, i) {
+    const n = QS.pins.filter(function(p) { return p.c === i; }).length;
+    h += '<button class="qs-cat ' + (QS.active === i ? 'on' : '') + '" data-qscat="' + i + '"' +
+      (QS.active === i ? ' style="border-color:' + c.color + '"' : '') + '>' +
+      '<span class="dot" style="background:' + c.color + '"></span>' + peEsc(c.name) +
+      ' <span class="cnt">' + n + '</span></button>';
+  });
+  h += '<button class="qs-addcat" id="qsAddCat">+ Type</button></div>';
+
+  h += '<div class="qs-acts">' +
+    '<button class="qs-act" id="qsUndo"' + (QS.pins.length ? '' : ' disabled') + '>' + qsSvg(QS_I.undo, 17) + 'Undo</button>' +
+    '<button class="qs-act ' + (QS.mode === 'scale' ? 'on' : (QS.scale ? 'pri' : '')) + '" id="qsScaleBtn">' +
+      qsSvg(QS_I.ruler, 17) + (QS.scale ? 'Scale set' : 'Set scale') + '</button>' +
+    '<button class="qs-act pri" id="qsAutoBtn"' + (QS.img ? '' : ' disabled') + '>' + qsSvg(QS_I.wand, 17) + 'Auto count</button>' +
+    '<button class="qs-act" id="qsClear"' + (QS.pins.length ? '' : ' disabled') + '>' + qsSvg(QS_I.trash, 17) + 'Clear</button>' +
+  '</div>';
+
+  ov.innerHTML = h;
+  qsCv = document.getElementById('qsCanvas');
+  qsCtx = qsCv ? qsCv.getContext('2d') : null;
+  qsWire();
+  requestAnimationFrame(function() { qsDraw(); qsHint(); });
+}
+
+function qsHint() {
+  const el = document.getElementById('qsHint');
+  if (!el) return;
+  if (!QS.img) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  if (QS.mode === 'region') el.textContent = 'Drag a box around ONE bundle';
+  else if (QS.mode === 'scale') el.textContent = QS.scaleTmp.length === 0 ? 'Tap one end of a known length' : 'Now tap the other end';
+  else if (!QS.pins.length) el.textContent = 'Tap each item · pinch to zoom';
+  else el.textContent = 'Tap a pin to remove it';
+}
+
+// ---------- 5. PENGESAN: HUJUNG BULAT ----------
+// Difference of Gaussians + penindasan bukan-maksimum. Bukan AI, bukan
+// internet. Diuji pada ikatan 253 dan 309 batang: tepat kedua-duanya.
+function qsBoxBlur(src, W, H, r) {
+  const t = new Float32Array(W * H), o = new Float32Array(W * H);
+  let x, y, s;
+  for (y = 0; y < H; y++) {
+    s = 0;
+    for (x = -r; x <= r; x++) s += src[y * W + Math.min(W - 1, Math.max(0, x))];
+    for (x = 0; x < W; x++) {
+      t[y * W + x] = s / (2 * r + 1);
+      s += src[y * W + Math.min(W - 1, x + r + 1)] - src[y * W + Math.max(0, x - r)];
+    }
+  }
+  for (x = 0; x < W; x++) {
+    s = 0;
+    for (y = -r; y <= r; y++) s += t[Math.min(H - 1, Math.max(0, y)) * W + x];
+    for (y = 0; y < H; y++) {
+      o[y * W + x] = s / (2 * r + 1);
+      s += t[Math.min(H - 1, y + r + 1) * W + x] - t[Math.max(0, y - r) * W + x];
+    }
+  }
+  return o;
+}
+
+function qsCrop(maxD) {
+  const rg = QS.region || { x:0, y:0, w:QS.img.width, h:QS.img.height };
+  const sc = Math.min(1, maxD / Math.max(rg.w, rg.h));
+  const W = Math.max(8, Math.round(rg.w * sc)), H = Math.max(8, Math.round(rg.h * sc));
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(QS.img, rg.x, rg.y, rg.w, rg.h, 0, 0, W, H);
+  return { rg:rg, sc:sc, W:W, H:H, data:g.getImageData(0, 0, W, H).data };
+}
+
+function qsCountEnds() {
+  const c = qsCrop(1400), W = c.W, H = c.H, d = c.data;
+  const gray = new Float32Array(W * H);
+  // Pengesan mencari kepingan TERANG. Hujung besi memang terang dengan celah
+  // gelap; simbol atas lukisan pula gelap atas putih — songsangkan.
+  const inv = QS.det.dark ? 255 : 0, sg = QS.det.dark ? -1 : 1;
+  let i, j;
+  for (i = 0, j = 0; i < d.length; i += 4, j++) gray[j] = inv + sg * (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114);
+
+  const r = Math.max(3, QS.det.r);
+  const a = qsBoxBlur(gray, W, H, Math.max(1, Math.round(r * 0.55)));
+  const b = qsBoxBlur(gray, W, H, Math.max(2, Math.round(r * 1.9)));
+  const dog = new Float32Array(W * H);
+  let mx = 0;
+  for (i = 0; i < W * H; i++) { dog[i] = a[i] - b[i]; if (dog[i] > mx) mx = dog[i]; }
+  if (mx <= 0) { showToast('Nothing found — try a brighter photo'); return; }
+
+  const thr = mx * (QS.det.thr / 100), sep = Math.max(2, Math.round(r * 1.15)), pts = [];
+  for (let y = sep; y < H - sep; y++) {
+    for (let x = sep; x < W - sep; x++) {
+      const v = dog[y * W + x];
+      if (v < thr) continue;
+      let ok = true;
+      for (let dy = -sep; dy <= sep && ok; dy++) {
+        for (let dx = -sep; dx <= sep; dx++) { if (dog[(y + dy) * W + x + dx] > v) { ok = false; break; } }
+      }
+      if (ok) pts.push([x, y]);
+    }
+  }
+  QS.pins = QS.pins.filter(function(p) { return p.c !== QS.active; });
+  pts.forEach(function(q) {
+    QS.pins.push({ x:c.rg.x + q[0] / c.sc, y:c.rg.y + q[1] / c.sc, c:QS.active });
+  });
+  qsRender();
+  showToast('Found ' + pts.length + ' — check, then tap to fix');
+}
+
+// ---------- 6. PENGESAN: BATANG SELARI ----------
+// Batang panjang bukan bulatan. Mencari kepingan pada batang panjang meletak
+// satu pin pada setiap ulir. Sebaliknya, jumlahkan kecerahan merentas arah
+// batang: setiap batang jadi satu puncak. Satu batang, satu pin.
+function qsCountBars() {
+  const c = qsCrop(1200), W = c.W, H = c.H, d = c.data;
+  const vert = (QS.det.dir === 'v');
+  const n = vert ? W : H, m = vert ? H : W;
+  const prof = new Float32Array(n);
+  let i;
+  for (i = 0; i < n; i++) {
+    let sum = 0;
+    for (let j = 0; j < m; j++) {
+      const x = vert ? i : j, y = vert ? j : i, k = (y * W + x) * 4;
+      sum += d[k] * 0.299 + d[k + 1] * 0.587 + d[k + 2] * 0.114;
+    }
+    prof[i] = sum / m;
+  }
+  if (QS.det.dark) for (i = 0; i < n; i++) prof[i] = 255 - prof[i];
+
+  // Buang kecerunan cahaya perlahan: tolak versi yang dilicinkan luas.
+  const wide = Math.max(6, Math.round(n / 14)), base = new Float32Array(n);
+  for (i = 0; i < n; i++) {
+    const a2 = Math.max(0, i - wide), b2 = Math.min(n - 1, i + wide);
+    let t = 0;
+    for (let q = a2; q <= b2; q++) t += prof[q];
+    base[i] = t / (b2 - a2 + 1);
+  }
+  let det = new Float32Array(n), mx = 0;
+  for (i = 0; i < n; i++) { det[i] = prof[i] - base[i]; if (det[i] > mx) mx = det[i]; }
+  if (mx <= 0) { showToast('No bars found — try the other direction'); return; }
+
+  // Satu batang boleh beri dua puncak, tepi kiri dan kanan sama-sama berkilau.
+  // Licinkan mengikut jarak minimum supaya satu batang = satu puncak.
+  const minSep = Math.max(2, Math.round(QS.det.r * c.sc * 1.2));
+  // minSep/6 diuji terhadap 11 batang berjarak diketahui: tepat pada setiap
+  // tetapan. minSep/3 melicin terlalu kuat dan mencantum batang bersebelahan;
+  // tanpa pelicinan langsung, satu batang berkilau memberi dua pin.
+  const sm = Math.max(1, Math.round(minSep / 6)), sdet = new Float32Array(n);
+  for (i = 0; i < n; i++) {
+    const a3 = Math.max(0, i - sm), b3 = Math.min(n - 1, i + sm);
+    let t = 0;
+    for (let q = a3; q <= b3; q++) t += det[q];
+    sdet[i] = t / (b3 - a3 + 1);
+  }
+  det = sdet; mx = 0;
+  for (i = 0; i < n; i++) if (det[i] > mx) mx = det[i];
+  if (mx <= 0) { showToast('No bars found — try the other direction'); return; }
+
+  // Garis dasar itu purata bergerak, jadi ia tidak boleh dipercayai dalam
+  // separuh tetingkap dari setiap hujung — di situ ia menghasilkan puncak
+  // palsu. Abaikan jalur tepi itu.
+  const edge = Math.max(2, Math.round(minSep * 0.8));
+  const thr = mx * (QS.det.thr / 100), pts = [];
+  for (i = Math.max(1, edge); i < n - 1 - edge; i++) {
+    if (det[i] < thr) continue;
+    if (det[i] >= det[i - 1] && det[i] > det[i + 1]) pts.push(i);
+  }
+  const keep = [];
+  pts.forEach(function(q) {
+    if (keep.length && q - keep[keep.length - 1] < minSep) {
+      if (det[q] > det[keep[keep.length - 1]]) keep[keep.length - 1] = q;
+    } else keep.push(q);
+  });
+
+  QS.pins = QS.pins.filter(function(p) { return p.c !== QS.active; });
+  keep.forEach(function(q) {
+    const ix = vert ? (c.rg.x + q / c.sc) : (c.rg.x + c.rg.w / 2);
+    const iy = vert ? (c.rg.y + c.rg.h / 2) : (c.rg.y + q / c.sc);
+    QS.pins.push({ x:ix, y:iy, c:QS.active });
+  });
+  qsRender();
+  showToast('Found ' + keep.length + ' bars — check, then tap to fix');
+}
+
+function qsAutoCount() {
+  if (!QS.img) return;
+  if (QS.det.kind === 'bars') qsCountBars(); else qsCountEnds();
+}
+
+// ---------- 7. HELAI AUTO ----------
+function qsOpenAuto() {
+  const SEL = 'sel';
+  const ends = QS.det.kind !== 'bars';
+  const sh = document.getElementById('qsSheet');
+  sh.innerHTML = '<div class="scrim" data-qsclose="1"></div><div class="panel compact">' +
+    '<h3><span>Auto count</span><button data-qsclose="1">' + qsSvg(QS_I.x, 17) + '</button></h3><div class="inner">' +
+    '<div class="qs-sumrow"><span class="l">Area</span><span class="v">' + (QS.region ? 'One box' : 'Whole photo') + '</span></div>' +
+    '<button class="qs-btn ghost" id="qaBox" style="margin-top:2px">' + (QS.region ? 'Redraw box' : 'Draw a box around ONE bundle') + '</button>' +
+    (QS.region ? '<button class="qs-btn ghost" id="qaBoxClr">Use whole photo</button>' : '') +
+    '<div class="qs-fld" style="margin-top:16px"><label>What shape am I counting?</label><div class="qs-two">' +
+      '<button class="qs-btn ghost ' + (ends ? SEL : '') + '" id="qaEnds" style="margin:0">Round ends<br><span style="font-weight:500;font-size:11px;opacity:0.8">bundle, seen end-on</span></button>' +
+      '<button class="qs-btn ghost ' + (ends ? '' : SEL) + '" id="qaBars" style="margin:0">Parallel bars<br><span style="font-weight:500;font-size:11px;opacity:0.8">mat or wall, from the side</span></button>' +
+    '</div></div>' +
+    (ends ? '' :
+      '<div class="qs-fld"><label>Bars run</label><div class="qs-two">' +
+        '<button class="qs-btn ghost ' + (QS.det.dir === 'v' ? SEL : '') + '" id="qaDirV" style="margin:0">Up &amp; down</button>' +
+        '<button class="qs-btn ghost ' + (QS.det.dir === 'h' ? SEL : '') + '" id="qaDirH" style="margin:0">Left &amp; right</button>' +
+      '</div></div>') +
+    '<div class="qs-fld"><label>Tone</label><div class="qs-two">' +
+      '<button class="qs-btn ghost ' + (QS.det.dark ? '' : SEL) + '" id="qaLight" style="margin:0">Light on dark<br><span style="font-weight:500;font-size:11px;opacity:0.8">a real steel photo</span></button>' +
+      '<button class="qs-btn ghost ' + (QS.det.dark ? SEL : '') + '" id="qaDark" style="margin:0">Dark on light<br><span style="font-weight:500;font-size:11px;opacity:0.8">symbols on a drawing</span></button>' +
+    '</div></div>' +
+    '<div class="qs-fld"><label>' + (ends ? 'Bar size' : 'Minimum gap') + ' &mdash; <b id="qaRv">' + QS.det.r + '</b> px</label>' +
+      '<input type="range" id="qaR" min="4" max="90" value="' + QS.det.r + '"></div>' +
+    '<div class="qs-fld"><label>Sensitivity &mdash; <b id="qaTv">' + QS.det.thr + '</b></label>' +
+      '<input type="range" id="qaT" min="6" max="45" value="' + QS.det.thr + '"></div>' +
+    (ends
+      ? '<div class="qs-note"><b>Match the yellow rings to the SMALLEST bar end you can see</b>, not the average. ' +
+        'Tested on 517 bars: set to the smallest it found every one; set 40% too big it missed 191.<br><br>' +
+        'Too small only adds extra dots &mdash; you can see those and delete them. Too big drops bars silently ' +
+        'and leaves no trace. <b>When unsure, go smaller.</b></div>'
+      : '<div class="qs-note">This mode adds up brightness across the bars, so each bar becomes one peak &mdash; ' +
+        'one bar, one pin. Set <b>Minimum gap</b> a little under the real gap between bars. Box a clean stretch ' +
+        'first; anything crossing the bars adds false peaks.</div>') +
+    '<button class="qs-btn" id="qaGo" style="margin-top:12px">Count now</button>' +
+  '</div></div>';
+  sh.classList.add('on');
+  QS.autoOpen = true; qsDraw();
+
+  const close = function() { sh.classList.remove('on'); QS.autoOpen = false; qsDraw(); };
+  sh.querySelectorAll('[data-qsclose]').forEach(function(b) { b.addEventListener('click', close); });
+  document.getElementById('qaR').addEventListener('input', function() {
+    QS.det.r = +this.value; document.getElementById('qaRv').textContent = this.value; qsDraw();
+  });
+  document.getElementById('qaT').addEventListener('input', function() {
+    QS.det.thr = +this.value; document.getElementById('qaTv').textContent = this.value;
+  });
+  // Jejari bermaksud benda berbeza bagi setiap mod — jangan bawa nilai lama.
+  // Jejari bermaksud benda berbeza bagi setiap mod, dan polaritinya pun berbeza:
+  // muka hujung besi yang dipotong memantul cahaya, jadi ia TERANG atas celah
+  // gelap; tetapi batang di atas konkrit biasanya lebih GELAP daripada latar.
+  document.getElementById('qaEnds').addEventListener('click', function() {
+    if (QS.det.kind !== 'ends') { QS.det.kind = 'ends'; QS.det.r = 10; QS.det.dark = false; }
+    qsOpenAuto();
+  });
+  document.getElementById('qaBars').addEventListener('click', function() {
+    if (QS.det.kind !== 'bars') { QS.det.kind = 'bars'; QS.det.r = 40; QS.det.dark = true; }
+    qsOpenAuto();
+  });
+  const dv = document.getElementById('qaDirV'), dh = document.getElementById('qaDirH');
+  if (dv) dv.addEventListener('click', function() { QS.det.dir = 'v'; qsOpenAuto(); });
+  if (dh) dh.addEventListener('click', function() { QS.det.dir = 'h'; qsOpenAuto(); });
+  document.getElementById('qaLight').addEventListener('click', function() { QS.det.dark = false; qsOpenAuto(); });
+  document.getElementById('qaDark').addEventListener('click', function() { QS.det.dark = true; qsOpenAuto(); });
+  document.getElementById('qaBox').addEventListener('click', function() {
+    sh.classList.remove('on'); QS.autoOpen = false; QS.mode = 'region'; QS.regTmp = null; qsRender();
+  });
+  const clr = document.getElementById('qaBoxClr');
+  if (clr) clr.addEventListener('click', function() { QS.region = null; qsOpenAuto(); });
+  document.getElementById('qaGo').addEventListener('click', function() {
+    sh.classList.remove('on'); QS.autoOpen = false; setTimeout(qsAutoCount, 60);
+  });
+}
+
+// ---------- 8. INTERAKSI ----------
+let _qsPtrs = {}, _qsMoved = false, _qsStart = null, _qsPinch = null;
+function qsStagePos(e) {
+  const r = qsCv.getBoundingClientRect();
+  return { x:e.clientX - r.left, y:e.clientY - r.top };
+}
+
+function qsLoadFile(f) {
+  if (!f) return;
+  const fr = new FileReader();
+  fr.onload = function() {
+    const im = new Image();
+    im.onload = function() {
+      // Kecilkan sebelum simpan: gambar 12MP base64 akan melanggar had 1 MiB
+      // dokumen Firestore. 1600px masih lebih daripada cukup untuk mengira.
+      const MAX = 1600;
+      const sc = Math.min(1, MAX / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width * sc); c.height = Math.round(im.height * sc);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      const url = c.toDataURL('image/jpeg', 0.78);
+      const im2 = new Image();
+      im2.onload = function() {
+        QS.img = im2; QS.imgData = url;
+        QS.pins = []; QS.scale = null; QS.region = null;
+        qsRender(); qsFit(); qsDraw();
+      };
+      im2.src = url;
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(f);
+}
+
+function qsTap(p) {
+  const ip = qsToImg(p.x, p.y);
+  if (QS.mode === 'scale') {
+    QS.scaleTmp.push(ip);
+    if (QS.scaleTmp.length === 2) {
+      const mm = prompt('How long is that line, in mm?\n(a 1000mm tape, a known slab width)', '1000');
+      const v = parseFloat(mm);
+      if (isFinite(v) && v > 0) {
+        QS.scale = { ax:QS.scaleTmp[0].x, ay:QS.scaleTmp[0].y, bx:ip.x, by:ip.y, mm:v };
+        showToast('Scale set — spacing now live');
+      }
+      QS.scaleTmp = []; QS.mode = 'pin'; qsRender(); return;
+    }
+    qsDraw(); qsHint(); return;
+  }
+  const rPx = Math.max(10, QS.det.r * 0.9);
+  for (let i = QS.pins.length - 1; i >= 0; i--) {
+    if (Math.hypot(QS.pins[i].x - ip.x, QS.pins[i].y - ip.y) < rPx) { QS.pins.splice(i, 1); qsRender(); return; }
+  }
+  QS.pins.push({ x:ip.x, y:ip.y, c:QS.active });
+  qsRender();
+}
+
+function qsWire() {
+  const st = document.getElementById('qsStage');
+  if (!st) return;
+
+  const take = document.getElementById('qsTake');
+  const pickF = document.getElementById('qsPickFile');
+  const f1 = document.getElementById('qsFile'), f2 = document.getElementById('qsFile2');
+  if (take && f1) {
+    take.addEventListener('click', function() { f1.click(); });
+    f1.addEventListener('change', function() { qsLoadFile(f1.files[0]); });
+  }
+  if (pickF && f2) {
+    pickF.addEventListener('click', function() { f2.click(); });
+    f2.addEventListener('change', function() { qsLoadFile(f2.files[0]); });
+  }
+
+  document.getElementById('qsBack').addEventListener('click', function() {
+    qsCloseAll(); openQuantityScanner();
+  });
+  document.getElementById('qsSaveBtn').addEventListener('click', qsOpenSave);
+  document.getElementById('qsUndo').addEventListener('click', function() { QS.pins.pop(); qsRender(); });
+  document.getElementById('qsClear').addEventListener('click', function() {
+    if (!confirm('Remove all ' + QS.pins.length + ' pins?')) return;
+    QS.pins = []; qsRender();
+  });
+  document.getElementById('qsScaleBtn').addEventListener('click', function() {
+    if (!QS.img) { showToast('Load a photo first'); return; }
+    QS.mode = QS.mode === 'scale' ? 'pin' : 'scale';
+    QS.scaleTmp = []; qsRender();
+  });
+  document.getElementById('qsAutoBtn').addEventListener('click', qsOpenAuto);
+
+  document.querySelectorAll('[data-qsz]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      if (!QS.img) return;
+      const r = qsCv.getBoundingClientRect(), cx = r.width / 2, cy = r.height / 2;
+      if (b.dataset.qsz === 'fit') qsFit();
+      else {
+        const f = b.dataset.qsz === 'in' ? 1.4 : 1 / 1.4;
+        const p = qsToImg(cx, cy);
+        QS.view.z *= f;
+        QS.view.tx = cx - p.x * QS.view.z; QS.view.ty = cy - p.y * QS.view.z;
+      }
+      qsDraw();
+    });
+  });
+
+  document.querySelectorAll('[data-qscat]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      const i = +b.dataset.qscat;
+      if (QS.active === i) {
+        const nn = prompt('Rename this type', QS.cats[i].name);
+        if (nn) QS.cats[i].name = nn.trim() || QS.cats[i].name;
+      }
+      QS.active = i; qsRender();
+    });
+  });
+  document.getElementById('qsAddCat').addEventListener('click', function() {
+    const nn = prompt('Name this type', 'Type ' + (QS.cats.length + 1));
+    if (nn === null) return;
+    QS.cats.push({ name:nn.trim() || ('Type ' + (QS.cats.length + 1)), color:QS_PAL[QS.cats.length % QS_PAL.length] });
+    QS.active = QS.cats.length - 1; qsRender();
+  });
+
+  st.addEventListener('pointerdown', function(e) {
+    if (!QS.img) return;
+    st.setPointerCapture(e.pointerId);
+    _qsPtrs[e.pointerId] = qsStagePos(e);
+    const ids = Object.keys(_qsPtrs);
+    if (ids.length === 1) { _qsMoved = false; _qsStart = qsStagePos(e); }
+    else if (ids.length === 2) {
+      const a = _qsPtrs[ids[0]], b = _qsPtrs[ids[1]];
+      _qsPinch = { d:Math.hypot(a.x - b.x, a.y - b.y), cx:(a.x + b.x) / 2, cy:(a.y + b.y) / 2 };
+      _qsPinch.p = qsToImg(_qsPinch.cx, _qsPinch.cy);
+      _qsMoved = true;
+    }
+  });
+  st.addEventListener('pointermove', function(e) {
+    if (!QS.img || !_qsPtrs[e.pointerId]) return;
+    const p = qsStagePos(e), ids = Object.keys(_qsPtrs);
+    if (ids.length === 2 && _qsPinch) {
+      _qsPtrs[e.pointerId] = p;
+      const a = _qsPtrs[ids[0]], b = _qsPtrs[ids[1]];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d < 10) return;
+      const cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+      QS.view.z *= d / _qsPinch.d;
+      QS.view.tx = cx - _qsPinch.p.x * QS.view.z;
+      QS.view.ty = cy - _qsPinch.p.y * QS.view.z;
+      _qsPinch.d = d; qsDraw(); return;
+    }
+    const prev = _qsPtrs[e.pointerId];
+    _qsPtrs[e.pointerId] = p;
+    if (Math.hypot(p.x - _qsStart.x, p.y - _qsStart.y) > 9) _qsMoved = true;
+    if (QS.mode === 'region') {
+      if (_qsMoved) {
+        const a = qsToImg(_qsStart.x, _qsStart.y), b = qsToImg(p.x, p.y);
+        QS.regTmp = { x:Math.min(a.x, b.x), y:Math.min(a.y, b.y), w:Math.abs(b.x - a.x), h:Math.abs(b.y - a.y) };
+        qsDraw();
+      }
+      return;
+    }
+    if (_qsMoved) { QS.view.tx += p.x - prev.x; QS.view.ty += p.y - prev.y; qsDraw(); }
+  });
+  const endFn = function(e) {
+    if (!QS.img) return;
+    const was = _qsMoved, ids = Object.keys(_qsPtrs);
+    delete _qsPtrs[e.pointerId];
+    if (Object.keys(_qsPtrs).length < 2) _qsPinch = null;
+    if (QS.mode === 'region' && ids.length === 1) {
+      if (QS.regTmp && QS.regTmp.w > 12 && QS.regTmp.h > 12) QS.region = QS.regTmp;
+      QS.regTmp = null; QS.mode = 'pin'; qsRender(); qsOpenAuto(); return;
+    }
+    if (ids.length === 1 && !was) qsTap(qsStagePos(e));
+  };
+  st.addEventListener('pointerup', endFn);
+  st.addEventListener('pointercancel', function(e) { delete _qsPtrs[e.pointerId]; _qsPinch = null; });
+}
+
+// ---------- 9. SIMPAN ----------
+function qsOpenSave() {
+  if (!QS.pins.length) { showToast('Nothing to count yet'); return; }
+  const sp = qsSpacing();
+  const cur = QS.editId ? (QS.entries.filter(function(e) { return e.id === QS.editId; })[0] || {}) : {};
+  let rows = '';
+  QS.cats.forEach(function(c, i) {
+    const n = QS.pins.filter(function(p) { return p.c === i; }).length;
+    if (!n) return;
+    rows += '<div class="qs-sumrow"><span class="l"><span class="d" style="background:' + c.color + '"></span>' +
+      peEsc(c.name) + '</span><span class="v">' + n + '</span></div>';
+  });
+  const sh = document.getElementById('qsSheet');
+  sh.innerHTML = '<div class="scrim" data-qsclose="1"></div><div class="panel">' +
+    '<h3><span>' + (QS.editId ? 'Update count' : 'Save count') + '</span>' +
+    '<button data-qsclose="1">' + qsSvg(QS_I.x, 17) + '</button></h3><div class="inner">' +
+    rows +
+    (sp && !sp.notARow ? '<div class="qs-sumrow"><span class="l">Spacing c/c (avg)</span><span class="v">' + qsF1(sp.avg) + ' mm</span></div>' +
+          '<div class="qs-sumrow"><span class="l">Widest gap</span><span class="v">' + qsF1(sp.max) + ' mm</span></div>' : '') +
+    '<div class="qs-fld" style="margin-top:12px"><label>Title</label><input id="qfT"></div>' +
+    '<div class="qs-fld"><div class="qs-two">' +
+      '<div><label>Element</label><input id="qfE" placeholder="e.g. Slab S3 soffit"></div>' +
+      '<div><label>Spec c/c (mm)</label><input id="qfS" type="number"></div>' +
+    '</div></div>' +
+    '<div class="qs-fld"><label>Location</label><input id="qfL" placeholder="e.g. Block A, Level 3"></div>' +
+    '<div class="qs-fld"><label>Notes</label><textarea id="qfN" placeholder="What you observed"></textarea></div>' +
+    '<div class="qs-note" id="qfVerdict"></div>' +
+    '<button class="qs-btn" id="qfGo">' + (QS.editId ? 'Update' : 'Save') + '</button>' +
+    '<button class="qs-btn ghost" data-qsclose="1">Cancel</button>' +
+  '</div></div>';
+  sh.classList.add('on');
+  sh.querySelectorAll('[data-qsclose]').forEach(function(b) {
+    b.addEventListener('click', function() { sh.classList.remove('on'); });
+  });
+  document.getElementById('qfT').value = cur.title || (QS.pins.length + ' items counted');
+  document.getElementById('qfE').value = cur.element || '';
+  document.getElementById('qfL').value = cur.location || '';
+  document.getElementById('qfN').value = cur.notes || '';
+  document.getElementById('qfS').value = QS.spec;
+
+  const verdict = function() {
+    const el = document.getElementById('qfVerdict');
+    const v = parseFloat(document.getElementById('qfS').value);
+    if (isFinite(v) && v > 0) QS.spec = v;
+    if (sp && sp.notARow) {
+      el.innerHTML = 'These pins are a cluster, not a single row, so no spacing is worked out &mdash; ' +
+        'only the count is saved. Spacing needs bars in one line.';
+      return;
+    }
+    if (!sp) { el.innerHTML = 'No scale set, so only the count is saved &mdash; no spacing.'; return; }
+    if (sp.max <= QS.spec * 1.05 && sp.min >= QS.spec * 0.95) {
+      el.innerHTML = '<b>Against ' + QS.spec + ' mm spec:</b> every gap is within &plusmn;5%.';
+      return;
+    }
+    const over = sp.max - QS.spec, under = QS.spec - sp.min;
+    const parts = [];
+    if (over > QS.spec * 0.05) parts.push('widest gap ' + qsF1(sp.max) + ' mm, ' + qsF1(over) + ' mm too wide');
+    if (under > QS.spec * 0.05) parts.push('tightest gap ' + qsF1(sp.min) + ' mm, ' + qsF1(under) + ' mm too tight');
+    el.innerHTML = '<b>Against ' + QS.spec + ' mm spec:</b> ' + parts.join('; ') + '. Flag before pour.';
+  };
+  verdict();
+  document.getElementById('qfS').addEventListener('input', verdict);
+  document.getElementById('qfGo').addEventListener('click', qsSave);
+}
+
+async function qsSave() {
+  if (!currentUser) { showToast('Sign in to save', 'error'); return; }
+  const g = function(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const title = g('qfT');
+  if (!title) { showToast('Give it a title first'); document.getElementById('qfT').focus(); return; }
+  const btn = document.getElementById('qfGo');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const sp = qsSpacing();
+  const perCat = QS.cats.map(function(c, i) {
+    return { name:c.name, color:c.color, count:QS.pins.filter(function(p) { return p.c === i; }).length };
+  });
+  const data = {
+    title: title,
+    element: g('qfE'), location: g('qfL'), notes: g('qfN'),
+    total: QS.pins.length,
+    cats: QS.cats.map(function(c) { return { name:c.name, color:c.color }; }),
+    perCat: perCat,
+    pins: QS.pins.map(function(p) { return { x:Math.round(p.x * 10) / 10, y:Math.round(p.y * 10) / 10, c:p.c }; }),
+    scale: QS.scale || null,
+    spec: QS.spec,
+    det: QS.det,
+    spacingAvg: (sp && !sp.notARow) ? Math.round(sp.avg * 10) / 10 : null,
+    spacingMin: (sp && !sp.notARow) ? Math.round(sp.min * 10) / 10 : null,
+    spacingMax: (sp && !sp.notARow) ? Math.round(sp.max * 10) / 10 : null,
+    photo: QS.imgData || null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    const col = db.collection('pocketInspections').doc(currentUser.uid).collection('quantityCounts');
+    if (QS.editId) {
+      await col.doc(QS.editId).update(data);
+      showToast('Changes saved');
+    } else {
+      data.inspectionId = (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null;
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await col.add(data);
+      QS.editId = ref.id;
+      showToast('Count saved');
+    }
+    document.getElementById('qsSheet').classList.remove('on');
+    QS.entries = [];
+    qsCloseAll();
+    openQuantityScanner();
+    setTimeout(qsOpenHistory, 120);
+  } catch (e) {
+    console.warn('[Quantity save]', e.message);
+    btn.disabled = false; btn.textContent = 'Save';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// ---------- 10. SEJARAH ----------
+async function qsLoadEntries() {
+  if (!currentUser) { QS.entries = []; return QS.entries; }
+  if (QS.entries.length) return QS.entries;
+  try {
+    const snap = await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('quantityCounts').orderBy('createdAt', 'desc').limit(60).get();
+    QS.entries = [];
+    snap.forEach(function(doc) {
+      const d = doc.data();
+      QS.entries.push({
+        id: doc.id,
+        title: d.title || 'Untitled',
+        element: d.element || '', location: d.location || '', notes: d.notes || '',
+        total: typeof d.total === 'number' ? d.total : 0,
+        cats: Array.isArray(d.cats) ? d.cats : [],
+        perCat: Array.isArray(d.perCat) ? d.perCat : [],
+        pins: Array.isArray(d.pins) ? d.pins : [],
+        scale: d.scale || null, spec: d.spec || 150, det: d.det || null,
+        spacingAvg: d.spacingAvg, spacingMin: d.spacingMin, spacingMax: d.spacingMax,
+        photo: d.photo || null,
+        createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
+      });
+    });
+  } catch (e) {
+    console.warn('[Quantity load]', e.message);
+    QS.entries = [];
+  }
+  return QS.entries;
+}
+
+function qsOpenHistory() {
+  qsCloseAll();
+  qsHead('Saved Counts', 'Counts you have recorded');
+  document.getElementById('toolModalBody').innerHTML = '<div class="br-load">Loading...</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="qsHistBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="qsHistNew">New count</button>';
+  document.getElementById('qsHistBack').addEventListener('click', openQuantityScanner);
+  document.getElementById('qsHistNew').addEventListener('click', function() { qsOpenScan(null); });
+  showToolModal();
+
+  qsLoadEntries().then(function(list) {
+    const body = document.getElementById('toolModalBody');
+    if (!body) return;
+    if (!list.length) {
+      body.innerHTML = '<div class="br-empty" style="margin-top:0">Nothing saved yet. Count something and tap <b>Save</b> to keep it here.</div>';
+      return;
+    }
+    let html = '';
+    list.forEach(function(e) {
+      const bits = [];
+      if (e.element) bits.push(e.element);
+      if (e.location) bits.push(e.location);
+      bits.push(e.createdAt.toLocaleDateString('en-MY', { day:'numeric', month:'short', year:'numeric' }));
+      html += '<div class="cnt-row" data-qsid="' + e.id + '">' +
+        '<div class="cnt-row-count">' + e.total + '</div>' +
+        '<div class="cnt-row-meta">' +
+          '<div class="cnt-row-label" style="color:var(--fg)">' + peEsc(e.title) + '</div>' +
+          '<div class="cnt-row-date">' + peEsc(bits.join(' · ')) +
+            (e.spacingAvg ? ' · c/c ' + e.spacingAvg + 'mm' : '') + '</div>' +
+        '</div>' +
+        '<button class="cnt-row-del" data-qsdel="' + e.id + '" aria-label="Delete">' + qsSvg(QS_I.trash, 16) + '</button>' +
+      '</div>';
+    });
+    body.innerHTML = html;
+    body.querySelectorAll('[data-qsid]').forEach(function(row) {
+      row.addEventListener('click', function(ev) {
+        if (ev.target.closest('[data-qsdel]')) return;
+        const e = QS.entries.filter(function(x) { return x.id === row.dataset.qsid; })[0];
+        if (e) qsOpenScan(e);
+      });
+    });
+    body.querySelectorAll('[data-qsdel]').forEach(function(b) {
+      b.addEventListener('click', function(ev) {
+        ev.stopPropagation();
+        qsDeleteEntry(b.dataset.qsdel);
+      });
+    });
+  });
+}
+
+async function qsDeleteEntry(id) {
+  if (!confirm('Delete this count?')) return;
+  try {
+    await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('quantityCounts').doc(id).delete();
+    QS.entries = [];
+    showToast('Deleted');
+    qsOpenHistory();
+  } catch (e) {
+    showToast('Could not delete. ' + e.message, 'error');
+  }
+}
+
+// =======================================================
 // TOOL: CONVERTER & CALCULATOR
 // =======================================================
 const CV_UNITS = {
@@ -16293,6 +17287,7 @@ const NT_ICONS = {
   arfloorplan:'<path d="M3 9.5 12 4l9 5.5-9 5.5z"/><path d="M3 14.5 12 20l9-5.5"/>',
   sketch2real:'<path d="M3 20.5 8 19l11-11a2.4 2.4 0 0 0-3.4-3.4L4.6 15.6z"/><path d="M14 6.5 17.5 10"/>',
   planeditor:'<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9.5h18M9.5 9.5V21"/>',
+  quantity:'<circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/>',
   voicetranslate:'<path d="M12 18.5a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v8.5a3 3 0 0 0 3 3z"/><path d="M5.5 13v2.5a6.5 6.5 0 0 0 13 0V13M12 22v-1.5"/>',
   converter:'<rect x="3.5" y="3" width="17" height="18" rx="2.5"/><path d="M7.5 8h9M8 13h2M8 17h2M14 13h2M14 17h2"/>',
   counter:'<path d="M5 4v16M9.5 4v16M14 4v16M18.5 4v16"/><path d="M3 14.5 21 9"/>'
@@ -16304,6 +17299,7 @@ const NT_TOOLS = [
   { id:'spirit',         name:'Spirit Level',     cat:'orient',  req:'SENSOR', kw:'bubble vertical plumb tilt' },
   { id:'compass',        name:'Compass',          cat:'orient',  req:'SENSOR', kw:'heading bearing north direction' },
   { id:'crackruler',     name:'Crack Ruler',      cat:'measure', kw:'width mm calibrate hairline' },
+  { id:'quantity',       name:'Quantity Scanner', cat:'measure', kw:'count bars bundle rebar tally spacing quantity' },
   { id:'armeasure',      name:'AR Measure',       cat:'measure', req:'AR',     kw:'distance length room' },
   { id:'arfloorplan',    name:'AR Floor Plan',    cat:'measure', req:'AR',     kw:'overlay plan floor' },
   { id:'sketch2real',    name:'Sketch to Real',   cat:'plan',    req:'AI',     kw:'drawing clean vector plan' },
