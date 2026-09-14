@@ -1811,6 +1811,14 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .qs-sumrow .v{font-family:var(--font-mono);font-weight:600}
 .qs-note{font-size:11.5px;line-height:1.5;color:var(--fg-dim);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
 .qs-note b{color:var(--fg)}
+.qs-catrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:9px 10px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);margin-bottom:6px}
+.qs-catrow .d{width:10px;height:10px;border-radius:50%;flex:none}
+.qs-catname{flex:1;min-width:80px;padding:6px 8px !important;border-radius:7px !important;font-size:13.5px !important;font-weight:600;background:var(--bg) !important}
+.qs-catsize{padding:6px 6px;border-radius:7px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:13px;font-family:inherit;flex:none}
+.qs-catn{font-family:var(--font-mono);font-weight:700;font-size:15px;min-width:38px;text-align:right;flex:none}
+.qs-catkg{flex-basis:100%;text-align:right;font-size:11.5px;color:var(--muted);font-family:var(--font-mono)}
+.qs-catkg:empty{display:none}
+#qfWt{font-family:var(--font-mono);font-weight:600}
 
 /* Converter & Calc */
 .cv-tabs{display:flex;gap:8px;margin-bottom:14px}
@@ -16064,7 +16072,7 @@ const QS_PAL = ['#1B4FD8', '#E08A00', '#0E9E7A', '#C2359E', '#B91C1C', '#6D28D9'
 let QS = {
   img: null, imgData: null, pins: [], active: 0,
   cats: [{ name:'Main bars', color:QS_PAL[0] }, { name:'Distribution', color:QS_PAL[1] }],
-  scale: null, scaleTmp: [], spec: 150,
+  scale: null, scaleTmp: [], spec: 150, barLength: 12,
   mode: 'pin', region: null, regTmp: null, autoOpen: false,
   det: { r:10, thr:18, dark:false, kind:'ends', dir:'v' },
   view: { z:1, tx:0, ty:0 },
@@ -16132,7 +16140,7 @@ function qsOpenScan(entry) {
 
   QS.pins = []; QS.scale = null; QS.scaleTmp = []; QS.region = null; QS.regTmp = null;
   QS.mode = 'pin'; QS.autoOpen = false; QS.active = 0; QS.editId = null;
-  QS.img = null; QS.imgData = null; QS.spec = 150;
+  QS.img = null; QS.imgData = null; QS.spec = 150; QS.barLength = 12;
   QS.cats = [{ name:'Main bars', color:QS_PAL[0] }, { name:'Distribution', color:QS_PAL[1] }];
   QS.det = { r:10, thr:18, dark:false, kind:'ends', dir:'v' };
 
@@ -16149,6 +16157,7 @@ function qsOpenScan(entry) {
     QS.cats = (entry.cats && entry.cats.length) ? entry.cats.slice() : QS.cats;
     QS.scale = entry.scale || null;
     QS.spec = entry.spec || 150;
+    QS.barLength = entry.barLength || 12;
     if (entry.det) QS.det = Object.assign(QS.det, entry.det);
     if (entry.photo) {
       const im = new Image();
@@ -16765,31 +16774,82 @@ function qsWire() {
 }
 
 // ---------- 9. SIMPAN ----------
+// Besi dijual dengan tan, bukan bilangan. Kiraan tidak boleh disemak lawan
+// Delivery Order sehingga ia ditukar jadi berat, jadi setiap jenis membawa
+// saiz batangnya sendiri dan beratnya dikira terus.
+const QS_SIZES = [6, 8, 10, 12, 16, 20, 25, 32, 40];
+function qsKgPerM(d) { return 0.006165 * d * d; }   // keluli 7850 kg/m3, luas pi*d^2/4
+
+function qsCatWeight(i) {
+  const c = QS.cats[i];
+  if (!c || !c.size) return 0;
+  const n = QS.pins.filter(function(p) { return p.c === i; }).length;
+  return n * (QS.barLength || 0) * qsKgPerM(c.size);
+}
+function qsTotalWeight() {
+  let t = 0;
+  QS.cats.forEach(function(c, i) { t += qsCatWeight(i); });
+  return t;
+}
+function qsFmtKg(kg) {
+  if (!kg) return '—';
+  if (kg >= 1000) return (Math.round(kg / 10) / 100).toFixed(2) + ' t';
+  return Math.round(kg) + ' kg';
+}
+
 function qsOpenSave() {
   if (!QS.pins.length) { showToast('Nothing to count yet'); return; }
   const sp = qsSpacing();
+  const hasSpacing = sp && !sp.notARow;
   const cur = QS.editId ? (QS.entries.filter(function(e) { return e.id === QS.editId; })[0] || {}) : {};
+
   let rows = '';
   QS.cats.forEach(function(c, i) {
     const n = QS.pins.filter(function(p) { return p.c === i; }).length;
     if (!n) return;
-    rows += '<div class="qs-sumrow"><span class="l"><span class="d" style="background:' + c.color + '"></span>' +
-      peEsc(c.name) + '</span><span class="v">' + n + '</span></div>';
+    let opts = '<option value="">size</option>';
+    QS_SIZES.forEach(function(d) {
+      opts += '<option value="' + d + '"' + (c.size === d ? ' selected' : '') + '>T' + d + '</option>';
+    });
+    rows += '<div class="qs-catrow" data-qsrow="' + i + '">' +
+      '<span class="d" style="background:' + c.color + '"></span>' +
+      '<input class="qs-catname" data-qsname="' + i + '" value="">' +
+      '<select class="qs-catsize" data-qssize="' + i + '">' + opts + '</select>' +
+      '<span class="qs-catn">' + n + '</span>' +
+      '<span class="qs-catkg" data-qskg="' + i + '"></span>' +
+    '</div>';
   });
+
   const sh = document.getElementById('qsSheet');
   sh.innerHTML = '<div class="scrim" data-qsclose="1"></div><div class="panel">' +
     '<h3><span>' + (QS.editId ? 'Update count' : 'Save count') + '</span>' +
     '<button data-qsclose="1">' + qsSvg(QS_I.x, 17) + '</button></h3><div class="inner">' +
-    rows +
-    (sp && !sp.notARow ? '<div class="qs-sumrow"><span class="l">Spacing c/c (avg)</span><span class="v">' + qsF1(sp.avg) + ' mm</span></div>' +
-          '<div class="qs-sumrow"><span class="l">Widest gap</span><span class="v">' + qsF1(sp.max) + ' mm</span></div>' : '') +
-    '<div class="qs-fld" style="margin-top:12px"><label>Title</label><input id="qfT"></div>' +
+
+    '<div class="qs-fld"><label>What you counted &mdash; tap a name to change it</label>' + rows + '</div>' +
+
+    '<div class="qs-fld"><div class="qs-two">' +
+      '<div><label>Bar length (m)</label><input id="qfLen" type="number" step="0.1" inputmode="decimal"></div>' +
+      '<div><label>Total weight</label><input id="qfWt" readonly></div>' +
+    '</div></div>' +
+
+    '<div class="qs-fld"><label>Expected on the DO (bars)</label>' +
+      '<input id="qfExp" type="number" inputmode="numeric" placeholder="leave blank if not checking"></div>' +
+    '<div class="qs-note" id="qfVar" style="display:none"></div>' +
+
+    '<div class="qs-fld" style="margin-top:14px"><label>Title</label><input id="qfT"></div>' +
+    '<div class="qs-fld"><div class="qs-two">' +
+      '<div><label>Supplier</label><input id="qfSup" placeholder="e.g. Amsteel"></div>' +
+      '<div><label>DO number</label><input id="qfDo" placeholder="e.g. 4471"></div>' +
+    '</div></div>' +
     '<div class="qs-fld"><div class="qs-two">' +
       '<div><label>Element</label><input id="qfE" placeholder="e.g. Slab S3 soffit"></div>' +
-      '<div><label>Spec c/c (mm)</label><input id="qfS" type="number"></div>' +
+      (hasSpacing ? '<div><label>Spec c/c (mm)</label><input id="qfS" type="number" inputmode="numeric"></div>' : '<div></div>') +
     '</div></div>' +
     '<div class="qs-fld"><label>Location</label><input id="qfL" placeholder="e.g. Block A, Level 3"></div>' +
     '<div class="qs-fld"><label>Notes</label><textarea id="qfN" placeholder="What you observed"></textarea></div>' +
+
+    (hasSpacing ? '<div class="qs-sumrow"><span class="l">Spacing c/c (avg)</span><span class="v">' + qsF1(sp.avg) + ' mm</span></div>' +
+      '<div class="qs-sumrow"><span class="l">Widest gap</span><span class="v">' + qsF1(sp.max) + ' mm</span></div>' : '') +
     '<div class="qs-note" id="qfVerdict"></div>' +
     '<button class="qs-btn" id="qfGo">' + (QS.editId ? 'Update' : 'Save') + '</button>' +
     '<button class="qs-btn ghost" data-qsclose="1">Cancel</button>' +
@@ -16798,16 +16858,57 @@ function qsOpenSave() {
   sh.querySelectorAll('[data-qsclose]').forEach(function(b) {
     b.addEventListener('click', function() { sh.classList.remove('on'); });
   });
+
+  // Nilai diletak dalam JS, bukan atribut — peEsc tidak melarikan petik tunggal.
+  sh.querySelectorAll('[data-qsname]').forEach(function(inp) {
+    inp.value = QS.cats[+inp.dataset.qsname].name;
+    inp.addEventListener('input', function() {
+      QS.cats[+inp.dataset.qsname].name = inp.value;
+    });
+    inp.addEventListener('change', function() {
+      if (!inp.value.trim()) { inp.value = 'Type ' + (+inp.dataset.qsname + 1); QS.cats[+inp.dataset.qsname].name = inp.value; }
+      qsDraw();
+    });
+  });
   document.getElementById('qfT').value = cur.title || (QS.pins.length + ' items counted');
   document.getElementById('qfE').value = cur.element || '';
   document.getElementById('qfL').value = cur.location || '';
   document.getElementById('qfN').value = cur.notes || '';
-  document.getElementById('qfS').value = QS.spec;
+  document.getElementById('qfSup').value = cur.supplier || '';
+  document.getElementById('qfDo').value = cur.doNo || '';
+  document.getElementById('qfExp').value = (cur.expected != null) ? cur.expected : '';
+  document.getElementById('qfLen').value = QS.barLength || '';
+  const specEl = document.getElementById('qfS');
+  if (specEl) specEl.value = QS.spec;
 
-  const verdict = function() {
+  function refresh() {
+    QS.barLength = parseFloat(document.getElementById('qfLen').value) || 0;
+    sh.querySelectorAll('[data-qskg]').forEach(function(el) {
+      const i = +el.dataset.qskg, kg = qsCatWeight(i);
+      el.textContent = kg ? qsFmtKg(kg) : '';
+    });
+    const tot = qsTotalWeight();
+    document.getElementById('qfWt').value = tot ? qsFmtKg(tot) : 'set size + length';
+
+    const exp = parseInt(document.getElementById('qfExp').value, 10);
+    const vEl = document.getElementById('qfVar');
+    if (isFinite(exp) && exp > 0) {
+      const diff = QS.pins.length - exp;
+      vEl.style.display = '';
+      if (diff === 0) vEl.innerHTML = '<b>Matches the DO exactly</b> &mdash; ' + exp + ' bars.';
+      else {
+        const kgPer = tot && QS.pins.length ? tot / QS.pins.length : 0;
+        vEl.innerHTML = '<b>' + (diff > 0 ? diff + ' more than the DO' : (-diff) + ' short of the DO') + '</b> &mdash; counted ' +
+          QS.pins.length + ', DO says ' + exp + '.' +
+          (kgPer ? ' That is ' + qsFmtKg(Math.abs(diff) * kgPer) + ' ' + (diff > 0 ? 'over' : 'unbilled') + '.' : '');
+      }
+    } else vEl.style.display = 'none';
+  }
+
+  function verdict() {
     const el = document.getElementById('qfVerdict');
-    const v = parseFloat(document.getElementById('qfS').value);
-    if (isFinite(v) && v > 0) QS.spec = v;
+    const sEl = document.getElementById('qfS');
+    if (sEl) { const v = parseFloat(sEl.value); if (isFinite(v) && v > 0) QS.spec = v; }
     if (sp && sp.notARow) {
       el.innerHTML = 'These pins are a cluster, not a single row, so no spacing is worked out &mdash; ' +
         'only the count is saved. Spacing needs bars in one line.';
@@ -16818,14 +16919,22 @@ function qsOpenSave() {
       el.innerHTML = '<b>Against ' + QS.spec + ' mm spec:</b> every gap is within &plusmn;5%.';
       return;
     }
-    const over = sp.max - QS.spec, under = QS.spec - sp.min;
-    const parts = [];
+    const over = sp.max - QS.spec, under = QS.spec - sp.min, parts = [];
     if (over > QS.spec * 0.05) parts.push('widest gap ' + qsF1(sp.max) + ' mm, ' + qsF1(over) + ' mm too wide');
     if (under > QS.spec * 0.05) parts.push('tightest gap ' + qsF1(sp.min) + ' mm, ' + qsF1(under) + ' mm too tight');
     el.innerHTML = '<b>Against ' + QS.spec + ' mm spec:</b> ' + parts.join('; ') + '. Flag before pour.';
-  };
-  verdict();
-  document.getElementById('qfS').addEventListener('input', verdict);
+  }
+
+  sh.querySelectorAll('[data-qssize]').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      QS.cats[+sel.dataset.qssize].size = parseInt(sel.value, 10) || null;
+      refresh();
+    });
+  });
+  document.getElementById('qfLen').addEventListener('input', refresh);
+  document.getElementById('qfExp').addEventListener('input', refresh);
+  if (specEl) specEl.addEventListener('input', verdict);
+  refresh(); verdict();
   document.getElementById('qfGo').addEventListener('click', qsSave);
 }
 
@@ -16838,22 +16947,31 @@ async function qsSave() {
   btn.disabled = true; btn.textContent = 'Saving...';
 
   const sp = qsSpacing();
+  const hasSpacing = sp && !sp.notARow;
+  const expRaw = parseInt(g('qfExp'), 10);
+  const expected = (isFinite(expRaw) && expRaw > 0) ? expRaw : null;
   const perCat = QS.cats.map(function(c, i) {
-    return { name:c.name, color:c.color, count:QS.pins.filter(function(p) { return p.c === i; }).length };
+    const n = QS.pins.filter(function(p) { return p.c === i; }).length;
+    return { name:c.name, color:c.color, size:c.size || null, count:n, kg:Math.round(qsCatWeight(i) * 10) / 10 };
   });
   const data = {
     title: title,
     element: g('qfE'), location: g('qfL'), notes: g('qfN'),
+    supplier: g('qfSup'), doNo: g('qfDo'),
     total: QS.pins.length,
-    cats: QS.cats.map(function(c) { return { name:c.name, color:c.color }; }),
+    expected: expected,
+    variance: expected != null ? (QS.pins.length - expected) : null,
+    barLength: QS.barLength || null,
+    totalKg: Math.round(qsTotalWeight() * 10) / 10 || null,
+    cats: QS.cats.map(function(c) { return { name:c.name, color:c.color, size:c.size || null }; }),
     perCat: perCat,
     pins: QS.pins.map(function(p) { return { x:Math.round(p.x * 10) / 10, y:Math.round(p.y * 10) / 10, c:p.c }; }),
     scale: QS.scale || null,
     spec: QS.spec,
     det: QS.det,
-    spacingAvg: (sp && !sp.notARow) ? Math.round(sp.avg * 10) / 10 : null,
-    spacingMin: (sp && !sp.notARow) ? Math.round(sp.min * 10) / 10 : null,
-    spacingMax: (sp && !sp.notARow) ? Math.round(sp.max * 10) / 10 : null,
+    spacingAvg: hasSpacing ? Math.round(sp.avg * 10) / 10 : null,
+    spacingMin: hasSpacing ? Math.round(sp.min * 10) / 10 : null,
+    spacingMax: hasSpacing ? Math.round(sp.max * 10) / 10 : null,
     photo: QS.imgData || null,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
@@ -16897,6 +17015,11 @@ async function qsLoadEntries() {
         element: d.element || '', location: d.location || '', notes: d.notes || '',
         total: typeof d.total === 'number' ? d.total : 0,
         cats: Array.isArray(d.cats) ? d.cats : [],
+        barLength: d.barLength || 12,
+        supplier: d.supplier || '', doNo: d.doNo || '',
+        expected: (typeof d.expected === 'number') ? d.expected : null,
+        totalKg: d.totalKg || null,
+        variance: (typeof d.variance === 'number') ? d.variance : null,
         perCat: Array.isArray(d.perCat) ? d.perCat : [],
         pins: Array.isArray(d.pins) ? d.pins : [],
         scale: d.scale || null, spec: d.spec || 150, det: d.det || null,
@@ -16941,7 +17064,9 @@ function qsOpenHistory() {
         '<div class="cnt-row-meta">' +
           '<div class="cnt-row-label" style="color:var(--fg)">' + peEsc(e.title) + '</div>' +
           '<div class="cnt-row-date">' + peEsc(bits.join(' · ')) +
-            (e.spacingAvg ? ' · c/c ' + e.spacingAvg + 'mm' : '') + '</div>' +
+            (e.totalKg ? ' · ' + (e.totalKg >= 1000 ? (Math.round(e.totalKg / 10) / 100).toFixed(2) + 't' : Math.round(e.totalKg) + 'kg') : '') +
+            (e.spacingAvg ? ' · c/c ' + e.spacingAvg + 'mm' : '') +
+            ((typeof e.variance === 'number' && e.variance !== 0) ? ' · ' + (e.variance > 0 ? '+' : '') + e.variance + ' vs DO' : '') + '</div>' +
         '</div>' +
         '<button class="cnt-row-del" data-qsdel="' + e.id + '" aria-label="Delete">' + qsSvg(QS_I.trash, 16) + '</button>' +
       '</div>';
