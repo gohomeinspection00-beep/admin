@@ -1858,23 +1858,81 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .cv-note{font-size:11.5px;color:var(--fg-dim);margin-top:10px;line-height:1.5;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .cv-note b{color:var(--fg)}
 
-/* Tally Counter */
-.cnt-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:#0f141a;color:#e5e7eb;font-family:var(--font-body)}
-.cnt-top{display:flex;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top) + 10px) 10px 10px;background:#0a0d12}
-.cnt-title{flex:1;text-align:center;font-weight:700;font-size:14px}
-.cnt-top button{padding:7px 10px;border-radius:9px;background:rgba(255,255,255,0.12);color:#fff;font-weight:700;font-size:12.5px;border:1px solid rgba(255,255,255,0.18)}
-.cnt-top button.cnt-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
-.cnt-labelwrap{padding:12px 14px;background:#0a0d12}
-.cnt-labelinput{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;box-sizing:border-box;text-align:center;font-weight:600}
-.cnt-labelinput::placeholder{color:#64748b;font-weight:400}
-.cnt-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
-.cnt-main:active{background:rgba(34,211,238,0.07)}
-.cnt-num{font-size:clamp(76px,30vw,170px);font-weight:800;font-family:var(--font-mono);line-height:1;color:#fff}
-.cnt-hint{font-size:14px;color:#64748b}
-.cnt-controls{display:flex;gap:12px;padding:16px 16px calc(env(safe-area-inset-bottom) + 18px);background:#0a0d12}
-.cnt-minus{width:80px;height:66px;border-radius:14px;background:#1e293b;color:#fff;font-size:32px;font-weight:700;border:1px solid rgba(255,255,255,0.15)}
-.cnt-minus:active{background:#0f1924}
-.cnt-reset{flex:1;border-radius:14px;background:rgba(255,255,255,0.08);color:#cbd5e1;font-weight:600;font-size:14px;border:1px solid rgba(255,255,255,0.15)}
+/* Tally Counter — beberapa pembilang serentak, boleh dikawal remote */
+.tc-overlay{position:fixed;inset:0;z-index:3200;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:var(--font-body);-webkit-user-select:none;user-select:none}
+.tc-hd{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 12px) 13px 11px;border-bottom:1px solid var(--line);background:var(--bg)}
+.tc-ic{width:33px;height:33px;border-radius:10px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--fg);flex:none}
+.tc-hd-t{flex:1;min-width:0}
+.tc-hd-t h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em}
+.tc-hd-t p{margin:1px 0 0;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-savebtn{padding:0 13px;height:33px;border-radius:10px;background:var(--accent);color:var(--accent-fg);font-size:13px;font-weight:600;flex:none}
+.tc-savebtn:disabled{background:var(--surface);color:var(--muted-2)}
+
+.tc-total{display:flex;align-items:baseline;gap:9px;padding:10px 14px;background:var(--accent-soft);border-bottom:1px solid var(--accent-line)}
+.tc-total .n{font-family:var(--font-mono);font-size:30px;font-weight:700;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.tc-total .l{font-size:12px;font-weight:600;color:var(--accent);flex:1}
+.tc-total .k{font-size:11px;color:var(--fg-dim);text-align:right;line-height:1.35}
+
+.tc-body{flex:1;overflow-y:auto;padding:11px 12px}
+.tc-body::-webkit-scrollbar{width:0}
+.tc-grid{display:grid;gap:9px}
+.tc-grid.tc-c1{grid-template-columns:1fr;height:100%}
+.tc-grid.tc-c2{grid-template-columns:1fr 1fr}
+
+.tc-card{position:relative;border-radius:16px;border:2px solid var(--line);background:var(--bg-2);padding:13px 13px 11px;
+  display:flex;flex-direction:column;justify-content:space-between;min-height:112px;overflow:hidden;text-align:left;cursor:pointer}
+.tc-card.tc-solo{min-height:100%;justify-content:center;align-items:center;gap:6px}
+.tc-card:active{transform:scale(0.985)}
+.tc-card .tc-top{display:flex;align-items:center;gap:7px;width:100%}
+.tc-card .tc-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.tc-card .tc-nm{flex:1;min-width:0;font-size:13px;font-weight:700;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-card .tc-key{font-family:var(--font-mono);font-size:10px;font-weight:600;padding:2px 6px;border-radius:5px;background:var(--surface);color:var(--fg-dim);flex:none}
+.tc-card .tc-bot{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;width:100%;margin-top:6px}
+.tc-card .tc-num{font-family:var(--font-mono);font-size:44px;font-weight:700;line-height:1;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+.tc-card.tc-solo .tc-num{font-size:clamp(90px,26vw,140px)}
+.tc-card.tc-solo .tc-nm{font-size:17px;text-align:center;flex:none}
+.tc-card.tc-solo .tc-bot{flex-direction:column;align-items:center;gap:10px}
+.tc-card .tc-minus{width:36px;height:34px;border-radius:9px;flex:none;background:var(--bg);border:1px solid var(--line);color:var(--fg-dim);font-size:19px;font-weight:700;line-height:1;display:grid;place-items:center}
+.tc-card.tc-solo .tc-minus{width:64px;height:46px;font-size:24px}
+.tc-card .tc-flash{position:absolute;inset:0;background:currentColor;opacity:0;pointer-events:none}
+.tc-card.tc-hit .tc-flash{animation:tc-fl 0.28s ease-out}
+@keyframes tc-fl{from{opacity:0.16}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.tc-card.tc-hit .tc-flash{animation:none}.tc-card:active{transform:none}}
+
+.tc-foot{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:9px 12px calc(env(safe-area-inset-bottom) + 13px);border-top:1px solid var(--line);background:var(--bg)}
+.tc-act{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:11px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:10.5px;font-weight:600}
+.tc-act:disabled{opacity:0.4}
+.tc-act.tc-on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+
+.tc-sheet{position:fixed;inset:0;z-index:3300;display:none}
+.tc-sheet.tc-open{display:block}
+.tc-sheet .tc-scrim{position:absolute;inset:0;background:var(--overlay)}
+.tc-sheet .tc-panel{position:absolute;left:0;right:0;bottom:0;max-height:88%;display:flex;flex-direction:column;background:var(--bg);border-radius:18px 18px 0 0;border-top:1px solid var(--line);animation:tc-up 0.24s ease both}
+@keyframes tc-up{from{transform:translateY(16px);opacity:0.5}to{transform:none;opacity:1}}
+.tc-sheet h3{margin:0;padding:15px 16px 11px;font-size:14.5px;font-weight:700;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
+.tc-sheet h3 span{flex:1}
+.tc-sheet h3 button{color:var(--muted);padding:2px;line-height:0}
+.tc-sheet .tc-inner{overflow-y:auto;padding:13px 16px calc(env(safe-area-inset-bottom) + 20px)}
+.tc-fld{margin-bottom:11px}
+.tc-fld label{display:block;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.tc-fld input,.tc-fld textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg-2);color:var(--fg);font-size:14px}
+.tc-fld textarea{min-height:58px;resize:vertical;line-height:1.5}
+.tc-pair{display:flex;gap:9px}
+.tc-pair>*{flex:1;min-width:0}
+.tc-btn{width:100%;padding:13px;border-radius:12px;background:var(--accent);color:var(--accent-fg);font-size:14px;font-weight:700;margin-top:4px}
+.tc-btn:disabled{opacity:0.6}
+.tc-btn.tc-ghost{background:var(--surface);color:var(--fg);border:1px solid var(--line);margin-top:8px}
+.tc-row{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);margin-bottom:6px}
+.tc-row .tc-d{width:10px;height:10px;border-radius:50%;flex:none}
+.tc-row input{flex:1;min-width:0;padding:6px 8px;border-radius:7px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:13.5px;font-weight:600}
+.tc-row .tc-v{font-family:var(--font-mono);font-size:16px;font-weight:700;min-width:44px;text-align:right}
+.tc-row .tc-rm{background:none;color:var(--muted);padding:4px;line-height:0;flex:none}
+.tc-note{font-size:11.5px;line-height:1.5;color:var(--fg-dim);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
+.tc-note b{color:var(--fg)}
+.tc-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tc-keys span{font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--fg-dim)}
+
+/* baris senarai dikongsi oleh sejarah Tally dan Quantity Scanner */
 .cnt-row{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px}
 .cnt-row:active{background:rgba(0,0,0,0.06)}
 .cnt-row-meta{flex:1;min-width:0}
@@ -17547,101 +17605,527 @@ function cvCalc2(t) {
 
 // =======================================================
 // TOOL: TALLY COUNTER
+// Beberapa pembilang serentak, sebab survey lantai tidak
+// mengira satu benda — hollow, retak, kotor, senget, semua
+// dalam satu jalan. Boleh dikawal remote Bluetooth kerana
+// remote itu berpasangan sebagai papan kekunci.
+// Disimpan di pocketInspections/{uid}/tallies/{id}
 // =======================================================
+const TC_PAL = ['#1B4FD8', '#E08A00', '#0E9E7A', '#C2359E', '#B91C1C', '#6D28D9'];
+const TC_DRAFT = 'pocket_tally_draft_v2';
+
+let TC = {
+  cts: [], active: 0, hist: [], sound: true, buzz: true,
+  entries: [], editId: null, countedOn: ''
+};
+let _tcAudio = null, _tcKeyBound = false;
+
+const TC_I = {
+  back:'<path d="M15 18l-6-6 6-6"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>',
+  mute:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M22 9l-6 6M16 9l6 6"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>',
+  cog:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>'
+};
+function tcSvg(p, s) {
+  return '<svg viewBox="0 0 24 24" width="' + (s || 17) + '" height="' + (s || 17) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+}
+function tcTotal() { return TC.cts.reduce(function(a, c) { return a + c.v; }, 0); }
+function tcToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function tcNiceDate(iso) {
+  if (!iso) return '';
+  const p = iso.split('-');
+  if (p.length !== 3) return iso;
+  const d = new Date(+p[0], +p[1] - 1, +p[2]);
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-MY', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// Maklum balas tanpa memandang — mata pada jubin, bukan telefon.
+function tcBlip(up) {
+  if (!TC.sound) return;
+  try {
+    _tcAudio = _tcAudio || new (window.AudioContext || window.webkitAudioContext)();
+    if (_tcAudio.state === 'suspended') _tcAudio.resume();
+    const o = _tcAudio.createOscillator(), g = _tcAudio.createGain();
+    o.type = 'square';
+    o.frequency.value = up ? 880 : 440;
+    g.gain.setValueAtTime(0.06, _tcAudio.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, _tcAudio.currentTime + 0.06);
+    o.connect(g); g.connect(_tcAudio.destination);
+    o.start(); o.stop(_tcAudio.currentTime + 0.07);
+  } catch (e) {}
+}
+function tcBuzz(ms) { if (TC.buzz && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+
+// Draf disimpan setiap kiraan supaya kerja separuh jalan tidak hilang
+// kalau app ditutup di tapak. Firestore tetap rekod sebenarnya.
+function tcSaveDraft() {
+  try {
+    localStorage.setItem(TC_DRAFT, JSON.stringify({ cts:TC.cts, active:TC.active, editId:TC.editId, countedOn:TC.countedOn }));
+  } catch (e) {}
+}
+function tcLoadDraft() {
+  try {
+    const d = JSON.parse(localStorage.getItem(TC_DRAFT) || 'null');
+    if (d && Array.isArray(d.cts) && d.cts.length) return d;
+  } catch (e) {}
+  return null;
+}
+function tcClearDraft() { try { localStorage.removeItem(TC_DRAFT); } catch (e) {} }
+
+// ---------- 1. PEMILIH ----------
+function tcHead(name, desc) {
+  document.getElementById('toolModalIcon').innerHTML =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v16M9 4v16M13 4v16M17 8l4 8"/></svg>';
+  document.getElementById('toolModalName').textContent = name;
+  document.getElementById('toolModalDesc').textContent = desc;
+}
+
 function openCounter() {
-  if (typeof closeTool === 'function') closeTool();
-  const LIST_KEY = 'cnt_items_v1', CUR_KEY = 'cnt_current_v1';
-
-  let ov = document.getElementById('cntOverlay');
-  if (ov) ov.remove();
-  ov = document.createElement('div');
-  ov.id = 'cntOverlay';
-  ov.className = 'cnt-overlay';
-  ov.innerHTML =
-    '<div class="cnt-top">' +
-      '<button id="cntClose">Close</button>' +
-      '<div class="cnt-title">Tally</div>' +
-      '<button id="cntNew">New</button>' +
-      '<button id="cntOpen">Open</button>' +
-      '<button class="cnt-primary" id="cntSave">Save</button>' +
-    '</div>' +
-    '<div class="cnt-labelwrap"><input class="cnt-labelinput" id="cntLabel" placeholder="What are you counting? e.g. Broken tiles – Unit A"></div>' +
-    '<div class="cnt-main" id="cntMain"><div class="cnt-num" id="cntNum">0</div><div class="cnt-hint">Tap anywhere to add +1</div></div>' +
-    '<div class="cnt-controls">' +
-      '<button class="cnt-minus" id="cntMinus">−</button>' +
-      '<button class="cnt-reset" id="cntReset">Reset</button>' +
+  tcHead('Tally Counter', 'Count several things at once, or review saved tallies');
+  const draft = tcLoadDraft();
+  document.getElementById('toolModalBody').innerHTML =
+    '<div class="br-pick">' +
+      '<button class="br-pick-btn" id="tcGoNew">' +
+        '<span class="br-pick-ico" style="background:var(--accent-soft);color:var(--accent)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v16M9 4v16M13 4v16M17 8l4 8"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>' + (draft ? 'Carry on counting' : 'New tally') + '</b><span>' +
+          (draft ? draft.cts.length + ' counters, ' + draft.cts.reduce(function(a, c) { return a + c.v; }, 0) + ' so far' : 'Up to six types in one pass') +
+        '</span></span>' +
+      '</button>' +
+      (draft ? '<button class="br-pick-btn" id="tcGoFresh">' +
+        '<span class="br-pick-ico" style="background:var(--surface);color:var(--fg-dim)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>' +
+        '</span><span class="br-pick-txt"><b>Start fresh</b><span>Clear the counters and begin again</span></span></button>' : '') +
+      '<button class="br-pick-btn" id="tcGoHist">' +
+        '<span class="br-pick-ico" style="background:var(--surface);color:var(--fg-dim)">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>' +
+        '</span>' +
+        '<span class="br-pick-txt"><b>Saved tallies</b><span>Counts you have recorded</span></span>' +
+        '<span class="br-pick-n" id="tcHistN">&middot;</span>' +
+      '</button>' +
     '</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="tcClose0">Close</button>';
+  document.getElementById('tcClose0').addEventListener('click', closeTool);
+  document.getElementById('tcGoNew').addEventListener('click', function() { tcOpenCount(draft ? 'draft' : null); });
+  const fresh = document.getElementById('tcGoFresh');
+  if (fresh) fresh.addEventListener('click', function() { tcClearDraft(); tcOpenCount(null); });
+  document.getElementById('tcGoHist').addEventListener('click', tcOpenHistory);
+  tcLoadEntries().then(function() {
+    const el = document.getElementById('tcHistN');
+    if (el) el.textContent = TC.entries.length;
+  });
+  showToolModal();
+}
+
+// ---------- 2. SKRIN MENGIRA ----------
+function tcOpenCount(src) {
+  if (typeof closeTool === 'function') closeTool();
+  tcCloseAll();
+
+  TC.hist = []; TC.editId = null; TC.active = 0;
+  TC.countedOn = tcToday();
+  if (src === 'draft') {
+    const d = tcLoadDraft();
+    if (d) { TC.cts = d.cts; TC.active = d.active || 0; TC.editId = d.editId || null; TC.countedOn = d.countedOn || tcToday(); }
+  } else if (src && typeof src === 'object') {
+    TC.cts = (src.cts || []).map(function(c) { return { n:c.n, v:c.v || 0 }; });
+    TC.editId = src.id;
+    TC.countedOn = src.countedOn || tcToday();
+  }
+  if (!TC.cts.length) TC.cts = [{ n:'Hollow', v:0 }, { n:'Cracked', v:0 }];
+
+  const ov = document.createElement('div');
+  ov.id = 'tcOverlay'; ov.className = 'tc-overlay';
   document.body.appendChild(ov);
+  const sh = document.createElement('div');
+  sh.id = 'tcSheet'; sh.className = 'tc-sheet';
+  document.body.appendChild(sh);
 
-  let count = 0, curId = null;
-  const numEl = ov.querySelector('#cntNum');
-  const labelEl = ov.querySelector('#cntLabel');
-  function render() { numEl.textContent = count; }
-  function loadList() { try { return JSON.parse(localStorage.getItem(LIST_KEY) || '[]'); } catch (e) { return []; } }
-  function storeList(a) { try { localStorage.setItem(LIST_KEY, JSON.stringify(a)); } catch (e) { if (typeof showToast === 'function') showToast('Storage full'); } }
-  function persistCurrent() { try { localStorage.setItem(CUR_KEY, JSON.stringify({ label: labelEl.value, count: count, curId: curId })); } catch (e) {} }
-  function buzz(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+  tcBindKeys();
+  tcRender();
+}
 
-  try { const c = JSON.parse(localStorage.getItem(CUR_KEY) || 'null'); if (c) { count = c.count || 0; curId = c.curId || null; labelEl.value = c.label || ''; } } catch (e) {}
-  render();
+function tcCloseAll() {
+  ['tcOverlay', 'tcSheet'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+}
 
-  function inc() { count++; render(); persistCurrent(); buzz(15); }
-  function dec() { if (count > 0) count--; render(); persistCurrent(); buzz(10); }
+function tcBump(i, d) {
+  const c = TC.cts[i];
+  if (!c) return;
+  if (d < 0 && c.v <= 0) return;
+  c.v += d;
+  TC.active = i;
+  TC.hist.push([i, d]);
+  if (TC.hist.length > 500) TC.hist.shift();
+  tcPaint(i);
+  tcSaveDraft();
+  tcBuzz(d > 0 ? 14 : 9);
+  tcBlip(d > 0);
+}
+function tcUndo() {
+  const h = TC.hist.pop();
+  if (!h) return;
+  TC.cts[h[0]].v -= h[1];
+  TC.active = h[0];
+  tcRender(); tcSaveDraft(); tcBuzz(9); tcBlip(false);
+}
+function tcAddType() {
+  if (TC.cts.length >= 6) return;
+  TC.cts.push({ n:'Type ' + (TC.cts.length + 1), v:0 });
+  TC.active = TC.cts.length - 1;
+}
 
-  ov.querySelector('#cntMain').addEventListener('click', inc);
-  ov.querySelector('#cntMinus').addEventListener('click', function(e) { e.stopPropagation(); dec(); });
-  ov.querySelector('#cntReset').addEventListener('click', function() { if (confirm('Reset count to 0?')) { count = 0; render(); persistCurrent(); } });
-  labelEl.addEventListener('input', persistCurrent);
+// Kemas kini setempat supaya menekan pantas tidak melukis semula seluruh skrin.
+function tcPaint(i) {
+  const card = document.querySelector('[data-tci="' + i + '"]');
+  if (!card) { tcRender(); return; }
+  card.querySelector('.tc-num').textContent = TC.cts[i].v;
+  const tot = document.querySelector('.tc-total .n');
+  if (tot) tot.textContent = tcTotal();
+  const k = document.querySelector('.tc-total .k');
+  if (k) k.innerHTML = TC.cts.map(function(c) { return peEsc(c.n) + ' ' + c.v; }).join('<br>');
+  // Butang ini dilukis pada render penuh sahaja, jadi tanpa ini Undo dan Save
+  // kekal disabled sepanjang mengira.
+  const u = document.getElementById('tcUndo');
+  if (u) u.disabled = !TC.hist.length;
+  const sv = document.getElementById('tcSaveBtn');
+  if (sv) sv.disabled = !tcTotal();
+  document.querySelectorAll('.tc-card').forEach(function(c) {
+    c.style.borderColor = (+c.dataset.tci === TC.active) ? TC_PAL[+c.dataset.tci % 6] : 'var(--line)';
+  });
+  card.classList.remove('tc-hit');
+  void card.offsetWidth;
+  card.classList.add('tc-hit');
+}
 
-  function save() {
-    const label = (labelEl.value || '').trim() || 'Untitled count';
-    let list = loadList();
-    let ex = curId ? list.find(function(p) { return p.id === curId; }) : null;
-    if (ex) { ex.label = label; ex.count = count; ex.updated = Date.now(); }
-    else { curId = 'cnt_' + Date.now(); list.unshift({ id: curId, label: label, count: count, updated: Date.now() }); }
-    storeList(list); labelEl.value = label; persistCurrent();
-    if (typeof showToast === 'function') showToast('Saved "' + label + '" = ' + count);
-  }
-  function newCount() { count = 0; curId = null; labelEl.value = ''; render(); persistCurrent(); labelEl.focus(); }
+function tcRender() {
+  const ov = document.getElementById('tcOverlay');
+  if (!ov) return;
+  const solo = TC.cts.length === 1;
+  let h = '';
 
-  function openList() {
-    const list = loadList();
-    let panel = ov.querySelector('#cntPanel');
-    if (panel) panel.remove();
-    panel = document.createElement('div');
-    panel.id = 'cntPanel';
-    panel.className = 'pe-panel';
-    let html = '<div class="pe-panel-card"><div class="pe-panel-head"><span>Saved counts</span><button id="cntPanelClose">✕</button></div><div class="pe-panel-list">';
-    if (list.length === 0) html += '<div class="pe-empty">No saved counts yet. Tap Save to keep one.</div>';
-    list.forEach(function(p) {
-      html += '<div class="cnt-row" data-id="' + p.id + '"><div class="cnt-row-meta"><div class="cnt-row-label">' + peEsc(p.label) + '</div><div class="cnt-row-date">' + new Date(p.updated).toLocaleString() + '</div></div><div class="cnt-row-count">' + p.count + '</div><button class="cnt-row-del" data-id="' + p.id + '"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div>';
+  h += '<div class="tc-hd">' +
+    '<button class="tc-ic" id="tcBack">' + tcSvg(TC_I.back) + '</button>' +
+    '<div class="tc-hd-t"><h2>Tally Counter</h2><p>' + TC.cts.length + ' counter' + (TC.cts.length === 1 ? '' : 's') +
+      ' &middot; tap a card to add</p></div>' +
+    '<button class="tc-savebtn" id="tcSaveBtn"' + (tcTotal() ? '' : ' disabled') + '>' +
+      (TC.editId ? 'Update' : 'Save') + '</button></div>';
+
+  h += '<div class="tc-total"><span class="n">' + tcTotal() + '</span><span class="l">total</span>' +
+    '<span class="k">' + TC.cts.map(function(c) { return peEsc(c.n) + ' ' + c.v; }).join('<br>') + '</span></div>';
+
+  h += '<div class="tc-body"><div class="tc-grid ' + (solo ? 'tc-c1' : 'tc-c2') + '">';
+  TC.cts.forEach(function(c, i) {
+    const col = TC_PAL[i % 6];
+    h += '<div class="tc-card' + (solo ? ' tc-solo' : '') + '" role="button" tabindex="0" data-tci="' + i +
+        '" style="border-color:' + (i === TC.active ? col : 'var(--line)') + ';color:' + col + '">' +
+      '<span class="tc-flash"></span>' +
+      '<span class="tc-top"><span class="tc-dot" style="background:' + col + '"></span>' +
+        '<span class="tc-nm">' + peEsc(c.n) + '</span>' +
+        '<span class="tc-key">' + (i + 1) + '</span></span>' +
+      '<span class="tc-bot"><span class="tc-num" style="color:' + col + '">' + c.v + '</span>' +
+        '<button class="tc-minus" data-tcm="' + i + '" aria-label="minus">−</button></span>' +
+    '</div>';
+  });
+  h += '</div></div>';
+
+  h += '<div class="tc-foot">' +
+    '<button class="tc-act" id="tcUndo"' + (TC.hist.length ? '' : ' disabled') + '>' + tcSvg(TC_I.undo) + 'Undo</button>' +
+    '<button class="tc-act" id="tcAdd"' + (TC.cts.length >= 6 ? ' disabled' : '') + '>' + tcSvg(TC_I.plus) + 'Add type</button>' +
+    '<button class="tc-act ' + (TC.sound ? 'tc-on' : '') + '" id="tcSound">' + tcSvg(TC.sound ? TC_I.vol : TC_I.mute) + 'Sound</button>' +
+    '<button class="tc-act" id="tcCfg">' + tcSvg(TC_I.cog) + 'Types</button>' +
+  '</div>';
+
+  ov.innerHTML = h;
+  tcWire();
+}
+
+function tcWire() {
+  const ov = document.getElementById('tcOverlay');
+  ov.querySelectorAll('.tc-card').forEach(function(c) {
+    c.addEventListener('click', function(e) {
+      if (e.target.closest('[data-tcm]')) return;
+      tcBump(+c.dataset.tci, 1);
     });
-    html += '</div></div>';
-    panel.innerHTML = html;
-    ov.appendChild(panel);
-    panel.addEventListener('click', function(e) { if (e.target === panel) panel.remove(); });
-    panel.querySelector('#cntPanelClose').onclick = function() { panel.remove(); };
-    panel.querySelectorAll('.cnt-row').forEach(function(el) {
-      el.addEventListener('click', function(e) {
-        if (e.target.closest('.cnt-row-del')) return;
-        const p = loadList().find(function(x) { return x.id === el.dataset.id; });
-        if (p) { count = p.count; curId = p.id; labelEl.value = p.label; render(); persistCurrent(); panel.remove(); }
+  });
+  ov.querySelectorAll('[data-tcm]').forEach(function(b) {
+    b.addEventListener('click', function(e) { e.stopPropagation(); tcBump(+b.dataset.tcm, -1); });
+  });
+  document.getElementById('tcBack').addEventListener('click', function() { tcCloseAll(); openCounter(); });
+  document.getElementById('tcUndo').addEventListener('click', tcUndo);
+  document.getElementById('tcAdd').addEventListener('click', function() { tcAddType(); tcRender(); tcSaveDraft(); });
+  document.getElementById('tcSound').addEventListener('click', function() {
+    TC.sound = !TC.sound; tcRender();
+    showToast(TC.sound ? 'Sound on' : 'Sound off');
+  });
+  document.getElementById('tcCfg').addEventListener('click', tcOpenTypes);
+  document.getElementById('tcSaveBtn').addEventListener('click', tcOpenSave);
+}
+
+// Remote tripod Bluetooth berpasangan sebagai papan kekunci, jadi kita dengar
+// kekunci dan bukan cuba bercakap dengan peranti itu.
+function tcBindKeys() {
+  if (_tcKeyBound) return;
+  _tcKeyBound = true;
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('tcOverlay')) return;
+    const sh = document.getElementById('tcSheet');
+    if (sh && sh.classList.contains('tc-open')) return;
+    if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    const k = e.key;
+    if (k >= '1' && k <= '6') {
+      const i = +k - 1;
+      if (TC.cts[i]) { TC.active = i; tcRender(); showToast(TC.cts[i].n); }
+      e.preventDefault(); return;
+    }
+    if (k === 'ArrowUp' || k === ' ' || k === 'Enter') { tcBump(TC.active, 1); e.preventDefault(); return; }
+    if (k === 'ArrowDown') { tcBump(TC.active, -1); e.preventDefault(); return; }
+    if (k === 'ArrowLeft') { TC.active = (TC.active - 1 + TC.cts.length) % TC.cts.length; tcRender(); showToast(TC.cts[TC.active].n); e.preventDefault(); return; }
+    if (k === 'ArrowRight') { TC.active = (TC.active + 1) % TC.cts.length; tcRender(); showToast(TC.cts[TC.active].n); e.preventDefault(); return; }
+    if (k === 'u' || k === 'U') { tcUndo(); e.preventDefault(); }
+  });
+}
+
+// ---------- 3. HELAI JENIS ----------
+function tcOpenTypes() {
+  const sh = document.getElementById('tcSheet');
+  const rows = TC.cts.map(function(c, i) {
+    return '<div class="tc-row"><span class="tc-d" style="background:' + TC_PAL[i % 6] + '"></span>' +
+      '<input data-tcn="' + i + '">' +
+      '<span class="tc-v">' + c.v + '</span>' +
+      (TC.cts.length > 1 ? '<button class="tc-rm" data-tcrm="' + i + '" aria-label="Remove">' + tcSvg(TC_I.trash, 15) + '</button>' : '') +
+      '</div>';
+  }).join('');
+  sh.innerHTML = '<div class="tc-scrim" data-tcx="1"></div><div class="tc-panel">' +
+    '<h3><span>Counters</span><button data-tcx="1">' + tcSvg(TC_I.x, 17) + '</button></h3><div class="tc-inner">' +
+    rows +
+    (TC.cts.length < 6 ? '<button class="tc-btn tc-ghost" id="tcAdd2">+ Add another type</button>' : '') +
+    '<div class="tc-note"><b>Bluetooth remote:</b> each button on a tripod remote sends one key, so this screen listens for keys.' +
+      '<div class="tc-keys"><span>↑ = +1</span><span>↓ = −1</span><span>← → = switch type</span><span>1–6 = pick one</span><span>OK = +1</span></div></div>' +
+    '<button class="tc-btn tc-ghost" id="tcResetAll">Reset all to zero</button>' +
+  '</div></div>';
+  sh.classList.add('tc-open');
+  sh.querySelectorAll('[data-tcx]').forEach(function(b) {
+    b.addEventListener('click', function() { sh.classList.remove('tc-open'); tcRender(); tcSaveDraft(); });
+  });
+  sh.querySelectorAll('[data-tcn]').forEach(function(inp) {
+    inp.value = TC.cts[+inp.dataset.tcn].n;
+    inp.addEventListener('input', function() { TC.cts[+inp.dataset.tcn].n = inp.value; });
+    inp.addEventListener('change', function() {
+      if (!inp.value.trim()) { inp.value = 'Type ' + (+inp.dataset.tcn + 1); TC.cts[+inp.dataset.tcn].n = inp.value; }
+      tcSaveDraft();
+    });
+  });
+  sh.querySelectorAll('[data-tcrm]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      const i = +b.dataset.tcrm;
+      TC.cts.splice(i, 1);
+      TC.hist = TC.hist.filter(function(x) { return x[0] !== i; })
+                       .map(function(x) { return [x[0] > i ? x[0] - 1 : x[0], x[1]]; });
+      if (TC.active >= TC.cts.length) TC.active = TC.cts.length - 1;
+      tcSaveDraft();
+      tcOpenTypes();
+    });
+  });
+  const a2 = document.getElementById('tcAdd2');
+  if (a2) a2.addEventListener('click', function() { tcAddType(); tcSaveDraft(); tcOpenTypes(); });
+  document.getElementById('tcResetAll').addEventListener('click', function() {
+    if (!confirm('Set every counter back to zero?')) return;
+    TC.cts.forEach(function(c) { c.v = 0; });
+    TC.hist = [];
+    sh.classList.remove('tc-open');
+    tcRender(); tcSaveDraft();
+    showToast('Reset');
+  });
+}
+
+// ---------- 4. SIMPAN ----------
+function tcOpenSave() {
+  if (!tcTotal()) { showToast('Nothing counted yet'); return; }
+  const cur = TC.editId ? (TC.entries.filter(function(e) { return e.id === TC.editId; })[0] || {}) : {};
+  const sh = document.getElementById('tcSheet');
+  const rows = TC.cts.filter(function(c) { return c.v > 0; }).map(function(c) {
+    const i = TC.cts.indexOf(c);
+    return '<div class="tc-row"><span class="tc-d" style="background:' + TC_PAL[i % 6] + '"></span>' +
+      '<span style="flex:1;font-weight:600">' + peEsc(c.n) + '</span><span class="tc-v">' + c.v + '</span></div>';
+  }).join('');
+  sh.innerHTML = '<div class="tc-scrim" data-tcx="1"></div><div class="tc-panel">' +
+    '<h3><span>' + (TC.editId ? 'Update tally' : 'Save tally') + '</span>' +
+    '<button data-tcx="1">' + tcSvg(TC_I.x, 17) + '</button></h3><div class="tc-inner">' +
+    rows +
+    '<div class="tc-row" style="background:var(--accent-soft);border-color:var(--accent-line)">' +
+      '<span style="flex:1;font-weight:700;color:var(--accent)">Total</span>' +
+      '<span class="tc-v" style="color:var(--accent)">' + tcTotal() + '</span></div>' +
+    '<div class="tc-fld" style="margin-top:12px"><label>Title</label><input id="tfT"></div>' +
+    '<div class="tc-fld"><label>Date counted</label><input id="tfD" type="date"></div>' +
+    '<div class="tc-fld"><div class="tc-pair">' +
+      '<div><label>Element</label><input id="tfE" placeholder="e.g. Floor tiles"></div>' +
+      '<div><label>Room / unit</label><input id="tfR" placeholder="e.g. Unit A-12-3"></div>' +
+    '</div></div>' +
+    '<div class="tc-fld"><label>Location</label><input id="tfL" placeholder="e.g. Block A, Level 12"></div>' +
+    '<div class="tc-fld"><label>Notes</label><textarea id="tfN" placeholder="What you observed"></textarea></div>' +
+    '<button class="tc-btn" id="tfGo">' + (TC.editId ? 'Update' : 'Save') + '</button>' +
+    '<button class="tc-btn tc-ghost" data-tcx="1">Cancel</button>' +
+  '</div></div>';
+  sh.classList.add('tc-open');
+  sh.querySelectorAll('[data-tcx]').forEach(function(b) {
+    b.addEventListener('click', function() { sh.classList.remove('tc-open'); });
+  });
+  const named = TC.cts.filter(function(c) { return c.v > 0; }).length;
+  document.getElementById('tfT').value = cur.title || (tcTotal() + ' counted · ' + named + ' type' + (named === 1 ? '' : 's'));
+  document.getElementById('tfD').value = TC.countedOn || tcToday();
+  document.getElementById('tfE').value = cur.element || '';
+  document.getElementById('tfR').value = cur.room || '';
+  document.getElementById('tfL').value = cur.location || '';
+  document.getElementById('tfN').value = cur.notes || '';
+  document.getElementById('tfGo').addEventListener('click', tcSave);
+}
+
+async function tcSave() {
+  if (!currentUser) { showToast('Sign in to save', 'error'); return; }
+  const g = function(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const title = g('tfT');
+  if (!title) { showToast('Give it a title first'); document.getElementById('tfT').focus(); return; }
+  const btn = document.getElementById('tfGo');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  TC.countedOn = g('tfD') || tcToday();
+  const data = {
+    title: title,
+    countedOn: TC.countedOn,
+    element: g('tfE'), room: g('tfR'), location: g('tfL'), notes: g('tfN'),
+    total: tcTotal(),
+    cts: TC.cts.map(function(c) { return { n:c.n, v:c.v }; }),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    const col = db.collection('pocketInspections').doc(currentUser.uid).collection('tallies');
+    if (TC.editId) {
+      await col.doc(TC.editId).update(data);
+      showToast('Changes saved');
+    } else {
+      data.inspectionId = (typeof activeInspectionId !== 'undefined' && activeInspectionId) ? activeInspectionId : null;
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await col.add(data);
+      TC.editId = ref.id;
+      showToast('Tally saved');
+    }
+    document.getElementById('tcSheet').classList.remove('tc-open');
+    TC.entries = [];
+    tcClearDraft();
+    tcCloseAll();
+    openCounter();
+    setTimeout(tcOpenHistory, 120);
+  } catch (e) {
+    console.warn('[Tally save]', e.message);
+    btn.disabled = false; btn.textContent = 'Save';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// ---------- 5. SEJARAH ----------
+async function tcLoadEntries() {
+  if (!currentUser) { TC.entries = []; return TC.entries; }
+  if (TC.entries.length) return TC.entries;
+  try {
+    const snap = await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('tallies').orderBy('createdAt', 'desc').limit(60).get();
+    TC.entries = [];
+    snap.forEach(function(doc) {
+      const d = doc.data();
+      TC.entries.push({
+        id: doc.id,
+        title: d.title || 'Untitled',
+        countedOn: d.countedOn || '',
+        element: d.element || '', room: d.room || '', location: d.location || '', notes: d.notes || '',
+        total: typeof d.total === 'number' ? d.total : 0,
+        cts: Array.isArray(d.cts) ? d.cts : [],
+        createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date()
       });
     });
-    panel.querySelectorAll('.cnt-row-del').forEach(function(bt) {
-      bt.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (!confirm('Delete this count?')) return;
-        storeList(loadList().filter(function(x) { return x.id !== bt.dataset.id; }));
-        openList();
+  } catch (e) {
+    console.warn('[Tally load]', e.message);
+    TC.entries = [];
+  }
+  return TC.entries;
+}
+
+function tcOpenHistory() {
+  tcCloseAll();
+  tcHead('Saved Tallies', 'Counts you have recorded');
+  document.getElementById('toolModalBody').innerHTML = '<div class="br-load">Loading...</div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-secondary" id="tcHistBack">Back</button>' +
+    '<button class="tool-btn tool-btn-primary" id="tcHistNew">New tally</button>';
+  document.getElementById('tcHistBack').addEventListener('click', openCounter);
+  document.getElementById('tcHistNew').addEventListener('click', function() { tcClearDraft(); tcOpenCount(null); });
+  showToolModal();
+
+  tcLoadEntries().then(function(list) {
+    const body = document.getElementById('toolModalBody');
+    if (!body) return;
+    if (!list.length) {
+      body.innerHTML = '<div class="br-empty" style="margin-top:0">Nothing saved yet. Count something and tap <b>Save</b> to keep it here.</div>';
+      return;
+    }
+    let html = '';
+    list.forEach(function(e) {
+      const bits = [];
+      if (e.element) bits.push(e.element);
+      if (e.room) bits.push(e.room);
+      if (e.location) bits.push(e.location);
+      const parts = e.cts.filter(function(c) { return c.v > 0; })
+        .map(function(c) { return peEsc(c.n) + ' ' + c.v; }).join(' · ');
+      html += '<div class="cnt-row" data-tcid="' + e.id + '">' +
+        '<div class="cnt-row-count">' + e.total + '</div>' +
+        '<div class="cnt-row-meta">' +
+          '<div class="cnt-row-label" style="color:var(--fg)">' + peEsc(e.title) + '</div>' +
+          (parts ? '<div class="cnt-row-date">' + parts + '</div>' : '') +
+          '<div class="cnt-row-date">' + (bits.length ? peEsc(bits.join(' · ')) + ' · ' : '') +
+            (e.countedOn ? tcNiceDate(e.countedOn) : e.createdAt.toLocaleDateString('en-MY', { day:'numeric', month:'short', year:'numeric' })) +
+          '</div>' +
+        '</div>' +
+        '<button class="cnt-row-del" data-tcdel="' + e.id + '" aria-label="Delete">' + tcSvg(TC_I.trash, 16) + '</button>' +
+      '</div>';
+    });
+    body.innerHTML = html;
+    body.querySelectorAll('[data-tcid]').forEach(function(row) {
+      row.addEventListener('click', function(ev) {
+        if (ev.target.closest('[data-tcdel]')) return;
+        const e = TC.entries.filter(function(x) { return x.id === row.dataset.tcid; })[0];
+        if (e) tcOpenCount(e);
       });
     });
-  }
+    body.querySelectorAll('[data-tcdel]').forEach(function(b) {
+      b.addEventListener('click', function(ev) { ev.stopPropagation(); tcDeleteEntry(b.dataset.tcdel); });
+    });
+  });
+}
 
-  ov.querySelector('#cntClose').addEventListener('click', function() { persistCurrent(); ov.remove(); });
-  ov.querySelector('#cntNew').addEventListener('click', newCount);
-  ov.querySelector('#cntOpen').addEventListener('click', openList);
-  ov.querySelector('#cntSave').addEventListener('click', save);
+async function tcDeleteEntry(id) {
+  if (!confirm('Delete this tally?')) return;
+  try {
+    await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('tallies').doc(id).delete();
+    TC.entries = [];
+    showToast('Deleted');
+    tcOpenHistory();
+  } catch (e) {
+    showToast('Could not delete. ' + e.message, 'error');
+  }
 }
 
 // =======================================================
