@@ -290,7 +290,7 @@ numPara(4,
 y += 4;
 
 numPara(5,
-  `Untuk makluman dan rekod pihak tuan, satu Laporan Pemeriksaan Elektrikal (Electrical Inspection Report) tambahan bagi unit ini telah dikemukakan secara serahan tangan (hardcopy) kepada pihak tuan pada akhir Ogos 2026. Laporan tersebut mengandungi dua belas (12) penemuan yang serius, antaranya: tiada voltan dikesan pada hampir kesemua light point, fan point dan AC point di seluruh unit (termasuk pada outgoing terminal MCB); sambungan soket 15A dan 13A di Kitchen kepada RCCB yang bercanggah dengan schematic diagram (30mA berbanding 100mA); serta anomali pendawaian di mana bacaan L+N = 0V tetapi L+E = 242V direkodkan, yang memerlukan siasatan lanjut. Tempoh tiga puluh (30) hari pembaikan bagi laporan elektrikal tersebut sedang berjalan secara berasingan, dan pihak tuan diingatkan agar menyelesaikan kesemua penemuan elektrikal tersebut — yang melibatkan KESELAMATAN penghuni — dalam tempoh yang ditetapkan, oleh orang kompeten (competent person).`
+  `Untuk makluman dan rekod pihak tuan, satu Laporan Pemeriksaan Elektrikal (Electrical Inspection Report) tambahan bagi unit ini telah dikemukakan secara serahan tangan (hardcopy) kepada pihak tuan pada akhir Ogos 2026. Laporan tersebut mengandungi dua belas (12) penemuan yang serius. Tempoh tiga puluh (30) hari pembaikan bagi laporan elektrikal tersebut sedang berjalan secara berasingan, dan pihak tuan diingatkan agar menyelesaikan kesemua penemuan elektrikal tersebut — yang melibatkan KESELAMATAN penghuni — dalam tempoh yang ditetapkan, oleh orang kompeten (competent person).`
 );
 y += 4;
 
