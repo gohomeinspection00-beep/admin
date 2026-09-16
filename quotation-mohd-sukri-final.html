@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation - Mohd Sukri</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background: white;
+            padding: 25mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        /* HEADER */
+        .header {
+            margin-bottom: 20px;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 15px;
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 5px;
+        }
+
+        .quotation-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        /* TWO COLUMN INFO */
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .info-block {
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #003366;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #003366;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 9px;
+        }
+
+        /* TABLE */
+        .quotation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 9px;
+        }
+
+        .quotation-table thead {
+            background: #003366;
+            color: white;
+        }
+
+        .quotation-table th {
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #003366;
+            text-transform: uppercase;
+        }
+
+        .quotation-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .quotation-table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .no-border {
+            border: none;
+            background: white;
+        }
+
+        .subtotal-row {
+            background: #e8e8e8;
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .total-row {
+            background: #003366;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        /* SUMMARY */
+        .summary-section {
+            margin-top: 20px;
+            font-size: 9px;
+        }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr 80px;
+            gap: 15px;
+            padding: 6px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-row.total {
+            font-weight: bold;
+            background: #003366;
+            color: white;
+            padding: 10px 5px;
+            border: none;
+            font-size: 11px;
+        }
+
+        /* NOTES */
+        .notes-section {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #003366;
+            font-size: 8px;
+            line-height: 1.5;
+        }
+
+        .notes-title {
+            font-weight: bold;
+            color: #003366;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        /* SIGNATURE */
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 25px;
+            font-size: 9px;
+        }
+
+        .signature-block {
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333;
+            margin: 30px 0 5px 0;
+            height: 25px;
+        }
+
+        .signature-name {
+            font-weight: bold;
+            color: #003366;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 8px;
+            color: #666;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* BUTTONS */
+        .buttons {
+            text-align: center;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 0 5px;
+            background: #003366;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #001a33;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .buttons {
+                display: none !important;
+            }
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            padding: 8px;
+            border-left: 3px solid #ff9800;
+            margin: 10px 0;
+            font-size: 9px;
+        }
+    </style>
+</head>
+<body>
+    <div class="buttons no-print">
+        <button class="btn" onclick="generatePDF()">📥 Download PDF</button>
+        <button class="btn" onclick="window.print()">🖨️ Print</button>
+    </div>
+
+    <div class="container" id="quotationContent">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="company-name">🏠 GoInspect™ - QUOTATION</div>
+        </div>
+
+        <div class="quotation-title">QUOTATION FOR REPAIR WORKS</div>
+
+        <!-- CLIENT & PROPERTY INFO -->
+        <div class="info-row">
+            <div class="info-block">
+                <div class="info-label">Maklumat Pemilik / Client</div>
+                <div class="info-value">
+                    <strong>Nama:</strong> Mohd Sukri<br>
+                    <strong>No. Tel:</strong> 011-11125646<br>
+                    <strong>Email:</strong> syukrieny@gmail.com
+                </div>
+            </div>
+            <div class="info-block">
+                <div class="info-label">Maklumat Harta / Property</div>
+                <div class="info-value">
+                    <strong>Alamat:</strong> No 50 Jalan Uda Utama 5/5, Bandar Uda Utama, 81200 JB<br>
+                    <strong>Invoice No:</strong> RCP-2026<br>
+                    <strong>Tarikh:</strong> 16 September 2026
+                </div>
+            </div>
+        </div>
+
+        <!-- QUOTATION TABLE -->
+        <table class="quotation-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">No.</th>
+                    <th style="width: 50%;">Perkara / Item Description</th>
+                    <th style="width: 15%;">Kuantiti / Qty</th>
+                    <th style="width: 15%;">Harga Unit / Unit Price (RM)</th>
+                    <th style="width: 15%;">Jumlah / Total (RM)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">1</td>
+                    <td>Baiki / Gantikan Roof Tile Pecah<br><span style="color: #666; font-size: 8px;">(Repair/Replace Broken Roof Tiles)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">250.00</td>
+                    <td class="text-right"><strong>250.00</strong></td>
+                </tr>
+                <tr>
+                    <td class="text-center">2</td>
+                    <td>Penggantian Insulation Sheet<br><span style="color: #666; font-size: 8px;">(Insulation Sheet Replacement)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">180.00</td>
+                    <td class="text-right"><strong>180.00</strong></td>
+                </tr>
+                <tr>
+                    <td class="text-center">3</td>
+                    <td>Menutup Fibre Net Menggunakan Cat Kalis Air<br><span style="color: #666; font-size: 8px;">(Seal Fibre Net with Waterproof Paint)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">80.00</td>
+                    <td class="text-right"><strong>80.00</strong></td>
+                </tr>
+                <tr>
+                    <td class="text-center">4</td>
+                    <td>Menukar Lantai dan Dinding Jubin Kosong untuk Semua Toilet<br><span style="color: #666; font-size: 8px;">(Replace Hollow Floor & Wall Tiles in All Toilets)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">10,000.00</td>
+                    <td class="text-right"><strong>10,000.00</strong></td>
+                </tr>
+                <tr>
+                    <td class="text-center">5</td>
+                    <td>Membaiki Masalah Elektrikal<br><span style="color: #666; font-size: 8px;">(Electrical Problem Repair & Rectification)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">1,000.00</td>
+                    <td class="text-right"><strong>1,000.00</strong></td>
+                </tr>
+                <tr class="subtotal-row">
+                    <td colspan="4" class="text-right">SUBTOTAL (Jumlah Kecil)</td>
+                    <td class="text-right">11,510.00</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-right">Service Tax / SST (6%)</td>
+                    <td class="text-right">690.60</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="4" class="text-right">JUMLAH BESAR / TOTAL (RM)</td>
+                    <td class="text-right">12,200.60</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- IMPORTANT NOTE -->
+        <div class="highlight-box">
+            <strong>⚠️ Nota Penting / Important Note:</strong><br>
+            Quotation ini adalah berdasarkan kepada pemeriksaan hartanah GoInspect. Kerja-kerja yang dinyatakan di atas adalah anggaran. Sebarang perubahan atau kerja tambahan mungkin diperlukan selepas pekerjaan dimulai.
+            <br><br>
+            This quotation is based on GoInspect property inspection. The works stated above are estimates. Any variations or additional works may be required after commencement of works.
+        </div>
+
+        <!-- TERMS & CONDITIONS -->
+        <div class="notes-section">
+            <div class="notes-title">Syarat & Terma / Terms & Conditions</div>
+            <ul style="margin-left: 15px;">
+                <li>Quotation ini sah sehingga 30 hari dari tarikh di atas / Valid for 30 days from above date</li>
+                <li>Pembayaran: 50% deposit, 50% selepas siap / Payment: 50% deposit, 50% upon completion</li>
+                <li>Kerja-kerja perlu dilakukan oleh kontraktor berdaftar / Works to be carried out by licensed contractor</li>
+                <li>Garansi: 12 bulan untuk kerja-kerja tangan / Warranty: 12 months workmanship</li>
+                <li>Waktu penyelesaian: Sehingga 2-4 minggu bergantung kepada jenis kerja / Completion time: Up to 2-4 weeks depending on work type</li>
+                <li>Harga tidak termasuk kos perjalanan atau kos luar jangka / Price excludes travel costs or unforeseen expenses</li>
+            </ul>
+        </div>
+
+        <!-- SIGNATURE -->
+        <div class="signature-section">
+            <div class="signature-block">
+                <div style="font-size: 10px; margin-bottom: 20px;">Tandatangan Kontraktor / Contractor's Signature</div>
+                <div class="signature-line"></div>
+                <div class="signature-name">GoInspect Representative</div>
+                <div style="font-size: 8px; color: #666;">Nama & Tarikh / Name & Date</div>
+            </div>
+            <div class="signature-block">
+                <div style="font-size: 10px; margin-bottom: 20px;">Tandatangan Pemilik / Client's Signature</div>
+                <div class="signature-line"></div>
+                <div class="signature-name">Mohd Sukri</div>
+                <div style="font-size: 8px; color: #666;">Nama & Tarikh / Name & Date</div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <strong>GoXpert Solutions Sdn. Bhd. | GoInspect™ Platform</strong><br>
+            Professional Property Inspection & Repair Solutions<br>
+            Email: Team.gohomeinspection@gmail.com | Phone: +6011-3144-6591
+        </div>
+    </div>
+
+    <script>
+        function generatePDF() {
+            const element = document.getElementById('quotationContent');
+            const opt = {
+                margin: 0,
+                filename: 'Quotation-Mohd-Sukri-RCP-2026.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                generatePDF();
+            }
+        });
+    </script>
+</body>
+</html>
