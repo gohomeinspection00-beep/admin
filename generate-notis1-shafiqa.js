@@ -280,7 +280,7 @@ for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus diberikan kepada isu KETIDAKJAJARAN DINDING (wall alignment issues) yang meluas — item No. 69, 70, 71, 105, 106, 107, 108, 150, 151 dan 152 — merangkumi Master Bedroom, Bedroom 2 dan Bedroom 3, sebagaimana dibuktikan dengan ujian spirit level semasa pemeriksaan. Ini menunjukkan mutu kerja pembinaan dan kemasan dinding yang tidak mengikut piawaian. Saya menuntut agar pihak tuan memperbetulkan KESEMUA permukaan dinding yang tidak sejajar mengikut piawaian kerja yang sepatutnya, dan bukan sekadar kemasan kosmetik.`
+  `Perhatian khusus diberikan kepada isu KETIDAKJAJARAN DINDING (wall alignment issues) yang meluas — item No. 69, 70, 71, 105, 106, 107, 108, 150, 151 dan 152 — merangkumi Master Bedroom, Bedroom 2 dan Bedroom 3, sebagaimana dibuktikan dengan ujian spirit level semasa pemeriksaan. Ini menunjukkan mutu kerja pembinaan dan kemasan dinding yang tidak mengikut piawaian. Saya menuntut agar pihak tuan memperbetulkan KESEMUA permukaan dinding yang tidak sejajar mengikut piawaian kerja yang sepatutnya, dan bukan sekadar kemasan kosmetik. Untuk makluman, item yang disenaraikan di atas hanyalah SEBAHAGIAN daripada isu ketidakjajaran yang dikesan — lokasi yang lebih tepat dan senarai penuh boleh dirujuk di dalam Laporan Pemeriksaan Kecacatan yang telah diserahkan kepada pihak tuan.`
 );
 y += 4;
 
