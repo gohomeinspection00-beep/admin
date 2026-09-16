@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoInspect - Slope Correction Addendum</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #d32f2f;
+            padding-bottom: 20px;
+        }
+
+        .company-info {
+            flex: 1;
+        }
+
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0f3c3a;
+            margin-bottom: 5px;
+        }
+
+        .company-tagline {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .company-details {
+            font-size: 11px;
+            color: #777;
+            line-height: 1.6;
+        }
+
+        .quotation-title {
+            text-align: right;
+            flex: 1;
+        }
+
+        .quotation-title h1 {
+            font-size: 28px;
+            color: #d32f2f;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #d32f2f;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .quotation-meta {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            font-size: 12px;
+        }
+
+        .info-block {
+            padding: 15px;
+            background: #fff3e0;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #d32f2f;
+            font-size: 13px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-content {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .alert-box {
+            padding: 15px;
+            background: #ffebee;
+            border-left: 4px solid #d32f2f;
+            margin-bottom: 20px;
+            border-radius: 3px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .alert-title {
+            font-weight: bold;
+            color: #c62828;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background: #d32f2f;
+            padding: 12px;
+            margin: 25px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .area-section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .area-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #d32f2f;
+            background: #fff3e0;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 10px;
+        }
+
+        .items-table thead {
+            background: #e8e8e8;
+        }
+
+        .items-table th {
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+            color: #d32f2f;
+            border: 1px solid #ddd;
+        }
+
+        .items-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .items-table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .summary-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr 150px;
+            gap: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-row.total {
+            font-weight: bold;
+            font-size: 14px;
+            background: #d32f2f;
+            color: white;
+            padding: 15px 10px;
+            border: none;
+        }
+
+        .summary-label {
+            text-align: left;
+        }
+
+        .summary-value {
+            text-align: right;
+        }
+
+        .terms-section {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fff3e0;
+            border-left: 4px solid #d32f2f;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .terms-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .terms-content ul {
+            margin-left: 20px;
+            list-style-type: disc;
+        }
+
+        .terms-content li {
+            margin-bottom: 5px;
+        }
+
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid #ddd;
+        }
+
+        .signature-block {
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333;
+            margin: 40px 0 5px 0;
+            height: 40px;
+        }
+
+        .signature-label {
+            font-weight: bold;
+            color: #d32f2f;
+            margin-top: 5px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #b71c1c;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            .buttons {
+                display: none !important;
+            }
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .highlight {
+            background: #ffccbc;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+
+        .method-box {
+            background: #e3f2fd;
+            padding: 10px;
+            border-left: 3px solid #1976d2;
+            margin: 10px 0;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .method-box strong {
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="buttons no-print">
+        <button class="btn" onclick="generatePDF()">📥 Download PDF</button>
+        <button class="btn" onclick="window.print()">🖨️ Print</button>
+    </div>
+
+    <div class="container" id="quotationContent">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="company-info">
+                <div class="company-name">🏠 GoInspect</div>
+                <div class="company-tagline">Professional Property Inspection & Repair Solutions</div>
+                <div class="company-details">
+                    <strong>GoXpert Solutions Sdn. Bhd.</strong><br>
+                    Email: Team.gohomeinspection@gmail.com<br>
+                    Phone: +6011-3144-6591<br>
+                    Johor, Malaysia
+                </div>
+            </div>
+            <div class="quotation-title">
+                <div class="badge">ADDENDUM</div>
+                <h1>SLOPE CORRECTION</h1>
+                <div class="quotation-meta">
+                    <strong>Quotation No.:</strong> GI-SLOPE-2026-A01<br>
+                    <strong>Date:</strong> 16 Sep 2026<br>
+                    <strong>Valid Until:</strong> 30 Oct 2026<br>
+                    <strong>Priority:</strong> <span class="highlight">HIGH</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERT BOX -->
+        <div class="alert-box">
+            <div class="alert-title">⚠️ IMPORTANT - WATER DRAINAGE ISSUE</div>
+            <strong>Finding:</strong> Three (3) areas identified with water stagnation and improper slope. Immediate correction recommended to prevent structural damage, mold growth, and further deterioration.<br><br>
+            <strong>Recommended Action:</strong> Prioritize these slope corrections BEFORE general repairs to establish proper drainage throughout property.
+        </div>
+
+        <!-- CLIENT INFO -->
+        <div class="info-section">
+            <div class="info-block">
+                <div class="info-label">Project Reference</div>
+                <div class="info-content">
+                    <strong>Main Quotation:</strong> GI-REPAIR-2026-001<br>
+                    <strong>Addendum Type:</strong> Slope/Drainage Correction<br>
+                    <strong>Priority Level:</strong> <span class="highlight">HIGH</span>
+                </div>
+            </div>
+            <div class="info-block">
+                <div class="info-label">Scope of Work</div>
+                <div class="info-content">
+                    <strong>3 Areas Identified:</strong><br>
+                    1. AC Ledge Floor (Finding 273)<br>
+                    2. Car Porch Floor (Finding 7)<br>
+                    3. Kitchen Floor (Finding 71-84)
+                </div>
+            </div>
+        </div>
+
+        <!-- REPAIR DETAILS -->
+        <div class="section-title">DETAILED SLOPE CORRECTION QUOTATION</div>
+
+        <!-- AREA 1: AC LEDGE FLOOR -->
+        <div class="area-section">
+            <div class="area-title">AREA 1: AC LEDGE FLOOR (Finding 273) - WATER STAGNANT</div>
+            <div class="method-box">
+                <strong>Method:</strong> Waterproofing membrane + self-leveling compound + new slope-tiled surface
+                <br><strong>Slope Target:</strong> Minimum 2-3% gradient for proper drainage
+                <br><strong>Inspection Finding:</strong> Possible water stagnant on slab surface
+            </div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Description of Work</th>
+                        <th style="width: 15%;">Materials/Qty</th>
+                        <th style="width: 10%;">Cost (RM)</th>
+                        <th style="width: 10%;">Hours</th>
+                        <th style="width: 15%;">Labor (RM)</th>
+                        <th style="width: 15%;">Subtotal (RM)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Surface preparation & cleaning</td>
+                        <td>Cleaning materials<br><span style="font-size: 9px; color: #666;">Est. RM 15</span></td>
+                        <td class="text-right">15.00</td>
+                        <td class="text-center">1</td>
+                        <td class="text-right">70.00</td>
+                        <td class="text-right"><strong>85.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Apply waterproofing membrane (2-layer)</td>
+                        <td>Waterproof membrane 10m²<br><span style="font-size: 9px; color: #666;">Est. RM 80</span></td>
+                        <td class="text-right">80.00</td>
+                        <td class="text-center">2.5</td>
+                        <td class="text-right">175.00</td>
+                        <td class="text-right"><strong>255.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Self-leveling compound with slope correction (2-3%)</td>
+                        <td>Leveling compound 20kg<br><span style="font-size: 9px; color: #666;">Est. RM 70</span></td>
+                        <td class="text-right">70.00</td>
+                        <td class="text-center">2</td>
+                        <td class="text-right">140.00</td>
+                        <td class="text-right"><strong>210.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>New tiles with sloped bed installation</td>
+                        <td>Porcelain tiles + adhesive<br><span style="font-size: 9px; color: #666;">Est. RM 60</span></td>
+                        <td class="text-right">60.00</td>
+                        <td class="text-center">3</td>
+                        <td class="text-right">210.00</td>
+                        <td class="text-right"><strong>270.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Grout & high-quality perimeter sealant</td>
+                        <td>Grout + epoxy sealant<br><span style="font-size: 9px; color: #666;">Est. RM 40</span></td>
+                        <td class="text-right">40.00</td>
+                        <td class="text-center">1.5</td>
+                        <td class="text-right">105.00</td>
+                        <td class="text-right"><strong>145.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Water test & drainage verification</td>
+                        <td>Testing materials<br><span style="font-size: 9px; color: #666;">Est. RM 10</span></td>
+                        <td class="text-right">10.00</td>
+                        <td class="text-center">1</td>
+                        <td class="text-right">70.00</td>
+                        <td class="text-right"><strong>80.00</strong></td>
+                    </tr>
+                    <tr style="background: #fff3e0; font-weight: bold;">
+                        <td colspan="3">AC Ledge Floor - SUBTOTAL</td>
+                        <td class="text-center">11</td>
+                        <td class="text-right">770.00</td>
+                        <td class="text-right">1,045.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AREA 2: CAR PORCH FLOOR -->
+        <div class="area-section">
+            <div class="area-title">AREA 2: CAR PORCH FLOOR (Finding 7) - DRAINAGE CORRECTION</div>
+            <div class="method-box">
+                <strong>Method:</strong> Remove existing tiles + apply waterproofing + re-lay with proper slope
+                <br><strong>Slope Target:</strong> Towards drainage point / edge
+                <br><strong>Inspection Finding:</strong> Crack on floor tiles + potential water pooling
+            </div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Description of Work</th>
+                        <th style="width: 15%;">Materials/Qty</th>
+                        <th style="width: 10%;">Cost (RM)</th>
+                        <th style="width: 10%;">Hours</th>
+                        <th style="width: 15%;">Labor (RM)</th>
+                        <th style="width: 15%;">Subtotal (RM)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Remove existing cracked/damaged tiles</td>
+                        <td>Labor-intensive removal<br><span style="font-size: 9px; color: #666;">Est. RM 20</span></td>
+                        <td class="text-right">20.00</td>
+                        <td class="text-center">2</td>
+                        <td class="text-right">140.00</td>
+                        <td class="text-right"><strong>160.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Concrete surface inspection & repair (if needed)</td>
+                        <td>Repair materials as required<br><span style="font-size: 9px; color: #666;">Est. RM 30</span></td>
+                        <td class="text-right">30.00</td>
+                        <td class="text-center">1.5</td>
+                        <td class="text-right">105.00</td>
+                        <td class="text-right"><strong>135.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Apply waterproofing membrane</td>
+                        <td>Waterproof membrane 15m²<br><span style="font-size: 9px; color: #666;">Est. RM 100</span></td>
+                        <td class="text-right">100.00</td>
+                        <td class="text-center">2</td>
+                        <td class="text-right">140.00</td>
+                        <td class="text-right"><strong>240.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Install new tiles with proper slope (mortar bed slope 2-3%)</td>
+                        <td>Tiles + adhesive/mortar<br><span style="font-size: 9px; color: #666;">Est. RM 80</span></td>
+                        <td class="text-right">80.00</td>
+                        <td class="text-center">4</td>
+                        <td class="text-right">280.00</td>
+                        <td class="text-right"><strong>360.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Grout, sealant & drainage channel prep</td>
+                        <td>Grout + sealant<br><span style="font-size: 9px; color: #666;">Est. RM 35</span></td>
+                        <td class="text-right">35.00</td>
+                        <td class="text-center">1.5</td>
+                        <td class="text-right">105.00</td>
+                        <td class="text-right"><strong>140.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Water test & drainage verification</td>
+                        <td>Testing materials<br><span style="font-size: 9px; color: #666;">Est. RM 10</span></td>
+                        <td class="text-right">10.00</td>
+                        <td class="text-center">1</td>
+                        <td class="text-right">70.00</td>
+                        <td class="text-right"><strong>80.00</strong></td>
+                    </tr>
+                    <tr style="background: #fff3e0; font-weight: bold;">
+                        <td colspan="3">Car Porch Floor - SUBTOTAL</td>
+                        <td class="text-center">12</td>
+                        <td class="text-right">840.00</td>
+                        <td class="text-right">1,115.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AREA 3: KITCHEN FLOOR -->
+        <div class="area-section">
+            <div class="area-title">AREA 3: KITCHEN FLOOR (Finding 71-84) - DRAINAGE & SLOPE FIX</div>
+            <div class="method-box">
+                <strong>Method:</strong> Partial tile replacement + leveling + slope correction towards sink/drain area
+                <br><strong>Slope Target:</strong> Towards kitchen sink drainage
+                <br><strong>Inspection Finding:</strong> Floor staining/over-grout + potential water pooling in low spots
+            </div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Description of Work</th>
+                        <th style="width: 15%;">Materials/Qty</th>
+                        <th style="width: 10%;">Cost (RM)</th>
+                        <th style="width: 10%;">Hours</th>
+                        <th style="width: 15%;">Labor (RM)</th>
+                        <th style="width: 15%;">Subtotal (RM)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Remove low-spot tiles & damaged grout</td>
+                        <td>Careful removal of select tiles<br><span style="font-size: 9px; color: #666;">Est. RM 15</span></td>
+                        <td class="text-right">15.00</td>
+                        <td class="text-center">1.5</td>
+                        <td class="text-right">105.00</td>
+                        <td class="text-right"><strong>120.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Level substrate with self-leveling compound (slope towards drain)</td>
+                        <td>Leveling compound 15kg<br><span style="font-size: 9px; color: #666;">Est. RM 50</span></td>
+                        <td class="text-right">50.00</td>
+                        <td class="text-center">1.5</td>
+                        <td class="text-right">105.00</td>
+                        <td class="text-right"><strong>155.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Install new tiles with slope (towards sink drain)</td>
+                        <td>Kitchen tiles + adhesive<br><span style="font-size: 9px; color: #666;">Est. RM 50</span></td>
+                        <td class="text-right">50.00</td>
+                        <td class="text-center">2.5</td>
+                        <td class="text-right">175.00</td>
+                        <td class="text-right"><strong>225.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Epoxy grout (stain-resistant) & perimeter sealant</td>
+                        <td>Epoxy grout + sealant<br><span style="font-size: 9px; color: #666;">Est. RM 45</span></td>
+                        <td class="text-right">45.00</td>
+                        <td class="text-center">1.5</td>
+                        <td class="text-right">105.00</td>
+                        <td class="text-right"><strong>150.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Floor trap & drain area inspection & sealing</td>
+                        <td>Cleaning + sealant<br><span style="font-size: 9px; color: #666;">Est. RM 20</span></td>
+                        <td class="text-right">20.00</td>
+                        <td class="text-center">1</td>
+                        <td class="text-right">70.00</td>
+                        <td class="text-right"><strong>90.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Water test & final drainage check</td>
+                        <td>Testing materials<br><span style="font-size: 9px; color: #666;">Est. RM 10</span></td>
+                        <td class="text-right">10.00</td>
+                        <td class="text-center">1</td>
+                        <td class="text-right">70.00</td>
+                        <td class="text-right"><strong>80.00</strong></td>
+                    </tr>
+                    <tr style="background: #fff3e0; font-weight: bold;">
+                        <td colspan="3">Kitchen Floor - SUBTOTAL</td>
+                        <td class="text-center">9</td>
+                        <td class="text-right">630.00</td>
+                        <td class="text-right">820.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-section">
+            <div class="section-title">ADDENDUM COST SUMMARY</div>
+
+            <div class="summary-row">
+                <div class="summary-label"><strong>1. AC Ledge Floor - Slope Correction</strong></div>
+                <div class="summary-value">RM 1,045.00</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label"><strong>2. Car Porch Floor - Drainage Correction</strong></div>
+                <div class="summary-value">RM 1,115.00</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label"><strong>3. Kitchen Floor - Slope & Drainage Fix</strong></div>
+                <div class="summary-value">RM 820.00</div>
+            </div>
+
+            <hr style="margin: 20px 0; border: none; border-top: 2px solid #0f3c3a;">
+
+            <div class="summary-row">
+                <div class="summary-label"><strong>Materials Total (3 Areas)</strong></div>
+                <div class="summary-value"><strong>RM 675.00</strong></div>
+            </div>
+
+            <div class="summary-row">
+                <div class="summary-label"><strong>Labor Total (32 hours × RM70/hour)</strong></div>
+                <div class="summary-value"><strong>RM 2,240.00</strong></div>
+            </div>
+
+            <div class="summary-row">
+                <div class="summary-label"><strong>Addendum Subtotal</strong></div>
+                <div class="summary-value"><strong>RM 2,915.00</strong></div>
+            </div>
+
+            <div class="summary-row">
+                <div class="summary-label"><strong>Service Tax (SST) 6%</strong></div>
+                <div class="summary-value"><strong>RM 174.90</strong></div>
+            </div>
+
+            <div class="summary-row total">
+                <div class="summary-label">ADDENDUM TOTAL (3 Areas)</div>
+                <div class="summary-value">RM 3,089.90</div>
+            </div>
+
+            <hr style="margin: 20px 0; border: none; border-top: 2px solid #999;">
+
+            <div class="summary-row" style="background: #f0f4c3; margin-top: 10px;">
+                <div class="summary-label"><strong style="color: #558b2f;">GRAND TOTAL (Main Quote + Addendum)</strong></div>
+                <div class="summary-value"><strong style="color: #558b2f;">RM 10,557.60</strong></div>
+            </div>
+        </div>
+
+        <!-- IMPORTANT NOTES -->
+        <div class="terms-section">
+            <div class="terms-title">Important Information</div>
+            <div class="terms-content">
+                <ul>
+                    <li><strong>Priority Recommendation:</strong> Complete slope corrections FIRST (this addendum) before other general repairs. Proper drainage is foundation for long-term structural integrity.</li>
+                    <li><strong>Waterproofing Method:</strong> Two-layer waterproof membrane application ensures water does not seep into concrete substrate, preventing mold, rust, and structural damage.</li>
+                    <li><strong>Slope Gradient:</strong> Minimum 2-3% slope is critical (approximately 1cm drop per 40cm length). Lower gradients may still allow water pooling.</li>
+                    <li><strong>Self-Leveling Compound:</strong> Professional-grade leveling compound used to create precise slope before tile installation. Ensures consistent drainage.</li>
+                    <li><strong>Water Test Verification:</strong> Each area will be tested post-completion with water to confirm proper drainage before sign-off.</li>
+                    <li><strong>Timeline:</strong> Estimated 2 weeks for all three areas (can be phased if preferred). Each area requires 48-72 hours curing between steps.</li>
+                    <li><strong>Labor Rate:</strong> RM70/hour (Johor 2026 market rate). Specialist labor for waterproofing application included.</li>
+                    <li><strong>Warranty:</strong> 12 months on workmanship. Waterproofing system carries manufacturer warranty (varies by product).</li>
+                    <li><strong>Optional Add-on:</strong> Stainless steel drain grates for AC ledge & kitchen floor (RM50-100 each) recommended to prevent debris accumulation.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SIGNATURE SECTION -->
+        <div class="signature-section">
+            <div class="signature-block">
+                <div style="font-size: 12px; margin-bottom: 30px;">Inspector/Contractor Signature</div>
+                <div class="signature-line"></div>
+                <div class="signature-label">GoInspect Authorized Representative</div>
+                <div style="font-size: 10px; color: #666;">Name, Signature & Date</div>
+            </div>
+            <div class="signature-block">
+                <div style="font-size: 12px; margin-bottom: 30px;">Client Acceptance</div>
+                <div class="signature-line"></div>
+                <div class="signature-label">Client/Property Owner</div>
+                <div style="font-size: 10px; color: #666;">Name, Signature & Date</div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <strong>GoXpert Solutions Sdn. Bhd. | GoInspect™ Platform</strong><br>
+            Professional Property Inspection & Repair Solutions - Johor, Malaysia<br>
+            Email: Team.gohomeinspection@gmail.com | Phone: +6011-3144-6591<br>
+            <br>
+            This addendum quotation complements the main repair quotation (GI-REPAIR-2026-001).<br>
+            Recommend prioritizing slope corrections to prevent further water damage.
+        </div>
+    </div>
+
+    <script>
+        function generatePDF() {
+            const element = document.getElementById('quotationContent');
+            const opt = {
+                margin: 10,
+                filename: 'GoInspect-Slope-Addendum-' + new Date().getTime() + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                generatePDF();
+            }
+        });
+    </script>
+</body>
+</html>
