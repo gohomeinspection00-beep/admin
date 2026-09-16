@@ -52,7 +52,7 @@ Repo ini menjana surat rasmi **Notis 1 (First Notice)** dan **Notis 2 / Notis Ak
 | Parkland City Sdn Bhd (201201031906 / 1016393-K) | HQ: No. 112, Jalan Tun Perak, 75300 Melaka; Site: Bangunan Parkland Group, Persiaran Wau Kikik, Bandar Layangkasa, 81700 Pasir Gudang | HQ 06-222 2888; Layangkasa 013-665 5111 |
 | UDA Land (South) Sdn. Bhd. (197501001813 / 23298-K) | JB: No. 1, Jalan Padi Mahsuri 12, Bandar Baru Uda, 81200 JB; HQ: Tingkat 15, Blok Menara, Kompleks Pertama, Jalan TAR, 50100 KL | JB 07-237 4944; HQ +603-2730 8500 |
 | Country View Resources | — CC peguam K.H. Koh Azhar & Koh | 07-335 9877 / 07-223 6799 |
-| Scientex Heights Sdn. Bhd. (198801002898 / 170255-V) | Sales: Persimpangan Jalan Baru Serkam, 77300 Mukim Jasin; Berdaftar: No. 9, Persiaran Selangor, Seksyen 15, 40200 Shah Alam | — |
+| Scientex Heights Sdn. Bhd. (198801002898 / 170255-V) | Sales: Persimpangan Jalan Baru Serkam, 77300 Merlimau/Mukim Jasin; Berdaftar: No. 9, Persiaran Selangor, Seksyen 15, 40200 Shah Alam | 06-251 9770; scientex-heights@scientex.com.my |
 | Metacorp Properties Sdn. Bhd. (198301002311 / 97547-U) | Perniagaan: No. 42A, Jalan TU 2, Taman Tasik Utama, Ayer Keroh; Berdaftar: L5-01, Menara Kenari, TTDI, 60000 KL | — |
 
 Nombor telefon pemaju lain: cari dengan WebSearch jika tiada dalam SPA.
