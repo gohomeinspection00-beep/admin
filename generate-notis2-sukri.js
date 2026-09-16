@@ -253,6 +253,7 @@ numPara(2,
 );
 y += 5;
 
+checkBreak(60);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Senarai Kecacatan yang Masih Belum Diselesaikan:", mL, y);
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
