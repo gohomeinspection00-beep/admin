@@ -275,11 +275,16 @@ for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}).`
+  `Bersama-sama notis ini turut disertakan Sebut Harga Rasmi Pembaikan (Official Repair Quotation) daripada kontraktor bertauliah, GO XPERT SOLUTION (SSM: 202503234804 / 003768196-A; CIDB Reg. No.: 0120250929-JH161484), bernombor 00202603 dan bertarikh 15 September 2026, dengan jumlah anggaran kos pembaikan keseluruhan kecacatan di unit ini sebanyak RM15,030.00 (Ringgit Malaysia: Lima Belas Ribu Tiga Puluh Sahaja). Salinan sebut harga tersebut dilampirkan sebagai Lampiran B. Sekiranya pihak tuan gagal melaksanakan pembaikan dalam tempoh notis ini, jumlah tersebut akan menjadi asas tuntutan kos pembaikan terhadap pihak tuan, termasuk tuntutan supaya ia ditolak daripada Wang Tahanan 5% (Retention Sum).`
 );
 y += 4;
 
 numPara(4,
+  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}).`
+);
+y += 4;
+
+numPara(5,
   `Merujuk kepada Klausa Penyampaian Dokumen ${data.klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -292,7 +297,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(5,
+numPara(6,
   `Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Kedua (Final Notice) ini tamat tempohnya pada ${data.tarikhDeadlineNotis2}, saya akan tanpa berlengah lagi mengambil tindakan berikut:`
 );
 y += 2;
@@ -372,6 +377,32 @@ doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const capText = "Akuan Terima Pos Daftar (AR Card) Pos Malaysia No. RW214685527MY — Notis Pertama (Ruj: NOTIS-1/2026/022) dihantar pada 10 Ogos 2026 kepada UDA LAND (SOUTH) SDN. BHD., dan telah DITERIMA serta ditandatangani oleh wakil penerima pada 12 Ogos 2026.";
 const capLines = doc.splitTextToSize(capText, cW - 20);
 for (const cl of capLines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN B — SEBUT HARGA RASMI PEMBAIKAN
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampTB = "LAMPIRAN B";
+doc.text(lampTB, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampTB) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampTB) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Sebut Harga Rasmi Pembaikan (Official Repair Quotation)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const quoImg = fs.readFileSync("/home/user/admin/sukri-quotation.jpg");
+const quoB64 = "data:image/jpeg;base64," + quoImg.toString("base64");
+const quoW = 150; const quoH = 212;
+doc.addImage(quoB64, "JPEG", (pageW - quoW) / 2, y, quoW, quoH);
+y += quoH + 5;
+
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const quoCap = "Sebut Harga No. 00202603 bertarikh 15 September 2026 daripada GO XPERT SOLUTION — jumlah RM15,030.00.";
+const quoCapL = doc.splitTextToSize(quoCap, cW - 10);
+for (const cl of quoCapL) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
