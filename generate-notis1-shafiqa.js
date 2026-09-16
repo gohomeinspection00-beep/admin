@@ -290,16 +290,21 @@ numPara(4,
 y += 4;
 
 numPara(5,
-  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+  `Untuk makluman dan rekod pihak tuan, satu Laporan Pemeriksaan Elektrikal (Electrical Inspection Report) tambahan bagi unit ini telah dikemukakan secara serahan tangan (hardcopy) kepada pihak tuan pada akhir Ogos 2026. Laporan tersebut mengandungi dua belas (12) penemuan yang serius, antaranya: tiada voltan dikesan pada hampir kesemua light point, fan point dan AC point di seluruh unit (termasuk pada outgoing terminal MCB); sambungan soket 15A dan 13A di Kitchen kepada RCCB yang bercanggah dengan schematic diagram (30mA berbanding 100mA); serta anomali pendawaian di mana bacaan L+N = 0V tetapi L+E = 242V direkodkan, yang memerlukan siasatan lanjut. Tempoh tiga puluh (30) hari pembaikan bagi laporan elektrikal tersebut sedang berjalan secara berasingan, dan pihak tuan diingatkan agar menyelesaikan kesemua penemuan elektrikal tersebut — yang melibatkan KESELAMATAN penghuni — dalam tempoh yang ditetapkan, oleh orang kompeten (competent person).`
 );
 y += 4;
 
 numPara(6,
+  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+);
+y += 4;
+
+numPara(7,
   `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan.`
 );
 y += 4;
 
-numPara(7, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+numPara(8, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -307,7 +312,7 @@ bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak t
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
-numPara(8,
+numPara(9,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -320,7 +325,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(9,
+numPara(10,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
