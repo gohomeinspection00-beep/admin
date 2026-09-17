@@ -28,8 +28,8 @@ const data = {
   jenisHartanah: "Rumah Teres 2 Tingkat (PTD 217365)",
   namaProyek: "Areca Terrace, Phase 4B",
 
-  noSPA: "",
-  tarikhSPA: "",
+  noSPA: "8971-18/eSPA/311224/PTD217365/01",
+  tarikhSPA: "31 Disember 2024",
   jenisSPA: "Jadual G",
   klausaPembaikan: "27(1)",
   klausaSerahan: "29(1)",
@@ -64,6 +64,7 @@ const data = {
   ],
 
   kronologi: [
+    { tarikh: "31 Disember 2024", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
     { tarikh: "24 Mei 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "27 Mei 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Batch 1 (167 kecacatan) dihantar melalui aplikasi ProFix" },
     { tarikh: "28 Mei 2026", peristiwa: "Laporan Pemeriksaan Kecacatan Batch 2 (160 kecacatan) dihantar melalui aplikasi ProFix — jumlah keseluruhan 327 kecacatan" },
@@ -248,7 +249,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}, PTD 217365), sebagaimana termaktub di dalam Perjanjian Jual Beli mengikut ${data.jenisSPA}, telah menjalankan Pemeriksaan Kecacatan (Defect Inspection) pada ${data.tarikhPemeriksaan1} dan telah mengemukakan Laporan Pemeriksaan Kecacatan (Defect Inspection Report) secara rasmi kepada pihak tuan melalui aplikasi ProFix dalam dua (2) batch — Batch 1 sebanyak 167 kecacatan pada 27 Mei 2026 dan Batch 2 sebanyak 160 kecacatan pada 28 Mei 2026 — berjumlah 327 kecacatan keseluruhannya. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}, PTD 217365), sebagaimana termaktub di dalam Perjanjian Jual Beli bertarikh ${data.tarikhSPA} (No. Rujukan SPA: ${data.noSPA}) mengikut ${data.jenisSPA}, telah menjalankan Pemeriksaan Kecacatan (Defect Inspection) pada ${data.tarikhPemeriksaan1} dan telah mengemukakan Laporan Pemeriksaan Kecacatan (Defect Inspection Report) secara rasmi kepada pihak tuan melalui aplikasi ProFix dalam dua (2) batch — Batch 1 sebanyak 167 kecacatan pada 27 Mei 2026 dan Batch 2 sebanyak 160 kecacatan pada 28 Mei 2026 — berjumlah 327 kecacatan keseluruhannya. Pihak tuan telah diberikan tempoh tiga puluh (30) hari untuk melaksanakan pembaikan terhadap semua kecacatan yang dilaporkan.`
 );
 y += 4;
 
