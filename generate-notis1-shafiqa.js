@@ -44,8 +44,8 @@ const data = {
   tarikhSerahanLaporan: "10 Ogos 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy)",
 
-  tarikhNotis: "17 September 2026",
-  tarikhDeadline: "2 Oktober 2026",
+  tarikhNotis: "18 September 2026",
+  tarikhDeadline: "3 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -77,8 +77,8 @@ const data = {
     { tarikh: "7 Ogos 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "10 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara serahan tangan (hardcopy) kepada pihak pemaju" },
     { tarikh: "9 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum dilaksanakan" },
-    { tarikh: "17 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "2 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "18 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "3 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
