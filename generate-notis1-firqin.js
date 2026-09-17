@@ -17,7 +17,12 @@ const data = {
 
   namaPemaju: "UDA LAND (SOUTH) SDN. BHD.",
   noSyarikat: "(197501001813 / 23298-K)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "KL") ? [
+    "(Ibu Pejabat / Headquarters)",
+    "Tingkat 15, Blok Menara, Kompleks Pertama,",
+    "Jalan Tuanku Abdul Rahman,",
+    "50100 Kuala Lumpur.",
+  ] : [
     "No. 1, Jalan Padi Mahsuri 12,",
     "Bandar Baru Uda,",
     "81200 Johor Bahru,",
@@ -74,7 +79,12 @@ const data = {
     { tarikh: "3 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
-  salinanKepada: [
+  salinanKepada: (process.argv[2] === "KL") ? [
+    {
+      nama: "UDA LAND (SOUTH) SDN. BHD. — Pejabat Johor Bahru",
+      alamat: ["No. 1, Jalan Padi Mahsuri 12,", "Bandar Baru Uda,", "81200 Johor Bahru, Johor."],
+    },
+  ] : [
     {
       nama: "UDA LAND (SOUTH) SDN. BHD. — Ibu Pejabat (SPA)",
       alamat: ["Tingkat 15, Blok Menara, Kompleks Pertama,", "Jalan Tuanku Abdul Rahman,", "50100 Kuala Lumpur."],
@@ -440,6 +450,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_FIRQIN.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_FIRQIN.pdf");
+const outName = (process.argv[2] === "KL") ? "NOTIS_1_FIRQIN_KL.pdf" : "NOTIS_1_FIRQIN.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
