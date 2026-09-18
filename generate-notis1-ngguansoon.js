@@ -6,9 +6,10 @@ const data = {
 
   namaPembeli: "NG GUAN SOON",
   alamatPengirim: [
-    "Apt Blk 417, Choa Chu Kang Ave 4,",
-    "#06-382,",
-    "Singapore 680417.",
+    "No. B-200, Aurora Resort,",
+    "Jalan Aurora Utama, Aurora Sentral,",
+    "79200 Iskandar Puteri,",
+    "Johor.",
   ],
   noKP: "K5534717P",
   telefonPembeli: "+65 9237 6382",
