@@ -8363,7 +8363,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.2 · build 19 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.3 · build 19 Sep 2026</div>
           </div>
         </div>
         
@@ -8394,7 +8394,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.2</span>
+      <span class="chat-build" title="Build">v1.3</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -21652,6 +21652,7 @@ async function loadInspections() {
         cover: d.cover || {},
         spaceCount: d.spaceCount || 0,
         findingCount: d.findingCount || 0,
+        coveredCount: d.coveredCount || 0,
         createdAt: d.createdAt?.toDate?.() || new Date(),
         updatedAt: d.updatedAt?.toDate?.() || new Date(),
         projectInfo: d.projectInfo || {},
@@ -21671,6 +21672,7 @@ async function loadInspections() {
     } catch (e) {}
     
     renderInspectionsHome();
+    if (typeof IP !== 'undefined' && IP.view === 'list' && document.getElementById('ipMode').classList.contains('show')) ipRender();
     if (document.getElementById('homeMode').classList.contains('show')) {
       renderOngoingCard();
     }
@@ -21794,15 +21796,26 @@ async function deleteInspection(inspId) {
   if (!confirm('Delete this inspection and all its photos? This cannot be undone.')) return;
   
   try {
-    // Delete all photos first
-    const photosRef = db.collection('pocketInspections').doc(currentUser.uid)
-      .collection('inspections').doc(inspId).collection('photos');
-    const photoSnap = await photosRef.get();
+    const root = db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('inspections').doc(inspId);
     const batch = db.batch();
-    photoSnap.forEach(function(doc) { batch.delete(doc.ref); });
-    batch.delete(db.collection('pocketInspections').doc(currentUser.uid)
-      .collection('inspections').doc(inspId));
+    // Ruang, penemuan dan pelan ialah subkoleksi: memadam dokumen induk
+    // tidak menyentuhnya, jadi ia kena dikumpul satu-satu dahulu.
+    const subs = await Promise.all(['photos', 'spaces', 'findings', 'plans'].map(function(n) {
+      return root.collection(n).get().catch(function() { return { forEach: function() {} }; });
+    }));
+    subs.forEach(function(snap, i) {
+      snap.forEach(function(doc) {
+        batch.delete(doc.ref);
+        // Gambar dan pelan sebenar duduk dalam telefon, bukan Firestore.
+        if (i === 2) { for (let k = 0; k < (doc.data().photoN || 0); k++) lbDrop('insp:' + inspId + ':' + doc.id + ':' + k); }
+        if (i === 3) lbDrop('plan:' + doc.id);
+      });
+    });
+    const photosRef = root.collection('photos');
+    batch.delete(root);
     await batch.commit();
+    if (typeof IP !== 'undefined' && IP.id === inspId) { IP.id = null; IP.insp = null; IP.view = 'list'; }
     
     inspections = inspections.filter(function(i) { return i.id !== inspId; });
     
@@ -25360,7 +25373,7 @@ const IP_PRI = ['Low','Medium','High','Urgent'];
 
 let IP = {
   view: 'list', id: null, insp: null, spaces: [], findings: [], plans: [],
-  spaceId: null, findId: null, planIx: 0, pinMode: false, draftType: 'defect', shots: [], busy: false
+  spaceId: null, findId: null, planIx: 0, pinMode: false, pinFor: null, draftType: 'defect', shots: [], busy: false
 };
 
 function ipT() { return IP_TYPES[(IP.insp && IP.insp.type) || IP.draftType] || IP_TYPES.defect; }
@@ -25441,6 +25454,7 @@ async function ipCreate(type) {
   };
   try {
     const doc = await ipRef().add(data);
+    setTimeout(function() { if (typeof renderInspectionsHome === 'function') renderInspectionsHome(); }, 0);
     inspections.unshift({
       id: doc.id, title: data.title, type: type, status: 'active', cover: data.cover,
       createdAt: now, updatedAt: now, projectInfo: {}, photoCount: 0,
@@ -25456,7 +25470,12 @@ async function ipPatch(obj) {
   if (IP.insp) Object.keys(obj).forEach(function(k) { if (k !== 'updatedAt') IP.insp[k] = obj[k]; });
 }
 async function ipCounts() {
-  await ipPatch({ spaceCount: IP.spaces.length, findingCount: IP.findings.length });
+  // coveredCount disimpan supaya bar kemajuan pada senarai menunjukkan
+  // berapa ruang sudah disentuh, bukan sekadar 0% atau 100%.
+  await ipPatch({ spaceCount: IP.spaces.length, findingCount: IP.findings.length, coveredCount: ipCovered() });
+  const row = (inspections || []).filter(function(x) { return x.id === IP.id; })[0];
+  if (row) { row.spaceCount = IP.spaces.length; row.findingCount = IP.findings.length; row.coveredCount = ipCovered(); }
+  if (typeof renderInspectionsHome === 'function') renderInspectionsHome();
 }
 
 async function ipAddSpace(x, y, planId) {
@@ -25475,19 +25494,50 @@ async function ipSpacePatch(id, obj) {
   if (s) Object.keys(obj).forEach(function(k) { s[k] = obj[k]; });
   try { await ipSub('spaces').doc(id).update(obj); } catch (e) { console.warn('[Space]', e.message); }
 }
+// Membuang ruang B daripada A, B, C meninggalkan A dan C — dan ruang
+// baharu berikutnya akan dinamakan C juga. Jadi huruf dan nombor
+// disusun semula setiap kali sesuatu dibuang.
+async function ipRekeySpaces() {
+  for (let i = 0; i < IP.spaces.length; i++) {
+    const want = ipKeyFor(i);
+    if (IP.spaces[i].key === want && IP.spaces[i].order === i) continue;
+    IP.spaces[i].key = want; IP.spaces[i].order = i;
+    try { await ipSub('spaces').doc(IP.spaces[i].id).update({ key: want, order: i }); } catch (e) {}
+    const kids = ipFindingsIn(IP.spaces[i].id);
+    for (let k = 0; k < kids.length; k++) {
+      if (kids[k].spaceKey === want) continue;
+      kids[k].spaceKey = want;
+      try { await ipSub('findings').doc(kids[k].id).update({ spaceKey: want }); } catch (e) {}
+    }
+  }
+}
+async function ipRenumber(spaceId) {
+  const list = ipFindingsIn(spaceId).sort(function(a, b) { return (a.no || 0) - (b.no || 0); });
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].no === i + 1) continue;
+    list[i].no = i + 1;
+    try { await ipSub('findings').doc(list[i].id).update({ no: i + 1 }); } catch (e) {}
+  }
+}
 async function ipDeleteSpace(id) {
   const kids = ipFindingsIn(id);
   for (let i = 0; i < kids.length; i++) await ipDeleteFinding(kids[i].id, true);
   IP.spaces = IP.spaces.filter(function(x) { return x.id !== id; });
   try { await ipSub('spaces').doc(id).delete(); } catch (e) {}
+  await ipRekeySpaces();
   ipCounts();
 }
 async function ipDeleteFinding(id, quiet) {
   const f = IP.findings.filter(function(x) { return x.id === id; })[0];
+  const sid = f ? f.spaceId : null;
   if (f) for (let i = 0; i < (f.photoN || 0); i++) lbDrop(ipPhotoKey(id, i));
   IP.findings = IP.findings.filter(function(x) { return x.id !== id; });
   try { await ipSub('findings').doc(id).delete(); } catch (e) {}
-  if (!quiet) { ipCounts(); showToast('Finding deleted'); }
+  if (!quiet) {
+    if (sid) await ipRenumber(sid);
+    ipCounts();
+    showToast('Finding deleted');
+  }
 }
 
 // ---------- 4. PAPARAN: SENARAI ----------
@@ -25513,7 +25563,7 @@ function ipViewList() {
   rows.forEach(function(r) {
     const t = IP_TYPES[r.type] || IP_TYPES.defect;
     const sc = r.spaceCount || 0, fc = r.findingCount || 0;
-    const pc = sc ? Math.min(100, Math.round((r.coveredCount != null ? r.coveredCount : Math.min(sc, fc ? sc : 0)) / sc * 100)) : 0;
+    const pc = sc ? Math.min(100, Math.round((r.coveredCount || 0) / sc * 100)) : 0;
     html += '<button class="ip-card ' + t.cls + '" data-ipopen="' + r.id + '">' +
       '<div class="ip-card-top"><b>' + ipEsc(r.title) + '</b><span class="ip-badge">' + ipEsc(t.short) + '</span></div>' +
       '<div class="ip-card-sub">' + sc + ' ' + t.units.toLowerCase() + ' · ' + fc + ' finding' + (fc === 1 ? '' : 's') + ' · ' + (r.photoCount || 0) + ' photos</div>' +
@@ -25601,12 +25651,15 @@ function ipViewHub() {
   body += '<div class="ip-sec" style="margin-top:15px"><b>Finish</b><i></i></div>' +
     '<button class="ip-tile" data-ipgo="export"><span class="ip-tile-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg></span>' +
       '<span class="ip-ttxt"><b>Check and export</b><span>Report PDF with the plan and every finding</span></span>' +
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>';
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>' +
+    '<button class="ip-ghost bad" id="ipDelInsp">Delete this inspection</button>';
   return html + '<div class="ip-pad ' + t.cls + '" style="padding-top:15px">' + body + '</div>';
 }
 
 function ipViewPlan() {
-  const t = ipT(), plan = IP.plans[IP.planIx] || null;
+  const t = ipT();
+  if (IP.planIx >= IP.plans.length) IP.planIx = Math.max(0, IP.plans.length - 1);
+  const plan = IP.plans[IP.planIx] || null;
   const pins = IP.spaces.filter(function(s) { return plan && s.planId === plan.id; });
   let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="hub"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>' +
     '<h2>' + ipEsc(plan ? plan.name : 'Floor') + ' <em>plan</em></h2>' +
@@ -25636,7 +25689,8 @@ function ipViewPlan() {
       return '<button class="ip-srow" data-ipspace="' + s.id + '"><span class="ip-key">' + ipEsc(s.key) + '</span>' +
         '<span class="ip-stxt"><b>' + ipEsc(s.name) + '</b><span>' + n + ' finding' + (n === 1 ? '' : 's') + '</span></span>' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>';
-    }).join('');
+    }).join('') +
+    '<button class="ip-ghost bad" id="ipDelPlan">Delete this plan</button>';
   return ipShell(html);
 }
 
@@ -25669,6 +25723,10 @@ function ipViewSpace() {
     });
   }
   html += '<button class="ip-add" data-ipnewfind="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add a finding</button>';
+  if (IP.plans.length) {
+    const onPlan = IP.plans.filter(function(x) { return x.id === s.planId; })[0];
+    html += '<button class="ip-ghost" id="ipPlaceOnPlan">' + (onPlan ? 'Move the pin on ' + ipEsc(onPlan.name) : 'Place this ' + t.unit.toLowerCase() + ' on a plan') + '</button>';
+  }
   if (!list.length) {
     html += '<button class="ip-ghost" id="ipNoDefect">' + (s.noDefect ? 'Marked: no defect found' : 'Mark as no defect found') + '</button>';
   }
@@ -25770,15 +25828,19 @@ function ipRender() {
 }
 function ipGo(v) { IP.view = v; ipRender(); }
 
+let _ipShotUrls = [];
 async function ipPaintShots() {
   const box = document.getElementById('ipShots');
   if (!box) return;
+  _ipShotUrls.forEach(function(u) { try { URL.revokeObjectURL(u); } catch (e) {} });
+  _ipShotUrls = [];
   const f = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
   const n = f ? (f.photoN || 0) : IP.shots.length;
   let html = '';
   if (f) {
     for (let i = 0; i < n; i++) {
       const url = await ipPhotoUrl(f, i);
+      if (url.indexOf('blob:') === 0) _ipShotUrls.push(url);
       html += '<div class="ip-shot"><img src="' + url + '" alt=""><button data-ipdelshot="' + i + '"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
     }
   } else {
@@ -25837,6 +25899,7 @@ async function ipSaveFinding() {
       const doc = await ipSub('findings').add(data);
       id = doc.id;
       IP.findings.push(Object.assign({ id: id }, data, { photoN: 0 }));
+      if (s.noDefect) await ipSpacePatch(s.id, { noDefect: false });
     }
     // Gambar penuh ke telefon, thumbnail ke Firestore.
     if (IP.shots.length) {
@@ -25845,7 +25908,7 @@ async function ipSaveFinding() {
         await lbPut(ipPhotoKey(id, base + i), IP.shots[i].blob, 'image/jpeg');
       }
       data.photoN = base + IP.shots.length;
-      if (!data.thumb) data.thumb = await ipThumbOf(IP.shots[0].blob);
+      if (!(existing && existing.thumb)) data.thumb = await ipThumbOf(IP.shots[0].blob);
     }
     if (t.gps && navigator.geolocation && !data.gps) {
       try {
@@ -25869,6 +25932,68 @@ async function ipSaveFinding() {
     console.warn('[Finding save]', e.message);
     if (btn) { btn.disabled = false; btn.textContent = existing ? 'Save changes' : 'Save finding'; }
     showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// AI membaca gambar dan mengisi HANYA medan yang masih kosong.
+// Ayat yang surveyor sudah tulis sendiri lebih bernilai daripada
+// ayat model, jadi ia tidak pernah ditulis ganti.
+async function ipAiRead() {
+  const btn = document.getElementById('ipAiRead');
+  let blob = null;
+  if (IP.shots.length) blob = IP.shots[0].blob;
+  else if (IP.findId) {
+    const f = IP.findings.filter(function(x) { return x.id === IP.findId; })[0];
+    if (f && f.photoN) { const rec = await lbGet(ipPhotoKey(f.id, 0)); if (rec) blob = rec.blob; }
+  }
+  if (!blob) { showToast('Take a photo first'); return; }
+  if (typeof callGemini !== 'function') { showToast('AI is not available'); return; }
+  const was = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Reading…'; }
+  try {
+    const small = await ipShrinkTo(blob, 1024, 0.8);
+    const dataUrl = await ipBlobToDataUrl(small);
+    const t = ipT();
+    const prompt = 'Analyse this building defect photo for a Malaysian surveyor report.\n' +
+      'Reply ONLY in this exact format, nothing else:\n' +
+      'ELEMENT: [exactly one of: ' + IP_ELEMENTS.join(' | ') + ']\n' +
+      'TYPE: [exactly one of: ' + IP_DEFTYPES.join(' | ') + ']\n' +
+      'DESCRIPTION: [2-3 sentences. What is visible, where on the element, and roughly how large. State only what the photo shows; do not speculate about causes.]\n' +
+      (t.rate ? 'RATING: [one of: good | fair | dilapidated]\n' : '') +
+      'PRIORITY: [one of: Low | Medium | High | Urgent]';
+    const txt = await callGemini([{ role: 'user', content: prompt, image: dataUrl, mode: 'consultant', timestamp: new Date() }], false);
+    const grab = function(k) {
+      const m = String(txt).match(new RegExp('^' + k + ':\\s*(.+)$', 'mi'));
+      return m ? m[1].trim().replace(/^\[|\]$/g, '').trim() : '';
+    };
+    const pick = function(sel, want) {
+      if (!sel || !want) return false;
+      const lc = want.toLowerCase();
+      for (let i = 0; i < sel.options.length; i++) {
+        const v = sel.options[i].value;
+        if (v && (v.toLowerCase() === lc || v.toLowerCase().indexOf(lc) === 0 || lc.indexOf(v.toLowerCase()) === 0)) { sel.value = v; return true; }
+      }
+      return false;
+    };
+    const filled = [];
+    const el = document.getElementById('ipfEl'), dt = document.getElementById('ipfDt'),
+          de = document.getElementById('ipfDesc'), pr = document.getElementById('ipfPri');
+    if (el && !el.value && pick(el, grab('ELEMENT'))) filled.push('element');
+    if (dt && !dt.value && pick(dt, grab('TYPE'))) filled.push('type');
+    if (de && !de.value.trim()) { const d = grab('DESCRIPTION'); if (d) { de.value = d; filled.push('description'); } }
+    if (pr && !pr.value && pick(pr, grab('PRIORITY'))) filled.push('priority');
+    if (t.rate) {
+      const r = grab('RATING').toLowerCase();
+      const cur = document.querySelector('#ipfRate button.on');
+      const tgt = document.querySelector('#ipfRate button[data-r="' + r + '"]');
+      if (!cur && tgt) { tgt.classList.add('on'); filled.push('rating'); }
+    }
+    showToast(filled.length ? 'Filled in: ' + filled.join(', ') + '. Check it before saving.' : 'Everything was already filled in');
+  } catch (e) {
+    console.warn('[Finding AI]', e.message);
+    showToast('Could not read the photo. ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = was; }
   }
 }
 
@@ -26169,8 +26294,16 @@ function ipWire() {
       return;
     }
     if (e.target.closest('[data-ipnewspace]')) {
+      // Kalau ada pelan, letakkan ruang itu di atasnya terus — ruang
+      // tanpa pin tidak pernah muncul dalam laporan bergambar.
+      if (IP.plans.length) { IP.pinMode = true; IP.pinFor = null; ipGo('plan'); showToast('Tap the plan where it is'); return; }
       const id = await ipAddSpace(50, 50, '');
       if (id) { IP.spaceId = id; ipGo('space'); }
+      return;
+    }
+    if (e.target.closest('#ipPlaceOnPlan')) {
+      IP.pinMode = true; IP.pinFor = IP.spaceId; ipGo('plan');
+      showToast('Tap the plan where it is');
       return;
     }
     if (e.target.closest('[data-ipnewfind]')) { IP.findId = null; IP.shots = []; ipGo('finding'); return; }
@@ -26185,7 +26318,9 @@ function ipWire() {
     }
     const fr = e.target.closest('#ipfRate button');
     if (fr) {
-      document.querySelectorAll('#ipfRate button').forEach(function(b) { b.classList.toggle('on', b === fr && !fr.classList.contains('on')); });
+      const was = fr.classList.contains('on');
+      document.querySelectorAll('#ipfRate button').forEach(function(b) { b.classList.remove('on'); });
+      if (!was) fr.classList.add('on');
       return;
     }
     if (e.target.closest('#ipMake')) {
@@ -26202,7 +26337,13 @@ function ipWire() {
     if (e.target.closest('#ipPlanUp') || e.target.closest('#ipPlanUp2') || e.target.closest('#ipPlanUp3')) {
       document.getElementById('ipPlanFile').click(); return;
     }
-    if (e.target.closest('#ipPinBtn')) { IP.pinMode = !IP.pinMode; ipRender(); if (IP.pinMode) showToast('Now tap the plan'); return; }
+    if (e.target.closest('#ipPinBtn')) {
+      IP.pinMode = !IP.pinMode;
+      if (!IP.pinMode) IP.pinFor = null;
+      ipRender();
+      if (IP.pinMode) showToast('Now tap the plan');
+      return;
+    }
     if (e.target.closest('#ipNoDefect')) {
       const s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
       await ipSpacePatch(IP.spaceId, { noDefect: !(s && s.noDefect) });
@@ -26212,12 +26353,40 @@ function ipWire() {
     if (e.target.closest('#ipDelSpace')) {
       const s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
       if (!s) return;
+      const n = ipFindingsIn(s.id).length;
+      // Membuang ruang membuang penemuannya sekali, jadi katakan berapa.
+      if (!confirm('Delete "' + s.name + '"' + (n ? ' and its ' + n + ' finding' + (n === 1 ? '' : 's') : '') + '? This cannot be undone.')) return;
       await ipDeleteSpace(IP.spaceId);
       showToast(ipT().unit + ' deleted');
       ipGo('hub');
       return;
     }
-    if (e.target.closest('#ipDelFind')) { await ipDeleteFinding(IP.findId); IP.findId = null; ipGo('space'); return; }
+    if (e.target.closest('#ipDelFind')) {
+      const f = IP.findings.filter(function(x) { return x.id === IP.findId; })[0];
+      if (!confirm('Delete finding ' + (f ? f.spaceKey + ipNo(f.no) : '') + '? Its photos go too.')) return;
+      await ipDeleteFinding(IP.findId); IP.findId = null; ipGo('space'); return;
+    }
+    if (e.target.closest('#ipDelPlan')) {
+      const plan = IP.plans[IP.planIx];
+      if (!plan) return;
+      const tagged = IP.spaces.filter(function(x) { return x.planId === plan.id; });
+      if (!confirm('Delete ' + plan.name + '?' + (tagged.length ? ' ' + tagged.length + ' ' + ipT().units.toLowerCase() + ' stay, but lose their pin.' : ''))) return;
+      for (let i = 0; i < tagged.length; i++) await ipSpacePatch(tagged[i].id, { planId: '', x: 50, y: 50 });
+      IP.plans = IP.plans.filter(function(x) { return x.id !== plan.id; });
+      lbDrop('plan:' + plan.id);
+      try { await ipSub('plans').doc(plan.id).delete(); } catch (err) {}
+      IP.planIx = 0;
+      ipRender();
+      showToast('Plan deleted');
+      return;
+    }
+    if (e.target.closest('#ipDelInsp')) {
+      const id = IP.id;
+      if (typeof deleteInspection !== 'function') return;
+      await deleteInspection(id);
+      if (!(inspections || []).some(function(x) { return x.id === id; })) { IP.id = null; IP.insp = null; ipGo('list'); }
+      return;
+    }
     if (e.target.closest('#ipComplete')) {
       await ipPatch({ status: 'completed' });
       const row = (inspections || []).filter(function(x) { return x.id === IP.id; })[0];
@@ -26226,7 +26395,7 @@ function ipWire() {
       ipGo('list');
       return;
     }
-    if (e.target.closest('#ipAiRead')) { showToast('Take a photo first, then AI read fills the fields'); return; }
+    if (e.target.closest('#ipAiRead')) { ipAiRead(); return; }
     if (e.target.closest('#ipMeasure')) {
       if (typeof openCrackRuler === 'function') openCrackRuler();
       else showToast('Crack Ruler is in Tools');
@@ -26239,8 +26408,17 @@ function ipWire() {
       const x = Math.round((e.clientX - b.left) / b.width * 100);
       const yy = Math.round((e.clientY - b.top) / b.height * 100);
       const plan = IP.plans[IP.planIx];
-      const id = await ipAddSpace(x, yy, plan ? plan.id : '');
       IP.pinMode = false;
+      if (IP.pinFor) {
+        // Memindahkan ruang sedia ada ke atas pelan.
+        const moving = IP.pinFor; IP.pinFor = null;
+        await ipSpacePatch(moving, { x: x, y: yy, planId: plan ? plan.id : '' });
+        IP.spaceId = moving;
+        ipGo('space');
+        showToast('Placed on ' + (plan ? plan.name : 'the plan'));
+        return;
+      }
+      const id = await ipAddSpace(x, yy, plan ? plan.id : '');
       // Terus masuk ke ruang itu: nama lalai "Space A" tidak berguna
       // dalam laporan, jadi minta nama sebenar semasa ingatan masih segar.
       if (id) { IP.spaceId = id; ipGo('space'); showToast(ipT().unit + ' placed — name it'); }
@@ -26299,7 +26477,7 @@ function ipOpenTab() {
 try { ipWire(); } catch (e) { console.warn('[Inspection wire]', e.message); }
 
 // Console banner
-console.log('%cGoXpert Pocket v1.2', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.3', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
