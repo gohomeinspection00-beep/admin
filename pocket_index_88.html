@@ -8332,6 +8332,82 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 }
 .nav-dot.on{display:grid}
 
+/* ---------- AR Measurement (arm-) ---------- */
+.arm-resume{
+  display:flex;flex-direction:column;gap:3px;padding:11px 12px;margin-bottom:14px;
+  border:1px solid var(--accent-line);background:var(--accent-soft);border-radius:var(--radius-lg);
+}
+.arm-resume b{font-size:13.5px;font-weight:700;color:var(--accent)}
+.arm-resume span{font-size:11.5px;color:var(--fg-dim);line-height:1.45}
+
+.arm-list{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.arm-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg)}
+.arm-item-k{
+  flex:none;padding:3px 7px;border-radius:6px;background:var(--surface);
+  font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--fg-dim);
+}
+.arm-item-t{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.arm-item-lbl{
+  width:100%;border:none;background:none;padding:0;outline:none;
+  font-size:13.5px;font-weight:650;letter-spacing:-.01em;color:var(--fg);font-family:inherit;
+}
+.arm-item-lbl:focus{border-bottom:1px solid var(--accent)}
+.arm-item-v{font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:600}
+.arm-item-x{flex:none;width:28px;height:28px;border-radius:8px;background:var(--surface);display:grid;place-items:center;color:var(--muted);border:none}
+
+.arm-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0 2px 12px}
+.arm-empty{text-align:center;padding:24px;color:var(--muted);font-size:13px}
+.arm-acts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.arm-act{
+  padding:11px;border-radius:var(--radius-lg);border:1px solid var(--line-2);background:var(--bg);
+  font-size:12.5px;font-weight:700;color:var(--fg-2);
+}
+.arm-act-bad{color:var(--critical);border-color:var(--critical)}
+
+/* --- lapisan dalam AR --- */
+.arm-top{
+  position:relative;z-index:3;pointer-events:auto;
+  padding:calc(env(safe-area-inset-top) + 12px) 14px 0;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+}
+.arm-modes{display:flex;gap:4px;padding:4px;border-radius:12px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+.arm-mode{
+  padding:8px 18px;border-radius:9px;border:none;background:none;
+  color:#e8eaed;font-size:13px;font-weight:700;font-family:var(--font-body);
+}
+.arm-mode.on{background:#22d3ee;color:#04222a}
+.arm-labels{position:absolute;inset:0;z-index:2;pointer-events:none}
+.arm-lbl{
+  position:absolute;transform:translate(-50%,-50%);display:none;
+  padding:4px 9px;border-radius:99px;background:rgba(6,20,26,.86);
+  color:#a5f3fc;font-family:var(--font-mono);font-size:11.5px;font-weight:700;
+  white-space:nowrap;border:1px solid rgba(34,211,238,.5);
+}
+.arm-bar{
+  position:relative;z-index:3;margin-top:auto;pointer-events:auto;
+  display:flex;align-items:center;gap:7px;
+  padding:12px 12px calc(env(safe-area-inset-bottom) + 14px);
+}
+.arm-b{
+  flex:1;min-width:0;padding:15px 6px;border-radius:14px;border:none;
+  background:rgba(0,0,0,.62);backdrop-filter:blur(8px);
+  color:#fff;font-size:13.5px;font-weight:700;font-family:var(--font-body);
+}
+.arm-b:disabled{opacity:.4}
+.arm-b-go{flex:2;background:#22d3ee;color:#04222a;font-size:16px;font-weight:800}
+.arm-sheet{
+  position:absolute;left:12px;right:12px;bottom:90px;z-index:4;
+  max-height:46vh;overflow-y:auto;display:none;
+  border-radius:16px;background:rgba(6,20,26,.94);backdrop-filter:blur(10px);
+  border:1px solid rgba(34,211,238,.35);padding:4px 0;
+}
+.arm-sheet.on{display:block}
+.arm-sheet-h{padding:10px 14px 6px;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#67e8f9}
+.arm-sheet-r{display:flex;align-items:baseline;gap:10px;padding:8px 14px;border-top:1px solid rgba(255,255,255,.07)}
+.arm-sheet-r b{font-size:13px;font-weight:650;color:#fff;min-width:0;flex:1}
+.arm-sheet-r span{font-family:var(--font-mono);font-size:12px;color:#a5f3fc;flex:none}
+.arm-sheet-f span{font-size:11px;color:#94a3b8;font-family:var(--font-body)}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -8867,7 +8943,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.9 · build 19 Sep 2026 · Messages</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v2.0 · build 19 Sep 2026 · AR Measurement rebuilt</div>
           </div>
         </div>
         
@@ -8898,7 +8974,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.9</span>
+      <span class="chat-build" title="Build">v2.0</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -15547,7 +15623,6 @@ document.querySelectorAll('.fab-option').forEach(function(opt) {
 // TOOL: AR MEASUREMENT (WebXR hit-test)
 // =======================================================
 let _threeLoading = null;
-let _arLastResult = null;
 
 function loadThree() {
   if (window.THREE) return Promise.resolve();
@@ -15562,79 +15637,319 @@ function loadThree() {
   return _threeLoading;
 }
 
+// =======================================================
+// TOOL: AR MEASUREMENT (ARM) — banyak ukuran dalam satu sesi
+// =======================================================
+// Versi lama hanya boleh dua titik, sekali, dan jawapannya hilang
+// sebagai toast bila AR ditutup. Di tapak seorang surveyor mengukur
+// sepuluh benda dalam satu pusingan bilik — lebar pintu, tinggi siling,
+// panjang koridor — jadi sesi ini menyimpan senarai, bukan satu nombor.
+//
+// Matematiknya diasingkan daripada WebXR supaya ia boleh diuji tanpa
+// telefon: armFmt, armLen dan armArea ialah fungsi tulen.
+
+const ARM_STORE = 'pocket_armeasure_v1';
+const ARM_MAXLBL = 24;   // label 3D yang dilukis serentak
+
+let ARM = { mode: 'dist', items: [], pts: [], seq: 0, listOpen: false };
+
+// Ukuran AR pada telefon biasanya tepat dalam lingkungan satu hingga
+// tiga sentimeter. Memaparkan milimeter memberi keyakinan yang tidak
+// wujud, jadi ia dibulatkan pada tahap yang benar-benar boleh dipercayai.
+function armFmt(m) {
+  if (!isFinite(m)) return '—';
+  const cm = m * 100;
+  if (cm < 100) return cm.toFixed(1) + ' cm';
+  return m.toFixed(2) + ' m';
+}
+function armFmtArea(a) {
+  if (!isFinite(a)) return '—';
+  if (a < 1) return (a * 10000).toFixed(0) + ' cm²';
+  return a.toFixed(2) + ' m²';
+}
+function armDist(a, b) {
+  const dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+function armLen(pts) {
+  let t = 0;
+  for (let i = 1; i < pts.length; i++) t += armDist(pts[i - 1], pts[i]);
+  return t;
+}
+// Luas poligon dalam ruang 3D (kaedah Newell). Formula tali kasut biasa
+// hanya betul kalau poligon itu mendatar; dinding dan siling tidak.
+function armArea(pts) {
+  if (pts.length < 3) return 0;
+  let nx = 0, ny = 0, nz = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length];
+    nx += (a.y - b.y) * (a.z + b.z);
+    ny += (a.z - b.z) * (a.x + b.x);
+    nz += (a.x - b.x) * (a.y + b.y);
+  }
+  return Math.sqrt(nx * nx + ny * ny + nz * nz) / 2;
+}
+function armMid(pts) {
+  const n = pts.length || 1;
+  let x = 0, y = 0, z = 0;
+  pts.forEach(function(p) { x += p.x; y += p.y; z += p.z; });
+  return { x: x / n, y: y / n, z: z / n };
+}
+
+// Disimpan selepas setiap ukuran, bukan hanya di hujung: kalau AR
+// tersekat atau telefon mati, pusingan bilik itu tidak hilang.
+function armLoad() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(ARM_STORE) || 'null');
+    if (raw && Array.isArray(raw.items)) { ARM.items = raw.items; ARM.seq = raw.seq || raw.items.length; }
+  } catch (e) {}
+}
+function armSave() {
+  try { localStorage.setItem(ARM_STORE, JSON.stringify({ items: ARM.items, seq: ARM.seq })); } catch (e) {}
+}
+function armDefaultLabel(kind) {
+  ARM.seq++;
+  if (kind === 'area') return 'Area ' + ARM.seq;
+  if (kind === 'path') return 'Run ' + ARM.seq;
+  return 'Measure ' + ARM.seq;
+}
+function armAdd(kind, pts, label) {
+  const copy = pts.map(function(p) { return { x: p.x, y: p.y, z: p.z }; });
+  const item = {
+    id: 'am' + Date.now() + Math.random().toString(36).slice(2, 6),
+    kind: kind, label: label || armDefaultLabel(kind),
+    m: armLen(copy) + (kind === 'area' ? armDist(copy[copy.length - 1], copy[0]) : 0),
+    area: kind === 'area' ? armArea(copy) : 0,
+    pts: copy, at: Date.now()
+  };
+  ARM.items.push(item);
+  armSave();
+  return item;
+}
+function armDrop(id) {
+  ARM.items = ARM.items.filter(function(x) { return x.id !== id; });
+  armSave();
+}
+function armClear() { ARM.items = []; ARM.seq = 0; armSave(); }
+function armSummary(it) {
+  if (it.kind === 'area') return armFmtArea(it.area) + ' · keliling ' + armFmt(it.m);
+  if (it.kind === 'path') return armFmt(it.m) + ' · ' + it.pts.length + ' titik';
+  return armFmt(it.m);
+}
+// Teks yang masuk ke laporan atau chat. Ayat yang surveyor akan tulis
+// sendiri, termasuk had ketepatannya — nombor tanpa kaedah tidak boleh
+// dipertahankan dalam laporan.
+function armText() {
+  if (!ARM.items.length) return '';
+  const L = ARM.items.map(function(it) { return it.label + ': ' + armSummary(it); });
+  L.push('');
+  L.push('Measured with phone AR (plane detection); typically accurate to within 1–3 cm.');
+  return L.join('\n');
+}
+
+// ---------- 2. SKRIN MASUK ----------
+function armIco() {
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M12 9v6M9 12h6"/></svg>';
+}
 function openARMeasure() {
-  document.getElementById('toolModalIcon').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>';
+  armLoad();
+  document.getElementById('toolModalIcon').innerHTML = armIco();
   document.getElementById('toolModalName').textContent = 'AR Measurement';
-  document.getElementById('toolModalDesc').textContent = 'Measure real-world distances with your camera';
-
-  document.getElementById('toolModalBody').innerHTML =
-    '<div class="ar-intro-steps">' +
-      '<div class="ar-step"><span class="ar-step-n">1</span><span>Point your camera at a flat surface (floor or wall) and move slowly.</span></div>' +
-      '<div class="ar-step"><span class="ar-step-n">2</span><span>Tap <strong>Add Point</strong> at the start, move to the end, then tap again.</span></div>' +
-      '<div class="ar-step"><span class="ar-step-n">3</span><span>Read the distance. Best for gaps, heights &amp; room sizes — not hairline cracks.</span></div>' +
-    '</div>' +
-    '<div id="arStatus" class="ar-status"></div>';
-
-  document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-primary" id="arStartBtn" disabled>Checking device…</button>';
-
+  document.getElementById('toolModalDesc').textContent = 'Banyak ukuran dalam satu pusingan';
+  armScreenStart();
   showToolModal();
+}
+
+function armScreenStart() {
+  const body = document.getElementById('toolModalBody');
+  const foot = document.getElementById('toolModalFoot');
+  let h = '';
+  if (ARM.items.length) {
+    h += '<div class="arm-resume">' +
+      '<b>' + ARM.items.length + ' ukuran daripada sesi lepas</b>' +
+      '<span>Ia disimpan dalam telefon. Sambung mengukur, atau lihat senarai.</span></div>';
+  }
+  h += '<div class="ar-intro-steps">' +
+    '<div class="ar-step"><span class="ar-step-n">1</span><span>Halakan kamera ke lantai atau dinding dan gerak perlahan sehingga bulatan muncul.</span></div>' +
+    '<div class="ar-step"><span class="ar-step-n">2</span><span><b>Jarak</b>: ketik hujung pertama, jalan ke hujung kedua, ketik lagi. Ia terus simpan dan awak boleh mula yang seterusnya — tak perlu keluar.</span></div>' +
+    '<div class="ar-step"><span class="ar-step-n">3</span><span><b>Laluan</b>: ketik titik demi titik sepanjang dinding. Tekan <b>Tutup</b> untuk dapatkan luas bilik.</span></div>' +
+  '</div>' +
+  '<div id="arStatus" class="ar-status"></div>';
+  body.innerHTML = h;
+  foot.innerHTML =
+    (ARM.items.length ? '<button class="tool-btn tool-btn-secondary" id="armSeeList">Senarai (' + ARM.items.length + ')</button>' : '') +
+    '<button class="tool-btn tool-btn-primary" id="arStartBtn" disabled>Menyemak peranti…</button>';
+  const see = document.getElementById('armSeeList');
+  if (see) see.addEventListener('click', armScreenList);
 
   const startBtn = document.getElementById('arStartBtn');
   const statusEl = document.getElementById('arStatus');
-
   if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
     statusEl.className = 'ar-status warn';
-    statusEl.innerHTML = 'AR isn\'t available here. It needs:<br>• Chrome on an <strong>ARCore-supported Android</strong> phone<br>• The app opened over <strong>https://</strong> (not a downloaded file)<br><br>Use <strong>Crack Ruler</strong> for now — it works on any phone.';
-    startBtn.textContent = 'AR not available';
+    statusEl.innerHTML = 'AR tidak boleh jalan di sini. Ia perlukan:<br>' +
+      '• Chrome pada telefon <b>Android yang menyokong ARCore</b><br>' +
+      '• App dibuka melalui <b>https://</b><br><br>' +
+      'iPhone tiada WebXR langsung — itu had Safari, bukan app ini. Guna <b>Crack Ruler</b> untuk ukur dari gambar.';
+    startBtn.textContent = 'AR tiada di sini';
     return;
   }
-
-  navigator.xr.isSessionSupported('immersive-ar').then(function(supported) {
-    if (!supported) {
+  navigator.xr.isSessionSupported('immersive-ar').then(function(ok) {
+    if (!ok) {
       statusEl.className = 'ar-status warn';
-      statusEl.innerHTML = 'This phone or browser doesn\'t support AR. Use <strong>Crack Ruler</strong> instead.';
-      startBtn.textContent = 'AR not supported';
+      statusEl.innerHTML = 'Telefon atau pelayar ini tidak menyokong AR. Guna <b>Crack Ruler</b> untuk ukur dari gambar.';
+      startBtn.textContent = 'AR tidak disokong';
       return;
     }
     startBtn.disabled = false;
-    startBtn.textContent = 'Start AR Measurement';
-    startBtn.onclick = function() { startARSession(statusEl, startBtn); };
+    startBtn.textContent = ARM.items.length ? 'Sambung mengukur' : 'Mula AR';
+    startBtn.onclick = function() { armStart(statusEl, startBtn); };
   }).catch(function(e) {
     statusEl.className = 'ar-status warn';
-    statusEl.textContent = 'Could not check AR support: ' + e.message;
-    startBtn.textContent = 'AR unavailable';
+    statusEl.textContent = 'Tidak dapat menyemak sokongan AR: ' + e.message;
+    startBtn.textContent = 'AR tidak tersedia';
   });
 }
 
-async function startARSession(statusEl, startBtn) {
-  if (startBtn) { startBtn.disabled = true; startBtn.textContent = 'Loading AR…'; }
-  _arLastResult = null;
-  try {
-    await loadThree();
-  } catch (e) {
-    if (statusEl) { statusEl.className = 'ar-status warn'; statusEl.textContent = 'Failed to load AR library — check your connection.'; }
-    if (startBtn) { startBtn.disabled = false; startBtn.textContent = 'Retry'; }
+// ---------- 3. SENARAI / RINGKASAN ----------
+function armScreenList() {
+  const body = document.getElementById('toolModalBody');
+  const foot = document.getElementById('toolModalFoot');
+  if (!ARM.items.length) {
+    body.innerHTML = '<div class="arm-empty">Belum ada ukuran.</div>';
+    foot.innerHTML = '<button class="tool-btn tool-btn-primary" id="armBack">Kembali</button>';
+    document.getElementById('armBack').addEventListener('click', armScreenStart);
     return;
   }
+  let h = '<div class="arm-list">';
+  ARM.items.forEach(function(it) {
+    h += '<div class="arm-item">' +
+      '<span class="arm-item-k">' + (it.kind === 'area' ? 'LUAS' : (it.kind === 'path' ? 'LALUAN' : 'JARAK')) + '</span>' +
+      '<span class="arm-item-t"><input class="arm-item-lbl" data-armlbl="' + it.id + '" value="' + escapeHTML(it.label) + '" maxlength="40">' +
+      '<span class="arm-item-v">' + escapeHTML(armSummary(it)) + '</span></span>' +
+      '<button class="arm-item-x" data-armdel="' + it.id + '" aria-label="Buang">' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
+    '</div>';
+  });
+  h += '</div>' +
+    '<p class="arm-note">Ukuran AR biasanya tepat dalam lingkungan 1–3 cm. Cukup untuk lebar pintu, tinggi siling dan saiz bilik; untuk retak halus guna Crack Ruler.</p>' +
+    '<div class="arm-acts">' +
+      '<button class="arm-act" data-armact="finding">Masuk ke finding</button>' +
+      '<button class="arm-act" data-armact="copy">Salin semua</button>' +
+      '<button class="arm-act" data-armact="chat">Hantar ke chat</button>' +
+      '<button class="arm-act arm-act-bad" data-armact="clear">Kosongkan</button>' +
+    '</div>';
+  body.innerHTML = h;
+  foot.innerHTML = '<button class="tool-btn tool-btn-secondary" id="armBack">Kembali</button>' +
+    '<button class="tool-btn tool-btn-primary" id="armMore">Ukur lagi</button>';
+  document.getElementById('armBack').addEventListener('click', armScreenStart);
+  document.getElementById('armMore').addEventListener('click', function() {
+    armScreenStart();
+    const b = document.getElementById('arStartBtn');
+    if (b && !b.disabled) b.click();
+  });
+  // Badan modal itu kekal dalam DOM, jadi pendengar mesti dibuang
+  // dahulu — kalau tidak setiap kali skrin ini dibuka ia bertindan dan
+  // satu ketikan Buang akan berjalan dua kali.
+  body.removeEventListener('click', armListClick);
+  body.addEventListener('click', armListClick);
+  body.removeEventListener('change', armLabelChange);
+  body.addEventListener('change', armLabelChange);
+}
+function armLabelChange(e) {
+  const el = e.target.closest('[data-armlbl]');
+  if (!el) return;
+  const it = ARM.items.filter(function(x) { return x.id === el.dataset.armlbl; })[0];
+  if (it) { it.label = el.value.trim() || it.label; armSave(); }
+}
+function armListClick(e) {
+  const del = e.target.closest('[data-armdel]');
+  if (del) { armDrop(del.dataset.armdel); armScreenList(); return; }
+  const act = e.target.closest('[data-armact]');
+  if (!act) return;
+  const k = act.dataset.armact;
+  if (k === 'clear') {
+    if (!confirm('Buang semua ' + ARM.items.length + ' ukuran?')) return;
+    armClear(); armScreenList(); return;
+  }
+  if (k === 'copy') {
+    const t = armText();
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(function() { showToast('Disalin'); },
+      function() { showToast('Tidak dapat menyalin'); });
+    else showToast('Tidak dapat menyalin di sini');
+    return;
+  }
+  if (k === 'finding') armToFinding();
+  if (k === 'chat') armToChat();
+}
+// Ukuran yang tidak sampai ke laporan ialah ukuran yang terbuang.
+function armToFinding() {
+  const box = document.getElementById('ipfDesc');
+  if (!box) { showToast('Buka satu finding dahulu, kemudian tekan Measure di dalamnya'); return; }
+  const lines = ARM.items.map(function(it) { return it.label + ' ' + armSummary(it); }).join('; ');
+  const line = 'Measured with phone AR: ' + lines + '. Typically accurate to within 1–3 cm.';
+  const cur = box.value.replace(/\s+$/, '');
+  box.value = cur ? cur + ' ' + line : line;
+  box.dispatchEvent(new Event('input', { bubbles: true }));
+  if (typeof IP !== 'undefined') {
+    IP.draftMeasure = Object.assign({}, IP.draftMeasure || {}, {
+      ar: ARM.items.map(function(it) { return { label: it.label, kind: it.kind, m: it.m, area: it.area }; }),
+      at: new Date().toISOString()
+    });
+  }
+  closeTool();
+  showToast('Ukuran masuk ke description');
+}
+async function armToChat() {
+  if (typeof MS === 'undefined' || !MS.rooms || !MS.rooms.length) { showToast('Belum ada perbualan'); return; }
+  const names = MS.rooms.map(function(r, i) { return (i + 1) + '. ' + msRoomName(r); }).join('\n');
+  const pick = prompt('Hantar ' + ARM.items.length + ' ukuran ke mana?\n\n' + names + '\n\nTaip nombor:', '1');
+  if (pick === null) return;
+  const n = parseInt(pick, 10);
+  if (!(n >= 1 && n <= MS.rooms.length)) return;
+  const room = MS.rooms[n - 1];
+  const keep = MS.roomId;
+  MS.roomId = room.id;
+  await msSend({ kind: 'text', text: armText() });
+  MS.roomId = keep;
+  showToast('Dihantar ke ' + msRoomName(room));
+}
 
+// ---------- 4. SESI AR ----------
+async function armStart(statusEl, startBtn) {
+  if (startBtn) { startBtn.disabled = true; startBtn.textContent = 'Memuatkan AR…'; }
+  try { await loadThree(); }
+  catch (e) {
+    if (statusEl) { statusEl.className = 'ar-status warn'; statusEl.textContent = 'Gagal memuatkan pustaka 3D — semak sambungan.'; }
+    if (startBtn) { startBtn.disabled = false; startBtn.textContent = 'Cuba lagi'; }
+    return;
+  }
   const THREE = window.THREE;
 
-  let overlay = document.getElementById('arOverlay');
-  if (overlay) overlay.remove();
-  overlay = document.createElement('div');
-  overlay.id = 'arOverlay';
-  overlay.innerHTML =
+  let ov = document.getElementById('arOverlay');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'arOverlay';
+  ov.innerHTML =
     '<div class="ar-crosshair"></div>' +
-    '<div class="ar-top"><div class="ar-hint" id="arHint">Move your phone to find a surface…</div></div>' +
-    '<div class="ar-label" id="arLabel"></div>' +
-    '<div class="ar-controls">' +
-      '<button class="ar-btn" id="arResetBtn">Reset</button>' +
-      '<button class="ar-btn ar-btn-primary" id="arAddBtn" disabled>Add Point</button>' +
-      '<button class="ar-btn" id="arExitBtn">Exit</button>' +
+    '<div class="arm-top">' +
+      '<div class="arm-modes">' +
+        '<button class="arm-mode on" data-armmode="dist">Jarak</button>' +
+        '<button class="arm-mode" data-armmode="path">Laluan</button>' +
+      '</div>' +
+      '<div class="ar-hint" id="arHint">Gerakkan telefon untuk cari permukaan…</div>' +
+    '</div>' +
+    '<div class="arm-labels" id="armLabels"></div>' +
+    '<div class="arm-sheet" id="armSheet"></div>' +
+    '<div class="arm-bar">' +
+      '<button class="arm-b" id="armUndo">Undo</button>' +
+      '<button class="arm-b arm-b-go" id="armAdd" disabled>Titik</button>' +
+      '<button class="arm-b" id="armDone" style="display:none">Selesai</button>' +
+      '<button class="arm-b" id="armClose" style="display:none">Tutup</button>' +
+      '<button class="arm-b" id="armList">0</button>' +
+      '<button class="arm-b" id="armExit">Keluar</button>' +
     '</div>';
-  document.body.appendChild(overlay);
-  overlay.style.display = 'flex';
+  document.body.appendChild(ov);
+  ov.style.display = 'flex';
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -15645,8 +15960,7 @@ async function startARSession(statusEl, startBtn) {
   document.body.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 30);
   const reticle = new THREE.Mesh(
     new THREE.RingGeometry(0.045, 0.06, 32).rotateX(-Math.PI / 2),
     new THREE.MeshBasicMaterial({ color: 0x22d3ee })
@@ -15655,124 +15969,205 @@ async function startARSession(statusEl, startBtn) {
   reticle.visible = false;
   scene.add(reticle);
 
-  const points = [];
-  const markers = [];
-  let lineObj = null;
+  const drawn = [];   // objek 3D bagi ukuran yang sudah disimpan
+  const live = [];    // objek 3D bagi ukuran yang sedang dibina
+  const labels = [];  // { el, pt } — label DOM diunjur setiap bingkai
+  ARM.pts = [];
 
-  const hintEl = overlay.querySelector('#arHint');
-  const labelEl = overlay.querySelector('#arLabel');
-  const addBtn = overlay.querySelector('#arAddBtn');
-  const resetBtn = overlay.querySelector('#arResetBtn');
-  const exitBtn = overlay.querySelector('#arExitBtn');
+  const hintEl = ov.querySelector('#arHint');
+  const addBtn = ov.querySelector('#armAdd');
+  const undoBtn = ov.querySelector('#armUndo');
+  const doneBtn = ov.querySelector('#armDone');
+  const closeBtn = ov.querySelector('#armClose');
+  const listBtn = ov.querySelector('#armList');
+  const sheet = ov.querySelector('#armSheet');
+  const labelBox = ov.querySelector('#armLabels');
 
-  function fmt(meters) {
-    const cm = meters * 100;
-    if (cm < 100) return cm.toFixed(1) + ' cm';
-    return meters.toFixed(2) + ' m';
+  const V = function(p) { return new THREE.Vector3(p.x, p.y, p.z); };
+  function dot(p, colour) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.012, 14, 14),
+      new THREE.MeshBasicMaterial({ color: colour }));
+    m.position.copy(V(p)); scene.add(m); return m;
   }
-  function updateHint() {
-    if (points.length === 0) hintEl.textContent = reticle.visible ? 'Aim the dot, then tap "Add Point"' : 'Move your phone to find a surface…';
-    else if (points.length === 1) hintEl.textContent = 'Move to the end, then "Add Point"';
-    else hintEl.textContent = 'Tap Reset to measure again';
+  function seg(a, b, colour) {
+    const g = new THREE.BufferGeometry().setFromPoints([V(a), V(b)]);
+    const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: colour }));
+    scene.add(l); return l;
   }
-  function addMarker(pos) {
-    const m = new THREE.Mesh(new THREE.SphereGeometry(0.012, 16, 16), new THREE.MeshBasicMaterial({ color: 0x06b6d4 }));
-    m.position.copy(pos);
-    scene.add(m);
-    markers.push(m);
+  function addLabel(pt, text) {
+    if (labels.length >= ARM_MAXLBL) return null;
+    const el = document.createElement('div');
+    el.className = 'arm-lbl';
+    el.textContent = text;
+    labelBox.appendChild(el);
+    const rec = { el: el, pt: pt };
+    labels.push(rec);
+    return rec;
   }
-  function doAddPoint() {
-    if (!reticle.visible || points.length >= 2) return;
-    const pos = new THREE.Vector3().setFromMatrixPosition(reticle.matrix);
-    points.push(pos);
-    addMarker(pos);
-    if (points.length === 2) {
-      const d = points[0].distanceTo(points[1]);
-      labelEl.textContent = fmt(d);
-      const geom = new THREE.BufferGeometry().setFromPoints([points[0], points[1]]);
-      lineObj = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: 0x22d3ee }));
-      scene.add(lineObj);
-      addBtn.disabled = true;
-      _arLastResult = fmt(d);
+  function clearLive() {
+    live.forEach(function(o) { scene.remove(o); if (o.geometry) o.geometry.dispose(); });
+    live.length = 0;
+    ARM.pts = [];
+  }
+  // Menggambar semula ukuran yang sudah disimpan, supaya ia kekal
+  // kelihatan sepanjang pusingan — itulah gunanya banyak ukuran.
+  function drawSaved(it) {
+    const c = it.kind === 'area' ? 0xf59e0b : 0x22c55e;
+    it.pts.forEach(function(p) { drawn.push(dot(p, c)); });
+    for (let i = 1; i < it.pts.length; i++) drawn.push(seg(it.pts[i - 1], it.pts[i], c));
+    if (it.kind === 'area' && it.pts.length > 2) drawn.push(seg(it.pts[it.pts.length - 1], it.pts[0], c));
+    const rec = addLabel(armMid(it.pts), armSummary(it));
+    if (rec) rec.itemId = it.id;
+  }
+  ARM.items.forEach(drawSaved);
+
+  function paintBar() {
+    const n = ARM.pts.length;
+    doneBtn.style.display = (ARM.mode === 'path' && n >= 2) ? '' : 'none';
+    closeBtn.style.display = (ARM.mode === 'path' && n >= 3) ? '' : 'none';
+    listBtn.textContent = String(ARM.items.length);
+    undoBtn.disabled = !(n || ARM.items.length);
+  }
+  function paintHint() {
+    const n = ARM.pts.length;
+    if (!reticle.visible) { hintEl.textContent = 'Gerakkan telefon untuk cari permukaan…'; return; }
+    if (ARM.mode === 'dist') {
+      hintEl.textContent = n === 0 ? 'Halakan bulatan ke hujung pertama, ketik Titik'
+                                   : 'Jalan ke hujung kedua, ketik Titik';
+      if (n === 1) hintEl.textContent += ' · ' + armFmt(armDist(ARM.pts[0], armReticlePt()));
+    } else {
+      hintEl.textContent = n === 0 ? 'Ketik titik demi titik sepanjang dinding'
+        : armFmt(armLen(ARM.pts.concat([armReticlePt()]))) + ' setakat ini · ' + n + ' titik';
     }
-    updateHint();
   }
-  function doReset() {
-    points.length = 0;
-    markers.forEach(function(m) { scene.remove(m); });
-    markers.length = 0;
-    if (lineObj) { scene.remove(lineObj); lineObj = null; }
-    labelEl.style.display = 'none';
-    labelEl.textContent = '';
-    addBtn.disabled = !reticle.visible;
-    _arLastResult = null;
-    updateHint();
+  function armReticlePt() {
+    const v = new THREE.Vector3().setFromMatrixPosition(reticle.matrix);
+    return { x: v.x, y: v.y, z: v.z };
   }
-  addBtn.addEventListener('click', doAddPoint);
-  resetBtn.addEventListener('click', doReset);
+  function commit(kind) {
+    if (ARM.pts.length < 2) return;
+    const it = armAdd(kind, ARM.pts);
+    clearLive();
+    drawSaved(it);
+    paintBar(); paintHint();
+    showToast(it.label + ': ' + armSummary(it));
+  }
+  function addPoint() {
+    if (!reticle.visible) return;
+    const p = armReticlePt();
+    ARM.pts.push(p);
+    live.push(dot(p, 0x06b6d4));
+    if (ARM.pts.length > 1) live.push(seg(ARM.pts[ARM.pts.length - 2], p, 0x22d3ee));
+    // Jarak menyimpan sendiri selepas dua titik, kemudian terus bersedia
+    // untuk ukuran seterusnya — tiada butang Reset untuk ditekan.
+    if (ARM.mode === 'dist' && ARM.pts.length === 2) commit('dist');
+    else { paintBar(); paintHint(); }
+  }
+  function undo() {
+    if (ARM.pts.length) {
+      ARM.pts.pop();
+      const n = ARM.pts.length ? 2 : 1;
+      for (let i = 0; i < n && live.length; i++) {
+        const o = live.pop(); scene.remove(o); if (o.geometry) o.geometry.dispose();
+      }
+      paintBar(); paintHint();
+      return;
+    }
+    const last = ARM.items[ARM.items.length - 1];
+    if (!last) return;
+    armDrop(last.id);
+    // Lukis semula semuanya: lebih mudah difahami daripada menjejak
+    // objek mana milik ukuran mana, dan senarainya pendek.
+    drawn.forEach(function(o) { scene.remove(o); if (o.geometry) o.geometry.dispose(); });
+    drawn.length = 0;
+    labels.forEach(function(l) { l.el.remove(); });
+    labels.length = 0;
+    ARM.items.forEach(drawSaved);
+    paintBar(); paintHint();
+    showToast('Ukuran terakhir dibuang');
+  }
+  function toggleList() {
+    ARM.listOpen = !ARM.listOpen;
+    if (!ARM.listOpen) { sheet.classList.remove('on'); return; }
+    sheet.innerHTML = '<div class="arm-sheet-h">Ukuran sesi ini</div>' +
+      (ARM.items.length
+        ? ARM.items.slice().reverse().map(function(it) {
+            return '<div class="arm-sheet-r"><b>' + escapeHTML(it.label) + '</b><span>' + escapeHTML(armSummary(it)) + '</span></div>';
+          }).join('')
+        : '<div class="arm-sheet-r"><span>Belum ada</span></div>') +
+      '<div class="arm-sheet-r arm-sheet-f"><span>Namakan dan simpan selepas keluar.</span></div>';
+    sheet.classList.add('on');
+  }
+
+  addBtn.addEventListener('click', addPoint);
+  undoBtn.addEventListener('click', undo);
+  doneBtn.addEventListener('click', function() { commit('path'); });
+  closeBtn.addEventListener('click', function() { commit('area'); });
+  listBtn.addEventListener('click', toggleList);
+  ov.querySelector('.arm-modes').addEventListener('click', function(e) {
+    const b = e.target.closest('[data-armmode]');
+    if (!b) return;
+    if (ARM.pts.length) { showToast('Habiskan atau undo ukuran ini dahulu'); return; }
+    ARM.mode = b.dataset.armmode;
+    ov.querySelectorAll('.arm-mode').forEach(function(x) { x.classList.toggle('on', x === b); });
+    paintBar(); paintHint();
+  });
 
   let session;
   try {
     session = await navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['hit-test'],
       optionalFeatures: ['dom-overlay'],
-      domOverlay: { root: overlay }
+      domOverlay: { root: ov }
     });
   } catch (e) {
-    overlay.remove();
+    ov.remove();
     if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
-    if (statusEl) { statusEl.className = 'ar-status warn'; statusEl.textContent = 'Could not start AR: ' + e.message; }
-    if (startBtn) { startBtn.disabled = false; startBtn.textContent = 'Start AR Measurement'; }
+    if (statusEl) { statusEl.className = 'ar-status warn'; statusEl.textContent = 'Tidak dapat memulakan AR: ' + e.message; }
+    if (startBtn) { startBtn.disabled = false; startBtn.textContent = 'Mula AR'; }
     return;
   }
-
-  exitBtn.addEventListener('click', function() { session.end(); });
+  ov.querySelector('#armExit').addEventListener('click', function() { session.end(); });
 
   await renderer.xr.setSession(session);
-
   const viewerSpace = await session.requestReferenceSpace('viewer');
   const localSpace = await session.requestReferenceSpace('local');
-  let hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
+  let hitSource = await session.requestHitTestSource({ space: viewerSpace });
 
   session.addEventListener('end', function() {
-    if (hitTestSource) { if (hitTestSource.cancel) hitTestSource.cancel(); hitTestSource = null; }
+    if (hitSource) { if (hitSource.cancel) hitSource.cancel(); hitSource = null; }
     renderer.setAnimationLoop(null);
     if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
     try { renderer.dispose(); } catch (e) {}
-    if (overlay && overlay.parentNode) overlay.remove();
-    if (typeof closeTool === 'function') closeTool();
-    if (_arLastResult && typeof showToast === 'function') showToast('AR distance: ' + _arLastResult);
+    if (ov && ov.parentNode) ov.remove();
+    clearLive();
+    // Keluar membawa awak ke senarai, bukan ke ketiadaan. Versi lama
+    // hanya melemparkan satu toast dan nombor itu hilang.
+    if (ARM.items.length) armScreenList(); else armScreenStart();
   });
 
-  const _mid = new THREE.Vector3();
-  renderer.setAnimationLoop(function(timestamp, frame) {
+  paintBar(); paintHint();
+  const _v = new THREE.Vector3();
+  renderer.setAnimationLoop(function(t, frame) {
     if (!frame) { renderer.render(scene, camera); return; }
-    if (hitTestSource) {
-      const results = frame.getHitTestResults(hitTestSource);
-      if (results.length > 0) {
-        const pose = results[0].getPose(localSpace);
-        if (pose) {
-          reticle.visible = points.length < 2;
-          reticle.matrix.fromArray(pose.transform.matrix);
-          if (points.length < 2) addBtn.disabled = false;
-        }
-      } else {
-        reticle.visible = false;
-        if (points.length < 2) addBtn.disabled = true;
-      }
+    if (hitSource) {
+      const hits = frame.getHitTestResults(hitSource);
+      if (hits.length) {
+        const pose = hits[0].getPose(localSpace);
+        if (pose) { reticle.visible = true; reticle.matrix.fromArray(pose.transform.matrix); }
+      } else reticle.visible = false;
     }
-    updateHint();
+    addBtn.disabled = !reticle.visible;
+    paintHint();
     renderer.render(scene, camera);
-    // float the distance label at the midpoint of the line (projected to screen)
-    if (points.length === 2) {
-      _mid.addVectors(points[0], points[1]).multiplyScalar(0.5).project(camera);
-      if (_mid.z < 1) {
-        labelEl.style.left = ((_mid.x * 0.5 + 0.5) * window.innerWidth) + 'px';
-        labelEl.style.top = ((-_mid.y * 0.5 + 0.5) * window.innerHeight) + 'px';
-        labelEl.style.display = 'block';
-      } else {
-        labelEl.style.display = 'none';
-      }
+    for (let i = 0; i < labels.length; i++) {
+      const L = labels[i];
+      _v.set(L.pt.x, L.pt.y, L.pt.z).project(camera);
+      if (_v.z < 1 && _v.x > -1.2 && _v.x < 1.2 && _v.y > -1.2 && _v.y < 1.2) {
+        L.el.style.left = ((_v.x * 0.5 + 0.5) * window.innerWidth) + 'px';
+        L.el.style.top = ((-_v.y * 0.5 + 0.5) * window.innerHeight) + 'px';
+        L.el.style.display = 'block';
+      } else L.el.style.display = 'none';
     }
   });
 }
@@ -29065,7 +29460,7 @@ try { msWire(); } catch (e) { console.warn('[Messages wire]', e.message); }
 
 
 // Console banner
-console.log('%cGoXpert Pocket v1.9', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v2.0', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
