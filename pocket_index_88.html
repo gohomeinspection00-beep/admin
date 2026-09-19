@@ -3729,6 +3729,7 @@ body.site-mode-active .voice-mode{
   background:var(--bg);
 }
 .site-mode.show{display:flex}
+.site-mode .site-top{display:none}
 
 /* Site Mode top bar */
 .site-top{
@@ -7891,6 +7892,285 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 }
 .cr2-mmin span{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
 
+/* =======================================================
+   SITE MODE DECK (sm-) — tampilan mudah untuk tapak
+   Semua kelas namanya bermula sm- supaya tidak berlanggar
+   dengan gaya lama .site-*, yang masih dipakai oleh bar atas.
+   ======================================================= */
+.sm-deck{
+  flex:1;min-height:0;overflow-y:auto;
+  background:var(--bg-2);
+  padding:12px 14px calc(14px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling:touch;
+}
+.sm-deck::-webkit-scrollbar{width:0}
+
+/* --- jalur konteks --- */
+.sm-ctx{
+  background:var(--bg);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:11px 12px;margin-bottom:12px;
+  box-shadow:var(--shadow-1);
+}
+.sm-ctx-top{display:flex;align-items:center;gap:9px}
+.sm-ctx-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--success);flex:none;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--success) 22%,transparent);
+}
+.sm-ctx-main{min-width:0;flex:1}
+.sm-ctx-name{
+  display:block;font-size:14.5px;font-weight:700;letter-spacing:-.02em;color:var(--fg);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sm-ctx-sub{
+  display:block;font-size:11px;color:var(--muted);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sm-ctx-swap{
+  flex:none;padding:7px 11px;border-radius:9px;border:1px solid var(--line-2);
+  background:var(--surface);font-size:11.5px;font-weight:700;color:var(--fg-2);
+}
+.sm-ctx-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.sm-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 9px;border-radius:8px;background:var(--surface);
+  font-size:11px;font-weight:600;color:var(--fg-dim);border:1px solid transparent;
+}
+.sm-chip.sm-chip-pick{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line)}
+.sm-chip.sm-chip-warn{background:var(--warning-soft);color:var(--warning)}
+.sm-chip.sm-chip-hot{background:var(--critical-soft);color:var(--critical)}
+.sm-chip-ico{flex:none;display:grid;place-items:center}
+
+/* --- grid alat --- */
+.sm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sm-tile{
+  position:relative;min-height:var(--sm-tile,78px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:10px 5px;border-radius:var(--radius-lg);
+  background:var(--bg);border:1px solid var(--line);
+  color:var(--fg);box-shadow:var(--shadow-1);
+  text-align:center;
+}
+.sm-tile:active{background:var(--surface)}
+.sm-tile-ico{color:var(--accent);flex:none;display:grid;place-items:center}
+.sm-tile-lbl{
+  font-size:var(--sm-lbl,11.5px);font-weight:650;line-height:1.2;letter-spacing:-.01em;
+  overflow-wrap:anywhere;
+}
+.sm-tile.sm-hot .sm-tile-ico{color:var(--critical)}
+.sm-tile-badge{
+  position:absolute;top:6px;right:6px;min-width:18px;height:18px;padding:0 5px;
+  border-radius:9px;background:var(--accent);color:var(--accent-fg);
+  font-family:var(--font-mono);font-size:10px;font-weight:700;
+  display:grid;place-items:center;
+}
+.sm-tile-badge.sm-badge-warn{background:var(--warning);color:#fff}
+.sm-tile-badge.sm-badge-hot{background:var(--critical);color:#fff}
+
+/* --- jalur baru ditangkap --- */
+.sm-shots{margin-bottom:12px}
+.sm-shots-head{
+  display:flex;align-items:baseline;gap:8px;margin:0 2px 7px;
+}
+.sm-shots-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sm-shots-more{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--accent)}
+.sm-shots-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.sm-shots-strip::-webkit-scrollbar{height:0}
+.sm-shot{
+  position:relative;flex:none;width:64px;height:64px;border-radius:11px;overflow:hidden;
+  background:var(--surface);border:1px solid var(--line);
+}
+.sm-shot-img{width:100%;height:100%;object-fit:cover;display:block}
+.sm-shot-tag{
+  position:absolute;left:0;right:0;bottom:0;padding:2px 4px;
+  background:linear-gradient(transparent,rgba(0,0,0,.72));
+  color:#fff;font-family:var(--font-mono);font-size:9px;font-weight:700;text-align:left;
+}
+.sm-shot-warn{
+  position:absolute;top:3px;right:3px;width:14px;height:14px;border-radius:50%;
+  background:var(--warning);color:#fff;display:grid;place-items:center;font-size:9px;font-weight:800;
+}
+
+/* --- baris tetapan pada skrin --- */
+.sm-rows{display:flex;flex-direction:column;gap:7px}
+.sm-row{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:11px 12px;border-radius:var(--radius-lg);
+  background:var(--bg);border:1px solid var(--line);text-align:left;color:var(--fg);
+}
+.sm-row-ico{flex:none;color:var(--muted);display:grid;place-items:center}
+.sm-row-txt{min-width:0;flex:1}
+.sm-row-name{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+.sm-row-sub{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.sm-row-end{flex:none;font-size:11.5px;font-weight:700;color:var(--accent)}
+.sm-sw{flex:none;width:44px;height:26px;border-radius:999px;background:var(--surface-2);position:relative;border:none}
+.sm-sw-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:var(--shadow-1);transition:transform .18s}
+.sm-sw.on{background:var(--success)}
+.sm-sw.on .sm-sw-knob{transform:translateX(18px)}
+
+/* --- bar bawah: Capture + tahan-untuk-cakap --- */
+.sm-bar{
+  flex:none;display:flex;gap:10px;align-items:center;
+  padding:10px 14px calc(12px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:var(--bg);
+}
+.sm-cap{
+  flex:1;height:62px;border-radius:18px;background:var(--accent);color:var(--accent-fg);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  font-size:16px;font-weight:800;letter-spacing:-.02em;
+  box-shadow:0 5px 16px color-mix(in srgb,var(--accent) 32%,transparent);
+}
+.sm-cap:active{transform:scale(.985)}
+.sm-cap.sm-off{background:var(--surface-2);color:var(--muted);box-shadow:none}
+.sm-talk{
+  flex:none;width:62px;height:62px;border-radius:18px;
+  border:1.5px solid var(--line-2);background:var(--bg);color:var(--fg-2);
+  display:grid;place-items:center;touch-action:none;
+}
+.sm-talk.sm-live{
+  background:var(--critical);border-color:var(--critical);color:#fff;
+  animation:smPulse 1.3s infinite;
+}
+@keyframes smPulse{
+  0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--critical) 45%,transparent)}
+  70%{box-shadow:0 0 0 18px transparent}
+  100%{box-shadow:0 0 0 0 transparent}
+}
+
+/* --- mod cahaya matahari: token sahaja, susun atur tak berubah --- */
+.site-mode.sm-sun{--sm-tile:88px;--sm-lbl:13px}
+.site-mode.sm-sun .sm-deck{background:#fff}
+.site-mode.sm-sun .sm-tile{background:#fff;border:2px solid #000;box-shadow:none;color:#000}
+.site-mode.sm-sun .sm-tile-ico{color:#000}
+.site-mode.sm-sun .sm-tile-lbl{font-weight:800}
+.site-mode.sm-sun .sm-ctx,
+.site-mode.sm-sun .sm-row{background:#fff;border:2px solid #000;color:#000;box-shadow:none}
+.site-mode.sm-sun .sm-ctx-name,
+.site-mode.sm-sun .sm-row-name{color:#000}
+.site-mode.sm-sun .sm-ctx-sub,
+.site-mode.sm-sun .sm-row-sub{color:#333}
+.site-mode.sm-sun .sm-cap{background:#08307f;color:#fff}
+.site-mode.sm-sun .sm-bar{background:#fff;border-top:2px solid #000}
+.site-mode.sm-sun .sm-talk{background:#fff;border:2px solid #000;color:#000}
+
+/* --- helaian penuh dalam Site Mode (customise / cakap) --- */
+.sm-sheet{
+  position:fixed;inset:0;z-index:260;display:none;flex-direction:column;
+  background:var(--bg);color:var(--fg);
+}
+.sm-sheet.on{display:flex}
+.sm-sheet-top{
+  flex:none;display:flex;align-items:center;gap:10px;
+  padding:calc(12px + env(safe-area-inset-top)) 14px 11px;
+  border-bottom:1px solid var(--line);
+}
+.sm-sheet-back{
+  width:32px;height:32px;border-radius:10px;background:var(--surface);
+  display:grid;place-items:center;flex:none;color:var(--fg-2);border:none;
+}
+.sm-sheet-ttl{min-width:0;flex:1}
+.sm-sheet-name{display:block;font-size:15px;font-weight:800;letter-spacing:-.025em}
+.sm-sheet-sub{display:block;font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm-sheet-body{flex:1;min-height:0;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
+.sm-sheet-body::-webkit-scrollbar{width:0}
+
+.sm-sec{display:flex;align-items:center;gap:8px;margin:16px 2px 9px}
+.sm-sec:first-child{margin-top:2px}
+.sm-sec-lbl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.sm-sec-rule{flex:1;height:1px;background:var(--line)}
+
+.sm-presets{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.sm-preset{
+  padding:11px;border-radius:var(--radius-lg);border:1.5px solid var(--line);
+  background:var(--bg);text-align:left;color:var(--fg);
+}
+.sm-preset.on{border-color:var(--accent);background:var(--accent-soft)}
+.sm-preset-name{display:block;font-size:13px;font-weight:700;letter-spacing:-.015em}
+.sm-preset-sub{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.sm-preset.on .sm-preset-sub{color:var(--accent)}
+
+.sm-pick{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:6px;
+  border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg);
+}
+.sm-pick.off{opacity:.55}
+.sm-pick-ico{flex:none;color:var(--accent);display:grid;place-items:center}
+.sm-pick-txt{min-width:0;flex:1}
+.sm-pick-name{display:block;font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+.sm-pick-sub{display:block;font-size:11px;color:var(--muted);margin-top:1px;line-height:1.35}
+.sm-pick-move{display:flex;flex-direction:column;gap:2px;flex:none}
+.sm-mv{
+  width:28px;height:21px;border-radius:6px;background:var(--surface);
+  display:grid;place-items:center;color:var(--fg-2);border:none;
+}
+.sm-mv:disabled{opacity:.3}
+
+/* --- skrin cakap --- */
+.sm-talk-modes{flex:none;display:flex;gap:6px;padding:12px 14px 0}
+.sm-tm{
+  flex:1;padding:11px 8px;border-radius:var(--radius-lg);border:1.5px solid var(--line);
+  background:var(--bg-2);color:var(--fg-dim);
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.sm-tm.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.sm-tm-txt{text-align:left}
+.sm-tm-name{display:block;font-size:13px;font-weight:700}
+.sm-tm-sub{display:block;font-size:9.5px;font-weight:600;opacity:.8;margin-top:1px}
+
+.sm-live-txt{padding:18px 14px;text-align:center;font-size:17px;font-weight:600;line-height:1.5;min-height:80px}
+.sm-live-dim{color:var(--muted-2)}
+.sm-hint{text-align:center;padding:14px 10px 4px;color:var(--muted);font-size:13px;line-height:1.55}
+.sm-hint-b{color:var(--fg);font-weight:700}
+
+.sm-bub{border-radius:16px;padding:12px 13px;margin-bottom:9px;font-size:14px;line-height:1.55}
+.sm-bub-me{background:var(--accent);color:var(--accent-fg);margin-left:34px;border-bottom-right-radius:5px}
+.sm-bub-ai{background:var(--bg-2);border:1px solid var(--line);margin-right:22px;border-bottom-left-radius:5px;width:100%;text-align:left;color:var(--fg)}
+.sm-bub-who{
+  display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:6px;font-weight:700;
+}
+.sm-bub-spk{margin-left:auto;font-size:9.5px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600}
+.sm-bub-err{border-color:var(--critical);background:var(--critical-soft)}
+
+.sm-acts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.sm-act{
+  padding:8px 11px;border-radius:10px;border:1px solid var(--line);background:var(--bg);
+  font-size:12px;font-weight:700;color:var(--fg-2);display:flex;align-items:center;gap:6px;
+}
+.sm-act.sm-act-p{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+
+.sm-draft{border:1.5px solid var(--accent);border-radius:16px;background:var(--accent-soft);padding:12px;margin-bottom:11px}
+.sm-draft-h{display:flex;align-items:center;gap:8px;margin-bottom:9px;color:var(--accent)}
+.sm-draft-t{font-size:13.5px;font-weight:800;letter-spacing:-.02em}
+.sm-draft-no{margin-left:auto;font-family:var(--font-mono);font-size:10px;font-weight:700}
+.sm-kv{display:flex;gap:9px;padding:5px 0;font-size:13px;align-items:baseline}
+.sm-kv-k{flex:none;width:72px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.sm-kv-v{min-width:0;flex:1;color:var(--fg)}
+.sm-draft-act{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.sm-da{padding:12px;border-radius:12px;font-size:13px;font-weight:700;text-align:center;border:none}
+.sm-da-y{background:var(--accent);color:var(--accent-fg)}
+.sm-da-n{background:var(--bg);border:1px solid var(--line-2);color:var(--fg-2)}
+
+.sm-wave{display:flex;align-items:center;justify-content:center;gap:3px;height:20px}
+.sm-wave-b{width:3px;border-radius:2px;background:currentColor;animation:smWv .9s infinite ease-in-out}
+@keyframes smWv{0%,100%{height:5px}50%{height:18px}}
+
+/* --- pil kembali bila Site Mode diletak tepi --- */
+.sm-park{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(74px + env(safe-area-inset-bottom));
+  z-index:390;display:none;align-items:center;gap:8px;
+  padding:9px 15px;border-radius:999px;
+  background:var(--accent);color:var(--accent-fg);border:none;
+  font-size:12.5px;font-weight:700;box-shadow:var(--shadow-3);
+}
+.sm-park.on{display:flex}
+
+.sm-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:8px 2px 0}
+.sm-empty{text-align:center;padding:26px 16px;color:var(--muted);font-size:13px;line-height:1.55}
+@media (prefers-reduced-motion:reduce){
+  .sm-talk.sm-live,.sm-wave-b{animation:none}
+}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -8417,7 +8697,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.6 · build 19 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.7 · build 19 Sep 2026 · Site Mode deck + Ask Pocket</div>
           </div>
         </div>
         
@@ -8448,7 +8728,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.6</span>
+      <span class="chat-build" title="Build">v1.7</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -8680,69 +8960,47 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
     <button class="site-exit-btn" id="siteExitBtn">Exit</button>
   </div>
   
-  <!-- Body — captures list, empty state, or choose-inspection CTA -->
-  <div class="site-body" id="siteBody">
-    
-    <!-- New: Choose Inspection CTA (shown when no active inspection) -->
-    <div class="site-choose-cta" id="siteChooseCta" style="display:none">
-      <div class="site-choose-cta-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <h2 class="site-choose-cta-title">Pilih <em>inspection</em> untuk mula</h2>
-      <p class="site-choose-cta-desc">Pilih inspection sedia ada atau buat baru untuk mula capture defect.</p>
-      <button class="site-choose-cta-btn" id="siteChooseInspBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        Choose Inspection
-      </button>
-      <div class="site-choose-cta-or">OR</div>
-      <button class="site-choose-cta-new" id="siteChooseNewBtn">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New inspection
-      </button>
-    </div>
-    
-    <div class="site-empty" id="siteEmpty">
-      <div class="site-empty-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </div>
-      <h2 class="site-empty-title">Ready to <em>inspect</em>.</h2>
-      <p class="site-empty-desc">Tap Capture to start documenting defects. Each photo gets timestamped and added to this inspection.</p>
-    </div>
-    
-    <div id="capturesContainer" style="display:none">
-      <div class="captures-header">
-        <div class="captures-count">Today's <em>captures</em></div>
-        <div class="captures-meta" id="capturesMeta">0 entries</div>
-      </div>
-      <div class="captures-list" id="capturesList"></div>
-    </div>
-  </div>
-  
-  <!-- Bottom 3-action bar -->
-  <div class="site-actions">
-    <button class="site-action primary" id="siteCaptureBtn">
-      <div class="site-action-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </div>
-      <div class="site-action-label">Capture</div>
+  <!-- Deck — jalur konteks, grid alat, tangkapan terbaru, tetapan skrin -->
+  <div class="sm-deck" id="smDeck"></div>
+
+  <!-- Bar bawah: Capture + tahan-untuk-cakap -->
+  <div class="sm-bar">
+    <button class="sm-cap" id="smCapBtn">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span id="smCapLbl">Capture</span>
     </button>
-    <button class="site-action" id="siteVoiceBtn">
-      <div class="site-action-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-      </div>
-      <div class="site-action-label">Voice</div>
-    </button>
-    <button class="site-action" id="siteEndBtn">
-      <div class="site-action-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-      </div>
-      <div class="site-action-label">End</div>
+    <button class="sm-talk" id="smTalkBtn" aria-label="Tahan untuk bercakap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>
     </button>
   </div>
-  
+
   <!-- Hidden file input for camera -->
   <input type="file" id="siteCaptureInput" accept="image/*" capture="environment" style="display:none">
 </div>
+
+<!-- Helaian Site Mode: pilih alat, atau bercakap -->
+<div class="sm-sheet" id="smSheet">
+  <div class="sm-sheet-top">
+    <button class="sm-sheet-back" id="smSheetBack" aria-label="Back">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="sm-sheet-ttl">
+      <span class="sm-sheet-name" id="smSheetName">Site Mode</span>
+      <span class="sm-sheet-sub" id="smSheetSub"></span>
+    </div>
+    <button class="sm-ctx-swap" id="smSheetAct" style="display:none"></button>
+  </div>
+  <div class="sm-sheet-body" id="smSheetBody"></div>
+  <div class="sm-bar" id="smSheetFoot" style="display:none">
+    <button class="sm-cap" id="smMic"><span id="smMicIn"></span></button>
+  </div>
+</div>
+
+<!-- Pil kembali bila Site Mode diletak tepi -->
+<button class="sm-park" id="smPark">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/></svg>
+  Back to Site Mode
+</button>
 
 <!-- ============ CAPTURE DETAIL ============ -->
 <div class="capture-detail" id="captureDetail">
@@ -20303,10 +20561,6 @@ let siteEditingCaptureId = null;
 const siteMode = document.getElementById('siteMode');
 const siteBanner = document.getElementById('siteBanner');
 const siteBody = document.getElementById('siteBody');
-const siteEmpty = document.getElementById('siteEmpty');
-const capturesContainer = document.getElementById('capturesContainer');
-const capturesList = document.getElementById('capturesList');
-const capturesMeta = document.getElementById('capturesMeta');
 const siteSessionMeta = document.getElementById('siteSessionMeta');
 const siteCaptureInput = document.getElementById('siteCaptureInput');
 const captureDetail = document.getElementById('captureDetail');
@@ -20343,113 +20597,27 @@ function enterSiteMode() {
     } catch (e) { console.warn('[SiteMode] resume failed', e.message); }
   }
   
-  // Update UI — will show CTA empty state since no active inspection
-  updateSiteModeBodyForInspection();
   updateSiteModeTopBar();
-  showToast('Pilih inspection untuk mula');
+  if (typeof smBoot === 'function') smBoot();
+  showToast('Pilih job untuk mula');
 }
 
 // =======================================================
 // Update Site Mode body based on active inspection state
 // =======================================================
-async function updateSiteModeBodyForInspection() {
-  const chooseCta = document.getElementById('siteChooseCta');
-  const empty = document.getElementById('siteEmpty');
-  const capturesContainer = document.getElementById('capturesContainer');
-  const captureBtn = document.getElementById('siteCaptureBtn');
-  const siteTop = document.querySelector('.site-top');
-  
-  if (!activeInspectionId) {
-    // No active inspection — show CTA, disable Capture
-    chooseCta.style.display = 'flex';
-    empty.style.display = 'none';
-    capturesContainer.style.display = 'none';
-    captureBtn.classList.add('disabled');
-    if (siteTop) siteTop.classList.add('no-inspection');
-    return;
-  }
-  
-  // Active inspection — hide CTA, enable Capture
-  chooseCta.style.display = 'none';
-  captureBtn.classList.remove('disabled');
-  if (siteTop) siteTop.classList.remove('no-inspection');
-  
-  // Show loading first
-  empty.style.display = 'flex';
-  empty.innerHTML = '<div class="site-empty-icon"><div class="cd-ai-spinner" style="width:24px;height:24px;border-width:3px"></div></div>' +
-    '<h2 class="site-empty-title">Loading <em>photos</em>...</h2>';
-  capturesContainer.style.display = 'none';
-  
-  // Load photos from Firestore inspection
-  let inspectionPhotos = [];
-  try {
-    inspectionPhotos = await loadInspectionPhotos(activeInspectionId);
-  } catch (e) {
-    console.warn('[Load inspection photos]', e.message);
-  }
-  
-  // Restore empty state HTML (in case user navigates back without photos)
-  empty.innerHTML = 
-    '<div class="site-empty-icon">' +
-      '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
-    '</div>' +
-    '<h2 class="site-empty-title">Ready to <em>inspect</em>.</h2>' +
-    '<p class="site-empty-desc">Tap Capture to start documenting defects. Each photo gets timestamped and added to this inspection.</p>';
-  
-  // Merge Firestore photos with local session captures (avoid duplicates)
-  if (!siteSession) {
-    siteSession = {
-      id: 'site_' + Date.now(),
-      startedAt: new Date(),
-      captures: []
-    };
-  }
-  
-  // Get firestoreIds already in session (to avoid duplicates)
-  const existingFirestoreIds = new Set(
-    siteSession.captures
-      .filter(function(c) { return c.firestoreId && c.inspectionId === activeInspectionId; })
-      .map(function(c) { return c.firestoreId; })
-  );
-  
-  // Add Firestore photos NOT already in session
-  inspectionPhotos.forEach(function(ph) {
-    if (existingFirestoreIds.has(ph.id)) return; // already loaded
-    
-    siteSession.captures.push({
-      id: 'cap_loaded_' + ph.id,
-      firestoreId: ph.id,
-      inspectionId: activeInspectionId,
-      image: ph.image,
-      location: ph.location || '',
-      note: ph.remarks || '',
-      gps: ph.gps || null,
-      timestamp: ph.timestamp,
-      condition: ph.condition || null,
-      priority: ph.priority || null,
-      baris: ph.baris || null,
-      defectType: ph.defectType || null,
-      aiStatus: ph.aiStatus || null,
-      aiAnalysis: ph.aiAnalysis || null
-    });
-  });
-  
-  // Now filter and render
-  const inspCaptures = siteSession.captures.filter(function(c) {
-    return c.inspectionId === activeInspectionId;
-  });
-  
-  if (inspCaptures.length === 0) {
-    empty.style.display = 'flex';
-    capturesContainer.style.display = 'none';
-  } else {
-    empty.style.display = 'none';
-    capturesContainer.style.display = 'block';
-    renderCaptures();
-  }
+
+
+// Deck baharu yang melukis Site Mode. Nama lama dikekalkan kerana
+// banyak tempat lain masih memanggilnya selepas inspection bertukar.
+function updateSiteModeBodyForInspection() {
+  // Inspection bertukar: muatkan ruang dan finding baharu sebelum melukis.
+  if (typeof smSyncInsp === 'function') smSyncInsp().then(function() { smRender(); });
+  else if (typeof smRender === 'function') smRender();
 }
+function renderCaptures() { if (typeof smRender === 'function') smRender(); }
 
 function exitSiteMode() {
+  if (typeof smShutdown === 'function') smShutdown();
   document.body.classList.remove('site-mode-active');
   siteMode.classList.remove('show');
   showToast('Back to office mode');
@@ -20512,105 +20680,7 @@ function persistSession() {
   }
 }
 
-function renderCaptures() {
-  if (!siteSession) return;
-  
-  // Filter by active inspection only
-  const inspCaptures = activeInspectionId ?
-    siteSession.captures.filter(function(c) { return c.inspectionId === activeInspectionId; }) :
-    [];
-  
-  const count = inspCaptures.length;
-  
-  // Update top bar meta with active inspection photo count
-  if (activeInspectionId) {
-    const insp = inspections.find(function(i) { return i.id === activeInspectionId; });
-    const totalCount = insp ? (insp.photoCount || count) : count;
-    siteSessionMeta.textContent = totalCount + ' photo' + (totalCount !== 1 ? 's' : '') + ' · tap to switch';
-  }
-  
-  if (count === 0) {
-    siteEmpty.style.display = 'flex';
-    capturesContainer.style.display = 'none';
-    return;
-  }
-  
-  siteEmpty.style.display = 'none';
-  capturesContainer.style.display = 'block';
-  capturesMeta.textContent = count + ' entries';
-  
-  // Render list (newest first)
-  const sorted = inspCaptures.slice().reverse();
-  let html = '';
-  sorted.forEach(function(cap, idx) {
-    const num = String(inspCaptures.length - idx).padStart(2, '0');
-    const time = cap.timestamp.toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' });
-    const dateLabel = cap.timestamp.toDateString() === new Date().toDateString() ?
-      'Today · ' + time : cap.timestamp.toLocaleDateString() + ' · ' + time;
-    
-    // BARIS score chip (Condition × Priority result)
-    let barisChip = '';
-    // Migrate old B-level if needed (display only — actual data migrates on detail open)
-    let displayScore = null;
-    let displayRating = null;
-    if (typeof cap.baris === 'number') {
-      displayScore = cap.baris;
-      displayRating = getBarisRating(cap.baris);
-    } else if (typeof cap.baris === 'string' && cap.baris.startsWith('B')) {
-      const m = migrateBLevel(cap.baris);
-      if (m) {
-        displayScore = calcBarisScore(m.condition, m.priority);
-        displayRating = getBarisRating(displayScore);
-      }
-    } else if (cap.condition && cap.priority) {
-      displayScore = calcBarisScore(cap.condition, cap.priority);
-      displayRating = getBarisRating(displayScore);
-    }
-    if (displayScore && displayRating) {
-      barisChip = '<span class="capture-row-score ' + displayRating + '">' + displayScore + '</span>';
-    }
-    
-    const locHtml = cap.location ?
-      '<div class="capture-loc">' + barisChip + escapeHTML(cap.location) + '</div>' :
-      '<div class="capture-loc-empty">' + barisChip + 'Untitled location</div>';
-    const noteHtml = cap.note ?
-      '<div class="capture-note">' + escapeHTML(cap.note) + '</div>' :
-      '<div class="capture-note" style="color:var(--muted);font-style:italic">No notes</div>';
-    const gpsHtml = cap.gps ?
-      '<div class="capture-gps"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
-      cap.gps.lat.toFixed(4) + ', ' + cap.gps.lng.toFixed(4) + '</div>' : '';
-    
-    // AI badge
-    let aiBadge = '';
-    if (cap.aiStatus === 'processing') {
-      aiBadge = '<div class="capture-thumb-ai-badge processing" title="Analysing">AI</div>';
-    } else if (cap.aiStatus === 'done') {
-      aiBadge = '<div class="capture-thumb-ai-badge" title="AI analysed">✓</div>';
-    }
-    
-    html += '<button class="capture-item" data-id="' + cap.id + '">' +
-      '<div class="capture-thumb">' +
-        '<img src="' + cap.image + '" alt="">' +
-        '<div class="capture-thumb-num">#' + num + '</div>' +
-        aiBadge +
-      '</div>' +
-      '<div class="capture-info">' +
-        locHtml +
-        '<div class="capture-time">' + dateLabel + '</div>' +
-        noteHtml +
-        gpsHtml +
-      '</div>' +
-    '</button>';
-  });
-  capturesList.innerHTML = html;
-  
-  // Wire up clicks
-  capturesList.querySelectorAll('.capture-item').forEach(function(el) {
-    el.addEventListener('click', function() {
-      openCaptureDetail(el.dataset.id);
-    });
-  });
-}
+
 
 // ===== Capture flow =====
 async function getGPS() {
@@ -20639,85 +20709,9 @@ async function getGPS() {
   });
 }
 
-document.getElementById('siteCaptureBtn').addEventListener('click', function() {
-  // If no active inspection, prompt to select/create
-  if (!activeInspectionId) {
-    siteSheetCallback = 'capture';
-    openInspSheet();
-    return;
-  }
-  // Active inspection exists — trigger camera
-  siteCaptureInput.click();
-});
 
-siteCaptureInput.addEventListener('change', async function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  e.target.value = '';
-  
-  showToast('Processing capture...');
-  
-  // Resize image
-  const resized = await resizeImage(file, 1200);
-  
-  // Try GPS in parallel (don't block)
-  const gpsPromise = getGPS();
-  
-  // Create capture entry
-  const capture = {
-    id: 'cap_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-    image: resized,
-    location: '',
-    note: '',
-    gps: null,
-    timestamp: new Date(),
-    baris: null,
-    defectType: null,
-    aiStatus: null,
-    aiAnalysis: null,
-    inspectionId: activeInspectionId  // tag with inspection
-  };
-  
-  if (!siteSession) {
-    siteSession = {
-      id: 'site_' + Date.now(),
-      startedAt: new Date(),
-      captures: []
-    };
-  }
-  siteSession.captures.push(capture);
-  
-  // Wait for GPS (max 6s)
-  const gps = await gpsPromise;
-  if (gps) capture.gps = gps;
-  
-  persistSession();
-  renderCaptures();
-  
-  // Save to Inspection in Firestore (background)
-  if (activeInspectionId) {
-    savePhotoToInspection({
-      image: capture.image,
-      location: '',
-      remarks: '',
-      gps: capture.gps,
-      baris: null,
-      defectType: null,
-      aiStatus: null,
-      aiAnalysis: null
-    }).then(function(photoId) {
-      if (photoId) {
-        capture.firestoreId = photoId;
-        persistSession();
-      }
-    });
-  }
-  
-  // Open detail to fill in info
-  openCaptureDetail(capture.id);
-  
-  // AI analysis no longer auto-triggered — user clicks "Analyse with AI" button manually
-});
+
+
 
 // =======================================================
 // AI AUTO-CLASSIFY
@@ -21448,22 +21442,11 @@ document.getElementById('captureAskBtn').addEventListener('click', function() {
   }, 200);
 });
 
-// ===== Voice button =====
-document.getElementById('siteVoiceBtn').addEventListener('click', function() {
-  // Switch to voice mode but stay in Site Mode visually (overlay)
-  // Simpler: exit site mode and go to voice
-  exitSiteMode();
-  switchTab('voice');
-});
-
-// ===== End session button =====
-document.getElementById('siteEndBtn').addEventListener('click', endSession);
 
 // ===== Banner trigger =====
 if (siteBanner) siteBanner.addEventListener('click', enterSiteMode);
 
-// ===== Exit button =====
-document.getElementById('siteExitBtn').addEventListener('click', exitSiteMode);
+
 
 
 
@@ -26816,8 +26799,1181 @@ function ipOpenTab() {
 
 try { ipWire(); } catch (e) { console.warn('[Inspection wire]', e.message); }
 
+// =======================================================
+// SITE MODE DECK (SM) — tampilan mudah untuk kerja tapak
+// =======================================================
+// Site Mode ialah pembantu, bukan tempat kerja penuh. Di tapak tiada
+// masa membuka banyak skrin, jadi deck ini hanya dua benda: satu grid
+// alat yang surveyor sendiri pilih, dan satu bar bawah yang sentiasa
+// ada — Capture dan tahan-untuk-bercakap.
+//
+// Yang penting: Capture di sini menulis terus ke koleksi `findings`,
+// sama seperti borang Inspection. Versi lama menulis ke `photos`, dan
+// laporan PDF tidak pernah membacanya. smImportLegacy() membawa masuk
+// tangkapan lama itu.
+
+const SM_KEY = 'pocket_sitemode_v1';
+
+const SM_I = {
+  cam:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+  plan:'<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9.5h18M9.5 9.5V21"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+  scan:'<path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16"/><circle cx="12" cy="12" r="3.2"/>',
+  ruler:'<path d="M4 20 20 4"/><path d="M7 12.5 9.5 15M11 8.5 13.5 11M15 4.5 17.5 7"/>',
+  count:'<path d="M5 4v16M9.5 4v16M14 4v16M18.5 4v16"/><path d="M3 14.5 21 9"/>',
+  lib:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  sos:'<path d="M12 2.6 3 6.4v5.3c0 5 3.8 9.3 9 10.4 5.2-1.1 9-5.4 9-10.4V6.4z"/><path d="M12 8.6v4M12 15.8h.01"/>',
+  task:'<path d="M9 11.5 11.5 14 16 9"/><rect x="3.5" y="3.5" width="17" height="17" rx="3"/>',
+  baris:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  level:'<rect x="2" y="9" width="20" height="6" rx="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><path d="M9 9v6M15 9v6"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 13.9 13.9 8.2 15.8 10.1 10.1z"/>',
+  qty:'<circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/>',
+  calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4"/>',
+  ai:'<rect x="4" y="7" width="16" height="13" rx="3"/><path d="M9 3h6M9 12h.01M15 12h.01M9 16h6M2 12v3M22 12v3"/>',
+  trans:'<path d="M12 18.5a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v8.5a3 3 0 0 0 3 3z"/><path d="M5.5 13v2.5a6.5 6.5 0 0 0 13 0V13M12 22v-1.5"/>',
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/>',
+  sun:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/>',
+  grid:'<rect x="3" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"/>',
+  imp:'<path d="M12 3v12M7.5 10.5 12 15l4.5-4.5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+  spk:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  up:'<path d="M18 15l-6-6-6 6"/>', dn:'<path d="M6 9l6 6 6-6"/>',
+  q:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 1 1 3.4 2.5c-.6.2-.9.8-.9 1.4v.4M12 17h.01"/>',
+  note:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+  chk:'<path d="M4.5 12.5 9.5 17.5 19.5 7"/>'
+};
+function smSvg(k, sz) {
+  return '<svg width="' + (sz || 24) + '" height="' + (sz || 24) + '" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + (SM_I[k] || '') + '</svg>';
+}
+function smEsc(s) { return (typeof escapeHTML === 'function') ? escapeHTML(s == null ? '' : s) : String(s == null ? '' : s); }
+
+// Alat yang boleh muncul pada deck. `run` ialah apa yang benar-benar
+// berlaku — kebanyakannya alat sedia ada yang sudah wujud dalam app.
+const SM_TOOLS = [
+  { k:'plan',    n:'Floor plan',  d:'Pelan kerja ini, dengan pinnya',      i:'plan',    run:function(){ smGoInsp('plan'); } },
+  { k:'finds',   n:'Findings',    d:'Apa yang sudah direkod',              i:'list',    run:function(){ smGoInsp('hub'); } },
+  { k:'scan',    n:'Defect Scan', d:'AI membaca gambar',                   i:'scan',    run:function(){ smTool('defect'); } },
+  { k:'crack',   n:'Crack Ruler', d:'Lebar retak daripada gambar',         i:'ruler',   run:function(){ smTool('crackruler'); } },
+  { k:'tally',   n:'Tally',       d:'Kira sambil berjalan',                i:'count',   run:function(){ smTool('counter'); } },
+  { k:'lib',     n:'Library',     d:'UBBL, standard, fail awak',           i:'lib',     run:function(){ smPark(function(){ switchTab('library'); }); } },
+  { k:'sos',     n:'Site safety', d:'Check-in dan butang kecemasan',       i:'sos',     hot:true, run:function(){ if (typeof sosOpen === 'function') sosOpen(); else showToast('SOS is not available'); } },
+  { k:'tasks',   n:'Tasks',       d:'Apa yang perlu siap hari ini',        i:'task',    run:function(){ if (typeof tkOpenScreen === 'function') tkOpenScreen(); else showToast('Tasks is not available'); } },
+  { k:'ai',      n:'Ask Pocket',  d:'Tahan, cakap, ia jawab kuat',         i:'ai',      run:function(){ smTalkOpen('ask'); } },
+  { k:'baris',   n:'BARIS Rater', d:'Nilai defect pada matriks',           i:'baris',   run:function(){ smTool('baris'); } },
+  { k:'level',   n:'Spirit Level',d:'Tegak dan rata',                      i:'level',   run:function(){ smTool('spirit'); } },
+  { k:'compass', n:'Compass',     d:'Arah dan bearing',                    i:'compass', run:function(){ smTool('compass'); } },
+  { k:'qty',     n:'Quantity',    d:'Kira rebar daripada gambar',          i:'qty',     run:function(){ smTool('quantity'); } },
+  { k:'calc',    n:'Calculator',  d:'Kiraan tapak dan saintifik',          i:'calc',    run:function(){ smTool('converter'); } },
+  { k:'trans',   n:'Translator',  d:'Bercakap dengan pekerja',             i:'trans',   run:function(){ smTool('voicetranslate'); } }
+];
+const SM_DEFAULT = ['plan','finds','scan','crack','tally','lib','sos','ai'];
+const SM_PRESETS = {
+  survey:   { n:'Survey',        d:'Condition assessment penuh',  ks:['plan','finds','scan','crack','tally','lib','sos','ai','baris'] },
+  snag:     { n:'Snagging',      d:'Defect liability, handover',  ks:['plan','finds','tally','tasks','sos','ai'] },
+  progress: { n:'Progress',      d:'Lawatan kemajuan tapak',      ks:['finds','qty','tally','calc','sos','ai','trans'] },
+  audit:    { n:'Safety audit',  d:'Pemeriksaan keselamatan',     ks:['finds','baris','level','compass','lib','sos','ai'] }
+};
+
+let SM = {
+  on: {}, order: [], sun: false, awake: true, keepSpace: true, lang: 'ms-MY',
+  speak: true, keepListening: false,
+  parked: false, spaceId: null, t0: null, gps: null, batt: null,
+  sheet: null, talkMode: 'ask', talkBusy: false, turns: [], draft: null,
+  legacyN: null, shots: []
+};
+let _smWake = null, _smGeo = null, _smClock = null, _smRecog = null, _smHeard = '', _smHolding = false;
+let _smRec = null, _smRecChunks = null;
+
+function smSave() {
+  try {
+    localStorage.setItem(SM_KEY, JSON.stringify({
+      on: SM.on, order: SM.order, sun: SM.sun, awake: SM.awake,
+      keepSpace: SM.keepSpace, lang: SM.lang, speak: SM.speak,
+      keepListening: SM.keepListening, spaceId: SM.keepSpace ? SM.spaceId : null
+    }));
+  } catch (e) {}
+}
+function smLoad() {
+  SM.order = SM_TOOLS.map(function(t) { return t.k; });
+  SM_TOOLS.forEach(function(t) { SM.on[t.k] = SM_DEFAULT.indexOf(t.k) !== -1; });
+  let raw = null;
+  try { raw = JSON.parse(localStorage.getItem(SM_KEY) || 'null'); } catch (e) {}
+  if (!raw) return;
+  if (raw.on) SM_TOOLS.forEach(function(t) { if (typeof raw.on[t.k] === 'boolean') SM.on[t.k] = raw.on[t.k]; });
+  if (Array.isArray(raw.order)) {
+    // Alat baharu yang ditambah selepas pengguna menyimpan susunannya
+    // mesti tetap muncul, jadi yang tiada dalam simpanan disambung di hujung.
+    const keep = raw.order.filter(function(k) { return SM_TOOLS.some(function(t) { return t.k === k; }); });
+    SM_TOOLS.forEach(function(t) { if (keep.indexOf(t.k) === -1) keep.push(t.k); });
+    SM.order = keep;
+  }
+  ['sun','awake','keepSpace','speak','keepListening'].forEach(function(k) {
+    if (typeof raw[k] === 'boolean') SM[k] = raw[k];
+  });
+  if (raw.lang) SM.lang = raw.lang;
+  if (raw.spaceId) SM.spaceId = raw.spaceId;
+}
+function smTool(id) { if (typeof openTool === 'function') openTool(id); else showToast('Tool not available'); }
+function smChosen() { return SM.order.filter(function(k) { return SM.on[k]; }); }
+function smToolOf(k) { return SM_TOOLS.filter(function(t) { return t.k === k; })[0]; }
+
+// ---------- konteks: skrin hidup, GPS, jam, bateri ----------
+async function smWakeOn() {
+  if (!SM.awake || _smWake) return;
+  try { if ('wakeLock' in navigator) { _smWake = await navigator.wakeLock.request('screen'); _smWake.addEventListener('release', function() { _smWake = null; }); } } catch (e) {}
+}
+function smWakeOff() { try { if (_smWake) _smWake.release(); } catch (e) {} _smWake = null; }
+function smGeoOn() {
+  if (_smGeo != null || !navigator.geolocation) return;
+  try {
+    _smGeo = navigator.geolocation.watchPosition(function(pos) {
+      SM.gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy };
+      smPaintChips();
+    }, function() { SM.gps = null; smPaintChips(); }, { enableHighAccuracy: true, maximumAge: 20000, timeout: 20000 });
+  } catch (e) { _smGeo = null; }
+}
+function smGeoOff() { try { if (_smGeo != null) navigator.geolocation.clearWatch(_smGeo); } catch (e) {} _smGeo = null; }
+function smBattOn() {
+  if (!navigator.getBattery) return;
+  navigator.getBattery().then(function(b) {
+    const set = function() { SM.batt = Math.round(b.level * 100); smPaintChips(); };
+    set(); b.addEventListener('levelchange', set);
+  }).catch(function() {});
+}
+function smElapsed() {
+  if (!SM.t0) return '';
+  const m = Math.floor((Date.now() - SM.t0) / 60000);
+  if (m < 60) return m + 'm on site';
+  return Math.floor(m / 60) + 'h ' + (m % 60) + 'm on site';
+}
+
+// ---------- ruang aktif ----------
+function smSpace() {
+  if (!SM.spaceId) return null;
+  return IP.spaces.filter(function(s) { return s.id === SM.spaceId; })[0] || null;
+}
+async function smEnsureSpace() {
+  if (smSpace()) return smSpace();
+  if (IP.spaces.length) { SM.spaceId = IP.spaces[0].id; smSave(); return smSpace(); }
+  const id = await ipAddSpace(null, null, '');
+  if (!id) return null;
+  SM.spaceId = id; smSave();
+  return smSpace();
+}
+
+// ---------- muat inspection aktif ke dalam IP ----------
+async function smSyncInsp() {
+  if (!activeInspectionId) { SM.legacyN = null; return; }
+  if (IP.id !== activeInspectionId) {
+    await ipLoadOne(activeInspectionId);
+    SM.legacyN = null;
+    // Ruang aktif milik job lama; jangan bawa ia ke job baharu.
+    if (!smSpace()) SM.spaceId = IP.spaces.length ? IP.spaces[0].id : null;
+    SM.shots.forEach(function(x) { try { URL.revokeObjectURL(x.url); } catch (e) {} });
+    SM.shots = [];
+  }
+  if (SM.legacyN == null) SM.legacyN = await smCountLegacy();
+}
+// Berapa banyak tangkapan lama yang BELUM dibawa masuk. Yang asal tidak
+// dibuang selepas import, jadi mengira semuanya akan buat jalur itu
+// meleter selama-lamanya walaupun kerja sudah selesai.
+async function smCountLegacy() {
+  if (!currentUser || !activeInspectionId) return 0;
+  try {
+    const snap = await db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('inspections').doc(activeInspectionId).collection('photos').get();
+    const done = {};
+    IP.findings.forEach(function(f) { if (f.fromPhoto) done[f.fromPhoto] = 1; });
+    let n = 0;
+    snap.forEach(function(d) { if (!done[d.id]) n++; });
+    return n;
+  } catch (e) { return 0; }
+}
+
+// ---------- 2. DECK ----------
+function smPaintChips() {
+  const el = document.getElementById('smChips');
+  if (!el) return;
+  el.innerHTML = smChipsHtml();
+}
+function smChipsHtml() {
+  const s = smSpace();
+  let h = '<button class="sm-chip sm-chip-pick" data-sm="space">' + smSvg('pin', 12) +
+    (s ? smEsc(s.key + ' · ' + (s.name || '')) : 'Pilih ruang') + '</button>';
+  if (SM.gps) h += '<span class="sm-chip">GPS ±' + Math.round(SM.gps.acc) + 'm</span>';
+  else h += '<span class="sm-chip sm-chip-warn">No GPS</span>';
+  if (SM.t0) h += '<span class="sm-chip">' + smEsc(smElapsed()) + '</span>';
+  if (SM.batt != null) h += '<span class="sm-chip' + (SM.batt <= 20 ? ' sm-chip-hot' : '') + '">' + SM.batt + '%</span>';
+  if (_smWake) h += '<span class="sm-chip">Screen on</span>';
+  return h;
+}
+
+function smRender() {
+  const deck = document.getElementById('smDeck');
+  if (!deck) return;
+  const sm = document.getElementById('siteMode');
+  if (sm) sm.classList.toggle('sm-sun', !!SM.sun);
+
+  const capBtn = document.getElementById('smCapBtn');
+  const capLbl = document.getElementById('smCapLbl');
+  if (capBtn) capBtn.classList.toggle('sm-off', !activeInspectionId);
+  if (capLbl) capLbl.textContent = activeInspectionId ? 'Capture' : 'Pilih job dulu';
+
+  let h = '';
+
+  // --- jalur konteks ---
+  const insp = activeInspectionId
+    ? (IP.insp || (inspections || []).filter(function(x) { return x.id === activeInspectionId; })[0] || null)
+    : null;
+  const tname = insp && IP_TYPES[insp.type] ? IP_TYPES[insp.type].n : 'Inspection';
+  h += '<div class="sm-ctx"><div class="sm-ctx-top">' +
+    (insp ? '<span class="sm-ctx-dot"></span>' : '') +
+    '<div class="sm-ctx-main">' +
+      (insp
+        ? '<span class="sm-ctx-name">' + smEsc(insp.title || 'Untitled') + '</span><span class="sm-ctx-sub">' + smEsc(tname) + '</span>'
+        : '<span class="sm-ctx-name">Belum pilih job</span><span class="sm-ctx-sub">Semua yang awak rekod perlu tempat untuk pergi</span>') +
+    '</div>' +
+    '<button class="sm-ctx-swap" data-sm="' + (insp ? 'swap' : 'pick') + '">' + (insp ? 'Tukar' : 'Pilih') + '</button>' +
+    '<button class="sm-ctx-swap" data-sm="exit" style="margin-left:6px">Exit</button>' +
+  '</div>' +
+  (insp ? '<div class="sm-ctx-chips" id="smChips">' + smChipsHtml() + '</div>' : '') +
+  '</div>';
+
+  // --- grid alat ---
+  const ks = smChosen();
+  if (ks.length) {
+    h += '<div class="sm-grid">';
+    ks.forEach(function(k) {
+      const t = smToolOf(k);
+      if (!t) return;
+      let badge = '';
+      if (k === 'finds' && IP.findings.length) badge = '<span class="sm-tile-badge">' + IP.findings.length + '</span>';
+      if (k === 'tasks' && typeof tkBuckets === 'function') {
+        try {
+          const b = tkBuckets();
+          const n = (b.overdue || []).length;
+          if (n) badge = '<span class="sm-tile-badge sm-badge-warn">' + n + '</span>';
+        } catch (e) {}
+      }
+      if (k === 'sos' && typeof SOS !== 'undefined' && SOS && SOS.armed) badge = '<span class="sm-tile-badge sm-badge-hot">ON</span>';
+      h += '<button class="sm-tile' + (t.hot ? ' sm-hot' : '') + '" data-smtool="' + t.k + '">' +
+        badge + '<span class="sm-tile-ico">' + smSvg(t.i, 26) + '</span>' +
+        '<span class="sm-tile-lbl">' + smEsc(t.n) + '</span></button>';
+    });
+    h += '</div>';
+  } else {
+    h += '<div class="sm-empty">Deck kosong. Tekan <b>Pilih alat</b> di bawah untuk memilih apa yang muncul di sini.</div>';
+  }
+
+  // --- baru ditangkap ---
+  if (insp && SM.shots.length) {
+    h += '<div class="sm-shots"><div class="sm-shots-head">' +
+      '<span class="sm-shots-title">Baru ditangkap</span>' +
+      '<button class="sm-shots-more" data-sm="allfinds">Semua ' + IP.findings.length + ' →</button></div>' +
+      '<div class="sm-shots-strip">';
+    SM.shots.slice().reverse().forEach(function(sh) {
+      h += '<button class="sm-shot" data-smfind="' + smEsc(sh.id) + '">' +
+        (sh.url ? '<img class="sm-shot-img" src="' + smEsc(sh.url) + '" alt="">' : '') +
+        (sh.thin ? '<span class="sm-shot-warn">!</span>' : '') +
+        '<span class="sm-shot-tag">' + smEsc(sh.tag) + '</span></button>';
+    });
+    h += '</div>' +
+      (SM.shots.some(function(x) { return x.thin; })
+        ? '<p class="sm-note">Yang bertanda <b>!</b> masih tiada description. Ketik untuk isi, atau tahan butang mic dan cakap.</p>'
+        : '') +
+      '</div>';
+  }
+
+  // --- baris tetapan pada skrin ---
+  h += '<div class="sm-rows">';
+  if (insp && SM.legacyN) {
+    h += '<button class="sm-row" data-sm="import">' +
+      '<span class="sm-row-ico">' + smSvg('imp', 19) + '</span>' +
+      '<span class="sm-row-txt"><span class="sm-row-name">Bawa masuk ' + SM.legacyN + ' tangkapan lama</span>' +
+      '<span class="sm-row-sub">Site Mode versi lama menyimpannya di tempat yang laporan PDF tidak baca. Tekan untuk jadikan ia findings sebenar.</span></span>' +
+      '<span class="sm-row-end">Import</span></button>';
+  }
+  h += '<button class="sm-row" data-sm="custom">' +
+    '<span class="sm-row-ico">' + smSvg('grid', 19) + '</span>' +
+    '<span class="sm-row-txt"><span class="sm-row-name">Pilih alat yang muncul</span>' +
+    '<span class="sm-row-sub">' + ks.length + ' daripada ' + SM_TOOLS.length + ' dipilih. Susunannya ikut awak.</span></span>' +
+    '<span class="sm-row-end">Ubah</span></button>';
+  h += '<div class="sm-row"><span class="sm-row-ico">' + smSvg('sun', 19) + '</span>' +
+    '<span class="sm-row-txt"><span class="sm-row-name">Mod cahaya matahari</span>' +
+    '<span class="sm-row-sub">Petak lebih besar, garis hitam pekat. Susun atur tidak berubah.</span></span>' +
+    '<button class="sm-sw' + (SM.sun ? ' on' : '') + '" data-smtog="sun"><span class="sm-sw-knob"></span></button></div>';
+  h += '</div>';
+
+  deck.innerHTML = h;
+}
+
+// ---------- 3. TANGKAP → FINDING ----------
+function smCaptureTap() {
+  if (!activeInspectionId) {
+    if (typeof openInspSheet === 'function') { siteSheetCallback = 'capture'; openInspSheet(); }
+    else showToast('Pilih inspection dahulu');
+    return;
+  }
+  const inp = document.getElementById('siteCaptureInput');
+  if (inp) inp.click();
+}
+
+// Gambar penuh ke telefon (IndexedDB), thumbnail kecil ke Firestore.
+// Had 1 MiB satu dokumen Firestore bermakna gambar penuh tidak boleh
+// disimpan di sana — sebab itu kunci gambar sama dengan borang Inspection.
+async function smSaveCapture(file) {
+  await smSyncInsp();
+  const s = await smEnsureSpace();
+  if (!s) { showToast('Tidak dapat buat ruang'); return; }
+  const t = IP_TYPES[(IP.insp && IP.insp.type) || 'defect'] || IP_TYPES.defect;
+  const no = ipFindingsIn(s.id).length + 1;
+  const tag = s.key + ipNo(no);
+  showToast('Menyimpan ' + tag + '…');
+
+  const data = {
+    spaceId: s.id, spaceKey: s.key, no: no,
+    element: '', defectType: '', desc: '', rate: '', priority: '',
+    cost: '', action: '', locationText: '',
+    planId: '', px: null, py: null, photoN: 0,
+    source: 'site',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if (SM.gps) data.gps = SM.gps.lat.toFixed(6) + ', ' + SM.gps.lng.toFixed(6) + ' (±' + Math.round(SM.gps.acc) + ' m)';
+
+  let id = null;
+  try {
+    const doc = await ipSub('findings').add(data);
+    id = doc.id;
+    const full = await ipShrinkTo(file, 1600, 0.82);
+    await lbPut(ipPhotoKey(id, 0), full, 'image/jpeg');
+    const thumb = await ipThumbOf(full);
+    await ipSub('findings').doc(id).set({ photoN: 1, thumb: thumb }, { merge: true });
+    IP.findings.push(Object.assign({ id: id }, data, { photoN: 1, thumb: thumb }));
+    SM.shots.push({ id: id, tag: tag, url: URL.createObjectURL(full), thin: true });
+    if (SM.shots.length > 12) { const old = SM.shots.shift(); try { URL.revokeObjectURL(old.url); } catch (e) {} }
+    if (s.noDefect) await ipSpacePatch(s.id, { noDefect: false });
+    await ipCounts();
+    await ipPatch({ photoCount: IP.findings.reduce(function(a, f) { return a + (f.photoN || 0); }, 0) });
+    smRender();
+    showToast(tag + ' disimpan dalam ' + (s.name || s.key));
+  } catch (e) {
+    console.warn('[SiteMode capture]', e.message);
+    showToast('Tidak dapat simpan. ' + e.message, 'error');
+  }
+  return id;
+}
+
+// ---------- 4. BAWA MASUK TANGKAPAN LAMA ----------
+// Site Mode versi lama menulis ke `photos`. Laporan PDF membaca
+// `findings`. Ini memindahkan yang lama supaya ia keluar dalam laporan.
+async function smImportLegacy() {
+  if (!currentUser || !activeInspectionId) return;
+  const n = SM.legacyN || 0;
+  if (!n) { showToast('Tiada tangkapan lama'); return; }
+  if (!confirm('Bawa masuk ' + n + ' tangkapan lama sebagai findings?\n\nYang asal tidak dibuang — ia kekal di tempatnya.')) return;
+  showToast('Membawa masuk…');
+  try {
+    await smSyncInsp();
+    const root = db.collection('pocketInspections').doc(currentUser.uid)
+      .collection('inspections').doc(activeInspectionId);
+    const snap = await root.collection('photos').orderBy('timestamp', 'asc').get();
+    // Satu ruang khas supaya tangkapan lama tidak bercampur dengan
+    // ruang yang surveyor susun sendiri.
+    let bucket = IP.spaces.filter(function(x) { return x.fromSite; })[0];
+    if (!bucket) {
+      const key = ipKeyFor(IP.spaces.length);
+      const d = { key: key, name: 'Site Mode captures', planId: '', x: null, y: null,
+                  rate: '', noDefect: false, fromSite: true, order: IP.spaces.length,
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+      const ref = await ipSub('spaces').add(d);
+      bucket = Object.assign({ id: ref.id }, d);
+      IP.spaces.push(bucket);
+    }
+    const done = new Set(IP.findings.filter(function(f) { return f.fromPhoto; }).map(function(f) { return f.fromPhoto; }));
+    let added = 0, base = ipFindingsIn(bucket.id).length;
+    for (let i = 0; i < snap.docs.length; i++) {
+      const pd = snap.docs[i];
+      if (done.has(pd.id)) continue;
+      const d = pd.data();
+      const rate = d.baris ? smBarisToRate(d) : '';
+      const f = {
+        spaceId: bucket.id, spaceKey: bucket.key, no: base + added + 1,
+        element: '', defectType: d.defectType || '', desc: d.remarks || '',
+        rate: rate, priority: smPrioName(d.priority), cost: '', action: '',
+        locationText: d.location || '',
+        planId: '', px: null, py: null, photoN: 0,
+        fromPhoto: pd.id, source: 'site-import',
+        createdAt: d.timestamp || firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (d.gps) f.gps = typeof d.gps === 'string' ? d.gps : (d.gps.lat + ', ' + d.gps.lng);
+      // Gambar lama ialah data URL dalam Firestore. Ia jadi thumbnail,
+      // dan salinan penuh masuk ke telefon supaya PDF boleh guna.
+      const ref = await ipSub('findings').add(f);
+      if (d.image) {
+        try {
+          const blob = await (await fetch(d.image)).blob();
+          await lbPut(ipPhotoKey(ref.id, 0), blob, 'image/jpeg');
+          const th = await ipThumbOf(blob);
+          await ipSub('findings').doc(ref.id).set({ photoN: 1, thumb: th }, { merge: true });
+          f.photoN = 1; f.thumb = th;
+        } catch (e) { console.warn('[Import photo]', e.message); }
+      }
+      IP.findings.push(Object.assign({ id: ref.id }, f));
+      added++;
+    }
+    await ipCounts();
+    await ipPatch({ photoCount: IP.findings.reduce(function(a, x) { return a + (x.photoN || 0); }, 0) });
+    SM.legacyN = await smCountLegacy();
+    smRender();
+    showToast(added ? (added + ' tangkapan masuk sebagai findings') : 'Semua sudah dibawa masuk');
+  } catch (e) {
+    console.warn('[Import legacy]', e.message);
+    showToast('Import gagal. ' + e.message, 'error');
+  }
+}
+function smBarisToRate(d) {
+  let score = null;
+  if (typeof d.baris === 'number') score = d.baris;
+  else if (typeof d.condition === 'number' && typeof d.priority === 'number' && typeof calcBarisScore === 'function') score = calcBarisScore(d.condition, d.priority);
+  if (score == null) return '';
+  if (score <= 6) return 'good';
+  if (score <= 12) return 'fair';
+  return 'dilapidated';
+}
+function smPrioName(p) {
+  if (p === 1) return 'Low';
+  if (p === 2) return 'Medium';
+  if (p === 3) return 'High';
+  if (p === 4) return 'Urgent';
+  return '';
+}
+
+// ---------- 5. LETAK TEPI / SAMBUNG SEMULA ----------
+// Library, findings dan floor plan ialah tab penuh, jadi Site Mode
+// perlu mengalah sebentar. Sesi tidak ditamatkan — satu pil kekal di
+// bawah untuk kembali, supaya tiada sesiapa hilang jalan pulang.
+function smPark(fn) {
+  SM.parked = true;
+  document.body.classList.remove('site-mode-active');
+  const sm = document.getElementById('siteMode');
+  if (sm) sm.classList.remove('show');
+  const pill = document.getElementById('smPark');
+  if (pill) pill.classList.add('on');
+  try { fn(); } catch (e) { console.warn('[SiteMode park]', e.message); }
+}
+function smUnpark() {
+  SM.parked = false;
+  const pill = document.getElementById('smPark');
+  if (pill) pill.classList.remove('on');
+  document.body.classList.add('site-mode-active');
+  const sm = document.getElementById('siteMode');
+  if (sm) sm.classList.add('show');
+  smWakeOn();
+  smRender();
+}
+function smGoInsp(view) {
+  if (!activeInspectionId) { showToast('Pilih job dahulu'); return; }
+  smPark(async function() {
+    await ipLoadOne(activeInspectionId);
+    IP.view = view;
+    if (view === 'plan' && !IP.plans.length) { IP.view = 'hub'; showToast('Belum ada floor plan — muat naik di sini'); }
+    switchTab('inspections');
+  });
+}
+function smOpenFinding(fid) {
+  smPark(async function() {
+    await ipLoadOne(activeInspectionId);
+    const f = IP.findings.filter(function(x) { return x.id === fid; })[0];
+    if (!f) { IP.view = 'hub'; switchTab('inspections'); return; }
+    IP.spaceId = f.spaceId; IP.findId = fid; IP.shots = []; IP.view = 'finding';
+    switchTab('inspections');
+  });
+}
+
+// ---------- 6. HELAIAN: PILIH ALAT ----------
+function smSheetOpen(kind) {
+  SM.sheet = kind;
+  const sh = document.getElementById('smSheet');
+  if (sh) sh.classList.add('on');
+  smSheetRender();
+}
+function smSheetClose() {
+  smTalkStop(true);
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+  SM.sheet = null;
+  const sh = document.getElementById('smSheet');
+  if (sh) sh.classList.remove('on');
+  smRender();
+}
+function smSheetRender() {
+  if (SM.sheet === 'custom') return smCustomRender();
+  if (SM.sheet === 'talk') return smTalkRender();
+  if (SM.sheet === 'space') return smSpaceRender();
+}
+
+function smCustomRender() {
+  const nm = document.getElementById('smSheetName');
+  const sb = document.getElementById('smSheetSub');
+  const act = document.getElementById('smSheetAct');
+  const body = document.getElementById('smSheetBody');
+  const foot = document.getElementById('smSheetFoot');
+  if (!body) return;
+  if (nm) nm.textContent = 'Pilih alat';
+  if (sb) sb.textContent = smChosen().length + ' akan muncul pada deck';
+  if (act) act.style.display = 'none';
+  if (foot) foot.style.display = 'none';
+
+  let h = '<div class="sm-sec"><span class="sm-sec-lbl">Mula daripada satu set</span><span class="sm-sec-rule"></span></div>';
+  h += '<div class="sm-presets">';
+  Object.keys(SM_PRESETS).forEach(function(k) {
+    const p = SM_PRESETS[k];
+    const same = p.ks.length === smChosen().length && p.ks.every(function(x) { return SM.on[x]; });
+    h += '<button class="sm-preset' + (same ? ' on' : '') + '" data-smpreset="' + k + '">' +
+      '<span class="sm-preset-name">' + smEsc(p.n) + '</span>' +
+      '<span class="sm-preset-sub">' + smEsc(p.d) + '</span></button>';
+  });
+  h += '</div>';
+
+  h += '<div class="sm-sec"><span class="sm-sec-lbl">Alat</span><span class="sm-sec-rule"></span></div>';
+  SM.order.forEach(function(k, i) {
+    const t = smToolOf(k);
+    if (!t) return;
+    const on = !!SM.on[k];
+    h += '<div class="sm-pick' + (on ? '' : ' off') + '">' +
+      '<span class="sm-pick-ico">' + smSvg(t.i, 21) + '</span>' +
+      '<span class="sm-pick-txt"><span class="sm-pick-name">' + smEsc(t.n) + '</span>' +
+      '<span class="sm-pick-sub">' + smEsc(t.d) + '</span></span>' +
+      '<span class="sm-pick-move">' +
+        '<button class="sm-mv" data-smmv="up" data-smk="' + k + '"' + (i === 0 ? ' disabled' : '') + '>' + smSvg('up', 13) + '</button>' +
+        '<button class="sm-mv" data-smmv="dn" data-smk="' + k + '"' + (i === SM.order.length - 1 ? ' disabled' : '') + '>' + smSvg('dn', 13) + '</button>' +
+      '</span>' +
+      '<button class="sm-sw' + (on ? ' on' : '') + '" data-smpick="' + k + '"><span class="sm-sw-knob"></span></button></div>';
+  });
+
+  h += '<div class="sm-sec"><span class="sm-sec-lbl">Skrin</span><span class="sm-sec-rule"></span></div>';
+  h += smRowSw('awake', 'Kekalkan skrin hidup', 'Tiada lagi buka kunci setiap kali nak ambil gambar. Bateri habis lebih laju.', SM.awake);
+  h += smRowSw('keepSpace', 'Ingat ruang terakhir', 'Bila awak buka Site Mode semula, ia kembali ke ruang yang sama.', SM.keepSpace);
+  h += smRowSw('sun', 'Mod cahaya matahari', 'Petak lebih besar, garis hitam pekat.', SM.sun);
+
+  h += '<div class="sm-sec"><span class="sm-sec-lbl">Suara</span><span class="sm-sec-rule"></span></div>';
+  h += smRowSw('speak', 'Baca jawapan kuat', 'Mata awak pada bangunan, bukan pada skrin.', SM.speak);
+  h += smRowSw('keepListening', 'Terus dengar selepas menjawab', 'Untuk soalan berturut. Matikan di tapak bising — mikrofon akan tangkap mesin.', SM.keepListening);
+  h += '<button class="sm-row" data-sm="lang">' +
+    '<span class="sm-row-ico">' + smSvg('trans', 19) + '</span>' +
+    '<span class="sm-row-txt"><span class="sm-row-name">Bahasa yang awak cakap</span>' +
+    '<span class="sm-row-sub">Ayat yang masuk laporan tetap ditulis Inggeris formal.</span></span>' +
+    '<span class="sm-row-end">' + (SM.lang === 'ms-MY' ? 'Melayu' : 'English') + '</span></button>';
+  body.innerHTML = h;
+}
+function smRowSw(key, name, sub, on) {
+  return '<div class="sm-row"><span class="sm-row-txt">' +
+    '<span class="sm-row-name">' + smEsc(name) + '</span>' +
+    '<span class="sm-row-sub">' + smEsc(sub) + '</span></span>' +
+    '<button class="sm-sw' + (on ? ' on' : '') + '" data-smtog="' + key + '"><span class="sm-sw-knob"></span></button></div>';
+}
+
+// ---------- 7. CAKAP: TANYA ATAU REKOD ----------
+// Dua kerja, dua butang. Membiarkan AI meneka yang mana satu menjimatkan
+// satu ketikan, tetapi satu hari ia akan memasukkan soalan surveyor ke
+// dalam laporan sebagai defect. Satu ketikan lebih murah daripada itu.
+function smTalkOpen(mode) {
+  SM.talkMode = mode || SM.talkMode || 'ask';
+  smSheetOpen('talk');
+}
+function smTalkRender() {
+  const nm = document.getElementById('smSheetName');
+  const sb = document.getElementById('smSheetSub');
+  const act = document.getElementById('smSheetAct');
+  const body = document.getElementById('smSheetBody');
+  const foot = document.getElementById('smSheetFoot');
+  if (!body) return;
+  const s = smSpace();
+  const insp = IP.insp || null;
+  if (nm) nm.textContent = 'Ask Pocket';
+  if (sb) sb.textContent = insp ? ((insp.title || 'Job') + (s ? ' · ' + s.key + ' ' + (s.name || '') : '')) : 'Belum pilih job';
+  if (act) { act.style.display = ''; act.textContent = SM.lang === 'ms-MY' ? 'BM' : 'EN'; act.dataset.sm = 'lang'; }
+
+  let h = '<div class="sm-talk-modes">' +
+    smTm('ask', 'q', 'Tanya', 'Standard, cara, bahan') +
+    smTm('note', 'note', 'Rekod', 'Cakap satu penemuan') +
+  '</div>';
+  body.innerHTML = '';
+
+  const wrap = document.createElement('div');
+  wrap.innerHTML = h;
+  body.appendChild(wrap.firstChild);
+
+  const inner = document.createElement('div');
+  inner.id = 'smTalkBody';
+  inner.style.paddingTop = '12px';
+  inner.innerHTML = smTalkBodyHtml();
+  body.appendChild(inner);
+
+  if (foot) foot.style.display = 'flex';
+  smFootPaint();
+}
+function smTm(k, ico, name, sub) {
+  return '<button class="sm-tm' + (SM.talkMode === k ? ' on' : '') + '" data-smmode="' + k + '">' +
+    smSvg(ico, 18) + '<span class="sm-tm-txt"><span class="sm-tm-name">' + name + '</span>' +
+    '<span class="sm-tm-sub">' + sub + '</span></span></button>';
+}
+function smFootPaint() {
+  const mic = document.getElementById('smMic');
+  const inn = document.getElementById('smMicIn');
+  if (!mic || !inn) return;
+  mic.style.touchAction = 'none';
+  if (_smHolding) {
+    mic.style.background = 'var(--critical)';
+    inn.innerHTML = '<span class="sm-wave">' + [0,1,2,3,4,5,6].map(function(i) {
+      return '<span class="sm-wave-b" style="animation-delay:' + (i * 0.09) + 's"></span>';
+    }).join('') + '</span> Sedang mendengar…';
+  } else if (SM.talkBusy) {
+    mic.style.background = 'var(--fg-2)';
+    inn.textContent = 'Berfikir…';
+  } else {
+    mic.style.background = '';
+    inn.innerHTML = smSvg('mic', 22) + ' ' + (SM.talkMode === 'ask' ? 'Tahan untuk tanya' : 'Tahan untuk rekod');
+  }
+}
+function smTalkBodyHtml() {
+  let h = '';
+  if (!SM.turns.length && !SM.draft) {
+    h += '<div class="sm-hint">' + (SM.talkMode === 'ask'
+      ? 'Tekan dan <span class="sm-hint-b">tahan</span> butang di bawah, tanya, lepas.<br>Jawapan dibaca kuat — pendek, untuk didengar sambil berjalan.'
+      : 'Tekan dan <span class="sm-hint-b">tahan</span>, cakap apa yang awak nampak.<br>Ia jadi satu penemuan dalam ruang aktif.') + '</div>';
+    const eg = SM.talkMode === 'ask'
+      ? ['Lebar minimum pintu keluar kecemasan?', 'Retak 3 mm pada dinding bata — kena risau?', 'Apa standard untuk hollow tiles?']
+      : ['Siling koridor ada kesan air, sekitar satu meter.', 'Retak halus atas skirting bilik air, 400 mm.', 'Jubin lobi bunyi kosong, dalam empat belas keping.'];
+    h += '<div class="sm-sec"><span class="sm-sec-lbl">' + (SM.talkMode === 'ask' ? 'Selalu ditanya di tapak' : 'Contoh ayat') + '</span><span class="sm-sec-rule"></span></div>';
+    eg.forEach(function(x) { h += '<div class="sm-bub sm-bub-ai">' + smEsc(x) + '</div>'; });
+    return h;
+  }
+  SM.turns.forEach(function(t, i) {
+    if (t.role === 'me') { h += '<div class="sm-bub sm-bub-me">' + smEsc(t.text) + '</div>'; return; }
+    h += '<div class="sm-bub sm-bub-ai' + (t.err ? ' sm-bub-err' : '') + '">' +
+      '<span class="sm-bub-who">' + smSvg('ai', 13) + 'Pocket' +
+      (t.spoken ? '<span class="sm-bub-spk">dibaca kuat</span>' : '') + '</span>' +
+      smEsc(t.text) + '</div>';
+    if (i === SM.turns.length - 1 && !t.err) {
+      h += '<div class="sm-acts">' +
+        '<button class="sm-act" data-sm="speakstop">' + smSvg('stop', 14) + 'Berhenti</button>' +
+        '<button class="sm-act" data-sm="speakagain">' + smSvg('spk', 14) + 'Ulang</button>' +
+        '<button class="sm-act sm-act-p" data-sm="saveans">' + smSvg('note', 14) + 'Simpan nota</button>' +
+      '</div>';
+    }
+  });
+  if (SM.draft) {
+    const d = SM.draft;
+    h += '<div class="sm-draft"><div class="sm-draft-h">' + smSvg('chk', 17) +
+      '<span class="sm-draft-t">Penemuan baharu</span><span class="sm-draft-no">' + smEsc(d.tag) + '</span></div>' +
+      smKv('Ruang', d.spaceLabel) +
+      (d.element ? smKv('Element', d.element) : '') +
+      (d.defectType ? smKv('Jenis', d.defectType) : '') +
+      (d.rate ? smKv('Rating', smRateName(d.rate)) : '') +
+      (d.priority ? smKv('Priority', d.priority) : '') +
+      smKv('Ayat', d.desc) +
+      '<div class="sm-draft-act">' +
+        '<button class="sm-da sm-da-n" data-sm="draftedit">Kemas dulu</button>' +
+        '<button class="sm-da sm-da-y" data-sm="draftsave">Simpan ' + smEsc(d.tag) + '</button>' +
+      '</div></div>';
+    h += '<p class="sm-note">Ayat itu ditulis semula jadi formal untuk laporan. Apa yang awak sebut kekal di atas — tiada apa direka yang awak tak cakap.</p>';
+  }
+  return h;
+}
+function smRateName(r) {
+  const row = IP_RATES.filter(function(x) { return x[0] === r; })[0];
+  return row ? row[1] : r;
+}
+function smKv(k, v) {
+  return '<div class="sm-kv"><span class="sm-kv-k">' + smEsc(k) + '</span><span class="sm-kv-v">' + smEsc(v) + '</span></div>';
+}
+function smTalkPaint() {
+  const b = document.getElementById('smTalkBody');
+  if (b) b.innerHTML = smTalkBodyHtml();
+  smFootPaint();
+}
+
+// ---------- mikrofon ----------
+function smRecog() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  if (_smRecog) return _smRecog;
+  const r = new SR();
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+  r.continuous = false;
+  r.onresult = function(e) {
+    let fin = '', part = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const tx = e.results[i][0].transcript;
+      if (e.results[i].isFinal) fin += tx; else part += tx;
+    }
+    if (fin) _smHeard += fin;
+    const el = document.getElementById('smLive');
+    if (el) el.innerHTML = smEsc(_smHeard) + '<span class="sm-live-dim">' + smEsc(part) + '</span>';
+  };
+  r.onerror = function(e) {
+    const net = e.error === 'network';
+    smTalkSay(net
+      ? 'Tiada isyarat. Pengecaman suara pada telefon menghantar audio ke pelayan, jadi ia tidak boleh menukar suara kepada teks di sini. Tekan “Rakam suara sahaja” — suara awak disimpan dalam telefon dan boleh ditranskrip bila ada isyarat.'
+      : (e.error === 'not-allowed'
+        ? 'Mikrofon tidak dibenarkan. Buka tetapan pelayar dan benarkan mikrofon untuk laman ini.'
+        : 'Mikrofon: ' + e.error), true, net);
+  };
+  r.onend = function() {
+    _smHolding = false;
+    const t = _smHeard.trim(); _smHeard = '';
+    if (t) smDispatch(t); else smTalkPaint();
+  };
+  _smRecog = r;
+  return r;
+}
+function smTalkStart() {
+  if (_smHolding || SM.talkBusy) return;
+  if (SM.talkMode === 'note' && !activeInspectionId) { showToast('Pilih job dahulu'); return; }
+  const r = smRecog();
+  if (!r) {
+    smTalkSay('Pelayar ini tidak boleh menukar suara kepada teks. Guna “Rakam suara sahaja”, atau taip dalam borang finding.', true, true);
+    return;
+  }
+  smPrimeSpeech();
+  _smHeard = ''; _smHolding = true;
+  SM.draft = null;
+  r.lang = SM.lang;
+  try { r.start(); } catch (e) { _smHolding = false; return; }
+  const b = document.getElementById('smTalkBody');
+  if (b) b.innerHTML = '<div class="sm-live-txt" id="smLive"><span class="sm-live-dim">…</span></div>';
+  smFootPaint();
+}
+function smTalkStop(silent) {
+  if (!_smHolding) return;
+  _smHolding = false;
+  try { if (_smRecog) _smRecog.stop(); } catch (e) {}
+  if (silent) { _smHeard = ''; }
+  smFootPaint();
+}
+function smTalkSay(text, isErr, offerRec) {
+  SM.turns.push({ role: 'ai', text: text, err: !!isErr });
+  if (SM.turns.length > 12) SM.turns.splice(0, SM.turns.length - 12);
+  smTalkPaint();
+  if (offerRec) {
+    const b = document.getElementById('smTalkBody');
+    if (b) b.insertAdjacentHTML('beforeend',
+      '<div class="sm-acts"><button class="sm-act sm-act-p" data-sm="recmemo">' + smSvg('mic', 14) + 'Rakam suara sahaja</button></div>');
+  }
+}
+function smDispatch(text) {
+  SM.turns.push({ role: 'me', text: text });
+  smTalkPaint();
+  if (SM.talkMode === 'ask') smAskAI(text); else smNoteAI(text);
+}
+
+// ---------- suara keluar ----------
+let _smPrimed = false;
+function smPrimeSpeech() {
+  if (_smPrimed || !window.speechSynthesis) return;
+  _smPrimed = true;
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+}
+function smVoiceFor(bcp) {
+  if (!window.speechSynthesis) return null;
+  let list = [];
+  try { list = speechSynthesis.getVoices() || []; } catch (e) { return null; }
+  const want = String(bcp || 'en-GB').toLowerCase();
+  const pre = want.split('-')[0];
+  let exact = null, loose = null;
+  for (let i = 0; i < list.length; i++) {
+    const lg = (list[i].lang || '').toLowerCase().replace('_', '-');
+    if (!lg) continue;
+    if (lg === want) { exact = list[i]; break; }
+    if (!loose && lg.split('-')[0] === pre) loose = list[i];
+  }
+  return exact || loose;
+}
+function smSpeak(text, bcp) {
+  if (!SM.speak || !window.speechSynthesis || !text) return false;
+  const v = smVoiceFor(bcp);
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = bcp || 'en-GB'; }
+    u.rate = 1; u.pitch = 1; u.volume = 1;
+    u.onend = function() {
+      // Soalan berturut tanpa menyentuh skrin — tetapi hanya bila
+      // surveyor menghidupkannya, sebab tapak bising akan masuk juga.
+      if (SM.keepListening && SM.sheet === 'talk' && SM.talkMode === 'ask' && !SM.talkBusy) smTalkStart();
+    };
+    speechSynthesis.speak(u);
+    setTimeout(function() { try { if (speechSynthesis.paused) speechSynthesis.resume(); } catch (e) {} }, 120);
+    return !!v;
+  } catch (e) { return false; }
+}
+
+// ---------- 8. AI ----------
+function smCtxLine() {
+  const insp = IP.insp;
+  const s = smSpace();
+  let c = 'Context: Malaysian building surveying, on site right now.';
+  if (insp) {
+    const t = IP_TYPES[insp.type];
+    c += ' Job: "' + (insp.title || 'Untitled') + '"' + (t ? ', a ' + t.n : '') + '.';
+  }
+  if (s) c += ' Currently in: ' + s.key + ' — ' + (s.name || '') + '.';
+  if (IP.findings.length) c += ' ' + IP.findings.length + ' findings recorded so far.';
+  return c;
+}
+async function smAskAI(q) {
+  if (typeof callGemini !== 'function') { smTalkSay('AI belum disediakan. Masukkan API key dalam Profile dahulu.', true); return; }
+  SM.talkBusy = true; smTalkPaint();
+  try {
+    const bm = SM.lang === 'ms-MY';
+    const prompt = smCtxLine() + '\n\n' +
+      'The surveyor asked this out loud while walking the building:\n"' + q + '"\n\n' +
+      'Answer in ' + (bm ? 'Malay (Bahasa Malaysia)' : 'English') + '. Rules:\n' +
+      '- At most 3 short sentences. It will be read aloud while they walk, not read on a screen.\n' +
+      '- Give the number or the answer first, then the qualifier.\n' +
+      '- End with one short reference line naming the code, by-law, clause or standard (e.g. "UBBL 1984, By-law 168"). If you are not sure of the exact clause, say which document to check instead of inventing a number.\n' +
+      '- No preamble, no bullet points, no markdown.';
+    const txt = String(await callGemini([{ role: 'user', content: prompt, mode: 'consultant', timestamp: new Date() }], true) || '').trim();
+    if (!txt) throw new Error('Jawapan kosong');
+    const spoken = smSpeak(txt, SM.lang);
+    SM.turns.push({ role: 'ai', text: txt, spoken: spoken });
+    if (SM.turns.length > 12) SM.turns.splice(0, SM.turns.length - 12);
+  } catch (e) {
+    smTalkSay('Tidak dapat menjawab. ' + e.message + ' — biasanya tiada isyarat.', true);
+  }
+  SM.talkBusy = false; smTalkPaint();
+}
+
+async function smNoteAI(said) {
+  if (!activeInspectionId) { smTalkSay('Pilih job dahulu.', true); return; }
+  SM.talkBusy = true; smTalkPaint();
+  try {
+    await smSyncInsp();
+    const s = await smEnsureSpace();
+    if (!s) throw new Error('Tiada ruang');
+    const t = IP_TYPES[(IP.insp && IP.insp.type) || 'defect'] || IP_TYPES.defect;
+    let el = '', dt = '', desc = said, rate = '', pri = '';
+    if (typeof callGemini === 'function') {
+      const prompt = smCtxLine() + '\n\n' +
+        'The surveyor spoke this defect out loud on site (Malay and English mixed):\n"' + said + '"\n\n' +
+        'Turn it into one report finding. Reply ONLY in this exact format, nothing else:\n' +
+        'ELEMENT: [exactly one of: ' + IP_ELEMENTS.join(' | ') + ']\n' +
+        'TYPE: [exactly one of: ' + IP_DEFTYPES.join(' | ') + ']\n' +
+        'DESCRIPTION: [formal English for a client report, 1-3 sentences. Say only what the surveyor said. Do NOT add causes, sizes, materials or locations they did not mention.]\n' +
+        (t.rate ? 'RATING: [one of: good | fair | dilapidated]\n' : '') +
+        'PRIORITY: [one of: ' + IP_PRI.join(' | ') + ']';
+      const txt = String(await callGemini([{ role: 'user', content: prompt, mode: 'consultant', timestamp: new Date() }], false) || '');
+      const grab = function(k) {
+        const m = txt.match(new RegExp('^' + k + ':\\s*(.+)$', 'mi'));
+        return m ? m[1].trim().replace(/^\[|\]$/g, '').trim() : '';
+      };
+      const near = function(list, want) {
+        if (!want) return '';
+        const lc = want.toLowerCase();
+        for (let i = 0; i < list.length; i++) {
+          const v = String(list[i]).toLowerCase();
+          if (v === lc || v.indexOf(lc) === 0 || lc.indexOf(v) === 0) return list[i];
+        }
+        return '';
+      };
+      el = near(IP_ELEMENTS, grab('ELEMENT'));
+      dt = near(IP_DEFTYPES, grab('TYPE'));
+      const d = grab('DESCRIPTION'); if (d) desc = d;
+      pri = near(IP_PRI, grab('PRIORITY'));
+      if (t.rate) rate = near(['good','fair','dilapidated'], grab('RATING').toLowerCase());
+    }
+    const no = ipFindingsIn(s.id).length + 1;
+    SM.draft = {
+      said: said, spaceId: s.id, spaceKey: s.key,
+      spaceLabel: s.key + ' · ' + (s.name || ''),
+      tag: s.key + ipNo(no), no: no,
+      element: el, defectType: dt, desc: desc, rate: rate, priority: pri
+    };
+  } catch (e) {
+    smTalkSay('Tidak dapat memproses. ' + e.message + ' — kalau tiada isyarat, tekan “Rakam suara sahaja”.', true, true);
+  }
+  SM.talkBusy = false; smTalkPaint();
+}
+
+async function smDraftSave(thenEdit) {
+  const d = SM.draft;
+  if (!d) return;
+  SM.talkBusy = true; smTalkPaint();
+  const data = {
+    spaceId: d.spaceId, spaceKey: d.spaceKey, no: d.no,
+    element: d.element, defectType: d.defectType, desc: d.desc,
+    rate: d.rate, priority: d.priority, cost: '', action: '', locationText: '',
+    planId: '', px: null, py: null, photoN: 0,
+    source: 'voice', heard: d.said,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if (SM.gps) data.gps = SM.gps.lat.toFixed(6) + ', ' + SM.gps.lng.toFixed(6) + ' (±' + Math.round(SM.gps.acc) + ' m)';
+  try {
+    const ref = await ipSub('findings').add(data);
+    IP.findings.push(Object.assign({ id: ref.id }, data));
+    const sp = IP.spaces.filter(function(x) { return x.id === d.spaceId; })[0];
+    if (sp && sp.noDefect) await ipSpacePatch(sp.id, { noDefect: false });
+    await ipCounts();
+    SM.draft = null;
+    SM.talkBusy = false;
+    if (thenEdit) { smSheetClose(); smOpenFinding(ref.id); return; }
+    showToast(d.tag + ' disimpan');
+    smTalkPaint();
+  } catch (e) {
+    SM.talkBusy = false;
+    smTalkSay('Tidak dapat simpan. ' + e.message, true);
+  }
+}
+
+// Jawapan yang berguna boleh terus jadi nota pada inspection ini,
+// supaya ia ada masa laporan ditulis malam nanti.
+async function smSaveAnswer() {
+  const last = SM.turns.slice().reverse().filter(function(t) { return t.role === 'ai' && !t.err; })[0];
+  const q = SM.turns.slice().reverse().filter(function(t) { return t.role === 'me'; })[0];
+  if (!last) return;
+  if (!activeInspectionId) { showToast('Pilih job dahulu'); return; }
+  try {
+    const prev = (IP.insp && IP.insp.notes) ? IP.insp.notes + '\n\n' : '';
+    const stamp = new Date().toLocaleString('en-MY', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    await ipPatch({ notes: prev + '[' + stamp + '] ' + (q ? q.text + '\n' : '') + last.text });
+    showToast('Disimpan sebagai nota pada job ini');
+  } catch (e) { showToast('Tidak dapat simpan nota', 'error'); }
+}
+
+// ---------- 9. RAKAMAN SUARA (bila transkrip tak boleh jalan) ----------
+// Tanpa isyarat, pengecaman suara mati. Yang masih boleh dilakukan
+// ialah menyimpan suara itu sendiri, supaya tiada apa yang hilang.
+async function smRecMemo() {
+  if (_smRec) { try { _smRec.stop(); } catch (e) {} return; }
+  if (!navigator.mediaDevices || !window.MediaRecorder) { showToast('Peranti ini tidak boleh merakam'); return; }
+  if (!activeInspectionId) { showToast('Pilih job dahulu'); return; }
+  let stream = null;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (e) { showToast('Mikrofon tidak dibenarkan'); return; }
+  _smRecChunks = [];
+  try { _smRec = new MediaRecorder(stream); } catch (e) { showToast('Tidak dapat merakam'); return; }
+  _smRec.ondataavailable = function(ev) { if (ev.data && ev.data.size) _smRecChunks.push(ev.data); };
+  _smRec.onstop = async function() {
+    try { stream.getTracks().forEach(function(t) { t.stop(); }); } catch (e) {}
+    const blob = new Blob(_smRecChunks, { type: _smRec.mimeType || 'audio/webm' });
+    _smRec = null; _smRecChunks = null;
+    await smSaveMemo(blob);
+  };
+  _smRec.start();
+  showToast('Merakam… tekan sekali lagi untuk berhenti');
+  smTalkPaint();
+}
+async function smSaveMemo(blob) {
+  try {
+    await smSyncInsp();
+    const s = await smEnsureSpace();
+    if (!s) throw new Error('Tiada ruang');
+    const no = ipFindingsIn(s.id).length + 1;
+    const data = {
+      spaceId: s.id, spaceKey: s.key, no: no,
+      element: '', defectType: '', rate: '', priority: '', cost: '', action: '', locationText: '',
+      desc: '(Nota suara — belum ditranskrip. Buka bila ada isyarat.)',
+      planId: '', px: null, py: null, photoN: 0,
+      source: 'voice-memo', memo: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    const ref = await ipSub('findings').add(data);
+    await lbPut('memo:' + IP.id + ':' + ref.id, blob, blob.type || 'audio/webm');
+    IP.findings.push(Object.assign({ id: ref.id }, data));
+    await ipCounts();
+    showToast(s.key + ipNo(no) + ' — suara disimpan dalam telefon');
+    smTalkPaint();
+  } catch (e) { showToast('Tidak dapat simpan rakaman. ' + e.message, 'error'); }
+}
+
+// ---------- 10. PEMILIH RUANG ----------
+function smSpaceRender() {
+  const nm = document.getElementById('smSheetName');
+  const sb = document.getElementById('smSheetSub');
+  const act = document.getElementById('smSheetAct');
+  const body = document.getElementById('smSheetBody');
+  const foot = document.getElementById('smSheetFoot');
+  if (!body) return;
+  if (nm) nm.textContent = 'Ruang aktif';
+  if (sb) sb.textContent = 'Semua yang awak tangkap masuk ke sini';
+  if (act) act.style.display = 'none';
+  if (foot) foot.style.display = 'none';
+  let h = '';
+  if (!IP.spaces.length) h += '<div class="sm-empty">Belum ada ruang. Tekan di bawah untuk buat yang pertama.</div>';
+  IP.spaces.forEach(function(s) {
+    const n = ipFindingsIn(s.id).length;
+    h += '<button class="sm-row" data-smspace="' + smEsc(s.id) + '">' +
+      '<span class="sm-row-ico">' + smSvg('pin', 19) + '</span>' +
+      '<span class="sm-row-txt"><span class="sm-row-name">' + smEsc(s.key + ' · ' + (s.name || '')) + '</span>' +
+      '<span class="sm-row-sub">' + n + ' finding' + (n === 1 ? '' : 's') + '</span></span>' +
+      (s.id === SM.spaceId ? '<span class="sm-row-end">Aktif</span>' : '') + '</button>';
+  });
+  h += '<div class="sm-sec"><span class="sm-sec-rule"></span></div>' +
+    '<button class="sm-row" data-sm="newspace"><span class="sm-row-ico">' + smSvg('grid', 19) + '</span>' +
+    '<span class="sm-row-txt"><span class="sm-row-name">Ruang baharu</span>' +
+    '<span class="sm-row-sub">Huruf seterusnya diberi sendiri.</span></span>' +
+    '<span class="sm-row-end">Tambah</span></button>';
+  body.innerHTML = h;
+}
+
+// ---------- 11. WIRING ----------
+function smWire() {
+  smLoad();
+
+  const deck = document.getElementById('smDeck');
+  if (deck) deck.addEventListener('click', function(e) {
+    const t = e.target.closest('[data-smtool]');
+    if (t) { const tool = smToolOf(t.dataset.smtool); if (tool) tool.run(); return; }
+    const tg = e.target.closest('[data-smtog]');
+    if (tg) { SM[tg.dataset.smtog] = !SM[tg.dataset.smtog]; smSave(); smRender(); return; }
+    const f = e.target.closest('[data-smfind]');
+    if (f) { smOpenFinding(f.dataset.smfind); return; }
+    const a = e.target.closest('[data-sm]');
+    if (!a) return;
+    const k = a.dataset.sm;
+    if (k === 'exit') exitSiteMode();
+    else if (k === 'custom') smSheetOpen('custom');
+    else if (k === 'import') smImportLegacy();
+    else if (k === 'allfinds') smGoInsp('hub');
+    else if (k === 'space') { smSheetOpen('space'); }
+    else if (k === 'swap' || k === 'pick') {
+      if (typeof openInspSheet === 'function') { siteSheetCallback = null; openInspSheet(); }
+      else showToast('Tidak dapat membuka senarai inspection');
+    }
+  });
+
+  const body = document.getElementById('smSheetBody');
+  if (body) body.addEventListener('click', function(e) {
+    const md = e.target.closest('[data-smmode]');
+    if (md) { SM.talkMode = md.dataset.smmode; SM.draft = null; SM.turns = []; smTalkRender(); return; }
+    const pr = e.target.closest('[data-smpreset]');
+    if (pr) {
+      const p = SM_PRESETS[pr.dataset.smpreset];
+      if (p) { SM_TOOLS.forEach(function(t) { SM.on[t.k] = p.ks.indexOf(t.k) !== -1; }); smSave(); smCustomRender(); }
+      return;
+    }
+    const pk = e.target.closest('[data-smpick]');
+    if (pk) { const k = pk.dataset.smpick; SM.on[k] = !SM.on[k]; smSave(); smCustomRender(); return; }
+    const mv = e.target.closest('[data-smmv]');
+    if (mv) {
+      const k = mv.dataset.smk, i = SM.order.indexOf(k);
+      const j = mv.dataset.smmv === 'up' ? i - 1 : i + 1;
+      if (i >= 0 && j >= 0 && j < SM.order.length) {
+        SM.order[i] = SM.order[j]; SM.order[j] = k; smSave(); smCustomRender();
+      }
+      return;
+    }
+    const tg = e.target.closest('[data-smtog]');
+    if (tg) {
+      const k = tg.dataset.smtog;
+      SM[k] = !SM[k]; smSave();
+      if (k === 'awake') { if (SM.awake) smWakeOn(); else smWakeOff(); }
+      smSheetRender();
+      return;
+    }
+    const sp = e.target.closest('[data-smspace]');
+    if (sp) { SM.spaceId = sp.dataset.smspace; smSave(); smSheetClose(); showToast('Ruang aktif ditukar'); return; }
+    const a = e.target.closest('[data-sm]');
+    if (!a) return;
+    const k = a.dataset.sm;
+    if (k === 'lang') { SM.lang = SM.lang === 'ms-MY' ? 'en-MY' : 'ms-MY'; smSave(); smSheetRender(); }
+    else if (k === 'newspace') { smNewSpace(); }
+    else if (k === 'speakstop') { try { speechSynthesis.cancel(); } catch (e2) {} }
+    else if (k === 'speakagain') {
+      const last = SM.turns.slice().reverse().filter(function(t) { return t.role === 'ai' && !t.err; })[0];
+      if (last) { smPrimeSpeech(); smSpeak(last.text, SM.lang); }
+    }
+    else if (k === 'saveans') smSaveAnswer();
+    else if (k === 'draftsave') smDraftSave(false);
+    else if (k === 'draftedit') smDraftSave(true);
+    else if (k === 'recmemo') smRecMemo();
+  });
+
+  const back = document.getElementById('smSheetBack');
+  if (back) back.addEventListener('click', smSheetClose);
+  const act = document.getElementById('smSheetAct');
+  if (act) act.addEventListener('click', function() {
+    if (SM.sheet === 'talk') { SM.lang = SM.lang === 'ms-MY' ? 'en-MY' : 'ms-MY'; smSave(); smTalkRender(); }
+  });
+
+  const cap = document.getElementById('smCapBtn');
+  if (cap) cap.addEventListener('click', smCaptureTap);
+  const inp = document.getElementById('siteCaptureInput');
+  if (inp) inp.addEventListener('change', async function(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (file) await smSaveCapture(file);
+  });
+
+  // Tahan-dan-lepas ialah satu gerakan; jari tahu bila ia tamat tanpa
+  // melihat skrin. Jangan lukis semula butang itu semasa jari menekan —
+  // kalau nodnya diganti, pelayar hantar pointercancel dan tekan-tahan
+  // mati serta-merta.
+  const hold = function(el, before) {
+    if (!el) return;
+    el.addEventListener('pointerdown', function(ev) {
+      ev.preventDefault();
+      try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+      if (before) before();
+      smTalkStart();
+    });
+    el.addEventListener('pointerup', function() { smTalkStop(false); });
+    el.addEventListener('pointercancel', function() { smTalkStop(false); });
+  };
+  hold(document.getElementById('smTalkBtn'), function() { if (SM.sheet !== 'talk') smTalkOpen(SM.talkMode); });
+  hold(document.getElementById('smMic'), null);
+
+  const park = document.getElementById('smPark');
+  if (park) park.addEventListener('click', smUnpark);
+}
+async function smNewSpace() {
+  const id = await ipAddSpace(null, null, '');
+  if (!id) return;
+  SM.spaceId = id; smSave();
+  const s = smSpace();
+  const name = prompt('Nama ruang', s ? s.name : '');
+  if (name && name.trim()) await ipSpacePatch(id, { name: name.trim() });
+  smSpaceRender();
+  showToast('Ruang ditambah');
+}
+
+// ---------- 12. MASUK / KELUAR ----------
+async function smBoot() {
+  if (!SM.t0) SM.t0 = Date.now();
+  smWakeOn(); smGeoOn(); smBattOn();
+  if (_smClock) clearInterval(_smClock);
+  _smClock = setInterval(smPaintChips, 60000);
+  smRender();
+  await smSyncInsp();
+  smRender();
+}
+function smShutdown() {
+  smWakeOff(); smGeoOff();
+  if (_smClock) { clearInterval(_smClock); _smClock = null; }
+  smTalkStop(true);
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+  SM.t0 = null;
+  SM.shots.forEach(function(s) { try { URL.revokeObjectURL(s.url); } catch (e) {} });
+  SM.shots = [];
+  SM.turns = []; SM.draft = null;
+  const pill = document.getElementById('smPark');
+  if (pill) pill.classList.remove('on');
+  SM.parked = false;
+}
+
+try { smWire(); } catch (e) { console.warn('[Site Mode wire]', e.message); }
+
+
 // Console banner
-console.log('%cGoXpert Pocket v1.6', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.7', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
