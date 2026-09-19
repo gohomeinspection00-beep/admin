@@ -6938,6 +6938,181 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .lb-btn.g{background:var(--surface);color:var(--fg-2);flex:none;padding-inline:18px}
 .lb-btn:disabled{opacity:.55}
 
+/* ==========================================================
+   SOS — LONE WORKER WATCH (sw-)
+   Kalau ciri ini gagal, seseorang boleh tercedera di tapak
+   tanpa sesiapa tahu. Jadi ia direka mengikut apa yang
+   berlaku bila ia gagal: tempoh bertenang sebelum menggera,
+   guna app dikira check-in supaya ia tidak menyakitkan lalu
+   dimatikan, dan admin sentiasa disalin.
+   Ditulis ke sosWatch/{uid} dan sosAlerts/{id}.
+========================================================== */
+.sw-screen{position:fixed;inset:0;z-index:3200;background:var(--bg);display:none;flex-direction:column}
+.sw-screen.show{display:flex}
+.sw-hd{flex:none;padding:calc(14px + env(safe-area-inset-top)) 15px 0;background:var(--bg)}
+.sw-top{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.sw-back{width:32px;height:32px;border-radius:10px;background:var(--surface);display:grid;place-items:center;flex:none;color:var(--fg-2)}
+.sw-top h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.035em;color:var(--fg)}
+.sw-top h2 em{font-family:var(--font-display);font-style:italic;font-weight:400;color:var(--critical)}
+.sw-tabs{display:flex;gap:4px;padding:3px;background:var(--surface);border-radius:11px;margin-bottom:12px}
+.sw-tabs button{flex:1;padding:8px 6px;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--fg-dim)}
+.sw-tabs button.on{background:var(--bg);color:var(--fg);box-shadow:var(--shadow-1)}
+.sw-tabs em{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-left:4px}
+.sw-roll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sw-roll::-webkit-scrollbar{width:0}
+.sw-pad{padding:2px 15px calc(28px + env(safe-area-inset-bottom))}
+
+.sw-sec{display:flex;align-items:center;gap:8px;margin:0 2px 9px}
+.sw-sec b{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.sw-sec i{flex:1;height:1px;background:var(--line)}
+
+.sw-pick{display:grid;gap:9px;margin-bottom:18px}
+.sw-pk{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1.5px solid var(--line);border-radius:16px;background:var(--bg-2);text-align:left;width:100%}
+.sw-pk.on{border-color:var(--accent);background:var(--accent-soft)}
+.sw-pk-ico{width:44px;height:44px;border-radius:14px;flex:none;display:grid;place-items:center;background:var(--surface);color:var(--fg-dim)}
+.sw-pk.on .sw-pk-ico{background:var(--accent);color:var(--accent-fg)}
+.sw-pk b{display:block;font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.sw-pk p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.45}
+.sw-pk-tick{flex:none;width:20px;height:20px;border-radius:50%;border:1.8px solid var(--line-2);display:grid;place-items:center;color:transparent;margin-top:12px}
+.sw-pk.on .sw-pk-tick{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.sw-who{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.sw-wb{padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);font-size:12.5px;font-weight:600;color:var(--fg-dim);display:flex;align-items:center;gap:8px}
+.sw-wb.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+
+.sw-fld{margin-bottom:14px}
+.sw-fld>label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.sw-fld input,.sw-fld select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--bg-2);font-size:14px;outline:none;color:var(--fg)}
+.sw-fld input:focus,.sw-fld select:focus{border-color:var(--accent);background:var(--bg)}
+.sw-fld input:disabled{opacity:.6}
+.sw-fld .sw-hint{margin:6px 2px 0;font-size:11px;color:var(--muted);line-height:1.45}
+.sw-fld .sw-hint.bad{color:var(--critical);font-weight:600}
+.sw-chips{display:flex;gap:6px;flex-wrap:wrap}
+.sw-chips button{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg-2);font-size:12.5px;font-weight:600;color:var(--fg-dim);font-variant-numeric:tabular-nums}
+.sw-chips button.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+
+.sw-row{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:8px}
+.sw-row-t{min-width:0;flex:1}
+.sw-row-t b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.015em;color:var(--fg)}
+.sw-row-t span{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.sw-sw{flex:none;width:44px;height:26px;border-radius:999px;background:var(--surface-2);position:relative;transition:background .18s}
+.sw-sw i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:var(--shadow-1);transition:transform .18s}
+.sw-sw.on{background:var(--success)}
+.sw-sw.on i{transform:translateX(18px)}
+
+.sw-go{width:100%;padding:16px;border-radius:15px;background:var(--critical);color:#fff;font-size:16px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:4px}
+.sw-go:disabled{opacity:.45}
+
+/* ---------- panel bersedia ---------- */
+.sw-dial{text-align:center;padding:10px 0 4px}
+.sw-ring{width:186px;height:186px;margin:0 auto;position:relative}
+.sw-ring svg{width:186px;height:186px;transform:rotate(-90deg);display:block}
+.sw-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sw-num{font-family:var(--font-mono);font-size:38px;font-weight:600;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums;color:var(--fg)}
+.sw-lbl{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-top:7px}
+.sw-state{margin:14px 0 0;font-size:13px;color:var(--fg-dim);line-height:1.5}
+.sw-state b{color:var(--fg)}
+.sw-ok{width:100%;padding:17px;border-radius:16px;background:var(--success);color:#fff;font-size:17px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0 9px}
+.sw-panic{
+  width:100%;padding:15px;border-radius:16px;border:2px solid var(--critical);background:var(--critical-soft);
+  color:var(--critical);font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px;
+  position:relative;overflow:hidden;touch-action:none;
+}
+.sw-panic i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--critical);opacity:.18}
+.sw-panic span{position:relative}
+.sw-stop{width:100%;margin-top:12px;padding:13px;border-radius:13px;border:1px solid var(--line-2);background:var(--bg);font-size:13.5px;font-weight:700;color:var(--fg-2)}
+
+.sw-facts{margin-top:16px}
+.sw-fact{display:flex;align-items:flex-start;gap:9px;padding:10px 0;border-top:1px solid var(--line);font-size:12.5px}
+.sw-fact svg{flex:none;margin-top:1px;color:var(--muted)}
+.sw-fact b{font-weight:600;color:var(--fg)}
+.sw-fact em{font-style:normal;color:var(--muted)}
+.sw-fact .sw-r{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--fg-2);text-align:right;line-height:1.4}
+
+/* ---------- jalur bersedia ---------- */
+.sw-strip{
+  position:fixed;left:10px;right:10px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:2200;
+  display:none;align-items:center;gap:9px;padding:10px 13px;border-radius:13px;
+  background:var(--warning-soft);border:1px solid var(--warning);color:var(--warning);
+  box-shadow:var(--shadow-2);
+}
+.sw-strip.show{display:flex}
+.sw-strip.hot{background:var(--critical-soft);border-color:var(--critical);color:var(--critical)}
+.sw-strip i{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none;animation:swBeat 2s infinite}
+.sw-strip.hot i{animation:swBeat .7s infinite}
+@keyframes swBeat{0%,100%{opacity:1}50%{opacity:.25}}
+.sw-strip b{font-size:12px;font-weight:700;letter-spacing:-.01em}
+.sw-strip span{font-family:var(--font-mono);font-size:12px;font-weight:600;margin-left:auto;font-variant-numeric:tabular-nums}
+.sw-strip button{flex:none;font-size:11px;font-weight:700;text-decoration:underline;color:inherit}
+
+/* ---------- panggilan check-in ---------- */
+.sw-due{
+  position:fixed;inset:0;z-index:3500;background:var(--critical);color:#fff;display:none;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:calc(28px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom));
+}
+.sw-due.show{display:flex}
+.sw-pulse{width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;margin-bottom:22px;animation:swRing 1.1s infinite}
+@keyframes swRing{0%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}70%{box-shadow:0 0 0 26px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.sw-due h2{margin:0 0 9px;font-size:27px;font-weight:800;letter-spacing:-.035em;line-height:1.15}
+.sw-due p{margin:0;font-size:14px;line-height:1.55;color:rgba(255,255,255,.85);max-width:30ch}
+.sw-due-count{font-family:var(--font-mono);font-size:52px;font-weight:600;letter-spacing:-.05em;margin:20px 0 4px;font-variant-numeric:tabular-nums}
+.sw-due-sub{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.sw-due-btn{width:100%;max-width:300px;margin-top:26px;padding:19px;border-radius:17px;background:#fff;color:var(--critical);font-size:18px;font-weight:800;letter-spacing:-.02em}
+.sw-due-alt{margin-top:13px;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);text-decoration:underline}
+
+/* ---------- SOS keluar ---------- */
+.sw-hero{text-align:center;padding:16px 0 4px}
+.sw-hero .sw-ico{width:70px;height:70px;border-radius:50%;background:var(--critical);color:#fff;display:grid;place-items:center;margin:0 auto 14px}
+.sw-hero h2{margin:0 0 6px;font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--fg)}
+.sw-hero p{margin:0;font-size:13px;color:var(--fg-dim);line-height:1.5}
+.sw-card{border:1px solid var(--line);border-radius:14px;background:var(--bg-2);padding:13px;margin-top:14px}
+.sw-card h4{margin:0 0 9px;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.sw-kv{display:flex;gap:10px;padding:6px 0;font-size:12.5px;align-items:baseline}
+.sw-kv b{flex:none;width:84px;color:var(--muted);font-weight:600;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase}
+.sw-kv span{min-width:0;flex:1;color:var(--fg);font-family:var(--font-mono);font-size:11.5px;word-break:break-word}
+
+/* ---------- sisi penerima ---------- */
+.sw-alert{border:1.5px solid var(--critical);background:var(--critical-soft);border-radius:16px;padding:14px;margin-bottom:12px}
+.sw-alert-hd{display:flex;align-items:center;gap:9px;margin-bottom:9px;color:var(--critical)}
+.sw-alert-hd b{font-size:14.5px;font-weight:800;letter-spacing:-.02em}
+.sw-alert-hd span{margin-left:auto;font-family:var(--font-mono);font-size:10.5px}
+.sw-alert p{margin:0 0 10px;font-size:12.5px;color:var(--fg-2);line-height:1.5}
+.sw-aacts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sw-aa{padding:11px;border-radius:11px;font-size:12.5px;font-weight:700;text-align:center;text-decoration:none;display:block}
+.sw-aa.p{background:var(--critical);color:#fff}
+.sw-aa.g{background:var(--bg);border:1px solid var(--line);color:var(--fg-2)}
+.sw-wrow{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:8px}
+.sw-av{width:38px;height:38px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.sw-wtxt{min-width:0;flex:1}
+.sw-wtxt b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.015em;color:var(--fg)}
+.sw-wtxt span{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.sw-tag{flex:none;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:999px}
+.sw-tag.ok{background:var(--success-soft);color:var(--success)}
+.sw-tag.due{background:var(--warning-soft);color:var(--warning)}
+.sw-tag.bad{background:var(--critical-soft);color:var(--critical)}
+.sw-blank{text-align:center;padding:26px 14px}
+.sw-blank p{margin:9px auto 0;font-size:12.5px;color:var(--muted);line-height:1.55;max-width:32ch}
+
+/* ---------- amaran masuk ---------- */
+.sw-inbound{
+  position:fixed;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top));z-index:3450;
+  display:none;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;
+  background:var(--critical);color:#fff;box-shadow:var(--shadow-3);
+}
+.sw-inbound.show{display:flex}
+.sw-inbound b{font-size:13px;font-weight:800;display:block}
+.sw-inbound em{font-style:normal;font-size:11px;opacity:.85;display:block;margin-top:1px}
+.sw-inbound button{flex:none;padding:7px 12px;border-radius:9px;background:#fff;color:var(--critical);font-size:11.5px;font-weight:800}
+
+/* ---------- Pocket ID dalam Profile ---------- */
+.sw-pid{
+  font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.08em;
+  color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:8px;padding:3px 9px;flex:none;
+}
+
+
 
 
 
@@ -7882,6 +8057,23 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
         <h1 class="profile-name" id="profileName">Surveyor</h1>
         <div class="profile-email" id="profileEmail">user@example.com</div>
       </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">
+          <span>Your Pocket ID</span>
+          <div class="profile-section-line"></div>
+        </div>
+        <button class="profile-row" id="profilePidCopy">
+          <div class="profile-row-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="12" r="2.4"/><path d="M14 10h4M14 14h3"/></svg>
+          </div>
+          <div class="profile-row-content">
+            <div class="profile-row-label">Give this to your safety contact</div>
+            <div class="profile-row-sub">Tap to copy. They enter it when they arm Site safety.</div>
+          </div>
+          <span class="sw-pid" id="profilePid">—</span>
+        </button>
+      </div>
       
       <div class="profile-section">
         <div class="profile-section-title">
@@ -7946,7 +8138,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.9.1 · build 19 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.0 · build 19 Sep 2026</div>
           </div>
         </div>
         
@@ -7977,7 +8169,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v0.9.1</span>
+      <span class="chat-build" title="Build">v1.0</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -8764,6 +8956,162 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   </div>
 </div>
 
+<!-- ===== SOS — LONE WORKER WATCH ===== -->
+<div class="sw-strip" id="swStrip">
+  <i></i><b id="swStripLbl">Watch on</b><span id="swStripT">--:--</span>
+  <button id="swStripOpen">Open</button>
+</div>
+
+<div class="sw-inbound" id="swInbound">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/></svg>
+  <div style="min-width:0;flex:1"><b id="swInboundWho">Someone needs help</b><em id="swInboundWhere"></em></div>
+  <button id="swInboundOpen">See</button>
+</div>
+
+<div class="sw-due" id="swDue">
+  <div class="sw-pulse"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+  <h2>Are you alright?</h2>
+  <p>Answer this, or Pocket sends your location and an SOS.</p>
+  <div class="sw-due-count" id="swDueT">5:00</div>
+  <div class="sw-due-sub">until the alarm goes out</div>
+  <button class="sw-due-btn" id="swDueOk">Yes — I am OK</button>
+  <button class="sw-due-alt" id="swDueNow">Send the SOS now</button>
+</div>
+
+<div class="sw-screen" id="swScreen">
+  <div class="sw-hd">
+    <div class="sw-top">
+      <button class="sw-back" id="swBack" aria-label="Back">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <h2>Site <em>safety</em></h2>
+    </div>
+    <div class="sw-tabs" id="swTabs">
+      <button data-t="me" class="on">Me</button>
+      <button data-t="watch">Watching <em id="swWatchN">0</em></button>
+    </div>
+  </div>
+  <div class="sw-roll"><div class="sw-pad">
+
+    <!-- ---- SETUP ---- -->
+    <div id="swSetup">
+      <div class="sw-sec"><b>How are you working today</b><i></i></div>
+      <div class="sw-pick" id="swPick">
+        <button class="sw-pk on" data-mode="solo">
+          <span class="sw-pk-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+          <span style="min-width:0;flex:1"><b>On my own</b><p>Nobody on site with me. Pocket checks I am still answering, and raises the alarm if I stop.</p></span>
+          <span class="sw-pk-tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg></span>
+        </button>
+        <button class="sw-pk" data-mode="pair">
+          <span class="sw-pk-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M17 5.2a3.4 3.4 0 0 1 0 6.6M18.5 20a6.5 6.5 0 0 0-3-5.4"/></svg></span>
+          <span style="min-width:0;flex:1"><b>With someone</b><p>A colleague is with me. No check-in nagging by default — just the panic button.</p></span>
+          <span class="sw-pk-tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg></span>
+        </button>
+      </div>
+
+      <div class="sw-sec"><b>Who gets the alarm</b><i></i></div>
+      <div class="sw-who" id="swWho">
+        <button class="sw-wb on" data-who="admin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 21 7v5c0 5-3.9 8.7-9 10-5.1-1.3-9-5-9-10V7z"/></svg>GoXpert admin</button>
+        <button class="sw-wb" data-who="id"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>A Pocket ID</button>
+      </div>
+      <div class="sw-fld" id="swIdFld" style="display:none">
+        <label>Their Pocket ID</label>
+        <input type="text" id="swPid" placeholder="e.g. 7K2-M9Q" autocapitalize="characters" autocomplete="off">
+        <p class="sw-hint" id="swPidHint">Every Pocket user has one, shown in their Profile. They must have Pocket installed and signed in — the alarm arrives inside the app.</p>
+      </div>
+      <div class="sw-fld">
+        <label>Also notify</label>
+        <input type="text" value="Admin — always included" disabled>
+        <p class="sw-hint">Admin is copied even when you name someone else. One person can miss a phone; two rarely do.</p>
+      </div>
+
+      <div id="swSoloOnly">
+        <div class="sw-sec"><b>Check-in</b><i></i></div>
+        <div class="sw-row">
+          <div class="sw-row-t"><b>Ask me to check in</b><span>A loud alarm you have to answer</span></div>
+          <button class="sw-sw on" id="swChk"><i></i></button>
+        </div>
+        <div class="sw-fld">
+          <label>Every</label>
+          <div class="sw-chips" id="swIvl">
+            <button data-m="15">15 min</button><button data-m="30">30 min</button>
+            <button data-m="60" class="on">1 hour</button><button data-m="120">2 hours</button>
+          </div>
+        </div>
+        <div class="sw-fld">
+          <label>If I do not answer, wait</label>
+          <div class="sw-chips" id="swGrc">
+            <button data-m="2">2 min</button><button data-m="5" class="on">5 min</button><button data-m="10">10 min</button>
+          </div>
+          <p class="sw-hint">Then the SOS goes out by itself. This pause is why a missed alarm while you are up a ladder does not scramble anyone.</p>
+        </div>
+        <div class="sw-row">
+          <div class="sw-row-t"><b>Using Pocket counts as a check-in</b><span>Take a photo, rate a defect — the clock resets. Fewer alarms, same cover.</span></div>
+          <button class="sw-sw on" id="swAuto"><i></i></button>
+        </div>
+        <div class="sw-fld" style="margin-top:14px">
+          <label>I expect to finish by</label>
+          <input type="time" id="swEnd" value="17:30">
+          <p class="sw-hint">At that time Pocket asks once. No answer still raises the alarm — not answering at the end of a job is exactly when something has gone wrong.</p>
+        </div>
+      </div>
+
+      <button class="sw-go" id="swArm">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 21 7v5c0 5-3.9 8.7-9 10-5.1-1.3-9-5-9-10V7z"/><path d="M9 12l2 2 4-4"/></svg>
+        Start watching me
+      </button>
+      <p class="sw-hint" style="text-align:center;margin-top:10px">Pocket needs your location, and must stay open on screen for the alarm to sound.</p>
+    </div>
+
+    <!-- ---- ARMED ---- -->
+    <div id="swArmed" style="display:none">
+      <div class="sw-dial">
+        <div class="sw-ring">
+          <svg viewBox="0 0 186 186" aria-hidden="true">
+            <circle cx="93" cy="93" r="82" fill="none" stroke="var(--surface-2)" stroke-width="10"/>
+            <circle id="swArc" cx="93" cy="93" r="82" fill="none" stroke="var(--warning)" stroke-width="10" stroke-linecap="round" stroke-dasharray="515.2" stroke-dashoffset="0" style="transition:stroke-dashoffset .3s linear"/>
+          </svg>
+          <div class="sw-mid"><div class="sw-num" id="swBigT">--:--</div><div class="sw-lbl" id="swBigL">until check-in</div></div>
+        </div>
+        <p class="sw-state" id="swState"></p>
+      </div>
+      <button class="sw-ok" id="swOk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg>
+        I am OK
+      </button>
+      <button class="sw-panic" id="swPanic"><i id="swPanicFill"></i><span>Hold 2 seconds to send SOS now</span></button>
+      <div class="sw-facts">
+        <div class="sw-fact"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/></svg><div><b>Location</b> <em>sent with every alarm</em></div><div class="sw-r" id="swLoc">waiting…</div></div>
+        <div class="sw-fact"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 21 7v5c0 5-3.9 8.7-9 10-5.1-1.3-9-5-9-10V7z"/></svg><div><b>Watching</b> <em id="swWatcher">admin</em></div><div class="sw-r" id="swWatchState">notified</div></div>
+        <div class="sw-fact"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="17" height="10" rx="2.5"/><path d="M22 10v4"/></svg><div><b>Screen</b> <em>kept awake so the alarm can sound</em></div><div class="sw-r" id="swWake">—</div></div>
+        <div class="sw-fact"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><div><b>Finish by</b> <em>then Pocket asks once</em></div><div class="sw-r" id="swEndTxt">—</div></div>
+      </div>
+      <button class="sw-stop" id="swStop">Stop watching me</button>
+    </div>
+
+    <!-- ---- SENT ---- -->
+    <div id="swSent" style="display:none">
+      <div class="sw-hero">
+        <div class="sw-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/></svg></div>
+        <h2 id="swSentWhy">SOS sent</h2>
+        <p>Sent to <b id="swSentWho">admin</b> inside Pocket. If there is no signal it queues and goes out the moment there is.</p>
+      </div>
+      <div class="sw-card"><h4>What they received</h4><div id="swSentBody"></div></div>
+      <button class="sw-stop" id="swFalse" style="margin-top:14px">False alarm — tell them I am fine</button>
+      <p class="sw-hint" style="text-align:center;margin-top:9px">This sends a follow-up. It does not delete what they already saw.</p>
+      <button class="sw-stop" id="swDone">Close</button>
+    </div>
+
+    <!-- ---- WATCHING ---- -->
+    <div id="swWatchPane" style="display:none">
+      <div id="swAlerts"></div>
+      <div class="sw-sec"><b>On site now</b><i></i></div>
+      <div id="swPeople"></div>
+    </div>
+
+  </div></div>
+</div>
+
 <script>
 // =======================================================
 // FIREBASE — projek GoXpert Pocket SENDIRI
@@ -9068,6 +9416,9 @@ function showApp() {
   }
   if (typeof lbLoad === 'function') {
     lbLoad().catch(e => console.warn('[showApp] library', e.message));
+  }
+  if (typeof sosBoot === 'function') {
+    sosBoot().catch(e => console.warn('[showApp] safety', e.message));
   }
 }
 
@@ -11142,10 +11493,7 @@ function formatRelativeTime(date) {
   on('nhLib', function() {
     switchTab('library');
   });
-  on('nhSos', function() {
-    // Fungsi SOS ditangguh sehingga ciri hubung pengguna berdekatan siap.
-    showToast('SOS coming soon');
-  });
+  on('nhSos', function() { if (typeof sosOpen === 'function') sosOpen(); });
   on('nhMode', function() {
     if (typeof setMode === 'function') {
       setMode(currentMode === 'consultant' ? 'normal' : 'consultant');
@@ -23621,8 +23969,727 @@ function lbWire() {
 
 try { lbWire(); } catch (e) { console.warn('[Library wire]', e.message); }
 
+// =======================================================
+// POCKET ID
+// Setiap pengguna dapat satu kod pendek yang boleh diberi
+// kepada orang lain. UID Firebase terlalu panjang untuk
+// ditaip di tapak. Huruf mengelirukan (0 O 1 I L) dibuang.
+// Disimpan di users/{uid}.pocketId dan pocketIds/{ID}.
+// =======================================================
+const PID_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+let myPocketId = '';
+
+function pidRandom() {
+  let s = '';
+  const a = new Uint32Array(6);
+  if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+  for (let i = 0; i < 6; i++) {
+    const n = (a[i] !== undefined ? a[i] : Math.floor(Math.random() * 0xffffffff)) % PID_ALPHABET.length;
+    s += PID_ALPHABET[n];
+  }
+  return s;
+}
+function pidPretty(id) { return id ? id.slice(0, 3) + '-' + id.slice(3) : ''; }
+function pidNormal(v) { return String(v || '').toUpperCase().replace(/[^0-9A-Z]/g, ''); }
+
+// Transaksi supaya dua pengguna tidak boleh merebut kod yang sama.
+async function pidClaim(uid, name) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const id = pidRandom();
+    const ref = db.collection('pocketIds').doc(id);
+    try {
+      await db.runTransaction(async function(tx) {
+        const snap = await tx.get(ref);
+        if (snap.exists) throw new Error('taken');
+        tx.set(ref, { uid: uid, name: name || '', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      });
+      return id;
+    } catch (e) {
+      if (e.message !== 'taken') throw e;
+    }
+  }
+  throw new Error('Could not pick an unused ID');
+}
+async function pidEnsure() {
+  if (!currentUser) return '';
+  try {
+    const uref = db.collection('users').doc(currentUser.uid);
+    const snap = await uref.get();
+    const existing = snap.exists ? (snap.data().pocketId || '') : '';
+    if (existing) { myPocketId = existing; pidPaint(); return existing; }
+    const name = currentUser.displayName || (snap.exists ? snap.data().name : '') || '';
+    const id = await pidClaim(currentUser.uid, name);
+    await uref.set({ pocketId: id }, { merge: true });
+    myPocketId = id;
+    pidPaint();
+    return id;
+  } catch (e) {
+    console.warn('[Pocket ID]', e.message);
+    return '';
+  }
+}
+function pidPaint() {
+  const el = document.getElementById('profilePid');
+  if (el) el.textContent = myPocketId ? pidPretty(myPocketId) : '—';
+}
+async function pidLookup(raw) {
+  const id = pidNormal(raw);
+  if (id.length !== 6) return null;
+  try {
+    const snap = await db.collection('pocketIds').doc(id).get();
+    if (!snap.exists) return null;
+    const d = snap.data();
+    return { id: id, uid: d.uid, name: d.name || '' };
+  } catch (e) {
+    console.warn('[Pocket ID lookup]', e.message);
+    return null;
+  }
+}
+
+// =======================================================
+// SOS — LONE WORKER WATCH
+// Direka mengikut apa yang berlaku bila ia gagal:
+//  · tempoh bertenang sebelum menggera, supaya loceng yang
+//    terlepas semasa atas tangga tidak mengerah orang;
+//  · guna app dikira check-in, supaya ia tidak menyakitkan
+//    lalu dimatikan terus — itu risiko paling besar;
+//  · admin sentiasa disalin selain orang yang dinamakan.
+// Status hidup di sosWatch/{uid}; amaran di sosAlerts/{id}.
+// =======================================================
+const SOS_KEY = 'pocket_sos_v1';
+
+let SOS = {
+  on: false, mode: 'solo', who: 'admin', watcherUid: '', watcherId: '', watcherName: '',
+  check: true, auto: true, ivl: 60, grc: 5, endAt: '',
+  dueAt: 0, escAt: 0, phase: 'idle', armedAt: 0, lastOk: 0,
+  lat: null, lng: null, acc: null, battery: null,
+  siteName: '', inspectionId: '', tab: 'me', view: 'setup',
+  isAdmin: false, watchList: [], alerts: []
+};
+let _sosTimer = null, _sosGeo = null, _sosWake = null, _sosAudio = null;
+let _sosLastWrite = 0, _sosUnsubA = null, _sosUnsubW = null;
+
+function sosSave() {
+  try {
+    localStorage.setItem(SOS_KEY, JSON.stringify({
+      on: SOS.on, mode: SOS.mode, who: SOS.who, watcherUid: SOS.watcherUid, watcherId: SOS.watcherId,
+      watcherName: SOS.watcherName, check: SOS.check, auto: SOS.auto, ivl: SOS.ivl, grc: SOS.grc,
+      endAt: SOS.endAt, dueAt: SOS.dueAt, escAt: SOS.escAt, phase: SOS.phase,
+      armedAt: SOS.armedAt, lastOk: SOS.lastOk, siteName: SOS.siteName, inspectionId: SOS.inspectionId
+    }));
+  } catch (e) {}
+}
+function sosLoad() {
+  try {
+    const d = JSON.parse(localStorage.getItem(SOS_KEY) || 'null');
+    if (d && typeof d === 'object') Object.keys(d).forEach(function(k) { SOS[k] = d[k]; });
+  } catch (e) {}
+}
+function sosClear() { try { localStorage.removeItem(SOS_KEY); } catch (e) {} }
+
+function sosFmt(ms) {
+  if (ms < 0) ms = 0;
+  const t = Math.round(ms / 1000), m = Math.floor(t / 60), s = t % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+function sosWhoName() {
+  if (SOS.who === 'admin') return 'GoXpert admin';
+  return (SOS.watcherName || pidPretty(SOS.watcherId) || 'your contact') + ' + admin';
+}
+function sosMapLink() {
+  if (SOS.lat == null) return '';
+  return 'https://maps.google.com/?q=' + SOS.lat.toFixed(6) + ',' + SOS.lng.toFixed(6);
+}
+
+// ---------- 1. DERIA ----------
+function sosStartGeo() {
+  if (!navigator.geolocation) { const e = document.getElementById('swLoc'); if (e) e.textContent = 'not available'; return; }
+  if (_sosGeo !== null) return;
+  _sosGeo = navigator.geolocation.watchPosition(function(p) {
+    const first = SOS.lat == null;
+    SOS.lat = p.coords.latitude; SOS.lng = p.coords.longitude; SOS.acc = Math.round(p.coords.accuracy || 0);
+    const e = document.getElementById('swLoc');
+    if (e) e.innerHTML = SOS.lat.toFixed(4) + ', ' + SOS.lng.toFixed(4) + '<br>±' + SOS.acc + ' m';
+    // Tulis kedudukan paling kerap dua minit sekali — bateri, bukan ketepatan,
+    // yang jadi had di tapak sepanjang hari.
+    // Tolakan segera pada fix pertama, supaya pemerhati tidak melihat
+    // "tiada lokasi" selama dua minit pertama.
+    if (first || Date.now() - _sosLastWrite > 120000) sosPush();
+  }, function(err) {
+    const e = document.getElementById('swLoc');
+    if (e) e.textContent = err.code === 1 ? 'permission denied' : 'no fix yet';
+  }, { enableHighAccuracy: true, maximumAge: 30000, timeout: 20000 });
+}
+function sosStopGeo() {
+  if (_sosGeo !== null && navigator.geolocation) navigator.geolocation.clearWatch(_sosGeo);
+  _sosGeo = null;
+}
+async function sosBattery() {
+  try {
+    if (!navigator.getBattery) return;
+    const b = await navigator.getBattery();
+    SOS.battery = Math.round(b.level * 100);
+  } catch (e) {}
+}
+// Pelayar perlahankan pemasa dan halang bunyi bila app di belakang,
+// jadi skrin kena kekal hidup selagi mod ini dipasang. Ini yang hilang
+// bila app dijadikan native nanti.
+async function sosWakeOn() {
+  const el = document.getElementById('swWake');
+  try {
+    if (!('wakeLock' in navigator)) { if (el) el.textContent = 'not supported'; return; }
+    _sosWake = await navigator.wakeLock.request('screen');
+    _sosWake.addEventListener('release', function() { _sosWake = null; });
+    if (el) el.textContent = 'held';
+  } catch (e) {
+    if (el) el.textContent = 'refused';
+  }
+}
+function sosWakeOff() {
+  try { if (_sosWake) _sosWake.release(); } catch (e) {}
+  _sosWake = null;
+}
+function sosPrime() {
+  try {
+    _sosAudio = _sosAudio || new (window.AudioContext || window.webkitAudioContext)();
+    if (_sosAudio.state === 'suspended') _sosAudio.resume();
+    const o = _sosAudio.createOscillator(), g = _sosAudio.createGain();
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(_sosAudio.destination);
+    o.start(); o.stop(_sosAudio.currentTime + 0.01);
+  } catch (e) {}
+  if ('Notification' in window && Notification.permission === 'default') {
+    try { Notification.requestPermission(); } catch (e) {}
+  }
+}
+function sosAlarm() {
+  try {
+    if (!_sosAudio) _sosAudio = new (window.AudioContext || window.webkitAudioContext)();
+    if (_sosAudio.state === 'suspended') _sosAudio.resume();
+    [0, 0.35, 0.7, 1.05].forEach(function(t) {
+      const o = _sosAudio.createOscillator(), g = _sosAudio.createGain();
+      o.type = 'square'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, _sosAudio.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.14, _sosAudio.currentTime + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, _sosAudio.currentTime + t + 0.24);
+      o.connect(g); g.connect(_sosAudio.destination);
+      o.start(_sosAudio.currentTime + t); o.stop(_sosAudio.currentTime + t + 0.26);
+    });
+  } catch (e) {}
+  if (navigator.vibrate) { try { navigator.vibrate([400, 150, 400, 150, 400]); } catch (e) {} }
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try { new Notification('Pocket — are you alright?', { body: 'Answer, or an SOS goes out.', tag: 'pocket-sos' }); } catch (e) {}
+  }
+}
+
+// ---------- 2. FIRESTORE ----------
+function sosWatchRef() { return db.collection('sosWatch').doc(currentUser.uid); }
+async function sosPush() {
+  if (!currentUser || !SOS.on) return;
+  _sosLastWrite = Date.now();
+  try {
+    await sosWatchRef().set({
+      uid: currentUser.uid,
+      name: currentUser.displayName || currentUser.email || 'Surveyor',
+      pocketId: myPocketId || '',
+      active: true,
+      mode: SOS.mode,
+      state: SOS.phase === 'due' ? 'due' : 'ok',
+      siteName: SOS.siteName || '',
+      inspectionId: SOS.inspectionId || '',
+      checkEnabled: !!SOS.check,
+      intervalMin: SOS.ivl,
+      graceMin: SOS.grc,
+      endAt: SOS.endAt || '',
+      nextDueAt: SOS.dueAt || 0,
+      lastCheckIn: SOS.lastOk || 0,
+      lat: SOS.lat, lng: SOS.lng, acc: SOS.acc,
+      battery: SOS.battery,
+      watcherUid: SOS.watcherUid || '',
+      watcherPocketId: SOS.watcherId || '',
+      notifyAdmin: true,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (e) { console.warn('[SOS push]', e.message); }
+}
+async function sosPushOff() {
+  if (!currentUser) return;
+  try {
+    await sosWatchRef().set({ active: false, state: 'off', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  } catch (e) { console.warn('[SOS off]', e.message); }
+}
+
+// ---------- 3. PASANG / TANGGAL ----------
+async function sosArm() {
+  if (!currentUser) { showToast('Sign in first', 'error'); return; }
+  const btn = document.getElementById('swArm');
+  btn.disabled = true;
+
+  if (SOS.who === 'id') {
+    const found = await pidLookup(document.getElementById('swPid').value);
+    const hint = document.getElementById('swPidHint');
+    if (!found) {
+      hint.textContent = 'No Pocket user has that ID. Check it with them — it is in their Profile.';
+      hint.classList.add('bad');
+      btn.disabled = false;
+      return;
+    }
+    if (found.uid === currentUser.uid) {
+      hint.textContent = 'That is your own ID. Name someone who is not on site with you.';
+      hint.classList.add('bad');
+      btn.disabled = false;
+      return;
+    }
+    hint.classList.remove('bad');
+    SOS.watcherUid = found.uid; SOS.watcherId = found.id; SOS.watcherName = found.name;
+  } else {
+    SOS.watcherUid = ''; SOS.watcherId = ''; SOS.watcherName = '';
+  }
+
+  sosPrime();
+  SOS.on = true;
+  SOS.armedAt = Date.now();
+  SOS.lastOk = Date.now();
+  SOS.phase = SOS.check ? 'count' : 'idlearm';
+  SOS.dueAt = SOS.check ? Date.now() + SOS.ivl * 60000 : 0;
+  SOS.endAt = document.getElementById('swEnd').value || '';
+
+  const insp = (typeof inspections !== 'undefined' && typeof activeInspectionId !== 'undefined')
+    ? inspections.filter(function(i) { return i.id === activeInspectionId; })[0] : null;
+  SOS.siteName = insp ? insp.title : '';
+  SOS.inspectionId = insp ? insp.id : '';
+
+  sosStartGeo();
+  sosBattery();
+  sosWakeOn();
+  sosSave();
+  sosPush();
+  sosView('armed');
+  sosRun();
+  btn.disabled = false;
+  showToast(SOS.check ? 'Watch on. First check-in in ' + SOS.ivl + ' min.' : 'Watch on. Panic button ready.');
+}
+
+function sosDisarm(quiet) {
+  SOS.on = false; SOS.phase = 'idle';
+  if (_sosTimer) clearInterval(_sosTimer);
+  _sosTimer = null;
+  sosStopGeo(); sosWakeOff(); sosClear();
+  document.getElementById('swDue').classList.remove('show');
+  sosPushOff();
+  sosPaintStrip();
+  sosView('setup');
+  if (!quiet) showToast('Watch off. Nobody is being notified.');
+}
+
+function sosRun() {
+  if (_sosTimer) clearInterval(_sosTimer);
+  _sosTimer = setInterval(sosTick, 250);
+  sosTick();
+}
+
+// Semua masa dikira dari cap masa, bukan dikumpul tick demi tick,
+// supaya app yang diminimumkan tidak hilang kiraan.
+function sosTick() {
+  if (!SOS.on) return;
+  sosPaintStrip();
+  if (!SOS.check) {
+    const b = document.getElementById('swBigT'), l = document.getElementById('swBigL');
+    if (b) b.textContent = '—';
+    if (l) l.textContent = 'panic button ready';
+    const arc = document.getElementById('swArc');
+    if (arc) arc.setAttribute('stroke-dashoffset', '515.2');
+    return;
+  }
+  if (SOS.phase === 'count') {
+    const left = SOS.dueAt - Date.now();
+    const span = SOS.ivl * 60000;
+    const b = document.getElementById('swBigT'), l = document.getElementById('swBigL'), arc = document.getElementById('swArc');
+    if (b) b.textContent = sosFmt(left);
+    if (l) l.textContent = 'until check-in';
+    if (arc) { arc.setAttribute('stroke-dashoffset', String(515.2 * (1 - Math.max(0, left) / span))); arc.setAttribute('stroke', 'var(--warning)'); }
+    if (left <= 0) sosDue(false);
+  } else if (SOS.phase === 'due') {
+    const left = SOS.escAt - Date.now();
+    const d = document.getElementById('swDueT');
+    if (d) d.textContent = sosFmt(left);
+    if (left <= 0) sosFire('No answer to the check-in');
+  }
+}
+
+function sosDue(resumed) {
+  SOS.phase = 'due';
+  SOS.escAt = Date.now() + SOS.grc * 60000;
+  sosSave();
+  document.getElementById('swDue').classList.add('show');
+  if (!resumed) sosAlarm();
+  sosPush();
+}
+
+function sosOk() {
+  SOS.phase = 'count';
+  SOS.lastOk = Date.now();
+  SOS.dueAt = Date.now() + SOS.ivl * 60000;
+  document.getElementById('swDue').classList.remove('show');
+  sosSave(); sosPush(); sosTick();
+  showToast('Checked in. Next in ' + SOS.ivl + ' min.');
+}
+
+// Sebarang tindakan sengaja dalam app bermakna orang itu sedar dan
+// memegang telefon — itulah yang "I am OK" maksudkan. Tanpa ini,
+// ciri keselamatan jadi menyakitkan lalu dimatikan.
+function sosTouch() {
+  if (!SOS.on || !SOS.check || !SOS.auto) return;
+  if (SOS.phase !== 'count') return;
+  if (Date.now() - SOS.lastOk < 20000) return;
+  SOS.lastOk = Date.now();
+  SOS.dueAt = Date.now() + SOS.ivl * 60000;
+  sosSave();
+}
+
+async function sosFire(why) {
+  const wasOn = SOS.on;
+  SOS.phase = 'fired';
+  if (_sosTimer) clearInterval(_sosTimer);
+  _sosTimer = null;
+  document.getElementById('swDue').classList.remove('show');
+  await sosBattery();
+
+  const payload = {
+    fromUid: currentUser ? currentUser.uid : '',
+    fromName: currentUser ? (currentUser.displayName || currentUser.email || 'Surveyor') : '',
+    fromPocketId: myPocketId || '',
+    toUid: SOS.watcherUid || '',
+    toAdmin: true,
+    reason: why,
+    siteName: SOS.siteName || '',
+    lat: SOS.lat, lng: SOS.lng, acc: SOS.acc,
+    battery: SOS.battery,
+    lastCheckIn: SOS.lastOk || 0,
+    resolved: false,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  document.getElementById('swSentWhy').textContent = why;
+  document.getElementById('swSentWho').textContent = sosWhoName();
+  const row = function(k, v) { return '<div class="sw-kv"><b>' + k + '</b><span>' + escapeHTML(v) + '</span></div>'; };
+  document.getElementById('swSentBody').innerHTML =
+    row('Who', payload.fromName + (myPocketId ? ' · ' + pidPretty(myPocketId) : '')) +
+    row('Site', payload.siteName || 'not set') +
+    row('Where', SOS.lat != null ? (SOS.lat.toFixed(6) + ', ' + SOS.lng.toFixed(6) + ' (±' + SOS.acc + ' m)\n' + sosMapLink()) : 'no fix — last known position unavailable') +
+    row('Time', new Date().toLocaleString('en-MY')) +
+    row('Last seen', SOS.lastOk ? new Date(SOS.lastOk).toLocaleTimeString('en-MY') : 'unknown') +
+    row('Battery', SOS.battery != null ? SOS.battery + '%' : 'unknown');
+  sosView('sent');
+  sosAlarm();
+
+  SOS.on = false;
+  sosStopGeo(); sosWakeOff(); sosClear();
+  sosPaintStrip();
+
+  if (!currentUser) return;
+  try {
+    const ref = await db.collection('sosAlerts').add(payload);
+    SOS.lastAlertId = ref.id;
+    await sosWatchRef().set({
+      active: false, state: 'sos', lastAlertId: ref.id,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (e) {
+    console.warn('[SOS fire]', e.message);
+    showToast('Alarm queued — it will send when there is signal', 'error');
+  }
+  if (!wasOn) return;
+}
+
+async function sosFalseAlarm() {
+  if (!SOS.lastAlertId || !currentUser) { showToast('Nothing to cancel'); return; }
+  try {
+    await db.collection('sosAlerts').doc(SOS.lastAlertId).update({
+      resolved: true, resolvedBy: 'sender', resolvedNote: 'False alarm — I am fine',
+      resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Follow-up sent: false alarm');
+  } catch (e) { showToast('Could not send. ' + e.message, 'error'); }
+}
+
+// ---------- 4. SISI PENERIMA ----------
+async function sosCheckAdmin() {
+  if (!currentUser) return false;
+  try {
+    const s = await db.collection('pocketAdmins').doc(currentUser.uid).get();
+    SOS.isAdmin = s.exists;
+  } catch (e) { SOS.isAdmin = false; }
+  return SOS.isAdmin;
+}
+function sosListen() {
+  if (!currentUser) return;
+  if (_sosUnsubA) { _sosUnsubA(); _sosUnsubA = null; }
+  if (_sosUnsubW) { _sosUnsubW(); _sosUnsubW = null; }
+  const alerts = SOS.isAdmin
+    ? db.collection('sosAlerts').where('toAdmin', '==', true).where('resolved', '==', false)
+    : db.collection('sosAlerts').where('toUid', '==', currentUser.uid).where('resolved', '==', false);
+  _sosUnsubA = alerts.onSnapshot(function(snap) {
+    SOS.alerts = [];
+    snap.forEach(function(d) {
+      const x = d.data();
+      if (x.fromUid === currentUser.uid) return;      // amaran sendiri bukan untuk sendiri
+      SOS.alerts.push(Object.assign({ id: d.id }, x));
+    });
+    SOS.alerts.sort(function(a, b) { return (b.createdAt && b.createdAt.seconds || 0) - (a.createdAt && a.createdAt.seconds || 0); });
+    sosPaintWatch();
+    sosPaintInbound();
+  }, function(e) { console.warn('[SOS alerts]', e.message); });
+
+  const watch = SOS.isAdmin
+    ? db.collection('sosWatch').where('active', '==', true)
+    : db.collection('sosWatch').where('watcherUid', '==', currentUser.uid).where('active', '==', true);
+  _sosUnsubW = watch.onSnapshot(function(snap) {
+    SOS.watchList = [];
+    snap.forEach(function(d) {
+      if (d.id === currentUser.uid) return;
+      SOS.watchList.push(Object.assign({ id: d.id }, d.data()));
+    });
+    sosPaintWatch();
+  }, function(e) { console.warn('[SOS watch]', e.message); });
+}
+function sosPaintInbound() {
+  const bar = document.getElementById('swInbound');
+  if (!bar) return;
+  const onWatchPane = document.getElementById('swScreen').classList.contains('show') && SOS.tab === 'watch';
+  if (!SOS.alerts.length || onWatchPane) { bar.classList.remove('show'); return; }
+  const a = SOS.alerts[0];
+  document.getElementById('swInboundWho').textContent = (a.fromName || 'Someone') + ' needs help';
+  document.getElementById('swInboundWhere').textContent = (a.siteName || 'location unknown') + ' · ' + (a.reason || '');
+  bar.classList.add('show');
+}
+function sosAgo(ts) {
+  if (!ts) return '';
+  const s = ts.seconds ? ts.seconds * 1000 : ts;
+  const m = Math.round((Date.now() - s) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + ' min ago';
+  return Math.round(m / 60) + ' h ago';
+}
+function sosPaintWatch() {
+  const n = document.getElementById('swWatchN');
+  if (n) n.textContent = SOS.watchList.length + SOS.alerts.length;
+
+  const ab = document.getElementById('swAlerts');
+  if (ab) {
+    ab.innerHTML = SOS.alerts.map(function(a) {
+      const link = (a.lat != null) ? 'https://maps.google.com/?q=' + a.lat + ',' + a.lng : '';
+      return '<div class="sw-alert">' +
+        '<div class="sw-alert-hd">' +
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/></svg>' +
+          '<b>' + escapeHTML(a.fromName || 'A surveyor') + '</b><span>' + sosAgo(a.createdAt) + '</span>' +
+        '</div>' +
+        '<p>' + escapeHTML(a.reason || 'SOS') + '. ' + escapeHTML(a.siteName || 'Site not set') + '.' +
+          (a.lat != null ? ' Location accurate to ' + (a.acc || '?') + ' m.' : ' No location fix.') +
+          (a.battery != null ? ' Battery ' + a.battery + '%.' : '') + '</p>' +
+        '<div class="sw-aacts">' +
+          (link ? '<a class="sw-aa p" href="' + link + '" target="_blank" rel="noopener">Open the map</a>' : '<span class="sw-aa g">No location</span>') +
+          '<button class="sw-aa g" data-sosack="' + a.id + '">Mark handled</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  const pb = document.getElementById('swPeople');
+  if (!pb) return;
+  if (!SOS.watchList.length) {
+    pb.innerHTML = '<div class="sw-blank">' +
+      '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 21 7v5c0 5-3.9 8.7-9 10-5.1-1.3-9-5-9-10V7z"/><path d="M9 12l2 2 4-4"/></svg>' +
+      '<p>' + (SOS.isAdmin ? 'Nobody has the watch on right now.' : 'Nobody has named you as their contact yet. Give them your Pocket ID — it is in your Profile.') + '</p></div>';
+    return;
+  }
+  pb.innerHTML = SOS.watchList.map(function(w) {
+    const due = w.nextDueAt ? Math.round((w.nextDueAt - Date.now()) / 60000) : null;
+    const state = w.state === 'sos' ? 'bad' : w.state === 'due' ? 'due' : 'ok';
+    const tag = w.state === 'sos' ? 'SOS' : w.state === 'due' ? 'DUE' : 'OK';
+    const bits = [];
+    bits.push(w.siteName || 'site not set');
+    bits.push(w.mode === 'pair' ? 'with someone' : 'alone');
+    if (w.checkEnabled && due != null) bits.push(due > 0 ? 'check-in in ' + due + ' min' : 'check-in due now');
+    if (w.endAt) bits.push('finishes ' + w.endAt);
+    return '<div class="sw-wrow"><span class="sw-av">' + escapeHTML((w.name || '?').charAt(0).toUpperCase()) + '</span>' +
+      '<span class="sw-wtxt"><b>' + escapeHTML(w.name || 'Surveyor') + '</b><span>' + escapeHTML(bits.join(' · ')) + '</span></span>' +
+      '<span class="sw-tag ' + state + '">' + tag + '</span></div>';
+  }).join('');
+}
+
+// ---------- 5. PAPARAN ----------
+function sosView(v) {
+  SOS.view = v;
+  const set = function(id, on) { const e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
+  const me = SOS.tab === 'me';
+  set('swSetup', me && v === 'setup');
+  set('swArmed', me && v === 'armed');
+  set('swSent', me && v === 'sent');
+  set('swWatchPane', !me);
+  if (v === 'armed') {
+    document.getElementById('swWatcher').textContent = sosWhoName();
+    document.getElementById('swEndTxt').textContent = SOS.endAt || 'not set';
+    document.getElementById('swState').innerHTML =
+      (SOS.mode === 'solo' ? 'Working alone' : 'With a colleague') +
+      (SOS.siteName ? ' at <b>' + escapeHTML(SOS.siteName) + '</b>' : '') +
+      '. ' + escapeHTML(sosWhoName()) + ' notified.';
+  }
+}
+function sosPaintStrip() {
+  const s = document.getElementById('swStrip');
+  if (!s) return;
+  if (!SOS.on) { s.classList.remove('show', 'hot'); return; }
+  s.classList.add('show');
+  const lbl = document.getElementById('swStripLbl'), t = document.getElementById('swStripT');
+  if (!SOS.check) {
+    s.classList.remove('hot');
+    lbl.textContent = 'Watch on'; t.textContent = 'panic ready';
+    return;
+  }
+  if (SOS.phase === 'due') {
+    s.classList.add('hot');
+    lbl.textContent = 'Answer now'; t.textContent = sosFmt(SOS.escAt - Date.now());
+  } else {
+    s.classList.remove('hot');
+    lbl.textContent = 'Watch on'; t.textContent = sosFmt(SOS.dueAt - Date.now());
+  }
+}
+function sosOpen() {
+  document.getElementById('swScreen').classList.add('show');
+  sosView(SOS.on ? 'armed' : (SOS.view === 'sent' ? 'sent' : 'setup'));
+  sosPaintWatch();
+  sosPaintInbound();
+}
+function sosClose() { document.getElementById('swScreen').classList.remove('show'); sosPaintInbound(); }
+
+// ---------- 6. SAMBUNG SEMULA ----------
+// Kalau app ditutup lama, tempoh bertenang mungkin sudah lepas.
+// Ia TIDAK menggera secara surut — pengguna jelas sedang pegang
+// telefon. Ia minta jawapan sekarang, dengan kiraan bermula semula.
+function sosResume() {
+  sosLoad();
+  if (!SOS.on) { sosPaintStrip(); return; }
+  sosStartGeo(); sosBattery(); sosWakeOn();
+  if (SOS.check) {
+    if (SOS.phase === 'due' || Date.now() > SOS.dueAt) sosDue(true);
+    else SOS.phase = 'count';
+  }
+  sosPush();
+  sosRun();
+  showToast('Watch is still on from earlier');
+}
+
+// ---------- 7. PENDAWAIAN ----------
+function sosWire() {
+  const on = function(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); };
+  on('swBack', sosClose);
+  on('swStripOpen', sosOpen);
+  on('swInboundOpen', function() { SOS.tab = 'watch'; sosSetTab('watch'); sosOpen(); });
+  on('swArm', sosArm);
+  on('swStop', function() { sosDisarm(false); });
+  on('swOk', sosOk);
+  on('swDueOk', sosOk);
+  on('swDueNow', function() { sosFire('They pressed the alarm'); });
+  on('swFalse', sosFalseAlarm);
+  on('swDone', function() { sosView('setup'); });
+
+  const pick = document.getElementById('swPick');
+  if (pick) pick.addEventListener('click', function(e) {
+    const b = e.target.closest('.sw-pk'); if (!b) return;
+    SOS.mode = b.dataset.mode;
+    pick.querySelectorAll('.sw-pk').forEach(function(x) { x.classList.toggle('on', x === b); });
+    document.getElementById('swSoloOnly').style.display = SOS.mode === 'solo' ? '' : 'none';
+    SOS.check = SOS.mode === 'solo';
+    document.getElementById('swChk').classList.toggle('on', SOS.check);
+  });
+  const who = document.getElementById('swWho');
+  if (who) who.addEventListener('click', function(e) {
+    const b = e.target.closest('.sw-wb'); if (!b) return;
+    SOS.who = b.dataset.who;
+    who.querySelectorAll('.sw-wb').forEach(function(x) { x.classList.toggle('on', x === b); });
+    document.getElementById('swIdFld').style.display = SOS.who === 'id' ? '' : 'none';
+  });
+  const iv = document.getElementById('swIvl');
+  if (iv) iv.addEventListener('click', function(e) {
+    const b = e.target.closest('button'); if (!b) return;
+    SOS.ivl = +b.dataset.m;
+    iv.querySelectorAll('button').forEach(function(x) { x.classList.toggle('on', x === b); });
+  });
+  const gr = document.getElementById('swGrc');
+  if (gr) gr.addEventListener('click', function(e) {
+    const b = e.target.closest('button'); if (!b) return;
+    SOS.grc = +b.dataset.m;
+    gr.querySelectorAll('button').forEach(function(x) { x.classList.toggle('on', x === b); });
+  });
+  on('swChk', function() { SOS.check = !SOS.check; this.classList.toggle('on', SOS.check); });
+  on('swAuto', function() { SOS.auto = !SOS.auto; this.classList.toggle('on', SOS.auto); });
+
+  const tabs = document.getElementById('swTabs');
+  if (tabs) tabs.addEventListener('click', function(e) {
+    const b = e.target.closest('button'); if (b) sosSetTab(b.dataset.t);
+  });
+
+  // Tahan 2 saat: tekan sekali terlalu mudah tersilap dalam poket,
+  // tetapi dua saat masih pantas dalam kecemasan.
+  const pb = document.getElementById('swPanic'), pf = document.getElementById('swPanicFill');
+  let hold = null, held = 0;
+  const holdEnd = function() { if (hold) clearInterval(hold); hold = null; held = 0; if (pf) pf.style.width = '0%'; };
+  if (pb) {
+    pb.addEventListener('pointerdown', function(e) {
+      e.preventDefault(); held = 0;
+      hold = setInterval(function() {
+        held += 50;
+        if (pf) pf.style.width = Math.min(100, held / 2000 * 100) + '%';
+        if (held >= 2000) { holdEnd(); sosFire('They held the SOS button'); }
+      }, 50);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function(ev) { pb.addEventListener(ev, holdEnd); });
+  }
+
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest('[data-sosack]');
+    if (a && currentUser) {
+      db.collection('sosAlerts').doc(a.dataset.sosack).update({
+        resolved: true, resolvedBy: currentUser.uid,
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(function(err) { showToast('Could not update. ' + err.message, 'error'); });
+    }
+    sosTouch();
+  }, true);
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState !== 'visible' || !SOS.on) return;
+    sosWakeOn();
+    sosTick();
+  });
+
+  const copy = document.getElementById('profilePidCopy');
+  if (copy) copy.addEventListener('click', function() {
+    if (!myPocketId) return;
+    const t = pidPretty(myPocketId);
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(function() { showToast('Pocket ID copied'); });
+    else showToast('Your Pocket ID is ' + t);
+  });
+}
+function sosSetTab(t) {
+  SOS.tab = t;
+  document.querySelectorAll('#swTabs button').forEach(function(b) { b.classList.toggle('on', b.dataset.t === t); });
+  sosView(SOS.view);
+  if (t === 'watch') sosPaintWatch();
+  sosPaintInbound();
+}
+
+async function sosBoot() {
+  await pidEnsure();
+  await sosCheckAdmin();
+  sosListen();
+  sosResume();
+}
+
+try { sosWire(); } catch (e) { console.warn('[SOS wire]', e.message); }
+
 // Console banner
-console.log('%cGoXpert Pocket v0.9.1', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.0', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>

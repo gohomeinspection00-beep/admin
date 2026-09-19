@@ -12,6 +12,15 @@ rules_version = '2';
 //   P1 — data Pocket terdedah kepada umum
 //   P2 — settings/pocketConfig tak boleh dibaca pengguna biasa
 //   P3 — users/{uid} ditolak kerana rules lama menjangka users/{email}
+//
+// PERLU DIPASANG SEMULA selepas ciri Site safety (v1.0): fail ini kini
+// merangkumi pocketIds, pocketAdmins, sosWatch dan sosAlerts. Tanpa itu
+// Pocket ID dan SOS akan ditolak secara senyap oleh peraturan penolak-semua
+// di hujung fail. Salin fail ini ke Firebase Console > Firestore > Rules.
+//
+// Untuk menjadikan satu akaun sebagai admin: Firestore > mulakan koleksi
+// pocketAdmins, dokumen bernama UID akaun itu (Authentication > Users),
+// tanpa medan. Admin melihat semua amaran SOS.
 // =============================================================================
 
 service cloud.firestore {
@@ -57,6 +66,63 @@ service cloud.firestore {
     match /settings/{doc} {
       allow read:  if signedIn();
       allow write: if false;
+    }
+
+
+    // ---- Pocket ID: kod pendek yang boleh diberi kepada orang lain ----
+    // get dibenarkan supaya sesiapa boleh menukar kod jadi UID semasa
+    // memasang Site safety. list TIDAK dibenarkan, supaya tiada siapa
+    // boleh membaca senarai penuh pengguna.
+    match /pocketIds/{code} {
+      allow get:    if signedIn();
+      allow list:   if false;
+      allow create: if signedIn()
+                    && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // ---- Penanda admin. Dibuat dari Firebase Console sahaja. ----
+    match /pocketAdmins/{uid} {
+      allow get:   if isOwner(uid);
+      allow list:  if false;
+      allow write: if false;
+    }
+    function isPocketAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/pocketAdmins/$(request.auth.uid));
+    }
+
+    // ---- Site safety: status hidup seorang pekerja seorang diri ----
+    // Dibaca oleh pemilik, oleh orang yang dinamakan sebagai pemerhati,
+    // dan oleh admin. Hanya pemilik boleh menulis.
+    match /sosWatch/{uid} {
+      allow get, list: if isOwner(uid)
+                       || (signedIn() && resource.data.watcherUid == request.auth.uid)
+                       || isPocketAdmin();
+      allow create, update: if isOwner(uid)
+                            && request.resource.data.uid == request.auth.uid;
+      allow delete: if isOwner(uid);
+    }
+
+    // ---- Amaran SOS ----
+    // Penghantar mencipta; penerima (atau admin) membaca dan menanda
+    // selesai. Amaran tidak boleh dipadam — rekod kecemasan kekal.
+    match /sosAlerts/{id} {
+      allow get, list: if signedIn() && (
+                            resource.data.fromUid == request.auth.uid
+                         || resource.data.toUid == request.auth.uid
+                         || (resource.data.toAdmin == true && isPocketAdmin())
+                       );
+      // Kos: isPocketAdmin() membaca satu dokumen setiap kali, jadi dua
+      // semakan medan yang murah diletak dahulu.
+      allow create: if signedIn()
+                    && request.resource.data.fromUid == request.auth.uid;
+      allow update: if signedIn() && (
+                            resource.data.fromUid == request.auth.uid
+                         || resource.data.toUid == request.auth.uid
+                         || (resource.data.toAdmin == true && isPocketAdmin())
+                       );
+      allow delete: if false;
     }
 
     // ---- Tolak semua yang lain ----
