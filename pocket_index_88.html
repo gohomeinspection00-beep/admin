@@ -7311,6 +7311,30 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .ip-mini-tabs button{padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);font-size:11px;font-weight:600;color:var(--fg-dim)}
 .ip-mini-tabs button.on{background:var(--tc);border-color:var(--tc);color:#fff}
 
+/* ---------- zum pelan ----------
+   Pelan lantai sebenar padat. Tanpa zum, menekan tepat pada satu
+   bilik kecil di telefon hampir mustahil. Pin dikecilkan songsang
+   mengikut zum supaya ia kekal sebesar jari, bukan membesar sampai
+   menutup pelan. */
+.ip-plan, .ip-mini{touch-action:none;overscroll-behavior:contain}
+.ip-stage{position:relative;width:100%;transform-origin:0 0;will-change:transform}
+.ip-pin,.ip-fpin,.ip-mini .ip-my-pin,.ip-mini .ip-ghost-pin,.ip-mini .ip-ghost-key{transition:none}
+.ip-pin{transform:translate(-50%,-100%) scale(var(--ipz,1));transform-origin:center bottom}
+.ip-fpin{transform:translate(-50%,-50%) scale(var(--ipz,1))}
+.ip-mini .ip-my-pin,.ip-mini .ip-ghost-pin{transform:translate(-50%,-50%) scale(var(--ipz,1))}
+.ip-mini .ip-ghost-key{transform:translate(-50%,-100%) scale(var(--ipz,1));transform-origin:center bottom}
+.ip-zoom{position:absolute;right:8px;bottom:8px;z-index:4;display:flex;flex-direction:column;gap:5px}
+.ip-zoom button{
+  width:32px;height:32px;border-radius:10px;background:rgba(0,0,0,.62);color:#fff;
+  display:grid;place-items:center;font-size:17px;font-weight:700;line-height:1;backdrop-filter:blur(3px);
+}
+.ip-zoom button:disabled{opacity:.35}
+.ip-zoomlvl{
+  position:absolute;left:8px;bottom:8px;z-index:4;padding:3px 8px;border-radius:8px;
+  background:rgba(0,0,0,.62);color:#fff;font-family:var(--font-mono);font-size:10px;font-weight:600;display:none;
+}
+.ip-zoomlvl.on{display:block}
+
 .ip-srow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:7px}
 .ip-key{width:30px;height:30px;border-radius:9px;background:var(--tc);color:#fff;display:grid;place-items:center;font-family:var(--font-mono);font-size:12px;font-weight:700;flex:none}
 .ip-stxt{min-width:0;flex:1}
@@ -8393,7 +8417,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.5 · build 19 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.6 · build 19 Sep 2026</div>
           </div>
         </div>
         
@@ -8424,7 +8448,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.5</span>
+      <span class="chat-build" title="Build">v1.6</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -25711,13 +25735,14 @@ function ipViewPlan() {
     ? (IP.pinFind ? 'Tap the plan on the exact spot of this finding.' : 'Tap the plan where the ' + t.unit.toLowerCase() + ' is.')
     : 'Tap Place to add a ' + t.unit.toLowerCase() + '. Findings are pinned from inside the finding.';
   html += '<div class="ip-planhint">' + hint + '</div>' +
-    '<div class="ip-plan" id="ipPlanBox"><img src="data:' + (plan.mime || 'image/jpeg') + ';base64,' + plan.thumb + '" alt="' + ipEsc(plan.name) + '">' +
+    '<div class="ip-plan" id="ipPlanBox"><div class="ip-stage" id="ipPlanStage">' +
+    '<img src="data:' + (plan.mime || 'image/jpeg') + ';base64,' + plan.thumb + '" alt="' + ipEsc(plan.name) + '">' +
     pins.map(function(s) {
       return '<div class="ip-pin" style="left:' + s.x + '%;top:' + s.y + '%"><b><span>' + ipEsc(s.key) + '</span></b><em>' + ipEsc(s.name) + '</em></div>';
     }).join('') +
     (IP.showFindPins ? fpins.map(function(f) {
       return '<div class="ip-fpin ' + (t.rate && f.rate ? 'r-' + f.rate : '') + '" style="left:' + f.px + '%;top:' + f.py + '%"><b>' + ipEsc(f.spaceKey) + ipNo(f.no) + '</b></div>';
-    }).join('') : '') + '</div>' +
+    }).join('') : '') + '</div>' + ipZoomBar() + '</div>' +
     (fpins.length ? '<button class="ip-ghost" id="ipTogglePins" style="margin:0 0 11px">' +
       (IP.showFindPins ? 'Hide the ' + fpins.length + ' finding pin' + (fpins.length === 1 ? '' : 's') : 'Show ' + fpins.length + ' finding pin' + (fpins.length === 1 ? '' : 's')) + '</button>' : '') +
     '<div class="ip-two" style="margin-bottom:13px">' +
@@ -25835,12 +25860,14 @@ function ipMiniPlan(space, f) {
       return '<button type="button" data-ipminiplan="' + pl.id + '" class="' + (pl.id === plan.id ? 'on' : '') + '">' + ipEsc(pl.name) + '</button>';
     }).join('') + '</div>' : '') +
     '<div class="ip-mini" id="ipMini" data-planid="' + plan.id + '">' +
+      '<div class="ip-stage" id="ipMiniStage">' +
       '<img src="data:' + (plan.mime || 'image/jpeg') + ';base64,' + plan.thumb + '" alt="' + ipEsc(plan.name) + '">' +
       (spacePin ? '<span class="ip-ghost-key" style="left:' + spacePin.x + '%;top:' + spacePin.y + '%">' + ipEsc(spacePin.key) + '</span>' : '') +
       others.map(function(o) {
         return '<span class="ip-ghost-pin" style="left:' + o.px + '%;top:' + o.py + '%">' + ipEsc(o.spaceKey) + ipNo(o.no) + '</span>';
       }).join('') +
       '<span class="ip-my-pin ' + (on ? 'on' : '') + '" id="ipMyPin" style="left:' + (on ? pin.px : 50) + '%;top:' + (on ? pin.py : 50) + '%">' + ipEsc(label) + '</span>' +
+      '</div>' + ipZoomBar() +
     '</div>' +
     '<p class="ip-mini-hint" id="ipMiniHint">' + (on ? 'Tap again to move it.' : 'Tap the exact spot of this finding. Faded marks are ' + (spacePin ? 'the ' + t.unit.toLowerCase() + ' and ' : '') + 'findings already pinned.') + '</p>' +
     (on ? '<button type="button" class="ip-ghost" id="ipClearPin" style="margin-top:7px">Remove this pin</button>' : '') +
@@ -25898,6 +25925,7 @@ function ipRender() {
     : ipViewHub();
   document.getElementById('ipMode').scrollTop = 0;
   if (v === 'finding') ipPaintShots();
+  if (v === 'plan' || v === 'finding') { try { ipZoomInit(); } catch (e) { console.warn('[Zoom]', e.message); } }
 }
 function ipGo(v) { IP.view = v; ipRender(); }
 
@@ -25922,6 +25950,154 @@ async function ipPaintShots() {
     });
   }
   box.innerHTML = html;
+}
+
+
+// ---------- ZUM PELAN ----------
+// Pelan lantai sebenar padat; tanpa zum, menekan tepat pada satu bilik
+// kecil di telefon hampir mustahil. Cubit untuk zum, seret untuk geser,
+// ketik untuk meletak pin. Ketikan dibezakan daripada seretan dengan
+// ambang jarak — kalau tidak, setiap kali menggeser akan menjatuhkan pin.
+const IP_ZMAX = 6, IP_ZTAPPX = 9;
+let IP_Z = {};   // id -> {s, tx, ty, key}
+
+function ipZoomBar() {
+  return '<div class="ip-zoomlvl" data-zlvl="1">1.0x</div>' +
+    '<div class="ip-zoom">' +
+      '<button type="button" data-zoom="in" aria-label="Zoom in">+</button>' +
+      '<button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>' +
+      '<button type="button" data-zoom="reset" aria-label="Fit" style="font-size:12px">FIT</button>' +
+    '</div>';
+}
+function ipZState(id, key) {
+  if (!IP_Z[id] || IP_Z[id].key !== key) IP_Z[id] = { s: 1, tx: 0, ty: 0, key: key };
+  return IP_Z[id];
+}
+function ipZApply(wrap, stage, st) {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  const natW = w, natH = stage.offsetHeight || h;
+  // Hadkan geseran supaya pelan tidak boleh diseret keluar sepenuhnya.
+  const spanX = natW * st.s - w, spanY = natH * st.s - h;
+  st.tx = spanX <= 0 ? (w - natW * st.s) / 2 : Math.min(0, Math.max(-spanX, st.tx));
+  st.ty = spanY <= 0 ? 0 : Math.min(0, Math.max(-spanY, st.ty));
+  stage.style.transform = 'translate(' + st.tx + 'px,' + st.ty + 'px) scale(' + st.s + ')';
+  stage.style.setProperty('--ipz', String(1 / st.s));
+  const lvl = wrap.querySelector('[data-zlvl]');
+  if (lvl) {
+    lvl.textContent = st.s.toFixed(1) + 'x';
+    lvl.classList.toggle('on', st.s > 1.02);
+  }
+  const out = wrap.querySelector('[data-zoom="out"]');
+  if (out) out.disabled = st.s <= 1.01;
+  const zin = wrap.querySelector('[data-zoom="in"]');
+  if (zin) zin.disabled = st.s >= IP_ZMAX - 0.01;
+}
+function ipZAt(wrap, st, ns, cx, cy) {
+  ns = Math.max(1, Math.min(IP_ZMAX, ns));
+  const k = ns / st.s;
+  // Titik di bawah jari mesti kekal di bawah jari.
+  st.tx = cx - (cx - st.tx) * k;
+  st.ty = cy - (cy - st.ty) * k;
+  st.s = ns;
+}
+function ipZBind(wrapId, stageId, key, onTap) {
+  const wrap = document.getElementById(wrapId), stage = document.getElementById(stageId);
+  if (!wrap || !stage) return;
+  const st = ipZState(wrapId, key);
+  const draw = function() { ipZApply(wrap, stage, st); };
+  if (stage.complete !== false) setTimeout(draw, 0);
+  const img = stage.querySelector('img');
+  if (img && !img.complete) img.addEventListener('load', draw, { once: true });
+  draw();
+
+  const pts = new Map();
+  let start = null, moved = 0, pinchD = 0, pinchC = null;
+  const local = function(e) {
+    const r = wrap.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+  wrap.addEventListener('pointerdown', function(e) {
+    if (e.target.closest('[data-zoom]')) return;
+    wrap.setPointerCapture(e.pointerId);
+    pts.set(e.pointerId, local(e));
+    if (pts.size === 1) { start = Object.assign({ t: Date.now() }, local(e)); moved = 0; }
+    if (pts.size === 2) {
+      const a = Array.from(pts.values());
+      pinchD = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y);
+      pinchC = { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2 };
+    }
+  });
+  wrap.addEventListener('pointermove', function(e) {
+    if (!pts.has(e.pointerId)) return;
+    const prev = pts.get(e.pointerId), now = local(e);
+    pts.set(e.pointerId, now);
+    if (pts.size >= 2) {
+      const a = Array.from(pts.values());
+      const d = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y);
+      if (pinchD > 0) {
+        const c = { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2 };
+        ipZAt(wrap, st, st.s * (d / pinchD), c.x, c.y);
+        st.tx += c.x - pinchC.x; st.ty += c.y - pinchC.y;
+        pinchC = c;
+        draw();
+      }
+      pinchD = d;
+      moved = 999;
+      e.preventDefault();
+      return;
+    }
+    moved += Math.abs(now.x - prev.x) + Math.abs(now.y - prev.y);
+    if (st.s > 1.01 && moved > 4) {
+      st.tx += now.x - prev.x; st.ty += now.y - prev.y;
+      draw();
+      e.preventDefault();
+    }
+  });
+  const end = function(e) {
+    if (!pts.has(e.pointerId)) return;
+    const p = pts.get(e.pointerId);
+    pts.delete(e.pointerId);
+    if (pts.size > 0) { pinchD = 0; return; }
+    const quick = start && (Date.now() - start.t) < 600;
+    if (quick && moved < IP_ZTAPPX && onTap) {
+      // offsetHeight ialah tinggi susun atur; transform CSS tidak
+      // mengubahnya, jadi ia sudah pun tinggi pada skala 1.
+      const natH = stage.offsetHeight;
+      const sx = (p.x - st.tx) / st.s, sy = (p.y - st.ty) / st.s;
+      const px = Math.round(sx / wrap.clientWidth * 1000) / 10;
+      const py = Math.round(sy / natH * 1000) / 10;
+      if (px >= 0 && px <= 100 && py >= 0 && py <= 100) onTap(px, py);
+    }
+    start = null; moved = 0; pinchD = 0;
+  };
+  wrap.addEventListener('pointerup', end);
+  wrap.addEventListener('pointercancel', end);
+  wrap.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    const l = local(e);
+    ipZAt(wrap, st, st.s * (e.deltaY < 0 ? 1.15 : 1 / 1.15), l.x, l.y);
+    draw();
+  }, { passive: false });
+  wrap.addEventListener('click', function(e) {
+    const z = e.target.closest('[data-zoom]');
+    if (!z) return;
+    e.stopPropagation();
+    const c = { x: wrap.clientWidth / 2, y: wrap.clientHeight / 2 };
+    if (z.dataset.zoom === 'in') ipZAt(wrap, st, st.s * 1.6, c.x, c.y);
+    else if (z.dataset.zoom === 'out') ipZAt(wrap, st, st.s / 1.6, c.x, c.y);
+    else { st.s = 1; st.tx = 0; st.ty = 0; }
+    draw();
+  });
+}
+function ipZoomInit() {
+  const plan = IP.plans[IP.planIx];
+  if (document.getElementById('ipPlanStage') && plan) {
+    ipZBind('ipPlanBox', 'ipPlanStage', 'plan:' + plan.id, function(px, py) { ipPlanTap(px, py); });
+  }
+  const mini = document.getElementById('ipMini');
+  if (mini && document.getElementById('ipMiniStage')) {
+    ipZBind('ipMini', 'ipMiniStage', 'mini:' + mini.dataset.planid, function(px, py) { ipMiniTap(px, py); });
+  }
 }
 
 // ---------- 6. TINDAKAN ----------
@@ -26414,7 +26590,10 @@ function ipWire() {
       const sp = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
       const fx = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
       const host = document.getElementById('ipMini');
-      if (host) host.parentNode.outerHTML = ipMiniPlan(sp, fx);
+      if (host) {
+        host.parentNode.outerHTML = ipMiniPlan(sp, fx);
+        try { ipZoomInit(); } catch (err) {}
+      }
       return;
     }
     if (e.target.closest('#ipClearPin')) {
@@ -26427,26 +26606,7 @@ function ipWire() {
       if (hn) hn.textContent = 'Tap the exact spot of this finding.';
       return;
     }
-    const mini = e.target.closest('#ipMini');
-    if (mini) {
-      // Borang ini penuh dengan teks yang belum disimpan, jadi pin
-      // dialihkan terus dalam DOM dan bukan dengan melukis semula.
-      const b = mini.getBoundingClientRect();
-      const px = Math.round((e.clientX - b.left) / b.width * 1000) / 10;
-      const py = Math.round((e.clientY - b.top) / b.height * 1000) / 10;
-      IP.draftPin = { planId: mini.dataset.planid, px: px, py: py };
-      const my = document.getElementById('ipMyPin');
-      if (my) { my.style.left = px + '%'; my.style.top = py + '%'; my.classList.add('on'); }
-      const hn = document.getElementById('ipMiniHint');
-      if (hn) hn.textContent = 'Tap again to move it.';
-      if (!document.getElementById('ipClearPin') && hn) {
-        const btn = document.createElement('button');
-        btn.type = 'button'; btn.className = 'ip-ghost'; btn.id = 'ipClearPin';
-        btn.style.marginTop = '7px'; btn.textContent = 'Remove this pin';
-        hn.parentNode.insertBefore(btn, hn.nextSibling);
-      }
-      return;
-    }
+
     if (e.target.closest('[data-ipnewfind]')) { IP.findId = null; IP.shots = []; IP.draftPin = null; ipGo('finding'); return; }
 
     const r = e.target.closest('#ipSpRate button');
@@ -26547,12 +26707,31 @@ function ipWire() {
       else showToast('Crack Ruler is in Tools');
       return;
     }
-    // Letak pin pada pelan
-    const box = e.target.closest('#ipPlanBox');
-    if (box && IP.pinMode) {
-      const b = box.getBoundingClientRect();
-      const x = Math.round((e.clientX - b.left) / b.width * 100);
-      const yy = Math.round((e.clientY - b.top) / b.height * 100);
+  });
+
+  // Ketikan pada pelan datang daripada pengawal zum, bukan daripada
+  // click, supaya menggeser pelan tidak menjatuhkan pin.
+  window.ipMiniTap = function(px, py) {
+    const mini = document.getElementById('ipMini');
+    if (!mini) return;
+    // Borang ini penuh dengan teks yang belum disimpan, jadi pin
+    // dialihkan terus dalam DOM dan bukan dengan melukis semula.
+    IP.draftPin = { planId: mini.dataset.planid, px: px, py: py };
+    const my = document.getElementById('ipMyPin');
+    if (my) { my.style.left = px + '%'; my.style.top = py + '%'; my.classList.add('on'); }
+    const hn = document.getElementById('ipMiniHint');
+    if (hn) hn.textContent = 'Tap again to move it.';
+    if (!document.getElementById('ipClearPin') && hn) {
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'ip-ghost'; btn.id = 'ipClearPin';
+      btn.style.marginTop = '7px'; btn.textContent = 'Remove this pin';
+      hn.parentNode.insertBefore(btn, hn.nextSibling);
+    }
+  };
+
+  window.ipPlanTap = async function(x, yy) {
+    if (!IP.pinMode) return;
+    {
       const plan = IP.plans[IP.planIx];
       IP.pinMode = false;
       if (IP.pinFind) {
@@ -26586,7 +26765,7 @@ function ipWire() {
       else ipRender();
       return;
     }
-  });
+  };
 
   body.addEventListener('change', async function(e) {
     if (e.target.id === 'ipSpName' && IP.spaceId) {
@@ -26638,7 +26817,7 @@ function ipOpenTab() {
 try { ipWire(); } catch (e) { console.warn('[Inspection wire]', e.message); }
 
 // Console banner
-console.log('%cGoXpert Pocket v1.5', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.6', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
