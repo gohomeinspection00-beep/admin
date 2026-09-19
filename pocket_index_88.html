@@ -8451,7 +8451,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   <main class="ip-mode" id="ipMode">
     <div id="ipBody"></div>
     <input type="file" id="ipCam" accept="image/*" capture="environment" multiple hidden>
-    <input type="file" id="ipPlanFile" accept="image/*" hidden>
+    <input type="file" id="ipPlanFile" accept="image/*,application/pdf" hidden>
   </main>
 
   <!-- LIBRARY MODE -->
@@ -8697,7 +8697,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.7 · build 19 Sep 2026 · Site Mode deck + Ask Pocket</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.8 · build 19 Sep 2026 · PDF floor plans + Measure returns</div>
           </div>
         </div>
         
@@ -8728,7 +8728,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.7</span>
+      <span class="chat-build" title="Build">v1.8</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -14181,6 +14181,10 @@ let crTask = null;          // { kind, refId, refMm, shape, img, handles, measPt
 let crPhase = 'calib';      // 'calib' | 'measure'
 let crEntries = [];
 let crEditId = null;
+// Bila Crack Ruler dibuka dari borang finding, nombor itu mesti balik
+// ke situ. Tanpa ini surveyor mengukur, melihat angka, kemudian menaip
+// semula sendiri — dan itulah yang berlaku sebelum ini.
+let crReturn = null;
 let crFlow = 'new';      // 'new' = giliran foto biasa, 'edit' = laras tanda sedia ada
 let crEditKind = null;   // ukuran mana yang sedang dilaras
 
@@ -14212,8 +14216,9 @@ function crClassify(mm) {
 }
 
 // ---------- 1. PEMILIH ----------
-function openCrackRuler() {
-  crHead('Crack Ruler', 'Measure from a photo, or review saved measurements');
+function openCrackRuler(target) {
+  crReturn = target || null;
+  crHead('Crack Ruler', crReturn ? 'Measure, then send the number to the finding' : 'Measure from a photo, or review saved measurements');
   document.getElementById('toolModalBody').innerHTML =
     '<div class="br-pick">' +
       '<button class="br-pick-btn" id="crGoNew">' +
@@ -14923,9 +14928,52 @@ function crScreenResult() {
   document.getElementById('toolModalBody').innerHTML = crResultHtml();
   document.getElementById('toolModalFoot').innerHTML =
     '<button class="tool-btn tool-btn-secondary" id="crAgain">Restart</button>' +
-    '<button class="tool-btn tool-btn-primary" id="crSaveBtn">Save</button>';
+    (crReturn
+      ? '<button class="tool-btn tool-btn-primary" id="crUseBtn">Use in finding</button>'
+      : '<button class="tool-btn tool-btn-primary" id="crSaveBtn">Save</button>');
   document.getElementById('crAgain').addEventListener('click', function() { crPlan = null; crScreenPlan(); });
-  document.getElementById('crSaveBtn').addEventListener('click', function() { crOpenForm(); });
+  const sv = document.getElementById('crSaveBtn');
+  if (sv) sv.addEventListener('click', function() { crOpenForm(); });
+  const use = document.getElementById('crUseBtn');
+  if (use) use.addEventListener('click', crUseInFinding);
+}
+
+// Ayat yang ditulis ialah ayat yang surveyor akan tulis sendiri:
+// angka, cara ia diukur, dan rujukan yang digunakan. Description
+// itulah yang masuk ke dalam laporan, jadi di situ ia diletakkan.
+function crMeasureSentence() {
+  const w = crResults.width, l = crResults.length;
+  const bits = [];
+  if (w) bits.push('width ' + w.mm.toFixed(2) + ' mm');
+  if (l) bits.push('length ' + crFmt(l.mm));
+  if (!bits.length) return '';
+  const ref = (w || l).ref;
+  return 'Measured from photograph: ' + bits.join(', ') +
+    (ref ? ' (scaled against ' + ref + ')' : '') + '.';
+}
+function crUseInFinding() {
+  const line = crMeasureSentence();
+  if (!line) { showToast('Nothing measured yet'); return; }
+  const box = document.getElementById('ipfDesc');
+  if (!box) { showToast('Open a finding first'); return; }
+  // Ditambah di hujung, tidak menimpa: ayat surveyor sendiri lebih
+  // bernilai daripada ayat yang dijana.
+  const cur = box.value.replace(/\s+$/, '');
+  box.value = cur ? cur + ' ' + line : line;
+  box.dispatchEvent(new Event('input', { bubbles: true }));
+  // Nombor mentah disimpan juga, supaya ia boleh dilihat semula
+  // kemudian tanpa membaca balik ayat.
+  IP.draftMeasure = {
+    widthMm: crResults.width ? crResults.width.mm : null,
+    lengthMm: crResults.length ? crResults.length.mm : null,
+    ref: (crResults.width || crResults.length).ref || '',
+    refMm: (crResults.width || crResults.length).refMm || null,
+    at: new Date().toISOString()
+  };
+  crReturn = null;
+  closeTool();
+  showToast('Measurement added to the description');
+  try { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } catch (e) {}
 }
 
 // ---------- 6. BORANG ----------
@@ -25409,7 +25457,7 @@ const IP_RATES = [['good','Good','Serviceable'],['fair','Fair','Needs attention'
 const IP_PRI = ['Low','Medium','High','Urgent'];
 
 let IP = {
-  view: 'list', id: null, insp: null, spaces: [], findings: [], plans: [],
+  view: 'list', id: null, insp: null, spaces: [], findings: [], plans: [], draftMeasure: null,
   spaceId: null, findId: null, planIx: 0, pinMode: false, pinFor: null, pinFind: null,
   pinAfterSave: false, showFindPins: true, draftPin: null, draftType: 'defect', shots: [], busy: false
 };
@@ -26121,6 +26169,10 @@ async function ipSaveFinding() {
     py: (IP.draftPin && IP.draftPin.py != null) ? IP.draftPin.py : null,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
+  // Ukuran daripada Crack Ruler, kalau ada. Ayatnya sudah masuk ke
+  // dalam description; ini menyimpan nombor mentahnya.
+  if (IP.draftMeasure) data.measure = IP.draftMeasure;
+  else if (existing && existing.measure) data.measure = existing.measure;
   if (!data.defectType && !data.desc) {
     if (btn) { btn.disabled = false; btn.textContent = existing ? 'Save changes' : 'Save finding'; }
     showToast('Give it a defect type or a description');
@@ -26170,6 +26222,7 @@ async function ipSaveFinding() {
     IP.pinAfterSave = false;
     IP.findId = null;
     IP.draftPin = null;
+    IP.draftMeasure = null;
     showToast('Finding saved');
     ipGo('space');
   } catch (e) {
@@ -26530,6 +26583,7 @@ function ipWire() {
     if (fd) {
       IP.findId = fd.dataset.ipfind;
       IP.shots = [];
+      IP.draftMeasure = null;
       const ex = IP.findings.filter(function(x) { return x.id === IP.findId; })[0];
       IP.draftPin = (ex && ex.px != null) ? { planId: ex.planId, px: ex.px, py: ex.py } : null;
       ipGo('finding');
@@ -26590,7 +26644,7 @@ function ipWire() {
       return;
     }
 
-    if (e.target.closest('[data-ipnewfind]')) { IP.findId = null; IP.shots = []; IP.draftPin = null; ipGo('finding'); return; }
+    if (e.target.closest('[data-ipnewfind]')) { IP.findId = null; IP.shots = []; IP.draftPin = null; IP.draftMeasure = null; ipGo('finding'); return; }
 
     const r = e.target.closest('#ipSpRate button');
     if (r) {
@@ -26686,7 +26740,7 @@ function ipWire() {
     }
     if (e.target.closest('#ipAiRead')) { ipAiRead(); return; }
     if (e.target.closest('#ipMeasure')) {
-      if (typeof openCrackRuler === 'function') openCrackRuler();
+      if (typeof openCrackRuler === 'function') openCrackRuler({ to: 'finding' });
       else showToast('Crack Ruler is in Tools');
       return;
     }
@@ -26769,27 +26823,102 @@ function ipWire() {
     const f = (e.target.files || [])[0];
     e.target.value = '';
     if (!f || !currentUser) return;
-    showToast('Loading the plan…');
-    const full = await ipShrinkTo(f, 1800, 0.85);
-    const thumb = await ipShrinkTo(f, 900, 0.72);
-    const dims = await new Promise(function(res) {
-      const u = URL.createObjectURL(full), im = new Image();
-      im.onload = function() { res({ w: im.width, h: im.height }); URL.revokeObjectURL(u); };
-      im.onerror = function() { res({ w: 1000, h: 700 }); URL.revokeObjectURL(u); };
-      im.src = u;
-    });
-    const data = { name: 'Plan ' + (IP.plans.length + 1), mime: 'image/jpeg', w: dims.w, h: dims.h,
-                   thumb: await lbBlobToB64(thumb), order: IP.plans.length,
-                   createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-    try {
-      const doc = await ipSub('plans').add(data);
-      await lbPut('plan:' + doc.id, full, 'image/jpeg');
-      IP.plans.push(Object.assign({ id: doc.id }, data));
-      IP.planIx = IP.plans.length - 1;
-      ipRender();
-      showToast('Plan added — tap Place to tag it');
-    } catch (err) { showToast('Could not save the plan. ' + err.message, 'error'); }
+    const isPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name || '');
+    if (!isPdf) {
+      showToast('Loading the plan…');
+      try { await ipAddPlanBlob(f, f.name); showToast('Plan added — tap Place to tag it'); }
+      catch (err) { showToast('Could not save the plan. ' + err.message, 'error'); }
+      return;
+    }
+    // Pelan lantai di Malaysia hampir selalu sampai sebagai PDF. Dulu
+    // surveyor terpaksa menukarnya sendiri di luar app sebelum boleh
+    // menanda apa-apa, jadi setiap muka surat dijadikan satu pelan.
+    showToast('Membuka PDF…');
+    let pages = [];
+    try { pages = await ipPdfPages(f); }
+    catch (err) { showToast('Tidak dapat membaca PDF itu. ' + err.message, 'error'); return; }
+    if (!pages.length) { showToast('PDF itu kosong'); return; }
+    let ok = 0;
+    for (let i = 0; i < pages.length; i++) {
+      showToast('Muka surat ' + (i + 1) + ' daripada ' + pages.length + '…');
+      try { await ipAddPlanBlob(pages[i], (f.name || 'Plan').replace(/\.pdf$/i, '') + (pages.length > 1 ? ' — p' + (i + 1) : '')); ok++; }
+      catch (err) { console.warn('[Plan page]', err.message); }
+    }
+    showToast(ok === 1 ? 'Plan added — tap Place to tag it' : ok + ' muka surat masuk sebagai pelan');
   });
+}
+
+// Satu pelan: gambar penuh ke telefon, thumbnail ke Firestore.
+async function ipAddPlanBlob(blob, name) {
+  const full = await ipShrinkTo(blob, 1800, 0.85);
+  const thumb = await ipShrinkTo(blob, 900, 0.72);
+  const dims = await new Promise(function(res) {
+    const u = URL.createObjectURL(full), im = new Image();
+    im.onload = function() { res({ w: im.width, h: im.height }); URL.revokeObjectURL(u); };
+    im.onerror = function() { res({ w: 1000, h: 700 }); URL.revokeObjectURL(u); };
+    im.src = u;
+  });
+  const clean = (name || '').replace(/\.(jpe?g|png|webp|gif|heic|heif|pdf)$/i, '').trim();
+  const data = { name: clean || ('Plan ' + (IP.plans.length + 1)),
+                 mime: 'image/jpeg', w: dims.w, h: dims.h,
+                 thumb: await lbBlobToB64(thumb), order: IP.plans.length,
+                 createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+  const doc = await ipSub('plans').add(data);
+  await lbPut('plan:' + doc.id, full, 'image/jpeg');
+  IP.plans.push(Object.assign({ id: doc.id }, data));
+  IP.planIx = IP.plans.length - 1;
+  ipRender();
+  return doc.id;
+}
+
+// pdf.js dimuatkan hanya bila sebuah PDF benar-benar dibuka, sama
+// seperti three.js dan fabric.js di tempat lain dalam app ini.
+const IP_PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const IP_PDFWK = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const IP_PDF_MAXPAGES = 12;
+let _ipPdfLoad = null;
+function ipLoadPdfJs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if (_ipPdfLoad) return _ipPdfLoad;
+  _ipPdfLoad = new Promise(function(res, rej) {
+    const sc = document.createElement('script');
+    sc.src = IP_PDFJS;
+    sc.onload = function() {
+      if (!window.pdfjsLib) { rej(new Error('pdf.js tidak dimuatkan')); return; }
+      try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = IP_PDFWK; } catch (e) {}
+      res(window.pdfjsLib);
+    };
+    sc.onerror = function() { _ipPdfLoad = null; rej(new Error('Tiada sambungan untuk memuatkan pembaca PDF')); };
+    document.head.appendChild(sc);
+  });
+  return _ipPdfLoad;
+}
+async function ipPdfPages(file) {
+  const lib = await ipLoadPdfJs();
+  const buf = await file.arrayBuffer();
+  const pdf = await lib.getDocument({ data: buf }).promise;
+  const n = Math.min(pdf.numPages, IP_PDF_MAXPAGES);
+  if (pdf.numPages > IP_PDF_MAXPAGES) showToast('PDF itu ada ' + pdf.numPages + ' muka surat; ' + IP_PDF_MAXPAGES + ' pertama diambil');
+  const out = [];
+  for (let i = 1; i <= n; i++) {
+    const page = await pdf.getPage(i);
+    // Dilukis pada lebar 1800px: cukup tajam untuk zum pada telefon
+    // tanpa membuat fail yang terlalu besar untuk disimpan.
+    const base = page.getViewport({ scale: 1 });
+    const scale = Math.min(3, Math.max(1, 1800 / base.width));
+    const vp = page.getViewport({ scale: scale });
+    const c = document.createElement('canvas');
+    c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    const ctx = c.getContext('2d');
+    // Pelan selalunya lukisan garis di atas latar lutsinar; tanpa
+    // putih di bawahnya ia jadi hitam pekat selepas ditukar ke JPEG.
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    const blob = await new Promise(function(r) { c.toBlob(r, 'image/jpeg', 0.88); });
+    if (blob) out.push(blob);
+    c.width = c.height = 0;
+  }
+  return out;
 }
 
 function ipOpenTab() {
@@ -27290,7 +27419,7 @@ function smOpenFinding(fid) {
     await ipLoadOne(activeInspectionId);
     const f = IP.findings.filter(function(x) { return x.id === fid; })[0];
     if (!f) { IP.view = 'hub'; switchTab('inspections'); return; }
-    IP.spaceId = f.spaceId; IP.findId = fid; IP.shots = []; IP.view = 'finding';
+    IP.spaceId = f.spaceId; IP.findId = fid; IP.shots = []; IP.draftMeasure = null; IP.view = 'finding';
     switchTab('inspections');
   });
 }
@@ -27973,7 +28102,7 @@ try { smWire(); } catch (e) { console.warn('[Site Mode wire]', e.message); }
 
 
 // Console banner
-console.log('%cGoXpert Pocket v1.7', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.8', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
