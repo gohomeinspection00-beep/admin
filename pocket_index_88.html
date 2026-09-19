@@ -432,6 +432,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 
 /* Body padding so content tak terhalang oleh bottom nav */
 .has-bottom-nav .home-mode,
+.has-bottom-nav .ip-mode,
 .has-bottom-nav .library-mode,
 .has-bottom-nav .profile-mode,
 .has-bottom-nav .chat-mode,
@@ -6432,6 +6433,7 @@ body.site-mode-active .voice-mode{
 body.on-home .topbar,
 body.on-tools .topbar,
 body.on-library .topbar,
+body.on-inspections .topbar,
 body.on-chat .topbar{display:none}
 /* Tanpa topbar, Library sendiri yang kena jauhkan diri dari bar status. */
 body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top))}
@@ -7166,6 +7168,165 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:700;
   display:flex;align-items:center;justify-content:center;gap:8px;
 }
+
+/* ==========================================================
+   INSPECTION (ip-)
+   Tiga jenis pemeriksaan atas satu struktur: pemeriksaan →
+   ruang → penemuan. Jenis hanya menentukan medan mana muncul,
+   jadi laporan tidak pernah keluar dengan lajur kosong dan
+   kita tidak membina tiga aliran berasingan.
+   Gambar penuh duduk dalam IndexedDB (had 1 MiB Firestore
+   tidak menampung satu pemeriksaan 40 gambar); Firestore
+   simpan rekod dan satu thumbnail kecil supaya senarai dan
+   PDF tetap menjadi walaupun peranti lain yang membuka.
+========================================================== */
+.ip-mode{
+  position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.ip-mode.show{display:flex}
+.ip-mode::-webkit-scrollbar{width:0}
+.ip-pad{padding:calc(16px + env(safe-area-inset-top)) 15px 26px}
+.ip-defect{--tc:var(--accent);--tb:var(--accent-soft);--tl:var(--accent-line)}
+.ip-bca{--tc:#6D28D9;--tb:#F1EBFE;--tl:#DDD1FB}
+.ip-site{--tc:#0E7C63;--tb:#E3F5F0;--tl:#B9E5DA}
+[data-theme="dark"] .ip-bca{--tc:#a78bfa;--tb:#1d1230;--tl:#3a2b5c}
+[data-theme="dark"] .ip-site{--tc:#2dd4a7;--tb:#07241c;--tl:#12463a}
+
+.ip-hd{display:flex;align-items:center;gap:11px;margin-bottom:15px}
+.ip-back{width:32px;height:32px;border-radius:10px;background:var(--surface);display:grid;place-items:center;flex:none;color:var(--fg-2)}
+.ip-hd h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.035em;color:var(--fg);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ip-hd h2 em{font-family:var(--font-display);font-style:italic;font-weight:400;color:var(--tc,var(--accent))}
+.ip-hd .ip-act{
+  margin-left:auto;flex:none;display:flex;align-items:center;gap:5px;padding:7px 12px;
+  border-radius:10px;background:var(--tc,var(--accent));color:#fff;font-size:12px;font-weight:600;
+}
+.ip-sec{display:flex;align-items:center;gap:8px;margin:0 2px 9px}
+.ip-sec b{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.ip-sec i{flex:1;height:1px;background:var(--line)}
+.ip-sec a{font-size:11.5px;font-weight:600;color:var(--tc,var(--accent));cursor:pointer}
+.ip-sec span{font-family:var(--font-mono);font-size:10.5px;color:var(--muted-2)}
+.ip-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;
+  background:var(--tb);color:var(--tc);font-size:9.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;white-space:nowrap;
+}
+
+.ip-card{display:block;width:100%;text-align:left;padding:13px;border:1px solid var(--line);border-radius:16px;background:var(--bg-2);margin-bottom:9px}
+.ip-card-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ip-card-top b{font-size:15px;font-weight:700;letter-spacing:-.02em;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)}
+.ip-card-sub{font-size:11.5px;color:var(--muted);margin-bottom:9px}
+.ip-bar{height:5px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin-bottom:7px}
+.ip-bar i{display:block;height:100%;background:var(--tc,var(--accent));border-radius:999px}
+.ip-card-foot{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--muted)}
+
+.ip-tp{display:block;width:100%;text-align:left;padding:14px;border:1.5px solid var(--line);border-radius:16px;background:var(--bg-2);margin-bottom:10px}
+.ip-tp.on{border-color:var(--tc);background:var(--tb)}
+.ip-tp-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ip-tp-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--surface);color:var(--fg-dim);flex:none}
+.ip-tp.on .ip-tp-ico{background:var(--tc);color:#fff}
+.ip-tp-hd b{font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.ip-tp-tick{margin-left:auto;width:20px;height:20px;border-radius:50%;border:1.8px solid var(--line-2);display:grid;place-items:center;color:transparent;flex:none}
+.ip-tp.on .ip-tp-tick{background:var(--tc);border-color:var(--tc);color:#fff}
+.ip-tp p{margin:0 0 9px;font-size:12px;color:var(--muted);line-height:1.5}
+.ip-chips{display:flex;flex-wrap:wrap;gap:5px}
+.ip-chip{font-size:9.5px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--surface);color:var(--fg-dim)}
+.ip-tp.on .ip-chip{background:var(--bg);color:var(--tc)}
+.ip-chip.no{opacity:.45;text-decoration:line-through}
+
+.ip-fld{margin-bottom:13px}
+.ip-fld>label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ip-fld input,.ip-fld textarea,.ip-fld select{
+  width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;
+  background:var(--bg-2);font-size:14px;outline:none;color:var(--fg);
+}
+.ip-fld textarea{min-height:68px;resize:vertical;font-size:13px;line-height:1.5}
+.ip-fld input:focus,.ip-fld textarea:focus,.ip-fld select:focus{border-color:var(--tc,var(--accent));background:var(--bg)}
+.ip-hint{margin:6px 2px 0;font-size:11px;color:var(--muted);line-height:1.45}
+.ip-two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ip-go{
+  width:100%;padding:15px;border-radius:14px;background:var(--tc,var(--accent));color:#fff;
+  font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;
+}
+.ip-go:disabled{opacity:.5}
+.ip-ghost{width:100%;padding:13px;border-radius:13px;border:1px solid var(--line-2);background:var(--bg);font-size:13.5px;font-weight:700;color:var(--fg-2);margin-top:9px}
+.ip-ghost.bad{color:var(--critical);border-color:var(--critical-soft);background:var(--critical-soft)}
+
+.ip-hub{padding:calc(16px + env(safe-area-inset-top)) 15px 14px;background:var(--tb);border-bottom:1px solid var(--tl)}
+.ip-hub h2{margin:8px 0 3px;font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1.2;color:var(--fg)}
+.ip-hub p{margin:0;font-size:12px;color:var(--fg-dim)}
+.ip-hubrow{display:flex;align-items:center;gap:13px;margin-top:13px}
+.ip-ring{width:52px;height:52px;position:relative;flex:none}
+.ip-ring svg{width:52px;height:52px;transform:rotate(-90deg);display:block}
+.ip-ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:-.04em;color:var(--fg)}
+.ip-hubrow strong{display:block;font-size:13px;font-weight:700;letter-spacing:-.015em;color:var(--fg)}
+.ip-hubrow span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+
+.ip-tile{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg-2);margin-bottom:8px}
+.ip-tile-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--tb);color:var(--tc);flex:none}
+.ip-ttxt{min-width:0;flex:1}
+.ip-ttxt b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.015em;color:var(--fg)}
+.ip-ttxt span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+
+.ip-plan{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);margin-bottom:11px;touch-action:manipulation}
+.ip-plan img{display:block;width:100%}
+.ip-plan .ip-blank{padding:44px 16px;text-align:center;color:var(--muted)}
+.ip-pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.ip-pin b{
+  width:26px;height:26px;border-radius:50% 50% 50% 4px;transform:rotate(45deg);
+  background:var(--tc);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;
+  box-shadow:0 2px 5px rgba(0,0,0,.3);border:2px solid #fff;
+}
+.ip-pin b span{transform:rotate(-45deg)}
+.ip-pin em{font-style:normal;margin-top:3px;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(0,0,0,.72);color:#fff;white-space:nowrap}
+.ip-planhint{padding:9px 11px;border-radius:11px;background:var(--tb);color:var(--tc);font-size:11.5px;font-weight:600;text-align:center;margin-bottom:11px}
+
+.ip-srow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:7px}
+.ip-key{width:30px;height:30px;border-radius:9px;background:var(--tc);color:#fff;display:grid;place-items:center;font-family:var(--font-mono);font-size:12px;font-weight:700;flex:none}
+.ip-stxt{min-width:0;flex:1}
+.ip-stxt b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.015em;color:var(--fg)}
+.ip-stxt span{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.ip-rate{flex:none;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px}
+.ip-r-good{background:var(--success-soft);color:var(--success)}
+.ip-r-fair{background:var(--warning-soft);color:var(--warning)}
+.ip-r-dilapidated{background:var(--critical-soft);color:var(--critical)}
+.ip-r-todo{background:var(--surface);color:var(--muted-2)}
+
+.ip-drow{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);margin-bottom:7px}
+.ip-dthumb{width:46px;height:46px;border-radius:10px;background:var(--surface);flex:none;display:grid;place-items:center;color:var(--muted-2);overflow:hidden;font-family:var(--font-mono);font-size:10px;font-weight:700}
+.ip-dthumb img{width:100%;height:100%;object-fit:cover}
+.ip-dmain{min-width:0;flex:1}
+.ip-dno{font-family:var(--font-mono);font-size:9.5px;font-weight:700;color:var(--tc);letter-spacing:.06em}
+.ip-dmain b{display:block;font-size:13px;font-weight:600;letter-spacing:-.015em;margin-top:1px;color:var(--fg)}
+.ip-dmain p{margin:3px 0 0;font-size:11px;color:var(--muted);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ip-dmeta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+
+.ip-add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:1px dashed var(--tl);border-radius:13px;background:var(--tb);color:var(--tc);font-size:13px;font-weight:700;margin-top:4px}
+.ip-rates{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ip-rates button{padding:11px 6px;border:1px solid var(--line);border-radius:11px;background:var(--bg-2);font-size:12px;font-weight:700;color:var(--fg-dim);text-align:center}
+.ip-rates button small{display:block;font-size:9px;font-weight:600;color:var(--muted);margin-top:2px}
+.ip-rates button.on[data-r="good"]{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.ip-rates button.on[data-r="fair"]{background:var(--warning-soft);border-color:var(--warning);color:var(--warning)}
+.ip-rates button.on[data-r="dilapidated"]{background:var(--critical-soft);border-color:var(--critical);color:var(--critical)}
+.ip-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:13px}
+.ip-tool{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);font-size:10.5px;font-weight:600;color:var(--fg-2);text-align:center;line-height:1.25}
+.ip-tool svg{color:var(--tc)}
+.ip-shots{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.ip-shot{width:66px;height:66px;border-radius:11px;overflow:hidden;border:1px solid var(--line);position:relative;flex:none}
+.ip-shot img{width:100%;height:100%;object-fit:cover;display:block}
+.ip-shot button{position:absolute;top:3px;right:3px;width:19px;height:19px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:grid;place-items:center}
+
+.ip-check{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-top:1px solid var(--line);font-size:12.5px}
+.ip-check svg{flex:none;margin-top:1px}
+.ip-check.ok svg{color:var(--success)}
+.ip-check.no svg{color:var(--warning)}
+.ip-check b{font-weight:600;color:var(--fg)}
+.ip-check span{color:var(--muted)}
+
+.ip-empty{text-align:center;padding:26px 14px}
+.ip-empty h4{margin:11px 0 5px;font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.ip-empty p{margin:0 auto;font-size:12px;color:var(--muted);line-height:1.5;max-width:30ch}
+
 
 
 
@@ -7951,6 +8112,14 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
     </div>
   </main>
 
+
+  <!-- INSPECTION MODE -->
+  <main class="ip-mode" id="ipMode">
+    <div id="ipBody"></div>
+    <input type="file" id="ipCam" accept="image/*" capture="environment" multiple hidden>
+    <input type="file" id="ipPlanFile" accept="image/*" hidden>
+  </main>
+
   <!-- LIBRARY MODE -->
   <main class="library-mode" id="libraryMode">
     <div class="library-content">
@@ -8194,7 +8363,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.1 · build 19 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.2 · build 19 Sep 2026</div>
           </div>
         </div>
         
@@ -8225,7 +8394,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.1</span>
+      <span class="chat-build" title="Build">v1.2</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -11537,7 +11706,7 @@ function renderOngoingCard() {
     ttl.textContent = 'New Inspection';
     sub.textContent = 'Create a record for one site';
     if (subline) subline.textContent = 'Ready for your first inspection?';
-    hero.onclick = function() { openNewInspModal(); };
+    hero.onclick = function() { switchTab('inspections'); if (typeof ipGo === 'function') ipGo('type'); };
   }
 }
 
@@ -14727,9 +14896,8 @@ function renderSensorUnsupported(toolName, msg) {
 // BOTTOM NAV TAB SWITCHING
 // =======================================================
 function switchTab(mode) {
-  // Tab "inspections" tiada skrin sendiri — ia Home + helaian pilih inspection.
-  const wantInspSheet = (mode === 'inspections');
-  if (wantInspSheet) mode = 'home';
+  // Inspection kini halaman penuh sendiri, bukan lagi helaian di atas Home.
+  const wantInspSheet = false;
 
   // Bottom nav active state
   document.querySelectorAll('.nav-btn').forEach(function(t) {
@@ -14741,11 +14909,13 @@ function switchTab(mode) {
   document.body.classList.toggle('on-tools', mode === 'tools');
   document.body.classList.toggle('on-chat', mode === 'chat' || mode === 'voice');
   document.body.classList.toggle('on-library', mode === 'library');
+  document.body.classList.toggle('on-inspections', mode === 'inspections');
 
   // Hide all modes
   document.getElementById('homeMode').classList.remove('show');
   document.getElementById('toolsMode').classList.remove('show');
   document.getElementById('libraryMode').classList.remove('show');
+  document.getElementById('ipMode').classList.remove('show');
   document.getElementById('profileMode').classList.remove('show');
   document.getElementById('chatMode').classList.add('hidden');
   document.getElementById('voiceMode').classList.remove('show');
@@ -14754,6 +14924,10 @@ function switchTab(mode) {
     document.getElementById('homeMode').classList.add('show');
     initHome();
     if (wantInspSheet && typeof openInspSheet === 'function') openInspSheet();
+    if (typeof voice_stopAll === 'function') voice_stopAll();
+  } else if (mode === 'inspections') {
+    document.getElementById('ipMode').classList.add('show');
+    if (typeof ipOpenTab === 'function') ipOpenTab();
     if (typeof voice_stopAll === 'function') voice_stopAll();
   } else if (mode === 'tools') {
     document.getElementById('toolsMode').classList.add('show');
@@ -21474,6 +21648,10 @@ async function loadInspections() {
         id: doc.id,
         title: d.title || 'Untitled inspection',
         status: d.status || 'active',
+        type: d.type || 'defect',
+        cover: d.cover || {},
+        spaceCount: d.spaceCount || 0,
+        findingCount: d.findingCount || 0,
         createdAt: d.createdAt?.toDate?.() || new Date(),
         updatedAt: d.updatedAt?.toDate?.() || new Date(),
         projectInfo: d.projectInfo || {},
@@ -21978,7 +22156,20 @@ inspNewCreateBtn.addEventListener('click', async function() {
 const inspDetail = document.getElementById('inspDetail');
 let currentDetailInspId = null;
 
+// Satu pintu sahaja ke satu pemeriksaan. Skrin butiran lama kekal
+// di bawah nama Legacy supaya tiada apa yang rosak, tetapi setiap
+// laluan dari Home kini membuka halaman Inspection yang baharu.
 async function openInspDetail(inspId) {
+  if (typeof ipLoadOne === 'function') {
+    await ipLoadOne(inspId);
+    IP.view = 'hub';
+    switchTab('inspections');
+    return;
+  }
+  return openInspDetailLegacy(inspId);
+}
+
+async function openInspDetailLegacy(inspId) {
   const insp = inspections.find(function(i) { return i.id === inspId; });
   if (!insp) return;
   
@@ -25123,8 +25314,992 @@ function qrWire() {
 try { sosWire(); } catch (e) { console.warn('[SOS wire]', e.message); }
 try { qrWire(); } catch (e) { console.warn('[QR wire]', e.message); }
 
+// =======================================================
+// INSPECTION
+// Tiga jenis pemeriksaan atas satu struktur: pemeriksaan →
+// ruang → penemuan. Jenis hanya menentukan medan mana yang
+// muncul, jadi laporan tidak pernah keluar dengan lajur
+// kosong dan tiada tiga aliran berasingan untuk dijaga.
+//
+// Nombor penemuan terikat pada ruang (A01, A02, B01) supaya
+// menambah satu penemuan di lobi minggu depan menjadi A03,
+// bukan nombor ke-47 yang tersalah tempat di tengah jadual.
+// Huruf yang sama muncul pada pin pelan lantai — itu satu-
+// satunya sebab pelan itu berguna di dalam laporan.
+//
+// Gambar penuh disimpan dalam IndexedDB (had 1 MiB satu
+// dokumen Firestore tidak menampung pemeriksaan 40 gambar);
+// Firestore menyimpan rekod dan satu thumbnail kecil supaya
+// senarai dan PDF tetap menjadi pada peranti lain.
+//   inspections/{id}/spaces|findings|plans
+// =======================================================
+const IP_TYPES = {
+  defect: { n:'Defect Inspection', short:'Defect', cls:'ip-defect', unit:'Space', units:'Spaces',
+    rate:false, cost:false, gps:false,
+    ico:'<path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/>',
+    blurb:'What is wrong, room by room. For handover, defect liability, snagging.',
+    has:['Cover + owner','Floor plan tagging','Spaces','Element','Defect type','Description','Photos'],
+    hasnt:['Condition rating','Repair cost'] },
+  bca: { n:'Building Condition Assessment', short:'BCA', cls:'ip-bca', unit:'Space', units:'Spaces',
+    rate:true, cost:true, gps:false,
+    ico:'<path d="M3 21h18M6 21V9l6-5 6 5v12"/><path d="M10 21v-6h4v6"/>',
+    blurb:'The same walk, but every finding carries a condition rating and what it takes to put right.',
+    has:['Everything in Defect','BARIS rating','Priority','Repair action','Cost estimate','Rating per space'],
+    hasnt:[] },
+  site: { n:'Site Inspection', short:'Site', cls:'ip-site', unit:'Location', units:'Locations',
+    rate:false, cost:false, gps:true,
+    ico:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.8"/>',
+    blurb:'Progress and issues out on site, where there are no rooms — every finding carries its own location.',
+    has:['Cover + client','Site plan tagging','Locations','Element','Defect type','Description','Photos','GPS','Priority'],
+    hasnt:['Condition rating'] }
+};
+const IP_ELEMENTS = ['Wall — internal','Wall — external','Floor','Ceiling','Roof covering','Door','Window','Staircase','Column','Beam','Drainage','M&E — electrical','M&E — plumbing','External works','Other'];
+const IP_DEFTYPES = ['Crack','Dampness','Spalling concrete','Honeycomb','Peeling paint','Hollow tile','Corrosion','Leak','Misalignment','Missing item','Poor workmanship','Blockage','Other'];
+const IP_RATES = [['good','Good','Serviceable'],['fair','Fair','Needs attention'],['dilapidated','Dilapidated','Act now']];
+const IP_PRI = ['Low','Medium','High','Urgent'];
+
+let IP = {
+  view: 'list', id: null, insp: null, spaces: [], findings: [], plans: [],
+  spaceId: null, findId: null, planIx: 0, pinMode: false, draftType: 'defect', shots: [], busy: false
+};
+
+function ipT() { return IP_TYPES[(IP.insp && IP.insp.type) || IP.draftType] || IP_TYPES.defect; }
+function ipEsc(s) { return (typeof escapeHTML === 'function') ? escapeHTML(s == null ? '' : s) : String(s == null ? '' : s); }
+function ipRef() { return db.collection('pocketInspections').doc(currentUser.uid).collection('inspections'); }
+function ipSub(name) { return ipRef().doc(IP.id).collection(name); }
+function ipKeyFor(n) { let s = ''; n++; while (n > 0) { const r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; }
+function ipNo(n) { return String(n).padStart(2, '0'); }
+function ipPhotoKey(fid, i) { return 'insp:' + IP.id + ':' + fid + ':' + i; }
+
+// ---------- 1. MUAT ----------
+async function ipLoadOne(id) {
+  IP.id = id;
+  IP.insp = (inspections || []).filter(function(x) { return x.id === id; })[0] || null;
+  IP.spaces = []; IP.findings = []; IP.plans = [];
+  if (!currentUser) return;
+  try {
+    const [sp, fi, pl] = await Promise.all([
+      ipSub('spaces').get(), ipSub('findings').get(), ipSub('plans').get()
+    ]);
+    sp.forEach(function(d) { IP.spaces.push(Object.assign({ id: d.id }, d.data())); });
+    fi.forEach(function(d) { IP.findings.push(Object.assign({ id: d.id }, d.data())); });
+    pl.forEach(function(d) { IP.plans.push(Object.assign({ id: d.id }, d.data())); });
+    IP.spaces.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+    IP.findings.sort(function(a, b) { return (a.no || 0) - (b.no || 0); });
+    IP.plans.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+  } catch (e) { console.warn('[Inspection load]', e.message); }
+}
+function ipFindingsIn(spaceId) { return IP.findings.filter(function(f) { return f.spaceId === spaceId; }); }
+function ipCovered() { return IP.spaces.filter(function(s) { return ipFindingsIn(s.id).length || s.rate || s.noDefect; }).length; }
+function ipPct() { return IP.spaces.length ? Math.round(ipCovered() / IP.spaces.length * 100) : 0; }
+
+// ---------- 2. GAMBAR ----------
+// Dua saiz: penuh untuk PDF dan skrin, kecil untuk senarai dan
+// untuk peranti lain yang tidak memegang fail asal.
+function ipShrinkTo(blob, maxW, q) {
+  return new Promise(function(res) {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = function() {
+      const sc = maxW / img.width;
+      const w = sc < 1 ? maxW : img.width, h = sc < 1 ? Math.round(img.height * sc) : img.height;
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      c.toBlob(function(b) { URL.revokeObjectURL(url); res(b || blob); }, 'image/jpeg', q || 0.8);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); res(blob); };
+    img.src = url;
+  });
+}
+async function ipThumbOf(blob) {
+  const small = await ipShrinkTo(blob, 320, 0.72);
+  return await lbBlobToB64(small);
+}
+async function ipPhotoUrl(f, i) {
+  try {
+    const rec = await lbGet(ipPhotoKey(f.id, i));
+    if (rec && rec.blob) return URL.createObjectURL(rec.blob);
+  } catch (e) {}
+  return f.thumb ? 'data:image/jpeg;base64,' + f.thumb : '';
+}
+
+// ---------- 3. TULIS ----------
+async function ipCreate(type) {
+  if (!currentUser) { showToast('Sign in first', 'error'); return null; }
+  const now = new Date();
+  const ref = String(now.getFullYear()) + '-' + String(Date.now()).slice(-4);
+  const data = {
+    title: 'Untitled inspection', type: type, status: 'active',
+    cover: { ref: 'GX-' + ref, title: '', addr: '', btype: '', built: '', client: '', phone: '', email: '',
+             date: now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0'),
+             weather: '', attend: '' },
+    photoCount: 0, spaceCount: 0, findingCount: 0,
+    barisCounts: { good: 0, fair: 0, dilapidated: 0 },
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    const doc = await ipRef().add(data);
+    inspections.unshift({
+      id: doc.id, title: data.title, type: type, status: 'active', cover: data.cover,
+      createdAt: now, updatedAt: now, projectInfo: {}, photoCount: 0,
+      spaceCount: 0, findingCount: 0, barisCounts: { good:0, fair:0, dilapidated:0 }, coverPhoto: null, photos: []
+    });
+    return doc.id;
+  } catch (e) { showToast('Could not create. ' + e.message, 'error'); return null; }
+}
+async function ipPatch(obj) {
+  if (!currentUser || !IP.id) return;
+  obj.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+  try { await ipRef().doc(IP.id).update(obj); } catch (e) { console.warn('[Inspection patch]', e.message); }
+  if (IP.insp) Object.keys(obj).forEach(function(k) { if (k !== 'updatedAt') IP.insp[k] = obj[k]; });
+}
+async function ipCounts() {
+  await ipPatch({ spaceCount: IP.spaces.length, findingCount: IP.findings.length });
+}
+
+async function ipAddSpace(x, y, planId) {
+  const key = ipKeyFor(IP.spaces.length);
+  const data = { key: key, name: ipT().unit + ' ' + key, planId: planId || '', x: x, y: y,
+                 rate: '', noDefect: false, order: IP.spaces.length, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+  try {
+    const d = await ipSub('spaces').add(data);
+    IP.spaces.push(Object.assign({ id: d.id }, data));
+    ipCounts();
+    return d.id;
+  } catch (e) { showToast('Could not add. ' + e.message, 'error'); return null; }
+}
+async function ipSpacePatch(id, obj) {
+  const s = IP.spaces.filter(function(x) { return x.id === id; })[0];
+  if (s) Object.keys(obj).forEach(function(k) { s[k] = obj[k]; });
+  try { await ipSub('spaces').doc(id).update(obj); } catch (e) { console.warn('[Space]', e.message); }
+}
+async function ipDeleteSpace(id) {
+  const kids = ipFindingsIn(id);
+  for (let i = 0; i < kids.length; i++) await ipDeleteFinding(kids[i].id, true);
+  IP.spaces = IP.spaces.filter(function(x) { return x.id !== id; });
+  try { await ipSub('spaces').doc(id).delete(); } catch (e) {}
+  ipCounts();
+}
+async function ipDeleteFinding(id, quiet) {
+  const f = IP.findings.filter(function(x) { return x.id === id; })[0];
+  if (f) for (let i = 0; i < (f.photoN || 0); i++) lbDrop(ipPhotoKey(id, i));
+  IP.findings = IP.findings.filter(function(x) { return x.id !== id; });
+  try { await ipSub('findings').doc(id).delete(); } catch (e) {}
+  if (!quiet) { ipCounts(); showToast('Finding deleted'); }
+}
+
+// ---------- 4. PAPARAN: SENARAI ----------
+function ipShell(inner, cls) {
+  return '<div class="ip-pad ' + (cls || ipT().cls) + '">' + inner + '</div>';
+}
+function ipViewList() {
+  const rows = (inspections || []).slice().sort(function(a, b) { return b.updatedAt - a.updatedAt; });
+  let html = '<div class="ip-hd"><h2>Your <em>inspections</em></h2>' +
+    '<button class="ip-act" data-ipgo="type"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New</button></div>';
+  if (!rows.length) {
+    html += '<div class="ip-empty">' +
+      '<svg width="74" height="64" viewBox="0 0 74 64" fill="none" aria-hidden="true">' +
+        '<rect x="12" y="6" width="38" height="50" rx="4" fill="var(--surface)" stroke="var(--accent-line)" stroke-width="1.6"/>' +
+        '<rect x="24" y="2" width="14" height="8" rx="2.5" fill="var(--accent-line)"/>' +
+        '<path d="M20 22h22M20 30h22M20 38h13" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"/>' +
+        '<circle cx="54" cy="42" r="12" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.4"/>' +
+        '<path d="M49 42h10M54 37v10" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>' +
+      '<h4>No inspections yet</h4><p>Start one and Pocket keeps the cover, the floor plan, every finding and the report in one place.</p></div>';
+    return ipShell(html, 'ip-defect');
+  }
+  html += '<div class="ip-sec"><b>All jobs</b><i></i><span>' + rows.length + '</span></div>';
+  rows.forEach(function(r) {
+    const t = IP_TYPES[r.type] || IP_TYPES.defect;
+    const sc = r.spaceCount || 0, fc = r.findingCount || 0;
+    const pc = sc ? Math.min(100, Math.round((r.coveredCount != null ? r.coveredCount : Math.min(sc, fc ? sc : 0)) / sc * 100)) : 0;
+    html += '<button class="ip-card ' + t.cls + '" data-ipopen="' + r.id + '">' +
+      '<div class="ip-card-top"><b>' + ipEsc(r.title) + '</b><span class="ip-badge">' + ipEsc(t.short) + '</span></div>' +
+      '<div class="ip-card-sub">' + sc + ' ' + t.units.toLowerCase() + ' · ' + fc + ' finding' + (fc === 1 ? '' : 's') + ' · ' + (r.photoCount || 0) + ' photos</div>' +
+      '<div class="ip-bar"><i style="width:' + pc + '%"></i></div>' +
+      '<div class="ip-card-foot">' + pc + '% COVERED<span>·</span>' + ipEsc(formatRelativeTime(r.updatedAt).toUpperCase()) + '</div>' +
+    '</button>';
+  });
+  return ipShell(html, 'ip-defect');
+}
+
+function ipViewType() {
+  let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="list"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><h2>What kind of <em>job</em></h2></div>';
+  Object.keys(IP_TYPES).forEach(function(k) {
+    const t = IP_TYPES[k], on = IP.draftType === k;
+    html += '<button class="ip-tp ' + t.cls + (on ? ' on' : '') + '" data-iptype="' + k + '">' +
+      '<div class="ip-tp-hd"><span class="ip-tp-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + t.ico + '</svg></span>' +
+      '<b>' + ipEsc(t.n) + '</b><span class="ip-tp-tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg></span></div>' +
+      '<p>' + ipEsc(t.blurb) + '</p><div class="ip-chips">' +
+        t.has.map(function(h) { return '<span class="ip-chip">' + ipEsc(h) + '</span>'; }).join('') +
+        t.hasnt.map(function(h) { return '<span class="ip-chip no">' + ipEsc(h) + '</span>'; }).join('') +
+      '</div></button>';
+  });
+  html += '<button class="ip-go" id="ipMake">Next — cover details</button>' +
+    '<p class="ip-hint" style="text-align:center">You can change the type later. Nothing entered is lost — extra fields appear or hide.</p>';
+  return ipShell(html, IP_TYPES[IP.draftType].cls);
+}
+
+function ipViewCover() {
+  const c = (IP.insp && IP.insp.cover) || {};
+  const t = ipT();
+  const f = function(lbl, id, v, ph, type) {
+    return '<div class="ip-fld"><label>' + lbl + '</label><input ' + (type ? 'type="' + type + '" ' : '') +
+      'id="' + id + '" value="' + ipEsc(v || '').replace(/"/g, '&quot;') + '" placeholder="' + ipEsc(ph || '') + '"></div>';
+  };
+  let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="' + (IP.spaces.length ? 'hub' : 'list') + '"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><h2>Cover <em>page</em></h2></div>' +
+    '<span class="ip-badge" style="margin-bottom:12px">' + ipEsc(t.n) + '</span>' +
+    '<div class="ip-sec"><b>The property</b><i></i></div>' +
+    f('Reference no.', 'ipcRef', c.ref) +
+    f('Property name', 'ipcTitle', c.title, 'Menara Seri') +
+    '<div class="ip-fld"><label>Address</label><textarea id="ipcAddr">' + ipEsc(c.addr) + '</textarea></div>' +
+    '<div class="ip-two">' + f('Building type', 'ipcBt', c.btype, 'Office tower') + f('Year built', 'ipcYr', c.built, '2009') + '</div>' +
+    '<div class="ip-sec"><b>' + (t === IP_TYPES.site ? 'Client' : 'Owner / client') + '</b><i></i></div>' +
+    f('Name', 'ipcCli', c.client) +
+    '<div class="ip-two">' + f('Phone', 'ipcPh', c.phone, '012-345 6789') + f('Email', 'ipcEm', c.email) + '</div>' +
+    '<div class="ip-sec"><b>The visit</b><i></i></div>' +
+    '<div class="ip-two">' + f('Date', 'ipcDate', c.date, '', 'date') + f('Weather', 'ipcW', c.weather, 'Dry, overcast') + '</div>' +
+    f('Who was present', 'ipcAt', c.attend, 'Building manager') +
+    '<button class="ip-go" id="ipSaveCover">' + (IP.spaces.length ? 'Save cover' : 'Start the inspection') + '</button>';
+  return ipShell(html);
+}
+
+function ipViewHub() {
+  const t = ipT(), p = ipPct(), C = 2 * Math.PI * 22;
+  const c = (IP.insp && IP.insp.cover) || {};
+  const urgent = IP.findings.filter(function(f) { return f.priority === 'Urgent'; }).length;
+  let html = '<div class="ip-hub ' + t.cls + '">' +
+    '<span class="ip-badge">' + ipEsc(t.n) + '</span>' +
+    '<h2>' + ipEsc(c.title || IP.insp.title || 'Untitled') + '</h2>' +
+    '<p>' + ipEsc(c.addr || 'No address yet') + '</p>' +
+    '<div class="ip-hubrow"><div class="ip-ring"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="var(--bg)" stroke-width="5" opacity=".55"/>' +
+      '<circle cx="26" cy="26" r="22" fill="none" stroke="var(--tc)" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - p / 100)).toFixed(1) + '"/></svg><b>' + p + '%</b></div>' +
+      '<div style="min-width:0;flex:1"><strong>' + ipCovered() + ' of ' + IP.spaces.length + ' ' + t.units.toLowerCase() + ' covered</strong>' +
+      '<span>' + IP.findings.length + ' finding' + (IP.findings.length === 1 ? '' : 's') + (urgent ? ' · ' + urgent + ' urgent' : '') + '</span></div></div></div>';
+
+  let body = '<button class="ip-back" data-ipgo="list" style="margin-bottom:13px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>' +
+    '<button class="ip-tile" data-ipgo="cover"><span class="ip-tile-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>' +
+      '<span class="ip-ttxt"><b>Cover and client</b><span>' + ipEsc(c.client || 'not filled in') + ' · ' + ipEsc(c.ref || '') + '</span></span>' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>' +
+    '<button class="ip-tile" data-ipgo="plan"><span class="ip-tile-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 10h9M12 3v18"/></svg></span>' +
+      '<span class="ip-ttxt"><b>Floor plans</b><span>' + (IP.plans.length ? IP.plans.length + ' plan' + (IP.plans.length === 1 ? '' : 's') + ' · ' + IP.spaces.filter(function(s) { return s.planId; }).length + ' tagged' : 'none uploaded yet') + '</span></span>' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>' +
+    '<div class="ip-sec" style="margin-top:15px"><b>' + t.units + '</b><i></i><a data-ipnewspace="1">Add</a></div>';
+  if (!IP.spaces.length) {
+    body += '<div class="ip-empty"><p>No ' + t.units.toLowerCase() + ' yet. Add one here, or tag them on a floor plan.</p></div>';
+  } else {
+    IP.spaces.forEach(function(s) {
+      const n = ipFindingsIn(s.id).length;
+      const tag = s.rate ? '<span class="ip-rate ip-r-' + s.rate + '">' + s.rate.slice(0, 5).toUpperCase() + '</span>'
+        : (n || s.noDefect ? '' : '<span class="ip-rate ip-r-todo">TO DO</span>');
+      body += '<button class="ip-srow" data-ipspace="' + s.id + '"><span class="ip-key">' + ipEsc(s.key) + '</span>' +
+        '<span class="ip-stxt"><b>' + ipEsc(s.name) + '</b><span>' + (n ? n + ' finding' + (n === 1 ? '' : 's') : (s.noDefect ? 'no defect found' : 'nothing recorded yet')) + '</span></span>' +
+        (t.rate ? tag : (n || s.noDefect ? '' : '<span class="ip-rate ip-r-todo">TO DO</span>')) + '</button>';
+    });
+  }
+  body += '<div class="ip-sec" style="margin-top:15px"><b>Finish</b><i></i></div>' +
+    '<button class="ip-tile" data-ipgo="export"><span class="ip-tile-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg></span>' +
+      '<span class="ip-ttxt"><b>Check and export</b><span>Report PDF with the plan and every finding</span></span>' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>';
+  return html + '<div class="ip-pad ' + t.cls + '" style="padding-top:15px">' + body + '</div>';
+}
+
+function ipViewPlan() {
+  const t = ipT(), plan = IP.plans[IP.planIx] || null;
+  const pins = IP.spaces.filter(function(s) { return plan && s.planId === plan.id; });
+  let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="hub"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>' +
+    '<h2>' + ipEsc(plan ? plan.name : 'Floor') + ' <em>plan</em></h2>' +
+    '<button class="ip-act" id="ipPlanUp"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-5 5 5M12 4v12"/></svg>Upload</button></div>';
+  if (IP.plans.length > 1) {
+    html += '<div class="ip-chips" style="margin-bottom:11px">' + IP.plans.map(function(p, i) {
+      return '<button class="ip-chip" data-ipplan="' + i + '" style="' + (i === IP.planIx ? 'background:var(--tc);color:#fff' : '') + '">' + ipEsc(p.name) + '</button>';
+    }).join('') + '</div>';
+  }
+  if (!plan) {
+    html += '<div class="ip-empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 10h9M12 3v18"/></svg>' +
+      '<h4>No plan yet</h4><p>Upload a photo or screenshot of the drawing. A PDF plan needs a screenshot first — Pocket reads images, not PDFs.</p></div>' +
+      '<button class="ip-add" id="ipPlanUp2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-5 5 5M12 4v12"/></svg>Upload a plan</button>';
+    return ipShell(html);
+  }
+  html += '<div class="ip-planhint">' + (IP.pinMode ? 'Tap the plan where the ' + t.unit.toLowerCase() + ' is.' : 'Tap a pin to open it, or tap Place to add a ' + t.unit.toLowerCase() + '.') + '</div>' +
+    '<div class="ip-plan" id="ipPlanBox"><img src="data:' + (plan.mime || 'image/jpeg') + ';base64,' + plan.thumb + '" alt="' + ipEsc(plan.name) + '">' +
+    pins.map(function(s) {
+      return '<div class="ip-pin" style="left:' + s.x + '%;top:' + s.y + '%"><b><span>' + ipEsc(s.key) + '</span></b><em>' + ipEsc(s.name) + '</em></div>';
+    }).join('') + '</div>' +
+    '<div class="ip-two" style="margin-bottom:13px">' +
+      '<button class="ip-ghost" id="ipPinBtn" style="margin:0">' + (IP.pinMode ? 'Cancel placing' : 'Place a ' + t.unit.toLowerCase()) + '</button>' +
+      '<button class="ip-ghost" id="ipPlanUp3" style="margin:0">Another level</button></div>' +
+    '<div class="ip-sec"><b>Tagged on this plan</b><i></i><span>' + pins.length + '</span></div>' +
+    pins.map(function(s) {
+      const n = ipFindingsIn(s.id).length;
+      return '<button class="ip-srow" data-ipspace="' + s.id + '"><span class="ip-key">' + ipEsc(s.key) + '</span>' +
+        '<span class="ip-stxt"><b>' + ipEsc(s.name) + '</b><span>' + n + ' finding' + (n === 1 ? '' : 's') + '</span></span>' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>';
+    }).join('');
+  return ipShell(html);
+}
+
+function ipViewSpace() {
+  const t = ipT(), s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
+  if (!s) return ipViewHub();
+  const list = ipFindingsIn(s.id);
+  let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="hub"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><h2><em>' + ipEsc(s.key) + '</em> ' + ipEsc(s.name) + '</h2></div>' +
+    '<div class="ip-fld"><label>' + t.unit + ' name</label><input id="ipSpName" value="' + ipEsc(s.name).replace(/"/g, '&quot;') + '"></div>';
+  if (t.rate) {
+    html += '<div class="ip-fld"><label>Condition of this ' + t.unit.toLowerCase() + '</label><div class="ip-rates" id="ipSpRate">' +
+      IP_RATES.map(function(r) { return '<button data-r="' + r[0] + '" class="' + (s.rate === r[0] ? 'on' : '') + '">' + r[1] + '<small>' + r[2] + '</small></button>'; }).join('') + '</div></div>';
+  }
+  html += '<div class="ip-sec"><b>Findings</b><i></i><span>' + list.length + '</span></div>';
+  if (!list.length) {
+    html += '<div class="ip-empty"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>' +
+      '<h4>Nothing recorded here</h4><p>Walk the ' + t.unit.toLowerCase() + ' and add what you find.</p></div>';
+  } else {
+    list.forEach(function(f) {
+      html += '<button class="ip-drow" data-ipfind="' + f.id + '">' +
+        '<span class="ip-dthumb">' + (f.thumb ? '<img src="data:image/jpeg;base64,' + f.thumb + '" alt="">' : (f.photoN ? f.photoN + '📷' : '—')) + '</span>' +
+        '<span class="ip-dmain"><span class="ip-dno">' + ipEsc(s.key) + ipNo(f.no) + '</span>' +
+          '<b>' + ipEsc(f.defectType || 'Untyped') + (f.element ? ' — ' + ipEsc(f.element) : '') + '</b>' +
+          (f.desc ? '<p>' + ipEsc(f.desc) + '</p>' : '') +
+          '<span class="ip-dmeta">' +
+            (t.rate && f.rate ? '<span class="ip-rate ip-r-' + f.rate + '">' + f.rate.slice(0, 5).toUpperCase() + '</span>' : '') +
+            (f.priority ? '<span class="ip-chip">' + ipEsc(f.priority) + '</span>' : '') +
+            (t.cost && f.cost ? '<span class="ip-chip">RM ' + ipEsc(f.cost) + '</span>' : '') +
+          '</span></span></button>';
+    });
+  }
+  html += '<button class="ip-add" data-ipnewfind="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add a finding</button>';
+  if (!list.length) {
+    html += '<button class="ip-ghost" id="ipNoDefect">' + (s.noDefect ? 'Marked: no defect found' : 'Mark as no defect found') + '</button>';
+  }
+  html += '<button class="ip-ghost bad" id="ipDelSpace">Delete this ' + t.unit.toLowerCase() + '</button>';
+  return ipShell(html);
+}
+
+function ipViewFinding() {
+  const t = ipT(), s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
+  if (!s) return ipViewHub();
+  const f = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
+  const d = f || { no: ipFindingsIn(s.id).length + 1, element: '', defectType: '', desc: '', rate: '', priority: '', cost: '', action: '', locationText: '', photoN: 0 };
+  const opt = function(list, v) { return '<option value=""></option>' + list.map(function(x) { return '<option' + (x === v ? ' selected' : '') + '>' + ipEsc(x) + '</option>'; }).join(''); };
+  let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="space"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>' +
+    '<h2>Finding <em>' + ipEsc(s.key) + ipNo(d.no) + '</em></h2>' +
+    (f ? '<button class="ip-act" id="ipShare"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button>' : '') +
+    '</div>' +
+    '<div class="ip-tools">' +
+      '<button class="ip-tool" id="ipShoot"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Photo</button>' +
+      '<button class="ip-tool" id="ipAiRead"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16"/><circle cx="12" cy="12" r="3.2"/></svg>AI read</button>' +
+      '<button class="ip-tool" id="ipMeasure"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9h20v6H2z"/><path d="M6 9v3M10 9v4M14 9v3M18 9v4"/></svg>Measure</button>' +
+    '</div>' +
+    '<div class="ip-shots" id="ipShots"></div>' +
+    '<div class="ip-fld"><label>Element</label><select id="ipfEl">' + opt(IP_ELEMENTS, d.element) + '</select>' +
+      '<p class="ip-hint">From a list, not free text — the same wall is called the same thing in every report you write.</p></div>' +
+    '<div class="ip-fld"><label>Defect type</label><select id="ipfDt">' + opt(IP_DEFTYPES, d.defectType) + '</select></div>' +
+    '<div class="ip-fld"><label>Description</label><textarea id="ipfDesc" placeholder="What you see, where exactly, how big.">' + ipEsc(d.desc) + '</textarea></div>';
+  if (t.rate) {
+    html += '<div class="ip-fld"><label>BARIS rating</label><div class="ip-rates" id="ipfRate">' +
+      [['good','Good','B1'],['fair','Fair','B2'],['dilapidated','Dilapidated','B3–B4']].map(function(r) {
+        return '<button data-r="' + r[0] + '" class="' + (d.rate === r[0] ? 'on' : '') + '">' + r[1] + '<small>' + r[2] + '</small></button>';
+      }).join('') + '</div></div>';
+  }
+  if (t.rate || t.gps) html += '<div class="ip-fld"><label>Priority</label><select id="ipfPri">' + opt(IP_PRI, d.priority) + '</select></div>';
+  if (t.rate) {
+    html += '<div class="ip-fld"><label>Recommended action</label><textarea id="ipfAct" placeholder="What should be done, and by whom.">' + ipEsc(d.action) + '</textarea></div>' +
+      '<div class="ip-fld"><label>Estimated cost (RM)</label><input id="ipfCost" inputmode="decimal" value="' + ipEsc(d.cost).replace(/"/g, '&quot;') + '"></div>';
+  }
+  if (t.gps) {
+    html += '<div class="ip-fld"><label>Where exactly</label><input id="ipfLoc" value="' + ipEsc(d.locationText).replace(/"/g, '&quot;') + '" placeholder="Chainage 2+140, north verge">' +
+      '<p class="ip-hint" id="ipGpsHint">' + (d.gps ? 'GPS ' + d.gps : 'GPS is captured when you save.') + '</p></div>';
+  }
+  html += '<button class="ip-go" id="ipSaveFind">' + (f ? 'Save changes' : 'Save finding') + '</button>';
+  if (f) html += '<button class="ip-ghost bad" id="ipDelFind">Delete this finding</button>';
+  return ipShell(html);
+}
+
+function ipViewExport() {
+  const t = ipT();
+  const noDesc = IP.findings.filter(function(f) { return !f.desc; }).length;
+  const noPhoto = IP.findings.filter(function(f) { return !(f.photoN > 0); }).length;
+  const blank = IP.spaces.filter(function(s) { return !ipFindingsIn(s.id).length && !s.rate && !s.noDefect; });
+  const c = (IP.insp && IP.insp.cover) || {};
+  const coverOk = !!(c.title && c.addr && c.client);
+  const row = function(ok, b, sub) {
+    return '<div class="ip-check ' + (ok ? 'ok' : 'no') + '">' +
+      (ok ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg>'
+          : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>') +
+      '<div><b>' + ipEsc(b) + '</b>' + (sub ? '<br><span>' + ipEsc(sub) + '</span>' : '') + '</div></div>';
+  };
+  let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="hub"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><h2>Before you <em>send</em></h2></div>' +
+    '<div class="ip-sec"><b>Checks</b><i></i></div>' +
+    row(coverOk, coverOk ? 'Cover complete' : 'Cover is missing something', coverOk ? 'Property, address and client all filled.' : 'Property name, address and client all show on page one.') +
+    row(blank.length === 0, blank.length ? blank.length + ' ' + t.units.toLowerCase() + ' still empty' : 'Every ' + t.unit.toLowerCase() + ' covered',
+        blank.length ? blank.map(function(s) { return s.key + ' ' + s.name; }).join(', ') : 'Nothing left blank.') +
+    row(noDesc === 0, noDesc ? noDesc + ' findings have no description' : 'Every finding described', 'A photo without words is not a report.') +
+    row(noPhoto === 0, noPhoto ? noPhoto + ' findings have no photo' : 'Every finding photographed', 'Photos are what the client argues with, not your prose.') +
+    '<div class="ip-sec" style="margin-top:16px"><b>The report will contain</b><i></i></div>' +
+    ['Cover page with the property, client and date',
+     'Summary — findings by ' + (t.rate ? 'rating and ' : '') + 'priority',
+     IP.plans.length ? 'Each plan with the lettered pins drawn on' : '',
+     'One table per ' + t.unit.toLowerCase() + ', findings numbered ' + (IP.spaces[0] ? IP.spaces[0].key : 'A') + '01, ' + (IP.spaces[0] ? IP.spaces[0].key : 'A') + '02 …',
+     'A photo with each finding, captioned with its number',
+     t.cost ? 'Cost summary, totalled' : '',
+     'Limitations and signature block'].filter(Boolean).map(function(x) {
+      return '<div class="ip-check ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg><div><b>' + ipEsc(x) + '</b></div></div>';
+    }).join('') +
+    '<button class="ip-go" id="ipPdf" style="margin-top:16px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Download the report PDF</button>' +
+    '<button class="ip-ghost" id="ipShareAll">Share the report</button>' +
+    '<button class="ip-ghost" id="ipComplete">Mark this inspection complete</button>';
+  return ipShell(html);
+}
+
+// ---------- 5. PAPARAN ----------
+function ipRender() {
+  const box = document.getElementById('ipBody');
+  if (!box) return;
+  const v = IP.view;
+  box.innerHTML = v === 'list' ? ipViewList()
+    : v === 'type' ? ipViewType()
+    : v === 'cover' ? ipViewCover()
+    : v === 'plan' ? ipViewPlan()
+    : v === 'space' ? ipViewSpace()
+    : v === 'finding' ? ipViewFinding()
+    : v === 'export' ? ipViewExport()
+    : ipViewHub();
+  document.getElementById('ipMode').scrollTop = 0;
+  if (v === 'finding') ipPaintShots();
+}
+function ipGo(v) { IP.view = v; ipRender(); }
+
+async function ipPaintShots() {
+  const box = document.getElementById('ipShots');
+  if (!box) return;
+  const f = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
+  const n = f ? (f.photoN || 0) : IP.shots.length;
+  let html = '';
+  if (f) {
+    for (let i = 0; i < n; i++) {
+      const url = await ipPhotoUrl(f, i);
+      html += '<div class="ip-shot"><img src="' + url + '" alt=""><button data-ipdelshot="' + i + '"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+    }
+  } else {
+    IP.shots.forEach(function(sh, i) {
+      html += '<div class="ip-shot"><img src="' + sh.url + '" alt=""><button data-ipdelshot="' + i + '"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+    });
+  }
+  box.innerHTML = html;
+}
+
+// ---------- 6. TINDAKAN ----------
+async function ipSaveCover() {
+  const g = function(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const cover = { ref:g('ipcRef'), title:g('ipcTitle'), addr:g('ipcAddr'), btype:g('ipcBt'), built:g('ipcYr'),
+                  client:g('ipcCli'), phone:g('ipcPh'), email:g('ipcEm'), date:g('ipcDate'), weather:g('ipcW'), attend:g('ipcAt') };
+  await ipPatch({ cover: cover, title: cover.title || 'Untitled inspection' });
+  const row = (inspections || []).filter(function(x) { return x.id === IP.id; })[0];
+  if (row) { row.cover = cover; row.title = cover.title || 'Untitled inspection'; }
+  showToast('Cover saved');
+  ipGo('hub');
+}
+
+async function ipAddPhotoFile(file) {
+  const full = await ipShrinkTo(file, 1600, 0.8);
+  const url = URL.createObjectURL(full);
+  IP.shots.push({ blob: full, url: url });
+  ipPaintShots();
+}
+async function ipSaveFinding() {
+  const s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
+  if (!s || !currentUser) return;
+  const btn = document.getElementById('ipSaveFind');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const g = function(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const t = ipT();
+  const existing = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
+  const rateBtn = document.querySelector('#ipfRate button.on');
+  const data = {
+    spaceId: s.id, spaceKey: s.key,
+    no: existing ? existing.no : ipFindingsIn(s.id).length + 1,
+    element: g('ipfEl'), defectType: g('ipfDt'), desc: g('ipfDesc'),
+    rate: t.rate ? (rateBtn ? rateBtn.dataset.r : (existing ? existing.rate : '')) : '',
+    priority: g('ipfPri'), cost: g('ipfCost'), action: g('ipfAct'), locationText: g('ipfLoc'),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if (!data.defectType && !data.desc) {
+    if (btn) { btn.disabled = false; btn.textContent = existing ? 'Save changes' : 'Save finding'; }
+    showToast('Give it a defect type or a description');
+    return;
+  }
+  try {
+    let id = IP.findId;
+    if (!existing) {
+      data.photoN = 0;
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const doc = await ipSub('findings').add(data);
+      id = doc.id;
+      IP.findings.push(Object.assign({ id: id }, data, { photoN: 0 }));
+    }
+    // Gambar penuh ke telefon, thumbnail ke Firestore.
+    if (IP.shots.length) {
+      const base = existing ? (existing.photoN || 0) : 0;
+      for (let i = 0; i < IP.shots.length; i++) {
+        await lbPut(ipPhotoKey(id, base + i), IP.shots[i].blob, 'image/jpeg');
+      }
+      data.photoN = base + IP.shots.length;
+      if (!data.thumb) data.thumb = await ipThumbOf(IP.shots[0].blob);
+    }
+    if (t.gps && navigator.geolocation && !data.gps) {
+      try {
+        const pos = await new Promise(function(res, rej) {
+          navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+        });
+        data.gps = pos.coords.latitude.toFixed(6) + ', ' + pos.coords.longitude.toFixed(6) + ' (±' + Math.round(pos.coords.accuracy) + ' m)';
+      } catch (e) {}
+    }
+    await ipSub('findings').doc(id).set(data, { merge: true });
+    const local = IP.findings.filter(function(x) { return x.id === id; })[0];
+    if (local) Object.keys(data).forEach(function(k) { if (k !== 'updatedAt' && k !== 'createdAt') local[k] = data[k]; });
+    IP.shots.forEach(function(sh) { try { URL.revokeObjectURL(sh.url); } catch (e) {} });
+    IP.shots = [];
+    IP.findId = null;
+    await ipCounts();
+    await ipPatch({ photoCount: IP.findings.reduce(function(a, f) { return a + (f.photoN || 0); }, 0) });
+    showToast('Finding saved');
+    ipGo('space');
+  } catch (e) {
+    console.warn('[Finding save]', e.message);
+    if (btn) { btn.disabled = false; btn.textContent = existing ? 'Save changes' : 'Save finding'; }
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+// ---------- 7. KONGSI SATU PENEMUAN ----------
+// Web Share membawa gambar sekali, jadi WhatsApp menerima foto
+// dan teks serentak. Kalau pelayar tidak menyokongnya, wa.me
+// tetap membuka WhatsApp dengan teksnya sahaja.
+async function ipShareFinding(fid) {
+  const f = IP.findings.filter(function(x) { return x.id === fid; })[0];
+  if (!f) return;
+  const s = IP.spaces.filter(function(x) { return x.id === f.spaceId; })[0] || { key: '?', name: '' };
+  const c = (IP.insp && IP.insp.cover) || {};
+  const t = ipT();
+  const L = [];
+  L.push('*' + (c.title || IP.insp.title || 'Inspection') + '* — ' + t.n);
+  L.push('Finding ' + s.key + ipNo(f.no) + ' · ' + s.name);
+  if (f.defectType) L.push('Defect: ' + f.defectType + (f.element ? ' (' + f.element + ')' : ''));
+  if (f.desc) L.push('');
+  if (f.desc) L.push(f.desc);
+  if (t.rate && f.rate) L.push('Condition: ' + f.rate);
+  if (f.priority) L.push('Priority: ' + f.priority);
+  if (t.cost && f.cost) L.push('Estimate: RM ' + f.cost);
+  if (f.action) L.push('Action: ' + f.action);
+  if (f.locationText) L.push('Location: ' + f.locationText);
+  if (f.gps) L.push('GPS: ' + f.gps + '  https://maps.google.com/?q=' + f.gps.split(' (')[0].replace(/\s/g, ''));
+  if (c.ref) L.push('Ref: ' + c.ref);
+  const text = L.join('\n');
+
+  const files = [];
+  for (let i = 0; i < (f.photoN || 0) && i < 3; i++) {
+    try {
+      const rec = await lbGet(ipPhotoKey(f.id, i));
+      if (rec && rec.blob) files.push(new File([rec.blob], s.key + ipNo(f.no) + '-' + (i + 1) + '.jpg', { type: 'image/jpeg' }));
+    } catch (e) {}
+  }
+  try {
+    if (files.length && navigator.canShare && navigator.canShare({ files: files })) {
+      await navigator.share({ text: text, files: files });
+      return;
+    }
+    if (navigator.share) { await navigator.share({ text: text }); return; }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+  }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+// ---------- 8. LAPORAN PDF ----------
+function ipPdfText(doc, s, x, y, w, size, style, col) {
+  doc.setFont('helvetica', style || 'normal');
+  doc.setFontSize(size);
+  if (col) doc.setTextColor(col[0], col[1], col[2]); else doc.setTextColor(30, 30, 30);
+  const lines = doc.splitTextToSize(String(s == null ? '' : s), w);
+  doc.text(lines, x, y);
+  return y + lines.length * size * 0.38;
+}
+async function ipBlobToDataUrl(blob) {
+  return new Promise(function(res) {
+    const r = new FileReader();
+    r.onload = function() { res(String(r.result)); };
+    r.onerror = function() { res(''); };
+    r.readAsDataURL(blob);
+  });
+}
+async function ipBuildPdf() {
+  if (typeof window.jspdf === 'undefined') { showToast('PDF library not loaded', 'error'); return null; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297, M = 15;
+  const t = ipT(), c = (IP.insp && IP.insp.cover) || {};
+  const title = c.title || IP.insp.title || 'Inspection';
+  const RGB = { good: [21, 128, 61], fair: [161, 98, 7], dilapidated: [185, 28, 28] };
+
+  const foot = function(page) {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(150, 150, 150);
+    doc.text(title + ' · ' + (c.ref || ''), M, H - 9);
+    doc.text('Page ' + page, W - M, H - 9, { align: 'right' });
+  };
+  let page = 1;
+  const nextPage = function() { foot(page); doc.addPage(); page++; };
+
+  // --- Cover ---
+  doc.setFillColor(27, 79, 216); doc.rect(0, 0, W, 6, 'F');
+  let y = 44;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 120, 120);
+  doc.text(t.n.toUpperCase(), M, y); y += 12;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(26); doc.setTextColor(20, 20, 20);
+  y = ipPdfText(doc, title, M, y, W - M * 2, 26, 'bold') + 4;
+  y = ipPdfText(doc, c.addr || '', M, y, W - M * 2, 11, 'normal', [90, 90, 90]) + 12;
+  doc.setDrawColor(220, 220, 220); doc.line(M, y, W - M, y); y += 10;
+  const kv = [['Reference', c.ref], ['Client', c.client], ['Contact', [c.phone, c.email].filter(Boolean).join('  ·  ')],
+              ['Building type', c.btype], ['Year built', c.built], ['Date of inspection', c.date],
+              ['Weather', c.weather], ['Present on site', c.attend],
+              [t.units, String(IP.spaces.length)], ['Findings', String(IP.findings.length)]];
+  kv.forEach(function(r) {
+    if (!r[1]) return;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(140, 140, 140);
+    doc.text(String(r[0]).toUpperCase(), M, y);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(30, 30, 30);
+    const lines = doc.splitTextToSize(String(r[1]), W - M * 2 - 52);
+    doc.text(lines, M + 52, y);
+    y += Math.max(7, lines.length * 4.6);
+  });
+
+  // --- Summary ---
+  nextPage(); y = M + 8;
+  y = ipPdfText(doc, 'Summary', M, y, W - M * 2, 17, 'bold') + 6;
+  if (t.rate) {
+    const cnt = { good: 0, fair: 0, dilapidated: 0 };
+    IP.findings.forEach(function(f) { if (cnt[f.rate] != null) cnt[f.rate]++; });
+    let bx = M;
+    [['good', 'Good'], ['fair', 'Fair'], ['dilapidated', 'Dilapidated']].forEach(function(r) {
+      const w = (W - M * 2 - 8) / 3;
+      doc.setFillColor(248, 248, 248); doc.roundedRect(bx, y, w, 20, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+      doc.setTextColor(RGB[r[0]][0], RGB[r[0]][1], RGB[r[0]][2]);
+      doc.text(String(cnt[r[0]]), bx + 5, y + 10);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(120, 120, 120);
+      doc.text(r[1], bx + 5, y + 16);
+      bx += w + 4;
+    });
+    y += 27;
+  }
+  const pri = {};
+  IP.findings.forEach(function(f) { if (f.priority) pri[f.priority] = (pri[f.priority] || 0) + 1; });
+  if (Object.keys(pri).length) {
+    y = ipPdfText(doc, 'By priority: ' + IP_PRI.filter(function(p) { return pri[p]; }).map(function(p) { return p + ' ' + pri[p]; }).join('   ·   '), M, y, W - M * 2, 10) + 8;
+  }
+  y = ipPdfText(doc, t.units, M, y, W - M * 2, 12, 'bold') + 5;
+  doc.setFontSize(9);
+  IP.spaces.forEach(function(s) {
+    if (y > H - 30) { nextPage(); y = M + 8; }
+    const n = ipFindingsIn(s.id).length;
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(30, 30, 30);
+    doc.text(s.key, M, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(s.name, M + 10, y);
+    doc.setTextColor(120, 120, 120);
+    doc.text(n + (n === 1 ? ' finding' : ' findings'), W - M - 34, y);
+    if (t.rate && s.rate) {
+      doc.setTextColor(RGB[s.rate][0], RGB[s.rate][1], RGB[s.rate][2]);
+      doc.setFont('helvetica', 'bold');
+      doc.text(s.rate.toUpperCase(), W - M, y, { align: 'right' });
+    }
+    doc.setDrawColor(235, 235, 235); doc.line(M, y + 2, W - M, y + 2);
+    y += 7.5;
+  });
+  if (t.cost) {
+    const total = IP.findings.reduce(function(a, f) { return a + (parseFloat(String(f.cost).replace(/[^0-9.]/g, '')) || 0); }, 0);
+    if (total) { y += 5; y = ipPdfText(doc, 'Estimated total: RM ' + total.toLocaleString('en-MY'), M, y, W - M * 2, 12, 'bold'); }
+  }
+
+  // --- Plans with pins ---
+  for (let pi = 0; pi < IP.plans.length; pi++) {
+    const p = IP.plans[pi];
+    nextPage(); y = M + 8;
+    y = ipPdfText(doc, p.name, M, y, W - M * 2, 15, 'bold') + 5;
+    let dataUrl = 'data:' + (p.mime || 'image/jpeg') + ';base64,' + p.thumb;
+    try { const rec = await lbGet('plan:' + p.id); if (rec && rec.blob) dataUrl = await ipBlobToDataUrl(rec.blob); } catch (e) {}
+    const maxW = W - M * 2, maxH = 200;
+    const ar = (p.h && p.w) ? p.h / p.w : 0.7;
+    let iw = maxW, ih = iw * ar;
+    if (ih > maxH) { ih = maxH; iw = ih / ar; }
+    const ix = M + (maxW - iw) / 2;
+    try { doc.addImage(dataUrl, 'JPEG', ix, y, iw, ih, undefined, 'FAST'); } catch (e) {}
+    doc.setDrawColor(210, 210, 210); doc.rect(ix, y, iw, ih);
+    IP.spaces.filter(function(s) { return s.planId === p.id; }).forEach(function(s) {
+      const px = ix + iw * (s.x / 100), py = y + ih * (s.y / 100);
+      doc.setFillColor(27, 79, 216); doc.circle(px, py, 3.4, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(255, 255, 255);
+      doc.text(s.key, px, py + 1.1, { align: 'center' });
+    });
+    y += ih + 7;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
+    doc.text('Pins are keyed to the tables that follow.', M, y);
+  }
+
+  // --- Findings by space ---
+  for (let si = 0; si < IP.spaces.length; si++) {
+    const s = IP.spaces[si];
+    const list = ipFindingsIn(s.id);
+    // Satu ruang satu muka surat membazir kertas bila ruang itu
+    // hanya ada satu penemuan; mula muka baharu hanya bila ruang
+    // yang tinggal tidak cukup.
+    if (si === 0 || y > H - 96) { nextPage(); y = M + 8; } else { y += 8; }
+    doc.setFillColor(27, 79, 216); doc.roundedRect(M, y - 5, 9, 9, 1.5, 1.5, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(255, 255, 255);
+    doc.text(s.key, M + 4.5, y + 1, { align: 'center' });
+    y = ipPdfText(doc, s.name, M + 13, y, W - M * 2 - 13, 15, 'bold') + 6;
+    if (!list.length) {
+      ipPdfText(doc, s.noDefect ? 'No defect found in this ' + t.unit.toLowerCase() + '.' : 'Nothing recorded.', M, y, W - M * 2, 10, 'normal', [120, 120, 120]);
+      continue;
+    }
+    for (let fi = 0; fi < list.length; fi++) {
+      const f = list[fi];
+      if (y > H - 76) { nextPage(); y = M + 8; }
+      const top = y;
+      let img = f.thumb ? 'data:image/jpeg;base64,' + f.thumb : '';
+      try { const rec = await lbGet(ipPhotoKey(f.id, 0)); if (rec && rec.blob) img = await ipBlobToDataUrl(rec.blob); } catch (e) {}
+      const iw = 54, ih = 40;
+      if (img) { try { doc.addImage(img, 'JPEG', M, top, iw, ih, undefined, 'FAST'); } catch (e) {} }
+      else { doc.setFillColor(245, 245, 245); doc.rect(M, top, iw, ih, 'F'); }
+      const tx = M + iw + 6, tw = W - M - tx;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(27, 79, 216);
+      doc.text(s.key + ipNo(f.no), tx, top + 4);
+      let ty = top + 10;
+      ty = ipPdfText(doc, (f.defectType || 'Untyped') + (f.element ? ' — ' + f.element : ''), tx, ty, tw, 10.5, 'bold');
+      ty += 1.5;
+      if (f.desc) ty = ipPdfText(doc, f.desc, tx, ty, tw, 8.5, 'normal', [70, 70, 70]) + 1.5;
+      const tags = [];
+      if (t.rate && f.rate) tags.push(f.rate.toUpperCase());
+      if (f.priority) tags.push('Priority: ' + f.priority);
+      if (t.cost && f.cost) tags.push('RM ' + f.cost);
+      if (f.locationText) tags.push(f.locationText);
+      if (f.gps) tags.push('GPS ' + f.gps);
+      if (tags.length) ty = ipPdfText(doc, tags.join('   ·   '), tx, ty, tw, 8, 'bold', [120, 120, 120]) + 1;
+      if (f.action) ipPdfText(doc, 'Action: ' + f.action, tx, ty, tw, 8.5, 'normal', [70, 70, 70]);
+      y = Math.max(top + ih, ty) + 9;
+      doc.setDrawColor(235, 235, 235); doc.line(M, y - 5, W - M, y - 5);
+    }
+  }
+
+  // --- Limitations ---
+  nextPage(); y = M + 8;
+  y = ipPdfText(doc, 'Limitations', M, y, W - M * 2, 15, 'bold') + 5;
+  y = ipPdfText(doc, 'This report records what was visible and reasonably accessible on the date of inspection. ' +
+    'No opening up, dismantling or testing was carried out unless stated. Areas that were locked, obstructed or ' +
+    'unsafe to reach were not inspected. Cost figures where given are indicative only and are not a tender price.',
+    M, y, W - M * 2, 9.5, 'normal', [70, 70, 70]) + 16;
+  doc.setDrawColor(180, 180, 180); doc.line(M, y, M + 70, y);
+  ipPdfText(doc, 'Inspected by', M, y + 5, 70, 8.5, 'normal', [120, 120, 120]);
+  foot(page);
+  return doc;
+}
+async function ipExportPdf(share) {
+  if (IP.busy) return;
+  IP.busy = true;
+  const btn = document.getElementById(share ? 'ipShareAll' : 'ipPdf');
+  const label = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Building the report…'; }
+  try {
+    const doc = await ipBuildPdf();
+    if (!doc) return;
+    const c = (IP.insp && IP.insp.cover) || {};
+    const name = ((c.title || IP.insp.title || 'inspection').replace(/[^\w\- ]+/g, '').trim() || 'inspection') + ' - ' + (c.ref || '') + '.pdf';
+    if (share) {
+      const blob = doc.output('blob');
+      const file = new File([blob], name, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: name });
+      } else {
+        doc.save(name);
+        showToast('This browser cannot share files — downloaded instead');
+      }
+    } else {
+      doc.save(name);
+      showToast('Report downloaded');
+    }
+  } catch (e) {
+    if (!(e && e.name === 'AbortError')) { console.warn('[PDF]', e.message); showToast('Could not build the PDF. ' + e.message, 'error'); }
+  } finally {
+    IP.busy = false;
+    if (btn) { btn.disabled = false; btn.innerHTML = label; }
+  }
+}
+
+// ---------- 9. PENDAWAIAN ----------
+function ipWire() {
+  const body = document.getElementById('ipMode');
+  if (!body) return;
+
+  body.addEventListener('click', async function(e) {
+    const g = e.target.closest('[data-ipgo]');
+    if (g) { ipGo(g.dataset.ipgo); return; }
+    const op = e.target.closest('[data-ipopen]');
+    if (op) { await ipLoadOne(op.dataset.ipopen); ipGo('hub'); return; }
+    const ty = e.target.closest('[data-iptype]');
+    if (ty) { IP.draftType = ty.dataset.iptype; ipRender(); return; }
+    const sp = e.target.closest('[data-ipspace]');
+    if (sp) { IP.spaceId = sp.dataset.ipspace; IP.findId = null; ipGo('space'); return; }
+    const fd = e.target.closest('[data-ipfind]');
+    if (fd) { IP.findId = fd.dataset.ipfind; IP.shots = []; ipGo('finding'); return; }
+    const pl = e.target.closest('[data-ipplan]');
+    if (pl) { IP.planIx = +pl.dataset.ipplan; ipRender(); return; }
+    const ds = e.target.closest('[data-ipdelshot]');
+    if (ds) {
+      const i = +ds.dataset.ipdelshot;
+      const f = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
+      if (f) {
+        await lbDrop(ipPhotoKey(f.id, i));
+        f.photoN = Math.max(0, (f.photoN || 1) - 1);
+        await ipSub('findings').doc(f.id).update({ photoN: f.photoN });
+      } else {
+        try { URL.revokeObjectURL(IP.shots[i].url); } catch (err) {}
+        IP.shots.splice(i, 1);
+      }
+      ipPaintShots();
+      return;
+    }
+    if (e.target.closest('[data-ipnewspace]')) {
+      const id = await ipAddSpace(50, 50, '');
+      if (id) { IP.spaceId = id; ipGo('space'); }
+      return;
+    }
+    if (e.target.closest('[data-ipnewfind]')) { IP.findId = null; IP.shots = []; ipGo('finding'); return; }
+
+    const r = e.target.closest('#ipSpRate button');
+    if (r) {
+      const s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
+      const v = (s && s.rate === r.dataset.r) ? '' : r.dataset.r;
+      await ipSpacePatch(IP.spaceId, { rate: v });
+      ipRender();
+      return;
+    }
+    const fr = e.target.closest('#ipfRate button');
+    if (fr) {
+      document.querySelectorAll('#ipfRate button').forEach(function(b) { b.classList.toggle('on', b === fr && !fr.classList.contains('on')); });
+      return;
+    }
+    if (e.target.closest('#ipMake')) {
+      const id = await ipCreate(IP.draftType);
+      if (id) { await ipLoadOne(id); ipGo('cover'); }
+      return;
+    }
+    if (e.target.closest('#ipSaveCover')) { ipSaveCover(); return; }
+    if (e.target.closest('#ipSaveFind')) { ipSaveFinding(); return; }
+    if (e.target.closest('#ipShare')) { ipShareFinding(IP.findId); return; }
+    if (e.target.closest('#ipPdf')) { ipExportPdf(false); return; }
+    if (e.target.closest('#ipShareAll')) { ipExportPdf(true); return; }
+    if (e.target.closest('#ipShoot')) { document.getElementById('ipCam').click(); return; }
+    if (e.target.closest('#ipPlanUp') || e.target.closest('#ipPlanUp2') || e.target.closest('#ipPlanUp3')) {
+      document.getElementById('ipPlanFile').click(); return;
+    }
+    if (e.target.closest('#ipPinBtn')) { IP.pinMode = !IP.pinMode; ipRender(); if (IP.pinMode) showToast('Now tap the plan'); return; }
+    if (e.target.closest('#ipNoDefect')) {
+      const s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
+      await ipSpacePatch(IP.spaceId, { noDefect: !(s && s.noDefect) });
+      ipRender();
+      return;
+    }
+    if (e.target.closest('#ipDelSpace')) {
+      const s = IP.spaces.filter(function(x) { return x.id === IP.spaceId; })[0];
+      if (!s) return;
+      await ipDeleteSpace(IP.spaceId);
+      showToast(ipT().unit + ' deleted');
+      ipGo('hub');
+      return;
+    }
+    if (e.target.closest('#ipDelFind')) { await ipDeleteFinding(IP.findId); IP.findId = null; ipGo('space'); return; }
+    if (e.target.closest('#ipComplete')) {
+      await ipPatch({ status: 'completed' });
+      const row = (inspections || []).filter(function(x) { return x.id === IP.id; })[0];
+      if (row) row.status = 'completed';
+      showToast('Marked complete');
+      ipGo('list');
+      return;
+    }
+    if (e.target.closest('#ipAiRead')) { showToast('Take a photo first, then AI read fills the fields'); return; }
+    if (e.target.closest('#ipMeasure')) {
+      if (typeof openCrackRuler === 'function') openCrackRuler();
+      else showToast('Crack Ruler is in Tools');
+      return;
+    }
+    // Letak pin pada pelan
+    const box = e.target.closest('#ipPlanBox');
+    if (box && IP.pinMode) {
+      const b = box.getBoundingClientRect();
+      const x = Math.round((e.clientX - b.left) / b.width * 100);
+      const yy = Math.round((e.clientY - b.top) / b.height * 100);
+      const plan = IP.plans[IP.planIx];
+      const id = await ipAddSpace(x, yy, plan ? plan.id : '');
+      IP.pinMode = false;
+      // Terus masuk ke ruang itu: nama lalai "Space A" tidak berguna
+      // dalam laporan, jadi minta nama sebenar semasa ingatan masih segar.
+      if (id) { IP.spaceId = id; ipGo('space'); showToast(ipT().unit + ' placed — name it'); }
+      else ipRender();
+      return;
+    }
+  });
+
+  body.addEventListener('change', async function(e) {
+    if (e.target.id === 'ipSpName' && IP.spaceId) {
+      await ipSpacePatch(IP.spaceId, { name: e.target.value.trim() || ipT().unit });
+    }
+  });
+
+  const cam = document.getElementById('ipCam');
+  if (cam) cam.addEventListener('change', async function(e) {
+    const fs = [].slice.call(e.target.files || []);
+    e.target.value = '';
+    for (let i = 0; i < fs.length; i++) await ipAddPhotoFile(fs[i]);
+    if (fs.length) showToast(fs.length + ' photo' + (fs.length === 1 ? '' : 's') + ' attached — save the finding to keep them');
+  });
+
+  const pf = document.getElementById('ipPlanFile');
+  if (pf) pf.addEventListener('change', async function(e) {
+    const f = (e.target.files || [])[0];
+    e.target.value = '';
+    if (!f || !currentUser) return;
+    showToast('Loading the plan…');
+    const full = await ipShrinkTo(f, 1800, 0.85);
+    const thumb = await ipShrinkTo(f, 900, 0.72);
+    const dims = await new Promise(function(res) {
+      const u = URL.createObjectURL(full), im = new Image();
+      im.onload = function() { res({ w: im.width, h: im.height }); URL.revokeObjectURL(u); };
+      im.onerror = function() { res({ w: 1000, h: 700 }); URL.revokeObjectURL(u); };
+      im.src = u;
+    });
+    const data = { name: 'Plan ' + (IP.plans.length + 1), mime: 'image/jpeg', w: dims.w, h: dims.h,
+                   thumb: await lbBlobToB64(thumb), order: IP.plans.length,
+                   createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+    try {
+      const doc = await ipSub('plans').add(data);
+      await lbPut('plan:' + doc.id, full, 'image/jpeg');
+      IP.plans.push(Object.assign({ id: doc.id }, data));
+      IP.planIx = IP.plans.length - 1;
+      ipRender();
+      showToast('Plan added — tap Place to tag it');
+    } catch (err) { showToast('Could not save the plan. ' + err.message, 'error'); }
+  });
+}
+
+function ipOpenTab() {
+  if (!IP.id) IP.view = 'list';
+  ipRender();
+}
+
+try { ipWire(); } catch (e) { console.warn('[Inspection wire]', e.message); }
+
 // Console banner
-console.log('%cGoXpert Pocket v1.1', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.2', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
