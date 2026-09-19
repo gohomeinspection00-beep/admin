@@ -6431,7 +6431,10 @@ body.site-mode-active .voice-mode{
    Consult bar dibuang terus — toggle Mode kini di Profile. */
 body.on-home .topbar,
 body.on-tools .topbar,
+body.on-library .topbar,
 body.on-chat .topbar{display:none}
+/* Tanpa topbar, Library sendiri yang kena jauhkan diri dari bar status. */
+body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top))}
 .consult-bar{display:none!important}
 
 .nh-wrap{display:flex;flex-direction:column;min-height:100%;background:var(--bg)}
@@ -7943,7 +7946,7 @@ body.on-chat .topbar{display:none}
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.9 · build 19 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.9.1 · build 19 Sep 2026</div>
           </div>
         </div>
         
@@ -7974,7 +7977,7 @@ body.on-chat .topbar{display:none}
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v0.9</span>
+      <span class="chat-build" title="Build">v0.9.1</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -14300,6 +14303,7 @@ function switchTab(mode) {
   document.body.classList.toggle('on-home', mode === 'home');
   document.body.classList.toggle('on-tools', mode === 'tools');
   document.body.classList.toggle('on-chat', mode === 'chat' || mode === 'voice');
+  document.body.classList.toggle('on-library', mode === 'library');
 
   // Hide all modes
   document.getElementById('homeMode').classList.remove('show');
@@ -23618,7 +23622,7 @@ function lbWire() {
 try { lbWire(); } catch (e) { console.warn('[Library wire]', e.message); }
 
 // Console banner
-console.log('%cGoXpert Pocket v0.9', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v0.9.1', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
