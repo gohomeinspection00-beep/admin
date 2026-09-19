@@ -13,10 +13,11 @@ rules_version = '2';
 //   P2 — settings/pocketConfig tak boleh dibaca pengguna biasa
 //   P3 — users/{uid} ditolak kerana rules lama menjangka users/{email}
 //
-// PERLU DIPASANG SEMULA selepas ciri Site safety (v1.0): fail ini kini
-// merangkumi pocketIds, pocketAdmins, sosWatch dan sosAlerts. Tanpa itu
-// Pocket ID dan SOS akan ditolak secara senyap oleh peraturan penolak-semua
-// di hujung fail. Salin fail ini ke Firebase Console > Firestore > Rules.
+// PERLU DIPASANG SEMULA selepas Messages (v1.9): fail ini kini merangkumi
+// pocketIds, pocketAdmins, sosWatch, sosAlerts dan pocketRooms. Tanpa itu
+// Pocket ID, SOS dan Messages akan ditolak secara senyap oleh peraturan
+// penolak-semua di hujung fail. Salin fail ini ke Firebase Console >
+// Firestore > Rules.
 //
 // Untuk menjadikan satu akaun sebagai admin: Firestore > mulakan koleksi
 // pocketAdmins, dokumen bernama UID akaun itu (Authentication > Users),
@@ -123,6 +124,54 @@ service cloud.firestore {
                          || (resource.data.toAdmin == true && isPocketAdmin())
                        );
       allow delete: if false;
+    }
+
+    // ---- Messages: chat peribadi dan kumpulan antara pengguna ----
+    // NAMA: pocketRooms, bukan pocketChats. pocketChats sudah dipakai
+    // oleh sejarah chat AI (satu cabang per UID) di atas.
+    //
+    // Senarai `members` ialah kunci keselamatannya. Pertanyaan senarai
+    // bilik menggunakan array-contains pada medan itu, jadi peraturan
+    // read yang sama melindungi get dan list sekali gus: kalau UID awak
+    // tiada dalam senarai, pelayan yang menolak, bukan UI.
+    match /pocketRooms/{roomId} {
+      function member() {
+        return signedIn() && request.auth.uid in resource.data.members;
+      }
+      allow get, list: if member();
+
+      // Pencipta mesti memasukkan dirinya sendiri; kalau tidak sesiapa
+      // boleh membuat bilik bagi pihak orang lain.
+      allow create: if signedIn()
+                    && request.auth.uid in request.resource.data.members
+                    && request.resource.data.createdBy == request.auth.uid
+                    && request.resource.data.members.size() >= 2
+                    && request.resource.data.members.size() <= 50;
+
+      // Ahli mengemas kini ringkasan mesej terakhir dan senarai ahli.
+      // Tiada siapa boleh mengeluarkan dirinya daripada senarai orang
+      // lain tanpa kekal ahli dahulu, dan bilik tidak boleh dikosongkan.
+      allow update: if member()
+                    && request.resource.data.createdBy == resource.data.createdBy
+                    && request.resource.data.members.size() >= 2
+                    && request.resource.data.members.size() <= 50;
+
+      allow delete: if false;
+
+      function roomMember() {
+        return signedIn() && request.auth.uid in
+          get(/databases/$(database)/documents/pocketRooms/$(roomId)).data.members;
+      }
+
+      match /messages/{msgId} {
+        allow get, list: if roomMember();
+        // Penghantar mesti dirinya sendiri: tiada siapa boleh menulis
+        // mesej atas nama orang lain.
+        allow create: if roomMember() && request.resource.data.by == request.auth.uid;
+        // Mesej yang sudah dibaca orang lain tidak boleh diubah isinya;
+        // hanya penghantar boleh menariknya balik.
+        allow update, delete: if signedIn() && resource.data.by == request.auth.uid;
+      }
     }
 
     // ---- Tolak semua yang lain ----

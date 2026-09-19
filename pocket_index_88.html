@@ -433,6 +433,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 /* Body padding so content tak terhalang oleh bottom nav */
 .has-bottom-nav .home-mode,
 .has-bottom-nav .ip-mode,
+.has-bottom-nav .ms-mode,
 .has-bottom-nav .library-mode,
 .has-bottom-nav .profile-mode,
 .has-bottom-nav .chat-mode,
@@ -6435,6 +6436,7 @@ body.on-home .topbar,
 body.on-tools .topbar,
 body.on-library .topbar,
 body.on-inspections .topbar,
+body.on-messages .topbar,
 body.on-chat .topbar{display:none}
 /* Tanpa topbar, Library sendiri yang kena jauhkan diri dari bar status. */
 body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top))}
@@ -6551,6 +6553,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .nh-sec{display:flex;align-items:center;gap:8px;margin:0 2px 11px;color:var(--fg-dim)}
 .nh-sec h3{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
 .nh-sec a{margin-left:auto;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none}
+.nh-sec a + a{margin-left:12px}
 
 /* ---------- inspection rows ---------- */
 .nh-insp{
@@ -8171,6 +8174,164 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   .sm-talk.sm-live,.sm-wave-b{animation:none}
 }
 
+/* =======================================================
+   MESSAGES (ms-) — chat peribadi dan kumpulan antara pengguna
+   Berbeza daripada chat AI, yang kekal di bawah .chat-mode.
+   ======================================================= */
+.ms-mode{
+  position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);
+}
+.ms-mode.show{display:flex}
+
+.ms-hd{
+  flex:none;display:flex;align-items:center;gap:10px;
+  padding:14px 16px 12px;border-bottom:1px solid var(--line);background:var(--bg);
+}
+.ms-hd-back{width:33px;height:33px;border-radius:10px;background:var(--surface);display:grid;place-items:center;flex:none;color:var(--fg-2);border:none}
+.ms-hd-t{min-width:0;flex:1}
+.ms-hd-t h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.03em;font-family:var(--font-body)}
+.ms-hd-t h2 em{font-family:var(--font-display);font-style:italic;font-weight:400;color:var(--accent)}
+.ms-hd-sub{display:block;font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-hd-act{
+  flex:none;padding:8px 12px;border-radius:10px;background:var(--accent);color:var(--accent-fg);
+  font-size:12.5px;font-weight:700;border:none;display:flex;align-items:center;gap:6px;
+}
+.ms-hd-ic{width:33px;height:33px;border-radius:10px;background:var(--surface);display:grid;place-items:center;flex:none;color:var(--fg-2);border:none}
+
+.ms-body{flex:1;min-height:0;overflow-y:auto;padding:12px 14px;-webkit-overflow-scrolling:touch}
+.ms-body::-webkit-scrollbar{width:0}
+.ms-body.ms-talk{background:var(--bg-2);padding:14px 12px}
+
+/* --- senarai bilik --- */
+.ms-row{
+  display:flex;align-items:center;gap:11px;width:100%;
+  padding:11px 10px;border-radius:13px;text-align:left;color:var(--fg);border:none;background:none;
+}
+.ms-row.ms-un{background:var(--accent-soft)}
+.ms-av{
+  width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:none;
+  font-size:15px;font-weight:800;color:#fff;letter-spacing:-.02em;
+}
+.ms-av.ms-av-sm{width:37px;height:37px;border-radius:12px;font-size:13px}
+.ms-rt{min-width:0;flex:1}
+.ms-rt-nm{display:flex;align-items:baseline;gap:7px}
+.ms-rt-nm b{font-size:14.5px;font-weight:650;letter-spacing:-.015em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-rt-tm{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--muted);flex:none}
+.ms-rt-pv{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-rt-pv i{font-style:normal;color:var(--accent);font-weight:650}
+.ms-badge{
+  flex:none;min-width:21px;height:21px;padding:0 6px;border-radius:11px;
+  background:var(--accent);color:var(--accent-fg);
+  font-family:var(--font-mono);font-size:11px;font-weight:700;display:grid;place-items:center;
+}
+.ms-badge.ms-hot{background:var(--critical);color:#fff}
+
+.ms-sec{display:flex;align-items:center;gap:8px;margin:16px 4px 8px}
+.ms-sec:first-child{margin-top:2px}
+.ms-sec-l{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.ms-sec-r{flex:1;height:1px;background:var(--line)}
+
+.ms-empty{text-align:center;padding:30px 18px;color:var(--muted);font-size:13px;line-height:1.6}
+.ms-empty b{display:block;color:var(--fg);font-size:15px;font-weight:700;margin-bottom:6px}
+.ms-mine{padding:13px;border:1px dashed var(--line-2);border-radius:13px;text-align:center;background:var(--bg-2);margin-top:4px}
+.ms-mine-k{display:block;font-family:var(--font-mono);font-size:23px;letter-spacing:.14em;margin:5px 0;color:var(--fg)}
+.ms-mine span{font-size:11.5px;color:var(--muted);line-height:1.45}
+
+/* --- gelembung --- */
+.ms-day{text-align:center;margin:6px 0 12px}
+.ms-day span{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);background:var(--bg);padding:4px 10px;border-radius:99px;border:1px solid var(--line);
+}
+.ms-turn{display:flex;margin-bottom:8px}
+.ms-turn.ms-me{justify-content:flex-end}
+.ms-bub{max-width:80%;border-radius:15px;padding:9px 12px;font-size:14px;line-height:1.5;box-shadow:var(--shadow-1);word-break:break-word}
+.ms-turn.ms-me .ms-bub{background:var(--accent);color:var(--accent-fg);border-bottom-right-radius:5px}
+.ms-turn.ms-you .ms-bub{background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:5px}
+.ms-who{display:block;font-size:10.5px;font-weight:700;color:var(--accent);margin-bottom:3px}
+.ms-tm{display:block;font-family:var(--font-mono);font-size:9.5px;margin-top:4px;opacity:.65;text-align:right}
+.ms-sys{text-align:center;font-size:11.5px;color:var(--muted);margin:10px 0;line-height:1.5}
+.ms-photo{display:block;max-width:100%;border-radius:11px;margin-bottom:5px}
+
+/* --- kad kerja --- */
+.ms-card{
+  max-width:88%;border-radius:15px;overflow:hidden;background:var(--bg);
+  border:1.5px solid var(--accent-line);box-shadow:var(--shadow-1);text-align:left;color:var(--fg);padding:0;
+}
+.ms-turn.ms-me .ms-card{border-color:var(--accent)}
+.ms-card-h{
+  display:flex;align-items:center;gap:7px;padding:8px 11px;background:var(--accent-soft);
+  color:var(--accent);font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.ms-card-tag{margin-left:auto;font-family:var(--font-mono);letter-spacing:0;text-transform:none}
+.ms-card-b{padding:10px 11px}
+.ms-card-t{display:block;font-size:14px;font-weight:700;letter-spacing:-.015em;margin-bottom:3px}
+.ms-card-s{display:block;font-size:12.5px;color:var(--fg-dim);line-height:1.45}
+.ms-card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ms-tag{font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;background:var(--surface);color:var(--fg-dim)}
+.ms-tag.ms-t-fair{background:var(--warning-soft);color:var(--warning)}
+.ms-tag.ms-t-dil{background:var(--critical-soft);color:var(--critical)}
+.ms-card-go{display:block;width:100%;padding:9px;border-top:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--accent);text-align:center}
+.ms-card-img{width:100%;display:block;background:var(--surface)}
+.ms-card.ms-sos{border-color:var(--critical)}
+.ms-card.ms-sos .ms-card-h{background:var(--critical-soft);color:var(--critical)}
+
+/* --- karang --- */
+.ms-compose{
+  flex:none;display:flex;align-items:flex-end;gap:8px;
+  padding:9px 12px calc(11px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:var(--bg);
+}
+.ms-cbtn{width:40px;height:40px;border-radius:13px;background:var(--surface);display:grid;place-items:center;flex:none;color:var(--fg-2);border:none}
+.ms-cin{
+  flex:1;min-height:40px;max-height:96px;border:1px solid var(--line-2);border-radius:14px;
+  background:var(--bg-2);padding:10px 12px;resize:none;outline:none;line-height:1.4;font-size:15px;
+}
+.ms-cin:focus{border-color:var(--accent)}
+.ms-send{width:40px;height:40px;border-radius:13px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;flex:none;border:none}
+.ms-send:disabled{opacity:.45}
+
+/* --- borang tambah --- */
+.ms-fld{margin-bottom:12px}
+.ms-fld label{display:block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ms-fld input{width:100%;padding:12px;border:1px solid var(--line-2);border-radius:12px;background:var(--bg-2);outline:none}
+.ms-fld input:focus{border-color:var(--accent)}
+.ms-hint{font-size:11.5px;color:var(--muted);margin:6px 2px 0;line-height:1.5}
+.ms-pidin{font-family:var(--font-mono);font-size:20px;letter-spacing:.22em;text-align:center;text-transform:uppercase}
+.ms-big{
+  display:block;width:100%;padding:13px;border-radius:13px;background:var(--accent);color:var(--accent-fg);
+  font-size:14.5px;font-weight:700;text-align:center;margin-bottom:8px;border:none;
+}
+.ms-big:disabled{opacity:.5}
+.ms-big.ms-alt{background:var(--bg);border:1px solid var(--line-2);color:var(--fg-2)}
+.ms-or{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:10.5px;font-weight:700;letter-spacing:.1em}
+.ms-or-r{flex:1;height:1px;background:var(--line)}
+.ms-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:99px;
+  background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:650;
+  margin:0 6px 6px 0;border:1px solid var(--accent-line);
+}
+.ms-chip button{color:inherit;display:grid;place-items:center;border:none;background:none}
+.ms-chip.ms-chip-add{background:var(--surface);color:var(--fg-dim);border-color:var(--line-2)}
+
+.ms-warn{
+  margin:0 0 10px;padding:10px 11px;border-radius:12px;
+  background:var(--warning-soft);border:1px solid var(--warning);font-size:12px;line-height:1.5;color:var(--fg);
+}
+.ms-warn b{display:block;font-weight:700;margin-bottom:3px}
+.ms-warn-acts{display:flex;gap:6px;margin-top:8px}
+.ms-warn-acts button{flex:1;padding:8px;border-radius:9px;font-size:12px;font-weight:700;background:var(--bg);border:1px solid var(--line-2);color:var(--fg-2)}
+
+/* Lencana belum baca pada bar bawah. */
+.nav-btn{position:relative}
+.nav-dot{
+  position:absolute;top:3px;left:calc(50% + 6px);
+  min-width:16px;height:16px;padding:0 4px;border-radius:8px;
+  background:var(--critical);color:#fff;font-family:var(--font-mono);font-size:9.5px;font-weight:700;
+  display:none;place-items:center;
+}
+.nav-dot.on{display:grid}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -8438,6 +8599,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
             <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>
           </svg>
           <h3>Recent inspections</h3>
+          <a id="allInspBtn">All</a>
           <a id="newInspBtn">New</a>
         </div>
         <div id="inspList"></div>
@@ -8452,6 +8614,14 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
     <div id="ipBody"></div>
     <input type="file" id="ipCam" accept="image/*" capture="environment" multiple hidden>
     <input type="file" id="ipPlanFile" accept="image/*,application/pdf" hidden>
+  </main>
+
+  <!-- MESSAGES MODE — chat antara pengguna (bukan chat AI) -->
+  <main class="ms-mode" id="msMode">
+    <div id="msHead"></div>
+    <div class="ms-body" id="msBody"></div>
+    <div id="msFoot"></div>
+    <input type="file" id="msPhoto" accept="image/*" hidden>
   </main>
 
   <!-- LIBRARY MODE -->
@@ -8697,7 +8867,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.8 · build 19 Sep 2026 · PDF floor plans + Measure returns</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.9 · build 19 Sep 2026 · Messages</div>
           </div>
         </div>
         
@@ -8728,7 +8898,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.8</span>
+      <span class="chat-build" title="Build">v1.9</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -9314,11 +9484,12 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       </span>
       <span class="nav-btn-label">Home</span>
     </button>
-    <button class="nav-btn" data-mode="inspections">
+    <button class="nav-btn" data-mode="messages">
       <span class="nav-btn-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4M9 10h6M9 14.5h4"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.3 9.3 0 0 1-2.9-.4L3 21l1.6-4.7A8.2 8.2 0 0 1 3.6 11.5 8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg>
       </span>
-      <span class="nav-btn-label">Inspection</span>
+      <span class="nav-btn-label">Messages</span>
+      <span class="nav-dot" id="msNavDot">0</span>
     </button>
     <div class="nav-fab-wrap">
       <button class="nav-fab" id="navFab" aria-label="Chat AI">
@@ -9989,6 +10160,11 @@ function showApp() {
   }
   if (typeof sosBoot === 'function') {
     sosBoot().catch(e => console.warn('[showApp] safety', e.message));
+  }
+  // Pendengar mesej bermula bila log masuk, bukan bila tab dibuka:
+  // lencana belum baca perlu bergerak walaupun awak di Home.
+  if (typeof msListen === 'function') {
+    try { msLoadLocal(); msListen(); } catch (e) { console.warn('[showApp] messages', e.message); }
   }
 }
 
@@ -15260,8 +15436,9 @@ function switchTab(mode) {
   const wantInspSheet = false;
 
   // Bottom nav active state
+  const navFor = (mode === 'inspections') ? 'home' : mode;
   document.querySelectorAll('.nav-btn').forEach(function(t) {
-    t.classList.toggle('active', t.dataset.mode === (wantInspSheet ? 'inspections' : mode));
+    t.classList.toggle('active', t.dataset.mode === navFor);
   });
 
   // Home sahaja yang ada header sendiri; sembunyikan topbar global di situ.
@@ -15270,12 +15447,14 @@ function switchTab(mode) {
   document.body.classList.toggle('on-chat', mode === 'chat' || mode === 'voice');
   document.body.classList.toggle('on-library', mode === 'library');
   document.body.classList.toggle('on-inspections', mode === 'inspections');
+  document.body.classList.toggle('on-messages', mode === 'messages');
 
   // Hide all modes
   document.getElementById('homeMode').classList.remove('show');
   document.getElementById('toolsMode').classList.remove('show');
   document.getElementById('libraryMode').classList.remove('show');
   document.getElementById('ipMode').classList.remove('show');
+  document.getElementById('msMode').classList.remove('show');
   document.getElementById('profileMode').classList.remove('show');
   document.getElementById('chatMode').classList.add('hidden');
   document.getElementById('voiceMode').classList.remove('show');
@@ -15288,6 +15467,10 @@ function switchTab(mode) {
   } else if (mode === 'inspections') {
     document.getElementById('ipMode').classList.add('show');
     if (typeof ipOpenTab === 'function') ipOpenTab();
+    if (typeof voice_stopAll === 'function') voice_stopAll();
+  } else if (mode === 'messages') {
+    document.getElementById('msMode').classList.add('show');
+    if (typeof msOpenTab === 'function') msOpenTab();
     if (typeof voice_stopAll === 'function') voice_stopAll();
   } else if (mode === 'tools') {
     document.getElementById('toolsMode').classList.add('show');
@@ -15310,6 +15493,7 @@ function switchTab(mode) {
     renderChat();
     document.getElementById('voiceMode').classList.add('show');
   }
+  if (mode !== 'messages' && typeof msLeaveTab === 'function') msLeaveTab();
 }
 
 // Wire up bottom nav buttons
@@ -24773,6 +24957,14 @@ async function sosFire(why) {
       active: false, state: 'sos', lastAlertId: ref.id,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
+    // Amaran juga mendarat dalam perbualan dengan pemerhati itu. Peti
+    // masuk SOS yang berasingan terlalu mudah terlepas pandang; satu
+    // tempat sahaja untuk dipandang lebih selamat daripada dua.
+    if (SOS.watcherUid && typeof msPostSos === 'function') {
+      msPostSos(SOS.watcherUid, why,
+        SOS.lat != null ? (SOS.lat.toFixed(6) + ', ' + SOS.lng.toFixed(6) + ' (±' + SOS.acc + ' m)') : '')
+        .catch(function(e) { console.warn('[SOS chat]', e.message); });
+    }
   } catch (e) {
     console.warn('[SOS fire]', e.message);
     showToast('Alarm queued — it will send when there is signal', 'error');
@@ -26298,9 +26490,30 @@ async function ipAiRead() {
 // Web Share membawa gambar sekali, jadi WhatsApp menerima foto
 // dan teks serentak. Kalau pelayar tidak menyokongnya, wa.me
 // tetap membuka WhatsApp dengan teksnya sahaja.
+// Dua tujuan, satu butang. Dalam Pocket untuk surveyor — kad boleh
+// diketik dan terus membuka rekod sebenar. Ke WhatsApp untuk klien dan
+// kontraktor — gambar dan teks, kerana mereka tiada Pocket.
 async function ipShareFinding(fid) {
   const f = IP.findings.filter(function(x) { return x.id === fid; })[0];
   if (!f) return;
+  if (typeof MS !== 'undefined' && MS.rooms && MS.rooms.length) {
+    const s0 = IP.spaces.filter(function(x) { return x.id === f.spaceId; })[0];
+    const tag = (s0 ? s0.key : '?') + ipNo(f.no);
+    const names = MS.rooms.map(function(r, i) { return (i + 1) + '. ' + msRoomName(r); }).join('\n');
+    const pick = prompt('Hantar ' + tag + ' ke mana?\n\n' + names +
+      '\n0. WhatsApp / kongsi keluar\n\nTaip nombor:', '1');
+    if (pick === null) return;
+    const n = parseInt(pick, 10);
+    if (n >= 1 && n <= MS.rooms.length) {
+      const room = MS.rooms[n - 1];
+      const keep = MS.roomId;
+      MS.roomId = room.id;
+      await msSend({ kind: 'finding', text: '', card: msFindingCard(f, s0, IP.insp) });
+      MS.roomId = keep;
+      showToast(tag + ' dihantar ke ' + msRoomName(room));
+      return;
+    }
+  }
   const s = IP.spaces.filter(function(x) { return x.id === f.spaceId; })[0] || { key: '?', name: '' };
   const c = (IP.insp && IP.insp.cover) || {};
   const t = ipT();
@@ -28100,9 +28313,759 @@ function smShutdown() {
 
 try { smWire(); } catch (e) { console.warn('[Site Mode wire]', e.message); }
 
+// =======================================================
+// MESSAGES (MS) — chat peribadi dan kumpulan antara pengguna
+// =======================================================
+// Bukan chat AI. Yang itu kekal di bawah .chat-mode dan menyimpan
+// sejarahnya di pocketChats/{uid}. Yang ini menulis ke pocketRooms,
+// nama berbeza justeru kerana pocketChats sudah diambil.
+//
+// Sebab ia wujud: semua orang sudah ada WhatsApp, jadi chat ini hanya
+// berbaloi kalau ia boleh menghantar kerja itu sendiri. Kad penemuan
+// yang boleh diketik dan terus membuka rekod sebenar ialah satu-satunya
+// perkara di sini yang WhatsApp tidak boleh buat.
+//
+// Had yang diketahui dan disengajakan:
+//  · Tiada push bila Pocket tertutup — itu perlukan pelayan (Blaze).
+//    Selagi Pocket terbuka, ada pemberitahuan dan lencana.
+//  · Gambar dikecilkan ke ~600px kerana tiada Firebase Storage; gambar
+//    penuh tidak boleh dipindahkan antara telefon pada pelan Spark.
+//  · Sekatan disimpan dalam telefon ini sahaja, bukan di pelayan.
+
+const MS_ROOMS = 'pocketRooms';
+const MS_SEEN = 'pocket_ms_seen_v1';
+const MS_BLOCK = 'pocket_ms_blocked_v1';
+const MS_PHOTO_MAX = 600;      // px
+const MS_PHOTO_BYTES = 190000; // had selamat di bawah 1 MiB satu dokumen
+const MS_PAGE = 120;
+
+let MS = {
+  view: 'list', roomId: null, rooms: [], msgs: [],
+  seen: {}, blocked: [], addMode: 'dm', picks: [], draft: null,
+  busy: false, found: null
+};
+let _msUnRooms = null, _msUnMsgs = null, _msNotified = {};
+
+const MS_I = {
+  back:'<path d="M19 12H5M12 5l-7 7 7 7"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  send:'<path d="M4 12h15M13 6l6 6-6 6"/>',
+  clip:'<path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l9-9a3.4 3.4 0 0 1 4.8 4.8l-9 9a1.8 1.8 0 0 1-2.5-2.5l8-8"/>',
+  qr:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14h1M14 20h3M20 17v4"/>',
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/>',
+  warn:'<path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/>',
+  doc:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  grp:'<path d="M17 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 20v-2a4 4 0 0 0-3-3.9M16.5 3.3a4 4 0 0 1 0 7.4"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'
+};
+function msSvg(k, sz) {
+  return '<svg width="' + (sz || 20) + '" height="' + (sz || 20) + '" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (MS_I[k] || '') + '</svg>';
+}
+function msEsc(s) { return (typeof escapeHTML === 'function') ? escapeHTML(s == null ? '' : s) : String(s == null ? '' : s); }
+// Thumbnail disimpan sebagai base64 mentah, bukan data URL — itu
+// caranya di seluruh app ini, jadi awalan ditambah semasa dilukis.
+function msImg(b64) { return b64 ? ('data:image/jpeg;base64,' + b64) : ''; }
+function msUid() { return currentUser ? currentUser.uid : ''; }
+function msCol() { return db.collection(MS_ROOMS); }
+
+function msLoadLocal() {
+  try { MS.seen = JSON.parse(localStorage.getItem(MS_SEEN) || '{}') || {}; } catch (e) { MS.seen = {}; }
+  try { MS.blocked = JSON.parse(localStorage.getItem(MS_BLOCK) || '[]') || []; } catch (e) { MS.blocked = []; }
+}
+function msSaveSeen() { try { localStorage.setItem(MS_SEEN, JSON.stringify(MS.seen)); } catch (e) {} }
+function msSaveBlock() { try { localStorage.setItem(MS_BLOCK, JSON.stringify(MS.blocked)); } catch (e) {} }
+
+function msMs(v) {
+  if (!v) return 0;
+  if (typeof v.toMillis === 'function') return v.toMillis();
+  if (v.seconds) return v.seconds * 1000;
+  return +new Date(v) || 0;
+}
+function msWhen(ms) {
+  if (!ms) return '';
+  const d = new Date(ms), now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  if (sameDay) return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const y = new Date(now.getTime() - 86400000);
+  if (d.toDateString() === y.toDateString()) return 'Semalam';
+  return d.toLocaleDateString('en-MY', { day: 'numeric', month: 'short' });
+}
+function msHue(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }
+function msAv(name, small) {
+  const n = name || '?';
+  const h = msHue(n);
+  const ini = n.split(/\s+/).map(function(w) { return w[0] || ''; }).slice(0, 2).join('').toUpperCase();
+  return '<span class="ms-av' + (small ? ' ms-av-sm' : '') + '" style="background:linear-gradient(145deg,hsl(' +
+    h + ',52%,46%),hsl(' + ((h + 34) % 360) + ',54%,38%))">' + msEsc(ini) + '</span>';
+}
+// Nama yang dipaparkan untuk sebuah bilik: kumpulan guna namanya
+// sendiri, DM guna nama orang seberang — bukan nama awak.
+function msRoomName(r) {
+  if (!r) return '';
+  if (r.type === 'group') return r.name || 'Kumpulan';
+  const other = (r.members || []).filter(function(u) { return u !== msUid(); })[0];
+  return (r.names && r.names[other]) || (r.pids && r.pids[other]) || 'Pocket user';
+}
+function msRoomSub(r) {
+  if (!r) return '';
+  if (r.type === 'group') return (r.members || []).length + ' orang';
+  const other = (r.members || []).filter(function(u) { return u !== msUid(); })[0];
+  const pid = r.pids && r.pids[other];
+  return pid ? 'Pocket ID ' + pidPretty(pid) : '';
+}
+function msOther(r) { return (r.members || []).filter(function(u) { return u !== msUid(); })[0] || ''; }
+function msUnread(r) {
+  const seen = MS.seen[r.id] || 0;
+  const last = msMs(r.lastAt);
+  if (!last || last <= seen) return 0;
+  if (r.lastBy === msUid()) return 0;
+  return 1; // kiraan tepat perlukan membaca setiap mesej; satu titik sudah memadai
+}
+function msTotalUnread() { return MS.rooms.filter(function(r) { return msUnread(r); }).length; }
+function msPaintDot() {
+  const el = document.getElementById('msNavDot');
+  if (!el) return;
+  const n = msTotalUnread();
+  el.textContent = n > 9 ? '9+' : String(n);
+  el.classList.toggle('on', n > 0);
+}
+
+// ---------- 2. DATA ----------
+// ID bilik DM dibina daripada dua UID yang disusun, jadi mustahil ada
+// dua perbualan berasingan dengan orang yang sama — tanpa ini, dua
+// orang boleh berakhir menaip dalam dua bilik berbeza tanpa sedar.
+function msDmId(a, b) { return 'dm_' + [a, b].sort().join('_'); }
+
+function msListen() {
+  if (!currentUser || _msUnRooms) return;
+  try {
+    // Tiada orderBy: array-contains bersama orderBy memerlukan indeks
+    // komposit yang perlu dipasang berasingan. Senarai bilik kecil,
+    // jadi ia disusun di sini.
+    _msUnRooms = msCol().where('members', 'array-contains', currentUser.uid)
+      .onSnapshot(function(snap) {
+        const rows = [];
+        snap.forEach(function(d) { rows.push(Object.assign({ id: d.id }, d.data())); });
+        rows.sort(function(a, b) { return msMs(b.lastAt) - msMs(a.lastAt); });
+        const fresh = rows.filter(function(r) { return !msSeenBefore(r); });
+        MS.rooms = rows.filter(function(r) { return MS.blocked.indexOf(msOther(r)) === -1 || r.type === 'group'; });
+        msPaintDot();
+        fresh.forEach(msNotify);
+        if (MS.view === 'list' && document.getElementById('msMode').classList.contains('show')) msRender();
+      }, function(err) {
+        console.warn('[Messages]', err.message);
+        if (MS.view === 'list') msRender(err.message);
+      });
+  } catch (e) { console.warn('[Messages listen]', e.message); }
+}
+function msSeenBefore(r) {
+  const last = msMs(r.lastAt);
+  if (!last || r.lastBy === msUid()) return true;
+  if (_msNotified[r.id] === last) return true;
+  return last <= (MS.seen[r.id] || 0);
+}
+// Pemberitahuan hanya berfungsi selagi Pocket terbuka. Itu had sebenar,
+// bukan kelalaian — push yang betul perlukan pelayan menghantar bagi
+// pihak pengguna, dan itu bukan pelan Spark.
+function msNotify(r) {
+  _msNotified[r.id] = msMs(r.lastAt);
+  if (MS.roomId === r.id) return;
+  const who = msRoomName(r);
+  showToast(who + ': ' + (r.lastText || 'mesej baharu'));
+  try {
+    if (window.Notification && Notification.permission === 'granted' && document.hidden) {
+      new Notification(who, { body: r.lastText || 'Mesej baharu', tag: 'ms_' + r.id });
+    }
+  } catch (e) {}
+}
+function msStop() {
+  try { if (_msUnRooms) _msUnRooms(); } catch (e) {}
+  try { if (_msUnMsgs) _msUnMsgs(); } catch (e) {}
+  _msUnRooms = null; _msUnMsgs = null;
+}
+function msOpenRoom(id) {
+  MS.roomId = id; MS.view = 'room'; MS.msgs = [];
+  try { if (_msUnMsgs) _msUnMsgs(); } catch (e) {}
+  _msUnMsgs = null;
+  msRender();
+  try {
+    _msUnMsgs = msCol().doc(id).collection('messages').orderBy('at', 'desc').limit(MS_PAGE)
+      .onSnapshot(function(snap) {
+        const rows = [];
+        snap.forEach(function(d) { rows.push(Object.assign({ id: d.id }, d.data())); });
+        rows.reverse();
+        MS.msgs = rows;
+        const last = rows.length ? msMs(rows[rows.length - 1].at) : 0;
+        if (last) { MS.seen[id] = Math.max(MS.seen[id] || 0, last); msSaveSeen(); msPaintDot(); }
+        if (MS.view === 'room' && MS.roomId === id) msPaintMsgs();
+      }, function(err) { console.warn('[Messages room]', err.message); showToast('Tidak dapat membaca perbualan. ' + err.message, 'error'); });
+  } catch (e) { console.warn('[Messages open]', e.message); }
+}
+function msCloseRoom() {
+  try { if (_msUnMsgs) _msUnMsgs(); } catch (e) {}
+  _msUnMsgs = null;
+  MS.roomId = null; MS.msgs = []; MS.draft = null;
+  MS.view = 'list'; msRender();
+}
+function msRoom() { return MS.rooms.filter(function(r) { return r.id === MS.roomId; })[0] || null; }
+
+// Satu mesej satu dokumen. Firestore hanya benarkan 1 MiB satu dokumen,
+// jadi menyimpan perbualan sebagai satu senarai dalam satu dokumen akan
+// pecah selepas beberapa ribu mesej.
+async function msSend(payload) {
+  const r = msRoom();
+  if (!r || !currentUser) return;
+  const now = firebase.firestore.Timestamp.now();
+  const msg = Object.assign({ by: currentUser.uid, at: now }, payload);
+  const label = payload.kind === 'text' ? (payload.text || '')
+    : payload.kind === 'photo' ? '📷 Gambar'
+    : payload.kind === 'finding' ? ((payload.card && payload.card.tag) || 'Penemuan')
+    : payload.kind === 'place' ? '📍 Lokasi'
+    : payload.kind === 'sos' ? 'SOS' : 'Mesej';
+  try {
+    await msCol().doc(r.id).collection('messages').add(msg);
+    await msCol().doc(r.id).update({
+      lastText: String(label).slice(0, 120), lastAt: now,
+      lastBy: currentUser.uid, lastKind: payload.kind
+    });
+    MS.seen[r.id] = now.toMillis(); msSaveSeen();
+  } catch (e) {
+    console.warn('[Messages send]', e.message);
+    showToast('Tidak dapat hantar. ' + e.message, 'error');
+  }
+}
+
+// ---------- 3. BUAT BILIK ----------
+async function msStartDm(found) {
+  if (!currentUser || !found) return null;
+  const id = msDmId(currentUser.uid, found.uid);
+  const me = (currentUser.displayName || currentUser.email || 'Saya').split('@')[0];
+  const names = {}; names[currentUser.uid] = me; names[found.uid] = found.name || '';
+  const pids = {}; if (myPocketId) pids[currentUser.uid] = myPocketId; pids[found.uid] = found.id;
+  try {
+    const ref = msCol().doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      await ref.set({
+        type: 'dm', members: [currentUser.uid, found.uid].sort(),
+        names: names, pids: pids, name: '',
+        createdBy: currentUser.uid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastText: '', lastAt: firebase.firestore.Timestamp.now(), lastBy: '', lastKind: ''
+      });
+    }
+    return id;
+  } catch (e) {
+    console.warn('[Messages dm]', e.message);
+    showToast('Tidak dapat mula chat. ' + e.message, 'error');
+    return null;
+  }
+}
+async function msCreateGroup(name, picks) {
+  if (!currentUser || !picks.length) return null;
+  const me = (currentUser.displayName || currentUser.email || 'Saya').split('@')[0];
+  const members = [currentUser.uid].concat(picks.map(function(p) { return p.uid; }));
+  const names = {}; names[currentUser.uid] = me;
+  const pids = {}; if (myPocketId) pids[currentUser.uid] = myPocketId;
+  picks.forEach(function(p) { names[p.uid] = p.name || ''; pids[p.uid] = p.id; });
+  try {
+    const ref = await msCol().add({
+      type: 'group', members: members, names: names, pids: pids,
+      name: name || 'Kumpulan', createdBy: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastText: 'Kumpulan dibuat', lastAt: firebase.firestore.Timestamp.now(),
+      lastBy: currentUser.uid, lastKind: 'sys'
+    });
+    return ref.id;
+  } catch (e) {
+    console.warn('[Messages group]', e.message);
+    showToast('Tidak dapat buat kumpulan. ' + e.message, 'error');
+    return null;
+  }
+}
+
+// ---------- 4. LUKISAN ----------
+function msRender(err) {
+  const head = document.getElementById('msHead');
+  const body = document.getElementById('msBody');
+  const foot = document.getElementById('msFoot');
+  if (!head || !body || !foot) return;
+  body.classList.toggle('ms-talk', MS.view === 'room');
+  if (MS.view === 'room') return msRenderRoom();
+  if (MS.view === 'add') return msRenderAdd();
+  return msRenderList(err);
+}
+
+function msRenderList(err) {
+  document.getElementById('msHead').innerHTML =
+    '<div class="ms-hd"><div class="ms-hd-t"><h2>Your <em>messages</em></h2>' +
+    '<span class="ms-hd-sub">' + (MS.rooms.length ? MS.rooms.length + ' perbualan' : 'Guna Pocket ID untuk mula') + '</span></div>' +
+    '<button class="ms-hd-act" data-ms="add">' + msSvg('plus', 14) + 'Baharu</button></div>';
+  document.getElementById('msFoot').innerHTML = '';
+
+  let h = '';
+  if (err) {
+    h += '<div class="ms-warn"><b>Tidak dapat membaca perbualan</b>' + msEsc(err) +
+      '<br><br>Kalau ini kali pertama Messages digunakan, rules Firestore belum dipasang semula. Lihat <code>pocket/firestore.rules</code>.</div>';
+  }
+  if (!MS.rooms.length && !err) {
+    h += '<div class="ms-empty"><b>Belum ada perbualan</b>' +
+      'Beri Pocket ID awak kepada seorang surveyor lain, atau imbas QR mereka. Tiada nombor telefon dikongsi.</div>';
+  } else {
+    h += '<div class="ms-sec"><span class="ms-sec-l">Perbualan</span><span class="ms-sec-r"></span></div>';
+    MS.rooms.forEach(function(r) {
+      const un = msUnread(r);
+      const pv = (r.lastBy && r.lastBy !== msUid() && r.type === 'group' && r.names && r.names[r.lastBy])
+        ? '<i>' + msEsc(r.names[r.lastBy]) + ':</i> ' + msEsc(r.lastText || '')
+        : msEsc(r.lastText || 'Belum ada mesej');
+      h += '<button class="ms-row' + (un ? ' ms-un' : '') + '" data-msroom="' + msEsc(r.id) + '">' +
+        msAv(msRoomName(r)) +
+        '<span class="ms-rt"><span class="ms-rt-nm"><b>' + msEsc(msRoomName(r)) + '</b>' +
+        '<span class="ms-rt-tm">' + msEsc(msWhen(msMs(r.lastAt))) + '</span></span>' +
+        '<span class="ms-rt-pv">' + pv + '</span></span>' +
+        (un ? '<span class="ms-badge' + (r.lastKind === 'sos' ? ' ms-hot' : '') + '">' + (r.lastKind === 'sos' ? '!' : '1') + '</span>' : '') +
+        '</button>';
+    });
+  }
+  h += '<div class="ms-sec"><span class="ms-sec-l">Pocket ID awak</span><span class="ms-sec-r"></span></div>' +
+    '<div class="ms-mine"><span>Beri kod ini supaya orang boleh cari awak</span>' +
+    '<span class="ms-mine-k">' + msEsc(myPocketId ? pidPretty(myPocketId) : '—') + '</span>' +
+    '<span>Sama seperti Site safety — tiada nombor telefon dikongsi</span></div>' +
+    '<p class="ms-hint">Mesej sampai serta-merta selagi Pocket terbuka. Bila Pocket tertutup ia menunggu awak, tidak berdering — untuk kecemasan, guna Site safety.</p>';
+  document.getElementById('msBody').innerHTML = h;
+  msPaintDot();
+}
+
+function msRenderRoom() {
+  const r = msRoom();
+  if (!r) { MS.view = 'list'; return msRender(); }
+  document.getElementById('msHead').innerHTML =
+    '<div class="ms-hd"><button class="ms-hd-back" data-ms="back">' + msSvg('back', 17) + '</button>' +
+    msAv(msRoomName(r), true) +
+    '<div class="ms-hd-t"><h2 style="font-size:16px">' + msEsc(msRoomName(r)) + '</h2>' +
+    '<span class="ms-hd-sub">' + msEsc(msRoomSub(r)) + '</span></div>' +
+    '<button class="ms-hd-ic" data-ms="info">' + msSvg(r.type === 'group' ? 'grp' : 'info', 17) + '</button></div>';
+  document.getElementById('msFoot').innerHTML =
+    '<div class="ms-compose">' +
+      '<button class="ms-cbtn" data-ms="attach">' + msSvg('clip', 19) + '</button>' +
+      '<textarea class="ms-cin" id="msIn" rows="1" placeholder="Tulis mesej"></textarea>' +
+      '<button class="ms-send" id="msSend">' + msSvg('send', 19) + '</button>' +
+    '</div>';
+  msPaintMsgs();
+}
+
+function msPaintMsgs() {
+  const body = document.getElementById('msBody');
+  const r = msRoom();
+  if (!body || !r) return;
+  let h = '';
+  // Orang yang belum pernah awak balas ditanda sekali, dengan butang
+  // sekat. Sesiapa yang ada Pocket ID awak boleh mula chat — itu memang
+  // gunanya kod itu — tetapi awak patut tahu bila ia orang baharu.
+  const mineHere = MS.msgs.some(function(m) { return m.by === msUid(); });
+  if (r.type === 'dm' && r.createdBy !== msUid() && !mineHere) {
+    h += '<div class="ms-warn"><b>' + msEsc(msRoomName(r)) + ' belum pernah chat dengan awak</b>' +
+      'Dia masuk melalui Pocket ID. Kalau awak tak kenal, sekat sekarang — dia tidak akan tahu.' +
+      '<span class="ms-warn-acts"><button data-ms="block">Sekat</button>' +
+      '<button data-ms="know">Saya kenal dia</button></span></div>';
+  }
+  let lastDay = '';
+  MS.msgs.forEach(function(m) {
+    const ms = msMs(m.at);
+    const day = ms ? new Date(ms).toDateString() : '';
+    if (day && day !== lastDay) {
+      lastDay = day;
+      const lbl = day === new Date().toDateString() ? 'Hari ini' : new Date(ms).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+      h += '<div class="ms-day"><span>' + msEsc(lbl) + '</span></div>';
+    }
+    if (m.kind === 'sys') { h += '<div class="ms-sys">' + msEsc(m.text || '') + '</div>'; return; }
+    const mine = m.by === msUid();
+    const who = (!mine && r.type === 'group' && r.names && r.names[m.by]) ? r.names[m.by] : '';
+    if (m.kind === 'finding' || m.kind === 'place' || m.kind === 'sos') {
+      h += msCardHtml(m, mine);
+      return;
+    }
+    h += '<div class="ms-turn ' + (mine ? 'ms-me' : 'ms-you') + '"><div class="ms-bub">' +
+      (who ? '<b class="ms-who">' + msEsc(who) + '</b>' : '') +
+      (m.kind === 'photo' && m.img ? '<img class="ms-photo" src="' + msEsc(msImg(m.img)) + '" alt="">' : '') +
+      msEsc(m.text || '') +
+      '<i class="ms-tm">' + msEsc(msWhen(ms)) + '</i></div></div>';
+  });
+  if (!MS.msgs.length) h += '<div class="ms-empty">Belum ada mesej di sini.</div>';
+  body.innerHTML = h;
+  body.scrollTop = body.scrollHeight;
+}
+
+function msCardHtml(m, mine) {
+  const c = m.card || {};
+  const isSos = m.kind === 'sos';
+  const kind = isSos ? 'Amaran SOS' : (m.kind === 'place' ? 'Lokasi' : 'Penemuan');
+  const tags = (c.tags || []).map(function(t) {
+    const cls = t.toLowerCase() === 'dilapidated' || /urgent/i.test(t) ? ' ms-t-dil'
+      : (t.toLowerCase() === 'fair' ? ' ms-t-fair' : '');
+    return '<span class="ms-tag' + cls + '">' + msEsc(t) + '</span>';
+  }).join('');
+  return '<div class="ms-turn ' + (mine ? 'ms-me' : 'ms-you') + '">' +
+    '<button class="ms-card' + (isSos ? ' ms-sos' : '') + '" data-mscard="' + msEsc(m.id) + '">' +
+      '<span class="ms-card-h">' + msSvg(isSos ? 'warn' : (m.kind === 'place' ? 'pin' : 'doc'), 12) + msEsc(kind) +
+      (c.tag ? '<span class="ms-card-tag">' + msEsc(c.tag) + '</span>' : '') + '</span>' +
+      (c.thumb ? '<img class="ms-card-img" src="' + msEsc(msImg(c.thumb)) + '" alt="">' : '') +
+      '<span class="ms-card-b"><span class="ms-card-t">' + msEsc(c.title || '') + '</span>' +
+      '<span class="ms-card-s">' + msEsc(c.sub || '') + '</span>' +
+      (tags ? '<span class="ms-card-meta">' + tags + '</span>' : '') + '</span>' +
+      '<span class="ms-card-go">' + msEsc(m.kind === 'place' ? 'Buka dalam peta' : (isSos ? 'Lihat amaran' : 'Buka dalam Pocket awak')) + '</span>' +
+    '</button></div>';
+}
+
+function msRenderAdd() {
+  document.getElementById('msHead').innerHTML =
+    '<div class="ms-hd"><button class="ms-hd-back" data-ms="back">' + msSvg('back', 17) + '</button>' +
+    '<div class="ms-hd-t"><h2 style="font-size:17px">Chat baharu</h2>' +
+    '<span class="ms-hd-sub">Guna Pocket ID, sama seperti Site safety</span></div></div>';
+  document.getElementById('msFoot').innerHTML = '';
+  const g = MS.addMode === 'group';
+  let h = '<button class="ms-big ms-alt" data-ms="qr">' + msSvg('qr', 16) + ' Imbas QR mereka</button>' +
+    '<div class="ms-or"><span class="ms-or-r"></span>ATAU<span class="ms-or-r"></span></div>' +
+    '<div class="ms-fld"><label>Pocket ID</label>' +
+      '<input class="ms-pidin" id="msPid" maxlength="7" placeholder="K7M-2QX" autocomplete="off">' +
+      '<p class="ms-hint">Enam aksara. Tiada 0, O, 1 atau I — supaya tiada siapa tersalah baca kod yang ditulis atas topi keledar.</p></div>' +
+    '<button class="ms-big" id="msFind"' + (MS.busy ? ' disabled' : '') + '>' +
+      (MS.busy ? 'Mencari…' : (g ? 'Cari dan tambah' : 'Cari dan mula chat')) + '</button>';
+
+  h += '<div class="ms-sec"><span class="ms-sec-l">' + (g ? 'Kumpulan' : 'Atau buat kumpulan') + '</span><span class="ms-sec-r"></span></div>';
+  if (!g) {
+    h += '<button class="ms-big ms-alt" data-ms="gmode">' + msSvg('grp', 15) + ' Buat kumpulan</button>';
+  } else {
+    h += '<div class="ms-fld"><label>Nama kumpulan</label><input id="msGName" placeholder="cth. Menara Seri — team"></div>' +
+      '<div><span class="ms-chip">Awak</span>' +
+      MS.picks.map(function(p, i) {
+        return '<span class="ms-chip">' + msEsc(p.name || pidPretty(p.id)) +
+          '<button data-msdrop="' + i + '">' + msSvg('x', 11) + '</button></span>';
+      }).join('') +
+      (MS.picks.length ? '' : '<span class="ms-chip ms-chip-add">Tambah orang di atas</span>') + '</div>' +
+      '<button class="ms-big" style="margin-top:12px" id="msMakeGroup"' + (MS.picks.length ? '' : ' disabled') + '>' +
+      'Buat kumpulan (' + (MS.picks.length + 1) + ' orang)</button>' +
+      '<p class="ms-hint">Ahli baharu nampak mesej dari saat dia masuk, bukan perbualan sebelumnya.</p>' +
+      '<button class="ms-big ms-alt" data-ms="dmode">Batal kumpulan</button>';
+  }
+  document.getElementById('msBody').innerHTML = h;
+}
+
+// ---------- 5. LAMPIRAN ----------
+function msAttach() {
+  const r = msRoom();
+  if (!r) return;
+  const opts = [
+    ['photo', 'Gambar', 'Dikecilkan ke 600px supaya ia boleh sampai'],
+    ['place', 'Lokasi saya', 'Titik GPS semasa'],
+    ['finding', 'Penemuan', 'Dari inspection aktif — boleh diketik']
+  ];
+  let h = '<div class="ms-sec"><span class="ms-sec-l">Lampirkan</span><span class="ms-sec-r"></span></div>';
+  opts.forEach(function(o) {
+    h += '<button class="ms-row" data-msatt="' + o[0] + '">' +
+      '<span class="ms-av ms-av-sm" style="background:var(--accent-soft);color:var(--accent)">' +
+      msSvg(o[0] === 'photo' ? 'clip' : (o[0] === 'place' ? 'pin' : 'doc'), 17) + '</span>' +
+      '<span class="ms-rt"><span class="ms-rt-nm"><b>' + o[1] + '</b></span>' +
+      '<span class="ms-rt-pv">' + o[2] + '</span></span></button>';
+  });
+  h += '<button class="ms-big ms-alt" style="margin-top:10px" data-ms="noattach">Batal</button>';
+  document.getElementById('msBody').innerHTML = h;
+}
+
+// Gambar penuh tidak boleh sampai ke telefon lain tanpa Firebase
+// Storage, jadi ia dikecilkan sehingga muat dalam satu dokumen
+// Firestore. Cukup untuk "tengok ni"; untuk laporan, hantar penemuan.
+async function msSendPhoto(file) {
+  showToast('Mengecilkan gambar…');
+  try {
+    let q = 0.62, b64 = '';
+    for (let i = 0; i < 4; i++) {
+      const small = await ipShrinkTo(file, MS_PHOTO_MAX, q);
+      b64 = await lbBlobToB64(small);
+      if (b64.length <= MS_PHOTO_BYTES) break;
+      q -= 0.14;
+    }
+    if (b64.length > MS_PHOTO_BYTES) { showToast('Gambar itu terlalu besar untuk dihantar'); return; }
+    await msSend({ kind: 'photo', img: b64, text: '' });
+  } catch (e) { showToast('Tidak dapat hantar gambar. ' + e.message, 'error'); }
+}
+async function msSendPlace() {
+  if (!navigator.geolocation) { showToast('Peranti ini tiada GPS'); return; }
+  showToast('Mencari lokasi…');
+  try {
+    const pos = await new Promise(function(res, rej) {
+      navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+    });
+    const lat = pos.coords.latitude, lng = pos.coords.longitude;
+    await msSend({ kind: 'place', text: '', card: {
+      title: lat.toFixed(5) + ', ' + lng.toFixed(5),
+      sub: 'Ketepatan lebih kurang ±' + Math.round(pos.coords.accuracy) + ' m',
+      lat: lat, lng: lng
+    }});
+  } catch (e) { showToast('Tidak dapat baca lokasi'); }
+}
+// Kad penemuan: inilah sebab chat ini wujud. Penerima ketik, ia buka
+// rekod sebenar dalam Pocket dia — bukan screenshot.
+function msFindingCard(f, s, insp) {
+  const t = IP_TYPES[(insp && insp.type) || 'defect'] || IP_TYPES.defect;
+  const tags = [];
+  if (t.rate && f.rate) tags.push(f.rate.charAt(0).toUpperCase() + f.rate.slice(1));
+  if (f.priority) tags.push('Priority: ' + f.priority);
+  if (f.photoN) tags.push(f.photoN + ' gambar');
+  return {
+    tag: (s ? s.key : '?') + ipNo(f.no),
+    title: (f.defectType || 'Penemuan') + (f.element ? ' — ' + f.element : ''),
+    sub: f.desc || '(belum ada description)',
+    tags: tags, thumb: f.thumb || '',
+    inspId: (insp && insp.id) || IP.id || '', findId: f.id,
+    job: (insp && insp.title) || ''
+  };
+}
+async function msAttachFinding() {
+  if (!IP.id || !IP.findings.length) {
+    document.getElementById('msBody').innerHTML =
+      '<div class="ms-empty"><b>Tiada penemuan untuk dihantar</b>' +
+      'Buka satu inspection dahulu, atau tangkap sesuatu dalam Site Mode.</div>' +
+      '<button class="ms-big ms-alt" data-ms="noattach">Kembali</button>';
+    return;
+  }
+  let h = '<div class="ms-sec"><span class="ms-sec-l">' + msEsc(IP.insp ? IP.insp.title : 'Inspection') + '</span><span class="ms-sec-r"></span></div>';
+  IP.findings.slice().reverse().slice(0, 40).forEach(function(f) {
+    const s = IP.spaces.filter(function(x) { return x.id === f.spaceId; })[0];
+    h += '<button class="ms-row" data-msfind="' + msEsc(f.id) + '">' +
+      (f.thumb ? '<img class="ms-av ms-av-sm" style="object-fit:cover" src="' + msEsc(msImg(f.thumb)) + '" alt="">'
+               : msAv((s ? s.key : '?') + ipNo(f.no), true)) +
+      '<span class="ms-rt"><span class="ms-rt-nm"><b>' + msEsc((s ? s.key : '?') + ipNo(f.no) + ' · ' + (f.defectType || 'Untyped')) + '</b></span>' +
+      '<span class="ms-rt-pv">' + msEsc(f.desc || '(belum ada description)') + '</span></span></button>';
+  });
+  h += '<button class="ms-big ms-alt" style="margin-top:10px" data-ms="noattach">Batal</button>';
+  document.getElementById('msBody').innerHTML = h;
+}
+
+// Membuka kad yang diterima. Ia salinan, bukan kunci: kalau penemuan
+// itu bukan milik awak, awak melihat apa yang dihantar, bukan
+// inspection orang lain — perkongsian dua hala ialah kerja lain.
+async function msOpenCard(mid) {
+  const m = MS.msgs.filter(function(x) { return x.id === mid; })[0];
+  if (!m) return;
+  const c = m.card || {};
+  if (m.kind === 'place' && c.lat != null) {
+    window.open('https://maps.google.com/?q=' + c.lat + ',' + c.lng, '_blank', 'noopener');
+    return;
+  }
+  if (m.kind === 'sos') { if (typeof sosOpen === 'function') sosOpen(); return; }
+  const mine = (inspections || []).some(function(x) { return x.id === c.inspId; });
+  if (mine && c.inspId && c.findId) {
+    msCloseRoom();
+    switchTab('inspections');
+    await ipLoadOne(c.inspId);
+    const f = IP.findings.filter(function(x) { return x.id === c.findId; })[0];
+    if (f) { IP.spaceId = f.spaceId; IP.findId = f.id; IP.shots = []; IP.draftMeasure = null; IP.view = 'finding'; }
+    else IP.view = 'hub';
+    ipRender();
+    return;
+  }
+  showToast('Penemuan ' + (c.tag || '') + ' milik ' + (c.job || 'job lain') + ' — awak melihat salinan yang dihantar');
+}
+
+// ---------- 6. SOS MENDARAT DI SINI JUGA ----------
+// Amaran SOS dulu hanya masuk ke peti masuk berasingan yang mudah
+// terlepas pandang. Ia sepatutnya muncul dalam perbualan dengan orang
+// itu — satu tempat sahaja untuk dipandang.
+async function msPostSos(toUid, why, gps) {
+  if (!currentUser || !toUid) return;
+  try {
+    const id = msDmId(currentUser.uid, toUid);
+    const ref = msCol().doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      const me = (currentUser.displayName || currentUser.email || 'Saya').split('@')[0];
+      const names = {}; names[currentUser.uid] = me; names[toUid] = '';
+      const pids = {}; if (myPocketId) pids[currentUser.uid] = myPocketId;
+      await ref.set({ type: 'dm', members: [currentUser.uid, toUid].sort(), names: names, pids: pids,
+        name: '', createdBy: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastText: '', lastAt: firebase.firestore.Timestamp.now(), lastBy: '', lastKind: '' });
+    }
+    const now = firebase.firestore.Timestamp.now();
+    await ref.collection('messages').add({
+      by: currentUser.uid, at: now, kind: 'sos', text: '',
+      card: { title: why || 'SOS', sub: gps ? ('Lokasi terakhir: ' + gps) : 'Tiada lokasi',
+              tags: ['Perlu tindakan'], tag: 'SOS' }
+    });
+    await ref.update({ lastText: 'SOS — ' + (why || 'perlu bantuan'), lastAt: now,
+                       lastBy: currentUser.uid, lastKind: 'sos' });
+  } catch (e) { console.warn('[Messages SOS]', e.message); }
+}
+
+// ---------- 7. WIRING ----------
+async function msFindPid() {
+  const el = document.getElementById('msPid');
+  const raw = el ? el.value : '';
+  if (pidNormal(raw).length !== 6) { showToast('Pocket ID ada enam aksara'); return; }
+  MS.busy = true; msRenderAdd();
+  const found = await pidLookup(raw);
+  MS.busy = false;
+  if (!found) { msRenderAdd(); showToast('Tiada sesiapa dengan kod itu'); return; }
+  if (found.uid === msUid()) { msRenderAdd(); showToast('Itu kod awak sendiri'); return; }
+  if (MS.addMode === 'group') {
+    if (MS.picks.some(function(p) { return p.uid === found.uid; })) { msRenderAdd(); showToast('Dia sudah dalam senarai'); return; }
+    MS.picks.push(found);
+    msRenderAdd();
+    showToast((found.name || pidPretty(found.id)) + ' ditambah');
+    return;
+  }
+  const id = await msStartDm(found);
+  if (id) { MS.view = 'room'; msOpenRoom(id); }
+}
+
+function msWire() {
+  msLoadLocal();
+
+  const body = document.getElementById('msBody');
+  if (body) body.addEventListener('click', async function(e) {
+    const r = e.target.closest('[data-msroom]');
+    if (r) { msOpenRoom(r.dataset.msroom); return; }
+    const c = e.target.closest('[data-mscard]');
+    if (c) { msOpenCard(c.dataset.mscard); return; }
+    const at = e.target.closest('[data-msatt]');
+    if (at) {
+      const k = at.dataset.msatt;
+      if (k === 'photo') { const inp = document.getElementById('msPhoto'); if (inp) inp.click(); msPaintMsgs(); }
+      else if (k === 'place') { msPaintMsgs(); msSendPlace(); }
+      else if (k === 'finding') msAttachFinding();
+      return;
+    }
+    const fd = e.target.closest('[data-msfind]');
+    if (fd) {
+      const f = IP.findings.filter(function(x) { return x.id === fd.dataset.msfind; })[0];
+      if (!f) return;
+      const s = IP.spaces.filter(function(x) { return x.id === f.spaceId; })[0];
+      msPaintMsgs();
+      await msSend({ kind: 'finding', text: '', card: msFindingCard(f, s, IP.insp) });
+      return;
+    }
+    const dp = e.target.closest('[data-msdrop]');
+    if (dp) { MS.picks.splice(+dp.dataset.msdrop, 1); msRenderAdd(); return; }
+    if (e.target.closest('#msFind')) { msFindPid(); return; }
+    if (e.target.closest('#msMakeGroup')) {
+      const nm = document.getElementById('msGName');
+      const id = await msCreateGroup(nm ? nm.value.trim() : '', MS.picks);
+      if (id) { MS.picks = []; MS.addMode = 'dm'; msOpenRoom(id); }
+      return;
+    }
+    const a = e.target.closest('[data-ms]');
+    if (!a) return;
+    const k = a.dataset.ms;
+    if (k === 'add') { MS.view = 'add'; MS.addMode = 'dm'; MS.picks = []; msRender(); }
+    else if (k === 'back') { if (MS.view === 'room') msCloseRoom(); else { MS.view = 'list'; msRender(); } }
+    else if (k === 'gmode') { MS.addMode = 'group'; msRenderAdd(); }
+    else if (k === 'dmode') { MS.addMode = 'dm'; MS.picks = []; msRenderAdd(); }
+    else if (k === 'noattach') msPaintMsgs();
+    else if (k === 'qr') msScanQr();
+    else if (k === 'know') { const rm = msRoom(); if (rm) { MS.seen['ok_' + rm.id] = 1; } msPaintMsgs(); showToast('Baiklah'); }
+    else if (k === 'block') msBlock();
+    else if (k === 'info') msInfo();
+  });
+
+  const head = document.getElementById('msHead');
+  if (head) head.addEventListener('click', function(e) {
+    const a = e.target.closest('[data-ms]');
+    if (!a) return;
+    const k = a.dataset.ms;
+    if (k === 'add') { MS.view = 'add'; MS.addMode = 'dm'; MS.picks = []; msRender(); }
+    else if (k === 'back') { if (MS.view === 'room') msCloseRoom(); else { MS.view = 'list'; msRender(); } }
+    else if (k === 'info') msInfo();
+  });
+
+  const foot = document.getElementById('msFoot');
+  if (foot) foot.addEventListener('click', function(e) {
+    if (e.target.closest('#msSend')) {
+      const i = document.getElementById('msIn');
+      const v = i ? i.value.trim() : '';
+      if (!v) return;
+      i.value = ''; i.style.height = '';
+      msSend({ kind: 'text', text: v.slice(0, 4000) });
+      return;
+    }
+    if (e.target.closest('[data-ms="attach"]')) msAttach();
+  });
+  if (foot) foot.addEventListener('keydown', function(e) {
+    if (e.target.id === 'msIn' && e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const b = document.getElementById('msSend');
+      if (b) b.click();
+    }
+  });
+  if (foot) foot.addEventListener('input', function(e) {
+    if (e.target.id !== 'msIn') return;
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(96, e.target.scrollHeight) + 'px';
+  });
+
+  const ph = document.getElementById('msPhoto');
+  if (ph) ph.addEventListener('change', async function(e) {
+    const f = (e.target.files || [])[0];
+    e.target.value = '';
+    if (f) await msSendPhoto(f);
+  });
+
+  const all = document.getElementById('allInspBtn');
+  if (all) all.addEventListener('click', function() { switchTab('inspections'); });
+}
+
+function msBlock() {
+  const r = msRoom();
+  if (!r) return;
+  const other = msOther(r);
+  if (!other) return;
+  if (!confirm('Sekat ' + msRoomName(r) + '?\n\nPerbualan ini hilang dari senarai awak dan dia tidak diberitahu. Sekatan ini disimpan dalam telefon ini sahaja — kalau awak guna telefon lain, sekat semula di sana.')) return;
+  if (MS.blocked.indexOf(other) === -1) MS.blocked.push(other);
+  msSaveBlock();
+  MS.rooms = MS.rooms.filter(function(x) { return x.id !== r.id; });
+  msCloseRoom();
+  showToast('Disekat pada telefon ini');
+}
+function msInfo() {
+  const r = msRoom();
+  if (!r) return;
+  const names = (r.members || []).map(function(u) {
+    return ((r.names && r.names[u]) || 'Pocket user') + (u === msUid() ? ' (awak)' : '');
+  });
+  alert((r.type === 'group' ? (r.name || 'Kumpulan') : msRoomName(r)) + '\n\n' +
+    names.join('\n') + '\n\n' +
+    (r.type === 'group' ? 'Ahli baharu nampak mesej dari saat dia masuk sahaja.' : msRoomSub(r)));
+}
+async function msScanQr() {
+  if (typeof qrOpenScanner !== 'function') { showToast('Pengimbas QR tiada di sini'); return; }
+  qrOpenScanner(async function(code) {
+    const el = document.getElementById('msPid');
+    if (el) el.value = pidPretty(pidNormal(code));
+    await msFindPid();
+  });
+}
+
+// ---------- 8. MASUK ----------
+// Pendengar bilik dihentikan bila tab ditinggalkan; pendengar senarai
+// kekal hidup supaya lencana belum baca masih bergerak di mana-mana.
+function msLeaveTab() {
+  try { if (_msUnMsgs) _msUnMsgs(); } catch (e) {}
+  _msUnMsgs = null;
+}
+function msOpenTab() {
+  msListen();
+  if (MS.view === 'room' && !msRoom()) MS.view = 'list';
+  msRender();
+  if (typeof pidEnsure === 'function' && !myPocketId) pidEnsure().then(function() { if (MS.view === 'list') msRender(); });
+}
+
+try { msWire(); } catch (e) { console.warn('[Messages wire]', e.message); }
+
+
 
 // Console banner
-console.log('%cGoXpert Pocket v1.8', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.9', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
