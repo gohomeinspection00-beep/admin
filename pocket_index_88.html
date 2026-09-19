@@ -7280,6 +7280,19 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .ip-pin b span{transform:rotate(-45deg)}
 .ip-pin em{font-style:normal;margin-top:3px;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(0,0,0,.72);color:#fff;white-space:nowrap}
 .ip-planhint{padding:9px 11px;border-radius:11px;background:var(--tb);color:var(--tc);font-size:11.5px;font-weight:600;text-align:center;margin-bottom:11px}
+/* Pin ruang ialah titisan berhuruf; pin penemuan ialah bulatan
+   bernombor yang lebih kecil, supaya pelan yang padat masih terbaca
+   dan dua jenis tanda itu tidak boleh dikelirukan. */
+.ip-fpin{position:absolute;transform:translate(-50%,-50%);pointer-events:none}
+.ip-fpin b{
+  display:grid;place-items:center;width:25px;height:25px;border-radius:50%;
+  background:var(--tc);color:#fff;font-family:var(--font-mono);font-size:8.5px;font-weight:700;letter-spacing:-.04em;
+  border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);
+}
+.ip-fpin.r-good b{background:var(--success)}
+.ip-fpin.r-fair b{background:var(--warning)}
+.ip-fpin.r-dilapidated b{background:var(--critical)}
+.ip-pinflag{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;color:var(--tc)}
 
 .ip-srow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:7px}
 .ip-key{width:30px;height:30px;border-radius:9px;background:var(--tc);color:#fff;display:grid;place-items:center;font-family:var(--font-mono);font-size:12px;font-weight:700;flex:none}
@@ -8363,7 +8376,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.3 · build 19 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v1.4 · build 19 Sep 2026</div>
           </div>
         </div>
         
@@ -8394,7 +8407,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v1.3</span>
+      <span class="chat-build" title="Build">v1.4</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -25373,7 +25386,8 @@ const IP_PRI = ['Low','Medium','High','Urgent'];
 
 let IP = {
   view: 'list', id: null, insp: null, spaces: [], findings: [], plans: [],
-  spaceId: null, findId: null, planIx: 0, pinMode: false, pinFor: null, draftType: 'defect', shots: [], busy: false
+  spaceId: null, findId: null, planIx: 0, pinMode: false, pinFor: null, pinFind: null,
+  pinAfterSave: false, showFindPins: true, draftType: 'defect', shots: [], busy: false
 };
 
 function ipT() { return IP_TYPES[(IP.insp && IP.insp.type) || IP.draftType] || IP_TYPES.defect; }
@@ -25675,11 +25689,20 @@ function ipViewPlan() {
       '<button class="ip-add" id="ipPlanUp2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-5 5 5M12 4v12"/></svg>Upload a plan</button>';
     return ipShell(html);
   }
-  html += '<div class="ip-planhint">' + (IP.pinMode ? 'Tap the plan where the ' + t.unit.toLowerCase() + ' is.' : 'Tap a pin to open it, or tap Place to add a ' + t.unit.toLowerCase() + '.') + '</div>' +
+  const fpins = IP.findings.filter(function(f) { return f.planId === plan.id && f.px != null; });
+  const hint = IP.pinMode
+    ? (IP.pinFind ? 'Tap the plan on the exact spot of this finding.' : 'Tap the plan where the ' + t.unit.toLowerCase() + ' is.')
+    : 'Tap Place to add a ' + t.unit.toLowerCase() + '. Findings are pinned from inside the finding.';
+  html += '<div class="ip-planhint">' + hint + '</div>' +
     '<div class="ip-plan" id="ipPlanBox"><img src="data:' + (plan.mime || 'image/jpeg') + ';base64,' + plan.thumb + '" alt="' + ipEsc(plan.name) + '">' +
     pins.map(function(s) {
       return '<div class="ip-pin" style="left:' + s.x + '%;top:' + s.y + '%"><b><span>' + ipEsc(s.key) + '</span></b><em>' + ipEsc(s.name) + '</em></div>';
-    }).join('') + '</div>' +
+    }).join('') +
+    (IP.showFindPins ? fpins.map(function(f) {
+      return '<div class="ip-fpin ' + (t.rate && f.rate ? 'r-' + f.rate : '') + '" style="left:' + f.px + '%;top:' + f.py + '%"><b>' + ipEsc(f.spaceKey) + ipNo(f.no) + '</b></div>';
+    }).join('') : '') + '</div>' +
+    (fpins.length ? '<button class="ip-ghost" id="ipTogglePins" style="margin:0 0 11px">' +
+      (IP.showFindPins ? 'Hide the ' + fpins.length + ' finding pin' + (fpins.length === 1 ? '' : 's') : 'Show ' + fpins.length + ' finding pin' + (fpins.length === 1 ? '' : 's')) + '</button>' : '') +
     '<div class="ip-two" style="margin-bottom:13px">' +
       '<button class="ip-ghost" id="ipPinBtn" style="margin:0">' + (IP.pinMode ? 'Cancel placing' : 'Place a ' + t.unit.toLowerCase()) + '</button>' +
       '<button class="ip-ghost" id="ipPlanUp3" style="margin:0">Another level</button></div>' +
@@ -25719,6 +25742,7 @@ function ipViewSpace() {
             (t.rate && f.rate ? '<span class="ip-rate ip-r-' + f.rate + '">' + f.rate.slice(0, 5).toUpperCase() + '</span>' : '') +
             (f.priority ? '<span class="ip-chip">' + ipEsc(f.priority) + '</span>' : '') +
             (t.cost && f.cost ? '<span class="ip-chip">RM ' + ipEsc(f.cost) + '</span>' : '') +
+            (f.px != null ? '<span class="ip-pinflag"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/></svg>on plan</span>' : '') +
           '</span></span></button>';
     });
   }
@@ -25770,6 +25794,10 @@ function ipViewFinding() {
       '<p class="ip-hint" id="ipGpsHint">' + (d.gps ? 'GPS ' + d.gps : 'GPS is captured when you save.') + '</p></div>';
   }
   html += '<button class="ip-go" id="ipSaveFind">' + (f ? 'Save changes' : 'Save finding') + '</button>';
+  if (IP.plans.length) {
+    html += '<button class="ip-ghost" id="ipPinFind">' +
+      (f && f.px != null ? 'Move this finding on the plan' : 'Pin this finding on the plan') + '</button>';
+  }
   if (f) html += '<button class="ip-ghost bad" id="ipDelFind">Delete this finding</button>';
   return ipShell(html);
 }
@@ -25923,9 +25951,17 @@ async function ipSaveFinding() {
     if (local) Object.keys(data).forEach(function(k) { if (k !== 'updatedAt' && k !== 'createdAt') local[k] = data[k]; });
     IP.shots.forEach(function(sh) { try { URL.revokeObjectURL(sh.url); } catch (e) {} });
     IP.shots = [];
-    IP.findId = null;
     await ipCounts();
     await ipPatch({ photoCount: IP.findings.reduce(function(a, f) { return a + (f.photoN || 0); }, 0) });
+    if (IP.pinAfterSave && IP.plans.length) {
+      IP.pinAfterSave = false;
+      IP.findId = id; IP.pinMode = true; IP.pinFind = id; IP.pinFor = null;
+      ipGo('plan');
+      showToast('Saved — now tap the exact spot');
+      return;
+    }
+    IP.pinAfterSave = false;
+    IP.findId = null;
     showToast('Finding saved');
     ipGo('space');
   } catch (e) {
@@ -26160,6 +26196,14 @@ async function ipBuildPdf() {
     const ix = M + (maxW - iw) / 2;
     try { doc.addImage(dataUrl, 'JPEG', ix, y, iw, ih, undefined, 'FAST'); } catch (e) {}
     doc.setDrawColor(210, 210, 210); doc.rect(ix, y, iw, ih);
+    IP.findings.filter(function(f) { return f.planId === p.id && f.px != null; }).forEach(function(f) {
+      const px = ix + iw * (f.px / 100), py = y + ih * (f.py / 100);
+      const col = (t.rate && RGB[f.rate]) ? RGB[f.rate] : [27, 79, 216];
+      doc.setFillColor(255, 255, 255); doc.circle(px, py, 3.0, 'F');
+      doc.setFillColor(col[0], col[1], col[2]); doc.circle(px, py, 2.5, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(4.6); doc.setTextColor(255, 255, 255);
+      doc.text(f.spaceKey + ipNo(f.no), px, py + 0.8, { align: 'center' });
+    });
     IP.spaces.filter(function(s) { return s.planId === p.id; }).forEach(function(s) {
       const px = ix + iw * (s.x / 100), py = y + ih * (s.y / 100);
       doc.setFillColor(27, 79, 216); doc.circle(px, py, 3.4, 'F');
@@ -26168,7 +26212,7 @@ async function ipBuildPdf() {
     });
     y += ih + 7;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
-    doc.text('Pins are keyed to the tables that follow.', M, y);
+    doc.text('Lettered pins are ' + t.units.toLowerCase() + '; numbered pins are individual findings. Both are keyed to the tables that follow.', M, y);
   }
 
   // --- Findings by space ---
@@ -26302,10 +26346,19 @@ function ipWire() {
       return;
     }
     if (e.target.closest('#ipPlaceOnPlan')) {
-      IP.pinMode = true; IP.pinFor = IP.spaceId; ipGo('plan');
+      IP.pinMode = true; IP.pinFor = IP.spaceId; IP.pinFind = null; ipGo('plan');
       showToast('Tap the plan where it is');
       return;
     }
+    if (e.target.closest('#ipPinFind')) {
+      // Penemuan baharu belum ada id, jadi ia disimpan dahulu — kalau
+      // tidak tiada apa untuk dipautkan kepada pin itu.
+      if (!IP.findId) { IP.pinAfterSave = true; await ipSaveFinding(); return; }
+      IP.pinMode = true; IP.pinFind = IP.findId; IP.pinFor = null; ipGo('plan');
+      showToast('Tap the exact spot');
+      return;
+    }
+    if (e.target.closest('#ipTogglePins')) { IP.showFindPins = !IP.showFindPins; ipRender(); return; }
     if (e.target.closest('[data-ipnewfind]')) { IP.findId = null; IP.shots = []; ipGo('finding'); return; }
 
     const r = e.target.closest('#ipSpRate button');
@@ -26339,7 +26392,7 @@ function ipWire() {
     }
     if (e.target.closest('#ipPinBtn')) {
       IP.pinMode = !IP.pinMode;
-      if (!IP.pinMode) IP.pinFor = null;
+      if (!IP.pinMode) { IP.pinFor = null; IP.pinFind = null; }
       ipRender();
       if (IP.pinMode) showToast('Now tap the plan');
       return;
@@ -26372,6 +26425,11 @@ function ipWire() {
       const tagged = IP.spaces.filter(function(x) { return x.planId === plan.id; });
       if (!confirm('Delete ' + plan.name + '?' + (tagged.length ? ' ' + tagged.length + ' ' + ipT().units.toLowerCase() + ' stay, but lose their pin.' : ''))) return;
       for (let i = 0; i < tagged.length; i++) await ipSpacePatch(tagged[i].id, { planId: '', x: 50, y: 50 });
+      const pinned = IP.findings.filter(function(x) { return x.planId === plan.id; });
+      for (let i = 0; i < pinned.length; i++) {
+        pinned[i].planId = ''; pinned[i].px = null; pinned[i].py = null;
+        try { await ipSub('findings').doc(pinned[i].id).update({ planId: '', px: null, py: null }); } catch (err) {}
+      }
       IP.plans = IP.plans.filter(function(x) { return x.id !== plan.id; });
       lbDrop('plan:' + plan.id);
       try { await ipSub('plans').doc(plan.id).delete(); } catch (err) {}
@@ -26409,6 +26467,21 @@ function ipWire() {
       const yy = Math.round((e.clientY - b.top) / b.height * 100);
       const plan = IP.plans[IP.planIx];
       IP.pinMode = false;
+      if (IP.pinFind) {
+        // Menandakan satu penemuan pada titik sebenarnya.
+        const fid = IP.pinFind; IP.pinFind = null;
+        const f = IP.findings.filter(function(z) { return z.id === fid; })[0];
+        if (f) {
+          f.planId = plan ? plan.id : ''; f.px = x; f.py = yy;
+          try { await ipSub('findings').doc(fid).update({ planId: f.planId, px: x, py: yy }); } catch (err) {}
+          IP.spaceId = f.spaceId; IP.findId = fid;
+          ipGo('finding');
+          showToast('Pinned ' + f.spaceKey + ipNo(f.no) + ' on ' + (plan ? plan.name : 'the plan'));
+          return;
+        }
+        ipRender();
+        return;
+      }
       if (IP.pinFor) {
         // Memindahkan ruang sedia ada ke atas pelan.
         const moving = IP.pinFor; IP.pinFor = null;
@@ -26477,7 +26550,7 @@ function ipOpenTab() {
 try { ipWire(); } catch (e) { console.warn('[Inspection wire]', e.message); }
 
 // Console banner
-console.log('%cGoXpert Pocket v1.3', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v1.4', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
