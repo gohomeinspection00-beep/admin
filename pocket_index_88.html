@@ -6794,6 +6794,148 @@ body.on-chat .topbar{display:none}
 .tk-pack p{margin:3px 0 0;font-size:11.5px;color:var(--muted);line-height:1.45}
 .tk-pack em{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--accent);font-weight:600}
 
+/* ==========================================================
+   LIBRARY — MY SHELF (lb-)
+   Rujukan seorang surveyor datang dalam dua bentuk: yang saya
+   tulis dalam app, dan fail dia sendiri — PDF UBBL, MS
+   standards, template report. Firestore had 1 MB satu dokumen,
+   jadi fail besar duduk dalam telefon (IndexedDB): buka tanpa
+   talian, tiada kos. Nama, tag dan nota naik ke Firestore
+   supaya senarai itu nampak di semua peranti; fail kecil naik
+   sekali dan benar-benar sync.
+========================================================== */
+.lb-top{display:flex;align-items:flex-end;gap:9px;margin-bottom:12px}
+.lb-top h1{
+  margin:0;font-size:24px;font-weight:800;letter-spacing:-.035em;line-height:1.05;color:var(--fg);
+}
+.lb-top h1 em{font-family:var(--font-display);font-style:italic;font-weight:400;color:var(--accent)}
+.lb-top span{
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);padding-bottom:4px;white-space:nowrap;
+}
+.lb-seg{display:flex;gap:4px;padding:3px;background:var(--surface);border-radius:11px;margin-bottom:14px}
+.lb-seg button{
+  flex:1;padding:8px 6px;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--fg-dim);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.lb-seg button.on{background:var(--bg);color:var(--fg);box-shadow:var(--shadow-1)}
+.lb-seg em{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--muted)}
+
+.lb-add{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:14px}
+.lb-addb{
+  display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;
+  border:1px dashed var(--accent-line);border-radius:14px;background:var(--accent-soft);color:var(--accent);
+}
+.lb-addb b{font-size:11.5px;font-weight:700;letter-spacing:-.01em}
+.lb-addb span{font-size:9.5px;color:var(--muted);text-align:center;line-height:1.25}
+
+.lb-shelf{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 13px;padding:0 16px 2px;-webkit-overflow-scrolling:touch}
+.lb-shelf::-webkit-scrollbar{height:0}
+.lb-shelf button{
+  flex:none;display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);
+  border-radius:999px;background:var(--bg);font-size:12px;font-weight:600;color:var(--fg-dim);white-space:nowrap;
+}
+.lb-shelf button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.lb-shelf button em{font-style:normal;font-family:var(--font-mono);font-size:10px;opacity:.7}
+.lb-shelf button.new{border-style:dashed;border-color:var(--accent-line);color:var(--accent)}
+
+.lb-meter{
+  display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--line);
+  border-radius:12px;background:var(--bg-2);margin-bottom:13px;
+}
+.lb-meter b{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg);white-space:nowrap}
+.lb-meter span{font-size:10.5px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-meter > button{flex:none;font-size:11.5px;font-weight:600;color:var(--accent)}
+
+.lb-secline{display:flex;align-items:center;gap:8px;margin:0 2px 8px}
+.lb-secline b{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.lb-secline i{flex:1;height:1px;background:var(--line)}
+.lb-secline span{font-family:var(--font-mono);font-size:10.5px;color:var(--muted-2)}
+
+.lb-item{
+  display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;padding:11px;
+  border:1px solid var(--line);border-radius:14px;background:var(--bg-2);margin-bottom:7px;
+}
+.lb-ico{
+  width:42px;height:42px;border-radius:12px;flex:none;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:9.5px;font-weight:600;overflow:hidden;
+}
+.lb-ico img{width:100%;height:100%;object-fit:cover}
+.lb-t-pdf{background:var(--critical-soft);color:var(--critical)}
+.lb-t-img{background:#E7F7F2;color:#0E9E7A}
+[data-theme="dark"] .lb-t-img{background:#07241c;color:#2dd4a7}
+.lb-t-doc{background:var(--accent-soft);color:var(--accent)}
+.lb-t-xls{background:var(--success-soft);color:var(--success)}
+.lb-t-note{background:var(--warning-soft);color:var(--warning)}
+.lb-mid{min-width:0;flex:1}
+.lb-name{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.015em;line-height:1.35;color:var(--fg)}
+.lb-sub{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:10.5px;color:var(--muted);flex-wrap:wrap}
+.lb-dot{width:2.5px;height:2.5px;border-radius:50%;background:var(--muted-2);flex:none}
+.lb-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.lb-tag{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:999px;background:var(--surface);color:var(--fg-dim)}
+.lb-where{flex:none;display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:5px}
+.lb-w-phone{background:var(--success-soft);color:var(--success)}
+.lb-w-cloud{background:var(--accent-soft);color:var(--accent)}
+.lb-w-away{background:var(--surface);color:var(--muted-2)}
+.lb-item.away{opacity:.62}
+.lb-src{flex:none;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted-2);padding-top:3px}
+
+.lb-blank{text-align:center;padding:26px 14px 30px}
+.lb-blank h4{margin:12px 0 5px;font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.lb-blank p{margin:0 auto;font-size:12.5px;color:var(--muted);line-height:1.55;max-width:32ch}
+.lb-hint{margin-top:18px;text-align:left}
+.lb-hint .lb-item{opacity:.75}
+
+/* ---------- helai butiran ---------- */
+.lb-sheet{position:fixed;inset:0;z-index:2450;display:none}
+.lb-sheet.show{display:block}
+.lb-scrim{position:absolute;inset:0;background:var(--overlay)}
+.lb-panel{
+  position:absolute;left:0;right:0;bottom:0;max-height:93%;background:var(--bg);
+  border-radius:20px 20px 0 0;display:flex;flex-direction:column;box-shadow:var(--shadow-3);
+}
+.lb-grip{width:36px;height:4px;border-radius:999px;background:var(--line-2);margin:9px auto 0;flex:none}
+.lb-phd{display:flex;align-items:flex-start;gap:11px;padding:12px 16px 11px;border-bottom:1px solid var(--line);flex:none}
+.lb-phd h3{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.3;color:var(--fg);word-break:break-word}
+.lb-phd p{margin:3px 0 0;font-size:10.5px;color:var(--muted)}
+.lb-px{margin-left:auto;flex:none;width:28px;height:28px;border-radius:9px;background:var(--surface);display:grid;place-items:center;color:var(--fg-dim)}
+.lb-pbd{overflow-y:auto;padding:14px 16px 4px;-webkit-overflow-scrolling:touch}
+.lb-pbd::-webkit-scrollbar{width:0}
+.lb-prev{
+  border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--surface);
+  margin-bottom:14px;min-height:140px;display:grid;place-items:center;
+}
+.lb-prev img{width:100%;display:block}
+.lb-prev iframe{width:100%;height:290px;border:0;display:block;background:#fff}
+.lb-prev .lb-ph{text-align:center;padding:30px 16px;color:var(--muted)}
+.lb-prev .lb-ph p{margin:9px 0 0;font-size:12px;line-height:1.5}
+.lb-fld{margin-bottom:13px}
+.lb-fld label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.lb-fld input,.lb-fld textarea,.lb-fld select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:11px;
+  background:var(--bg-2);font-size:13.5px;outline:none;color:var(--fg);
+}
+.lb-fld textarea{min-height:60px;resize:vertical;line-height:1.5;font-size:13px}
+.lb-fld .lb-long{min-height:170px}
+.lb-fld input:focus,.lb-fld textarea:focus,.lb-fld select:focus{border-color:var(--accent);background:var(--bg)}
+.lb-acts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.lb-act{
+  display:flex;align-items:center;gap:8px;padding:11px;border:1px solid var(--line);
+  border-radius:12px;background:var(--bg-2);font-size:12.5px;font-weight:600;color:var(--fg-2);text-align:left;
+}
+.lb-act svg{color:var(--accent);flex:none}
+.lb-act.dngr{color:var(--critical);border-color:var(--critical-soft);background:var(--critical-soft)}
+.lb-act.dngr svg{color:var(--critical)}
+.lb-pft{
+  flex:none;padding:11px 16px calc(14px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);display:flex;gap:8px;
+}
+.lb-btn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;text-align:center}
+.lb-btn.p{background:var(--accent);color:var(--accent-fg)}
+.lb-btn.g{background:var(--surface);color:var(--fg-2);flex:none;padding-inline:18px}
+.lb-btn:disabled{opacity:.55}
+
+
 
 
 /* ==========================================================
@@ -7581,16 +7723,20 @@ body.on-chat .topbar{display:none}
       
       <!-- BROWSE VIEW -->
       <div id="libBrowseView">
-        <div class="lib-header">
-          <div class="lib-eyebrow">Reference Library</div>
-          <h1 class="lib-title">Defects, standards, &amp; <em>law</em>.</h1>
-          <p class="lib-desc">Browse the complete knowledge base used by Pocket. Tap any entry for full details, then jump straight into chat for follow-up.</p>
+        <div class="lb-top">
+          <h1>Reference <em>library</em></h1>
+          <span id="lbCount">23 entries</span>
         </div>
         
         <div class="lib-search">
           <svg class="lib-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="libSearchInput" placeholder="Search defects, standards, legal clauses...">
+          <input type="text" id="libSearchInput" placeholder="Search your files and Pocket reference">
           <button class="lib-search-clear" id="libSearchClear">×</button>
+        </div>
+
+        <div class="lb-seg" id="lbSeg">
+          <button data-pane="mine">My shelf <em id="lbSegMine">0</em></button>
+          <button data-pane="pocket" class="on">Pocket <em id="lbSegPocket">23</em></button>
         </div>
         
         <!-- Search results (when active) -->
@@ -7617,6 +7763,38 @@ body.on-chat .topbar{display:none}
               <!-- populated by JS -->
             </div>
           </div>
+        </div>
+
+        <!-- MY SHELF -->
+        <div id="libMineView" style="display:none">
+          <div class="lb-add">
+            <button class="lb-addb" id="lbUpBtn">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 9l5-5 5 5M12 4v12"/></svg>
+              <b>Upload file</b><span>PDF, doc, sheet</span>
+            </button>
+            <button class="lb-addb" id="lbCamBtn">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <b>Snap page</b><span>Photo of a book</span>
+            </button>
+            <button class="lb-addb" id="lbNoteBtn">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>
+              <b>Write note</b><span>Your own entry</span>
+            </button>
+          </div>
+          <input type="file" id="lbFileIn" multiple hidden>
+          <input type="file" id="lbCamIn" accept="image/*" capture="environment" hidden>
+
+          <div class="lb-shelf" id="lbShelfRow"></div>
+
+          <div class="lb-meter">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+            <div style="min-width:0;flex:1;display:flex;gap:6px;align-items:baseline">
+              <b id="lbMeterTxt">0 B</b><span id="lbMeterSub">on this phone</span>
+            </div>
+            <button id="lbMeterBtn">Manage</button>
+          </div>
+
+          <div id="lbMineList"></div>
         </div>
       </div>
       
@@ -7765,7 +7943,7 @@ body.on-chat .topbar{display:none}
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.8 · build 14 Sep 2026</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v0.9 · build 19 Sep 2026</div>
           </div>
         </div>
         
@@ -7796,7 +7974,7 @@ body.on-chat .topbar{display:none}
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v0.8</span>
+      <span class="chat-build" title="Build">v0.9</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -8564,6 +8742,25 @@ body.on-chat .topbar{display:none}
   </div>
 </div>
 
+<!-- ===== LIBRARY ITEM SHEET ===== -->
+<div class="lb-sheet" id="lbSheet">
+  <div class="lb-scrim" data-lbx="1"></div>
+  <div class="lb-panel">
+    <div class="lb-grip"></div>
+    <div class="lb-phd">
+      <div style="min-width:0"><h3 id="lbdTitle">Item</h3><p id="lbdMeta"></p></div>
+      <button class="lb-px" data-lbx="1" aria-label="Close">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="lb-pbd" id="lbdBody"></div>
+    <div class="lb-pft">
+      <button class="lb-btn g" id="lbdSave">Save</button>
+      <button class="lb-btn p" id="lbdOpen">Open</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // =======================================================
 // FIREBASE — projek GoXpert Pocket SENDIRI
@@ -8865,6 +9062,9 @@ function showApp() {
   }
   if (typeof tkLoad === 'function') {
     tkLoad().catch(e => console.warn('[showApp] tasks', e.message));
+  }
+  if (typeof lbLoad === 'function') {
+    lbLoad().catch(e => console.warn('[showApp] library', e.message));
   }
 }
 
@@ -10980,7 +11180,19 @@ function initLibrary() {
   
   const trending = document.getElementById('trendingList');
   trending.innerHTML = '';
-  TRENDING_KEYS.forEach(function(t, idx) {
+
+  // Guna rekod sebenar sebaik ada cukup, kalau tidak senarai pilihan.
+  const opens = lbOpens();
+  const ranked = Object.keys(opens)
+    .map(function(k) { const p = k.split('/'); return { catKey: p[0], entryId: p.slice(1).join('/'), n: opens[k] }; })
+    .filter(function(r) { return LIBRARY[r.catKey]; })
+    .sort(function(a, b) { return b.n - a.n; })
+    .slice(0, 5);
+  const useOwn = ranked.length >= 3;
+  const label = document.querySelector('#libDefaultView .home-section:last-child .home-section-label');
+  if (label) label.textContent = useOwn ? 'Opened most' : 'Start here';
+
+  (useOwn ? ranked : TRENDING_KEYS).forEach(function(t, idx) {
     const cat = LIBRARY[t.catKey];
     if (!cat) return;
     const entry = cat.entries.find(function(e) { return e.id === t.entryId; });
@@ -11043,11 +11255,27 @@ function showLibraryList(catKey) {
   });
 }
 
+// "Popular this week" tidak bermakna untuk app satu orang.
+// Yang berguna ialah apa yang pengguna ini sendiri buka paling kerap.
+const LB_OPENS = 'pocket_lib_opens_v1';
+function lbOpens() {
+  try { return JSON.parse(localStorage.getItem(LB_OPENS) || '{}') || {}; } catch (e) { return {}; }
+}
+function lbNoteOpen(catKey, entryId) {
+  try {
+    const o = lbOpens();
+    const k = catKey + '/' + entryId;
+    o[k] = (o[k] || 0) + 1;
+    localStorage.setItem(LB_OPENS, JSON.stringify(o));
+  } catch (e) {}
+}
+
 function showLibraryDetail(catKey, entryId) {
   const cat = LIBRARY[catKey];
   if (!cat) return;
   const entry = cat.entries.find(function(e) { return e.id === entryId; });
   if (!entry) return;
+  lbNoteOpen(catKey, entryId);
   
   document.getElementById('libBrowseView').style.display = 'none';
   document.getElementById('libListView').classList.remove('show');
@@ -11104,6 +11332,16 @@ function showLibraryBrowse() {
   document.getElementById('libBrowseView').style.display = 'block';
   document.getElementById('libListView').classList.remove('show');
   document.getElementById('libDetailView').classList.remove('show');
+  // Membuka satu hasil carian mengosongkan kotak itu, jadi hasil lama
+  // tidak boleh kekal di skrin apabila pengguna kembali.
+  const box = document.getElementById('libSearchInput');
+  const res = document.getElementById('libSearchResults');
+  if (box && res && !box.value.trim()) {
+    res.style.display = 'none';
+    const clr = document.getElementById('libSearchClear');
+    if (clr) clr.classList.remove('show');
+    if (typeof lbSetPane === 'function') lbSetPane(LB.pane);
+  }
 }
 
 document.getElementById('libListBack').addEventListener('click', showLibraryBrowse);
@@ -11120,7 +11358,8 @@ libSearchInput.addEventListener('input', function() {
   
   if (q.length === 0) {
     libSearchResults.style.display = 'none';
-    libDefaultView.style.display = 'block';
+    if (typeof lbSetPane === 'function') lbSetPane(LB.pane);
+    else libDefaultView.style.display = 'block';
     return;
   }
   
@@ -11137,15 +11376,29 @@ libSearchInput.addEventListener('input', function() {
     });
   });
   
+  // Satu carian merentas dua rak: fail sendiri dahulu, kemudian rujukan Pocket.
+  const mine = (typeof LB !== 'undefined' ? LB.items : []).filter(function(i) {
+    return (i.name + ' ' + (i.note || '') + ' ' + (i.tags || []).join(' ') + ' ' + (i.shelf || ''))
+      .toLowerCase().indexOf(q) !== -1;
+  });
+
   libDefaultView.style.display = 'none';
+  const mineView = document.getElementById('libMineView');
+  if (mineView) mineView.style.display = 'none';
   libSearchResults.style.display = 'block';
-  
-  if (results.length === 0) {
+
+  if (results.length === 0 && mine.length === 0) {
     libSearchResults.innerHTML = '<div class="activity-empty">No matches. Try different keywords.</div>';
     return;
   }
-  
-  let html = '<div class="lib-group-title">' + results.length + ' result' + (results.length !== 1 ? 's' : '') + '</div>';
+
+  let html = '';
+  if (mine.length) {
+    html += '<div class="lb-secline"><b>On my shelf</b><i></i><span>' + mine.length + '</span></div>' +
+      mine.map(function(i) { return lbItemHTML(i, 'MINE'); }).join('');
+  }
+  if (results.length && mine.length) html += '<div class="lb-secline" style="margin-top:14px"><b>Pocket reference</b><i></i><span>' + results.length + '</span></div>';
+  else if (results.length) html += '<div class="lib-group-title">' + results.length + ' result' + (results.length !== 1 ? 's' : '') + '</div>';
   results.forEach(function(r) {
     let barisCls = '';
     if (r.entry.baris) {
@@ -11175,7 +11428,8 @@ libSearchClear.addEventListener('click', function() {
   libSearchInput.value = '';
   libSearchClear.classList.remove('show');
   libSearchResults.style.display = 'none';
-  libDefaultView.style.display = 'block';
+  if (typeof lbSetPane === 'function') lbSetPane(LB.pane);
+  else libDefaultView.style.display = 'block';
 });
 
 // =======================================================
@@ -22807,8 +23061,564 @@ function tkWire() {
 
 try { tkWire(); } catch (e) { console.warn('[Tasks wire]', e.message); }
 
+// =======================================================
+// LIBRARY — MY SHELF
+// Fail besar (PDF UBBL, katalog) disimpan dalam IndexedDB
+// pada telefon ini: ratusan MB muat, buka tanpa talian,
+// tiada kos. Firestore had 1 MB satu dokumen, jadi ia
+// menyimpan nama, tag dan nota sahaja — itu yang menyeberang
+// antara peranti. Fail bawah LB_SYNC_MAX naik sekali sebagai
+// base64 dan benar-benar sync.
+// Disimpan di pocketInspections/{uid}/libraryItems/{id}
+// =======================================================
+const LB_SYNC_MAX = 700000;          // base64 ~933 KB, bawah had 1 MiB Firestore
+const LB_IDB = 'goxpertLibrary';
+const LB_STORE = 'files';
+const LB_SHELVES = ['UBBL', 'Standards', 'Templates', 'Site photos', 'Products', 'Past reports'];
+
+let LB = { items: [], shelf: 'All', pane: 'pocket', editId: null, loaded: false, here: {} };
+function lbPocketN() {
+  let n = 0;
+  try { Object.keys(LIBRARY).forEach(function(k) { n += (LIBRARY[k].entries || []).length; }); } catch (e) {}
+  return n;
+}
+let _lbDB = null, _lbURLs = {};
+
+// ---------- 1. STOR DALAM TELEFON ----------
+function lbOpenDB() {
+  if (_lbDB) return Promise.resolve(_lbDB);
+  return new Promise(function(res, rej) {
+    if (!window.indexedDB) { rej(new Error('No IndexedDB')); return; }
+    const req = indexedDB.open(LB_IDB, 1);
+    req.onupgradeneeded = function() {
+      const d = req.result;
+      if (!d.objectStoreNames.contains(LB_STORE)) d.createObjectStore(LB_STORE, { keyPath: 'id' });
+    };
+    req.onsuccess = function() { _lbDB = req.result; res(_lbDB); };
+    req.onerror = function() { rej(req.error || new Error('IndexedDB blocked')); };
+  });
+}
+function lbPut(id, blob, mime) {
+  return lbOpenDB().then(function(d) {
+    return new Promise(function(res, rej) {
+      const tx = d.transaction(LB_STORE, 'readwrite');
+      tx.objectStore(LB_STORE).put({ id: id, blob: blob, mime: mime || blob.type || '' });
+      tx.oncomplete = res; tx.onerror = function() { rej(tx.error); };
+    });
+  });
+}
+function lbGet(id) {
+  return lbOpenDB().then(function(d) {
+    return new Promise(function(res) {
+      const r = d.transaction(LB_STORE, 'readonly').objectStore(LB_STORE).get(id);
+      r.onsuccess = function() { res(r.result || null); };
+      r.onerror = function() { res(null); };
+    });
+  }).catch(function() { return null; });
+}
+function lbDrop(id) {
+  return lbOpenDB().then(function(d) {
+    return new Promise(function(res) {
+      const tx = d.transaction(LB_STORE, 'readwrite');
+      tx.objectStore(LB_STORE).delete(id);
+      tx.oncomplete = res; tx.onerror = res;
+    });
+  }).catch(function() {});
+}
+// Satu imbasan supaya senarai tahu fail mana ada pada telefon ini.
+function lbScanLocal() {
+  return lbOpenDB().then(function(d) {
+    return new Promise(function(res) {
+      const r = d.transaction(LB_STORE, 'readonly').objectStore(LB_STORE).getAllKeys();
+      r.onsuccess = function() {
+        const m = {};
+        (r.result || []).forEach(function(k) { m[k] = 1; });
+        res(m);
+      };
+      r.onerror = function() { res({}); };
+    });
+  }).catch(function() { return {}; });
+}
+
+// ---------- 2. JENIS FAIL ----------
+function lbKind(name, mime) {
+  const e = (String(name || '').split('.').pop() || '').toLowerCase();
+  if (mime && mime.indexOf('image/') === 0) return 'img';
+  if (mime === 'application/pdf' || e === 'pdf') return 'pdf';
+  if (['doc', 'docx', 'rtf', 'odt', 'txt'].indexOf(e) >= 0) return 'doc';
+  if (['xls', 'xlsx', 'csv', 'ods'].indexOf(e) >= 0) return 'xls';
+  if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'heic', 'bmp'].indexOf(e) >= 0) return 'img';
+  return 'file';
+}
+function lbKindLabel(it) {
+  if (it.kind === 'note') return 'NOTE';
+  const e = (String(it.name || '').split('.').pop() || '').toLowerCase();
+  if (it.kind === 'pdf') return 'PDF';
+  if (it.kind === 'img') return 'IMG';
+  if (it.kind === 'xls') return 'XLS';
+  if (it.kind === 'doc') return 'DOC';
+  return (e || 'FILE').slice(0, 4).toUpperCase();
+}
+function lbKindCls(it) {
+  return 'lb-t-' + (it.kind === 'note' ? 'note' : it.kind === 'pdf' ? 'pdf' : it.kind === 'img' ? 'img' : it.kind === 'xls' ? 'xls' : 'doc');
+}
+function lbSize(n) {
+  if (!n) return '';
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return Math.round(n / 1024) + ' KB';
+  return (n / 1048576).toFixed(1) + ' MB';
+}
+// Nota hidup sepenuhnya dalam Firestore, jadi ia sentiasa sync.
+function lbWhere(it) {
+  if (it.kind === 'note' || it.data) return 'cloud';
+  return LB.here[it.id] ? 'phone' : 'away';
+}
+function lbEsc(s) { return (typeof escapeHTML === 'function') ? escapeHTML(s == null ? '' : s) : String(s == null ? '' : s); }
+
+// ---------- 3. MUAT ----------
+function lbCol() {
+  return db.collection('pocketInspections').doc(currentUser.uid).collection('libraryItems');
+}
+async function lbLoad() {
+  LB.here = await lbScanLocal();
+  if (!currentUser) { lbRenderMine(); return; }
+  try {
+    const snap = await lbCol().orderBy('createdAt', 'desc').limit(300).get();
+    const list = [];
+    snap.forEach(function(doc) {
+      const d = doc.data();
+      list.push({
+        id: doc.id,
+        name: d.name || 'Untitled',
+        kind: d.kind || 'file',
+        mime: d.mime || '',
+        size: typeof d.size === 'number' ? d.size : 0,
+        shelf: d.shelf || '',
+        tags: Array.isArray(d.tags) ? d.tags : [],
+        note: d.note || '',
+        data: d.data || '',
+        createdAt: (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate() : new Date()
+      });
+    });
+    LB.items = list;
+    LB.loaded = true;
+  } catch (e) {
+    console.warn('[Library load]', e.message);
+  }
+  lbRenderMine();
+}
+
+// ---------- 4. SENARAI ----------
+function lbShelvesInUse() {
+  const seen = {};
+  LB.items.forEach(function(i) { if (i.shelf) seen[i.shelf] = (seen[i.shelf] || 0) + 1; });
+  return Object.keys(seen).sort().map(function(k) { return { n: k, c: seen[k] }; });
+}
+function lbPaintShelves() {
+  const row = document.getElementById('lbShelfRow');
+  if (!row) return;
+  const shelves = lbShelvesInUse();
+  let html = '<button data-lbshelf="All" class="' + (LB.shelf === 'All' ? 'on' : '') + '">All<em>' + LB.items.length + '</em></button>';
+  shelves.forEach(function(s) {
+    html += '<button data-lbshelf="' + lbEsc(s.n) + '" class="' + (LB.shelf === s.n ? 'on' : '') + '">' + lbEsc(s.n) + '<em>' + s.c + '</em></button>';
+  });
+  row.innerHTML = html;
+  row.style.display = shelves.length ? '' : 'none';
+}
+function lbItemHTML(it, src) {
+  const w = lbWhere(it);
+  const badge = w === 'phone' ? '<span class="lb-where lb-w-phone">PHONE</span>'
+    : w === 'cloud' ? '<span class="lb-where lb-w-cloud">SYNCED</span>'
+    : '<span class="lb-where lb-w-away">NOT HERE</span>';
+  let thumb = lbKindLabel(it);
+  if (it.kind === 'img' && it.data) thumb = '<img src="data:' + (it.mime || 'image/jpeg') + ';base64,' + it.data + '" alt="">';
+  else if (it.kind === 'img' && _lbURLs[it.id]) thumb = '<img src="' + _lbURLs[it.id] + '" alt="">';
+  return '<button class="lb-item ' + (w === 'away' ? 'away' : '') + '" data-lbopen="' + it.id + '">' +
+    '<span class="lb-ico ' + lbKindCls(it) + '">' + thumb + '</span>' +
+    '<span class="lb-mid"><span class="lb-name">' + lbEsc(it.name) + '</span>' +
+      '<span class="lb-sub">' + badge +
+        (it.size ? '<span class="lb-dot"></span><span>' + lbSize(it.size) + '</span>' : '') +
+        (it.shelf ? '<span class="lb-dot"></span><span>' + lbEsc(it.shelf) + '</span>' : '') +
+      '</span>' +
+      (it.tags.length ? '<span class="lb-tags">' + it.tags.map(function(t) { return '<span class="lb-tag">' + lbEsc(t) + '</span>'; }).join('') + '</span>' : '') +
+    '</span>' +
+    (src ? '<span class="lb-src">' + src + '</span>' : '') +
+  '</button>';
+}
+function lbBlank() {
+  return '<div class="lb-blank">' +
+    '<svg width="96" height="72" viewBox="0 0 96 72" fill="none" aria-hidden="true">' +
+      '<rect x="8" y="16" width="22" height="48" rx="3" fill="var(--surface)" stroke="var(--line-2)" stroke-width="1.6"/>' +
+      '<rect x="33" y="8" width="22" height="56" rx="3" fill="var(--accent-soft)" stroke="var(--accent-line)" stroke-width="1.6"/>' +
+      '<rect x="58" y="22" width="22" height="42" rx="3" fill="var(--surface)" stroke="var(--line-2)" stroke-width="1.6" stroke-dasharray="4 3"/>' +
+      '<path d="M69 34v18M60 43h18" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<path d="M14 26h10M14 32h10M39 18h10M39 24h10" stroke="var(--muted-2)" stroke-width="1.6" stroke-linecap="round"/>' +
+    '</svg>' +
+    '<h4>Your shelf is empty</h4>' +
+    '<p>Put the documents you keep reaching for on site here. They stay on this phone, so they open with no signal.</p>' +
+    '<div class="lb-hint">' +
+      '<div class="lb-secline" style="margin-top:20px"><b>People usually start with</b><i></i></div>' +
+      '<div class="lb-item"><span class="lb-ico lb-t-pdf">PDF</span><span class="lb-mid"><span class="lb-name">UBBL 1984</span><span class="lb-sub">The by-laws you quote most</span></span></div>' +
+      '<div class="lb-item"><span class="lb-ico lb-t-pdf">PDF</span><span class="lb-mid"><span class="lb-name">MS 1064 / MS 1194</span><span class="lb-sub">Standards you cite in reports</span></span></div>' +
+      '<div class="lb-item"><span class="lb-ico lb-t-doc">DOC</span><span class="lb-mid"><span class="lb-name">Your report template</span><span class="lb-sub">Company letterhead and layout</span></span></div>' +
+      '<div class="lb-item"><span class="lb-ico lb-t-note">NOTE</span><span class="lb-mid"><span class="lb-name">Contractor and lab contacts</span><span class="lb-sub">Written straight into Pocket</span></span></div>' +
+    '</div></div>';
+}
+function lbRenderMine() {
+  const seg = document.getElementById('lbSegMine');
+  if (seg) seg.textContent = LB.items.length;
+  const cnt = document.getElementById('lbCount');
+  if (cnt) cnt.textContent = LB.items.length ? LB.items.length + ' mine · ' + lbPocketN() + ' Pocket' : lbPocketN() + ' entries';
+
+  const list = document.getElementById('lbMineList');
+  if (!list) return;
+  lbPaintShelves();
+
+  const here = LB.items.filter(function(i) { return i.size && lbWhere(i) !== 'away'; });
+  const used = here.reduce(function(a, b) { return a + b.size; }, 0);
+  const mt = document.getElementById('lbMeterTxt');
+  const ms = document.getElementById('lbMeterSub');
+  if (mt) mt.textContent = lbSize(used) || '0 B';
+  if (ms) ms.textContent = 'on this phone · ' + here.length + ' file' + (here.length === 1 ? '' : 's') + ' open with no signal';
+
+  if (!LB.items.length) { list.innerHTML = lbBlank(); return; }
+
+  const rows = LB.shelf === 'All' ? LB.items : LB.items.filter(function(i) { return i.shelf === LB.shelf; });
+  const files = rows.filter(function(i) { return i.kind !== 'note'; });
+  const notes = rows.filter(function(i) { return i.kind === 'note'; });
+  let html = '';
+  if (files.length) html += '<div class="lb-secline"><b>Documents</b><i></i><span>' + files.length + '</span></div>' + files.map(function(i) { return lbItemHTML(i); }).join('');
+  if (notes.length) html += '<div class="lb-secline" style="margin-top:14px"><b>My notes</b><i></i><span>' + notes.length + '</span></div>' + notes.map(function(i) { return lbItemHTML(i); }).join('');
+  if (!html) html = '<div class="lb-blank"><p>Nothing on this shelf yet.</p></div>';
+  list.innerHTML = html;
+}
+function lbSetPane(p) {
+  LB.pane = p;
+  document.querySelectorAll('#lbSeg button').forEach(function(b) { b.classList.toggle('on', b.dataset.pane === p); });
+  const mine = document.getElementById('libMineView');
+  const pocket = document.getElementById('libDefaultView');
+  const results = document.getElementById('libSearchResults');
+  if (results && results.style.display !== 'none') {
+    // Carian menguasai kedua-dua anak tetingkap, jadi tukar tab bermakna keluar dari carian.
+    const box = document.getElementById('libSearchInput');
+    if (box) box.value = '';
+    const clr = document.getElementById('libSearchClear');
+    if (clr) clr.classList.remove('show');
+    results.style.display = 'none';
+  }
+  if (mine) mine.style.display = p === 'mine' ? 'block' : 'none';
+  if (pocket) pocket.style.display = p === 'mine' ? 'none' : 'block';
+  if (p === 'mine') lbRenderMine();
+}
+
+// ---------- 5. MASUKKAN FAIL ----------
+function lbBlobToB64(blob) {
+  return new Promise(function(res, rej) {
+    const r = new FileReader();
+    r.onload = function() { res(String(r.result).split(',')[1] || ''); };
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
+// Gambar muka surat buku selalunya 4 MB. Kecilkan supaya ia
+// muat dalam had sync, dan tetap boleh dibaca.
+function lbShrink(file, maxW) {
+  return new Promise(function(res) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function() {
+      const scale = maxW / img.width;
+      const w = scale < 1 ? maxW : img.width;
+      const h = scale < 1 ? Math.round(img.height * scale) : img.height;
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      c.toBlob(function(b) { URL.revokeObjectURL(url); res(b || file); }, 'image/jpeg', 0.8);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); res(file); };
+    img.src = url;
+  });
+}
+async function lbAddFiles(files, shrinkImages) {
+  if (!currentUser) { showToast('Sign in to keep your shelf', 'error'); return; }
+  const shelf = LB.shelf === 'All' ? '' : LB.shelf;
+  let added = 0, failed = 0;
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    try {
+      let blob = f;
+      let name = f.name || ('Photo ' + new Date().toLocaleDateString('en-MY'));
+      const kind = lbKind(name, f.type);
+      if (kind === 'img' && (shrinkImages || f.size > LB_SYNC_MAX)) {
+        blob = await lbShrink(f, 1600);
+        if (!/\.(jpe?g)$/i.test(name)) name = name.replace(/\.[^.]+$/, '') + '.jpg';
+      }
+      const doc = {
+        name: name, kind: kind, mime: blob.type || f.type || '', size: blob.size,
+        shelf: shelf, tags: [], note: '',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (blob.size <= LB_SYNC_MAX) doc.data = await lbBlobToB64(blob);
+      const ref = await lbCol().add(doc);
+      try { await lbPut(ref.id, blob, doc.mime); LB.here[ref.id] = 1; } catch (e) { console.warn('[Library idb]', e.message); }
+      LB.items.unshift({
+        id: ref.id, name: name, kind: kind, mime: doc.mime, size: blob.size,
+        shelf: shelf, tags: [], note: '', data: doc.data || '', createdAt: new Date()
+      });
+      added++;
+    } catch (e) {
+      console.warn('[Library add]', e.message);
+      failed++;
+    }
+  }
+  lbRenderMine();
+  if (added) showToast(added + ' file' + (added === 1 ? '' : 's') + ' on your shelf');
+  if (failed) showToast(failed + ' could not be added', 'error');
+}
+async function lbNewNote() {
+  if (!currentUser) { showToast('Sign in to keep your shelf', 'error'); return; }
+  try {
+    const doc = {
+      name: 'Untitled note', kind: 'note', mime: '', size: 0,
+      shelf: LB.shelf === 'All' ? '' : LB.shelf, tags: [], note: '',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    const ref = await lbCol().add(doc);
+    const it = { id: ref.id, name: doc.name, kind: 'note', mime: '', size: 0, shelf: doc.shelf, tags: [], note: '', data: '', createdAt: new Date() };
+    LB.items.unshift(it);
+    lbRenderMine();
+    lbOpenItem(ref.id);
+  } catch (e) {
+    console.warn('[Library note]', e.message);
+    showToast('Could not create the note. ' + e.message, 'error');
+  }
+}
+
+// ---------- 6. BUTIRAN ----------
+async function lbBlobFor(it) {
+  const rec = await lbGet(it.id);
+  if (rec && rec.blob) return rec.blob;
+  if (it.data) {
+    try {
+      const bin = atob(it.data);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const blob = new Blob([arr], { type: it.mime || 'application/octet-stream' });
+      // Salin ke telefon supaya kali kedua ia buka serta-merta.
+      lbPut(it.id, blob, it.mime).then(function() { LB.here[it.id] = 1; }).catch(function() {});
+      return blob;
+    } catch (e) { return null; }
+  }
+  return null;
+}
+async function lbOpenItem(id) {
+  const it = LB.items.filter(function(x) { return x.id === id; })[0];
+  if (!it) return;
+  LB.editId = id;
+  const w = lbWhere(it);
+  document.getElementById('lbdTitle').textContent = it.name;
+  document.getElementById('lbdMeta').textContent =
+    lbKindLabel(it) + (it.size ? ' · ' + lbSize(it.size) : '') + ' · ' +
+    (w === 'phone' ? 'on this phone' : w === 'cloud' ? 'synced to all devices' : 'not on this device');
+
+  const body = document.getElementById('lbdBody');
+  const shelfOpts = LB_SHELVES.concat(lbShelvesInUse().map(function(s) { return s.n; }))
+    .filter(function(v, i, a) { return a.indexOf(v) === i; });
+
+  const common =
+    '<div class="lb-fld"><label>Name</label><input id="lbdName" type="text" value="' + lbEsc(it.name).replace(/"/g, '&quot;') + '"></div>' +
+    (it.kind === 'note'
+      ? '<div class="lb-fld"><label>Note</label><textarea id="lbdNote" class="lb-long" placeholder="Write the reference you keep needing.">' + lbEsc(it.note) + '</textarea></div>'
+      : '<div class="lb-fld"><label>My note</label><textarea id="lbdNote" placeholder="Why you keep this. Page numbers, clause numbers, what to look at.">' + lbEsc(it.note) + '</textarea></div>') +
+    '<div class="lb-fld"><label>Tags</label><input id="lbdTags" type="text" value="' + lbEsc(it.tags.join(', ')).replace(/"/g, '&quot;') + '" placeholder="Comma separated"></div>' +
+    '<div class="lb-fld"><label>Shelf</label><input id="lbdShelf" type="text" list="lbShelfList" value="' + lbEsc(it.shelf).replace(/"/g, '&quot;') + '" placeholder="UBBL, Templates, Client name…">' +
+      '<datalist id="lbShelfList">' + shelfOpts.map(function(s) { return '<option value="' + lbEsc(s) + '">'; }).join('') + '</datalist></div>' +
+    '<div class="lb-acts">' +
+      '<button class="lb-act" id="lbdAsk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Ask Pocket</button>' +
+      '<button class="lb-act dngr" id="lbdDel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>Delete</button>' +
+    '</div>';
+
+  let head = '';
+  if (it.kind === 'note') head = '';
+  else if (w === 'away') head = '<div class="lb-prev"><div class="lb-ph">' +
+    '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 21 7v10l-9 4.5L3 17V7z"/><path d="M3 7l9 5 9-5M12 12v9.5"/></svg>' +
+    '<p>This one is saved on another phone.<br>Too big to sync, so add it again here if you need it on site.</p></div></div>';
+  else head = '<div class="lb-prev" id="lbdPrev"><div class="lb-ph">' +
+    '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>' +
+    '<p>Loading…</p></div></div>';
+
+  body.innerHTML = head + common;
+  const saveBtn = document.getElementById('lbdSave');
+  const openBtn = document.getElementById('lbdOpen');
+  saveBtn.disabled = false; saveBtn.textContent = 'Save';
+  saveBtn.className = it.kind === 'note' ? 'lb-btn p' : 'lb-btn g';
+  openBtn.style.display = (it.kind === 'note' || w === 'away') ? 'none' : '';
+  document.getElementById('lbSheet').classList.add('show');
+
+  document.getElementById('lbdAsk').addEventListener('click', function() { lbAsk(it); });
+  document.getElementById('lbdDel').addEventListener('click', function() { lbDelete(it.id); });
+
+  if (it.kind !== 'note' && w !== 'away') {
+    const blob = await lbBlobFor(it);
+    const prev = document.getElementById('lbdPrev');
+    if (!prev) return;
+    if (!blob) {
+      prev.innerHTML = '<div class="lb-ph"><p>The file is missing from this phone. Add it again to read it here.</p></div>';
+      return;
+    }
+    if (_lbURLs[it.id]) { try { URL.revokeObjectURL(_lbURLs[it.id]); } catch (e) {} }
+    _lbURLs[it.id] = URL.createObjectURL(blob);
+    if (it.kind === 'img') prev.innerHTML = '<img src="' + _lbURLs[it.id] + '" alt="">';
+    // #view=FitH supaya pembaca PDF terbina buka muat lebar, bukan 100%.
+    else if (it.kind === 'pdf') prev.innerHTML = '<iframe src="' + _lbURLs[it.id] + '#view=FitH" title="' + lbEsc(it.name) + '"></iframe>';
+    else prev.innerHTML = '<div class="lb-ph">' +
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>' +
+      '<p>Tap Open to read it in your document app.</p></div>';
+  }
+}
+function lbCloseSheet() { document.getElementById('lbSheet').classList.remove('show'); }
+
+async function lbOpenFile() {
+  const it = LB.items.filter(function(x) { return x.id === LB.editId; })[0];
+  if (!it) return;
+  if (it.kind === 'note') { lbCloseSheet(); return; }
+  const blob = await lbBlobFor(it);
+  if (!blob) { showToast('The file is not on this phone', 'error'); return; }
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w) {
+    const a = document.createElement('a');
+    a.href = url; a.download = it.name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  setTimeout(function() { try { URL.revokeObjectURL(url); } catch (e) {} }, 60000);
+}
+
+async function lbSaveMeta() {
+  const it = LB.items.filter(function(x) { return x.id === LB.editId; })[0];
+  if (!it || !currentUser) { lbCloseSheet(); return; }
+  const g = function(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const name = g('lbdName') || it.name;
+  const note = g('lbdNote');
+  const tags = g('lbdTags').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+  const shelf = g('lbdShelf');
+  const btn = document.getElementById('lbdSave');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await lbCol().doc(it.id).update({
+      name: name, note: note, tags: tags, shelf: shelf,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    it.name = name; it.note = note; it.tags = tags; it.shelf = shelf;
+    lbCloseSheet();
+    lbRenderMine();
+    showToast('Saved');
+  } catch (e) {
+    console.warn('[Library save]', e.message);
+    btn.disabled = false; btn.textContent = 'Save';
+    showToast('Could not save. ' + e.message, 'error');
+  }
+}
+
+async function lbDelete(id) {
+  const it = LB.items.filter(function(x) { return x.id === id; })[0];
+  if (!it) return;
+  LB.items = LB.items.filter(function(x) { return x.id !== id; });
+  delete LB.here[id];
+  if (_lbURLs[id]) { try { URL.revokeObjectURL(_lbURLs[id]); } catch (e) {} delete _lbURLs[id]; }
+  lbCloseSheet();
+  lbRenderMine();
+  lbDrop(id);
+  if (!currentUser) return;
+  try { await lbCol().doc(id).delete(); showToast('Removed from your shelf'); }
+  catch (e) { console.warn('[Library delete]', e.message); showToast('Could not remove. ' + e.message, 'error'); }
+}
+
+function lbAsk(it) {
+  const bits = [];
+  bits.push('I keep this in my library: "' + it.name + '".');
+  if (it.tags.length) bits.push('Tags: ' + it.tags.join(', ') + '.');
+  if (it.note) bits.push('My note on it: ' + it.note);
+  bits.push(it.kind === 'note'
+    ? 'Check it against Malaysian practice and tell me what is missing.'
+    : 'What should I be looking for in this on a survey, and how do I cite it in a report?');
+  const prompt = bits.join(' ');
+  lbCloseSheet();
+  switchTab('chat');
+  setTimeout(function() {
+    const box = document.getElementById('msgInput');
+    if (!box) return;
+    box.value = prompt;
+    if (typeof autoSize === 'function') autoSize();
+    if (typeof updateSendBtn === 'function') updateSendBtn();
+    box.focus();
+  }, 120);
+}
+
+// Fail terbesar dahulu — itu yang perlu dibuang untuk kosongkan ruang.
+function lbManage() {
+  const here = LB.items.filter(function(i) { return i.size && lbWhere(i) !== 'away'; });
+  if (!here.length) { showToast('No files stored on this phone yet'); return; }
+  LB.shelf = 'All';
+  LB.items.sort(function(a, b) { return (b.size || 0) - (a.size || 0); });
+  lbRenderMine();
+  showToast('Biggest files first — open one to delete it');
+}
+
+// ---------- 7. PENDAWAIAN ----------
+function lbWire() {
+  const on = function(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); };
+  on('lbUpBtn', function() { document.getElementById('lbFileIn').click(); });
+  on('lbCamBtn', function() { document.getElementById('lbCamIn').click(); });
+  on('lbNoteBtn', lbNewNote);
+  on('lbMeterBtn', lbManage);
+  on('lbdSave', lbSaveMeta);
+  on('lbdOpen', lbOpenFile);
+
+  const fi = document.getElementById('lbFileIn');
+  if (fi) fi.addEventListener('change', function(e) {
+    const fs = [].slice.call(e.target.files || []);
+    e.target.value = '';
+    if (fs.length) lbAddFiles(fs, false);
+  });
+  const ci = document.getElementById('lbCamIn');
+  if (ci) ci.addEventListener('change', function(e) {
+    const fs = [].slice.call(e.target.files || []);
+    e.target.value = '';
+    if (fs.length) lbAddFiles(fs, true);
+  });
+
+  const seg = document.getElementById('lbSeg');
+  if (seg) seg.addEventListener('click', function(e) {
+    const b = e.target.closest('button');
+    if (b) lbSetPane(b.dataset.pane);
+  });
+
+  const row = document.getElementById('lbShelfRow');
+  if (row) row.addEventListener('click', function(e) {
+    const b = e.target.closest('[data-lbshelf]');
+    if (!b) return;
+    LB.shelf = b.dataset.lbshelf;
+    lbRenderMine();
+  });
+
+  const sheet = document.getElementById('lbSheet');
+  if (sheet) sheet.addEventListener('click', function(e) {
+    if (e.target.closest('[data-lbx]')) lbCloseSheet();
+  });
+
+  document.addEventListener('click', function(e) {
+    const o = e.target.closest('[data-lbopen]');
+    if (o) lbOpenItem(o.dataset.lbopen);
+  });
+}
+
+try { lbWire(); } catch (e) { console.warn('[Library wire]', e.message); }
+
 // Console banner
-console.log('%cGoXpert Pocket v0.8', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v0.9', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
