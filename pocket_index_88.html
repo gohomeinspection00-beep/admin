@@ -8606,6 +8606,54 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .pr-disk-body{flex:1;min-height:0;overflow-y:auto;padding:14px 16px calc(20px + env(safe-area-inset-bottom))}
 .pr-disk-body::-webkit-scrollbar{width:0}
 
+/* ---------- Peranti (hw-) ---------- */
+.hw-tabs{display:flex;gap:5px;padding:4px;background:var(--surface);border-radius:12px;margin-bottom:12px}
+.hw-tab{flex:1;padding:9px 6px;border-radius:9px;border:none;background:none;font-size:12.5px;font-weight:700;color:var(--muted);font-family:var(--font-body)}
+.hw-tab.on{background:var(--accent);color:var(--accent-fg)}
+.hw-hint{font-size:11.5px;color:var(--muted);line-height:1.55;margin:0 2px 11px}
+.hw-hint b{color:var(--fg-2)}
+.hw-sec{display:flex;align-items:center;gap:8px;margin:15px 2px 9px}
+.hw-sec-l{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.hw-sec-r{flex:1;height:1px;background:var(--line)}
+.hw-chk{display:flex;gap:10px;padding:10px 11px;border-radius:12px;margin-bottom:9px;font-size:12.5px;line-height:1.45}
+.hw-chk b{display:block;font-weight:700;margin-bottom:1px}
+.hw-chk span{color:var(--fg-2);font-weight:400}
+.hw-chk.good{background:var(--success-soft);color:var(--success)}
+.hw-chk.warn{background:var(--warning-soft);color:var(--warning)}
+.hw-chk.bad{background:var(--critical-soft);color:var(--critical)}
+.hw-go{display:block;width:100%;padding:14px;border-radius:13px;background:var(--accent);color:var(--accent-fg);font-size:14.5px;font-weight:700;border:none;margin-bottom:10px;font-family:var(--font-body)}
+.hw-go:disabled{opacity:.5}
+.hw-dev{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:8px}
+.hw-dev-t{min-width:0;flex:1}
+.hw-dev-t b{display:block;font-size:13.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hw-dev-t span{display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--muted);margin-top:2px}
+.hw-dc{flex:none;padding:8px 11px;border-radius:9px;background:var(--surface);font-size:11.5px;font-weight:700;color:var(--fg-2);border:none}
+.hw-pad{padding:13px;border-radius:13px;background:var(--bg-2);border:1px solid var(--line);font-size:12.5px;color:var(--fg-dim);margin-bottom:9px;font-family:var(--font-mono)}
+.hw-log{max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);padding:8px}
+.hw-log::-webkit-scrollbar{width:0}
+.hw-row{display:flex;gap:9px;padding:5px 4px;font-size:11.5px;align-items:baseline;border-bottom:1px solid var(--line)}
+.hw-row:last-child{border-bottom:0}
+.hw-tm{flex:none;font-family:var(--font-mono);font-size:10px;color:var(--muted-2)}
+.hw-tx{min-width:0;flex:1;font-family:var(--font-mono);word-break:break-all;color:var(--fg-2)}
+.hw-row.ok .hw-tx{color:var(--success)}
+.hw-row.bad .hw-tx{color:var(--critical)}
+.hw-row.warn .hw-tx{color:var(--warning)}
+.hw-row.data .hw-tx{color:var(--accent)}
+.hw-guess{display:flex;flex-direction:column;gap:3px;padding:6px 4px 9px}
+.hw-g{display:flex;gap:9px;align-items:baseline;font-size:11px;opacity:.5}
+.hw-g.good{opacity:1}
+.hw-g b{min-width:0;flex:1;font-weight:600;color:var(--muted)}
+.hw-g span{flex:none;font-family:var(--font-mono);font-weight:700;color:var(--fg-dim)}
+.hw-g.good b{color:var(--fg-2)}
+.hw-g.good span{color:var(--success);font-size:13px}
+.hw-g.hit{background:var(--success-soft);border-radius:8px;padding:4px 7px;margin:0 -3px}
+.hw-g.hit b{color:var(--success);font-weight:700}
+.hw-exp{display:flex;align-items:center;gap:9px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:9px}
+.hw-exp label{flex:none;font-size:12px;font-weight:650;color:var(--fg-2)}
+.hw-exp input{min-width:0;flex:1;padding:8px 10px;border:1px solid var(--line-2);border-radius:9px;background:var(--bg);outline:none;font-family:var(--font-mono);font-size:15px;color:var(--fg)}
+.hw-exp input:focus{border-color:var(--accent)}
+.hw-exp span{flex:none;font-size:11.5px;color:var(--muted)}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -9120,7 +9168,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.3 · build 20 Sep 2026 · Log masuk + Profile</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.4 · build 20 Sep 2026 · Peranti (uji BLE)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -9148,7 +9196,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v2.3</span>
+      <span class="chat-build" title="Build">v2.4</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -12899,6 +12947,7 @@ function openTool(toolKey) {
   else if (toolKey === 'armeasure') openARMeasure();
   else if (toolKey === 'arfloorplan') openARFloorPlan();
   else if (toolKey === 'model3d') openModel3D();
+  else if (toolKey === 'hardware') openHardware();
   else if (toolKey === 'sketch2real') openSketchToReal();
   else if (toolKey === 'planeditor') openPlanEditor();
   else if (toolKey === 'quantity') openQuantityScanner();
@@ -21398,6 +21447,7 @@ const NT_ICONS = {
   armeasure:'<path d="M12 2.8 20.5 7v10L12 21.2 3.5 17V7z"/><path d="M12 2.8V12l8.5-5M12 12 3.5 7M12 12v9.2"/>',
   arfloorplan:'<path d="M3 9.5 12 4l9 5.5-9 5.5z"/><path d="M3 14.5 12 20l9-5.5"/>',
   model3d:'<path d="M12 2.6 20.5 7v10L12 21.4 3.5 17V7z"/><path d="M12 2.6V12l8.5-5M12 12 3.5 7M12 12v9.4"/>',
+  hardware:'<path d="M12 3v3M12 18v3M4.2 7.5l2.6 1.5M17.2 15l2.6 1.5M4.2 16.5l2.6-1.5M17.2 9l2.6-1.5"/><circle cx="12" cy="12" r="3.2"/>',
   sketch2real:'<path d="M3 20.5 8 19l11-11a2.4 2.4 0 0 0-3.4-3.4L4.6 15.6z"/><path d="M14 6.5 17.5 10"/>',
   planeditor:'<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9.5h18M9.5 9.5V21"/>',
   scicalc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4"/>',
@@ -21417,6 +21467,7 @@ const NT_TOOLS = [
   { id:'armeasure',      name:'AR Measure',       cat:'measure', req:'AR',     kw:'distance length room' },
   { id:'arfloorplan',    name:'AR Floor Plan',    cat:'measure', req:'AR',     kw:'overlay plan floor' },
   { id:'model3d',        name:'Model 3D',         cat:'plan',    kw:'glb gltf bim ifc revit model 3d ar usdz walk clash deviation x-ray section' },
+  { id:'hardware',       name:'Peranti',          cat:'util',    kw:'bluetooth ble laser distance disto meter remote gamepad shutter kamera camera usb test uji perkakasan' },
   { id:'sketch2real',    name:'Sketch to Real',   cat:'plan',    req:'AI',     kw:'drawing clean vector plan' },
   { id:'planeditor',     name:'Plan Editor',      cat:'plan',    kw:'draw annotate canvas markup' },
   { id:'voicetranslate', name:'Voice Translator', cat:'util',    req:'AI',     kw:'speak language contractor phrasebook worker bangla tamil nepali offline' },
@@ -21849,6 +21900,315 @@ function prWire() {
   });
 }
 try { prWire(); } catch (e) { console.warn('[Profile wire]', e.message); }
+// =======================================================
+// TOOL: PERANTI (HW) — uji laser BLE, remote dan kamera
+// =======================================================
+// Dibina sebelum apa-apa penyahkod ditulis, kerana meter murah tidak
+// menerbitkan protokolnya. Cara jujur untuk menyambungkannya ialah
+// melihat bait sebenar yang keluar bila butang ukur ditekan, bukan
+// meneka. Halaman ini melakukan itu, dan cuba meneka nilainya.
+//
+// Web Bluetooth hanya bercakap BLE (GATT). Meter Bluetooth Classic /
+// SPP tidak boleh dicapai oleh mana-mana pelayar — kalau tiada apa
+// muncul di sini, itu sebabnya, dan pemulangan ialah jawapannya.
+
+// Servis yang diketahui. Chrome menyembunyikan mana-mana servis yang
+// tidak disenaraikan di sini, jadi senarai ini menentukan apa yang
+// boleh dilihat langsung.
+const HW_SERVICES = [
+  '3ab10100-f831-4395-b29d-570977d5bf94',              // Leica DISTO
+  '6e400001-b5a3-f393-e0a9-e50e24dcca9e',              // Nordic UART (banyak meter murah)
+  '0000ffe0-0000-1000-8000-00805f9b34fb',              // HM-10 / CC2541
+  '0000fff0-0000-1000-8000-00805f9b34fb',              // generik Cina
+  '0000ffb0-0000-1000-8000-00805f9b34fb',
+  '0000180a-0000-1000-8000-00805f9b34fb',              // device info
+  '0000180f-0000-1000-8000-00805f9b34fb',              // battery
+  '0000fee7-0000-1000-8000-00805f9b34fb',
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455'               // Microchip transparent UART
+];
+const HW_NAMES = {
+  '3ab10100-f831-4395-b29d-570977d5bf94': 'Leica DISTO',
+  '6e400001-b5a3-f393-e0a9-e50e24dcca9e': 'Nordic UART',
+  '0000ffe0-0000-1000-8000-00805f9b34fb': 'HM-10 UART',
+  '0000fff0-0000-1000-8000-00805f9b34fb': 'Generik FFF0',
+  '0000180f-0000-1000-8000-00805f9b34fb': 'Bateri',
+  '0000180a-0000-1000-8000-00805f9b34fb': 'Maklumat peranti'
+};
+
+let HW = { tab: 'ble', dev: null, server: null, log: [], subs: 0, last: null, pad: null, padRaf: 0, expect: 0 };
+
+function hwIco() {
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M12 3v18l5-5-10-10 10-10z" transform="translate(0,3) scale(0.85)"/></svg>';
+}
+function hwEsc(s) { return escapeHTML(String(s == null ? '' : s)); }
+function hwHex(dv) {
+  const out = [];
+  for (let i = 0; i < dv.byteLength; i++) out.push(dv.getUint8(i).toString(16).padStart(2, '0'));
+  return out.join(' ');
+}
+// Meter murah menghantar jarak dalam salah satu daripada beberapa
+// bentuk sahaja. Semua ditunjuk, dan yang munasabah (0.05–200 m)
+// ditanda — itu memberi jawapan tanpa dokumentasi vendor.
+function hwGuess(dv) {
+  const out = [];
+  const ok = function(v) { return isFinite(v) && v >= 0.05 && v <= 200; };
+  if (dv.byteLength >= 4) {
+    const f = dv.getFloat32(0, true);
+    out.push({ how: 'float32 LE (Leica)', v: f, m: f, good: ok(f) });
+    const fb = dv.getFloat32(0, false);
+    out.push({ how: 'float32 BE', v: fb, m: fb, good: ok(fb) });
+    const u32 = dv.getUint32(0, true);
+    out.push({ how: 'uint32 LE ÷1000 (mm)', v: u32, m: u32 / 1000, good: ok(u32 / 1000) });
+  }
+  if (dv.byteLength >= 2) {
+    const u16 = dv.getUint16(0, true);
+    out.push({ how: 'uint16 LE ÷1000 (mm)', v: u16, m: u16 / 1000, good: ok(u16 / 1000) });
+    out.push({ how: 'uint16 LE ÷100 (cm)', v: u16, m: u16 / 100, good: ok(u16 / 100) });
+  }
+  let txt = '';
+  try { txt = new TextDecoder().decode(dv.buffer || dv); } catch (e) {}
+  if (/[0-9]/.test(txt)) {
+    const m = txt.match(/-?\d+(\.\d+)?/);
+    if (m) {
+      const n = parseFloat(m[0]);
+      out.push({ how: 'teks ASCII (m)', v: txt.trim(), m: n, good: ok(n) });
+      out.push({ how: 'teks ASCII ÷1000 (mm)', v: txt.trim(), m: n / 1000, good: ok(n / 1000) });
+    }
+  }
+  return out;
+}
+function hwSay(kind, text, data) {
+  HW.log.unshift({ t: Date.now(), kind: kind, text: text, data: data || null });
+  if (HW.log.length > 60) HW.log.length = 60;
+  hwPaintLog();
+}
+
+function openHardware() {
+  document.getElementById('toolModalIcon').innerHTML = hwIco();
+  document.getElementById('toolModalName').textContent = 'Peranti';
+  document.getElementById('toolModalDesc').textContent = 'Uji laser, remote dan kamera sebelum bayar';
+  hwRender();
+  showToolModal();
+}
+function hwRender() {
+  const body = document.getElementById('toolModalBody');
+  const foot = document.getElementById('toolModalFoot');
+  let h = '<div class="hw-tabs">' +
+    [['ble', 'Laser BLE'], ['pad', 'Remote'], ['cam', 'Kamera']].map(function(t) {
+      return '<button class="hw-tab' + (HW.tab === t[0] ? ' on' : '') + '" data-hwtab="' + t[0] + '">' + t[1] + '</button>';
+    }).join('') + '</div><div id="hwBody"></div>';
+  body.innerHTML = h;
+  foot.innerHTML = '<button class="tool-btn tool-btn-primary" id="hwClose">Tutup</button>';
+  document.getElementById('hwClose').onclick = function() { hwStopPad(); closeTool(); };
+  body.querySelector('.hw-tabs').onclick = function(e) {
+    const b = e.target.closest('[data-hwtab]');
+    if (!b) return;
+    hwStopPad();
+    HW.tab = b.dataset.hwtab;
+    hwRender();
+  };
+  if (HW.tab === 'ble') hwBle();
+  else if (HW.tab === 'pad') hwPad();
+  else hwCam();
+}
+
+// ---------- BLE ----------
+async function hwBle() {
+  const el = document.getElementById('hwBody');
+  const has = !!(navigator.bluetooth);
+  let avail = has;
+  try { if (has && navigator.bluetooth.getAvailability) avail = await navigator.bluetooth.getAvailability(); } catch (e) {}
+  if (!has) {
+    el.innerHTML = '<div class="hw-chk bad"><div><b>Pelayar ini tiada Web Bluetooth</b>' +
+      '<span>Perlukan Chrome pada Android, melalui https://. iPhone dan Safari tidak menyokongnya langsung — tiada kod boleh menampung itu.</span></div></div>';
+    return;
+  }
+  el.innerHTML =
+    (avail ? '' : '<div class="hw-chk warn"><div><b>Bluetooth nampak tertutup</b><span>Hidupkan Bluetooth dan kebenaran Lokasi — Android memerlukan Lokasi untuk mengimbas BLE.</span></div></div>') +
+    '<p class="hw-hint">Hidupkan meter, pastikan Bluetooth-nya aktif, kemudian tekan Cari. Selepas bersambung, <b>tekan butang ukur pada meter</b> dan lihat apa yang masuk.</p>' +
+    '<button class="hw-go" id="hwScan">Cari peranti</button>' +
+    '<div id="hwDev"></div>' +
+    '<div class="hw-exp"><label for="hwExpect">Meter papar berapa?</label>' +
+      '<input id="hwExpect" type="text" inputmode="decimal" placeholder="cth. 3.421" value="' + (HW.expect || '') + '">' +
+      '<span>meter</span></div>' +
+    '<p class="hw-hint">Taip nombor yang keluar pada skrin meter itu sendiri. Penyahkod yang sepadan akan ditanda &#10003; — itu jawapan muktamad, bukan tekaan.</p>' +
+    '<div class="hw-sec"><span class="hw-sec-l">Apa yang masuk</span><span class="hw-sec-r"></span></div>' +
+    '<div class="hw-log" id="hwLog"></div>';
+  document.getElementById('hwScan').onclick = hwScan;
+  const ex = document.getElementById('hwExpect');
+  if (ex) ex.addEventListener('input', function() {
+    HW.expect = parseFloat(ex.value) || 0;
+    hwPaintLog();
+  });
+  hwPaintDev(); hwPaintLog();
+}
+function hwPaintDev() {
+  const el = document.getElementById('hwDev');
+  if (!el) return;
+  if (!HW.dev) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="hw-dev"><div class="hw-dev-t"><b>' + hwEsc(HW.dev.name || 'Tanpa nama') + '</b>' +
+    '<span>' + (HW.server && HW.server.connected ? 'bersambung · ' + HW.subs + ' notifikasi didengar' : 'terputus') + '</span></div>' +
+    '<button class="hw-dc" id="hwDisc">Putus</button></div>';
+  const d = document.getElementById('hwDisc');
+  if (d) d.onclick = function() { try { HW.dev.gatt.disconnect(); } catch (e) {} };
+}
+function hwPaintLog() {
+  const el = document.getElementById('hwLog');
+  if (!el) return;
+  if (!HW.log.length) { el.innerHTML = '<p class="hw-hint">Belum ada apa-apa. Tekan butang ukur pada meter.</p>'; return; }
+  el.innerHTML = HW.log.map(function(r) {
+    let h = '<div class="hw-row ' + r.kind + '"><span class="hw-tm">' +
+      new Date(r.t).toLocaleTimeString('en-GB', { hour12: false }) + '</span>' +
+      '<span class="hw-tx">' + hwEsc(r.text) + '</span></div>';
+    if (r.data && r.data.length) {
+      // Kalau surveyor menaip apa yang skrin meter papar, padanan itu
+      // muktamad — tiada lagi teka antara dua penyahkod munasabah.
+      const rows = r.data.map(function(g) {
+        const hit = HW.expect > 0 && typeof g.m === 'number' &&
+          Math.abs(g.m - HW.expect) <= Math.max(0.005, HW.expect * 0.01);
+        return { g: g, hit: hit };
+      });
+      const anyHit = rows.some(function(x) { return x.hit; });
+      h += '<div class="hw-guess">' + rows.map(function(x) {
+        const cls = x.hit ? ' good hit' : (!anyHit && x.g.good ? ' good' : '');
+        return '<div class="hw-g' + cls + '"><b>' + (x.hit ? '&#10003; ' : '') + hwEsc(x.g.how) + '</b>' +
+          '<span>' + hwEsc(typeof x.g.m === 'number' ? x.g.m.toFixed(3) + ' m' : x.g.m) + '</span></div>';
+      }).join('') + '</div>';
+    }
+    return h;
+  }).join('');
+}
+async function hwScan() {
+  const btn = document.getElementById('hwScan');
+  if (btn) { btn.disabled = true; btn.textContent = 'Memilih…'; }
+  try {
+    const dev = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true, optionalServices: HW_SERVICES
+    });
+    HW.dev = dev; HW.log = []; HW.subs = 0;
+    dev.addEventListener('gattserverdisconnected', function() {
+      hwSay('warn', 'Peranti terputus');
+      hwPaintDev();
+    });
+    hwSay('ok', 'Dipilih: ' + (dev.name || 'tanpa nama'));
+    hwPaintDev();
+    await hwConnect(dev);
+  } catch (e) {
+    if (!/cancel/i.test(e.message || '')) hwSay('bad', 'Gagal: ' + e.message);
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Cari peranti'; }
+}
+async function hwConnect(dev) {
+  try {
+    const server = await dev.gatt.connect();
+    HW.server = server;
+    hwSay('ok', 'Bersambung. Membaca servis…');
+    let services = [];
+    try { services = await server.getPrimaryServices(); }
+    catch (e) { hwSay('warn', 'Tiada servis yang dikenali. ' + e.message); }
+    if (!services.length) {
+      hwSay('bad', 'Tiada servis yang boleh dilihat. Kalau meter ini Bluetooth Classic (SPP), pelayar memang tidak boleh mencapainya — pulangkan dan cari yang bertanda BLE.');
+    }
+    for (let i = 0; i < services.length; i++) {
+      const sv = services[i];
+      const nm = HW_NAMES[sv.uuid] || sv.uuid.slice(0, 8);
+      let chars = [];
+      try { chars = await sv.getCharacteristics(); } catch (e) { continue; }
+      hwSay('ok', 'Servis ' + nm + ' · ' + chars.length + ' ciri');
+      for (let c = 0; c < chars.length; c++) {
+        const ch = chars[c];
+        if (!ch.properties.notify && !ch.properties.indicate) continue;
+        try {
+          await ch.startNotifications();
+          HW.subs++;
+          ch.addEventListener('characteristicvaluechanged', function(ev) {
+            const dv = ev.target.value;
+            HW.last = { uuid: ch.uuid, bytes: hwHex(dv) };
+            hwSay('data', ch.uuid.slice(0, 8) + ' → ' + hwHex(dv), hwGuess(dv));
+          });
+        } catch (e) {}
+      }
+    }
+    hwPaintDev();
+    if (HW.subs) hwSay('ok', 'Sedia. Tekan butang ukur pada meter sekarang.');
+    else hwSay('warn', 'Tiada ciri yang boleh memberitahu. Meter ini mungkin perlukan arahan dihantar dahulu, atau ia bukan BLE.');
+  } catch (e) {
+    hwSay('bad', 'Tidak dapat bersambung: ' + e.message);
+  }
+}
+
+// ---------- REMOTE ----------
+// Android tidak menghantar kekunci volume kepada halaman web, jadi
+// remote shutter murah selalunya senyap di sini. Gamepad API pula
+// memang direka untuk dibaca, dan itulah yang paling boleh dipercayai.
+function hwPad() {
+  const el = document.getElementById('hwBody');
+  el.innerHTML =
+    '<p class="hw-hint">Tekan mana-mana butang pada remote awak. Halaman ini menunjukkan <b>betul-betul</b> apa yang pelayar terima — kalau tiada apa muncul, remote itu tidak boleh dipakai.</p>' +
+    '<div class="hw-chk warn"><div><b>Kekunci volume tidak akan muncul</b>' +
+    '<span>Android menelannya sebelum sampai ke halaman web. Remote shutter murah kebanyakannya hantar volume — itu sebabnya ia tidak berfungsi, dan tiada kod boleh membetulkannya.</span></div></div>' +
+    '<div class="hw-pad" id="hwPadState">Menunggu…</div>' +
+    '<div class="hw-sec"><span class="hw-sec-l">Apa yang masuk</span><span class="hw-sec-r"></span></div>' +
+    '<div class="hw-log" id="hwLog"></div>';
+  HW.log = []; hwPaintLog();
+  const onKey = function(e) {
+    hwSay('data', 'Kekunci: "' + e.key + '" (code ' + e.code + ')');
+  };
+  document.addEventListener('keydown', onKey);
+  HW._offKey = function() { document.removeEventListener('keydown', onKey); };
+  const seen = {};
+  const tick = function() {
+    if (!document.getElementById('hwPadState')) return;
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    let any = null;
+    for (let i = 0; i < pads.length; i++) {
+      const p = pads[i];
+      if (!p) continue;
+      any = p;
+      for (let b = 0; b < p.buttons.length; b++) {
+        const on = p.buttons[b].pressed;
+        const k = i + ':' + b;
+        if (on && !seen[k]) hwSay('data', 'Gamepad butang ' + b + ' ditekan');
+        seen[k] = on;
+      }
+    }
+    const st = document.getElementById('hwPadState');
+    if (st) st.textContent = any ? ('Gamepad dijumpai: ' + (any.id || 'tanpa nama')) : 'Tiada gamepad. Tekan satu butang untuk membangunkannya.';
+    HW.padRaf = requestAnimationFrame(tick);
+  };
+  tick();
+}
+function hwStopPad() {
+  if (HW.padRaf) cancelAnimationFrame(HW.padRaf);
+  HW.padRaf = 0;
+  if (HW._offKey) { HW._offKey(); HW._offKey = null; }
+}
+
+// ---------- KAMERA ----------
+async function hwCam() {
+  const el = document.getElementById('hwBody');
+  el.innerHTML = '<p class="hw-hint">Kamera yang pelayar ini boleh lihat. Kamera USB-C hanya muncul pada Android 14+ dan bergantung telefon.</p><div id="hwCamList">Menyemak…</div>';
+  let list = [];
+  try {
+    // Label kamera hanya terbuka selepas kebenaran diberi.
+    try { const s = await navigator.mediaDevices.getUserMedia({ video: true }); s.getTracks().forEach(function(t) { t.stop(); }); } catch (e) {}
+    list = (await navigator.mediaDevices.enumerateDevices()).filter(function(d) { return d.kind === 'videoinput'; });
+  } catch (e) {}
+  const box = document.getElementById('hwCamList');
+  // Nota ini benar sama ada kamera dijumpai atau tidak, jadi ia
+  // sentiasa ditunjukkan — itulah soalan sebenar yang orang ada.
+  const note = '<div class="hw-chk warn"><div><b>Borescope Wi-Fi dan kamera termal tidak akan muncul</b>' +
+    '<span>Borescope Wi-Fi stream melalui HTTP dan Pocket berjalan atas HTTPS, jadi pelayar menyekatnya. Kamera termal perlukan SDK Android asli. Untuk kedua-duanya: tangkap dengan app vendor, kemudian import gambar itu ke penemuan.</span></div></div>';
+  if (!list.length) {
+    box.innerHTML = '<div class="hw-chk bad"><div><b>Tiada kamera dilihat</b><span>Benarkan kamera, kemudian buka semula skrin ini.</span></div></div>' + note;
+    return;
+  }
+  box.innerHTML = list.map(function(d, i) {
+    return '<div class="hw-dev"><div class="hw-dev-t"><b>' + hwEsc(d.label || ('Kamera ' + (i + 1))) + '</b>' +
+      '<span>' + hwEsc(d.deviceId.slice(0, 12)) + '…</span></div></div>';
+  }).join('') + note;
+}
+
 
 // Sign out button
 document.getElementById('profileSignOut').addEventListener('click', function() {
@@ -31191,7 +31551,7 @@ async function mdExportUsdz() {
 
 
 // Console banner
-console.log('%cGoXpert Pocket v2.3', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v2.4', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
