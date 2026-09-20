@@ -8486,68 +8486,188 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .md-res span{margin-left:auto;font-family:var(--font-mono);font-size:13px;font-weight:700;color:#4ade80;flex:none}
 .md-res span.bad{color:#f87171}
 
+/* ---------- Log masuk, direka semula (au-) ---------- */
+/* Borang diletak rendah, bukan di tengah: bahagian atas telefon 6.7"
+   tidak boleh dicapai dengan satu tangan semasa memanjat tangga. */
+.au-wrap{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:0 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.au-brand{flex:none;display:flex;align-items:center;gap:10px;padding:calc(20px + env(safe-area-inset-top)) 0 0}
+.au-mk{width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;flex:none}
+.au-bt{min-width:0}
+.au-bt b{display:block;font-size:15px;font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--fg)}
+.au-bt b em{font-family:var(--font-display);font-style:italic;font-weight:400;color:var(--accent)}
+.au-bt span{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:1px}
+.au-gap{flex:1;min-height:14px}
+.au-h{margin:0 0 4px;font-size:27px;font-weight:800;letter-spacing:-.035em;line-height:1.12;color:var(--fg)}
+.au-h em{font-family:var(--font-display);font-style:italic;font-weight:400;color:var(--accent)}
+.au-p{margin:0 0 18px;font-size:13px;color:var(--muted);line-height:1.5}
+.au-fld{margin-bottom:11px}
+.au-fld label{display:block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.au-in{position:relative;display:flex;align-items:center}
+/* 16px menghalang iOS daripada mengezum masuk semasa medan difokus. */
+.au-in input{
+  width:100%;padding:14px 13px;border:1.5px solid var(--line-2);border-radius:13px;
+  background:var(--bg-2);outline:none;font-size:16px;color:var(--fg);font-family:var(--font-body);
+}
+.au-in input:focus{border-color:var(--accent)}
+.au-in.pw input{padding-right:50px}
+.au-eye{position:absolute;right:6px;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:var(--muted);border:none;background:none}
+.au-rowa{display:flex;align-items:center;gap:10px;margin:2px 0 16px}
+.au-chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--fg-2);font-weight:600;border:none;background:none;padding:0}
+.au-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line-2);display:grid;place-items:center;color:transparent;flex:none}
+.au-box.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.au-lnk{margin-left:auto;font-size:12.5px;font-weight:650;color:var(--accent);border:none;background:none;padding:0}
+.au-go{
+  display:block;width:100%;padding:16px;border-radius:14px;background:var(--accent);color:var(--accent-fg);
+  font-size:15.5px;font-weight:700;text-align:center;border:none;font-family:var(--font-body);
+}
+.au-go.alt{background:var(--bg);border:1.5px solid var(--line-2);color:var(--fg-2);margin-top:8px}
+.au-go:disabled{opacity:.5}
+.au-foot{flex:none;padding:14px 0 calc(18px + env(safe-area-inset-bottom));text-align:center;font-size:12.5px;color:var(--muted)}
+.au-foot a{color:var(--accent);font-weight:700;cursor:pointer}
+.au-msg{display:flex;gap:9px;padding:11px 12px;border-radius:12px;font-size:12.5px;line-height:1.45;margin-bottom:12px}
+.au-msg b{display:block;font-weight:700;margin-bottom:1px}
+.au-msg span{color:var(--fg-2);font-weight:400}
+.au-msg.bad{background:var(--critical-soft);color:var(--critical)}
+.au-msg.warn{background:var(--warning-soft);color:var(--warning)}
+.au-msg.ok{background:var(--success-soft);color:var(--success)}
+.au-msg .mi{flex:none;margin-top:1px}
+.au-meter{display:flex;gap:4px;margin-top:7px}
+.au-meter i{flex:1;height:4px;border-radius:99px;background:var(--surface-2)}
+.au-meter i.on{background:var(--success)}
+.au-meter i.mid{background:var(--warning)}
+.au-mtxt{font-size:11px;color:var(--muted);margin-top:5px}
+.au-hide{display:none!important}
+
+/* ---------- Profile, direka semula (pr-) ---------- */
+.pr-head{
+  flex:none;display:flex;align-items:center;gap:12px;
+  padding:calc(16px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid var(--line);
+}
+.pr-av{
+  width:46px;height:46px;border-radius:15px;flex:none;display:grid;place-items:center;
+  font-size:17px;font-weight:800;color:#fff;background:linear-gradient(145deg,#2f63e8,#12328f);
+}
+.pr-ht{min-width:0;flex:1}
+.pr-ht b{display:block;font-size:17px;font-weight:800;letter-spacing:-.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr-ht span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr-edit{flex:none;padding:8px 12px;border-radius:10px;background:var(--surface);font-size:12px;font-weight:700;color:var(--fg-2);border:none}
+.pr-body{padding:14px 16px 6px}
+.pr-sec{display:flex;align-items:center;gap:8px;margin:18px 2px 9px}
+.pr-sec:first-child{margin-top:0}
+.pr-sec-l{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pr-sec-r{flex:1;height:1px;background:var(--line)}
+
+.pr-pid{display:flex;align-items:center;gap:13px;padding:14px;border-radius:15px;background:var(--accent-soft);border:1px solid var(--accent-line);margin-bottom:9px;width:100%;text-align:left}
+.pr-pid-q{width:56px;height:56px;border-radius:11px;background:var(--bg);display:grid;place-items:center;flex:none;padding:5px;color:var(--fg)}
+.pr-pid-t{min-width:0;flex:1}
+.pr-pid-t b{display:block;font-family:var(--font-mono);font-size:21px;font-weight:700;letter-spacing:.1em;color:var(--accent)}
+.pr-pid-t span{display:block;font-size:11.5px;color:var(--fg-dim);margin-top:3px;line-height:1.4}
+.pr-pid-c{flex:none;padding:9px 12px;border-radius:10px;background:var(--accent);color:var(--accent-fg);font-size:12px;font-weight:700;border:none}
+
+.pr-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:13px;border:1px solid var(--line);background:var(--bg);margin-bottom:7px;text-align:left;color:var(--fg)}
+.pr-ri{width:32px;height:32px;border-radius:9px;background:var(--surface);display:grid;place-items:center;flex:none;color:var(--fg-2)}
+.pr-rt{min-width:0;flex:1}
+.pr-rt b{display:block;font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+.pr-rt span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.pr-rt span em{font-style:normal;color:var(--warning);font-weight:650}
+.pr-re{flex:none;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);font-weight:600}
+.pr-sw{flex:none;width:44px;height:26px;border-radius:99px;background:var(--surface-2);position:relative;border:none}
+.pr-sw i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:var(--shadow-1);transition:transform .18s}
+.pr-sw.on{background:var(--success)} .pr-sw.on i{transform:translateX(18px)}
+.pr-row.bad{border-color:var(--critical)}
+.pr-row.bad .pr-rt b{color:var(--critical)}
+.pr-row.bad .pr-ri{background:var(--critical-soft);color:var(--critical)}
+
+.pr-sync{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:2px}
+.pr-syb{padding:11px;border-radius:13px;border:1px solid var(--line);background:var(--bg)}
+.pr-syb b{display:block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.pr-syb.cloud b{color:var(--success)}
+.pr-syb.here b{color:var(--warning)}
+.pr-syb span{display:block;font-size:11.5px;color:var(--fg-dim);line-height:1.5}
+
+.pr-disk{border:1px solid var(--line);border-radius:15px;padding:13px;background:var(--bg-2);margin-bottom:9px}
+.pr-disk-t{display:flex;align-items:baseline;gap:8px;margin-bottom:9px}
+.pr-disk-t b{font-size:13.5px;font-weight:700}
+.pr-disk-t span{margin-left:auto;font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
+.pr-bar{height:9px;border-radius:99px;background:var(--surface-2);overflow:hidden;display:flex}
+.pr-bar i{display:block;height:100%}
+.pr-leg{display:flex;gap:11px;flex-wrap:wrap;margin-top:9px}
+.pr-leg em{font-style:normal;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-dim)}
+.pr-dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+.pr-out{display:block;width:100%;padding:14px;border-radius:13px;border:1px solid var(--critical);color:var(--critical);font-size:14px;font-weight:700;text-align:center;margin-top:14px;background:var(--bg)}
+.pr-tiny{font-size:11px;color:var(--muted);line-height:1.5;margin:9px 2px 0;text-align:center}
+
+/* Skrin simpanan */
+.pr-disk-screen{position:fixed;inset:0;z-index:2350;background:var(--bg);display:none;flex-direction:column}
+.pr-disk-screen.show{display:flex}
+.pr-disk-body{flex:1;min-height:0;overflow-y:auto;padding:14px 16px calc(20px + env(safe-area-inset-bottom))}
+.pr-disk-body::-webkit-scrollbar{width:0}
+
 </style>
 </head>
 <body class="has-bottom-nav">
 
 <!-- ============ AUTH SCREEN ============ -->
 <div class="auth-screen show" id="authScreen">
-  <div class="auth-card">
-    <div class="auth-brand">
-      <div class="auth-mark">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-          <path d="M12 2L2 7v10l10 5 10-5V7l-10-5zM12 12l8-4M12 12v9M12 12L4 8"/>
-        </svg>
-      </div>
-      <h1 class="auth-title">GoXpert <em>Pocket</em></h1>
-      <div class="auth-sub">AI Surveyor Companion</div>
+  <!-- Jenama kecil di atas, borang di bawah: bahagian atas telefon
+       besar tidak boleh dicapai dengan satu tangan di tapak. -->
+  <div class="au-wrap">
+    <div class="au-brand">
+      <span class="au-mk"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 2 2.8 6.6v9.2L12 22l9.2-6.2V6.6z"/><path d="M12 2v9.5l9.2-4.9M12 11.5 2.8 6.6M12 11.5V22"/></svg></span>
+      <span class="au-bt"><b>GoXpert <em>Pocket</em></b><span>Surveyor companion</span></span>
     </div>
-    
-    <div class="auth-meta">
-      <div class="auth-meta-label">Built for</div>
-      Building surveyors, inspectors,<br>and defect-management professionals
+    <div class="au-gap"></div>
+
+    <!-- Tiada talian: beritahu apa yang MASIH boleh, bukan hanya apa yang gagal -->
+    <div id="authOffline" class="au-hide">
+      <h2 class="au-h">Tiada isyarat <em>di sini</em></h2>
+      <p class="au-p">Basement, bilik enjin, tapak jauh — ini biasa.</p>
+      <div class="au-msg bad"><span class="mi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.7 12.6A6 6 0 0 0 12 10.6M5 12.5a10 10 0 0 1 3.2-2.2M2 8.8A15 15 0 0 1 7 6M22 8.8a15 15 0 0 0-7.6-2.7M12 19h.01"/></svg></span>
+        <div><b>Log masuk perlukan talian</b><span>Pengesahan berlaku di pelayan, jadi tiada isyarat bermakna tiada log masuk baharu. Ini bukan kerosakan app.</span></div></div>
+      <div class="au-msg ok"><span class="mi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg></span>
+        <div><b>Kalau awak sudah masuk sebelum ini</b><span>Pocket terus jalan tanpa talian: gambar, penemuan, ukuran, pelan dan model semuanya disimpan dalam telefon dan dihantar sendiri bila isyarat kembali.</span></div></div>
+      <div class="au-msg warn"><span class="mi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/></svg></span>
+        <div><b>Sebab itu "Kekal masuk" dihidupkan</b><span>Keluar akaun sebelum turun ke basement bermakna terkunci di luar sehingga dapat isyarat semula.</span></div></div>
     </div>
-    
-    <!-- LOGIN -->
-    <div class="auth-form" id="loginForm">
-      <div class="auth-field">
-        <label class="auth-label">Email Address</label>
-        <input type="email" class="auth-input" id="loginEmail" placeholder="surveyor@example.com" autocomplete="email">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Password</label>
-        <input type="password" class="auth-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+
+    <!-- MASUK -->
+    <div id="loginForm">
+      <h2 class="au-h">Masuk semula, <em>teruskan kerja</em></h2>
+      <p class="au-p">Inspection, penemuan dan pelan awak menunggu di tempat awak tinggalkan.</p>
+      <div class="au-fld"><label for="loginEmail">E-mel</label>
+        <div class="au-in"><input type="email" id="loginEmail" placeholder="awak@syarikat.com" autocomplete="email" inputmode="email"></div></div>
+      <div class="au-fld"><label for="loginPassword">Kata laluan</label>
+        <div class="au-in pw"><input type="password" id="loginPassword" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" autocomplete="current-password">
+          <button class="au-eye" type="button" data-eye="loginPassword" aria-label="Tunjuk kata laluan"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.6 12S5.5 5 12 5s10.4 7 10.4 7-3.9 7-10.4 7S1.6 12 1.6 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="au-rowa">
+        <button class="au-chk" type="button" id="authStay"><span class="au-box on" id="authStayBox"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg></span>Kekal masuk</button>
+        <button class="au-lnk" type="button" id="authForgot">Lupa kata laluan?</button>
       </div>
       <div class="auth-error" id="loginError"></div>
-      <button class="auth-btn" id="loginBtn">
-        <span id="loginBtnText">Sign In</span>
-      </button>
-      <div class="auth-divider">
-        New to Pocket? <a id="showSignup">Create an account</a>
-      </div>
+      <button class="au-go" id="loginBtn"><span id="loginBtnText">Masuk</span></button>
+      <div class="au-foot">Belum ada akaun? <a id="showSignup">Buat satu</a></div>
     </div>
-    
-    <!-- SIGNUP -->
-    <div class="auth-form" id="signupForm" style="display:none">
-      <div class="auth-field">
-        <label class="auth-label">Full Name</label>
-        <input type="text" class="auth-input" id="signupName" placeholder="Ahmad Fikri" autocomplete="name">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Email Address</label>
-        <input type="email" class="auth-input" id="signupEmail" placeholder="surveyor@example.com" autocomplete="email">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Password (min 6 chars)</label>
-        <input type="password" class="auth-input" id="signupPassword" placeholder="••••••••" autocomplete="new-password">
-      </div>
+
+    <!-- AKAUN BAHARU -->
+    <div id="signupForm" style="display:none">
+      <h2 class="au-h">Buat akaun <em>Pocket</em></h2>
+      <p class="au-p">Satu akaun, satu Pocket ID. Kod itulah yang orang lain guna untuk hantar mesej dan untuk jadi pemerhati keselamatan awak.</p>
+      <div class="au-fld"><label for="signupName">Nama penuh</label>
+        <div class="au-in"><input type="text" id="signupName" placeholder="Nama yang keluar dalam laporan" autocomplete="name"></div></div>
+      <div class="au-fld"><label for="signupEmail">E-mel</label>
+        <div class="au-in"><input type="email" id="signupEmail" placeholder="awak@syarikat.com" autocomplete="email" inputmode="email"></div></div>
+      <div class="au-fld"><label for="signupPassword">Kata laluan</label>
+        <div class="au-in pw"><input type="password" id="signupPassword" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" autocomplete="new-password">
+          <button class="au-eye" type="button" data-eye="signupPassword" aria-label="Tunjuk kata laluan"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.6 12S5.5 5 12 5s10.4 7 10.4 7-3.9 7-10.4 7S1.6 12 1.6 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+        <div class="au-meter" id="pwMeter"><i></i><i></i><i></i></div>
+        <div class="au-mtxt" id="pwText">Enam aksara sekurang-kurangnya.</div></div>
+      <div style="height:12px"></div>
       <div class="auth-error" id="signupError"></div>
-      <button class="auth-btn" id="signupBtn">
-        <span id="signupBtnText">Create Account</span>
-      </button>
-      <div class="auth-divider">
-        Already registered? <a id="showLogin">Sign in</a>
-      </div>
+      <button class="au-go" id="signupBtn"><span id="signupBtnText">Buat akaun</span></button>
+      <div class="au-foot">Dah ada akaun? <a id="showLogin">Masuk</a></div>
     </div>
   </div>
 </div>
@@ -8933,114 +9053,90 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   
   <!-- PROFILE MODE -->
   <main class="profile-mode" id="profileMode">
-    <div class="profile-content">
-      
-      <div class="profile-header">
-        <div class="profile-avatar" id="profileAvatar">F</div>
-        <h1 class="profile-name" id="profileName">Surveyor</h1>
-        <div class="profile-email" id="profileEmail">user@example.com</div>
+    <div class="pr-head">
+      <span class="pr-av" id="profileAvatar">S</span>
+      <span class="pr-ht"><b id="profileName">Surveyor</b><span id="profileEmail">—</span></span>
+      <button class="pr-edit" id="profileEdit">Ubah</button>
+    </div>
+    <div class="profile-content pr-body">
+
+      <div class="pr-sec"><span class="pr-sec-l">Pocket ID awak</span><span class="pr-sec-r"></span></div>
+      <button class="pr-pid" id="profilePidCopy">
+        <span class="pr-pid-q" id="profilePidQr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+        <span class="pr-pid-t"><b id="profilePid">—</b>
+          <span>Orang lain guna kod ini untuk hantar mesej kepada awak, dan untuk jadi pemerhati Site safety.</span></span>
+        <span class="pr-pid-c" id="profilePidBtn">Tunjuk</span>
+      </button>
+      <button class="pr-row" id="profilePidNew">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5 21 2M17 6l3 3M14 9l2.5 2.5"/></svg></span>
+        <span class="pr-rt"><b>Tukar Pocket ID</b><span>Kalau kod lama tersebar kepada orang yang awak tak mahu.</span></span>
+      </button>
+
+      <div class="pr-sec"><span class="pr-sec-l">Apa telefon ini pegang</span><span class="pr-sec-r"></span></div>
+      <button class="pr-row" id="profileDisk">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+        <span class="pr-rt"><b>Simpanan</b><span id="profileDiskSub">mengira…</span></span>
+        <span class="pr-re">Lihat</span>
+      </button>
+      <div class="pr-sync">
+        <div class="pr-syb cloud"><b>Dalam awan</b><span>Inspection, penemuan, ruang, tugasan, mesej, Pocket ID</span></div>
+        <div class="pr-syb here"><b>Telefon ini sahaja</b><span>Gambar penuh, pelan, model 3D, fail Library besar, nota suara</span></div>
       </div>
 
-      <div class="profile-section">
-        <div class="profile-section-title">
-          <span>Your Pocket ID</span>
-          <div class="profile-section-line"></div>
-        </div>
-        <button class="profile-row" id="profilePidCopy">
-          <div class="profile-row-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="12" r="2.4"/><path d="M14 10h4M14 14h3"/></svg>
-          </div>
-          <div class="profile-row-content">
-            <div class="profile-row-label">Give this to your safety contact</div>
-            <div class="profile-row-sub">Tap to show the QR they can scan.</div>
-          </div>
-          <span class="sw-pid" id="profilePid">—</span>
-        </button>
+      <div class="pr-sec"><span class="pr-sec-l">Keutamaan</span><span class="pr-sec-r"></span></div>
+      <div class="pr-row" id="profileThemeRow">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></span>
+        <span class="pr-rt"><b>Mod gelap</b><span id="profileThemeSub">—</span></span>
+        <button class="pr-sw" id="profileThemeToggle"><i></i></button>
       </div>
-      
-      <div class="profile-section">
-        <div class="profile-section-title">
-          <span>Preferences</span>
-          <div class="profile-section-line"></div>
-        </div>
-        
-        <button class="profile-row" id="profileThemeRow">
-          <div class="profile-row-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </div>
-          <div class="profile-row-content">
-            <div class="profile-row-label">Dark mode</div>
-            <div class="profile-row-sub" id="profileThemeSub">Currently using light theme</div>
-          </div>
-          <div class="profile-toggle-track" id="profileThemeToggle">
-            <div class="profile-toggle-knob"></div>
-          </div>
-        </button>
-        
-        <button class="profile-row" id="profileConsultRow">
-          <div class="profile-row-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </div>
-          <div class="profile-row-content">
-            <div class="profile-row-label">Consultant Mode</div>
-            <div class="profile-row-sub" id="profileConsultSub">Structured technical responses</div>
-          </div>
-          <div class="profile-toggle-track" id="profileConsultToggle">
-            <div class="profile-toggle-knob"></div>
-          </div>
-        </button>
+      <div class="pr-row" id="profileConsultRow">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg></span>
+        <span class="pr-rt"><b>Mod perunding</b><span id="profileConsultSub">—</span></span>
+        <button class="pr-sw" id="profileConsultToggle"><i></i></button>
       </div>
-      
-      <div class="profile-section">
-        <div class="profile-section-title">
-          <span>Data</span>
-          <div class="profile-section-line"></div>
-        </div>
-        
-        <button class="profile-row" id="profileClearRow">
-          <div class="profile-row-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
-          </div>
-          <div class="profile-row-content">
-            <div class="profile-row-label">Clear chat history</div>
-            <div class="profile-row-sub">Permanently delete all messages</div>
-          </div>
-          <svg class="profile-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
+      <button class="pr-row" id="profileNotif">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+        <span class="pr-rt"><b>Pemberitahuan</b><span>Hanya semasa Pocket terbuka.</span></span>
+        <span class="pr-re" id="profileNotifState">—</span>
+      </button>
+
+      <div class="pr-sec"><span class="pr-sec-l">Keselamatan</span><span class="pr-sec-r"></span></div>
+      <button class="pr-row" id="profileWatcher">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 3 6.4v5.3c0 5 3.8 9.3 9 10.4 5.2-1.1 9-5.4 9-10.4V6.4z"/><path d="M9.2 12.2 11.3 14.3 15 10.6"/></svg></span>
+        <span class="pr-rt"><b>Pemerhati Site safety</b><span id="profileWatcherSub">Belum ditetapkan</span></span>
+        <span class="pr-re">Ubah</span>
+      </button>
+      <button class="pr-row" id="profilePwd">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5 21 2M17 6l3 3M14 9l2.5 2.5"/></svg></span>
+        <span class="pr-rt"><b>Tukar kata laluan</b><span>Awak akan kekal masuk pada telefon ini.</span></span>
+      </button>
+
+      <div class="pr-sec"><span class="pr-sec-l">Data</span><span class="pr-sec-r"></span></div>
+      <button class="pr-row" id="profileClearRow">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></span>
+        <span class="pr-rt"><b>Kosongkan sejarah chat AI</b><span>Mesej dengan Ask Pocket sahaja. Inspection tidak disentuh.</span></span>
+      </button>
+
+      <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
+      <div class="pr-row" style="cursor:default">
+        <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.3 · build 20 Sep 2026 · Log masuk + Profile</span></span>
       </div>
-      
-      <div class="profile-section">
-        <div class="profile-section-title">
-          <span>About</span>
-          <div class="profile-section-line"></div>
-        </div>
-        
-        <div class="profile-row" style="cursor:default">
-          <div class="profile-row-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          </div>
-          <div class="profile-row-content">
-            <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v2.2 · build 20 Sep 2026 · Model 3D (GLB)</div>
-          </div>
-        </div>
-        
-        <div class="profile-row" style="cursor:default">
-          <div class="profile-row-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-          </div>
-          <div class="profile-row-content">
-            <div class="profile-row-label">Powered by</div>
-            <div class="profile-row-sub">Go Xpert Solution · ACPIM Member</div>
-          </div>
-        </div>
-      </div>
-      
-      <button class="profile-signout" id="profileSignOut">Sign out</button>
-      
+
+      <button class="pr-out" id="profileSignOut">Keluar akaun</button>
+      <p class="pr-tiny">Keluar akaun tidak memadam apa-apa dari telefon ini.</p>
     </div>
   </main>
-  
+
+  <!-- SIMPANAN: apa telefon ini pegang, dan apa selamat dibuang -->
+  <div class="pr-disk-screen" id="diskScreen">
+    <div class="pr-head">
+      <button class="pr-ri" id="diskBack" style="width:34px;height:34px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+      <span class="pr-ht"><b>Simpanan</b><span>Apa telefon ini pegang</span></span>
+    </div>
+    <div class="pr-disk-body" id="diskBody"></div>
+  </div>
+
   <!-- CHAT MODE -->
   <main class="chat-mode hidden" id="chatMode">
     
@@ -9052,7 +9148,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v2.2</span>
+      <span class="chat-build" title="Build">v2.3</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -10131,8 +10227,8 @@ auth.onAuthStateChanged(async (user) => {
     currentUser = user;
     const lTxt = document.getElementById('loginBtnText');
     const sTxt = document.getElementById('signupBtnText');
-    if (lTxt) lTxt.textContent = 'Loading...';
-    if (sTxt) sTxt.textContent = 'Loading...';
+    if (lTxt) lTxt.textContent = 'Memuatkan…';
+    if (sTxt) sTxt.textContent = 'Memuatkan…';
     
     try {
       await loadConfig();
@@ -10159,20 +10255,116 @@ auth.onAuthStateChanged(async (user) => {
     const sBtn = document.getElementById('signupBtn');
     const sTxt = document.getElementById('signupBtnText');
     if (lBtn) lBtn.disabled = false;
-    if (lTxt) lTxt.textContent = 'Sign In';
+    if (lTxt) lTxt.textContent = 'Masuk';
     if (sBtn) sBtn.disabled = false;
-    if (sTxt) sTxt.textContent = 'Create Account';
+    if (sTxt) sTxt.textContent = 'Buat akaun';
+    if (typeof auPaintOnline === 'function') auPaintOnline();
   }
 });
 
 document.getElementById('showSignup').addEventListener('click', () => {
   document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('signupForm').style.display = 'flex';
+  document.getElementById('signupForm').style.display = '';
 });
 document.getElementById('showLogin').addEventListener('click', () => {
   document.getElementById('signupForm').style.display = 'none';
-  document.getElementById('loginForm').style.display = 'flex';
+  document.getElementById('loginForm').style.display = '';
 });
+// =======================================================
+// LOG MASUK — mata, kekal masuk, set semula, tiada isyarat
+// =======================================================
+const AU_STAY = 'pocket_auth_stay_v1';
+let auStay = true;
+try { const v = localStorage.getItem(AU_STAY); if (v !== null) auStay = v === '1'; } catch (e) {}
+
+const AU_EYE_ON = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.6 12S5.5 5 12 5s10.4 7 10.4 7-3.9 7-10.4 7S1.6 12 1.6 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const AU_EYE_OFF = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 5.2A9.8 9.8 0 0 1 12 5c6.5 0 10.4 7 10.4 7a17 17 0 0 1-3.2 4M6.3 6.4A17 17 0 0 0 1.6 12S5.5 19 12 19a9.7 9.7 0 0 0 4-.85"/><path d="M3 3l18 18"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+
+function auPaintStay() {
+  const box = document.getElementById('authStayBox');
+  if (box) box.classList.toggle('on', auStay);
+}
+// Tanpa talian, log masuk baharu memang tidak boleh. Yang berguna
+// bukan memberitahu ia gagal, tetapi memberitahu apa yang masih jalan.
+function auPaintOnline() {
+  const off = document.getElementById('authOffline');
+  const lf = document.getElementById('loginForm');
+  const sf = document.getElementById('signupForm');
+  if (!off || !lf) return;
+  const on = navigator.onLine !== false;
+  off.classList.toggle('au-hide', on);
+  if (!on) { lf.style.display = 'none'; if (sf) sf.style.display = 'none'; }
+  else if (sf && sf.style.display !== 'none') { lf.style.display = 'none'; }
+  else { lf.style.display = ''; }
+}
+function auPwStrength() {
+  const el = document.getElementById('signupPassword');
+  const m = document.getElementById('pwMeter');
+  const t = document.getElementById('pwText');
+  if (!el || !m || !t) return;
+  const n = el.value.length;
+  const lvl = n === 0 ? 0 : (n < 6 ? 1 : (n < 10 ? 2 : 3));
+  const bars = m.querySelectorAll('i');
+  for (let i = 0; i < bars.length; i++) {
+    bars[i].className = '';
+    if (lvl >= i + 1) bars[i].className = (lvl === 1 || (lvl === 2 && i === 1)) ? 'mid' : 'on';
+  }
+  t.textContent = n === 0 ? 'Enam aksara sekurang-kurangnya.'
+    : lvl === 1 ? 'Terlalu pendek — enam aksara sekurang-kurangnya.'
+    : lvl === 2 ? 'Boleh. Sepuluh aksara lebih baik.' : 'Bagus.';
+}
+function auWire() {
+  auPaintStay(); auPaintOnline();
+  window.addEventListener('online', auPaintOnline);
+  window.addEventListener('offline', auPaintOnline);
+
+  document.querySelectorAll('[data-eye]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const inp = document.getElementById(btn.dataset.eye);
+      if (!inp) return;
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.innerHTML = show ? AU_EYE_OFF : AU_EYE_ON;
+      try { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+    });
+  });
+
+  const stay = document.getElementById('authStay');
+  if (stay) stay.addEventListener('click', function() {
+    auStay = !auStay;
+    try { localStorage.setItem(AU_STAY, auStay ? '1' : '0'); } catch (e) {}
+    auPaintStay();
+    showToast(auStay ? 'Kekal masuk — penting kalau awak kerja di kawasan tiada isyarat.'
+                     : 'Awak akan diminta masuk semula setiap kali.');
+  });
+
+  // Tanpa ini, lupa kata laluan bermakna terkunci selama-lamanya.
+  const forgot = document.getElementById('authForgot');
+  if (forgot) forgot.addEventListener('click', async function() {
+    const el = document.getElementById('loginEmail');
+    const err = document.getElementById('loginError');
+    const email = (el ? el.value : '').trim();
+    if (!email) { if (err) { err.textContent = 'Taip e-mel awak dahulu, kemudian tekan ini.'; err.classList.add('show'); } if (el) el.focus(); return; }
+    forgot.disabled = true; forgot.textContent = 'Menghantar…';
+    try {
+      await auth.sendPasswordResetEmail(email);
+      if (err) { err.classList.remove('show'); }
+      showToast('Pautan set semula dihantar ke ' + email);
+    } catch (e) {
+      if (err) { err.textContent = friendlyAuthError(e); err.classList.add('show'); }
+    }
+    forgot.disabled = false; forgot.textContent = 'Lupa kata laluan?';
+  });
+
+  const sp = document.getElementById('signupPassword');
+  if (sp) sp.addEventListener('input', auPwStrength);
+
+  // Enter pada medan terakhir menghantar borang.
+  const lp = document.getElementById('loginPassword');
+  if (lp) lp.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+  if (sp) sp.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('signupBtn').click(); });
+}
+try { auWire(); } catch (e) { console.warn('[Auth wire]', e.message); }
 
 document.getElementById('loginBtn').addEventListener('click', async () => {
   const email = document.getElementById('loginEmail').value.trim();
@@ -10182,15 +10374,22 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
   const txt = document.getElementById('loginBtnText');
   
   errEl.classList.remove('show');
-  if (!email || !pwd) { errEl.textContent = 'Please enter your email and password.'; errEl.classList.add('show'); return; }
+  if (!email || !pwd) { errEl.textContent = 'Isi e-mel dan kata laluan dahulu.'; errEl.classList.add('show'); return; }
   
-  btn.disabled = true; txt.textContent = 'Signing in...';
+  btn.disabled = true; txt.textContent = 'Memasukkan…';
   try {
+    // LOCAL bertahan selepas app ditutup; SESSION hilang. Pilihan ini
+    // penting di tapak: keluar akaun sebelum turun ke basement
+    // bermakna terkunci di luar sehingga ada isyarat semula.
+    try {
+      const P = firebase.auth.Auth.Persistence;
+      await auth.setPersistence(auStay ? P.LOCAL : P.SESSION);
+    } catch (pe) { console.warn('[Auth persistence]', pe.message); }
     await auth.signInWithEmailAndPassword(email, pwd);
   } catch (e) {
     errEl.textContent = friendlyAuthError(e);
     errEl.classList.add('show');
-    btn.disabled = false; txt.textContent = 'Sign In';
+    btn.disabled = false; txt.textContent = 'Masuk';
   }
 });
 
@@ -10203,10 +10402,10 @@ document.getElementById('signupBtn').addEventListener('click', async () => {
   const txt = document.getElementById('signupBtnText');
   
   errEl.classList.remove('show');
-  if (!name || !email || !pwd) { errEl.textContent = 'Please fill in all fields.'; errEl.classList.add('show'); return; }
-  if (pwd.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.classList.add('show'); return; }
+  if (!name || !email || !pwd) { errEl.textContent = 'Isi semua medan dahulu.'; errEl.classList.add('show'); return; }
+  if (pwd.length < 6) { errEl.textContent = 'Kata laluan mesti enam aksara sekurang-kurangnya.'; errEl.classList.add('show'); return; }
   
-  btn.disabled = true; txt.textContent = 'Creating account...';
+  btn.disabled = true; txt.textContent = 'Membuat akaun…';
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pwd);
     await cred.user.updateProfile({ displayName: name });
@@ -10217,21 +10416,23 @@ document.getElementById('signupBtn').addEventListener('click', async () => {
   } catch (e) {
     errEl.textContent = friendlyAuthError(e);
     errEl.classList.add('show');
-    btn.disabled = false; txt.textContent = 'Create Account';
+    btn.disabled = false; txt.textContent = 'Buat akaun';
   }
 });
 
 function friendlyAuthError(e) {
   const code = e.code || '';
-  if (code.includes('user-not-found')) return 'Account not found.';
-  if (code.includes('wrong-password')) return 'Incorrect password.';
-  if (code.includes('invalid-credential')) return 'Email or password is incorrect.';
-  if (code.includes('email-already-in-use')) return 'This email is already registered.';
-  if (code.includes('invalid-email')) return 'Invalid email format.';
-  if (code.includes('weak-password')) return 'Password is too weak.';
-  if (code.includes('too-many-requests')) return 'Too many attempts. Try again later.';
-  if (code.includes('network')) return 'Network issue. Check your connection.';
-  return e.message || 'Unexpected error.';
+  if (code.includes('user-not-found')) return 'Tiada akaun dengan e-mel itu.';
+  if (code.includes('wrong-password')) return 'Kata laluan salah.';
+  if (code.includes('invalid-credential')) return 'E-mel atau kata laluan salah.';
+  if (code.includes('email-already-in-use')) return 'E-mel itu sudah didaftarkan. Cuba masuk.';
+  if (code.includes('invalid-email')) return 'Format e-mel tidak betul.';
+  if (code.includes('weak-password')) return 'Kata laluan terlalu lemah — enam aksara sekurang-kurangnya.';
+  if (code.includes('too-many-requests')) return 'Terlalu banyak percubaan. Cuba lagi sebentar nanti.';
+  // Ralat rangkaian memberitahu surveyor yang app rosak. Ia tidak
+  // rosak — basement memang tiada isyarat.
+  if (code.includes('network')) return 'Tiada talian. Log masuk perlukan isyarat; kerja yang sudah ada dalam telefon tidak terjejas.';
+  return e.message || 'Ada masalah yang tidak dijangka.';
 }
 
 // =======================================================
@@ -21377,15 +21578,28 @@ function initProfile() {
   const themeToggle = document.getElementById('profileThemeToggle');
   const themeSub = document.getElementById('profileThemeSub');
   themeToggle.classList.toggle('on', currentTheme === 'dark');
-  themeSub.textContent = currentTheme === 'dark' ? 'Currently using dark theme' : 'Currently using light theme';
+  themeSub.textContent = currentTheme === 'dark' ? 'Sedang guna tema gelap.' : 'Sedang guna tema cerah.';
   
   // Consultant toggle state
   const consultToggle = document.getElementById('profileConsultToggle');
   const consultSub = document.getElementById('profileConsultSub');
   consultToggle.classList.toggle('on', currentMode === 'consultant');
   consultSub.textContent = currentMode === 'consultant' ?
-    'Active — structured technical responses' :
-    'Inactive — quick conversational answers';
+    'Jawapan berstruktur dengan rujukan.' :
+    'Jawapan ringkas dan bersembang.';
+
+  const nt = document.getElementById('profileNotifState');
+  if (nt) nt.textContent = !window.Notification ? 'tiada'
+    : (Notification.permission === 'granted' ? 'Hidup'
+      : (Notification.permission === 'denied' ? 'Disekat' : 'Benarkan'));
+
+  const ws = document.getElementById('profileWatcherSub');
+  if (ws) {
+    const nm = (typeof SOS !== 'undefined' && SOS && SOS.watcherName) ? SOS.watcherName : '';
+    const every = (typeof SOS !== 'undefined' && SOS && SOS.everyMin) ? SOS.everyMin : 0;
+    ws.textContent = nm ? (nm + (every ? ' · check-in setiap ' + every + ' minit' : '')) : 'Belum ditetapkan';
+  }
+  if (typeof prPaintDiskSub === 'function') prPaintDiskSub();
 }
 
 // Theme toggle row
@@ -21410,9 +21624,235 @@ document.getElementById('profileClearRow').addEventListener('click', function() 
   }
 });
 
+// =======================================================
+// SIMPANAN — apa telefon ini pegang, dan apa selamat dibuang
+// =======================================================
+// Model 3D boleh 30 MB setiap satu, gambar penuh dan pelan berpuluh
+// MB lagi. Semuanya dalam telefon, semuanya tidak kelihatan, dan
+// sebelum ini tiada cara melepaskan ruang. Perbezaan yang paling
+// penting di sini: membuang FAIL bukan membuang REKOD.
+const PR_KINDS = [
+  { k: 'model',  n: 'Model 3D',        c: '#5B8DEF', pre: 'model:' },
+  { k: 'insp',   n: 'Gambar penemuan', c: '#22c55e', pre: 'insp:' },
+  { k: 'plan',   n: 'Pelan lantai',    c: '#f59e0b', pre: 'plan:' },
+  { k: 'memo',   n: 'Nota suara',      c: '#f472b6', pre: 'memo:' },
+  { k: 'lib',    n: 'Library',         c: '#a78bfa', pre: '' }
+];
+function prBytes(b) {
+  if (!b) return '0 B';
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(0) + ' KB';
+  if (b < 1073741824) return (b / 1048576).toFixed(1) + ' MB';
+  return (b / 1073741824).toFixed(2) + ' GB';
+}
+// Satu imbasan IndexedDB, dikumpul mengikut awalan kunci. Kunci itu
+// sudah pun membezakan jenis — model:, insp:, plan:, memo: — jadi
+// tiada indeks tambahan diperlukan.
+function prScan() {
+  return new Promise(function(res) {
+    const out = { total: 0, by: {}, jobs: {} };
+    PR_KINDS.forEach(function(k) { out.by[k.k] = 0; });
+    let req;
+    try { req = indexedDB.open(LB_IDB); } catch (e) { res(out); return; }
+    req.onerror = function() { res(out); };
+    req.onsuccess = function() {
+      const db2 = req.result;
+      let tx;
+      try { tx = db2.transaction('files', 'readonly'); } catch (e) { res(out); return; }
+      const cur = tx.objectStore('files').openCursor();
+      cur.onsuccess = function(ev) {
+        const c = ev.target.result;
+        if (!c) { res(out); return; }
+        const id = String(c.key || '');
+        const v = c.value || {};
+        const size = (v.blob && v.blob.size) || 0;
+        out.total += size;
+        let kind = 'lib';
+        for (let i = 0; i < PR_KINDS.length; i++) {
+          if (PR_KINDS[i].pre && id.indexOf(PR_KINDS[i].pre) === 0) { kind = PR_KINDS[i].k; break; }
+        }
+        out.by[kind] += size;
+        // insp:<inspId>:... dan model:<id> — hanya yang pertama boleh
+        // dikaitkan dengan job daripada kuncinya sahaja.
+        if (kind === 'insp') {
+          const parts = id.split(':');
+          if (parts[1]) out.jobs[parts[1]] = (out.jobs[parts[1]] || 0) + size;
+        }
+        c.continue();
+      };
+      cur.onerror = function() { res(out); };
+    };
+  });
+}
+function prOpenDisk() {
+  const sc = document.getElementById('diskScreen');
+  if (sc) sc.classList.add('show');
+  prPaintDisk();
+}
+function prCloseDisk() {
+  const sc = document.getElementById('diskScreen');
+  if (sc) sc.classList.remove('show');
+  prPaintDiskSub();
+}
+async function prPaintDisk() {
+  const body = document.getElementById('diskBody');
+  if (!body) return;
+  body.innerHTML = '<p class="pr-tiny">Mengira…</p>';
+  const scan = await prScan();
+  let quota = 0;
+  try { const e = await navigator.storage.estimate(); quota = e.quota || 0; } catch (e) {}
+
+  const segs = PR_KINDS.filter(function(k) { return scan.by[k.k] > 0; });
+  let h = '<div class="pr-disk"><div class="pr-disk-t"><b>' + prBytes(scan.total) + ' dipakai</b>' +
+    (quota ? '<span>daripada ' + prBytes(quota) + '</span>' : '') + '</div><div class="pr-bar">';
+  segs.forEach(function(k) {
+    const w = quota ? (scan.by[k.k] / quota * 100) : (scan.total ? scan.by[k.k] / scan.total * 100 : 0);
+    h += '<i style="width:' + Math.max(0.6, w).toFixed(2) + '%;background:' + k.c + '"></i>';
+  });
+  h += '</div><div class="pr-leg">' + segs.map(function(k) {
+    return '<em><span class="pr-dot" style="background:' + k.c + '"></span>' + escapeHTML(k.n) + ' ' + prBytes(scan.by[k.k]) + '</em>';
+  }).join('') + (segs.length ? '' : '<em>Belum ada fail</em>') + '</div></div>';
+
+  // Amaran jujur: fail-fail ini tiada salinan lain. Kalau telefon
+  // hilang, ia hilang. Itu akibat pelan percuma, dan surveyor berhak
+  // tahu sebelum ia berlaku.
+  const noCopy = scan.by.model + scan.by.plan + scan.by.insp;
+  if (noCopy > 0) {
+    h += '<div class="au-msg warn" style="margin-bottom:9px"><span class="mi">' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/></svg></span>' +
+      '<div><b>' + prBytes(noCopy) + ' tiada salinan lain</b><span>Model 3D, pelan dan gambar penuh tidak disalin ke awan — tiada Firebase Storage pada pelan percuma. Kalau telefon ini hilang, fail-fail itu hilang. Simpan fail asal di komputer.</span></div></div>';
+  }
+
+  const rows = (inspections || []).map(function(i) {
+    return { id: i.id, title: i.title || 'Untitled', status: i.status || 'active', size: scan.jobs[i.id] || 0 };
+  }).filter(function(r) { return r.size > 0; }).sort(function(a, b) { return b.size - a.size; });
+  if (rows.length) {
+    h += '<div class="pr-sec"><span class="pr-sec-l">Gambar ikut job</span><span class="pr-sec-r"></span></div>';
+    rows.forEach(function(r) {
+      h += '<button class="pr-row" data-prjob="' + escapeHTML(r.id) + '">' +
+        '<span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg></span>' +
+        '<span class="pr-rt"><b>' + escapeHTML(r.title) + '</b><span>' + escapeHTML(r.status) + '</span></span>' +
+        '<span class="pr-re">' + prBytes(r.size) + '</span></button>';
+    });
+  }
+
+  h += '<div class="pr-sec"><span class="pr-sec-l">Kemas</span><span class="pr-sec-r"></span></div>' +
+    '<button class="pr-row bad" id="prWipe">' +
+    '<span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></span>' +
+    '<span class="pr-rt"><b>Kosongkan semua fail tempatan</b><span>Gambar penuh, pelan, model dan nota suara. Penemuan, rating dan laporan tidak disentuh.</span></span>' +
+    '<span class="pr-re">' + prBytes(scan.total) + '</span></button>' +
+    '<p class="pr-tiny">Pelayar boleh membuang simpanan sendiri bila telefon kesuntukan ruang. Pocket sudah meminta kekekalan — tetapi permintaan itu boleh ditolak.</p>';
+  body.innerHTML = h;
+
+  body.onclick = function(e) {
+    const j = e.target.closest('[data-prjob]');
+    if (j) { prDropJob(j.dataset.prjob); return; }
+    if (e.target.closest('#prWipe')) prWipeAll(scan.total);
+  };
+}
+async function prDropJob(id) {
+  const i = (inspections || []).filter(function(x) { return x.id === id; })[0];
+  const nm = i ? (i.title || 'job ini') : 'job ini';
+  if (!confirm('Buang gambar penuh bagi "' + nm + '" dari telefon ini?\n\nPenemuan, rating dan laporan kekal — hanya fail gambar yang dibuang. Thumbnail masih kelihatan.')) return;
+  const keys = await prKeysWith('insp:' + id + ':');
+  for (let k = 0; k < keys.length; k++) { try { await lbDrop(keys[k]); } catch (e) {} }
+  showToast(keys.length + ' fail dibuang');
+  prPaintDisk();
+}
+function prKeysWith(prefix) {
+  return new Promise(function(res) {
+    const out = [];
+    let req;
+    try { req = indexedDB.open(LB_IDB); } catch (e) { res(out); return; }
+    req.onerror = function() { res(out); };
+    req.onsuccess = function() {
+      let tx;
+      try { tx = req.result.transaction('files', 'readonly'); } catch (e) { res(out); return; }
+      const cur = tx.objectStore('files').openKeyCursor ? tx.objectStore('files').openKeyCursor() : tx.objectStore('files').openCursor();
+      cur.onsuccess = function(ev) {
+        const c = ev.target.result;
+        if (!c) { res(out); return; }
+        const id = String(c.key || '');
+        if (id.indexOf(prefix) === 0) out.push(id);
+        c.continue();
+      };
+      cur.onerror = function() { res(out); };
+    };
+  });
+}
+async function prWipeAll(total) {
+  if (!confirm('Kosongkan SEMUA fail tempatan (' + prBytes(total) + ')?\n\nGambar penuh, pelan, model 3D dan nota suara dibuang dari telefon ini.\n\nPenemuan, rating, ruang, laporan dan mesej hidup dalam awan dan TIDAK disentuh.')) return;
+  const keys = await prKeysWith('');
+  for (let k = 0; k < keys.length; k++) { try { await lbDrop(keys[k]); } catch (e) {} }
+  showToast(keys.length + ' fail dibuang · rekod tidak disentuh');
+  prPaintDisk();
+}
+async function prPaintDiskSub() {
+  const el = document.getElementById('profileDiskSub');
+  if (!el) return;
+  const scan = await prScan();
+  const noCopy = scan.by.model + scan.by.plan + scan.by.insp;
+  el.innerHTML = prBytes(scan.total) + ' dipakai' +
+    (noCopy > 0 ? ' · <em>' + prBytes(noCopy) + ' tiada salinan lain</em>' : '');
+}
+
+// ---------- Profil: wiring baharu ----------
+function prWire() {
+  const on = function(id, fn) { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); };
+  on('profileDisk', prOpenDisk);
+  on('diskBack', prCloseDisk);
+  on('profileEdit', async function() {
+    if (!currentUser) return;
+    const nm = prompt('Nama yang keluar dalam laporan PDF', currentUser.displayName || '');
+    if (nm === null) return;
+    const v = nm.trim();
+    if (!v) { showToast('Nama tidak boleh kosong'); return; }
+    try {
+      await currentUser.updateProfile({ displayName: v });
+      await db.collection('users').doc(currentUser.uid).set({ name: v }, { merge: true });
+      initProfile();
+      showToast('Nama dikemas kini');
+    } catch (e) { showToast('Tidak dapat tukar nama. ' + e.message, 'error'); }
+  });
+  // Kod lama berhenti berfungsi serta-merta; perbualan sedia ada kekal
+  // sebab bilik disimpan mengikut UID, bukan mengikut kod.
+  on('profilePidNew', async function() {
+    if (!currentUser) return;
+    if (!confirm('Tukar Pocket ID awak?\n\nKod lama berhenti berfungsi serta-merta. Sesiapa yang menyimpan kod lama perlu kod baharu.\n\nPerbualan dan pemerhati yang sedia ada kekal.')) return;
+    try {
+      const old = myPocketId;
+      const id = await pidClaim(currentUser.uid, currentUser.displayName || '');
+      await db.collection('users').doc(currentUser.uid).set({ pocketId: id }, { merge: true });
+      if (old) { try { await db.collection('pocketIds').doc(old).delete(); } catch (e) {} }
+      myPocketId = id;
+      pidPaint(); initProfile();
+      showToast('Pocket ID baharu: ' + pidPretty(id));
+    } catch (e) { showToast('Tidak dapat tukar kod. ' + e.message, 'error'); }
+  });
+  on('profileNotif', async function() {
+    if (!window.Notification) { showToast('Peranti ini tiada pemberitahuan'); return; }
+    if (Notification.permission === 'granted') {
+      showToast('Sudah dibenarkan. Bunyi dan lencana hanya semasa Pocket terbuka — deringan bila app tertutup perlukan pelayan.');
+      return;
+    }
+    try { await Notification.requestPermission(); } catch (e) {}
+    initProfile();
+  });
+  on('profileWatcher', function() {
+    if (typeof sosOpen === 'function') sosOpen(); else showToast('Site safety tiada di sini');
+  });
+  on('profilePwd', async function() {
+    if (!currentUser || !currentUser.email) return;
+    if (!confirm('Hantar pautan tukar kata laluan ke ' + currentUser.email + '?')) return;
+    try { await auth.sendPasswordResetEmail(currentUser.email); showToast('Pautan dihantar ke ' + currentUser.email); }
+    catch (e) { showToast(friendlyAuthError(e), 'error'); }
+  });
+}
+try { prWire(); } catch (e) { console.warn('[Profile wire]', e.message); }
+
 // Sign out button
 document.getElementById('profileSignOut').addEventListener('click', function() {
-  if (!confirm('Sign out of GoXpert Pocket?')) return;
+  if (!confirm('Keluar akaun?\n\nData dalam telefon ini kekal — tiada apa dipadam.\n\nTetapi awak perlukan isyarat untuk masuk semula, jadi jangan buat ini sebelum turun ke kawasan tiada talian.')) return;
   if (typeof auth !== 'undefined' && auth.signOut) {
     auth.signOut().catch(function(e) { console.warn('[SignOut]', e.message); });
   }
@@ -25229,6 +25669,13 @@ async function pidEnsure() {
 function pidPaint() {
   const el = document.getElementById('profilePid');
   if (el) el.textContent = myPocketId ? pidPretty(myPocketId) : '—';
+  pidPaintQr();
+}
+function pidPaintQr() {
+  const box = document.getElementById('profilePidQr');
+  if (!box) return;
+  if (!myPocketId || typeof qrSvg !== 'function') return;
+  try { box.innerHTML = qrSvg('GXP:' + myPocketId, 46); } catch (e) {}
 }
 async function pidLookup(raw) {
   const id = pidNormal(raw);
@@ -25871,6 +26318,7 @@ function sosWire() {
 
   const card = document.getElementById('profilePidCopy');
   if (card) card.addEventListener('click', function() { if (typeof qrOpenCard === 'function') qrOpenCard(); });
+  pidPaintQr();
 }
 function sosSetTab(t) {
   SOS.tab = t;
@@ -30743,7 +31191,7 @@ async function mdExportUsdz() {
 
 
 // Console banner
-console.log('%cGoXpert Pocket v2.2', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v2.3', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
