@@ -8402,6 +8402,90 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 }
 .fp-find-lbl{background:rgba(24,8,8,.88);color:#fecaca;border-color:rgba(248,113,113,.55)}
 
+/* ---------- Model 3D (md-) ---------- */
+.md-sec{display:flex;align-items:center;gap:8px;margin:15px 2px 9px}
+.md-sec:first-child{margin-top:0}
+.md-sec-l{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.md-sec-r{flex:1;height:1px;background:var(--line)}
+.md-empty{text-align:center;padding:26px 16px;color:var(--muted);font-size:12.5px;line-height:1.6}
+.md-empty b{display:block;color:var(--fg);font-size:15px;font-weight:700;margin-bottom:6px}
+.md-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:10px 2px 0}
+
+.md-disk{border:1px solid var(--line);border-radius:var(--radius-lg);padding:11px 12px;background:var(--bg-2);margin-bottom:4px}
+.md-disk-t{display:flex;align-items:baseline;gap:8px;font-size:12px;margin-bottom:7px}
+.md-disk-t b{font-weight:700}
+.md-disk-t span{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.md-bar{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.md-bar i{display:block;height:100%}
+
+.md-row{display:flex;align-items:center;gap:11px;width:100%;padding:10px;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:8px;text-align:left;color:var(--fg)}
+.md-th{width:50px;height:50px;border-radius:10px;flex:none;background:var(--surface);display:grid;place-items:center;color:var(--accent)}
+.md-t{min-width:0;flex:1}
+.md-t b{display:block;font-size:14px;font-weight:650;letter-spacing:-.015em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.md-t span{display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--muted);margin-top:2px}
+.md-miss{font-style:normal;color:var(--warning);font-weight:600}
+.md-x{flex:none;width:28px;height:28px;border-radius:8px;background:var(--surface);display:grid;place-items:center;color:var(--muted)}
+
+.md-chk{display:flex;gap:10px;padding:10px 11px;border-radius:12px;margin-bottom:7px;font-size:12.5px;line-height:1.45}
+.md-chk b{display:block;font-weight:700;margin-bottom:1px}
+.md-chk span{color:var(--fg-2);font-weight:400}
+.md-chk.good{background:var(--success-soft);color:var(--success)}
+.md-chk.warn{background:var(--warning-soft);color:var(--warning)}
+.md-chk.bad{background:var(--critical-soft);color:var(--critical)}
+
+.md-units{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.md-unit{padding:9px 6px;border-radius:11px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);font-size:12px;font-weight:650;text-align:center}
+.md-unit.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.md-unit small{display:block;font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
+.md-unit.on small{color:var(--accent)}
+
+.md-kv{display:flex;gap:10px;padding:6px 0;font-size:13px;align-items:baseline;border-bottom:1px solid var(--line)}
+.md-kv:last-of-type{border-bottom:0}
+.md-kv b{flex:none;width:96px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.md-kv span{min-width:0;flex:1;font-family:var(--font-mono);font-size:12.5px}
+.md-fld{margin-top:10px}
+.md-fld label{display:block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.md-fld input{width:100%;padding:11px;border:1px solid var(--line-2);border-radius:11px;background:var(--bg-2);outline:none}
+.md-fld input:focus{border-color:var(--accent)}
+
+/* --- pelihat skrin penuh --- */
+#mdView{position:fixed;inset:0;z-index:3050;display:flex;flex-direction:column;background:#0d1418;font-family:var(--font-body)}
+.md-vtop{flex:none;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 13px 11px;border-bottom:1px solid rgba(255,255,255,.09)}
+.md-vic{width:33px;height:33px;border-radius:10px;background:rgba(255,255,255,.1);display:grid;place-items:center;flex:none;color:#e8eaed;border:none}
+.md-vtt{min-width:0;flex:1}
+.md-vtt b{display:block;font-size:15px;font-weight:800;letter-spacing:-.025em;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.md-vtt span{display:block;font-size:11px;color:#94a3b8;margin-top:1px}
+.md-vpill{flex:none;padding:8px 13px;border-radius:10px;background:#22d3ee;color:#04222a;font-size:12.5px;font-weight:700;border:none}
+.md-chips{flex:none;display:flex;gap:5px;padding:9px 12px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.md-chips::-webkit-scrollbar{height:0}
+.md-chip{flex:none;padding:6px 11px;border-radius:9px;background:rgba(255,255,255,.08);color:#94a3b8;font-size:11.5px;font-weight:650;border:none}
+.md-chip.on{background:rgba(34,211,238,.2);color:#a5f3fc}
+.md-stage{flex:1;min-height:0;position:relative;touch-action:none}
+.md-stage canvas{display:block;width:100%;height:100%}
+.md-vbot{flex:none;padding:9px 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
+.md-slide{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:12px;background:rgba(255,255,255,.07)}
+.md-slide.dark{background:rgba(0,0,0,.58);backdrop-filter:blur(8px)}
+.md-slide b{font-size:11px;font-weight:700;color:#cbd5e1;flex:none;width:48px}
+.md-track{flex:1;height:5px;border-radius:99px;background:rgba(255,255,255,.2);position:relative;touch-action:none}
+.md-track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:#22d3ee;width:0}
+.md-track u{position:absolute;top:50%;left:0;width:17px;height:17px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.md-val{font-family:var(--font-mono);font-size:11px;color:#a5f3fc;flex:none;width:52px;text-align:right}
+.md-vbar{display:flex;gap:7px}
+.md-vb{flex:1;padding:13px 6px;border-radius:13px;background:rgba(255,255,255,.09);color:#fff;font-size:12.5px;font-weight:700;border:none}
+.md-vb.on{background:#22d3ee;color:#04222a}
+.md-hint{font-size:11.5px;color:#94a3b8;line-height:1.45;text-align:center;min-height:16px}
+.md-hint b{color:#a5f3fc}
+
+/* --- lapisan AR --- */
+#mdArOv{position:fixed;inset:0;z-index:3000;display:none;flex-direction:column;font-family:var(--font-body);pointer-events:none}
+#mdArOv .arm-top,#mdArOv .arm-bar,#mdArOv .md-arctl{pointer-events:auto}
+.md-arctl{position:relative;z-index:3;margin-top:auto;padding:0 12px 6px;display:flex;flex-direction:column;gap:7px}
+.md-res{display:flex;align-items:baseline;gap:8px;padding:9px 11px;border-radius:12px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+.md-res b{font-size:11px;font-weight:700;color:#cbd5e1;flex:none}
+.md-res em{font-style:normal;font-size:10.5px;color:#94a3b8;min-width:0;flex:1}
+.md-res span{margin-left:auto;font-family:var(--font-mono);font-size:13px;font-weight:700;color:#4ade80;flex:none}
+.md-res span.bad{color:#f87171}
+
 </style>
 </head>
 <body class="has-bottom-nav">
@@ -8937,7 +9021,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           </div>
           <div class="profile-row-content">
             <div class="profile-row-label">Version</div>
-            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v2.1 · build 19 Sep 2026 · AR Floor Plan rebuilt</div>
+            <div class="profile-row-sub" id="buildStamp">GoXpert Pocket · v2.2 · build 20 Sep 2026 · Model 3D (GLB)</div>
           </div>
         </div>
         
@@ -8968,7 +9052,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="chat-header-title" id="chatHeaderTitle">
         <span class="chat-header-title-empty">New chat</span>
       </div>
-      <span class="chat-build" title="Build">v2.1</span>
+      <span class="chat-build" title="Build">v2.2</span>
       <button class="chat-consult" id="chatConsult" aria-label="Toggle Consultant mode">
         <span class="chat-consult-sw"></span><span id="chatConsultLbl">Normal</span>
       </button>
@@ -12613,6 +12697,7 @@ function openTool(toolKey) {
   else if (toolKey === 'crackruler') openCrackRuler();
   else if (toolKey === 'armeasure') openARMeasure();
   else if (toolKey === 'arfloorplan') openARFloorPlan();
+  else if (toolKey === 'model3d') openModel3D();
   else if (toolKey === 'sketch2real') openSketchToReal();
   else if (toolKey === 'planeditor') openPlanEditor();
   else if (toolKey === 'quantity') openQuantityScanner();
@@ -12622,6 +12707,11 @@ function openTool(toolKey) {
   else if (toolKey === 'counter') openCounter();
 }
 
+// Penutupan menunggu 250 ms untuk peralihan selesai. Kalau satu alat
+// menutup dan membuka alat lain serta-merta — seperti Plan Editor
+// menyerahkan gambarnya kepada AR Floor Plan — pemasa lama itu akan
+// menyembunyikan modal yang baru dibuka seperempat saat kemudian.
+let _toolHideT = null;
 function closeTool() {
   // Stop sensors if running
   if (typeof stopSpiritLevel === 'function') stopSpiritLevel();
@@ -12629,7 +12719,8 @@ function closeTool() {
   
   toolModal.classList.remove('show');
   toolModalOverlay.classList.remove('show');
-  setTimeout(function() { toolModal.style.display = 'none'; }, 250);
+  if (_toolHideT) clearTimeout(_toolHideT);
+  _toolHideT = setTimeout(function() { toolModal.style.display = 'none'; _toolHideT = null; }, 250);
 }
 
 document.getElementById('toolModalClose').addEventListener('click', closeTool);
@@ -12640,6 +12731,7 @@ document.querySelectorAll('.tool-card').forEach(function(card) {
 });
 
 function showToolModal() {
+  if (_toolHideT) { clearTimeout(_toolHideT); _toolHideT = null; }
   toolModal.style.display = 'flex';
   setTimeout(function() {
     toolModalOverlay.classList.add('show');
@@ -21104,6 +21196,7 @@ const NT_ICONS = {
   crackruler:'<path d="M4 20 20 4"/><path d="M7 12.5 9.5 15M11 8.5 13.5 11M15 4.5 17.5 7"/>',
   armeasure:'<path d="M12 2.8 20.5 7v10L12 21.2 3.5 17V7z"/><path d="M12 2.8V12l8.5-5M12 12 3.5 7M12 12v9.2"/>',
   arfloorplan:'<path d="M3 9.5 12 4l9 5.5-9 5.5z"/><path d="M3 14.5 12 20l9-5.5"/>',
+  model3d:'<path d="M12 2.6 20.5 7v10L12 21.4 3.5 17V7z"/><path d="M12 2.6V12l8.5-5M12 12 3.5 7M12 12v9.4"/>',
   sketch2real:'<path d="M3 20.5 8 19l11-11a2.4 2.4 0 0 0-3.4-3.4L4.6 15.6z"/><path d="M14 6.5 17.5 10"/>',
   planeditor:'<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9.5h18M9.5 9.5V21"/>',
   scicalc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4"/>',
@@ -21122,6 +21215,7 @@ const NT_TOOLS = [
   { id:'quantity',       name:'Quantity Scanner', cat:'measure', kw:'count bars bundle rebar tally spacing quantity' },
   { id:'armeasure',      name:'AR Measure',       cat:'measure', req:'AR',     kw:'distance length room' },
   { id:'arfloorplan',    name:'AR Floor Plan',    cat:'measure', req:'AR',     kw:'overlay plan floor' },
+  { id:'model3d',        name:'Model 3D',         cat:'plan',    kw:'glb gltf bim ifc revit model 3d ar usdz walk clash deviation x-ray section' },
   { id:'sketch2real',    name:'Sketch to Real',   cat:'plan',    req:'AI',     kw:'drawing clean vector plan' },
   { id:'planeditor',     name:'Plan Editor',      cat:'plan',    kw:'draw annotate canvas markup' },
   { id:'voicetranslate', name:'Voice Translator', cat:'util',    req:'AI',     kw:'speak language contractor phrasebook worker bangla tamil nepali offline' },
@@ -29604,10 +29698,1052 @@ function msOpenTab() {
 
 try { msWire(); } catch (e) { console.warn('[Messages wire]', e.message); }
 
+// =======================================================
+// TOOL: MODEL 3D (MD) — GLB di tapak, dalam AR dan tanpa AR
+// =======================================================
+// Fail GLB tidak pernah pergi ke Firestore: had satu dokumen 1 MiB,
+// dan model ini puluhan MB. Bait-baitnya duduk dalam IndexedDB seperti
+// gambar penemuan dan pelan lantai. Firestore hanya memegang satu
+// entri kecil pada dokumen inspection yang sedia ada — bukan koleksi
+// baharu, bukan pendengar baharu, jadi membuka job tidak menambah
+// walau satu bacaan pun.
+//
+// Matematik jajaran diasingkan sebagai fungsi tulen supaya boleh diuji
+// tanpa telefon dan tanpa WebGL.
+
+const MD_FIELD = 'models';          // medan tatasusunan pada dokumen inspection
+const MD_MAXTRI = 900000;           // di atas ini, telefon pertengahan tercungap
+const MD_WARNTRI = 500000;
+
+function mdV(x, y, z) { return { x: x, y: y, z: z }; }
+function mdSub(a, b) { return mdV(a.x - b.x, a.y - b.y, a.z - b.z); }
+function mdLen(a) { return Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z); }
+function mdMean(ps) {
+  const n = ps.length || 1; let x = 0, y = 0, z = 0;
+  ps.forEach(function(p) { x += p.x; y += p.y; z += p.z; });
+  return mdV(x / n, y / n, z / n);
+}
+// Putaran pada paksi tegak sahaja. Bangunan berdiri tegak dan AR
+// memberi kita graviti, jadi senget dan tunduk bukan yang tidak
+// diketahui — hanya arah hadapan.
+function mdYawApply(p, c, s) { return mdV(p.x * c + p.z * s, p.y, -p.x * s + p.z * c); }
+function mdPlace(st, p) {
+  const c = Math.cos(st.yaw), s = Math.sin(st.yaw);
+  const r = mdYawApply(mdV(p.x * st.scale, p.y * st.scale, p.z * st.scale), c, s);
+  return mdV(r.x + st.t.x, r.y + st.t.y, r.z + st.t.z);
+}
+// Arah bertentangan: satu titik dunia balik kepada koordinat model.
+function mdUnplace(st, w) {
+  const d = mdSub(w, st.t);
+  const c = Math.cos(-st.yaw), s = Math.sin(-st.yaw);
+  const r = mdYawApply(d, c, s);
+  return mdV(r.x / st.scale, r.y / st.scale, r.z / st.scale);
+}
+
+// ---- Satu titik: kedudukan diselesaikan sepenuhnya, arah tidak ----
+// Di sinilah model 3D berbeza daripada pelan 2D. Pelan tiada
+// ketinggian, jadi tinggi terpaksa dilaras tangan. Titik pada model
+// membawa X, Y dan Z sekali, jadi satu titik sudah cukup untuk
+// kedudukan. Yang tinggal hanyalah yaw.
+function mdFrom1(m, w, yaw, scale) {
+  const sc = scale || 1;
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  const r = mdYawApply(mdV(m.x * sc, m.y * sc, m.z * sc), c, s);
+  return { yaw: yaw, scale: sc, t: mdSub(w, r), pairs: 1, rms: 0, two: false };
+}
+
+// ---- Dua titik atau lebih: yaw diselesaikan, dan lebihannya jadi
+// nombor ralat. Empat yang tidak diketahui, enam persamaan. ----
+function mdFromPairs(pairs, lockScale) {
+  if (!pairs || pairs.length < 2) return null;
+  const M = pairs.map(function(p) { return p.m; });
+  const W = pairs.map(function(p) { return p.w; });
+  const mc = mdMean(M), wc = mdMean(W);
+  let num = 0, den = 0, sm = 0, sw = 0;
+  for (let i = 0; i < pairs.length; i++) {
+    const a = mdSub(M[i], mc), b = mdSub(W[i], wc);
+    // Memaksimumkan c·A + s·B, dengan R(x,z) = (xc+zs, -xs+zc).
+    // Tandanya penting: yang songsang lulus pada 0° dan 180° tetapi
+    // memulangkan yaw bercermin pada setiap arah lain.
+    num += a.z * b.x - a.x * b.z;
+    den += a.x * b.x + a.z * b.z;
+    sm += Math.sqrt(a.x * a.x + a.z * a.z);
+    sw += Math.sqrt(b.x * b.x + b.z * b.z);
+  }
+  if (Math.abs(num) < 1e-12 && Math.abs(den) < 1e-12) return null;  // titik bertindih
+  const yaw = Math.atan2(num, den);
+  // Skala dikunci 1 kerana model IFC sudah dalam meter. Nilai yang
+  // dikira tetap dipulangkan supaya ia boleh DISEMAK, bukan dipakai.
+  const measured = sm > 1e-9 ? sw / sm : 1;
+  const scale = lockScale === false ? measured : 1;
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  const rmc = mdYawApply(mdV(mc.x * scale, mc.y * scale, mc.z * scale), c, s);
+  const st = { yaw: yaw, scale: scale, t: mdSub(wc, rmc), pairs: pairs.length, two: true, measured: measured };
+  let sq = 0;
+  for (let i = 0; i < pairs.length; i++) sq += Math.pow(mdLen(mdSub(mdPlace(st, M[i]), W[i])), 2);
+  st.rms = Math.sqrt(sq / pairs.length);
+  return st;
+}
+function mdDeg(rad) { return (rad * 180 / Math.PI + 360) % 360; }
+function mdRad(deg) { return deg * Math.PI / 180; }
+
+// ---- Unit: model IFC dari Revit selalunya milimeter. Bangunan
+// selebar 42 800 unit bukan 42 km — ia 42.8 m dalam mm. ----
+const MD_UNITS = [
+  { k: 'm',  n: 'Meter',     f: 1 },
+  { k: 'mm', n: 'Milimeter', f: 0.001 },
+  { k: 'cm', n: 'Sentimeter', f: 0.01 },
+  { k: 'ft', n: 'Kaki',      f: 0.3048 },
+  { k: 'in', n: 'Inci',      f: 0.0254 }
+];
+// Bangunan yang munasabah: antara 2 m dan 300 m pada paksi terpanjang.
+// Faktor yang membawa model ke dalam julat itu hampir pasti unitnya.
+function mdGuessUnit(spanMetres) {
+  if (!isFinite(spanMetres) || spanMetres <= 0) return null;
+  let best = null;
+  MD_UNITS.forEach(function(u) {
+    const v = spanMetres * u.f;
+    if (v < 2 || v > 300) return;
+    // Paling hampir dengan 30 m, saiz bangunan biasa dalam skala log.
+    const d = Math.abs(Math.log(v / 30));
+    if (!best || d < best.d) best = { k: u.k, n: u.n, f: u.f, span: v, d: d };
+  });
+  return best;
+}
+function mdFmtBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(0) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+function mdFmtTri(n) {
+  if (n < 1000) return n + '';
+  return Math.round(n / 1000) + 'k';
+}
+
+// ---------- 2. KEADAAN + SIMPANAN ----------
+let MD = {
+  view: 'list', id: null, meta: null, obj: null, raw: null,
+  clip: 1.6, clipOn: false, xray: false, groups: [], hidden: {},
+  marks: [], pins: 'two', yaw: 0, scale: 1, st: null, busy: false,
+  unit: null, pending: null
+};
+let _mdThree = null, _mdGltf = null, _mdUsdz = null;
+const MD_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/';
+const MD_JSD = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/';
+
+function mdScript(src) {
+  return new Promise(function(res, rej) {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = function() { res(); };
+    s.onerror = function() { rej(new Error('Tiada sambungan untuk memuatkan ' + src.split('/').pop())); };
+    document.head.appendChild(s);
+  });
+}
+// GLTFLoader ialah skrip klasik yang melekat pada THREE global, sama
+// seperti three.min.js yang app ini sudah guna — tiada modul bercampur.
+function mdLoadGltf() {
+  if (_mdGltf) return _mdGltf;
+  _mdGltf = (async function() {
+    await loadThree();
+    if (!window.THREE.GLTFLoader) await mdScript(MD_CDN + 'loaders/GLTFLoader.js');
+    if (!window.THREE.DRACOLoader) {
+      try { await mdScript(MD_CDN + 'loaders/DRACOLoader.js'); } catch (e) {}
+    }
+    if (!window.THREE.GLTFLoader) throw new Error('GLTFLoader tidak dimuatkan');
+    return window.THREE.GLTFLoader;
+  })().catch(function(e) { _mdGltf = null; throw e; });
+  return _mdGltf;
+}
+function mdMakeLoader() {
+  const THREE = window.THREE;
+  const l = new THREE.GLTFLoader();
+  if (THREE.DRACOLoader) {
+    try {
+      const d = new THREE.DRACOLoader();
+      d.setDecoderPath(MD_CDN + 'libs/draco/');
+      l.setDRACOLoader(d);
+    } catch (e) {}
+  }
+  return l;
+}
+
+function mdList() {
+  if (typeof IP === 'undefined' || !IP.insp) return [];
+  const a = IP.insp[MD_FIELD];
+  return Array.isArray(a) ? a : [];
+}
+// Satu entri kecil pada dokumen inspection yang sedia ada. Tiada
+// koleksi baharu bermakna tiada bacaan baharu bila job dibuka.
+async function mdSaveList(rows) {
+  if (typeof IP === 'undefined' || !IP.id) return;
+  const patch = {};
+  patch[MD_FIELD] = rows;
+  await ipPatch(patch);
+  if (IP.insp) IP.insp[MD_FIELD] = rows;
+}
+function mdKey(id) { return 'model:' + id; }
+async function mdHave(id) {
+  try { const r = await lbGet(mdKey(id)); return !!(r && r.blob); } catch (e) { return false; }
+}
+async function mdBytesUsed() {
+  let total = 0;
+  const rows = mdList();
+  for (let i = 0; i < rows.length; i++) {
+    try { const r = await lbGet(mdKey(rows[i].id)); if (r && r.blob) total += r.blob.size; } catch (e) {}
+  }
+  return total;
+}
+// Pelayar boleh membuang simpanan laman bila telefon kesuntukan ruang.
+// Permintaan ini menghalang pembuangan senyap — tetapi ia boleh
+// ditolak, jadi fail asal jangan dibuang dari komputer.
+async function mdPersist() {
+  try {
+    if (!navigator.storage || !navigator.storage.persist) return null;
+    if (await navigator.storage.persisted()) return true;
+    return await navigator.storage.persist();
+  } catch (e) { return null; }
+}
+async function mdQuota() {
+  try {
+    if (!navigator.storage || !navigator.storage.estimate) return null;
+    const e = await navigator.storage.estimate();
+    return { used: e.usage || 0, quota: e.quota || 0 };
+  } catch (e) { return null; }
+}
+
+// ---------- 3. MEMBACA GLB ----------
+function mdCountTris(root) {
+  let n = 0;
+  root.traverse(function(o) {
+    if (!o.isMesh || !o.geometry) return;
+    const g = o.geometry;
+    n += g.index ? g.index.count / 3 : (g.attributes.position ? g.attributes.position.count / 3 : 0);
+  });
+  return Math.round(n);
+}
+function mdBounds(root) {
+  const THREE = window.THREE;
+  const b = new THREE.Box3().setFromObject(root);
+  const s = new THREE.Vector3();
+  b.getSize(s);
+  return { x: s.x, y: s.y, z: s.z, span: Math.max(s.x, s.y, s.z), box: b };
+}
+// Nama node ialah metadata percuma: pengeksport IFC menyimpan
+// IfcWall, IfcSlab dan nama tingkat di situ, jadi penapis datang
+// tanpa pangkalan data tambahan.
+function mdGroups(root) {
+  const seen = {};
+  root.traverse(function(o) {
+    if (!o.isMesh) return;
+    let g = '';
+    let p = o;
+    while (p && !g) {
+      const m = String(p.name || '').match(/Ifc([A-Za-z]+)/);
+      if (m) g = m[1];
+      p = p.parent;
+    }
+    if (!g) g = String(o.name || '').split(/[_.:]/)[0] || 'Lain';
+    g = g.slice(0, 22);
+    seen[g] = (seen[g] || 0) + 1;
+  });
+  return Object.keys(seen).sort(function(a, b) { return seen[b] - seen[a]; })
+    .slice(0, 8).map(function(k) { return { k: k, n: seen[k] }; });
+}
+function mdGroupOf(o) {
+  let p = o, g = '';
+  while (p && !g) {
+    const m = String(p.name || '').match(/Ifc([A-Za-z]+)/);
+    if (m) g = m[1];
+    p = p.parent;
+  }
+  if (!g) g = String(o.name || '').split(/[_.:]/)[0] || 'Lain';
+  return g.slice(0, 22);
+}
+
+// ---------- 4. SKRIN: SENARAI ----------
+function mdIco() {
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 20.5 7v10L12 21.4 3.5 17V7z"/><path d="M12 2.6V12l8.5-5M12 12 3.5 7M12 12v9.4"/></svg>';
+}
+function openModel3D() {
+  document.getElementById('toolModalIcon').innerHTML = mdIco();
+  document.getElementById('toolModalName').textContent = 'Model 3D';
+  document.getElementById('toolModalDesc').textContent = 'GLB dalam telefon — Firestore tak tersentuh';
+  mdScreenList();
+  showToolModal();
+}
+
+async function mdScreenList() {
+  MD.view = 'list';
+  const body = document.getElementById('toolModalBody');
+  const foot = document.getElementById('toolModalFoot');
+  if (typeof IP === 'undefined' || !IP.id) {
+    body.innerHTML = '<div class="md-empty"><b>Buka satu inspection dahulu</b>Model disimpan pada job, supaya penemuan dan model bercakap tentang bangunan yang sama.</div>';
+    foot.innerHTML = '<button class="tool-btn tool-btn-primary" id="mdClose">Tutup</button>';
+    document.getElementById('mdClose').onclick = closeTool;
+    return;
+  }
+  const rows = mdList();
+  let h = '<div class="md-disk" id="mdDisk"><div class="md-disk-t"><b>Simpanan telefon</b><span>mengira…</span></div>' +
+    '<div class="md-bar"><i style="width:0%;background:var(--accent)"></i></div></div>';
+  h += '<div class="md-sec"><span class="md-sec-l">Model job ini</span><span class="md-sec-r"></span></div>';
+  if (!rows.length) {
+    h += '<div class="md-empty"><b>Belum ada model</b>Tambah fail GLB. Kalau awak ada IFC atau Revit, tukar ke GLB di komputer dahulu — Blender percuma.</div>';
+  } else {
+    h += '<div id="mdRows">' + rows.map(function(m) {
+      return '<button class="md-row" data-mdopen="' + escapeHTML(m.id) + '">' +
+        '<span class="md-th">' + mdIco() + '</span>' +
+        '<span class="md-t"><b>' + escapeHTML(m.name) + '</b>' +
+        '<span data-mdhave="' + escapeHTML(m.id) + '">' + mdFmtBytes(m.size || 0) + ' · ' + mdFmtTri(m.tris || 0) + ' tri · ' + escapeHTML(m.unit || 'm') + '</span></span>' +
+        '<span class="md-x" data-mddel="' + escapeHTML(m.id) + '">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>';
+    }).join('') + '</div>';
+  }
+  h += '<p class="md-note">Fail tinggal dalam telefon ini. Firestore hanya menyimpan nama, saiz dan unit — lebih kurang 180 bait satu model, pada dokumen job yang sedia ada.</p>';
+  body.innerHTML = h;
+  foot.innerHTML = '<button class="tool-btn tool-btn-secondary" id="mdAdd">Tambah GLB</button>' +
+    '<input type="file" id="mdFile" accept=".glb,model/gltf-binary" hidden>' +
+    '<button class="tool-btn tool-btn-primary" id="mdClose">Tutup</button>';
+  document.getElementById('mdClose').onclick = closeTool;
+  document.getElementById('mdAdd').onclick = function() { document.getElementById('mdFile').click(); };
+  document.getElementById('mdFile').onchange = function(e) {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (f) mdImport(f);
+  };
+  body.onclick = function(e) {
+    const d = e.target.closest('[data-mddel]');
+    if (d) { e.stopPropagation(); mdDelete(d.dataset.mddel); return; }
+    const o = e.target.closest('[data-mdopen]');
+    if (o) mdOpen(o.dataset.mdopen);
+  };
+  // Mana satu benar-benar ada dalam telefon ini, dan berapa ruang dipakai.
+  rows.forEach(async function(m) {
+    const has = await mdHave(m.id);
+    const el = document.querySelector('[data-mdhave="' + m.id + '"]');
+    if (el && !has) el.innerHTML = mdFmtBytes(m.size || 0) + ' · <em class="md-miss">tiada fail di sini</em>';
+  });
+  const q = await mdQuota();
+  const used = await mdBytesUsed();
+  const disk = document.getElementById('mdDisk');
+  if (disk) {
+    const pct = q && q.quota ? Math.min(100, used / q.quota * 100) : 0;
+    disk.innerHTML = '<div class="md-disk-t"><b>Simpanan telefon</b><span>' +
+      mdFmtBytes(used) + (q && q.quota ? ' / ' + mdFmtBytes(q.quota) : '') + '</span></div>' +
+      '<div class="md-bar"><i style="width:' + pct.toFixed(1) + '%;background:var(--accent)"></i></div>';
+  }
+}
+
+async function mdDelete(id) {
+  const m = mdList().filter(function(x) { return x.id === id; })[0];
+  if (!m) return;
+  if (!confirm('Buang "' + m.name + '" dari telefon ini?\n\nEntri kecilnya kekal pada job, jadi awak masih tahu job ini ada model itu. Muat naik semula bila perlu.')) return;
+  try { await lbDrop(mdKey(id)); } catch (e) {}
+  showToast('Fail dibuang dari telefon ini');
+  mdScreenList();
+}
+
+// ---------- 5. MASUK + SEMAK UNIT ----------
+async function mdImport(file) {
+  const body = document.getElementById('toolModalBody');
+  const foot = document.getElementById('toolModalFoot');
+  body.innerHTML = '<div class="md-empty"><b>Membaca model…</b>' + mdFmtBytes(file.size) + '</div>';
+  foot.innerHTML = '';
+  let Loader;
+  try { Loader = await mdLoadGltf(); }
+  catch (e) { body.innerHTML = '<div class="md-empty"><b>Tidak dapat memuatkan pembaca GLB</b>' + escapeHTML(e.message) + '</div>'; mdBackFoot(); return; }
+  let gltf;
+  try {
+    const buf = await file.arrayBuffer();
+    gltf = await new Promise(function(res, rej) { mdMakeLoader().parse(buf, '', res, rej); });
+  } catch (e) {
+    body.innerHTML = '<div class="md-empty"><b>Fail itu tidak boleh dibaca</b>Pastikan ia GLB (glTF 2.0 binari), bukan OBJ, FBX atau IFC.<br><br>' + escapeHTML(e.message) + '</div>';
+    mdBackFoot(); return;
+  }
+  const root = gltf.scene || gltf.scenes[0];
+  const tris = mdCountTris(root);
+  const bb = mdBounds(root);
+  const guess = mdGuessUnit(bb.span);
+  MD.pending = { file: file, root: root, tris: tris, bb: bb, guess: guess, unit: guess ? guess.k : 'm' };
+  mdScreenCheck();
+}
+function mdBackFoot() {
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="mdBack">Kembali</button>';
+  document.getElementById('mdBack').onclick = mdScreenList;
+}
+function mdScreenCheck() {
+  const p = MD.pending;
+  if (!p) return mdScreenList();
+  const body = document.getElementById('toolModalBody');
+  const u = MD_UNITS.filter(function(x) { return x.k === p.unit; })[0] || MD_UNITS[0];
+  const span = p.bb.span * u.f;
+  let h = '<div class="md-sec"><span class="md-sec-l">Semakan sebelum simpan</span><span class="md-sec-r"></span></div>';
+
+  if (p.guess && p.guess.k !== 'm') {
+    h += '<div class="md-chk bad"><div><b>Unit nampak ' + escapeHTML(p.guess.n.toLowerCase()) + '</b>' +
+      '<span>Model ini ' + Math.round(p.bb.span).toLocaleString('en-MY') + ' unit pada paksi terpanjang. Kalau meter, itu ' +
+      (p.bb.span / 1000).toFixed(1) + ' km. Dalam ' + escapeHTML(p.guess.n.toLowerCase()) + ' ia ' + p.guess.span.toFixed(1) + ' m — itu saiz bangunan.</span></div></div>';
+  } else {
+    h += '<div class="md-chk good"><div><b>Unit nampak meter</b><span>Paksi terpanjang ' + span.toFixed(1) + ' m. Tiada penukaran perlu.</span></div></div>';
+  }
+  if (p.tris > MD_MAXTRI) {
+    h += '<div class="md-chk bad"><div><b>' + mdFmtTri(p.tris) + ' segi tiga — terlalu berat</b>' +
+      '<span>Telefon pertengahan akan tercungap atau kehabisan memori. Eksport ikut tingkat, bukan satu bangunan penuh.</span></div></div>';
+  } else if (p.tris > MD_WARNTRI) {
+    h += '<div class="md-chk warn"><div><b>' + mdFmtTri(p.tris) + ' segi tiga</b>' +
+      '<span>Boleh jalan, tetapi hampir had telefon pertengahan. Kalau tersekat, eksport satu tingkat sahaja.</span></div></div>';
+  } else {
+    h += '<div class="md-chk good"><div><b>' + mdFmtTri(p.tris) + ' segi tiga</b><span>Selesa untuk telefon.</span></div></div>';
+  }
+  const gs = mdGroups(p.root);
+  if (gs.length > 1) {
+    h += '<div class="md-chk good"><div><b>' + gs.length + ' kumpulan dalam nama node</b>' +
+      '<span>' + gs.map(function(g) { return escapeHTML(g.k); }).join(', ') + ' — boleh ditapis nanti tanpa data tambahan.</span></div></div>';
+  }
+
+  h += '<div class="md-sec"><span class="md-sec-l">Unit model</span><span class="md-sec-r"></span></div><div class="md-units">';
+  MD_UNITS.forEach(function(x) {
+    h += '<button class="md-unit' + (x.k === p.unit ? ' on' : '') + '" data-mdunit="' + x.k + '">' +
+      escapeHTML(x.n) + '<small>' + (p.bb.span * x.f).toFixed(1) + ' m</small></button>';
+  });
+  h += '</div>';
+  h += '<div class="md-sec"><span class="md-sec-l">Butiran</span><span class="md-sec-r"></span></div>' +
+    '<div class="md-kv"><b>Fail</b><span>' + mdFmtBytes(p.file.size) + '</span></div>' +
+    '<div class="md-kv"><b>Saiz model</b><span>' + (p.bb.x * u.f).toFixed(1) + ' × ' + (p.bb.z * u.f).toFixed(1) + ' × ' + (p.bb.y * u.f).toFixed(1) + ' m</span></div>' +
+    '<div class="md-kv"><b>Unit</b><span>' + escapeHTML(u.k) + (u.f !== 1 ? ' → m (×' + u.f + ')' : '') + '</span></div>' +
+    '<div class="md-kv"><b>Ke Firestore</b><span>~180 bait</span></div>' +
+    '<div class="md-fld"><label>Nama</label><input id="mdName" value="' + escapeHTML(p.file.name.replace(/\.glb$/i, '')) + '" maxlength="60"></div>';
+  body.innerHTML = h;
+  body.onclick = function(e) {
+    const b = e.target.closest('[data-mdunit]');
+    if (b) { MD.pending.unit = b.dataset.mdunit; mdScreenCheck(); }
+  };
+  const foot = document.getElementById('toolModalFoot');
+  foot.innerHTML = '<button class="tool-btn tool-btn-secondary" id="mdCancel">Batal</button>' +
+    '<button class="tool-btn tool-btn-primary" id="mdSave">Simpan ke telefon</button>';
+  document.getElementById('mdCancel').onclick = function() { MD.pending = null; mdScreenList(); };
+  document.getElementById('mdSave').onclick = mdSavePending;
+}
+async function mdSavePending() {
+  const p = MD.pending;
+  if (!p) return;
+  const btn = document.getElementById('mdSave');
+  if (btn) { btn.disabled = true; btn.textContent = 'Menyimpan…'; }
+  const nm = document.getElementById('mdName');
+  const u = MD_UNITS.filter(function(x) { return x.k === p.unit; })[0] || MD_UNITS[0];
+  const id = 'md' + Date.now() + Math.random().toString(36).slice(2, 6);
+  try {
+    await lbPut(mdKey(id), p.file, 'model/gltf-binary');
+    await mdPersist();
+    const rows = mdList().slice();
+    rows.push({ id: id, name: (nm ? nm.value.trim() : '') || 'Model', size: p.file.size,
+                tris: p.tris, unit: u.k, f: u.f,
+                w: +(p.bb.x * u.f).toFixed(2), d: +(p.bb.z * u.f).toFixed(2), h: +(p.bb.y * u.f).toFixed(2),
+                at: Date.now() });
+    await mdSaveList(rows);
+    MD.pending = null;
+    showToast('Model disimpan dalam telefon ini');
+    mdScreenList();
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Simpan ke telefon'; }
+    showToast('Tidak dapat simpan. ' + e.message, 'error');
+  }
+}
+
+// ---------- 6. MEMBUKA MODEL ----------
+async function mdOpen(id) {
+  const meta = mdList().filter(function(x) { return x.id === id; })[0];
+  if (!meta) return;
+  const body = document.getElementById('toolModalBody');
+  body.innerHTML = '<div class="md-empty"><b>Membuka ' + escapeHTML(meta.name) + '…</b>' + mdFmtBytes(meta.size || 0) + '</div>';
+  document.getElementById('toolModalFoot').innerHTML = '';
+  let rec = null;
+  try { rec = await lbGet(mdKey(id)); } catch (e) {}
+  if (!rec || !rec.blob) {
+    body.innerHTML = '<div class="md-empty"><b>Fail itu tiada dalam telefon ini</b>' +
+      'Firestore hanya menyimpan namanya — fail ' + mdFmtBytes(meta.size || 0) +
+      ' tidak boleh berpindah antara peranti tanpa Firebase Storage. Muat naik semula di telefon ini.</div>';
+    mdBackFoot(); return;
+  }
+  try { await mdLoadGltf(); }
+  catch (e) { body.innerHTML = '<div class="md-empty"><b>Tidak dapat memuatkan pembaca GLB</b>' + escapeHTML(e.message) + '</div>'; mdBackFoot(); return; }
+  try {
+    const buf = await rec.blob.arrayBuffer();
+    const gltf = await new Promise(function(res, rej) { mdMakeLoader().parse(buf, '', res, rej); });
+    MD.id = id; MD.meta = meta;
+    MD.obj = gltf.scene || gltf.scenes[0];
+    MD.obj.scale.setScalar(meta.f || 1);
+    MD.groups = mdGroups(MD.obj);
+    MD.hidden = {}; MD.marks = []; MD.st = null; MD.yaw = 0;
+    closeTool();
+    mdViewer();
+  } catch (e) {
+    body.innerHTML = '<div class="md-empty"><b>Model itu rosak</b>' + escapeHTML(e.message) + '</div>';
+    mdBackFoot();
+  }
+}
+
+// ---------- 7. PELIHAT 3D (tanpa AR — jalan pada mana-mana telefon) ----------
+function mdViewer() {
+  const THREE = window.THREE;
+  let ov = document.getElementById('mdView');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'mdView';
+  ov.innerHTML =
+    '<div class="md-vtop">' +
+      '<button class="md-vic" id="mdVBack"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>' +
+      '<div class="md-vtt"><b>' + escapeHTML(MD.meta.name) + '</b><span id="mdVSub">Orbit dan zum · potong untuk masuk ke dalam</span></div>' +
+      '<button class="md-vpill" id="mdVAr">Jajar</button>' +
+    '</div>' +
+    '<div class="md-chips" id="mdChips"></div>' +
+    '<div class="md-stage" id="mdStage"></div>' +
+    '<div class="md-vbot">' +
+      '<div class="md-slide"><b>Potong</b><span class="md-track" id="mdTrack"><i></i><u></u></span><span class="md-val" id="mdClipV">tutup</span></div>' +
+      '<div class="md-vbar">' +
+        '<button class="md-vb" id="mdClipBtn">Potong</button>' +
+        '<button class="md-vb" id="mdXray">X-ray</button>' +
+        '<button class="md-vb" id="mdMark">Tanda</button>' +
+        '<button class="md-vb" id="mdFit">Muat</button>' +
+      '</div>' +
+      '<div class="md-hint" id="mdVHint"></div>' +
+    '</div>';
+  document.body.appendChild(ov);
+
+  const stage = ov.querySelector('#mdStage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+  renderer.setSize(stage.clientWidth, stage.clientHeight);
+  renderer.localClippingEnabled = true;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d1418);
+  scene.add(new THREE.HemisphereLight(0xdfefff, 0x28323a, 1.15));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.55);
+  dir.position.set(3, 8, 5); scene.add(dir);
+  scene.add(MD.obj);
+
+  const bb = mdBounds(MD.obj);
+  const ctr = new THREE.Vector3();
+  bb.box.getCenter(ctr);
+  const camera = new THREE.PerspectiveCamera(55, stage.clientWidth / stage.clientHeight, 0.05, bb.span * 40 + 50);
+  const cam = { r: bb.span * 1.7, th: Math.PI * 0.25, ph: Math.PI * 0.32 };
+  function place() {
+    camera.position.set(
+      ctr.x + cam.r * Math.sin(cam.ph) * Math.sin(cam.th),
+      ctr.y + cam.r * Math.cos(cam.ph),
+      ctr.z + cam.r * Math.sin(cam.ph) * Math.cos(cam.th));
+    camera.lookAt(ctr);
+  }
+  place();
+
+  // Satah potong: tanpa memotong, awak berdiri muka-ke-muka dengan
+  // dinding dan tidak nampak apa-apa. Ini kawalan melihat, bukan
+  // kawalan meletak — ia sama dalam AR dan di luar AR.
+  const plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+  const mats = [];
+  MD.obj.traverse(function(o) {
+    if (!o.isMesh || !o.material) return;
+    const ms = Array.isArray(o.material) ? o.material : [o.material];
+    ms.forEach(function(m) {
+      if (mats.indexOf(m) === -1) {
+        mats.push(m);
+        m.userData.mdOpa = m.opacity;
+        m.userData.mdTrans = m.transparent;
+      }
+    });
+  });
+  function applyClip() {
+    const on = MD.clipOn;
+    plane.constant = bb.box.min.y + MD.clip;
+    mats.forEach(function(m) { m.clippingPlanes = on ? [plane] : []; m.clipShadows = on; m.needsUpdate = true; });
+    const v = ov.querySelector('#mdClipV');
+    if (v) v.textContent = on ? MD.clip.toFixed(2) + ' m' : 'tutup';
+    ov.querySelector('#mdClipBtn').classList.toggle('on', on);
+    const tr = ov.querySelector('#mdTrack');
+    const pc = Math.max(0, Math.min(1, MD.clip / Math.max(0.5, bb.y)));
+    tr.querySelector('i').style.width = (pc * 100) + '%';
+    tr.querySelector('u').style.left = (pc * 100) + '%';
+  }
+  function applyXray() {
+    mats.forEach(function(m) {
+      if (MD.xray) { m.transparent = true; m.opacity = 0.28; m.depthWrite = false; }
+      else { m.transparent = !!m.userData.mdTrans; m.opacity = m.userData.mdOpa != null ? m.userData.mdOpa : 1; m.depthWrite = true; }
+      m.needsUpdate = true;
+    });
+    ov.querySelector('#mdXray').classList.toggle('on', MD.xray);
+  }
+  function applyHide() {
+    MD.obj.traverse(function(o) { if (o.isMesh) o.visible = !MD.hidden[mdGroupOf(o)]; });
+    paintChips();
+  }
+  function paintChips() {
+    ov.querySelector('#mdChips').innerHTML = MD.groups.map(function(g) {
+      return '<button class="md-chip' + (MD.hidden[g.k] ? '' : ' on') + '" data-mdg="' + escapeHTML(g.k) + '">' +
+        escapeHTML(g.k) + '</button>';
+    }).join('');
+  }
+  paintChips(); applyClip(); applyXray();
+
+  // Penanda: raycast, kemudian melekat pada bucu terdekat. Surveyor
+  // mahu sudut tiang itu, bukan suatu tempat pada mukanya.
+  const ray = new THREE.Raycaster();
+  const dots = [];
+  function addDot(p, i) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(bb.span * 0.008, 14, 14),
+      new THREE.MeshBasicMaterial({ color: i === 0 ? 0x22d3ee : 0xf59e0b, depthTest: false }));
+    m.position.copy(p); m.renderOrder = 999;
+    scene.add(m); dots.push(m);
+  }
+  function clearDots() { dots.forEach(function(d) { scene.remove(d); }); dots.length = 0; }
+  function snapVertex(hit) {
+    const g = hit.object.geometry;
+    if (!g || !g.attributes || !g.attributes.position || !hit.face) return hit.point.clone();
+    const pos = g.attributes.position;
+    const idx = [hit.face.a, hit.face.b, hit.face.c];
+    let best = null, bd = Infinity;
+    for (let i = 0; i < 3; i++) {
+      const v = new THREE.Vector3().fromBufferAttribute(pos, idx[i]);
+      hit.object.localToWorld(v);
+      const d = v.distanceTo(hit.point);
+      if (d < bd) { bd = d; best = v; }
+    }
+    // Hanya melekat kalau bucu itu benar-benar dekat; jika tidak,
+    // titik yang diketik lebih jujur daripada sudut yang jauh.
+    return (best && bd < bb.span * 0.03) ? best : hit.point.clone();
+  }
+  function paintHint() {
+    const need = MD.pins === 'two' ? 2 : 1;
+    const hint = ov.querySelector('#mdVHint');
+    if (!MD.markMode) { hint.textContent = ''; return; }
+    if (MD.marks.length >= need) {
+      hint.innerHTML = MD.marks.length + ' titik dipilih' +
+        (MD.marks.length === 2 ? ' · jarak model ' + MD.marks[0].distanceTo(MD.marks[1]).toFixed(2) + ' m' : '') +
+        ' — tekan <b>Jajar</b>';
+    } else {
+      hint.innerHTML = 'Ketik ' + (MD.marks.length === 0 ? 'titik pertama' : 'titik kedua') +
+        ' — pilih <b>sudut</b>, bukan tengah dinding';
+    }
+  }
+
+  let drag = null, moved = 0, pinch = 0;
+  const loc = function(e) { const r = stage.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  stage.addEventListener('pointerdown', function(e) {
+    stage.setPointerCapture(e.pointerId);
+    drag = loc(e); moved = 0;
+  });
+  stage.addEventListener('pointermove', function(e) {
+    if (!drag) return;
+    const p = loc(e);
+    const dx = p.x - drag.x, dy = p.y - drag.y;
+    moved += Math.abs(dx) + Math.abs(dy);
+    cam.th -= dx * 0.008;
+    cam.ph = Math.max(0.08, Math.min(Math.PI - 0.08, cam.ph - dy * 0.008));
+    drag = p; place();
+  });
+  stage.addEventListener('pointerup', function(e) {
+    const was = drag; drag = null;
+    if (!was || moved > 9) return;
+    if (!MD.markMode) return;
+    const p = loc(e);
+    const nd = { x: (p.x / stage.clientWidth) * 2 - 1, y: -(p.y / stage.clientHeight) * 2 + 1 };
+    ray.setFromCamera(nd, camera);
+    const hits = ray.intersectObject(MD.obj, true).filter(function(h) { return h.object.visible; });
+    if (!hits.length) { showToast('Tiada permukaan di situ'); return; }
+    const need = MD.pins === 'two' ? 2 : 1;
+    if (MD.marks.length >= need) { MD.marks = []; clearDots(); }
+    const v = snapVertex(hits[0]);
+    MD.marks.push(v); addDot(v, MD.marks.length - 1);
+    paintHint();
+  });
+  stage.addEventListener('pointercancel', function() { drag = null; });
+  stage.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    cam.r = Math.max(bb.span * 0.12, Math.min(bb.span * 8, cam.r * (e.deltaY > 0 ? 1.12 : 1 / 1.12)));
+    place();
+  }, { passive: false });
+
+  ov.querySelector('#mdChips').addEventListener('click', function(e) {
+    const b = e.target.closest('[data-mdg]');
+    if (!b) return;
+    const k = b.dataset.mdg;
+    MD.hidden[k] = !MD.hidden[k];
+    applyHide();
+  });
+  ov.querySelector('#mdClipBtn').onclick = function() { MD.clipOn = !MD.clipOn; applyClip(); };
+  ov.querySelector('#mdXray').onclick = function() { MD.xray = !MD.xray; applyXray(); };
+  ov.querySelector('#mdFit').onclick = function() { cam.r = bb.span * 1.7; cam.th = Math.PI * 0.25; cam.ph = Math.PI * 0.32; place(); };
+  ov.querySelector('#mdMark').onclick = function() {
+    MD.markMode = !MD.markMode;
+    ov.querySelector('#mdMark').classList.toggle('on', MD.markMode);
+    if (!MD.markMode) { MD.marks = []; clearDots(); }
+    paintHint();
+  };
+  const tr = ov.querySelector('#mdTrack');
+  const slide = function(e) {
+    const r = tr.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    MD.clip = x * Math.max(0.5, bb.y);
+    MD.clipOn = true; applyClip();
+  };
+  tr.addEventListener('pointerdown', function(e) { tr.setPointerCapture(e.pointerId); slide(e); });
+  tr.addEventListener('pointermove', function(e) { if (e.buttons) slide(e); });
+
+  ov.querySelector('#mdVBack').onclick = function() { mdCloseViewer(); openModel3D(); };
+  ov.querySelector('#mdVAr').onclick = function() {
+    if (!MD.markMode || !MD.marks.length) {
+      showToast('Tekan Tanda dahulu, kemudian ketik ' + (MD.pins === 'two' ? 'dua sudut' : 'satu sudut') + ' pada model');
+      MD.markMode = true;
+      ov.querySelector('#mdMark').classList.add('on');
+      paintHint();
+      return;
+    }
+    mdStartAr();
+  };
+
+  const resize = function() {
+    if (!document.getElementById('mdView')) { window.removeEventListener('resize', resize); return; }
+    renderer.setSize(stage.clientWidth, stage.clientHeight);
+    camera.aspect = stage.clientWidth / stage.clientHeight;
+    camera.updateProjectionMatrix();
+  };
+  window.addEventListener('resize', resize);
+  MD._viewer = { renderer: renderer, scene: scene, stop: false };
+  (function loop() {
+    if (!document.getElementById('mdView')) { renderer.dispose(); return; }
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  })();
+  paintHint();
+}
+function mdCloseViewer() {
+  const ov = document.getElementById('mdView');
+  if (ov) ov.remove();
+  MD.markMode = false;
+}
+
+// ---------- 8. AR: JAJAR DAN BERJALAN DI DALAMNYA ----------
+async function mdStartAr() {
+  const THREE = window.THREE;
+  if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) { mdNoAr(); return; }
+  let okAr = false;
+  try { okAr = await navigator.xr.isSessionSupported('immersive-ar'); } catch (e) {}
+  if (!okAr) { mdNoAr(); return; }
+
+  const need = MD.pins === 'two' ? 2 : 1;
+  const modelPts = MD.marks.slice(0, need).map(function(v) { return mdV(v.x, v.y, v.z); });
+  mdCloseViewer();
+
+  let ov = document.getElementById('mdArOv');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.id = 'mdArOv';
+  ov.innerHTML =
+    '<div class="ar-crosshair"></div>' +
+    '<div class="arm-top"><div class="ar-hint" id="mdArHint">Gerakkan telefon untuk cari permukaan…</div></div>' +
+    '<div class="arm-labels" id="mdArLbl"></div>' +
+    '<div class="md-arctl" id="mdArCtl" style="display:none">' +
+      '<div class="md-res" id="mdRes"></div>' +
+      '<div class="md-slide dark"><b>Potong</b><span class="md-track" id="mdArTrack"><i></i><u></u></span><span class="md-val" id="mdArClipV">tutup</span></div>' +
+    '</div>' +
+    '<div class="arm-bar">' +
+      '<button class="arm-b arm-b-go" id="mdArTag">Titik 1</button>' +
+      '<button class="arm-b" id="mdArYawL" style="display:none">Putar −</button>' +
+      '<button class="arm-b" id="mdArYawR" style="display:none">Putar +</button>' +
+      '<button class="arm-b" id="mdArClip" style="display:none">Potong</button>' +
+      '<button class="arm-b" id="mdArXray" style="display:none">X-ray</button>' +
+      '<button class="arm-b" id="mdArPin" style="display:none">Sisihan</button>' +
+      '<button class="arm-b" id="mdArRedo" style="display:none">Jajar</button>' +
+      '<button class="arm-b" id="mdArExit">Keluar</button>' +
+    '</div>';
+  document.body.appendChild(ov);
+  ov.style.display = 'flex';
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.xr.enabled = true;
+  renderer.xr.setReferenceSpaceType('local');
+  renderer.localClippingEnabled = true;
+  renderer.domElement.style.display = 'none';
+  document.body.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.add(new THREE.HemisphereLight(0xdfefff, 0x28323a, 1.2));
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.02, 200);
+  const reticle = new THREE.Mesh(
+    new THREE.RingGeometry(0.045, 0.06, 32).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: 0x22d3ee }));
+  reticle.matrixAutoUpdate = false; reticle.visible = false;
+  scene.add(reticle);
+
+  const hintEl = ov.querySelector('#mdArHint');
+  const tagBtn = ov.querySelector('#mdArTag');
+  const resEl = ov.querySelector('#mdRes');
+  const ctl = ov.querySelector('#mdArCtl');
+  const lblBox = ov.querySelector('#mdArLbl');
+  const worldPts = [];
+  const labels = [];
+  let placed = false;
+
+  const mats = [];
+  MD.obj.traverse(function(o) {
+    if (!o.isMesh || !o.material) return;
+    (Array.isArray(o.material) ? o.material : [o.material]).forEach(function(m) {
+      if (mats.indexOf(m) === -1) { mats.push(m); m.userData.mdOpa = m.opacity; m.userData.mdTrans = m.transparent; }
+    });
+  });
+  const plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+  function applyClip() {
+    mats.forEach(function(m) { m.clippingPlanes = MD.clipOn ? [plane] : []; m.needsUpdate = true; });
+    const v = ov.querySelector('#mdArClipV');
+    if (v) v.textContent = MD.clipOn ? MD.clip.toFixed(2) + ' m' : 'tutup';
+    ov.querySelector('#mdArClip').classList.toggle('on', MD.clipOn);
+  }
+  function applyXray() {
+    mats.forEach(function(m) {
+      if (MD.xray) { m.transparent = true; m.opacity = 0.3; m.depthWrite = false; }
+      else { m.transparent = !!m.userData.mdTrans; m.opacity = m.userData.mdOpa != null ? m.userData.mdOpa : 1; m.depthWrite = true; }
+      m.needsUpdate = true;
+    });
+    ov.querySelector('#mdArXray').classList.toggle('on', MD.xray);
+  }
+  function reticlePt() {
+    const v = new THREE.Vector3().setFromMatrixPosition(reticle.matrix);
+    return mdV(v.x, v.y, v.z);
+  }
+  function applySt() {
+    if (!MD.st) return;
+    MD.obj.position.set(MD.st.t.x, MD.st.t.y, MD.st.t.z);
+    MD.obj.rotation.set(0, MD.st.yaw, 0);
+    MD.obj.scale.setScalar((MD.meta.f || 1) * MD.st.scale);
+    // Satah potong dalam koordinat dunia: paras di atas lantai AR.
+    plane.constant = (worldPts[0] ? worldPts[0].y : 0) + MD.clip;
+  }
+  // Dua titik memberi enam persamaan untuk empat yang tidak diketahui.
+  // Lebihan itu jadi nombor ralat: 18 mm bermakna pilihan awak
+  // bersetuju, 300 mm bermakna satu daripadanya tersilap — dan awak
+  // tahu sebelum berjalan keliling bangunan.
+  function paintRes() {
+    if (!MD.st) { resEl.innerHTML = ''; return; }
+    if (MD.st.two) {
+      const mm = MD.st.rms * 1000;
+      const bad = mm > 120;
+      resEl.innerHTML = '<b>Ralat padanan</b><em>' + MD.st.pairs + ' titik · skala diukur ' +
+        (MD.st.measured || 1).toFixed(3) + '</em><span class="' + (bad ? 'bad' : '') + '">' +
+        (mm < 1000 ? Math.round(mm) + ' mm' : (mm / 1000).toFixed(2) + ' m') + '</span>';
+      if (bad) showToast('Ralat besar — satu pilihan mungkin tersilap. Tekan Jajar untuk ulang.');
+    } else {
+      resEl.innerHTML = '<b>Putar</b><em>satu titik tidak boleh tentukan arah</em><span style="color:#a5f3fc">' +
+        Math.round(mdDeg(MD.st.yaw)) + '°</span>';
+    }
+  }
+  function align() {
+    if (MD.pins === 'two') {
+      MD.st = mdFromPairs([{ m: modelPts[0], w: worldPts[0] }, { m: modelPts[1], w: worldPts[1] }]);
+      if (!MD.st) { showToast('Dua titik itu bertindih — cuba lagi'); worldPts.length = 0; return; }
+    } else {
+      MD.st = mdFrom1(modelPts[0], worldPts[0], mdRad(MD.yaw), 1);
+    }
+    scene.add(MD.obj);
+    placed = true;
+    applySt(); applyClip(); applyXray(); paintRes();
+    tagBtn.style.display = 'none';
+    ['mdArClip', 'mdArXray', 'mdArPin', 'mdArRedo'].forEach(function(k) { ov.querySelector('#' + k).style.display = ''; });
+    if (MD.pins === 'one') { ov.querySelector('#mdArYawL').style.display = ''; ov.querySelector('#mdArYawR').style.display = ''; }
+    ctl.style.display = '';
+    hintEl.textContent = MD.pins === 'two'
+      ? 'Model diletak. Potong pada paras mata untuk masuk ke dalamnya.'
+      : 'Model diletak. Putar sehingga ia padan dengan bangunan.';
+  }
+  function paintHint() {
+    if (placed || !hintEl) return;
+    if (!reticle.visible) { hintEl.textContent = 'Gerakkan telefon untuk cari permukaan…'; return; }
+    hintEl.textContent = 'Berdiri di sudut yang awak tanda pada model, halakan bulatan ke situ';
+    tagBtn.textContent = 'Titik ' + (worldPts.length + 1);
+  }
+  // Ketik di mana realiti berbeza daripada model. Ia jadi finding
+  // biasa — koleksi yang sama, laporan yang sama, tiada yang baharu.
+  async function pinDeviation() {
+    if (!reticle.visible || !MD.st) { showToast('Cari permukaan dahulu'); return; }
+    if (typeof IP === 'undefined' || !IP.id || !currentUser) { showToast('Buka satu inspection dahulu'); return; }
+    const w = reticlePt();
+    const m = mdUnplace(MD.st, w);
+    try {
+      let sp = IP.spaces[0];
+      if (!sp) { const nid = await ipAddSpace(null, null, ''); sp = IP.spaces.filter(function(x) { return x.id === nid; })[0]; }
+      if (!sp) { showToast('Tidak dapat buat ruang'); return; }
+      const no = ipFindingsIn(sp.id).length + 1;
+      const data = {
+        spaceId: sp.id, spaceKey: sp.key, no: no,
+        element: '', defectType: '', desc: 'Sisihan daripada model 3D "' + MD.meta.name + '".',
+        rate: '', priority: '', cost: '', action: '', locationText: '',
+        planId: '', px: null, py: null, photoN: 0, source: 'ar-model',
+        model: { id: MD.id, name: MD.meta.name,
+                 mx: +m.x.toFixed(3), my: +m.y.toFixed(3), mz: +m.z.toFixed(3),
+                 rms: MD.st.rms ? +MD.st.rms.toFixed(3) : 0 },
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      const ref = await ipSub('findings').add(data);
+      IP.findings.push(Object.assign({ id: ref.id }, data));
+      await ipCounts();
+      const el = document.createElement('div');
+      el.className = 'arm-lbl fp-find-lbl';
+      el.textContent = sp.key + ipNo(no) + ' · sisihan';
+      lblBox.appendChild(el);
+      labels.push({ el: el, pt: { x: w.x, y: w.y + 0.1, z: w.z } });
+      showToast(sp.key + ipNo(no) + ' ditanda — isi butirannya kemudian');
+    } catch (e) { showToast('Tidak dapat menanda. ' + e.message, 'error'); }
+  }
+
+  tagBtn.onclick = function() {
+    if (!reticle.visible) return;
+    worldPts.push(reticlePt());
+    if (worldPts.length >= need) align(); else paintHint();
+  };
+  ov.querySelector('#mdArYawL').onclick = function() { MD.yaw = (MD.yaw - 2 + 360) % 360; MD.st = mdFrom1(modelPts[0], worldPts[0], mdRad(MD.yaw), 1); applySt(); paintRes(); };
+  ov.querySelector('#mdArYawR').onclick = function() { MD.yaw = (MD.yaw + 2) % 360; MD.st = mdFrom1(modelPts[0], worldPts[0], mdRad(MD.yaw), 1); applySt(); paintRes(); };
+  ov.querySelector('#mdArClip').onclick = function() { MD.clipOn = !MD.clipOn; applyClip(); };
+  ov.querySelector('#mdArXray').onclick = function() { MD.xray = !MD.xray; applyXray(); };
+  ov.querySelector('#mdArPin').onclick = pinDeviation;
+  ov.querySelector('#mdArRedo').onclick = function() {
+    worldPts.length = 0; MD.st = null; placed = false;
+    scene.remove(MD.obj);
+    tagBtn.style.display = '';
+    ['mdArYawL', 'mdArYawR', 'mdArClip', 'mdArXray', 'mdArPin', 'mdArRedo'].forEach(function(k) { ov.querySelector('#' + k).style.display = 'none'; });
+    ctl.style.display = 'none';
+    paintHint();
+  };
+  const tr = ov.querySelector('#mdArTrack');
+  const slide = function(e) {
+    const r = tr.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    MD.clip = x * 3.2;
+    MD.clipOn = true;
+    tr.querySelector('i').style.width = (x * 100) + '%';
+    tr.querySelector('u').style.left = (x * 100) + '%';
+    applySt(); applyClip();
+  };
+  tr.addEventListener('pointerdown', function(e) { tr.setPointerCapture(e.pointerId); slide(e); });
+  tr.addEventListener('pointermove', function(e) { if (e.buttons) slide(e); });
+
+  let session;
+  try {
+    session = await navigator.xr.requestSession('immersive-ar', {
+      requiredFeatures: ['hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: ov }
+    });
+  } catch (e) {
+    ov.remove();
+    if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    showToast('Tidak dapat memulakan AR: ' + e.message);
+    openModel3D();
+    return;
+  }
+  ov.querySelector('#mdArExit').onclick = function() { session.end(); };
+  await renderer.xr.setSession(session);
+  const viewerSpace = await session.requestReferenceSpace('viewer');
+  const localSpace = await session.requestReferenceSpace('local');
+  let hitSource = await session.requestHitTestSource({ space: viewerSpace });
+
+  session.addEventListener('end', function() {
+    if (hitSource) { if (hitSource.cancel) hitSource.cancel(); hitSource = null; }
+    renderer.setAnimationLoop(null);
+    if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    try { renderer.dispose(); } catch (e) {}
+    labels.forEach(function(l) { l.el.remove(); });
+    if (ov && ov.parentNode) ov.remove();
+    // Jajaran hidup dalam koordinat sesi AR dan mati bersamanya.
+    MD.st = null;
+    scene.remove(MD.obj);
+    if (typeof ipRender === 'function' && IP.id) ipRender();
+    openModel3D();
+  });
+
+  paintHint();
+  const _v = new THREE.Vector3();
+  renderer.setAnimationLoop(function(t, frame) {
+    if (!frame) { renderer.render(scene, camera); return; }
+    if (hitSource) {
+      const hits = frame.getHitTestResults(hitSource);
+      if (hits.length) {
+        const pose = hits[0].getPose(localSpace);
+        if (pose) { reticle.visible = true; reticle.matrix.fromArray(pose.transform.matrix); }
+      } else reticle.visible = false;
+    }
+    tagBtn.disabled = !reticle.visible;
+    if (!placed) paintHint();
+    renderer.render(scene, camera);
+    for (let i = 0; i < labels.length; i++) {
+      const L = labels[i];
+      _v.set(L.pt.x, L.pt.y, L.pt.z).project(camera);
+      if (_v.z < 1 && Math.abs(_v.x) < 1.15 && Math.abs(_v.y) < 1.15) {
+        L.el.style.left = ((_v.x * 0.5 + 0.5) * window.innerWidth) + 'px';
+        L.el.style.top = ((-_v.y * 0.5 + 0.5) * window.innerHeight) + 'px';
+        L.el.style.display = 'block';
+      } else L.el.style.display = 'none';
+    }
+  });
+}
+
+// ---------- 9. iPHONE: USDZ + AR QUICK LOOK ----------
+// Safari tiada WebXR, tetapi ada AR Quick Look. USDZExporter three.js
+// tidak bergantung pada three langsung — satu-satunya importnya ialah
+// fflate — jadi ia boleh dipakai bersama binaan klasik di sini.
+function mdNoAr() {
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  mdCloseViewer();
+  openModel3D();
+  const body = document.getElementById('toolModalBody');
+  const foot = document.getElementById('toolModalFoot');
+  body.innerHTML = '<div class="md-chk warn"><div><b>AR langsung tiada di sini</b>' +
+    '<span>WebXR perlukan Chrome pada Android yang menyokong ARCore, melalui https://.' +
+    (ios ? ' iPhone tiada WebXR langsung — tetapi Safari ada AR Quick Look, dan itu cukup untuk meletakkan model dalam bilik.' : '') +
+    '</span></div></div>' +
+    (ios ? '<div class="md-chk good"><div><b>USDZ dijana dalam telefon ini</b>' +
+      '<span>Tiada pelayan, tiada muat naik, sifar bait ke Firestore. Hadnya: Quick Look hanya melihat — tiada potong, tiada x-ray, tiada tanda sisihan.</span></div></div>' : '') +
+    '<p class="md-note">Pelihat 3D biasa tetap jalan di sini: potong, tapis dan tanda semuanya tanpa AR.</p>';
+  foot.innerHTML = (ios ? '<button class="tool-btn tool-btn-primary" id="mdUsdz">Buka dalam AR (USDZ)</button>' : '') +
+    '<button class="tool-btn tool-btn-secondary" id="mdBack2">Kembali</button>';
+  const bk = document.getElementById('mdBack2');
+  if (bk) bk.onclick = mdScreenList;
+  const ub = document.getElementById('mdUsdz');
+  if (ub) ub.onclick = mdExportUsdz;
+}
+async function mdExportUsdz() {
+  const btn = document.getElementById('mdUsdz');
+  if (!MD.obj) { showToast('Buka satu model dahulu'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Menukar…'; }
+  try {
+    if (!_mdUsdz) {
+      const mod = await import(MD_JSD + 'exporters/USDZExporter.js');
+      _mdUsdz = mod.USDZExporter;
+    }
+    const arr = await new _mdUsdz().parse(MD.obj);
+    const blob = new Blob([arr], { type: 'model/vnd.usdz+zip' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('rel', 'ar');
+    a.setAttribute('href', url);
+    a.appendChild(document.createElement('img'));
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() { a.remove(); URL.revokeObjectURL(url); }, 30000);
+    showToast('USDZ ' + mdFmtBytes(blob.size) + ' — Quick Look dibuka');
+  } catch (e) {
+    showToast('Tidak dapat menjana USDZ. ' + e.message, 'error');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Buka dalam AR (USDZ)'; }
+}
+
+
 
 
 // Console banner
-console.log('%cGoXpert Pocket v2.1', 'font-size:18px;color:#06b6d4;font-weight:bold');
+console.log('%cGoXpert Pocket v2.2', 'font-size:18px;color:#06b6d4;font-weight:bold');
 console.log('%cAI Surveyor Companion © 2026 Go Xpert Solution', 'color:#737373');
 </script>
 </body>
