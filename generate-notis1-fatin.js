@@ -46,8 +46,8 @@ const data = {
   tarikhTamat30Hari: "4 September 2026",
   tarikhReInspection: "9 September 2026",
 
-  tarikhNotis: (process.argv[2] === "HQ") ? "22 September 2026" : "15 September 2026",
-  tarikhDeadline: (process.argv[2] === "HQ") ? "7 Oktober 2026" : "30 September 2026",
+  tarikhNotis: (process.argv[2] === "HQ") ? "22 September 2026" : "25 September 2026",
+  tarikhDeadline: (process.argv[2] === "HQ") ? "7 Oktober 2026" : "10 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -68,8 +68,8 @@ const data = {
     { tarikh: "5 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara serahan tangan (hardcopy) kepada pihak penjual/pemaju — merupakan notis bertulis di bawah Klausa 11.1" },
     { tarikh: "4 September 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 11.1 — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "9 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 8 kecacatan masih belum dibaiki / belum disiapkan sepenuhnya" },
-    { tarikh: (process.argv[2] === "HQ") ? "22 September 2026" : "15 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: (process.argv[2] === "HQ") ? "7 Oktober 2026" : "30 September 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: (process.argv[2] === "HQ") ? "22 September 2026" : "25 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: (process.argv[2] === "HQ") ? "7 Oktober 2026" : "10 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
