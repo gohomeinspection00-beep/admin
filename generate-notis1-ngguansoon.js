@@ -44,8 +44,8 @@ const data = {
   tarikhSerahanLaporan: "4 Ogos 2026",
   kaedahSerahanLaporan: "Aplikasi CV Connect",
 
-  tarikhNotis: "19 September 2026",
-  tarikhDeadline: "4 Oktober 2026",
+  tarikhNotis: "22 September 2026",
+  tarikhDeadline: "7 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -78,8 +78,8 @@ const data = {
     { tarikh: "24 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "4 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara rasmi kepada pemaju melalui Aplikasi CV Connect" },
     { tarikh: "3 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum dilaksanakan" },
-    { tarikh: "19 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "4 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "22 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "7 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
