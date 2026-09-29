@@ -49,21 +49,17 @@ const data = {
   kaedahPenghantaranNotis2: "serahan rasmi",
 
   kecacatan: [
-    { tag: "45", lokasi: "Bedroom 1 — Wall", kecacatan: "Hollowness pada dinding masih ada (Hollowness on wall still observed)", status: "Belum Dibaiki" },
-    { tag: "71", lokasi: "AC Ledge (Bedroom 3) — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Dibaiki" },
-    { tag: "100", lokasi: "Bedroom 3 — M&E", kecacatan: "Open ground pada soket 13A — sistem pembumian tidak berfungsi (Open ground on socket 13A — Major Defect)", status: "Belum Dibaiki" },
-    { tag: "116", lokasi: "Ceiling Area (Family Area) — Fixtures", kecacatan: "Insulation sheet rosak dan pemasangan tidak sempurna (Damaged and improper installation for insulation sheet)", status: "Belum Dibaiki" },
-    { tag: "128", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Lengan injap terapung bengkok menyebabkan air terpancut keluar (Bent on floating valve arm still observed)", status: "Belum Dibaiki" },
-    { tag: "130", lokasi: "Water Tank Area — Fixtures", kecacatan: "Insulation sheet rosak dan pemasangan tidak sempurna (Damaged and improper installation for insulation sheet)", status: "Belum Dibaiki" },
-    { tag: "134", lokasi: "Staircase — Floor", kecacatan: "Hollowness pada jubin lantai dan skirting masih ada (Hollowness on floor tiles and skirting still observed)", status: "Belum Dibaiki Sepenuhnya" },
-    { tag: "153", lokasi: "Top Roof — Wall", kecacatan: "Keretakan pada dinding masih ada (Crack on wall still observed)", status: "Belum Dibaiki" },
-    { tag: "154", lokasi: "Top Roof — Roof", kecacatan: "Kerosakan/keretakan pada genting bumbung (Damaged/crack on roof tiles)", status: "Belum Dibaiki Sepenuhnya" },
-    { tag: "162", lokasi: "Utility — M&E", kecacatan: "SPD tidak berfungsi (Malfunction Surge Protective Device — Major Defect)", status: "Belum Dibaiki" },
-    { tag: "172", lokasi: "Bathroom 3 — Ceiling", kecacatan: "Kebocoran dan kelembapan tinggi pada permukaan siling di dalam ceiling manhole (Leaking and high moisture on ceiling surface inside ceiling manhole)", status: "Belum Dibaiki" },
-    { tag: "173", lokasi: "Bathroom 3 — Ceiling", kecacatan: "Kebocoran dan kelembapan tinggi pada permukaan siling di dalam ceiling manhole (Leaking and high moisture on ceiling surface inside ceiling manhole)", status: "Belum Dibaiki" },
-    { tag: "200", lokasi: "Living and Dining — Ceiling", kecacatan: "Kebocoran dan kelembapan tinggi pada siling di dalam ceiling manhole (Leaking and high moisture on ceiling inside ceiling manhole)", status: "Belum Dibaiki" },
-    { tag: "243", lokasi: "Car Porch — Floor", kecacatan: "Keretakan dan shrinkage cracks pada keseluruhan papak lantai masih ada (Cracks and shrinkage cracks on all floor slab still observed)", status: "Belum Dibaiki Sepenuhnya" },
-    { tag: "251", lokasi: "Car Porch — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Dibaiki" },
+    { tag: "1", lokasi: "Car Porch — Floor", kecacatan: "Keretakan dan shrinkage cracks pada keseluruhan papak lantai masih ada, dengan perbezaan tona (tonality) pada papak selepas kerja pembaikan (Crack and shrinkage cracks on all floor slab still observed; tonality on floor slab after rectification work)", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "2", lokasi: "Car Porch — M&E", kecacatan: "Rintangan elektrod bumi diukur 56 ohm pada ujian ketiga (sebelum ini 69 ohm) — melebihi had di bawah 10 ohm yang ditetapkan ST Domestic Electrical Installation Guidelines, Second Edition 2024, Klausa 10.8(b) bagi pemasangan dengan SPD; tidak patuh dan menjejaskan keberkesanan SPD (Measured earth electrode resistance 56 ohm, exceeds required limit — non-compliant)", status: "Belum Dibaiki" },
+    { tag: "3", lokasi: "Bathroom 3 — Ceiling", kecacatan: "Kelembapan tinggi pada permukaan siling di dalam ceiling manhole masih ada (High moisture on ceiling surface inside ceiling manhole still observed)", status: "Belum Dibaiki" },
+    { tag: "4", lokasi: "Bathroom 3 — Ceiling", kecacatan: "Kelembapan tinggi pada permukaan siling di dalam ceiling manhole masih ada (High moisture on ceiling surface inside ceiling manhole still observed)", status: "Belum Dibaiki" },
+    { tag: "5", lokasi: "Living and Dining — Ceiling", kecacatan: "Kelembapan tinggi pada siling di dalam ceiling manhole masih ada (High moisture on ceiling inside ceiling manhole still observed)", status: "Belum Dibaiki" },
+    { tag: "6", lokasi: "Ceiling Area (Bathroom 1) — Fixtures", kecacatan: "Pemasangan insulation sheet tidak sempurna masih ada (Improper installation for insulation sheet still observed)", status: "Belum Dibaiki" },
+    { tag: "7", lokasi: "Ceiling Area (Bedroom 2) — Fixtures", kecacatan: "Pemasangan aluminium foil sheet tidak sempurna (Improper installation of aluminium foil sheet)", status: "Belum Dibaiki" },
+    { tag: "8", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Getaran pada incoming pipe (Vibrate on incoming pipe) — KECACATAN BARU (New Defect)", status: "Kecacatan Baru — Belum Dibaiki" },
+    { tag: "9", lokasi: "Water Tank Area — Fixtures", kecacatan: "Insulation sheet rosak dan pemasangan tidak sempurna masih ada (Damaged and improper installation for insulation sheet still observed)", status: "Belum Dibaiki" },
+    { tag: "10", lokasi: "AC Ledge (Bedroom 3) — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall still observed)", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "11", lokasi: "Top Roof — Roof", kecacatan: "Keretakan pada genting bumbung dan pemasangan genting tidak sempurna masih ada (Crack on roof tiles; improper installation of roof tiles still observed)", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
@@ -73,6 +69,7 @@ const data = {
     { tarikh: "30 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "8 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 15 kecacatan masih belum dibaiki" },
     { tarikh: "11 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/041" },
+    { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 11 penemuan: kecacatan masih belum diselesaikan dan 1 kecacatan baru dikesan" },
     { tarikh: "26 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
     { tarikh: "29 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "14 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
@@ -252,7 +249,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh Notis Kedua ini dikeluarkan, pemantauan berterusan oleh pemilik mendapati bahawa kerja pembaikan terhadap kecacatan yang telah dilaporkan — yang telah pun disahkan masih belum diselesaikan oleh Pemeriksaan Semula (Re-Inspection) pada 8 September 2026 — masih belum dilaksanakan atau belum disempurnakan oleh pihak tuan. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan.`
+  `Namun, hasil daripada Pemeriksaan Ketiga (Third Inspection) yang dijalankan pada 24 September 2026 oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM), didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya — malah terdapat KECACATAN BARU yang dikesan. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan. Laporan Pemeriksaan Ketiga penuh disertakan bersama-sama notis ini. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -273,13 +270,13 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}.`;
+const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}, dan Laporan Pemeriksaan Ketiga (Third Inspection Report) bertarikh 24 September 2026 yang disertakan bersama-sama notis ini.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus dan SEGERA sekali lagi diberikan kepada kecacatan elektrik yang melibatkan KESELAMATAN — item No. 100 (open ground pada soket 13A, sistem pembumian tidak berfungsi) dan item No. 162 (SPD tidak berfungsi). Kedua-dua kecacatan ini kekal tidak dibaiki sejak dilaporkan dan terus mendedahkan penghuni kepada risiko kejutan elektrik dan kebakaran. Pembaikan oleh orang kompeten (competent person) dituntut dengan segera. Perhatian turut diberikan kepada kebocoran aktif yang berterusan — item No. 172, 173 dan 200 (kebocoran dan kelembapan tinggi pada siling di Bathroom 3 serta Living and Dining) — di mana punca kebocoran dituntut dikesan dan dibaiki sepenuhnya, bukan sekadar pembaikan kosmetik.`
+  `Perhatian khusus dan SEGERA diberikan kepada item No. 2 — rintangan elektrod bumi yang masih berada pada 56 ohm pada ujian ketiga (berbanding had di bawah 10 ohm yang ditetapkan oleh ST Domestic Electrical Installation Guidelines, Second Edition 2024, Klausa 10.8(b) bagi pemasangan dengan SPD). Walaupun sedikit penurunan dicatatkan (daripada 69 ohm), pemasangan ini KEKAL TIDAK PATUH dan keberkesanan SPD terjejas — pembetulan penuh oleh orang kompeten (competent person) dituntut dengan segera. Perhatian turut diberikan kepada kelembapan tinggi yang berterusan pada siling di dalam ceiling manhole (item No. 3, 4 dan 5 — Bathroom 3 dan Living and Dining), di mana punca dituntut dikesan dan dibaiki sepenuhnya; serta item No. 8 — getaran pada incoming pipe di Water Tank Area, iaitu KECACATAN BARU yang dikesan selepas kerja pembaikan pihak tuan dan dituntut dibaiki bersama-sama dalam tempoh notis ini.`
 );
 y += 4;
 
