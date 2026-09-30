@@ -82,7 +82,7 @@ const data = {
     { tarikh: "28 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju" },
     { tarikh: "27 Julai 2026", peristiwa: "Pemeriksaan Kedua (Re-Inspection) — laporan Batch 2 (159 kecacatan) dan Batch 3 (114 kecacatan) dihantar melalui aplikasi ProFix pada 28 dan 29 Julai 2026" },
     { tarikh: "15 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/024" },
-    { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama diserahkan secara fizikal (by hand) kepada pihak pemaju" },
+    { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama diserahkan secara fizikal (by hand) dan DIAKUI TERIMA oleh wakil pemaju, En. Mohd Shawl bin Kamsan (Officer), dengan cop rasmi DITERIMA (rujuk Lampiran A)" },
     { tarikh: "11 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari dari tarikh serahan 27 Ogos 2026) — kecacatan masih belum diselesaikan" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 50 penemuan masih belum diselesaikan, termasuk kecacatan baru; ujian semula elektrik pada 27 September 2026 mengesahkan rintangan penebatan masih gagal" },
     { tarikh: "1 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
@@ -258,7 +258,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1}, yang telah diserahkan secara fizikal (by hand) kepada pihak tuan pada 27 Ogos 2026, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari dari tarikh serahan tersebut, iaitu sehingga ${data.tarikhDeadlineNotis1}, untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
+  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1}, yang telah diserahkan secara fizikal (by hand) kepada pihak tuan pada 27 Ogos 2026 dan telah DIAKUI TERIMA oleh wakil pihak tuan, En. Mohd Shawl bin Kamsan (Officer), dengan cop rasmi "DITERIMA 27 AUG 2026" (salinan Akuan Terima dilampirkan sebagai Lampiran A), pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari dari tarikh serahan tersebut, iaitu sehingga ${data.tarikhDeadlineNotis1}, untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
 );
 y += 4;
 
@@ -376,6 +376,34 @@ drawTable(
   data.kronologi.map(k => [k.tarikh, k.peristiwa]),
   krColW
 );
+
+// ============================================================
+// LAMPIRAN A — BUKTI AKUAN TERIMA NOTIS 1
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN A";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Akuan Terima Notis Pertama oleh Pemaju", pageW / 2, y, { align: "center" });
+y += 5;
+doc.text("(Proof of Developer's Acknowledgement of Receipt — First Notice)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const akuanImg = fs.readFileSync("/home/user/admin/aridhasan-bukti-akuan.jpg");
+const akuanB64 = "data:image/jpeg;base64," + akuanImg.toString("base64");
+const imgW = 100; const imgH = 160;
+doc.addImage(akuanB64, "JPEG", (pageW - imgW) / 2, y, imgW, imgH);
+y += imgH + 6;
+
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const capText = "Akuan Terima Notis Pertama (Ruj: NOTIS-1/2026/024) — diterima dan ditandatangani oleh En. Mohd Shawl bin Kamsan (Officer) pada 27 Ogos 2026, dengan cop rasmi DITERIMA 27 AUG 2026.";
+const capLines = doc.splitTextToSize(capText, cW - 20);
+for (const cl of capLines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
