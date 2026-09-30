@@ -18,7 +18,12 @@ const data = {
 
   namaPemaju: "UDA LAND (SOUTH) SDN. BHD.",
   noSyarikat: "(197501001813 / 23298-K)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "JB") ? [
+    "No. 1, Jalan Padi Mahsuri 12,",
+    "Bandar Baru Uda,",
+    "81200 Johor Bahru,",
+    "Johor.",
+  ] : [
     "Tingkat 15, Blok Menara,",
     "Kompleks Pertama,",
     "Jalan Tuanku Abdul Rahman,",
@@ -435,6 +440,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_2_ARIDHASAN.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_2_ARIDHASAN.pdf");
+const outName = (process.argv[2] === "JB") ? "NOTIS_2_ARIDHASAN_JB.pdf" : "NOTIS_2_ARIDHASAN.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
