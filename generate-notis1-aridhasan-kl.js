@@ -67,10 +67,11 @@ const data = {
     { tarikh: "28 & 29 Julai 2026", peristiwa: "Laporan Re-Inspection diserahkan kepada pemaju melalui aplikasi ProFix — Batch 2 (159 kecacatan) dan Batch 3 (114 kecacatan)" },
     { tarikh: "15 Ogos 2026", peristiwa: "Notis tuntutan pembaikan (Ruj: NOTIS-1/2026/024) dikeluarkan" },
     { tarikh: "27 Ogos 2026", peristiwa: "Notis diserahkan secara fizikal di pejabat Johor Bahru — DIAKUI TERIMA oleh En. Mohd Sharil bin Kamsan (Officer) dengan cop DITERIMA" },
-    { tarikh: "1 September 2026", peristiwa: "Penghantaran laporan susulan dibuat ke dalam aplikasi ProFix" },
     { tarikh: "11 September 2026", peristiwa: "Tamat tempoh 15 hari dari serahan notis — pembaikan masih belum disempurnakan" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 50 penemuan masih belum diselesaikan" },
-    { tarikh: "1 Oktober 2026", peristiwa: "Notis ini dikeluarkan kepada Ibu Pejabat pihak tuan di Kuala Lumpur" },
+    { tarikh: "1 Oktober 2026", peristiwa: "Laporan Pemeriksaan Ketiga dihantar kepada pemaju melalui aplikasi ProFix" },
+    { tarikh: "1 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Ruj: NOTIS-2/2026/024) diteruskan kepada pejabat pihak tuan di Johor Bahru — tarikh akhir MUKTAMAD 16 Oktober 2026" },
+    { tarikh: "1 Oktober 2026", peristiwa: "Notis ini dikeluarkan kepada Ibu Pejabat / UDA Holdings Berhad di Kuala Lumpur" },
     { tarikh: "16 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari notis ini)" },
   ],
 
@@ -254,7 +255,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 28 Mei 2026, Pemeriksaan Semula (Re-Inspection) pada 27 Julai 2026 mendapati masih terdapat banyak kecacatan yang belum diselesaikan, dan laporan Batch 2 (159 kecacatan) serta Batch 3 (114 kecacatan) telah diserahkan melalui aplikasi ProFix pada 28 dan 29 Julai 2026. Notis tuntutan pembaikan bertarikh 15 Ogos 2026 (Ruj: NOTIS-1/2026/024) kemudiannya telah diserahkan secara fizikal kepada pejabat pihak tuan di Johor Bahru pada 27 Ogos 2026 dan DIAKUI TERIMA oleh wakil pihak tuan, En. Mohd Sharil bin Kamsan (Officer), dengan cop rasmi "DITERIMA 27 AUG 2026" — namun tempoh yang diberikan tamat pada 11 September 2026 tanpa pembaikan disempurnakan. Penghantaran laporan susulan ke dalam aplikasi ProFix juga telah dibuat pada 1 September 2026. Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM pada 24 September 2026 seterusnya mengesahkan 50 penemuan masih belum diselesaikan. Antara kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 28 Mei 2026, Pemeriksaan Semula (Re-Inspection) pada 27 Julai 2026 mendapati masih terdapat banyak kecacatan yang belum diselesaikan, dan laporan Batch 2 (159 kecacatan) serta Batch 3 (114 kecacatan) telah diserahkan melalui aplikasi ProFix pada 28 dan 29 Julai 2026. Notis tuntutan pembaikan bertarikh 15 Ogos 2026 (Ruj: NOTIS-1/2026/024) kemudiannya telah diserahkan secara fizikal kepada pejabat pihak tuan di Johor Bahru pada 27 Ogos 2026 dan DIAKUI TERIMA oleh wakil pihak tuan, En. Mohd Sharil bin Kamsan (Officer), dengan cop rasmi "DITERIMA 27 AUG 2026" (salinan Akuan Terima dilampirkan sebagai Lampiran A) — namun tempoh yang diberikan tamat pada 11 September 2026 tanpa pembaikan disempurnakan. Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM pada 24 September 2026 seterusnya mengesahkan 50 penemuan masih belum diselesaikan, dan Laporan Pemeriksaan Ketiga tersebut dihantar secara rasmi kepada pihak tuan melalui aplikasi ProFix pada 1 Oktober 2026. Berikutan kegagalan tersebut, Notis Kedua / Notis Akhir (Final Notice, Ruj: NOTIS-2/2026/024) bertarikh 1 Oktober 2026 kini telah diteruskan kepada pejabat pihak tuan di Johor Bahru (No. 1, Jalan Padi Mahsuri 12, Bandar Baru Uda), dengan tarikh akhir pembaikan yang MUKTAMAD pada 16 Oktober 2026. Antara kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -373,6 +374,30 @@ drawTable(
 );
 
 // ============================================================
+// LAMPIRAN A — BUKTI AKUAN TERIMA NOTIS 1 (PEJABAT JOHOR BAHRU)
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN A";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Akuan Terima Notis Pertama — Pejabat Johor Bahru", pageW / 2, y, { align: "center" });
+y += 5;
+doc.text("(Proof of Acknowledgement of Receipt — First Notice, Johor Bahru Office)", pageW / 2, y, { align: "center" });
+y += 8;
+const akuanImg = fs.readFileSync("/home/user/admin/aridhasan-bukti-akuan.jpg");
+const akuanB64 = "data:image/jpeg;base64," + akuanImg.toString("base64");
+const imgW = 100; const imgH = 160;
+doc.addImage(akuanB64, "JPEG", (pageW - imgW) / 2, y, imgW, imgH);
+y += imgH + 6;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const capText = "Akuan Terima Notis Pertama (Ruj: NOTIS-1/2026/024) — diserahkan di pejabat UDA Johor Bahru (No. 1, Jalan Padi Mahsuri 12, Bandar Baru Uda) dan diakui terima oleh En. Mohd Sharil bin Kamsan (Officer) pada 27 Ogos 2026, dengan cop rasmi DITERIMA 27 AUG 2026.";
+const capLines = doc.splitTextToSize(capText, cW - 20);
+for (const cl of capLines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
+
 // AKUAN TERIMA x 2
 // ============================================================
 function drawAkuanTerima(copyLabel) {
