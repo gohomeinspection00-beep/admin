@@ -43,8 +43,8 @@ const data = {
   tempohNotis1: "15",
   kaedahPenghantaranNotis1: "serahan rasmi",
 
-  tarikhNotis2: "30 September 2026",
-  tarikhDeadlineNotis2: "15 Oktober 2026",
+  tarikhNotis2: "1 Oktober 2026",
+  tarikhDeadlineNotis2: "16 Oktober 2026",
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "serahan rasmi",
 
@@ -71,8 +71,8 @@ const data = {
     { tarikh: "11 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/041" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 11 penemuan: kecacatan masih belum diselesaikan dan 1 kecacatan baru dikesan" },
     { tarikh: "26 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
-    { tarikh: "30 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
-    { tarikh: "15 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "1 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
+    { tarikh: "16 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
