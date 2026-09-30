@@ -15,8 +15,8 @@ const data = {
   telefonPembeli: "017-225 0417",
   emailPembeli: "eswari9583@yahoo.com",
 
-  namaPemaju: "UDA LAND (SOUTH) SDN. BHD.",
-  noSyarikat: "(197501001813 / 23298-K)",
+  namaPemaju: "UDA HOLDINGS BERHAD",
+  noSyarikat: "(199501018305 / 347508-T)",
   alamatPenerima: [
     "Tingkat 15, Blok Menara,",
     "Kompleks Pertama,",
