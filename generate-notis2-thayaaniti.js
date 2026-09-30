@@ -19,7 +19,7 @@ const data = {
   namaPemaju: "AVENUE GREEN DEVELOPMENT SDN. BHD.",
   noSyarikat: "(202201000586 / 1446283-D)",
   alamatPenerima: [
-    "#01-05, Pangsapuri Seri 18,",
+    "#01-03, Pangsapuri Seri 18,",
     "Jalan Persiaran Jaya Putra,",
     "Bandar Jaya Putra,",
     "81100 Johor Bahru, Johor.",
