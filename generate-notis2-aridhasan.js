@@ -41,7 +41,7 @@ const data = {
   tarikhNotis1: "15 Ogos 2026",
   tarikhDeadlineNotis1: "30 Ogos 2026",
   tempohNotis1: "15",
-  kaedahPenghantaranNotis1: "serahan rasmi",
+  kaedahPenghantaranNotis1: "serahan fizikal (by hand)",
 
   tarikhReInspection: "24 September 2026",
 
@@ -77,6 +77,7 @@ const data = {
     { tarikh: "28 Mei 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju" },
     { tarikh: "27 Julai 2026", peristiwa: "Pemeriksaan Kedua (Re-Inspection) — laporan Batch 2 (159 kecacatan) dan Batch 3 (114 kecacatan) dihantar melalui aplikasi ProFix pada 28 dan 29 Julai 2026" },
     { tarikh: "15 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/024" },
+    { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama diserahkan secara fizikal (by hand) kepada pihak pemaju" },
     { tarikh: "30 Ogos 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 50 penemuan masih belum diselesaikan, termasuk kecacatan baru; ujian semula elektrik pada 27 September 2026 mengesahkan rintangan penebatan masih gagal" },
     { tarikh: "1 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
@@ -252,7 +253,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dikemukakan kepada pihak tuan, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
+  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1}, yang telah diserahkan secara fizikal (by hand) kepada pihak tuan pada 27 Ogos 2026, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
 );
 y += 4;
 
@@ -289,7 +290,7 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Berhubung isu arah bukaan pintu bi-fold di Bathroom 2 dan Bathroom 3 serta pintu pagar (gate) yang tidak mengikut Pelan Lantai (Floor Plan) yang diluluskan di dalam Perjanjian Jual Beli (item No. 7 dan No. 8 Notis Pertama): atas dasar tolak ansur, saya TIDAK menuntut penukaran arah bukaan tersebut, DENGAN SYARAT pihak tuan mengemukakan kepada saya lukisan terkini yang diluluskan (latest approved / as-built drawing) yang menunjukkan arah bukaan sebenar sebagaimana yang sedia ada, sebagai dokumen rasmi bagi rekod dan rujukan saya selaku pembeli.`
+  `Berhubung isu arah bukaan pintu bi-fold di Bathroom 2 dan Bathroom 3 serta pintu pagar (gate) yang tidak mengikut Pelan Lantai (Floor Plan) yang diluluskan di dalam Perjanjian Jual Beli (item No. 7 dan No. 8 Notis Pertama): atas dasar tolak ansur, saya TIDAK menuntut penukaran arah bukaan tersebut, DENGAN SYARAT pihak tuan mengemukakan kepada saya lukisan terkini yang diluluskan (latest approved / as-built drawing) yang menunjukkan arah bukaan sebenar sebagaimana yang sedia ada, sebagai dokumen rasmi bagi rekod dan rujukan saya selaku pembeli. Begitu juga, bagi item No. 30 — pintu kaca di Master Bathroom yang tidak dapat dibuka 90 darjah kerana tersekat dengan shower head — pihak tuan dituntut menyemak semula perkara ini dan memberikan PENJELASAN RASMI kepada saya sama ada ia mengikut reka bentuk yang diluluskan ataupun kesilapan pemasangan, serta melaksanakan pembetulan yang sewajarnya sekiranya ia berpunca daripada pemasangan.`
 );
 y += 4;
 
