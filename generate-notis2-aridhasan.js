@@ -290,7 +290,7 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Berhubung isu arah bukaan pintu bi-fold di Bathroom 2 dan Bathroom 3 serta pintu pagar (gate) yang tidak mengikut Pelan Lantai (Floor Plan) yang diluluskan di dalam Perjanjian Jual Beli (item No. 7 dan No. 8 Notis Pertama): atas dasar tolak ansur, saya TIDAK menuntut penukaran arah bukaan tersebut, DENGAN SYARAT pihak tuan mengemukakan kepada saya lukisan terkini yang diluluskan (latest approved / as-built drawing) yang menunjukkan arah bukaan sebenar sebagaimana yang sedia ada, sebagai dokumen rasmi bagi rekod dan rujukan saya selaku pembeli. Begitu juga, bagi item No. 30 — pintu kaca di Master Bathroom yang tidak dapat dibuka 90 darjah kerana tersekat dengan shower head — pihak tuan dituntut menyemak semula perkara ini dan memberikan PENJELASAN RASMI kepada saya sama ada ia mengikut reka bentuk yang diluluskan ataupun kesilapan pemasangan, serta melaksanakan pembetulan yang sewajarnya sekiranya ia berpunca daripada pemasangan.`
+  `Berhubung isu arah bukaan pintu bi-fold di Bathroom 2 dan Bathroom 3 serta pintu pagar (gate) yang tidak mengikut Pelan Lantai (Floor Plan) yang diluluskan di dalam Perjanjian Jual Beli (item No. 7 dan No. 8 Notis Pertama): atas dasar tolak ansur, saya TIDAK menuntut penukaran arah bukaan tersebut, DENGAN SYARAT pihak tuan mengemukakan kepada saya lukisan terkini yang diluluskan (latest approved / as-built drawing) yang menunjukkan arah bukaan sebenar sebagaimana yang sedia ada, sebagai dokumen rasmi bagi rekod dan rujukan saya selaku pembeli. Begitu juga, bagi item No. 30 — pintu kaca di Master Bathroom yang tidak dapat dibuka sepenuhnya (90 darjah) kerana tersekat dengan shower head — keadaan ini menyusahkan kami setiap kali membuka pintu tersebut tanpa terkena shower head. Oleh itu, kami meminta pihak tuan menyemak semula bukaan pintu kaca tersebut dan memberikan PENJELASAN RASMI sama ada ia mengikut reka bentuk yang diluluskan ataupun kesilapan pemasangan, serta melaksanakan pembetulan yang sewajarnya.`
 );
 y += 4;
 
@@ -328,12 +328,13 @@ bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempa
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
+checkBreak(80);
 para("Saya berharap pihak tuan mengambil tindakan segera dan muktamad terhadap Notis Kedua ini. Ini merupakan notis akhir sebelum tindakan undang-undang dimulakan. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.");
 y += 4;
 para("Sekian.");
 y += 10;
 
-checkBreak(60);
+checkBreak(46);
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Yang benar,", mL, y);
 y += 20;
