@@ -66,7 +66,8 @@ const data = {
     { tarikh: "27 Julai 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan sepenuhnya" },
     { tarikh: "28 & 29 Julai 2026", peristiwa: "Laporan Re-Inspection diserahkan kepada pemaju melalui aplikasi ProFix — Batch 2 (159 kecacatan) dan Batch 3 (114 kecacatan)" },
     { tarikh: "15 Ogos 2026", peristiwa: "Notis tuntutan pembaikan (Ruj: NOTIS-1/2026/024) dikeluarkan" },
-    { tarikh: "27 Ogos 2026", peristiwa: "Notis diserahkan secara fizikal di pejabat Johor Bahru — DIAKUI TERIMA oleh En. Mohd Shawl bin Kamsan (Officer) dengan cop DITERIMA" },
+    { tarikh: "27 Ogos 2026", peristiwa: "Notis diserahkan secara fizikal di pejabat Johor Bahru — DIAKUI TERIMA oleh En. Mohd Sharil bin Kamsan (Officer) dengan cop DITERIMA" },
+    { tarikh: "1 September 2026", peristiwa: "Penghantaran laporan susulan dibuat ke dalam aplikasi ProFix" },
     { tarikh: "11 September 2026", peristiwa: "Tamat tempoh 15 hari dari serahan notis — pembaikan masih belum disempurnakan" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 50 penemuan masih belum diselesaikan" },
     { tarikh: "1 Oktober 2026", peristiwa: "Notis ini dikeluarkan kepada Ibu Pejabat pihak tuan di Kuala Lumpur" },
@@ -253,7 +254,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 28 Mei 2026, Pemeriksaan Semula (Re-Inspection) pada 27 Julai 2026 mendapati masih terdapat banyak kecacatan yang belum diselesaikan, dan laporan Batch 2 (159 kecacatan) serta Batch 3 (114 kecacatan) telah diserahkan melalui aplikasi ProFix pada 28 dan 29 Julai 2026. Notis tuntutan pembaikan bertarikh 15 Ogos 2026 (Ruj: NOTIS-1/2026/024) kemudiannya telah diserahkan secara fizikal kepada pejabat pihak tuan di Johor Bahru pada 27 Ogos 2026 dan DIAKUI TERIMA oleh wakil pihak tuan, En. Mohd Shawl bin Kamsan (Officer), dengan cop rasmi "DITERIMA 27 AUG 2026" — namun tempoh yang diberikan tamat pada 11 September 2026 tanpa pembaikan disempurnakan. Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM pada 24 September 2026 seterusnya mengesahkan 50 penemuan masih belum diselesaikan. Antara kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 28 Mei 2026, Pemeriksaan Semula (Re-Inspection) pada 27 Julai 2026 mendapati masih terdapat banyak kecacatan yang belum diselesaikan, dan laporan Batch 2 (159 kecacatan) serta Batch 3 (114 kecacatan) telah diserahkan melalui aplikasi ProFix pada 28 dan 29 Julai 2026. Notis tuntutan pembaikan bertarikh 15 Ogos 2026 (Ruj: NOTIS-1/2026/024) kemudiannya telah diserahkan secara fizikal kepada pejabat pihak tuan di Johor Bahru pada 27 Ogos 2026 dan DIAKUI TERIMA oleh wakil pihak tuan, En. Mohd Sharil bin Kamsan (Officer), dengan cop rasmi "DITERIMA 27 AUG 2026" — namun tempoh yang diberikan tamat pada 11 September 2026 tanpa pembaikan disempurnakan. Penghantaran laporan susulan ke dalam aplikasi ProFix juga telah dibuat pada 1 September 2026. Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM pada 24 September 2026 seterusnya mengesahkan 50 penemuan masih belum diselesaikan. Antara kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 

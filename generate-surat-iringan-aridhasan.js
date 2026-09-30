@@ -135,7 +135,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Untuk makluman pihak tuan, Notis Pertama tersebut telah diserahkan secara fizikal (by hand) kepada pejabat pihak tuan di Johor Bahru (No. 1, Jalan Padi Mahsuri 12, Bandar Baru Uda) pada 27 Ogos 2026, dan telah DIAKUI TERIMA oleh wakil pihak tuan, En. Mohd Shawl bin Kamsan (Officer), dengan cop rasmi "DITERIMA 27 AUG 2026". Tempoh lima belas (15) hari yang diperuntukkan di dalam notis tersebut telah tamat pada 11 September 2026 tanpa pembaikan disempurnakan.`
+  `Untuk makluman pihak tuan, Notis Pertama tersebut telah diserahkan secara fizikal (by hand) kepada pejabat pihak tuan di Johor Bahru (No. 1, Jalan Padi Mahsuri 12, Bandar Baru Uda) pada 27 Ogos 2026, dan telah DIAKUI TERIMA oleh wakil pihak tuan, En. Mohd Sharil bin Kamsan (Officer), dengan cop rasmi "DITERIMA 27 AUG 2026". Tempoh lima belas (15) hari yang diperuntukkan di dalam notis tersebut telah tamat pada 11 September 2026 tanpa pembaikan disempurnakan.`
 );
 y += 4;
 
