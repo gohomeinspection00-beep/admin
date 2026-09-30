@@ -272,7 +272,7 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai di atas bukanlah senarai penuh. Kecacatan lain yang turut belum diselesaikan adalah sebagaimana terkandung dalam Laporan Re-Inspection (Batch 2 & Batch 3) yang diserahkan pada ${data.tarikhSerahanLaporan2} serta Laporan Pemeriksaan Kecacatan Kali Pertama (Batch 1) yang diserahkan pada ${data.tarikhSerahanLaporan}.`;
+const fn = `*Senarai di atas bukanlah senarai penuh. Kecacatan lain yang turut belum diselesaikan adalah sebagaimana terkandung dalam Laporan Re-Inspection (Batch 2 & Batch 3) yang diserahkan melalui aplikasi ProFix pada 28 dan 29 Julai 2026 serta Laporan Pemeriksaan Kecacatan Kali Pertama (Batch 1) yang diserahkan melalui aplikasi ProFix pada 28 April 2026.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { checkBreak(6); doc.text(f, mL, y); y += 4.5; }
 y += 5;
