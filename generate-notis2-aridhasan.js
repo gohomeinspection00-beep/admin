@@ -84,7 +84,7 @@ const data = {
     { tarikh: "15 Ogos 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/024" },
     { tarikh: "27 Ogos 2026", peristiwa: "Notis Pertama diserahkan secara fizikal (by hand) dan DIAKUI TERIMA oleh wakil pemaju, En. Mohd Sharil bin Kamsan (Officer), dengan cop rasmi DITERIMA (rujuk Lampiran A)" },
     { tarikh: "11 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari dari tarikh serahan 27 Ogos 2026) — kecacatan masih belum diselesaikan" },
-    { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 50 penemuan masih belum diselesaikan, termasuk kecacatan baru; ujian semula elektrik pada 27 September 2026 mengesahkan rintangan penebatan masih gagal" },
+    { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 49 penemuan masih belum diselesaikan, termasuk kecacatan baru; ujian semula elektrik pada 27 September 2026 mengesahkan rintangan penebatan masih gagal" },
     { tarikh: "1 Oktober 2026", peristiwa: "Laporan Pemeriksaan Ketiga dihantar kepada pemaju melalui aplikasi ProFix" },
     { tarikh: "1 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "16 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
@@ -264,7 +264,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, hasil daripada Pemeriksaan Ketiga (Third Inspection) yang dijalankan pada ${data.tarikhReInspection} oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM), didapati SEMUA 50 penemuan yang direkodkan masih belum diselesaikan oleh pihak tuan — termasuk beberapa KECACATAN BARU yang berlaku akibat kerja pembaikan pihak tuan sendiri. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan. Laporan Pemeriksaan Ketiga penuh disertakan bersama-sama notis ini. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
+  `Namun, hasil daripada Pemeriksaan Ketiga (Third Inspection) yang dijalankan pada ${data.tarikhReInspection} oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM), didapati kesemua 49 penemuan yang direkodkan masih belum diselesaikan oleh pihak tuan — termasuk beberapa KECACATAN BARU yang berlaku akibat kerja pembaikan pihak tuan sendiri. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan. Laporan Pemeriksaan Ketiga penuh disertakan bersama-sama notis ini. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -285,7 +285,7 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai di atas hanyalah sebahagian daripada 50 penemuan Pemeriksaan Ketiga. Senarai penuh adalah sebagaimana Laporan Pemeriksaan Ketiga bertarikh ${data.tarikhReInspection} yang disertakan bersama-sama notis ini, serta laporan-laporan terdahulu yang dihantar melalui ${data.kaedahSerahanLaporan}.`;
+const fn = `*Senarai di atas hanyalah sebahagian daripada 49 penemuan Pemeriksaan Ketiga. Senarai penuh adalah sebagaimana Laporan Pemeriksaan Ketiga bertarikh ${data.tarikhReInspection} yang disertakan bersama-sama notis ini, serta laporan-laporan terdahulu yang dihantar melalui ${data.kaedahSerahanLaporan}.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
