@@ -328,20 +328,56 @@ numPara(10,
 );
 y += 4;
 
+checkBreak(45);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+const sTG = "G. Ringkasan Dokumen & Maklumat Yang Dituntut";
+doc.text(sTG, mL, y);
+doc.setLineWidth(0.3);
+doc.line(mL, y + 1, mL + doc.getTextWidth(sTG), y + 1);
+y += 8;
+
+numPara(11,
+  `Bagi memudahkan rujukan pihak tuan, berikut adalah ringkasan kesemua dokumen dan maklumat rasmi yang dituntut melalui surat ini. Kesemuanya hendaklah dikemukakan secara BERTULIS kepada saya (melalui serahan fizikal, pos berdaftar, atau e-mel ke ${data.emailPembeli}) dalam tempoh yang dinyatakan di Seksyen H di bawah:`
+);
+y += 4;
+
+const dokColW = [12, 78, cW - 12 - 78];
+drawTable(
+  ["No.", "Dokumen / Maklumat Dituntut", "Berhubung Dengan"],
+  [
+    ["1", "Salinan lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan gradient lantai", "Kitchen — floor alignment"],
+    ["2", "Salinan lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan spesifikasi dinding dan susun atur tiles", "Kitchen — dinding senget & kawasan tanpa tiles"],
+    ["3", "Salinan lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan spesifikasi dinding", "Master Bedroom — dinding senget yang ketara pada tiles"],
+    ["4", "Dokumen reka bentuk rasmi yang diluluskan (approved design documentation), termasuk keputusan semakan sama ada ceiling board sepatutnya dipasang", "Metal Deck Area — large opening & exposed roof structure (Item No. 197)"],
+    ["5", "Keterangan rasmi bertulis mengapa rantai (chain) tidak dibekalkan, ATAU pembekalan dan pemasangan rantai tersebut", "Basin stopper — slot rantai wujud tetapi rantai tiada"],
+    ["6", "Bukti bergambar selepas siap kerja pembaikan bumbung (after-repair photographic evidence) yang menunjukkan roof tiles dalam keadaan sempurna tanpa pecah", "Roof tiles — kerosakan selepas kerja pembaikan (Seksyen F)"],
+    ["7", "Spesifikasi bahan (material specification) dan pengesahan bertulis sama ada mailbox dan pintu refuse chamber sedia ada akan DIGANTIKAN dengan unit baharu yang sempurna, berserta tarikh penggantian", "Mailbox & pintu refuse chamber senget (Seksyen B)"],
+    ["8", "Jadual kerja pembaikan (rectification work schedule) yang menyatakan tarikh mula dan tarikh siap bagi SETIAP kecacatan yang masih tertunggak, bagi memastikan penyiapan sebelum tarikh akhir Notis Pertama", "Kesemua kecacatan tertunggak dalam Notis Pertama & Laporan Re-Inspection"],
+  ],
+  dokColW
+);
+y += 5;
+
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const dokFn = "*Kegagalan mengemukakan mana-mana dokumen di atas akan diambil sebagai pengakuan bahawa tiada dokumen sokongan wujud bagi dakwaan lisan berkenaan, dan kecacatan tersebut hendaklah dibaiki sepenuhnya tanpa sebarang pengecualian.";
+const dokFnL = doc.splitTextToSize(dokFn, cW);
+for (const f of dokFnL) { checkBreak(6); doc.text(f, mL, y); y += 4.5; }
+y += 5;
+
 checkBreak(30);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sT7 = "G. Tempoh Notis Pertama Kekal Berkuat Kuasa";
+const sT7 = "H. Tempoh Notis Pertama Kekal Berkuat Kuasa";
 doc.text(sT7, mL, y);
 doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(sT7), y + 1);
 y += 8;
 
-numPara(11,
+numPara(12,
   `Untuk mengelakkan sebarang keraguan, surat susulan ini TIDAK melanjutkan mahupun menggantikan tempoh yang ditetapkan dalam Notis Pertama. Tarikh akhir penyiapan semua kerja pembaikan sebagaimana dinyatakan dalam Notis Pertama KEKAL pada ${data.tarikhDeadline}. Kesemua jawapan bertulis dan dokumen rasmi yang dituntut di dalam surat ini hendaklah dikemukakan dalam tempoh yang sama. Sekiranya pembaikan masih tidak disempurnakan dan/atau dokumen yang dituntut tidak dikemukakan dalam tempoh tersebut, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan tanpa rujukan lanjut, dan tindakan selanjutnya sebagaimana dinyatakan dalam Notis Pertama — termasuk tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR) — akan diteruskan.`
 );
 y += 4;
 
-numPara(12,
+numPara(13,
   `Merujuk kepada Klausa 13.1 (Notices) di dalam Perjanjian Jual Beli, surat ini yang diberikan melalui serahan tangan atau surat berdaftar ke alamat pihak tuan adalah dianggap sah diserahkan (sufficiently served).`
 );
 y += 4;
