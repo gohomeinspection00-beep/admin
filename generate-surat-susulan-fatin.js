@@ -231,7 +231,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Pada 25 September 2026 (Jumaat), satu Pemeriksaan Bersama (Joint Inspection) telah dijalankan di hartanah tersebut dengan kehadiran saya selaku pemilik, wakil pihak pemaju, dan beberapa wakil daripada kontraktor utama (main contractor). Dalam perbincangan tersebut, beberapa maklum balas telah diberikan secara LISAN oleh pihak yang mewakili pemaju dan kontraktor berhubung kecacatan yang dilaporkan. Memandangkan maklum balas lisan tidak mempunyai nilai rekod, surat ini dikeluarkan bagi merekodkan secara BERTULIS kesemua maklum balas tersebut berserta pendirian rasmi saya, dan menuntut jawapan serta dokumentasi rasmi daripada pihak tuan bagi setiap perkara di bawah.`
+  `Pada 25 September 2026 (Jumaat), satu Pemeriksaan Bersama (Joint Inspection) telah dijalankan di hartanah tersebut dengan kehadiran saya selaku pemilik, wakil pihak pemaju, dan beberapa wakil daripada kontraktor utama (main contractor). Dalam perbincangan tersebut, beberapa maklum balas telah diberikan secara LISAN oleh pihak yang mewakili pemaju dan kontraktor berhubung kecacatan yang dilaporkan. Memandangkan maklum balas lisan tidak mempunyai nilai rekod, surat ini dikeluarkan bagi merekodkan secara BERTULIS kesemua maklum balas tersebut berserta pendirian rasmi saya, dan menuntut jawapan serta dokumentasi rasmi daripada pihak tuan bagi setiap perkara di bawah. Untuk rekod, semasa pemeriksaan tersebut penyelia tapak (site supervisor) pihak tuan turut memaklumkan agar pemilik berhubung TERUS dengan Ibu Pejabat pihak tuan berhubung perkara-perkara ini; sehubungan itu, surat ini dikemukakan kepada Ibu Pejabat pihak tuan untuk tindakan.`
 );
 y += 4;
 
@@ -262,59 +262,76 @@ y += 4;
 
 checkBreak(30);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sT3 = 'C. Alasan "Refer Drawing" — Kitchen & Master Bedroom';
+const sT3 = 'C. Alasan "Refer Drawing" — Wall Tiles Dapur (Item No. 29)';
 doc.text(sT3, mL, y);
 doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(sT3), y + 1);
 y += 8;
 
 numPara(5,
-  `Semasa Joint Inspection, alasan "refer drawing" (merujuk kepada lukisan) telah diberikan secara lisan bagi TIGA kecacatan berikut:`
-);
-y += 2;
-bullet("Kitchen — ketidakjajaran lantai / alignment lantai (floor alignment) yang didakwa mengikut gradient dalam lukisan;");
-bullet("Kitchen — dinding yang senget dan kawasan dinding yang tidak dipasang tiles, yang didakwa mengikut lukisan; dan");
-bullet("Master Bedroom — dinding yang senget sehingga ketara (nampak jelas) pada pemasangan tiles, yang juga didakwa mengikut lukisan.");
-y += 4;
-
-numPara(6,
-  `Pendirian saya adalah seperti berikut: Perjanjian Jual Beli yang ditandatangani TIDAK menyatakan sebarang peruntukan berkenaan gradient lantai di Kitchen, dan TIDAK menyatakan bahawa dinding di Kitchen mahupun Master Bedroom dibina senget sehingga ketara pada permukaan tiles. Dakwaan lisan "refer drawing" tanpa sebarang dokumen sokongan tidak mempunyai apa-apa nilai. Oleh itu, bagi SETIAP satu daripada tiga perkara di atas, pihak tuan dituntut mengemukakan dokumen rasmi (official documentation) — iaitu salinan lukisan yang diluluskan (approved drawing) dan/atau lukisan as-built terkini yang jelas menunjukkan spesifikasi yang didakwa — dalam bentuk bertulis kepada saya. Sekiranya dokumen tersebut tidak dapat dikemukakan, atau dokumen tersebut tidak menyokong keadaan sedia ada, maka kecacatan berkenaan hendaklah dibaiki sepenuhnya mengikut standard mutu kerja yang sewajarnya, atas kos pihak tuan.`
+  `Semasa Joint Inspection, alasan "refer drawing" (merujuk kepada lukisan / section plan) telah diberikan secara lisan bagi item No. 29 (Kitchen — Wall): keperluan menyemak section plan sama ada dinding tersebut sepatutnya dipasang wall tiles. Dakwaan lisan "refer drawing" tanpa sebarang dokumen sokongan tidak mempunyai apa-apa nilai. Pihak tuan dituntut mengemukakan dokumen rasmi (official documentation) — salinan section plan / lukisan yang diluluskan (approved drawing) dan/atau lukisan as-built terkini — yang jelas menunjukkan spesifikasi dinding tersebut. Sekiranya dokumen tersebut tidak dapat dikemukakan, atau tidak menyokong keadaan sedia ada, dinding berkenaan hendaklah disiapkan dengan wall tiles sewajarnya, atas kos pihak tuan. (Alasan "ikut design / refer drawing" yang turut diberikan bagi item No. 63 — Metal Deck Area — dijawab di Seksyen G di bawah.)`
 );
 y += 4;
 
 checkBreak(30);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sT4 = "D. Rantai Basin Stopper Tidak Dibekalkan";
+const sTD = 'D. Alasan "Within Tolerance" — Item No. 26, 27, 28 & 32';
+doc.text(sTD, mL, y);
+doc.setLineWidth(0.3);
+doc.line(mL, y + 1, mL + doc.getTextWidth(sTD), y + 1);
+y += 8;
+
+numPara(6,
+  `Berhubung item No. 26 (Kitchen — lippage floor tile), item No. 27 (Kitchen — uneven floor tiles), item No. 28 (Kitchen — isu penjajaran yang jelas kelihatan pada permukaan dinding dan skirting) dan item No. 32 (Yard — kecerunan lantai berlebihan / too much gradient), pihak yang mewakili pemaju dan kontraktor menyatakan secara lisan bahawa kesemua kecacatan tersebut berada "dalam had toleransi (within tolerance)" dan oleh itu TIADA tindakan akan diambil. Dakwaan lisan ini tidak boleh diterima. Pihak tuan dituntut menyatakan secara BERTULIS bagi SETIAP item di atas: (i) standard atau piawaian toleransi yang dirujuk (contohnya CIDB QLASSIC, Malaysian Standard, atau spesifikasi pengilang — dengan rujukan penuh); (ii) had toleransi yang dibenarkan di bawah standard tersebut; dan (iii) bacaan ukuran sebenar yang diambil di tapak berserta kaedah dan lokasi pengukuran. Perlu ditegaskan bahawa bukti bergambar di dalam laporan pemeriksaan — termasuk ukuran menggunakan alat aras (spirit level) — jelas menunjukkan kecacatan yang ketara dan masih wujud. Tanpa pengesahan bertulis berserta data ukuran sebagaimana di atas, keengganan mengambil tindakan tidak akan diterima, dan item-item ini kekal sebagai kecacatan tertunggak yang wajib dibaiki.`
+);
+y += 4;
+
+checkBreak(30);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+const sTE = 'E. Dakwaan Ukuran Laser — Item No. 41 (Master Bedroom)';
+doc.text(sTE, mL, y);
+doc.setLineWidth(0.3);
+doc.line(mL, y + 1, mL + doc.getTextWidth(sTE), y + 1);
+y += 8;
+
+numPara(7,
+  `Berhubung item No. 41 (Master Bedroom — isu penjajaran pada permukaan dinding akibat pemotongan floor tiles yang tidak konsisten), pihak kontraktor menerangkan secara lisan bahawa mereka telah menembak laser dari dinding bertentangan dan, berdasarkan itu, mendakwa dinding tersebut lurus. Penjelasan ini tidak menjawab kecacatan yang dilaporkan: isu yang direkodkan adalah ketidakjajaran yang JELAS KELIHATAN pada permukaan dinding/tiles akibat pemotongan floor tiles yang tidak konsisten, sebagaimana dirakam bergambar di dalam laporan pemeriksaan. Satu demonstrasi laser secara lisan tanpa sebarang rekod tidak mempunyai nilai pembuktian. Pihak tuan dituntut mengemukakan laporan pengukuran bertulis (kaedah pengukuran, bacaan, lokasi titik ukur dan nama pegawai yang menjalankan ukuran) dan/atau menjalankan pengesahan ukuran semula secara bersama dengan kehadiran pemilik. Sekiranya pemotongan tiles didapati tidak konsisten, pembetulan hendaklah dilaksanakan sepenuhnya atas kos pihak tuan.`
+);
+y += 4;
+
+checkBreak(30);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+const sT4 = "F. Rantai Basin Stopper Tidak Dibekalkan";
 doc.text(sT4, mL, y);
 doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(sT4), y + 1);
 y += 8;
 
-numPara(7,
+numPara(8,
   `Berhubung keperluan memasang rantai (chain) pada basin stopper bagi mengelakkan kebocoran, pihak kontraktor utama menyatakan secara lisan bahawa pemasangan adalah merujuk kepada rumah contoh (show unit). Walau bagaimanapun, slot untuk rantai tersebut jelas wujud pada kelengkapan yang dipasang, yang menunjukkan rantai merupakan sebahagian daripada kelengkapan asal yang sepatutnya dibekalkan. Rujukan kepada rumah contoh bukanlah jawapan kontraktual. Pihak tuan dituntut memberikan keterangan rasmi bertulis mengapa rantai tersebut tidak dibekalkan, atau membekalkan dan memasang rantai berkenaan.`
 );
 y += 4;
 
 checkBreak(30);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sT5 = "E. Bukaan Besar & Struktur Bumbung Terdedah (Metal Deck Area)";
+const sT5 = "G. Bukaan Besar & Struktur Bumbung Terdedah (Metal Deck Area)";
 const sT5L = doc.splitTextToSize(sT5, cW);
 for (const l of sT5L) { doc.text(l, mL, y); doc.setLineWidth(0.3); doc.line(mL, y + 1, mL + doc.getTextWidth(l), y + 1); y += LH; }
 y += 2;
 
-numPara(8,
-  `Berhubung item No. 197 dalam Notis Pertama — bukaan besar (large opening) dengan struktur bumbung terdedah di Metal Deck Area — pihak yang mewakili pemaju menyatakan secara lisan bahawa keadaan tersebut adalah "mengikut design". Perlu ditegaskan bahawa keadaan ini turut menyebabkan wujudnya bukaan di dalam ruang siling di mana cahaya luar boleh dilihat menembusi masuk — keadaan yang turut membuka laluan kepada air hujan, habuk dan haiwan perosak. Sebagaimana telah dituntut dalam Notis Pertama, sekiranya keadaan ini benar-benar merupakan reka bentuk asal yang diluluskan, pihak tuan dituntut mengemukakan dokumen rasmi (official documentation) reka bentuk yang diluluskan sebagai pengesahan bertulis, termasuk semakan sama ada kawasan tersebut sepatutnya dipasang ceiling board sebagai lapisan perlindungan. Jawapan lisan "ikut design" tanpa dokumen tidak akan diterima sebagai penyelesaian.`
+numPara(9,
+  `Berhubung item No. 63 dalam Laporan Pemeriksaan (direkodkan sebagai item No. 197 di dalam senarai Notis Pertama) — bukaan besar (large opening) dengan struktur bumbung terdedah di Metal Deck Area — pihak yang mewakili pemaju menyatakan secara lisan bahawa keadaan tersebut adalah "mengikut design". Perlu ditegaskan bahawa keadaan ini turut menyebabkan wujudnya bukaan di dalam ruang siling di mana cahaya luar boleh dilihat menembusi masuk — keadaan yang turut membuka laluan kepada air hujan, habuk dan haiwan perosak. Sebagaimana telah dituntut dalam Notis Pertama, sekiranya keadaan ini benar-benar merupakan reka bentuk asal yang diluluskan, pihak tuan dituntut mengemukakan dokumen rasmi (official documentation) reka bentuk yang diluluskan sebagai pengesahan bertulis, termasuk semakan sama ada kawasan tersebut sepatutnya dipasang ceiling board sebagai lapisan perlindungan. Jawapan lisan "ikut design" tanpa dokumen tidak akan diterima sebagai penyelesaian.`
 );
 y += 4;
 
 checkBreak(40);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sT6 = "F. Kerosakan Roof Tiles Selepas Kerja Pembaikan — Dakwaan";
+const sT6 = "H. Kerosakan Roof Tiles Selepas Kerja Pembaikan — Dakwaan";
 const sT6b = "Terhadap Pihak Pemeriksa Ditolak Dengan Bukti";
 for (const l of [sT6, sT6b]) { doc.text(l, mL, y); doc.setLineWidth(0.3); doc.line(mL, y + 1, mL + doc.getTextWidth(l), y + 1); y += LH; }
 y += 2;
 
-numPara(9,
+numPara(10,
   `Berhubung kecacatan baharu yang direkodkan sebagai "New Defect from Rectification Work — crack/damage on roof tiles after rectification work", pihak yang mewakili pemaju/kontraktor telah mendakwa secara lisan bahawa kerosakan tersebut disebabkan oleh juruukur (surveyor) yang menaiki bumbung semasa pemeriksaan. Dakwaan ini adalah TIDAK BERASAS dan dengan ini DITOLAK berdasarkan bukti bergambar berikut (rujuk Lampiran A):`
 );
 y += 2;
@@ -323,21 +340,21 @@ bullet("Semasa Pemeriksaan Semula (Re-Inspection) pada 9 September 2026, didapat
 bullet("Kronologi gambar ini jelas menunjukkan kerosakan berlaku dalam tempoh kerja pembaikan (rectification work) dijalankan oleh pihak kontraktor, dan bukannya disebabkan oleh pihak pemeriksa.");
 y += 4;
 
-numPara(10,
+numPara(11,
   `Sehubungan itu, sekiranya pihak tuan masih mengekalkan dakwaan bahawa kerosakan tersebut bukan berpunca daripada kerja pembaikan pihak kontraktor, pihak tuan dituntut mengemukakan bukti bergambar (photographic evidence) kerja pembaikan bumbung yang telah dijalankan — iaitu gambar selepas siap kerja pembaikan (after-repair photos) yang menunjukkan roof tiles di kawasan tersebut berada dalam keadaan sempurna TANPA pecah. Tanpa bukti sedemikian, kerosakan tersebut kekal sebagai kecacatan baharu akibat kerja pembaikan (new defect arising from rectification work) yang WAJIB dibaiki sepenuhnya oleh pihak tuan atas kos pihak tuan sendiri, dengan kadar SEGERA memandangkan ia melibatkan bumbung yang terdedah kepada risiko kebocoran air hujan.`
 );
 y += 4;
 
 checkBreak(45);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sTG = "G. Ringkasan Dokumen & Maklumat Yang Dituntut";
+const sTG = "I. Ringkasan Dokumen & Maklumat Yang Dituntut";
 doc.text(sTG, mL, y);
 doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(sTG), y + 1);
 y += 8;
 
-numPara(11,
-  `Bagi memudahkan rujukan pihak tuan, berikut adalah ringkasan kesemua dokumen dan maklumat rasmi yang dituntut melalui surat ini. Kesemuanya hendaklah dikemukakan secara BERTULIS kepada saya (melalui serahan fizikal, pos berdaftar, atau e-mel ke ${data.emailPembeli}) dalam tempoh yang dinyatakan di Seksyen H di bawah:`
+numPara(12,
+  `Bagi memudahkan rujukan pihak tuan, berikut adalah ringkasan kesemua dokumen dan maklumat rasmi yang dituntut melalui surat ini. Kesemuanya hendaklah dikemukakan secara BERTULIS kepada saya (melalui serahan fizikal, pos berdaftar, atau e-mel ke ${data.emailPembeli}) dalam tempoh yang dinyatakan di Seksyen J di bawah:`
 );
 y += 4;
 
@@ -345,12 +362,12 @@ const dokColW = [12, 78, cW - 12 - 78];
 drawTable(
   ["No.", "Dokumen / Maklumat Dituntut", "Berhubung Dengan"],
   [
-    ["1", "Salinan lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan gradient lantai", "Kitchen — floor alignment"],
-    ["2", "Salinan lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan spesifikasi dinding dan susun atur tiles", "Kitchen — dinding senget & kawasan tanpa tiles"],
-    ["3", "Salinan lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan spesifikasi dinding", "Master Bedroom — dinding senget yang ketara pada tiles"],
-    ["4", "Dokumen reka bentuk rasmi yang diluluskan (approved design documentation), termasuk keputusan semakan sama ada ceiling board sepatutnya dipasang", "Metal Deck Area — large opening & exposed roof structure (Item No. 197)"],
-    ["5", "Keterangan rasmi bertulis mengapa rantai (chain) tidak dibekalkan, ATAU pembekalan dan pemasangan rantai tersebut", "Basin stopper — slot rantai wujud tetapi rantai tiada"],
-    ["6", "Bukti bergambar selepas siap kerja pembaikan bumbung (after-repair photographic evidence) yang menunjukkan roof tiles dalam keadaan sempurna tanpa pecah", "Roof tiles — kerosakan selepas kerja pembaikan (Seksyen F)"],
+    ["1", "Salinan section plan / lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan spesifikasi dinding — sama ada sepatutnya dipasang wall tiles", "Item No. 29 — Kitchen Wall (Seksyen C)"],
+    ["2", "Pengesahan bertulis bagi dakwaan toleransi: (i) nama & rujukan penuh standard yang dirujuk, (ii) had toleransi dibenarkan, (iii) bacaan ukuran sebenar di tapak berserta kaedah & lokasi pengukuran — bagi SETIAP item", "Item No. 26, 27, 28 & 32 — alasan \"within tolerance\" (Seksyen D)"],
+    ["3", "Laporan pengukuran bertulis bagi dakwaan ukuran laser (kaedah, bacaan, lokasi titik ukur, nama pegawai), dan/atau pengesahan ukuran semula bersama dengan kehadiran pemilik", "Item No. 41 — Master Bedroom Wall (Seksyen E)"],
+    ["4", "Dokumen reka bentuk rasmi yang diluluskan (approved design documentation), termasuk keputusan semakan sama ada ceiling board sepatutnya dipasang", "Item No. 63 — Metal Deck Area, large opening & exposed roof structure (Seksyen G)"],
+    ["5", "Keterangan rasmi bertulis mengapa rantai (chain) tidak dibekalkan, ATAU pembekalan dan pemasangan rantai tersebut", "Basin stopper — slot rantai wujud tetapi rantai tiada (Seksyen F)"],
+    ["6", "Bukti bergambar selepas siap kerja pembaikan bumbung (after-repair photographic evidence) yang menunjukkan roof tiles dalam keadaan sempurna tanpa pecah", "Roof tiles — kerosakan selepas kerja pembaikan (Seksyen H)"],
     ["7", "Spesifikasi bahan (material specification) dan pengesahan bertulis sama ada mailbox dan pintu refuse chamber sedia ada akan DIGANTIKAN dengan unit baharu yang sempurna, berserta tarikh penggantian", "Mailbox & pintu refuse chamber senget (Seksyen B)"],
     ["8", "Jadual kerja pembaikan (rectification work schedule) yang menyatakan tarikh mula dan tarikh siap bagi SETIAP kecacatan yang masih tertunggak, bagi memastikan penyiapan sebelum tarikh akhir Notis Pertama", "Kesemua kecacatan tertunggak dalam Notis Pertama & Laporan Re-Inspection"],
   ],
@@ -366,18 +383,18 @@ y += 5;
 
 checkBreak(30);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sT7 = "H. Tempoh Notis Pertama Kekal Berkuat Kuasa";
+const sT7 = "J. Tempoh Notis Pertama Kekal Berkuat Kuasa";
 doc.text(sT7, mL, y);
 doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(sT7), y + 1);
 y += 8;
 
-numPara(12,
+numPara(13,
   `Untuk mengelakkan sebarang keraguan, surat susulan ini TIDAK melanjutkan mahupun menggantikan tempoh yang ditetapkan dalam Notis Pertama. Tarikh akhir penyiapan semua kerja pembaikan sebagaimana dinyatakan dalam Notis Pertama KEKAL pada ${data.tarikhDeadline}. Kesemua jawapan bertulis dan dokumen rasmi yang dituntut di dalam surat ini hendaklah dikemukakan dalam tempoh yang sama. Sekiranya pembaikan masih tidak disempurnakan dan/atau dokumen yang dituntut tidak dikemukakan dalam tempoh tersebut, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan tanpa rujukan lanjut, dan tindakan selanjutnya sebagaimana dinyatakan dalam Notis Pertama — termasuk tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR) — akan diteruskan.`
 );
 y += 4;
 
-numPara(13,
+numPara(14,
   `Merujuk kepada Klausa 13.1 (Notices) di dalam Perjanjian Jual Beli, surat ini yang diberikan melalui serahan tangan atau surat berdaftar ke alamat pihak tuan adalah dianggap sah diserahkan (sufficiently served).`
 );
 y += 4;
@@ -489,7 +506,7 @@ doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
 doc.text("Salinan Akuan Terima Notis Pertama (NOTIS-1/2026/043)", pageW / 2, y, { align: "center" });
 y += 10;
 
-addEvidenceImage("/home/user/admin/fatin-akuan-ayerkeroh.jpg", 90, 160,
+addEvidenceImage("/home/user/admin/fatin-akuan-ayerkeroh.jpg", 115, 115 * 864 / 705,
   'Akuan Terima di pejabat Ayer Keroh — diterima oleh En. Haziron bin Hasan (Supervisor, Site — Group Facilities, Property Liaison & Project Management) pada 24 September 2026, cop rasmi "RECEIVED 24 SEP 2026 METACORP PROPERTIES SDN BHD".');
 
 newPage();
