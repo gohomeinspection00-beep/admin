@@ -44,35 +44,36 @@ const data = {
   tarikhSerahanLaporan: "13 Ogos 2026",
   kaedahSerahanLaporan: "serahan tangan (hardcopy)",
 
-  tarikhNotis: "25 September 2026",
-  tarikhDeadline: "10 Oktober 2026",
+  tarikhReInspection: "28 September 2026",
+
+  tarikhNotis: "1 Oktober 2026",
+  tarikhDeadline: "16 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
   kecacatan: [
-    { tag: "4", lokasi: "Car Porch — Floor", kecacatan: "Enapan tanah di kawasan tanah — kedalaman 13 inci (Soil settlement spot on ground area, depth: 13 inch)", status: "Belum Dibaiki" },
-    { tag: "11", lokasi: "Car Porch — Ceiling", kecacatan: "Kelembapan tinggi pada siling dengan cat mengelupas dan kesan air pada permukaannya (High moisture on ceiling with peeling paint and watermark)", status: "Belum Dibaiki" },
-    { tag: "105", lokasi: "Backyard — Plumbing & Sanitary", kecacatan: "Ujian flushing: tanah/tanah merah keluar bersama air dan kebanyakan paip dipenuhi tanah (Flushing test: soil/red soil come out with water and most of pipe have soil — Poor Drainage System)", status: "Belum Dibaiki" },
-    { tag: "169", lokasi: "Bathroom 1 — Wall", kecacatan: "Kesan air pada dinding (Water mark on wall)", status: "Belum Dibaiki" },
-    { tag: "170", lokasi: "Bathroom 1 — Wall", kecacatan: "Kelembapan tinggi pada dinding (High moisture on wall)", status: "Belum Dibaiki" },
-    { tag: "176", lokasi: "Bathroom 1 — Plumbing & Sanitary", kecacatan: "Air masih keluar walaupun tidak flush (Water still come out even not flush)", status: "Belum Dibaiki" },
-    { tag: "230", lokasi: "Bathroom 2 — Plumbing & Sanitary", kecacatan: "Kebocoran dari paip tangki simbah tandas dan paip besen (Leaking from toilet cistern pipe and basin pipe)", status: "Belum Dibaiki" },
-    { tag: "245", lokasi: "Bedroom 3 — Wall", kecacatan: "Hollowness pada dinding bercat (Hollowness on painted wall)", status: "Belum Dibaiki" },
-    { tag: "290", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Celahan ketara sekeliling distribution pipe (Visible gap around distribution pipe — Jointing Issue)", status: "Belum Dibaiki" },
-    { tag: "291", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air kotor dan perlu dibersihkan (Water tank dirty and need to be clean)", status: "Belum Dibaiki" },
-    { tag: "294", lokasi: "Flat Roof — Floor", kecacatan: "Bunyi hollow dengan keretakan pada permukaan papak (Hollow sound with crack on slab surface)", status: "Belum Dibaiki" },
-    { tag: "295", lokasi: "Flat Roof — Wall", kecacatan: "Wall copping tidak sejajar — ketara (Wall copping not align, visible)", status: "Belum Dibaiki" },
-    { tag: "302", lokasi: "Top Roof — Roof", kecacatan: "Kerosakan dan lubang pada roof flashing (Damage and hole on roof flashing)", status: "Belum Dibaiki" },
-    { tag: "303", lokasi: "Top Roof — Roof", kecacatan: "Skru tidak dipasang penuh pada roof flashing (Screw not fully install on roof flashing)", status: "Belum Dibaiki" },
-    { tag: "304", lokasi: "Top Roof — Roof", kecacatan: "Skru hilang dan lubang pada genting bumbung (Missing screw and have hole on roof tiles)", status: "Belum Dibaiki" },
+    { tag: "2", lokasi: "Car Porch — Floor", kecacatan: "Enapan tanah di kawasan tanah — kedalaman 13 inci — masih ada (Soil settlement spot on ground area, depth: 13 inch — still observed)", status: "Belum Dibaiki" },
+    { tag: "86", lokasi: "Bathroom 1 — Plumbing & Sanitary", kecacatan: "Kebocoran pada basin bottle trap / jointing paip besen masih ada (Leaking basin bottle trap; leaking basin down pipe jointing — Major Defect, still observed)", status: "Belum Dibaiki" },
+    { tag: "105", lokasi: "Bedroom 3 — Wall", kecacatan: "Hollowness pada dinding bercat masih ada (Hollowness on painted wall — still observed)", status: "Belum Dibaiki" },
+    { tag: "119", lokasi: "Water Tank Area — Floor", kecacatan: "Keretakan pada keseluruhan permukaan papak masih ada (Crack on all of slab surface — still observed)", status: "Belum Dibaiki" },
+    { tag: "120", lokasi: "Water Tank Area — Floor", kecacatan: "Celahan pemisahan antara papak dan dinding masih ada (Separation gap between slab and wall — still observed)", status: "Belum Dibaiki" },
+    { tag: "121", lokasi: "Water Tank Area — Wall", kecacatan: "Keretakan pada keseluruhan permukaan dinding masih ada (All of wall surface have crack — still observed)", status: "Belum Dibaiki" },
+    { tag: "122", lokasi: "Water Tank Area — Wall", kecacatan: "Objek terdedah pada dinding masih ada (Exposed object on wall — still observed)", status: "Belum Dibaiki" },
+    { tag: "125", lokasi: "Water Tank Area — Window", kecacatan: "Celahan ketara dan penyendalan tidak sempurna sekeliling bingkai tingkap masih ada (Visible gap and improper seal around windows frame — still observed)", status: "Belum Dibaiki" },
+    { tag: "126", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Celahan ketara sekeliling distribution pipe masih ada (Visible gap around distribution pipe — Jointing Issue, still observed)", status: "Belum Dibaiki" },
+    { tag: "127", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air kotor dan perlu dibersihkan masih ada (Water tank dirty and need to be clean — still observed)", status: "Belum Dibaiki" },
+    { tag: "130", lokasi: "Flat Roof — Floor", kecacatan: "Bunyi hollow dengan keretakan pada permukaan papak masih ada (Hollow sound with crack on slab surface — still observed)", status: "Belum Dibaiki" },
+    { tag: "131", lokasi: "Flat Roof — Wall", kecacatan: "Wall copping tidak sejajar — ketara — masih ada (Wall copping not align, visible — still observed)", status: "Belum Dibaiki" },
+    { tag: "136", lokasi: "Top Roof — Roof", kecacatan: "Skru hilang dan lubang pada genting bumbung masih ada (Missing screw and have hole on roof tiles — still observed)", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
     { tarikh: "3 Ogos 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "13 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara serahan tangan (hardcopy) kepada pihak pemaju" },
     { tarikh: "12 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum dilaksanakan" },
-    { tarikh: "25 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "10 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "28 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 13 kecacatan disahkan masih belum dibaiki" },
+    { tarikh: "1 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "16 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -250,7 +251,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, sehingga tarikh notis ini dikeluarkan dan walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 12 September 2026, didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum dilaksanakan oleh pihak tuan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 12 September 2026, Pemeriksaan Semula (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mengesahkan bahawa kecacatan masih belum diselesaikan oleh pihak tuan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
@@ -268,18 +269,18 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai di atas bukanlah senarai penuh. Kecacatan lain yang turut belum diselesaikan adalah sebagaimana terkandung dalam Laporan Pemeriksaan Kecacatan yang telah diserahkan kepada pihak tuan pada ${data.tarikhSerahanLaporan}.`;
+const fn = `*Senarai di atas bukanlah senarai penuh. Kecacatan lain yang turut belum diselesaikan adalah sebagaimana terkandung dalam Laporan Pemeriksaan Kecacatan Kali Pertama yang diserahkan pada ${data.tarikhSerahanLaporan} dan Laporan Pemeriksaan Semula (Re-Inspection Report) bertarikh ${data.tarikhReInspection}.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus diberikan kepada item No. 4 — enapan tanah (soil settlement) sedalam TIGA BELAS (13) INCI di kawasan Car Porch. Enapan sedalam ini menunjukkan kemungkinan pemadatan tanah yang tidak sempurna dan boleh menjejaskan struktur sekeliling; saya menuntut agar pihak tuan menyiasat punca enapan dan melaksanakan pembaikan tapak yang sewajarnya, bukan sekadar menambak semula permukaan. Perhatian turut diberikan kepada item No. 105 — sistem saliran di Backyard yang tidak sempurna: tanah merah keluar bersama air semasa ujian flushing dan kebanyakan paip dipenuhi tanah. Pihak tuan dituntut menyemak dan membersihkan keseluruhan sistem saliran serta memastikan kecerunan paip yang betul.`
+  `Perhatian khusus diberikan kepada item No. 2 — enapan tanah (soil settlement) sedalam TIGA BELAS (13) INCI di kawasan Car Porch yang MASIH TIDAK DIBAIKI walaupun telah dilaporkan sejak pemeriksaan pertama. Enapan sedalam ini menunjukkan kemungkinan pemadatan tanah yang tidak sempurna dan boleh menjejaskan struktur sekeliling; saya menuntut agar pihak tuan menyiasat punca enapan dan melaksanakan pembaikan tapak yang sewajarnya, bukan sekadar menambak semula permukaan. Perhatian turut diberikan kepada kluster kecacatan di Water Tank Area (item No. 119 hingga 127) — keretakan pada keseluruhan papak dan dinding, celahan pemisahan, celahan sekeliling tingkap dan paip, serta tangki air yang masih kotor — yang kesemuanya kekal tidak disentuh.`
 );
 y += 4;
 
 numPara(4,
-  `Perhatian turut diberikan kepada kebocoran aktif dan kelembapan — item No. 230 (kebocoran dari paip tangki simbah tandas dan paip besen di Bathroom 2), item No. 176 (air masih keluar walaupun tidak flush di Bathroom 1), serta item No. 170, No. 169 dan No. 11 (kelembapan tinggi, kesan air dan cat mengelupas pada dinding Bathroom 1 dan siling Car Porch, disahkan dengan bacaan moisture meter). Kebocoran dan kelembapan yang berterusan akan merosakkan kemasan dan struktur unit. Saya menuntut agar pihak tuan mengesan dan membaiki PUNCA kebocoran dan kelembapan tersebut dengan sempurna, dan bukan sekadar kerja kemasan semula pada permukaan.`
+  `Perhatian turut diberikan kepada item No. 86 — kebocoran pada basin bottle trap / jointing paip besen di Bathroom 1 (kecacatan major) yang masih berterusan dan boleh menyebabkan kerosakan air; pihak tuan dituntut mengesan dan membaiki PUNCA kebocoran tersebut dengan sempurna, dan bukan sekadar kerja kemasan semula.`
 );
 y += 4;
 
