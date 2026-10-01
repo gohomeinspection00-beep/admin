@@ -506,7 +506,7 @@ doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
 doc.text("Salinan Akuan Terima Notis Pertama (NOTIS-1/2026/043)", pageW / 2, y, { align: "center" });
 y += 10;
 
-addEvidenceImage("/home/user/admin/fatin-akuan-ayerkeroh.jpg", 115, 115 * 864 / 705,
+addEvidenceImage("/home/user/admin/fatin-akuan-ayerkeroh.jpg", 110, 110 * 1072 / 739,
   'Akuan Terima di pejabat Ayer Keroh — diterima oleh En. Haziron bin Hasan (Supervisor, Site — Group Facilities, Property Liaison & Project Management) pada 24 September 2026, cop rasmi "RECEIVED 24 SEP 2026 METACORP PROPERTIES SDN BHD".');
 
 newPage();
@@ -518,7 +518,7 @@ doc.setLineWidth(0.4);
 doc.line(pageW / 2 - doc.getTextWidth(lb2) / 2, y + 1, pageW / 2 + doc.getTextWidth(lb2) / 2, y + 1);
 y += 10;
 
-addEvidenceImage("/home/user/admin/fatin-akuan-hq.jpg", 110, 110 * 1280 / 960,
+addEvidenceImage("/home/user/admin/fatin-akuan-hq.jpg", 110, 110 * 1072 / 732,
   "Akuan Terima di Ibu Pejabat Kuala Lumpur — diterima oleh En. Noor Razmin Riza bin Noor Hazizi (Senior Executive, Property Management) pada 22 September 2026.");
 
 // ============================================================
