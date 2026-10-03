@@ -286,6 +286,29 @@ numPara(6,
 );
 y += 4;
 
+checkBreak(50);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+doc.text("Keputusan Pengukuran oleh Pemilik (2 Oktober 2026):", mL, y);
+y += 6;
+
+drawTable(
+  ["Item", "Lokasi", "Ukuran Direkodkan", "Alat"],
+  [
+    ["26", "Kitchen — lippage floor tile", "2mm", "Pembaris berskala"],
+    ["27", "Kitchen — uneven floor tiles", "8mm", "Spirit level 1.2m + pembaris"],
+    ["41", "Master Bedroom — dinding & skirting", "Dinding: 6mm; Skirting: 9mm; Skirting (spirit level 1.2m): 12mm", "Sesiku L (L-square) & spirit level 1.2m"],
+    ["6", "Carporch — isu penjajaran", "13mm", "Sesiku L (L-square)"],
+  ],
+  [14, 42, 62, cW - 14 - 42 - 62]
+);
+y += 5;
+
+para(
+  `Bagi mengesahkan kedudukan sebenar, saya telah menjalankan pengukuran sendiri di tapak pada 2 Oktober 2026, dan kesemua bacaan dirakam sepenuhnya secara bergambar (rujuk Lampiran C). Keputusan adalah sebagaimana jadual di atas. Sebagai perbandingan, piawaian QLASSIC (CIS 7) yang lazim digunakan dalam industri pembinaan di Malaysia menetapkan toleransi kerataan permukaan sekitar 3mm per 1.2 meter straight edge, dan lippage tiles maksimum sekitar 1mm. Bacaan 8mm hingga 13mm yang direkodkan adalah BERKALI GANDA melebihi toleransi lazim tersebut. Sehubungan itu, pihak tuan dituntut menyatakan secara bertulis standard manakah, dengan rujukan penuh, yang didakwa membenarkan sisihan sebesar ini; sekiranya tiada, kesemua item berkenaan hendaklah dibaiki sepenuhnya. Pengukuran turut merekodkan sisihan penjajaran 13mm pada item No. 6 (Carporch), yang turut dituntut untuk dibaiki.`,
+  { indent: 10 }
+);
+y += 4;
+
 checkBreak(30);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
 const sTE = 'E. Dakwaan Ukuran Laser — Item No. 41 (Master Bedroom)';
@@ -295,7 +318,7 @@ doc.line(mL, y + 1, mL + doc.getTextWidth(sTE), y + 1);
 y += 8;
 
 numPara(7,
-  `Berhubung item No. 41 (Master Bedroom — isu penjajaran pada permukaan dinding akibat pemotongan floor tiles yang tidak konsisten), pihak kontraktor menerangkan secara lisan bahawa mereka telah menembak laser dari dinding bertentangan dan, berdasarkan itu, mendakwa dinding tersebut lurus. Penjelasan ini tidak menjawab kecacatan yang dilaporkan: isu yang direkodkan adalah ketidakjajaran yang JELAS KELIHATAN pada permukaan dinding/tiles akibat pemotongan floor tiles yang tidak konsisten, sebagaimana dirakam bergambar di dalam laporan pemeriksaan. Satu demonstrasi laser secara lisan tanpa sebarang rekod tidak mempunyai nilai pembuktian. Pihak tuan dituntut mengemukakan laporan pengukuran bertulis (kaedah pengukuran, bacaan, lokasi titik ukur dan nama pegawai yang menjalankan ukuran) dan/atau menjalankan pengesahan ukuran semula secara bersama dengan kehadiran pemilik. Sekiranya pemotongan tiles didapati tidak konsisten, pembetulan hendaklah dilaksanakan sepenuhnya atas kos pihak tuan.`
+  `Berhubung item No. 41 (Master Bedroom — isu penjajaran pada permukaan dinding akibat pemotongan floor tiles yang tidak konsisten), pihak kontraktor menerangkan secara lisan bahawa mereka telah menembak laser dari dinding bertentangan dan, berdasarkan itu, mendakwa dinding tersebut lurus. Penjelasan ini tidak menjawab kecacatan yang dilaporkan: isu yang direkodkan adalah ketidakjajaran yang JELAS KELIHATAN pada permukaan dinding/tiles akibat pemotongan floor tiles yang tidak konsisten, sebagaimana dirakam bergambar di dalam laporan pemeriksaan. Satu demonstrasi laser secara lisan tanpa sebarang rekod tidak mempunyai nilai pembuktian. Malah, pengukuran yang dijalankan sendiri oleh pemilik pada 2 Oktober 2026 merekodkan sisihan 6mm pada permukaan dinding (sesiku L), 9mm pada skirting (sesiku L) dan 12mm pada skirting menggunakan spirit level 1.2 meter (rujuk Lampiran C dan jadual pengukuran di Seksyen D) — bacaan yang secara langsung menyangkal dakwaan "lurus" tersebut. Pihak tuan dituntut mengemukakan laporan pengukuran bertulis (kaedah pengukuran, bacaan, lokasi titik ukur dan nama pegawai yang menjalankan ukuran) dan/atau menjalankan pengesahan ukuran semula secara bersama dengan kehadiran pemilik. Sekiranya pemotongan tiles didapati tidak konsisten, pembetulan hendaklah dilaksanakan sepenuhnya atas kos pihak tuan.`
 );
 y += 4;
 
@@ -425,6 +448,7 @@ doc.text("Lampiran:", mL, y); y += LH_S;
 doc.setFont("helvetica", "normal");
 doc.text("A. Bukti bergambar — keretakan sedia ada vs kerosakan roof tiles selepas kerja pembaikan", mL + 4, y); y += LH_S;
 doc.text("B. Salinan Akuan Terima Notis Pertama (Ayer Keroh, 24 Sept 2026 & Ibu Pejabat KL, 22 Sept 2026)", mL + 4, y); y += LH_S;
+doc.text("C. Bukti bergambar pengukuran oleh pemilik pada 2 Oktober 2026 (item No. 6, 26, 27 & 41)", mL + 4, y); y += LH_S;
 
 // ============================================================
 // KRONOLOGI
@@ -451,6 +475,7 @@ const kronologi = [
   { tarikh: "22 September 2026", peristiwa: "Notis Pertama (NOTIS-1/2026/043) diserahkan ke Ibu Pejabat KL — diakui terima oleh En. Noor Razmin Riza bin Noor Hazizi (Senior Executive, Property Management)" },
   { tarikh: "24 September 2026", peristiwa: 'Notis Pertama diakui terima di pejabat Ayer Keroh oleh En. Haziron bin Hasan (Supervisor, Site) — cop rasmi "RECEIVED 24 SEP 2026"' },
   { tarikh: "25 September 2026", peristiwa: "Pemeriksaan Bersama (Joint Inspection) — pemilik bersama wakil pemaju dan wakil kontraktor utama; maklum balas lisan diberikan" },
+  { tarikh: "2 Oktober 2026", peristiwa: "Pengukuran semakan dijalankan sendiri oleh pemilik — sisihan 2mm hingga 13mm direkodkan secara bergambar pada item No. 6, 26, 27 dan 41" },
   { tarikh: "2 Oktober 2026", peristiwa: "Surat Susulan ini dikeluarkan — merekodkan maklum balas lisan dan menuntut dokumentasi rasmi" },
   { tarikh: data.tarikhDeadline, peristiwa: "Tarikh akhir pembaikan di bawah Notis Pertama (KEKAL — tidak dilanjutkan oleh surat ini)" },
 ];
@@ -520,6 +545,32 @@ y += 10;
 
 addEvidenceImage("/home/user/admin/fatin-akuan-hq.jpg", 110, 110 * 1072 / 732,
   "Akuan Terima di Ibu Pejabat Kuala Lumpur — diterima oleh En. Noor Razmin Riza bin Noor Hazizi (Senior Executive, Property Management) pada 22 September 2026.");
+
+// ============================================================
+// LAMPIRAN C — UKURAN PEMILIK
+// ============================================================
+const ukuranImgs = [
+  ["/home/user/admin/fatin-ukur-item41.jpg", "Gambar 1 — Item No. 41 (Master Bedroom): sisihan 6mm pada permukaan dinding (sesiku L), 9mm pada skirting (sesiku L) dan 12mm pada skirting diukur menggunakan spirit level 1.2 meter."],
+  ["/home/user/admin/fatin-ukur-item27.jpg", "Gambar 2 — Item No. 27 (Kitchen — uneven floor tiles): sisihan 8mm direkodkan menggunakan spirit level 1.2 meter dan pembaris (gambar bertarikh 02/10/2026, 17:03)."],
+  ["/home/user/admin/fatin-ukur-item26.jpg", "Gambar 3 — Item No. 26 (Kitchen — lippage floor tile): lippage 2mm direkodkan menggunakan pembaris berskala."],
+  ["/home/user/admin/fatin-ukur-item6.jpg", "Gambar 4 — Item No. 6 (Carporch): sisihan penjajaran 13mm direkodkan menggunakan sesiku L (L-square)."],
+];
+ukuranImgs.forEach(([img, cap], idx) => {
+  newPage();
+  y = 25;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  const lcT = idx === 0 ? "LAMPIRAN C" : "LAMPIRAN C (sambungan)";
+  doc.text(lcT, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(lcT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lcT) / 2, y + 1);
+  y += 6;
+  if (idx === 0) {
+    doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+    doc.text("Bukti Bergambar — Pengukuran oleh Pemilik pada 2 Oktober 2026", pageW / 2, y, { align: "center" });
+  }
+  y += 8;
+  addEvidenceImage(img, 120, 120 * 1400 / 990, cap);
+});
 
 // ============================================================
 // AKUAN TERIMA x 2
