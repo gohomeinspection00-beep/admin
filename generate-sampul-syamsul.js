@@ -7,7 +7,7 @@ const sets = [
   {
     label: "SYAMSUL IZWANI (NOTIS 1) — ke BANDAR NUSAJAYA DEVELOPMENT, Imperia Office Tower, Puteri Harbour  [Ruj: NOTIS-1/2026/052]",
     pengirim,
-    penerima: ["BANDAR NUSAJAYA DEVELOPMENT SDN. BHD. (199201021441 / 252945-M)", "Level 7, Imperia Office Tower,", "Jalan Laksamana 1, Puteri Harbour,", "79200 Iskandar Puteri, Johor."],
+    penerima: ["BANDAR NUSAJAYA DEVELOPMENT SDN. BHD. (199201021441 / 252945-M)", "d/a UEM Sunrise Berhad,", "Level 6, Imperia Office Tower,", "Jalan Laksamana 1, Puteri Harbour,", "79000 Iskandar Puteri, Johor."],
   },
   {
     label: "SYAMSUL IZWANI (NOTIS 1) — ke BANDAR NUSAJAYA DEVELOPMENT, Pejabat Berdaftar Solaris Dutamas KL  [Ruj: NOTIS-1/2026/052]",

@@ -24,9 +24,10 @@ const data = {
     "50480 Kuala Lumpur,",
     "Wilayah Persekutuan Kuala Lumpur.",
   ] : [
-    "Level 7, Imperia Office Tower,",
+    "d/a UEM Sunrise Berhad,",
+    "Level 6, Imperia Office Tower,",
     "Jalan Laksamana 1, Puteri Harbour,",
-    "79200 Iskandar Puteri,",
+    "79000 Iskandar Puteri,",
     "Johor.",
   ],
 
