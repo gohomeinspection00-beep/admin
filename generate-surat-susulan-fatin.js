@@ -35,7 +35,7 @@ const data = {
   alamatHartanah: "No. 53, Jalan TU 13, Taman Tasik Utama, Ayer Keroh, 75450 Melaka",
   jenisHartanah: "Rumah Teres 1 Tingkat (Unit ST-187C, H.S.(M) 7054, PT 26455, Mukim Bukit Katil)",
 
-  tarikhSurat: "2 Oktober 2026",
+  tarikhSurat: "6 Oktober 2026",
   tarikhNotis1: IS_HQ ? "22 September 2026" : "25 September 2026",
   tarikhDeadline: IS_HQ ? "7 Oktober 2026" : "10 Oktober 2026",
 };
@@ -244,7 +244,7 @@ doc.line(mL, y + 1, mL + doc.getTextWidth(sT), y + 1);
 y += 8;
 
 numPara(3,
-  `Semasa Joint Inspection, didapati keretakan (crack) pada apron slab di bahagian luar rumah MASIH BERULANG semula walaupun kerja pembaikan telah dijalankan oleh pihak tuan. Keretakan yang berulang selepas pembaikan jelas menunjukkan pembaikan yang dijalankan bersifat kosmetik dan tidak menangani punca sebenar. Pihak tuan dituntut mengenal pasti dan menangani PUNCA keretakan tersebut (contohnya pemadatan tanah atau asas papak yang tidak sempurna), dan bukan sekadar menampal permukaan retakan.`
+  `Semasa Joint Inspection, didapati keretakan (crack) pada apron slab di bahagian luar rumah MASIH BERULANG semula walaupun kerja pembaikan telah dijalankan oleh pihak tuan. Keretakan yang berulang selepas pembaikan jelas menunjukkan pembaikan yang dijalankan bersifat kosmetik dan tidak menangani punca sebenar. Pihak tuan dituntut mengenal pasti dan menangani PUNCA keretakan tersebut, dan bukan sekadar menampal permukaan retakan.`
 );
 y += 4;
 
@@ -282,7 +282,7 @@ doc.line(mL, y + 1, mL + doc.getTextWidth(sTD), y + 1);
 y += 8;
 
 numPara(6,
-  `Berhubung item No. 26 (Kitchen — lippage floor tile), item No. 27 (Kitchen — uneven floor tiles), item No. 28 (Kitchen — isu penjajaran yang jelas kelihatan pada permukaan dinding dan skirting) dan item No. 32 (Yard — kecerunan lantai berlebihan / too much gradient), pihak yang mewakili pemaju dan kontraktor menyatakan secara lisan bahawa kesemua kecacatan tersebut berada "dalam had toleransi (within tolerance)" dan oleh itu TIADA tindakan akan diambil. Dakwaan lisan ini tidak boleh diterima. Pihak tuan dituntut menyatakan secara BERTULIS bagi SETIAP item di atas: (i) standard atau piawaian toleransi yang dirujuk (contohnya CIDB QLASSIC, Malaysian Standard, atau spesifikasi pengilang — dengan rujukan penuh); (ii) had toleransi yang dibenarkan di bawah standard tersebut; dan (iii) bacaan ukuran sebenar yang diambil di tapak berserta kaedah dan lokasi pengukuran. Perlu ditegaskan bahawa bukti bergambar di dalam laporan pemeriksaan — termasuk ukuran menggunakan alat aras (spirit level) — jelas menunjukkan kecacatan yang ketara dan masih wujud. Tanpa pengesahan bertulis berserta data ukuran sebagaimana di atas, keengganan mengambil tindakan tidak akan diterima, dan item-item ini kekal sebagai kecacatan tertunggak yang wajib dibaiki.`
+  `Berhubung item No. 26 (Kitchen — lippage floor tile), item No. 27 (Kitchen — uneven floor tiles), item No. 28 (Kitchen — isu penjajaran yang jelas kelihatan pada permukaan dinding dan skirting) dan item No. 32 (Yard — kecerunan lantai berlebihan / too much gradient), pihak yang mewakili pemaju dan kontraktor menyatakan secara lisan bahawa kesemua kecacatan tersebut berada "dalam had toleransi (within tolerance)" dan oleh itu TIADA tindakan akan diambil. Dakwaan lisan ini tidak boleh diterima. Pihak tuan dituntut menyatakan secara BERTULIS bagi SETIAP item di atas: (i) standard atau piawaian toleransi yang dirujuk (contohnya CIDB QLASSIC, Malaysian Standard, atau spesifikasi pengilang — dengan rujukan penuh); (ii) had toleransi yang dibenarkan di bawah standard tersebut; dan (iii) bacaan ukuran sebenar yang diambil di tapak berserta kaedah dan lokasi pengukuran. Perlu ditegaskan bahawa semasa pemeriksaan-pemeriksaan terdahulu, alat aras (spirit level) dan susunan tiles digunakan sebagai penunjuk visual (visual indicator) — tiada bacaan ukuran direkodkan ketika itu kerana kecacatan tersebut jelas kelihatan senget secara ketara dan dapat dirasai secara fizikal ketika berjalan di atas permukaan berkenaan. Tanpa pengesahan bertulis berserta data ukuran sebagaimana di atas, keengganan mengambil tindakan tidak akan diterima, dan item-item ini kekal sebagai kecacatan tertunggak yang wajib dibaiki.`
 );
 y += 4;
 
@@ -304,7 +304,7 @@ drawTable(
 y += 5;
 
 para(
-  `Bagi mengesahkan kedudukan sebenar, saya telah menjalankan pengukuran sendiri di tapak pada 2 Oktober 2026, dan kesemua bacaan dirakam sepenuhnya secara bergambar (rujuk Lampiran C). Keputusan adalah sebagaimana jadual di atas. Sebagai perbandingan, piawaian QLASSIC (CIS 7) yang lazim digunakan dalam industri pembinaan di Malaysia menetapkan toleransi kerataan permukaan sekitar 3mm per 1.2 meter straight edge, dan lippage tiles maksimum sekitar 1mm. Bacaan 8mm hingga 13mm yang direkodkan adalah BERKALI GANDA melebihi toleransi lazim tersebut. Sehubungan itu, pihak tuan dituntut menyatakan secara bertulis standard manakah, dengan rujukan penuh, yang didakwa membenarkan sisihan sebesar ini; sekiranya tiada, kesemua item berkenaan hendaklah dibaiki sepenuhnya. Pengukuran turut merekodkan sisihan penjajaran 13mm pada item No. 6 (Carporch), yang turut dituntut untuk dibaiki.`,
+  `Bagi mengesahkan kedudukan sebenar, saya telah menjalankan pengukuran sendiri di tapak pada 2 Oktober 2026, bersama jurukur bangunan (building surveyor) yang saya lantik, dan kesemua bacaan dirakam sepenuhnya secara bergambar (rujuk Lampiran C). Keputusan adalah sebagaimana jadual di atas. Sebagai perbandingan umum, piawaian QLASSIC (CIS 7) menetapkan toleransi kerataan permukaan sekitar 3mm per 1.2 meter straight edge dan lippage tiles maksimum sekitar 1mm — bacaan 8mm hingga 13mm yang direkodkan adalah BERKALI GANDA melebihinya. Walau bagaimanapun, perlu dimaklumkan bahawa CIDB, melalui kenyataan media pada November 2024, telah menarik balik "Quality Guidebook for Homeowners (2014)" dengan serta-merta dan mengisytiharkan sebarang salinan atau petikan daripadanya sebagai terbatal dan tidak boleh digunakan, sambil menjelaskan bahawa QLASSIC/CIS 7 merupakan sistem penilaian mutu kerja semasa pembinaan dan BUKAN spesifikasi kecacatan bagi pemeriksaan selepas serahan milikan kosong. Justeru, ketiadaan standard toleransi rasmi yang terpakai bagi pemeriksaan kecacatan bermakna dakwaan lisan "within tolerance" oleh pihak tuan adalah tanpa sebarang asas rujukan yang sah — dan atas sebab itulah penilaian kecacatan ini dibuat berdasarkan perbandingan visual, yang jelas menunjukkan permukaan senget secara ketara dan dapat dirasai ketika berjalan, kini disokong pula dengan bacaan ukuran sebenar sebagaimana jadual di atas. Sekiranya pihak tuan masih mendakwa kecacatan ini berada di dalam mana-mana had toleransi, pihak tuan dituntut menyatakan secara BERTULIS standard yang SAH dan TERPAKAI tersebut, dengan rujukan penuh; sekiranya tiada, kesemua item berkenaan hendaklah dibaiki sepenuhnya. Pengukuran turut merekodkan sisihan penjajaran 13mm pada item No. 6 (Carporch), yang turut dituntut untuk dibaiki.`,
   { indent: 10 }
 );
 y += 4;
@@ -476,7 +476,7 @@ const kronologi = [
   { tarikh: "24 September 2026", peristiwa: 'Notis Pertama diakui terima di pejabat Ayer Keroh oleh En. Haziron bin Hasan (Supervisor, Site) — cop rasmi "RECEIVED 24 SEP 2026"' },
   { tarikh: "25 September 2026", peristiwa: "Pemeriksaan Bersama (Joint Inspection) — pemilik bersama wakil pemaju dan wakil kontraktor utama; maklum balas lisan diberikan" },
   { tarikh: "2 Oktober 2026", peristiwa: "Pengukuran semakan dijalankan sendiri oleh pemilik — sisihan 2mm hingga 13mm direkodkan secara bergambar pada item No. 6, 26, 27 dan 41" },
-  { tarikh: "2 Oktober 2026", peristiwa: "Surat Susulan ini dikeluarkan — merekodkan maklum balas lisan dan menuntut dokumentasi rasmi" },
+  { tarikh: "6 Oktober 2026", peristiwa: "Surat Susulan ini dikeluarkan — merekodkan maklum balas lisan dan menuntut dokumentasi rasmi" },
   { tarikh: data.tarikhDeadline, peristiwa: "Tarikh akhir pembaikan di bawah Notis Pertama (KEKAL — tidak dilanjutkan oleh surat ini)" },
 ];
 
