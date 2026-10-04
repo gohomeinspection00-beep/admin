@@ -22,6 +22,11 @@ const data = {
     "No. 1010-1012, Kompleks Sri Putra,",
     "Seberang Jalan Putra,",
     "05150 Alor Setar, Kedah.",
+  ] : (process.argv[2] === "PEJABAT") ? [
+    "(Tempat Perniagaan / Place of Business)",
+    "PTD 209290, Jalan Kunyit,",
+    "Taman Sri Amar,",
+    "81100 Johor Bahru, Johor.",
   ] : [
     "(Pejabat Pengurusan)",
     "L13, Menara A, Pangsapuri Seri Permata,",
@@ -468,7 +473,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-const outName = (process.argv[2] === "KEDAH") ? "NOTIS_1_GOJUNWEI_KEDAH.pdf" : "NOTIS_1_GOJUNWEI.pdf";
+const outName = (process.argv[2] === "KEDAH") ? "NOTIS_1_GOJUNWEI_KEDAH.pdf" : (process.argv[2] === "PEJABAT") ? "NOTIS_1_GOJUNWEI_PEJABAT.pdf" : "NOTIS_1_GOJUNWEI.pdf";
 fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
 console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
