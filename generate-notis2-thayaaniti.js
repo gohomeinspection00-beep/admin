@@ -71,6 +71,7 @@ const data = {
     { tarikh: "11 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/041" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 11 penemuan: kecacatan masih belum diselesaikan dan 1 kecacatan baru dikesan" },
     { tarikh: "26 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
+    { tarikh: "2 Oktober 2026", peristiwa: "Pihak pemaju memaklumkan secara lisan/tidak rasmi dakwaan \"tiada kebocoran fizikal (no physical leaking)\" bagi item kelembapan tinggi — tanpa butiran pemeriksaan bertulis" },
     { tarikh: "2 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. 00202604 berjumlah RM7,610.00 diperoleh daripada kontraktor" },
     { tarikh: "5 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — bersama sebut harga rasmi pembaikan" },
     { tarikh: "20 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
@@ -282,16 +283,31 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}).`
+  `Berhubung item No. 3, 4 dan 5 tersebut, pada 2 Oktober 2026 pihak tuan telah memaklumkan secara lisan/tidak rasmi bahawa "tiada kebocoran fizikal (no physical leaking)" dikesan di kawasan berkenaan. Dengan ini ditegaskan bahawa kecacatan yang dilaporkan BUKANLAH dakwaan kebocoran fizikal, tetapi bacaan KELEMBAPAN TINGGI (high moisture) yang direkodkan secara objektif oleh Building Surveyor berdaftar RISM dan kekal direkodkan sehingga Pemeriksaan Ketiga pada 24 September 2026. Kelembapan tinggi pada permukaan siling adalah petunjuk awal kemasukan atau resapan air (water ingress) — contohnya kegagalan lapisan kalis air atau resapan perlahan pada paip/sambungan di dalam ruang siling — yang lazimnya berlaku SEBELUM kebocoran kelihatan secara fizikal. Ketiadaan titisan air yang kelihatan pada hari pemeriksaan pihak tuan tidak menafikan kewujudan kecacatan ini dan tidak melepaskan kewajipan pihak tuan di bawah Klausa 27(1) untuk mengesan dan membaiki PUNCANYA. Pihak tuan dituntut mengemukakan secara BERTULIS butiran pemeriksaan yang menjadi asas dakwaan tersebut — tarikh pemeriksaan, nama pegawai, kaedah dan alat pengujian (sama ada visual semata-mata atau menggunakan moisture meter / thermal imaging camera), serta bacaan yang direkodkan — ataupun, sebagai alternatif, menjalankan PEMERIKSAAN BERSAMA (joint inspection) di mana bacaan kelembapan diambil di hadapan kedua-dua pihak dan direkodkan secara bertulis.`
 );
 y += 4;
 
 numPara(5,
-  `Bagi makluman pihak tuan, saya telah pun memperoleh sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bagi kesemua kerja pembaikan yang masih tertunggak — GoXpert Solution, No. Sebut Harga 00202604 bertarikh 2 Oktober 2026 — dengan jumlah keseluruhan RM7,610.00 (Ringgit Malaysia: Tujuh Ribu Enam Ratus Sepuluh Sahaja). Salinan sebut harga tersebut dilampirkan sebagai LAMPIRAN A. Sekiranya pihak tuan masih gagal menyiapkan semua kerja pembaikan dalam tempoh notis ini, jumlah tersebut atau kos sebenar yang ditanggung akan dituntut sepenuhnya daripada pihak tuan, termasuk melalui tolakan daripada Wang Tahanan 5% (Retention Sum) di bawah Klausa 27(2) dan/atau tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR).`
+  `Memandangkan kecacatan kelembapan tinggi ini telah dilaporkan di dalam Tempoh Liabiliti Kecacatan (DLP) sejak 31 Julai 2026, hak saya terhadap pembaikannya telah pun terpelihara. Sekiranya pihak tuan memilih untuk tidak melaksanakan sebarang kerja pembaikan atas alasan "tiada kebocoran fizikal", maka pihak tuan dituntut mengeluarkan AKUAN BERTULIS yang menyatakan: (i) kecacatan pada item No. 3, 4 dan 5 telah dilaporkan di dalam tempoh DLP; dan (ii) sekiranya kebocoran, kesan air, kulat atau apa-apa kerosakan berkaitan muncul di kawasan yang sama atau bersebelahan pada bila-bila masa, TERMASUK SELEPAS tamat tempoh DLP, pihak tuan kekal bertanggungjawab sepenuhnya untuk mengesan punca dan melaksanakan pembaikan atas kos pihak tuan sendiri, memandangkan ia merupakan lanjutan kecacatan yang sama yang telah dilaporkan dalam tempoh. Tanpa akuan bertulis sedemikian, sebarang cadangan untuk meletakkan perkara ini sebagai "dalam pemerhatian" (under review/observation) adalah TIDAK DITERIMA.`
 );
 y += 4;
 
 numPara(6,
+  `Untuk rekod, saya telah merancang kerja ubah suai di hartanah tersebut (antaranya melibatkan bilik air di tingkat bawah), namun telah MENANGGUHKAN kesemua kerja tersebut sehingga isu kelembapan ini diselesaikan atau akuan bertulis di perenggan 5 dikeluarkan. Dengan itu, keadaan sedia ada di kawasan berkenaan kekal tidak diusik, dan sebarang kerosakan berkaitan air yang muncul kemudian tidak boleh dikaitkan dengan kerja ubah suai saya.`
+);
+y += 4;
+
+numPara(7,
+  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis2}. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}).`
+);
+y += 4;
+
+numPara(8,
+  `Bagi makluman pihak tuan, saya telah pun memperoleh sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bagi kesemua kerja pembaikan yang masih tertunggak — GoXpert Solution, No. Sebut Harga 00202604 bertarikh 2 Oktober 2026 — dengan jumlah keseluruhan RM7,610.00 (Ringgit Malaysia: Tujuh Ribu Enam Ratus Sepuluh Sahaja). Salinan sebut harga tersebut dilampirkan sebagai LAMPIRAN A. Sekiranya pihak tuan masih gagal menyiapkan semua kerja pembaikan dalam tempoh notis ini, jumlah tersebut atau kos sebenar yang ditanggung akan dituntut sepenuhnya daripada pihak tuan, termasuk melalui tolakan daripada Wang Tahanan 5% (Retention Sum) di bawah Klausa 27(2) dan/atau tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR).`
+);
+y += 4;
+
+numPara(9,
   `Merujuk kepada Klausa Penyampaian Dokumen ${data.klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -304,7 +320,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(7,
+numPara(10,
   `Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Kedua (Final Notice) ini tamat tempohnya pada ${data.tarikhDeadlineNotis2}, saya akan tanpa berlengah lagi mengambil tindakan berikut:`
 );
 y += 2;
