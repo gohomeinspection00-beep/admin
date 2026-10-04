@@ -28,6 +28,11 @@ Then follow `/hyperframes` → `/general-video` + `/hyperframes-core` for the co
 3. **Build** (sections 2–4), verify with `hyperframes check` + snapshots, render, `scripts/share.sh`, send.
 4. **After every delivered draft ask:** "Nak tukar apa-apa lagi, atau dah siap?"
 5. **When they say siap → make the thumbnail** (section 5), send it, ask if it's OK.
+6. **Always suggest improvements (client rule).** In the plan (step 2) and with each draft,
+   add a short "Cadangan penambahbaikan" list: anything you think would make the video better
+   (e.g. a music bed, a hook in the first 2 s, stronger before/after split, extra B-roll, better
+   take, safer layout). Suggest only — never add it without the client's yes. Record accepted
+   ideas in this skill so they become the new default.
 
 ## 2. Brand + design tokens (never change without being asked)
 
