@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>GoXpert Hook</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --ink: #1d1a33;
+        --paper: #f6f2e7;
+        --accent: #f6c33b;
+        --display: "League Gothic", "Oswald", sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--ink); }
+      #cam { position: absolute; inset: 0; transform-origin: 50% 30%; }
+      .footage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .shot { position: absolute; inset: 0; overflow: hidden; background: var(--ink); }
+      .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .shot .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(29, 26, 51, 0.55) 0%, rgba(29, 26, 51, 0) 35%, rgba(29, 26, 51, 0) 65%, rgba(29, 26, 51, 0.6) 100%); }
+      .before-tag { position: absolute; left: 60px; top: 520px; z-index: 2; display: block; padding: 10px 20px 8px; background: var(--paper); color: var(--ink); font-family: var(--mono); font-weight: 700; font-size: 36px; letter-spacing: 0.08em; }
+      #title { position: absolute; left: 60px; right: 60px; top: 170px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+      #kicker { display: block; padding: 10px 22px 8px; background: var(--ink); color: var(--paper); border: 4px solid var(--accent); font-family: var(--mono); font-weight: 700; font-size: 38px; letter-spacing: 0.05em; }
+      .mask { display: block; overflow: hidden; }
+      #big { display: block; padding: 12px 28px 2px; background: var(--accent); color: var(--ink); font-family: var(--display); font-size: 190px; line-height: 0.95; text-transform: uppercase; }
+      #stamp { position: absolute; left: 60px; top: 760px; display: flex; align-items: center; gap: 18px; padding: 16px 30px 6px; border: 10px solid var(--paper); color: var(--paper); background: rgba(29, 26, 51, 0.6); font-family: var(--display); font-size: 160px; line-height: 1; text-transform: uppercase; }
+      #stamp svg { display: block; width: 120px; height: 120px; margin-top: -10px; }
+      .cap { position: absolute; left: 60px; right: 60px; bottom: 440px; display: flex; justify-content: center; }
+      .cap-in { display: block; max-width: 960px; padding: 14px 30px 6px; background: rgba(29, 26, 51, 0.92); color: var(--paper); font-family: var(--display); font-size: 96px; line-height: 1; text-transform: uppercase; text-align: center; }
+      .cap-in b { font-weight: 400; color: var(--accent); }
+      #flash { position: absolute; inset: 0; background: var(--paper); opacity: 0; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-width="1080" data-height="1920" data-duration="2.5">
+      <div id="cam">
+        <!-- speech: "dan kali ketiga juga, diorang tak repair" (talk2 75.61–78.06) -->
+        <video id="hook-v" class="clip footage" src="assets/hook-src.mp4" playsinline data-has-audio="true"
+          data-start="0" data-duration="2.5" data-media-start="1.01" data-track-index="0"
+          data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.03,"v":1},{"t":2.42,"v":1},{"t":2.5,"v":0}]}]}'></video>
+      </div>
+
+      <div id="shot1" class="shot clip" data-start="0" data-duration="0.68" data-track-index="1">
+        <img id="img1bg" src="assets/before-tiles.jpg" alt="" style="filter: blur(30px) brightness(0.7); transform: scale(1.2)" /><img id="img1" src="assets/before-tiles.jpg" alt="" style="object-fit: contain" /><div class="shade"></div><span class="before-tag">BEFORE</span>
+      </div>
+      <div id="shot2" class="shot clip" data-start="0.68" data-duration="0.62" data-track-index="1">
+        <img id="img2" src="assets/before-tile-crack.jpg" alt="" /><div class="shade"></div><span class="before-tag">BEFORE</span>
+      </div>
+
+      <div id="title" class="clip" data-start="0" data-duration="2.5" data-track-index="2">
+        <span id="kicker">INSPECTION · REPORT KALI KE-3</span>
+        <span class="mask"><span id="big">Masih Pecah</span></span>
+      </div>
+
+      <div id="stamp-host" class="clip" data-start="1.3" data-duration="1.2" data-track-index="3" style="position:absolute;inset:0">
+        <span id="stamp"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="square"/></svg>Tak Dibaiki</span>
+      </div>
+
+      <div id="cap0" class="cap clip" data-start="0" data-duration="1.29" data-track-index="4"><span class="cap-in">dan <b>kali ketiga</b> juga</span></div>
+      <div id="cap1" class="cap clip" data-start="1.29" data-duration="1.21" data-track-index="4"><span class="cap-in">diorang <b>tak repair</b></span></div>
+
+      <div id="flash-host" class="clip" data-start="0" data-duration="2.5" data-track-index="5" style="position:absolute;inset:0;pointer-events:none"><div id="flash"></div></div>
+
+      <audio id="h-snap1" src=".media/audio/sfx/sfx_008.mp3" data-start="0" data-duration="0.4" data-volume="0.7" data-track-index="10"></audio>
+      <audio id="h-title" src=".media/audio/sfx/sfx_002.mp3" data-start="0.32" data-duration="2.1" data-volume="0.3" data-track-index="11"></audio>
+      <audio id="h-snap2" src=".media/audio/sfx/sfx_008.mp3" data-start="0.68" data-duration="0.4" data-volume="0.7" data-track-index="12"></audio>
+      <audio id="h-whoosh" src=".media/audio/sfx/sfx_001.mp3" data-start="1.22" data-duration="0.6" data-volume="0.4" data-track-index="13"></audio>
+      <audio id="h-stamp" src=".media/audio/sfx/sfx_010.mp3" data-start="1.6" data-duration="0.9" data-volume="0.32" data-track-index="14"></audio>
+      <audio id="h-out" src=".media/audio/sfx/sfx_001.mp3" data-start="2.1" data-duration="0.4" data-volume="0.45" data-track-index="15"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      tl.set("#cam", { scale: 1.1 }, 0);
+      tl.fromTo("#img1", { scale: 1.18 }, { scale: 1.03, duration: 0.68, ease: "power2.out" }, 0);
+      tl.fromTo("#img2", { scale: 1.25 }, { scale: 1.06, duration: 0.62, ease: "power2.out" }, 0.68);
+      tl.fromTo("#kicker", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.2, ease: "power3.out" }, 0.02);
+      tl.fromTo("#big", { yPercent: 105 }, { yPercent: 0, duration: 0.26, ease: "power4.out" }, 0.32);
+      tl.fromTo("#stamp", { opacity: 0, scale: 2.4, rotation: 2 }, { opacity: 1, scale: 1, rotation: -7, duration: 0.16, ease: "power4.in" }, 1.6);
+      tl.fromTo("#cap0 .cap-in", { y: 26, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2)" }, 0);
+      tl.fromTo("#cap1 .cap-in", { y: 26, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2)" }, 1.29);
+      tl.fromTo("#flash", { opacity: 0 }, { opacity: 0.9, duration: 0.1, ease: "power1.in" }, 2.4);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

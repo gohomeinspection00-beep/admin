@@ -18,7 +18,12 @@ Then follow `/hyperframes` → `/general-video` + `/hyperframes-core` for the co
 
 1. **Receive video → analyse first, do not edit yet.** Probe (duration, resolution, rotation,
    HDR), make a contact sheet, extract `-ac 1 -ar 16000` audio, run `scripts/transcribe.py`.
-2. **Tell the plan, then ask for materials — wait for the answer.** In Malay, send:
+2. **Tell the plan, then ask for materials — wait for the answer.** First question, always:
+   **"Video ni nak pos kat mana?"** (TikTok / IG Reels / FB Reels / YouTube Shorts / FB feed /
+   YouTube biasa). The answer sets the format: Reels/TikTok/Shorts → 9:16 1080×1920, captions
+   above `bottom: 440px`, ≤ 90 s ideal; FB/IG feed → 4:5 1080×1350 (keep text inside it);
+   YouTube biasa → 16:9 1920×1080 + a 1280×720 thumbnail. Several platforms → one master
+   9:16 plus extra exports. Then, in Malay, send:
    - transcript summary + what will be cut (false starts, repeated phrases, fillers, pauses),
      estimated final length;
    - the beat-by-beat graphics plan (which component at which line), SFX, end card;
@@ -98,6 +103,18 @@ error (warnings, ≤0.22), riser (last 1.2 s into the end card). Volumes 0.25–
 The client asked for louder speech and less noise — this is the approved balance; harsher
 settings ate consonants. Re-transcribe a few kept ranges after cleaning to confirm.
 Final deliverable: `scripts/share.sh render.mp4 share.mp4` (−13 LUFS, ~21 MB per 100 s).
+
+## 4b. Hook — first 2–2.5 s (added for the Tribunal video, keep doing it)
+
+Before the talking part, pre-roll a hook built from his own strongest line about the main
+defect (e.g. "dan kali ketiga juga, diorang tak repair"), cut with the before photos
+(full photo on a blurred copy so red boxes stay visible → tight crop of the close-up) →
+his footage with the "✗ TAK DIBAIKI" stamp, big yellow title ("MASIH PECAH"), kicker chip,
+captions, white flash out. Template: `templates/hook/index.html`. Render it as its own
+project (`--sdr --crf 18`), then concat in front of the main render with ffmpeg
+(`concat` filter, both 1080×1920 30fps 48 kHz stereo) and run `share.sh` on the joined file.
+Keep the hook's SFX ≤ 0.3–0.35 so it is not louder than the body (check RMS of the first
+2.5 s vs the next seconds).
 
 ## 5. Thumbnail (only after "dah siap")
 
