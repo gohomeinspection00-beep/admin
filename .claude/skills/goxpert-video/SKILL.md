@@ -110,11 +110,17 @@ error (warnings, ≤0.22), riser. **The bundled riser peaks at ~3–3.5 s and is
 moment it should land (end card, a reveal). Never start it at 8.8 s (that part is silent). Volumes 0.25–0.5; speech dominates.
 **Never use the glitch SFX** — the client heard it as crackling ("bunyi pecah").
 
+**Picture**: footage under 1080 px wide (phones often send 720p) is upscaled and sharpened
+before building — `scale=1080:1920:flags=lanczos,hqdn3d=1.2:1.2:2:2,cas=strength=0.55`
+(`-crf 12`); measured ~2.3× Laplacian sharpness on the Tanah Mendap video with no halos.
+Render with `--crf 14`. `scripts/share.sh` now sizes the bitrate from the duration (~19 MB,
+≤ 8 Mbps) — short videos come out much sharper than the old fixed CRF 26.
+
 **Speech**: always run `scripts/clean_audio.sh` on every source before building
 (RNNoise `assets/sh.rnnn` + light FFT denoise + fast gate + compressor + loudnorm −13).
 The client asked for louder speech and less noise — this is the approved balance; harsher
 settings ate consonants. Re-transcribe a few kept ranges after cleaning to confirm.
-Final deliverable: `scripts/share.sh render.mp4 share.mp4` (−13 LUFS, ~21 MB per 100 s).
+Final deliverable: `scripts/share.sh render.mp4 share.mp4` (−13 LUFS, ~19 MB whatever the length).
 
 ## 4b. Hook — first 2–2.5 s (added for the Tribunal video, keep doing it)
 
