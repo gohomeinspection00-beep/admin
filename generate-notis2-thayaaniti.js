@@ -67,7 +67,7 @@ const data = {
     { tarikh: "28 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "31 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara rasmi kepada pemaju melalui WhatsApp" },
     { tarikh: "30 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
-    { tarikh: "8 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 15 kecacatan masih belum dibaiki" },
+    { tarikh: "8 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — daripada 269 item, hanya 191 (71.0%) selesai: 27 Not Complete, 18 Not Fully Complete dan 5 kecacatan baru (1 New Defect; 4 New Defect from Rectification Work) direkodkan" },
     { tarikh: "11 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/041" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 11 penemuan: kecacatan masih belum diselesaikan dan 1 kecacatan baru dikesan" },
     { tarikh: "26 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
@@ -251,7 +251,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, hasil daripada Pemeriksaan Ketiga (Third Inspection) yang dijalankan pada 24 September 2026 oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM), didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya — malah terdapat KECACATAN BARU yang dikesan. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan. Laporan Pemeriksaan Ketiga penuh disertakan bersama-sama notis ini. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
+  `Namun, Pemeriksaan Semula (Re-Inspection) pada 8 September 2026 telah pun merekodkan bahawa daripada 269 item yang diperiksa, hanya 191 item (71.0%) disahkan selesai — manakala 27 item berstatus Not Complete, 18 item Not Fully Complete, dan 5 kecacatan baru dikesan (1 New Defect dan 4 New Defect from Rectification Work, iaitu kecacatan yang timbul akibat kerja pembaikan pihak tuan sendiri). Seterusnya, hasil daripada Pemeriksaan Ketiga (Third Inspection) yang dijalankan pada 24 September 2026 oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM), didapati bahawa pembaikan terhadap kecacatan yang telah dilaporkan masih belum disempurnakan sepenuhnya — malah terdapat KECACATAN BARU yang dikesan. Ini bermakna pihak tuan telah gagal mematuhi Notis Pertama yang dikeluarkan. Laporan Pemeriksaan Ketiga penuh disertakan bersama-sama notis ini. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
