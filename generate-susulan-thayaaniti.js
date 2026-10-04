@@ -149,7 +149,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Dengan segala hormatnya perkara di atas dirujuk. Surat ini adalah susulan kepada Notis Kedua / Notis Akhir (Final Notice) dengan rujukan NOTIS-2/2026/041 bertarikh 1 Oktober 2026, yang antara lainnya menuntut pembaikan terhadap item No. 3, 4 dan 5 — kelembapan tinggi (high moisture) pada permukaan siling di dalam ceiling manhole di Bathroom 3 serta Living and Dining — sebagaimana disahkan oleh Pemeriksaan Ketiga (Third Inspection) yang dijalankan oleh Building Surveyor berdaftar RISM pada 24 September 2026. Kecacatan ini telah dilaporkan secara berterusan sejak Laporan Pemeriksaan Kecacatan Kali Pertama yang diserahkan pada 31 Julai 2026, iaitu di dalam Tempoh Liabiliti Kecacatan (Defect Liability Period) di bawah Klausa 27(1) Jadual G Perjanjian Jual Beli.`
+  `Dengan segala hormatnya perkara di atas dirujuk. Surat ini adalah susulan kepada Notis Kedua / Notis Akhir (Final Notice) dengan rujukan NOTIS-2/2026/041 bertarikh 5 Oktober 2026, yang antara lainnya menuntut pembaikan terhadap item No. 3, 4 dan 5 — kelembapan tinggi (high moisture) pada permukaan siling di dalam ceiling manhole di Bathroom 3 serta Living and Dining — sebagaimana disahkan oleh Pemeriksaan Ketiga (Third Inspection) yang dijalankan oleh Building Surveyor berdaftar RISM pada 24 September 2026. Kecacatan ini telah dilaporkan secara berterusan sejak Laporan Pemeriksaan Kecacatan Kali Pertama yang diserahkan pada 31 Julai 2026, iaitu di dalam Tempoh Liabiliti Kecacatan (Defect Liability Period) di bawah Klausa 27(1) Jadual G Perjanjian Jual Beli.`
 );
 y += 4;
 
@@ -198,7 +198,7 @@ y += 4;
 heading("E. Tempoh Notis Kedua Kekal Berkuat Kuasa");
 
 numPara(8,
-  `Surat ini TIDAK melanjutkan mahupun menggantikan tempoh yang ditetapkan di dalam Notis Kedua. Tarikh akhir MUKTAMAD pembaikan kekal pada 16 Oktober 2026, dan kesemua jawapan bertulis serta dokumen yang dituntut di dalam surat ini hendaklah dikemukakan dalam tempoh yang sama. Kegagalan berbuat demikian akan mengakibatkan tindakan selanjutnya diteruskan sebagaimana dinyatakan di dalam Notis Kedua, termasuk tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR).`
+  `Surat ini TIDAK melanjutkan mahupun menggantikan tempoh yang ditetapkan di dalam Notis Kedua. Tarikh akhir MUKTAMAD pembaikan kekal pada 20 Oktober 2026, dan kesemua jawapan bertulis serta dokumen yang dituntut di dalam surat ini hendaklah dikemukakan dalam tempoh yang sama. Kegagalan berbuat demikian akan mengakibatkan tindakan selanjutnya diteruskan sebagaimana dinyatakan di dalam Notis Kedua, termasuk tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR).`
 );
 y += 4;
 

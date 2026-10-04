@@ -43,8 +43,8 @@ const data = {
   tempohNotis1: "15",
   kaedahPenghantaranNotis1: "serahan rasmi",
 
-  tarikhNotis2: "1 Oktober 2026",
-  tarikhDeadlineNotis2: "16 Oktober 2026",
+  tarikhNotis2: "5 Oktober 2026",
+  tarikhDeadlineNotis2: "20 Oktober 2026",
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "serahan rasmi",
 
@@ -71,8 +71,9 @@ const data = {
     { tarikh: "11 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/041" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 11 penemuan: kecacatan masih belum diselesaikan dan 1 kecacatan baru dikesan" },
     { tarikh: "26 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
-    { tarikh: "1 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
-    { tarikh: "16 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "2 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. 00202604 berjumlah RM7,610.00 diperoleh daripada kontraktor" },
+    { tarikh: "5 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — bersama sebut harga rasmi pembaikan" },
+    { tarikh: "20 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
@@ -286,6 +287,11 @@ numPara(4,
 y += 4;
 
 numPara(5,
+  `Bagi makluman pihak tuan, saya telah pun memperoleh sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bagi kesemua kerja pembaikan yang masih tertunggak — GoXpert Solution, No. Sebut Harga 00202604 bertarikh 2 Oktober 2026 — dengan jumlah keseluruhan RM7,610.00 (Ringgit Malaysia: Tujuh Ribu Enam Ratus Sepuluh Sahaja). Salinan sebut harga tersebut dilampirkan sebagai LAMPIRAN A. Sekiranya pihak tuan masih gagal menyiapkan semua kerja pembaikan dalam tempoh notis ini, jumlah tersebut atau kos sebenar yang ditanggung akan dituntut sepenuhnya daripada pihak tuan, termasuk melalui tolakan daripada Wang Tahanan 5% (Retention Sum) di bawah Klausa 27(2) dan/atau tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR).`
+);
+y += 4;
+
+numPara(6,
   `Merujuk kepada Klausa Penyampaian Dokumen ${data.klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -298,7 +304,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(6,
+numPara(7,
   `Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Kedua (Final Notice) ini tamat tempohnya pada ${data.tarikhDeadlineNotis2}, saya akan tanpa berlengah lagi mengambil tindakan berikut:`
 );
 y += 2;
@@ -351,6 +357,33 @@ drawTable(
   data.kronologi.map(k => [k.tarikh, k.peristiwa]),
   krColW
 );
+
+// ============================================================
+// LAMPIRAN A — SEBUT HARGA
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const laT = "LAMPIRAN A";
+doc.text(laT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(laT) / 2, y + 1, pageW / 2 + doc.getTextWidth(laT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Sebut Harga Rasmi Pembaikan (Official Repair Quotation)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const quotImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/thayaaniti-quotation.jpg").toString("base64");
+const qW = 112, qH = 112 * 1400 / 991;
+const qX = (pageW - qW) / 2;
+doc.addImage(quotImg, "JPEG", qX, y, qW, qH);
+doc.setLineWidth(0.3); bk();
+doc.rect(qX, y, qW, qH);
+y += qH + 5;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const qCap = "Sebut Harga Rasmi Pembaikan — GoXpert Solution, No. 00202604 bertarikh 2 Oktober 2026, berjumlah RM7,610.00 (sah selama 30 hari dari tarikh dikeluarkan; maklumat pembayaran dikaburkan).";
+const qCapL = doc.splitTextToSize(qCap, cW - 20);
+for (const c of qCapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
