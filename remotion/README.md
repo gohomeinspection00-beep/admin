@@ -1,6 +1,7 @@
 # Remotion — edit video GoXpert
 
-Video dibina dengan React (https://www.remotion.dev). Projek ni berasingan dari admin panel.
+Video dibina dengan React (https://www.remotion.dev). Projek ni berasingan dari admin panel dan dari skill `goxpert-video` (HyperFrames).
+Panduan untuk Claude: `.claude/skills/remotion-video/SKILL.md`.
 
 ```bash
 cd remotion

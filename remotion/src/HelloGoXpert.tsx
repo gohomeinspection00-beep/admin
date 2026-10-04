@@ -1,6 +1,6 @@
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
-// Warna brand GoXpert (sama dengan skill goxpert-video)
+// Warna brand GoXpert
 const INK = "#1d1a33";
 const PAPER = "#f6f2e7";
 const ACCENT = "#f6c33b";

@@ -1,6 +1,6 @@
 ---
 name: goxpert-video
-description: GoXpert Solutions (Go Home Inspection) house style for editing inspection videos with HyperFrames — the client-approved colours, captions, motion graphics, SFX, audio clean-up, subject cut-out, end card and thumbnail. Use whenever the user sends a video/footage to edit, asks for a reel/TikTok/inspection video, adds before photos, or asks for a thumbnail. Also defines the mandatory plan → materials → build → review → thumbnail conversation flow.
+description: GoXpert Solutions (Go Home Inspection) house style for editing inspection videos with HyperFrames — the client-approved colours, captions, motion graphics, SFX, audio clean-up, subject cut-out, end card and thumbnail. Use whenever the user sends a video/footage to edit, asks for a reel/TikTok/inspection video, adds before photos, or asks for a thumbnail. Also defines the mandatory plan → materials → build → review → thumbnail conversation flow. Not for Remotion — if the user asks for Remotion, use `remotion-video` instead.
 ---
 
 # GoXpert inspection video — house style + workflow
