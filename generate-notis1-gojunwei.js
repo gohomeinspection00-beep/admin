@@ -51,8 +51,8 @@ const data = {
 
   tarikhReInspection: "29 September 2026",
 
-  tarikhNotis: "5 Oktober 2026",
-  tarikhDeadline: "20 Oktober 2026",
+  tarikhNotis: "6 Oktober 2026",
+  tarikhDeadline: "21 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -119,8 +119,8 @@ const data = {
     { tarikh: "30 Januari 2026", peristiwa: "Laporan Pemeriksaan Semula (kali kedua) dikemukakan melalui aplikasi Marvis — kecacatan masih belum diselesaikan" },
     { tarikh: "29 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 53 kecacatan direkodkan: kecacatan lama masih belum selesai, kecacatan baru, dan kecacatan baru akibat kerja pembaikan" },
     { tarikh: "2 Oktober 2026", peristiwa: "Laporan Pemeriksaan Ketiga dikemukakan melalui aplikasi Marvis (submission kali ketiga)" },
-    { tarikh: "5 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "20 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "6 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "21 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
