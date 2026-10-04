@@ -86,6 +86,16 @@ or `check` errors with `multiple_root_compositions`.
   (u2net, ~0.4 s/frame on CPU — only for the clashing ranges), add the webm **muted** in an
   untimed `#cam-fg` wrapper above graphics/below captions, same `data-start/data-media-start`
   and the same zoom tweens as `#cam` (`"#cam, #cam-fg"`). Audio must not double.
+- **Measuring montage**: long stretches where he measures while mumbling → one muted clip at
+  `data-playback-rate="4"` with a "×4" badge + "MENGUKUR KEDALAMAN…" chip + a yellow progress
+  bar, soft clicks every ~1 s and the riser landing on the next spoken result.
+- **Measurement count-up**: ink card with yellow top border, kicker "KEDALAMAN MENDAPAN",
+  League Gothic 220px number counting 0→value (GSAP proxy + `onUpdate`), unit in yellow, and a
+  solid chip with the conversion (e.g. "= 1 KAKI 1 INCI · ≈ 33 CM").
+- **Privacy blur** (he often says "blur kawasan mana"): bake it into the source before building —
+  cut the range, `remove-background` it, `gblur` the frame, feather with a gradient mask via
+  `alphamerge` (not `maskedmerge`), overlay the blurred top, then overlay the cut-out person so
+  he stays sharp. Always ask what must be blurred; default = neighbouring houses/estate.
 - **End card (3.5 s)**: last frame blurred 18px + ink shade 0.82, yellow vertical stripe,
   mono kicker (e.g. "INSPECTION KE-3 · SEBELUM KE TRIBUNAL"), "PEMERIKSAAN / RUMAH /
   **PROFESIONAL**" (200px, last line yellow), logo card, WhatsApp CTA; white flash in.
@@ -95,7 +105,9 @@ or `check` errors with `multiple_root_compositions`.
 **SFX map** (bundled library via `npx hyperframes media-use resolve --type sfx`):
 whoosh-short (entries/transitions), impact-bass (titles, stamps, end), ping (tags), pop (chips,
 ticks), click-soft (shutter/"report"), sparkle (✓ fixed), chime (all good / "hak anda"),
-error (warnings, ≤0.22), riser (last 1.2 s into the end card). Volumes 0.25–0.5; speech dominates.
+error (warnings, ≤0.22), riser. **The bundled riser peaks at ~3–3.5 s and is silent after
+~5 s** — always use it from `data-media-start` 0 and place its start 3.3–3.5 s before the
+moment it should land (end card, a reveal). Never start it at 8.8 s (that part is silent). Volumes 0.25–0.5; speech dominates.
 **Never use the glitch SFX** — the client heard it as crackling ("bunyi pecah").
 
 **Speech**: always run `scripts/clean_audio.sh` on every source before building
