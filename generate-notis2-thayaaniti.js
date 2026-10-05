@@ -69,6 +69,8 @@ const data = {
     { tarikh: "30 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "8 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — daripada 269 item, hanya 191 (71.0%) selesai: 27 Not Complete, 18 Not Fully Complete dan 5 kecacatan baru (1 New Defect; 4 New Defect from Rectification Work) direkodkan" },
     { tarikh: "11 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/041" },
+    { tarikh: "12 September 2026", peristiwa: "Notis Pertama dihantar melalui Pos Berdaftar Akuan Terima (AR) No. RW219465144MY" },
+    { tarikh: "19 September 2026", peristiwa: "Notis Pertama DITERIMA oleh pihak pemaju — kad Akuan Terima (AR) ditandatangani oleh penerima (rujuk Lampiran B)" },
     { tarikh: "24 September 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 11 penemuan: kecacatan masih belum diselesaikan dan 1 kecacatan baru dikesan" },
     { tarikh: "26 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — kecacatan masih belum diselesaikan" },
     { tarikh: "2 Oktober 2026", peristiwa: "Pihak pemaju memaklumkan secara lisan/tidak rasmi dakwaan \"tiada kebocoran fizikal (no physical leaking)\" bagi item kelembapan tinggi — tanpa butiran pemeriksaan bertulis" },
@@ -246,7 +248,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dikemukakan kepada pihak tuan, pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
+  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} dengan nombor rujukan ${data.noRujukanNotis1} yang telah dihantar kepada pihak tuan melalui Pos Berdaftar Akuan Terima (AR) No. RW219465144MY pada 12 September 2026 dan telah DITERIMA oleh pihak tuan pada 19 September 2026 — sebagaimana dibuktikan oleh kad Akuan Terima (AR) Pos Malaysia yang ditandatangani oleh penerima di pihak tuan dan dilampirkan sebagai Lampiran B — pihak tuan telah diberikan tempoh ${data.tempohNotis1} hari sehingga ${data.tarikhDeadlineNotis1} untuk melaksanakan pembaikan kecacatan selaras dengan tanggungjawab pemaju di bawah Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
 );
 y += 4;
 
@@ -400,6 +402,33 @@ doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const qCap = "Sebut Harga Rasmi Pembaikan — GoXpert Solution, No. 00202604 bertarikh 2 Oktober 2026, berjumlah RM7,610.00 (sah selama 30 hari dari tarikh dikeluarkan; maklumat pembayaran dikaburkan).";
 const qCapL = doc.splitTextToSize(qCap, cW - 20);
 for (const c of qCapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN B — KAD AR NOTIS 1
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lbT = "LAMPIRAN B";
+doc.text(lbT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lbT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lbT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Penghantaran & Penerimaan Notis Pertama (Pos Berdaftar AR)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const arImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/thayaaniti-ar.jpg").toString("base64");
+const arW = 100, arH = 100 * 1400 / 787;
+const arX = (pageW - arW) / 2;
+doc.addImage(arImg, "JPEG", arX, y, arW, arH);
+doc.setLineWidth(0.3); bk();
+doc.rect(arX, y, arW, arH);
+y += arH + 5;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const arCap = "Kad Akuan Terima (AR) Pos Malaysia No. RW219465144MY — Notis Pertama (Ruj: NOTIS-1/2026/041) diposkan pada 12 September 2026 dan diterima serta ditandatangani oleh penerima di pihak pemaju pada 19 September 2026 (cop Pos Malaysia 18 SEP 2026; pengesahan Penyelia Posmen). Gambar dirakam pada 24 September 2026.";
+const arCapL = doc.splitTextToSize(arCap, cW - 20);
+for (const c of arCapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
