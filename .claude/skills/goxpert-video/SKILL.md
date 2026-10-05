@@ -164,7 +164,9 @@ SFX, no tweens (`data-no-timeline` on the root). Text is static and hard-cuts wi
 saat 0–3 mono chip **"DEFECT APA HARINI??"** + 2-line question in League Gothic 120px ink boxes
 (line 2 yellow), e.g. "TENGOK APA JADI / DEKAT FLOOR TRAP NI?"; after the reveal the same chip +
 the defect name in Malay ("FLOOR TRAP / TERSUMBAT" — not English like "clogged"). Keep text at
-`bottom: 440px` so it never covers the defect. Also send a no-text copy.
+`bottom: 440px` so it never covers the defect. Then end on a 2 s freeze of the last defect frame
+(`tpad=stop_mode=clone`, original audio fading out) with the same chip + "PERNAH JADI / KAT RUMAH
+ANDA?" — client asked for this. Also send a no-text copy, and give a post caption ending in a question.
 
 ## 5. Thumbnail (only after "dah siap")
 
