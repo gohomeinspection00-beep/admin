@@ -16,11 +16,11 @@ client in casual Malay.
 | Element | Spec |
 |---|---|
 | Canvas | 1080×1920 PNG (9:16) |
-| Background | the photo blurred 14px + greyscale, under a yellow `#fcd116` gradient (0.66–1.0) |
+| Background | the photo blurred 10px, with a yellow `#fcd116` gradient: solid at the top (to ~22%) and bottom (from ~80%), almost clear in the middle so the photo shows behind the card (client asked 2026-10-05) |
 | Logo | `goxpert-video/assets/logo.png` on a white card, radius 26px, top centre (y 150) |
 | Line 1 | SYMPTOM question start — Montserrat 900, uppercase, navy `#161b2e`, white 6px stroke + white hard shadow, max 138px |
 | Line 2 | big punch line — same style, blue `#084c96`, max 215px |
-| Photo card | 700×600, 12px red `#e63b3b` border, rotated −3°, navy drop shadow |
+| Photo card | **880×754** (enlarged on request), 14px red `#e63b3b` border, rotated −3°, navy drop shadow |
 | Sticker | red, white 8px border, radius 16, rotated −7°, overlapping the card's bottom-right; default **AWAS!** |
 | Kicker | "Defect apa harini??" — Montserrat 800, navy, white stroke |
 | Pill | navy, radius 28, yellow text — the defect NAME in Malay (e.g. FLOOR TRAP TERSUMBAT) |

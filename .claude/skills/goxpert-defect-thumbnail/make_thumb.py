@@ -30,7 +30,7 @@ w, h = map(int, subprocess.check_output(
      "-of", "csv=p=0:s=x", photo], text=True).strip().split("x"))
 if cfg.get("crop"):
     cx, cy, cw, ch = cfg["crop"]
-else:  # largest centred 7:6 box (card is 700x600)
+else:  # largest centred 7:6 box (card is 880x754)
     cw, ch = (w, int(w * 6 / 7)) if w * 6 / 7 <= h else (int(h * 7 / 6), h)
     cx, cy = (w - cw) // 2, (h - ch) // 2
 
@@ -38,7 +38,7 @@ def ff(*args):
     subprocess.run(["ffmpeg", "-v", "error", "-y", *args], check=True)
 
 ff("-i", photo, "-frames:v", "1", "-vf",
-   f"crop={cw}:{ch}:{cx}:{cy},scale=1050:900:flags=lanczos,cas=strength=0.4", "-q:v", "2",
+   f"crop={cw}:{ch}:{cx}:{cy},scale=1320:1131:flags=lanczos,cas=strength=0.4", "-q:v", "2",
    os.path.join(work, "assets", "photo.jpg"))
 ff("-i", rel(cfg.get("bg", cfg["photo"])), "-frames:v", "1", "-vf",
    "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920", "-q:v", "3",

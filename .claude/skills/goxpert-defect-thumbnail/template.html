@@ -9,8 +9,8 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--yellow); }
       #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--yellow); }
-      #bg { position: absolute; inset: -60px; width: calc(100% + 120px); height: calc(100% + 120px); object-fit: cover; filter: blur(14px) grayscale(1) contrast(0.9); }
-      #shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(252,209,22,0.96) 0%, rgba(252,209,22,0.78) 30%, rgba(252,209,22,0.66) 55%, rgba(252,209,22,0.9) 75%, rgba(252,209,22,1) 100%); mix-blend-mode: normal; }
+      #bg { position: absolute; inset: -60px; width: calc(100% + 120px); height: calc(100% + 120px); object-fit: cover; filter: blur(10px) saturate(0.9); }
+      #shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(252,209,22,1) 0%, rgba(252,209,22,0.97) 22%, rgba(252,209,22,0.55) 34%, rgba(252,209,22,0.12) 46%, rgba(252,209,22,0.12) 62%, rgba(252,209,22,0.6) 72%, rgba(252,209,22,0.97) 80%, rgba(252,209,22,1) 100%); }
 
       #logo { position: absolute; left: 50%; top: 150px; transform: translateX(-50%); display: block; padding: 18px 30px; background: var(--white); border-radius: 26px; box-shadow: 0 14px 30px rgba(22,27,46,0.25); }
       #logo img { display: block; width: 300px; height: 104px; }
@@ -21,18 +21,18 @@
       #h1 { font-size: 138px; color: var(--navy); }
       #h2 { font-size: 215px; color: var(--blue); margin-top: 4px; }
 
-      #card { position: absolute; left: 190px; top: 735px; width: 700px; height: 600px; transform: rotate(-3deg); }
-      #card-shadow { position: absolute; left: 22px; top: 22px; right: -22px; bottom: -22px; background: rgba(22,27,46,0.35); }
-      #card-in { position: absolute; inset: 0; border: 12px solid var(--red); overflow: hidden; background: #000; }
+      #card { position: absolute; left: 100px; top: 700px; width: 880px; height: 754px; transform: rotate(-3deg); }
+      #card-shadow { position: absolute; left: 26px; top: 26px; right: -26px; bottom: -26px; background: rgba(22,27,46,0.35); }
+      #card-in { position: absolute; inset: 0; border: 14px solid var(--red); overflow: hidden; background: #000; }
       #card-in img { display: block; width: 100%; height: 100%; object-fit: cover; }
-      #sticker { position: absolute; z-index: 2; right: 100px; top: 1170px; display: block; padding: 18px 40px 14px; background: var(--red); color: var(--white); border: 8px solid var(--white); border-radius: 16px; transform: rotate(-7deg);
+      #sticker { position: absolute; z-index: 2; right: 50px; top: 1290px; display: block; padding: 18px 40px 14px; background: var(--red); color: var(--white); border: 8px solid var(--white); border-radius: 16px; transform: rotate(-7deg);
                  font-family: var(--heavy); font-weight: 900; font-size: 96px; line-height: 1; text-transform: uppercase; white-space: nowrap; box-shadow: 0 14px 0 rgba(0,0,0,0.3); }
 
-      #small { position: absolute; left: 0; right: 0; top: 1385px; text-align: center; font-family: var(--heavy); font-weight: 800; font-size: 64px; color: var(--navy); white-space: nowrap;
+      #small { position: absolute; left: 0; right: 0; top: 1500px; text-align: center; font-family: var(--heavy); font-weight: 800; font-size: 64px; color: var(--navy); white-space: nowrap;
                -webkit-text-stroke: 4px var(--white); paint-order: stroke fill; text-shadow: 0 6px 0 var(--white); }
-      #pill { position: absolute; left: 50px; right: 50px; top: 1470px; height: 112px; display: flex; align-items: center; justify-content: center; padding: 6px 20px 0; background: var(--navy); border-radius: 28px; box-shadow: 0 12px 0 rgba(22,27,46,0.3);
+      #pill { position: absolute; left: 50px; right: 50px; top: 1585px; height: 112px; display: flex; align-items: center; justify-content: center; padding: 6px 20px 0; background: var(--navy); border-radius: 28px; box-shadow: 0 12px 0 rgba(22,27,46,0.3);
               font-family: var(--heavy); font-weight: 900; font-size: 92px; line-height: 1; color: var(--yellow); text-transform: uppercase; white-space: nowrap; letter-spacing: -0.01em; }
-      #sub { position: absolute; left: 0; right: 0; top: 1640px; text-align: center; font-family: var(--heavy); font-weight: 700; font-size: 46px; color: var(--navy); white-space: nowrap; }
+      #sub { position: absolute; left: 0; right: 0; top: 1752px; text-align: center; font-family: var(--heavy); font-weight: 700; font-size: 46px; color: var(--navy); white-space: nowrap; }
     </style>
   </head>
   <body>
