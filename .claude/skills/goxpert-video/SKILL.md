@@ -134,6 +134,30 @@ project (`--sdr --crf 18`), then concat in front of the main render with ffmpeg
 Keep the hook's SFX ≤ 0.3–0.35 so it is not louder than the body (check RMS of the first
 2.5 s vs the next seconds).
 
+## 4c. Series: "Defects Apa Harini?" (short single-defect clips, started EP01 2026-10-05)
+
+Recurring niche format for short defect clips (often no speech, just ambience). Template:
+`templates/defects-harini/` — `template.tpl` + `build.py` + `episode.json` (one JSON per episode,
+everything data-driven: clips, defect title/location, marks, zooms, risks, level, stamp, captions).
+Run `python3 <skill>/templates/defects-harini/build.py episode.json` inside the project dir.
+
+Beats: series ident 2.4 s ("EP NN · date" chip, DEFECTS / APA / **HARINI?** on yellow with the
+"?" wobbling, dashed scan ring, footage under an ink shade 0.78) → white flash → persistent badge
+top-left ("? DEFECTS APA HARINI EP NN") → "⚠ DEFECT HARINI" + big yellow defect title + 📍 location
+chip → dashed rings on each spot (inside `#marks`, which zooms with `#cam` so rings stay locked) →
+"TAHAP RISIKO" meter (3 bars + word) + numbered risks low at `bottom: 590px` → rotated
+"PERLU DIBAIKI" stamp + tip chip → standard end card with the series kicker and a
+"ESOK DEFECT APA PULA? FOLLOW →" chip. Keep EP numbers running; ask the client for the defect
+name/location and confirm assumptions in the plan.
+
+Project prep for this format:
+- SFX ids from `media-use resolve` are assigned in resolve order, so copy them to
+  `assets/sfx/<whoosh|impact|ping|pop|click|sparkle|chime|error|riser>.mp3` — the template uses names.
+- No-speech ambience (water, etc.): do **not** run `clean_audio.sh` (RNNoise eats it); use
+  `highpass=f=80,loudnorm=I=-20:TP=-3`. Captions describe the defect instead of transcribing.
+- `npx -y hyperframes` may try a non-existent newer version; install the pinned one with
+  `npm i -g hyperframes@<version from --version>` and call `hyperframes` directly.
+
 ## 5. Thumbnail (only after "dah siap")
 
 `templates/thumbnail/index.html` — 1080×1920 single-frame composition: blurred footage

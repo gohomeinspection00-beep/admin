@@ -1,0 +1,28 @@
+{
+  "ep": 1,
+  "date": "05.10.2026",
+  "kicker": "SIRI INSPECTION RUMAH · GOXPERT",
+  "intro": 2.4,
+  "clips": [
+    { "src": "assets/clip1.mp4", "in": 0, "out": 14.9, "audio": true, "volume": 0.9 }
+  ],
+  "defect": { "title": "Air Karat", "place": "TANGKI AIR", "at": 2.5, "dur": 3.0 },
+  "marks": [
+    { "at": 5.6, "dur": 2.2, "x": 270, "y": 1335, "label": "LUBANG PAIP", "side": "right" },
+    { "at": 7.9, "dur": 2.2, "x": 760, "y": 1060, "label": "SALUTAN TERHAKIS", "side": "above" }
+  ],
+  "zooms": [
+    { "at": 7.9, "dur": 2.2, "scale": 1.18, "x": 760, "y": 1060 }
+  ],
+  "risks": {
+    "at": 10.2, "dur": 2.5, "head": "RISIKO",
+    "items": ["KARAT MAKAN STRUKTUR", "KEBOCORAN TANGKI", "AIR KOTOR KE PAIP RUMAH"]
+  },
+  "level": { "value": 3, "label": "Tinggi" },
+  "stamp": { "at": 12.8, "text": "Perlu Dibaiki", "tip": "SEMAK TANGKI RUMAH ANDA" },
+  "captions": [
+    [2.9, 5.4, "air keluar <b>warna karat</b>"],
+    [8.2, 10.0, "air karat <b>makan salutan</b>"]
+  ],
+  "next": "ESOK DEFECT APA PULA? FOLLOW"
+}
