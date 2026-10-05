@@ -178,13 +178,9 @@ the headline for depth, one before photo polaroid with "BEFORE · DEFECT", a war
 footer bar (logo card + WhatsApp). Keep key text inside y 285–1635 (Instagram grid crop).
 Render: `npx hyperframes snapshot --at 0.5` → `snapshots/frame-00-at-0.5s.png`; send the PNG.
 
-**Bold thumbnail variant (client reference, 2026-10-05)** — `templates/thumbnail-bold/index.html`:
-navy background (blurred frame + gradient), white logo card top centre, Montserrat 900 uppercase with
-dark stroke + hard drop shadow: line 1 white symptom question, line 2 big yellow (e.g. "AIR LAMBAT /
-TURUN?"); real photo of the defect in a red-bordered card rotated −3°, red "AWAS!" sticker (white
-border, −7°) overlapping its corner; "Defect apa harini??" small, yellow pill with the defect name
-("FLOOR TRAP TERSUMBAT"), grey line "Semak sebelum tamat DLP". Montserrat is fetched automatically
-by HyperFrames from Google Fonts. Size text so check reports no `text_box_overflow`.
+**Defects showcase ("Defect apa harini??") thumbnails** use their own skill:
+`.claude/skills/goxpert-defect-thumbnail/` (yellow background, blue text, logo, red photo card —
+fixed design, screenshot in → PNG out). Use that skill for every defect-series thumbnail.
 
 ## 6. Editing rules + gotchas learned
 

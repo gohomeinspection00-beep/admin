@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Defect Thumbnail</title>
+    <style>
+      :root { --navy: #161b2e; --blue: #084c96; --yellow: #fcd116; --red: #e63b3b; --white: #ffffff; --edge: #10131f; --heavy: "Montserrat", "Poppins", sans-serif; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--yellow); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--yellow); }
+      #bg { position: absolute; inset: -60px; width: calc(100% + 120px); height: calc(100% + 120px); object-fit: cover; filter: blur(14px) grayscale(1) contrast(0.9); }
+      #shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(252,209,22,0.96) 0%, rgba(252,209,22,0.78) 30%, rgba(252,209,22,0.66) 55%, rgba(252,209,22,0.9) 75%, rgba(252,209,22,1) 100%); mix-blend-mode: normal; }
+
+      #logo { position: absolute; left: 50%; top: 150px; transform: translateX(-50%); display: block; padding: 18px 30px; background: var(--white); border-radius: 26px; box-shadow: 0 14px 30px rgba(22,27,46,0.25); }
+      #logo img { display: block; width: 300px; height: 104px; }
+
+      #head { position: absolute; left: 0; right: 0; top: 315px; height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+      .h { display: block; font-family: var(--heavy); font-weight: 900; line-height: 1.0; text-transform: uppercase; white-space: nowrap; letter-spacing: -0.01em;
+           -webkit-text-stroke: 6px var(--white); paint-order: stroke fill; text-shadow: 0 10px 0 var(--white), 0 18px 30px rgba(22,27,46,0.35); }
+      #h1 { font-size: 138px; color: var(--navy); }
+      #h2 { font-size: 215px; color: var(--blue); margin-top: 4px; }
+
+      #card { position: absolute; left: 190px; top: 735px; width: 700px; height: 600px; transform: rotate(-3deg); }
+      #card-shadow { position: absolute; left: 22px; top: 22px; right: -22px; bottom: -22px; background: rgba(22,27,46,0.35); }
+      #card-in { position: absolute; inset: 0; border: 12px solid var(--red); overflow: hidden; background: #000; }
+      #card-in img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      #sticker { position: absolute; z-index: 2; right: 100px; top: 1170px; display: block; padding: 18px 40px 14px; background: var(--red); color: var(--white); border: 8px solid var(--white); border-radius: 16px; transform: rotate(-7deg);
+                 font-family: var(--heavy); font-weight: 900; font-size: 96px; line-height: 1; text-transform: uppercase; white-space: nowrap; box-shadow: 0 14px 0 rgba(0,0,0,0.3); }
+
+      #small { position: absolute; left: 0; right: 0; top: 1385px; text-align: center; font-family: var(--heavy); font-weight: 800; font-size: 64px; color: var(--navy); white-space: nowrap;
+               -webkit-text-stroke: 4px var(--white); paint-order: stroke fill; text-shadow: 0 6px 0 var(--white); }
+      #pill { position: absolute; left: 50px; right: 50px; top: 1470px; height: 112px; display: flex; align-items: center; justify-content: center; padding: 6px 20px 0; background: var(--navy); border-radius: 28px; box-shadow: 0 12px 0 rgba(22,27,46,0.3);
+              font-family: var(--heavy); font-weight: 900; font-size: 92px; line-height: 1; color: var(--yellow); text-transform: uppercase; white-space: nowrap; letter-spacing: -0.01em; }
+      #sub { position: absolute; left: 0; right: 0; top: 1640px; text-align: center; font-family: var(--heavy); font-weight: 700; font-size: 46px; color: var(--navy); white-space: nowrap; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-no-timeline data-start="0" data-width="1080" data-height="1920" data-duration="1">
+      <div id="scene" class="clip" data-start="0" data-duration="1" data-track-index="0" style="position:absolute;inset:0" data-layout-allow-overflow>
+        <img id="bg" src="assets/bg.jpg" alt="" data-layout-allow-overflow />
+        <div id="shade"></div>
+        <div id="logo"><img src="assets/logo.png" alt="GoXpert Solutions" /></div>
+        <div id="head">
+          <span id="h1" class="h">__LINE1__</span>
+          <span id="h2" class="h">__LINE2__</span>
+        </div>
+        <div id="card"><div id="card-shadow"></div><div id="card-in"><img src="assets/photo.jpg" alt="" /></div></div>
+        <span id="sticker">__STICKER__</span>
+        <div id="small">__KICKER__</div>
+        <div id="pill">__PILL__</div>
+        <div id="sub">__SUB__</div>
+      </div>
+    </div>
+    <script>
+      // Shrink any line that would not fit (same max sizes as the approved design; never grows).
+      (function () {
+        var hf = window.__hyperframes;
+        if (!hf || !hf.fitTextFontSize) return;
+        [["h1", 138, 900, 920], ["h2", 215, 900, 920], ["pill", 92, 900, 900], ["small", 64, 800, 940],
+         ["sticker", 96, 900, 520], ["sub", 46, 700, 960]].forEach(function (r) {
+          var el = document.getElementById(r[0]);
+          var txt = r[0] === "small" || r[0] === "sub" ? el.textContent : el.textContent.toUpperCase();
+          var fit = hf.fitTextFontSize(txt, { fontFamily: "Montserrat", fontWeight: r[2], maxWidth: r[3], baseFontSize: r[1], minFontSize: 40 });
+          if (fit && fit.fontSize < r[1]) el.style.fontSize = fit.fontSize + "px";
+        });
+      })();
+    </script>
+  </body>
+</html>
