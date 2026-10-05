@@ -275,14 +275,14 @@ y += 4;
 
 checkBreak(30);
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
-const sTD = 'D. Alasan "Within Tolerance" — Item No. 26, 27, 28 & 32';
+const sTD = 'D. Alasan "Within Tolerance" — Item No. 26, 27, 28 & 41';
 doc.text(sTD, mL, y);
 doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(sTD), y + 1);
 y += 8;
 
 numPara(6,
-  `Berhubung item No. 26 (Kitchen — lippage floor tile), item No. 27 (Kitchen — uneven floor tiles), item No. 28 (Kitchen — isu penjajaran yang jelas kelihatan pada permukaan dinding dan skirting) dan item No. 32 (Yard — kecerunan lantai berlebihan / too much gradient), pihak yang mewakili pemaju dan kontraktor menyatakan secara lisan bahawa kesemua kecacatan tersebut berada "dalam had toleransi (within tolerance)" dan oleh itu TIADA tindakan akan diambil. Dakwaan lisan ini tidak boleh diterima. Pihak tuan dituntut menyatakan secara BERTULIS bagi SETIAP item di atas: (i) standard atau piawaian toleransi yang dirujuk (contohnya CIDB QLASSIC, Malaysian Standard, atau spesifikasi pengilang — dengan rujukan penuh); (ii) had toleransi yang dibenarkan di bawah standard tersebut; dan (iii) bacaan ukuran sebenar yang diambil di tapak berserta kaedah dan lokasi pengukuran. Perlu ditegaskan bahawa semasa pemeriksaan-pemeriksaan terdahulu, alat aras (spirit level) dan susunan tiles digunakan sebagai penunjuk visual (visual indicator) — tiada bacaan ukuran direkodkan ketika itu kerana kecacatan tersebut jelas kelihatan senget secara ketara dan dapat dirasai secara fizikal ketika berjalan di atas permukaan berkenaan. Tanpa pengesahan bertulis berserta data ukuran sebagaimana di atas, keengganan mengambil tindakan tidak akan diterima, dan item-item ini kekal sebagai kecacatan tertunggak yang wajib dibaiki.`
+  `Berhubung item No. 26 (Kitchen — lippage floor tile), item No. 27 (Kitchen — uneven floor tiles), item No. 28 (Kitchen — isu penjajaran yang jelas kelihatan pada permukaan dinding dan skirting) dan item No. 41 (Master Bedroom — isu penjajaran pada permukaan dinding akibat pemotongan floor tiles yang tidak konsisten), pihak yang mewakili pemaju dan kontraktor menyatakan secara lisan bahawa kesemua kecacatan tersebut berada "dalam had toleransi (within tolerance)" dan oleh itu TIADA tindakan akan diambil. Dakwaan lisan ini tidak boleh diterima. Pihak tuan dituntut menyatakan secara BERTULIS bagi SETIAP item di atas: (i) standard atau piawaian toleransi yang dirujuk (contohnya CIDB QLASSIC, Malaysian Standard, atau spesifikasi pengilang — dengan rujukan penuh); (ii) had toleransi yang dibenarkan di bawah standard tersebut; dan (iii) bacaan ukuran sebenar yang diambil di tapak berserta kaedah dan lokasi pengukuran. Perlu ditegaskan bahawa semasa pemeriksaan-pemeriksaan terdahulu, alat aras (spirit level) dan susunan tiles digunakan sebagai penunjuk visual (visual indicator) — tiada bacaan ukuran direkodkan ketika itu kerana kecacatan tersebut jelas kelihatan senget secara ketara dan dapat dirasai secara fizikal ketika berjalan di atas permukaan berkenaan. Tanpa pengesahan bertulis berserta data ukuran sebagaimana di atas, keengganan mengambil tindakan tidak akan diterima, dan item-item ini kekal sebagai kecacatan tertunggak yang wajib dibaiki.`
 );
 y += 4;
 
@@ -386,7 +386,7 @@ drawTable(
   ["No.", "Dokumen / Maklumat Dituntut", "Berhubung Dengan"],
   [
     ["1", "Salinan section plan / lukisan diluluskan (approved drawing) dan/atau lukisan as-built terkini yang menunjukkan spesifikasi dinding — sama ada sepatutnya dipasang wall tiles", "Item No. 29 — Kitchen Wall (Seksyen C)"],
-    ["2", "Pengesahan bertulis bagi dakwaan toleransi: (i) nama & rujukan penuh standard yang dirujuk, (ii) had toleransi dibenarkan, (iii) bacaan ukuran sebenar di tapak berserta kaedah & lokasi pengukuran — bagi SETIAP item", "Item No. 26, 27, 28 & 32 — alasan \"within tolerance\" (Seksyen D)"],
+    ["2", "Pengesahan bertulis bagi dakwaan toleransi: (i) nama & rujukan penuh standard yang dirujuk, (ii) had toleransi dibenarkan, (iii) bacaan ukuran sebenar di tapak berserta kaedah & lokasi pengukuran — bagi SETIAP item", "Item No. 26, 27, 28 & 41 — alasan \"within tolerance\" (Seksyen D)"],
     ["3", "Laporan pengukuran bertulis bagi dakwaan ukuran laser (kaedah, bacaan, lokasi titik ukur, nama pegawai), dan/atau pengesahan ukuran semula bersama dengan kehadiran pemilik", "Item No. 41 — Master Bedroom Wall (Seksyen E)"],
     ["4", "Dokumen reka bentuk rasmi yang diluluskan (approved design documentation), termasuk keputusan semakan sama ada ceiling board sepatutnya dipasang", "Item No. 63 — Metal Deck Area, large opening & exposed roof structure (Seksyen G)"],
     ["5", "Keterangan rasmi bertulis mengapa rantai (chain) tidak dibekalkan, ATAU pembekalan dan pemasangan rantai tersebut", "Basin stopper — slot rantai wujud tetapi rantai tiada (Seksyen F)"],
