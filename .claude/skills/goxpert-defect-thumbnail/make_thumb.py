@@ -18,6 +18,8 @@ import html, json, os, shutil, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 LOGO = os.path.join(HERE, "..", "goxpert-video", "assets", "logo.png")
 
+if not shutil.which("hyperframes"):
+    sys.exit("hyperframes not found — run: npm i -g hyperframes@0.8.132")
 cfg = json.load(open(sys.argv[1]))
 base = os.path.dirname(os.path.abspath(sys.argv[1]))
 rel = lambda p: p if os.path.isabs(p) else os.path.join(base, p)

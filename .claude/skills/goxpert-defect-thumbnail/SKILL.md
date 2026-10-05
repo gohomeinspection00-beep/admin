@@ -5,9 +5,10 @@ description: GoXpert Solutions "Defect apa harini??" defects-showcase THUMBNAIL 
 
 # GoXpert "Defect apa harini??" thumbnail
 
-Client (Malay-speaking, writes casual Malay) approved this on 2026-10-05: layout from their
-reference ("TILES BUNYI KOSONG?" style), then **colours inverted at their request** — yellow
-background, blue text. Every future screenshot gets **exactly this design**. Do not change colours,
+**FINAL — locked by the client on 2026-10-05 ("oke final").** Client (Malay-speaking, writes casual
+Malay): layout from their reference ("TILES BUNYI KOSONG?" style), then **colours inverted at their
+request** (yellow background, blue text), then a bigger photo card and yellow gradient top and bottom.
+The first approved output was "AIR LAMBAT / TURUN?" + "FLOOR TRAP TERSUMBAT". Every future screenshot gets **exactly this design**. Do not change colours,
 fonts, positions, logo, sticker style or the bottom line unless the client asks. Talk to the
 client in casual Malay.
 
@@ -40,7 +41,9 @@ It looks best with line 1 ≤ ~12 characters, line 2 ≤ ~8, pill ≤ ~20, stick
    - If you can't tell what the defect is, ask before making it. Don't guess a scary label.
 3. Pick the crop: a region `[x, y, w, h]` of the screenshot without phone UI, with the defect
    near the centre (the card is 7:6; the script defaults to a centred 7:6 crop).
-4. Make it (needs `hyperframes` on PATH; see goxpert-video §4c for the install note):
+4. Make it. In a fresh session, first run `command -v hyperframes || npm i -g hyperframes@0.8.132`
+   (don't use `npx -y hyperframes`: it tries a newer version that doesn't exist). Montserrat
+   downloads automatically on the first run.
    ```bash
    cat > thumb.json <<'EOF'
    { "photo": "ss.jpg", "crop": [0, 220, 1080, 926],
