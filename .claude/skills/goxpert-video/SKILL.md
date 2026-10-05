@@ -158,6 +158,14 @@ Project prep for this format:
 - `npx -y hyperframes` may try a non-existent newer version; install the pinned one with
   `npm i -g hyperframes@<version from --version>` and call `hyperframes` directly.
 
+**Plain hook variant (client asked 2026-10-05: "taknak animation / template")** — when he sends a
+short clip to use as a hook: trim to the reveal (stop before the camera wanders off), upscale, no
+SFX, no tweens (`data-no-timeline` on the root). Text is static and hard-cuts with two clips:
+saat 0–3 mono chip **"DEFECT APA HARINI??"** + 2-line question in League Gothic 120px ink boxes
+(line 2 yellow), e.g. "TENGOK APA JADI / DEKAT FLOOR TRAP NI?"; after the reveal the same chip +
+the defect name in Malay ("FLOOR TRAP / TERSUMBAT" — not English like "clogged"). Keep text at
+`bottom: 440px` so it never covers the defect. Also send a no-text copy.
+
 ## 5. Thumbnail (only after "dah siap")
 
 `templates/thumbnail/index.html` — 1080×1920 single-frame composition: blurred footage
