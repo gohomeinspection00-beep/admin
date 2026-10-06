@@ -158,13 +158,14 @@ Project prep for this format:
 - `npx -y hyperframes` may try a non-existent newer version; install the pinned one with
   `npm i -g hyperframes@<version from --version>` and call `hyperframes` directly.
 
-**Defect series video = CLEAN (client rule, final 2026-10-06).** For "Defect apa harini??" clips:
-thumbnail PNG (goxpert-defect-thumbnail skill) as the **first 2.0 s** (0.7 s was too short to read — client, 2026-10-06), then the footage only —
-**no text on the video at all** (he rejected the hook question / defect name / "Pernah jadi…" overlays,
-the PUNCA/RISIKO/CARA ELAK pages and the end card). Only the thumbnail carries words. Trim the
-footage to the defect reveal (stop before the camera wanders off), upscale to 1080×1920, no
-animation, no SFX, **silent** AAC track (he adds a trending sound in the app). Build with ffmpeg:
-`-loop 1 -t 2.0 -i thumb.png -i clip.mp4 -f lavfi -i anullsrc=r=48000:cl=stereo` + `concat=n=2:v=1:a=0`.
+**Defect series video = CLEAN (client rule, final 2026-10-06).** For "Defect apa harini??" clips
+deliver **two separate files**: (1) the video — footage only, **no text and NO thumbnail inside**,
+trimmed to the defect reveal, upscaled to 1080×1920 30 fps, no animation, no SFX, sound OFF
+(silent AAC track; he adds a trending sound in the app); (2) the thumbnail PNG from the
+goxpert-defect-thumbnail skill, which he uploads as the cover. He tried the thumbnail inside the
+video (0.7 s, then 2 s) and cancelled it. Build the video with
+`.claude/skills/goxpert-defect-thumbnail/make_video.sh footage.mp4 out.mp4 [start] [end]`.
+He rejected text overlays, PUNCA/RISIKO/CARA ELAK pages and end cards for this series.
 Give a post caption ending in a question (e.g. "Pernah jadi kat rumah anda? Komen bawah 👇").
 
 ## 5. Thumbnail (only after "dah siap")
