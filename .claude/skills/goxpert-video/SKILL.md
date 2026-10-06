@@ -158,20 +158,14 @@ Project prep for this format:
 - `npx -y hyperframes` may try a non-existent newer version; install the pinned one with
   `npm i -g hyperframes@<version from --version>` and call `hyperframes` directly.
 
-**Plain hook variant (client asked 2026-10-05: "taknak animation / template")** — when he sends a
-short clip to use as a hook: trim to the reveal (stop before the camera wanders off), upscale, no
-SFX, no tweens (`data-no-timeline` on the root). Text is static and hard-cuts with two clips:
-saat 0–3 mono chip **"DEFECT APA HARINI??"** + 2-line question in League Gothic 120px ink boxes
-(line 2 yellow), e.g. "TENGOK APA JADI / DEKAT FLOOR TRAP NI?"; after the reveal the same chip +
-the defect name in Malay ("FLOOR TRAP / TERSUMBAT" — not English like "clogged"). Keep text at
-`bottom: 440px` so it never covers the defect. Then end on a 2 s freeze of the last defect frame
-(`tpad=stop_mode=clone`, original audio fading out) with the same chip + "PERNAH JADI / KAT RUMAH
-ANDA?" — client asked for this. Also send a no-text copy, and give a post caption ending in a question.
-For this series the **full video is just that** (question → defect name → "Pernah jadi…", ~7.5 s,
-silent so he adds a trending sound): the client rejected extra PUNCA / RISIKO / CARA ELAK pages and
-the end card (2026-10-06). Don't add them unless he asks. The series thumbnail
-(goxpert-defect-thumbnail skill) always goes in as the **first 0.7 s** of the video (concat the PNG
-with ffmpeg, 1080×1920 30 fps, silent AAC track) so the profile grid shows it.
+**Defect series video = CLEAN (client rule, final 2026-10-06).** For "Defect apa harini??" clips:
+thumbnail PNG (goxpert-defect-thumbnail skill) as the **first 0.7 s**, then the footage only —
+**no text on the video at all** (he rejected the hook question / defect name / "Pernah jadi…" overlays,
+the PUNCA/RISIKO/CARA ELAK pages and the end card). Only the thumbnail carries words. Trim the
+footage to the defect reveal (stop before the camera wanders off), upscale to 1080×1920, no
+animation, no SFX, **silent** AAC track (he adds a trending sound in the app). Build with ffmpeg:
+`-loop 1 -t 0.7 -i thumb.png -i clip.mp4 -f lavfi -i anullsrc=r=48000:cl=stereo` + `concat=n=2:v=1:a=0`.
+Give a post caption ending in a question (e.g. "Pernah jadi kat rumah anda? Komen bawah 👇").
 
 ## 5. Thumbnail (only after "dah siap")
 
