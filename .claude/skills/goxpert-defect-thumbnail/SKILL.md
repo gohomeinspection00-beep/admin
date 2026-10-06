@@ -54,9 +54,11 @@ It looks best with line 1 ≤ ~12 characters, line 2 ≤ ~8, pill ≤ ~20, stick
    ```
    Optional keys: `bg` (another image for the background), `sticker`, `kicker`, `sub`.
    Video input works too (it takes frame 0). For a specific moment, extract that frame to a JPG first.
-5. Look at the PNG yourself (text fits, defect visible, sticker not covering the defect), send it
+5. If there is a video for it, also put the PNG in as the video's **first 0.7 s** (client rule,
+   2026-10-06), then send both files.
+6. Look at the PNG yourself (text fits, defect visible, sticker not covering the defect), send it
    with SendUserFile, and ask: "Thumbnail ni okay, atau nak tukar apa-apa?"
-6. Work in the scratchpad; never commit screenshots or PNGs to the repo.
+7. Work in the scratchpad; never commit screenshots or PNGs to the repo.
 
 `check` may flag `text_occluded` on a long sticker over the photo. That is a false positive (the
 sticker is on top). Contrast warnings on line 2 mean the blue was changed; keep `#084c96`.

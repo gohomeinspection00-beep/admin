@@ -169,7 +169,9 @@ the defect name in Malay ("FLOOR TRAP / TERSUMBAT" — not English like "clogged
 ANDA?" — client asked for this. Also send a no-text copy, and give a post caption ending in a question.
 For this series the **full video is just that** (question → defect name → "Pernah jadi…", ~7.5 s,
 silent so he adds a trending sound): the client rejected extra PUNCA / RISIKO / CARA ELAK pages and
-the end card (2026-10-06). Don't add them unless he asks.
+the end card (2026-10-06). Don't add them unless he asks. The series thumbnail
+(goxpert-defect-thumbnail skill) always goes in as the **first 0.7 s** of the video (concat the PNG
+with ffmpeg, 1080×1920 30 fps, silent AAC track) so the profile grid shows it.
 
 ## 5. Thumbnail (only after "dah siap")
 
