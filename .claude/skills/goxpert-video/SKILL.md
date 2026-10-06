@@ -159,12 +159,12 @@ Project prep for this format:
   `npm i -g hyperframes@<version from --version>` and call `hyperframes` directly.
 
 **Defect series video = CLEAN (client rule, final 2026-10-06).** For "Defect apa harini??" clips:
-thumbnail PNG (goxpert-defect-thumbnail skill) as the **first 0.7 s**, then the footage only —
+thumbnail PNG (goxpert-defect-thumbnail skill) as the **first 2.0 s** (0.7 s was too short to read — client, 2026-10-06), then the footage only —
 **no text on the video at all** (he rejected the hook question / defect name / "Pernah jadi…" overlays,
 the PUNCA/RISIKO/CARA ELAK pages and the end card). Only the thumbnail carries words. Trim the
 footage to the defect reveal (stop before the camera wanders off), upscale to 1080×1920, no
 animation, no SFX, **silent** AAC track (he adds a trending sound in the app). Build with ffmpeg:
-`-loop 1 -t 0.7 -i thumb.png -i clip.mp4 -f lavfi -i anullsrc=r=48000:cl=stereo` + `concat=n=2:v=1:a=0`.
+`-loop 1 -t 2.0 -i thumb.png -i clip.mp4 -f lavfi -i anullsrc=r=48000:cl=stereo` + `concat=n=2:v=1:a=0`.
 Give a post caption ending in a question (e.g. "Pernah jadi kat rumah anda? Komen bawah 👇").
 
 ## 5. Thumbnail (only after "dah siap")
