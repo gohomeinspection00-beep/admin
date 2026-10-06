@@ -167,6 +167,9 @@ the defect name in Malay ("FLOOR TRAP / TERSUMBAT" — not English like "clogged
 `bottom: 440px` so it never covers the defect. Then end on a 2 s freeze of the last defect frame
 (`tpad=stop_mode=clone`, original audio fading out) with the same chip + "PERNAH JADI / KAT RUMAH
 ANDA?" — client asked for this. Also send a no-text copy, and give a post caption ending in a question.
+For this series the **full video is just that** (question → defect name → "Pernah jadi…", ~7.5 s,
+silent so he adds a trending sound): the client rejected extra PUNCA / RISIKO / CARA ELAK pages and
+the end card (2026-10-06). Don't add them unless he asks.
 
 ## 5. Thumbnail (only after "dah siap")
 
