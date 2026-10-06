@@ -41,8 +41,8 @@ const data = {
 
   tarikhReInspection: "4 Oktober 2026",
 
-  tarikhNotis: "6 Oktober 2026",
-  tarikhDeadline: "21 Oktober 2026",
+  tarikhNotis: "7 Oktober 2026",
+  tarikhDeadline: "22 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -85,8 +85,8 @@ const data = {
     { tarikh: "Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "21 Julai 2026", peristiwa: "Pemeriksaan Kedua (Second Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "4 Oktober 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 31 kecacatan direkodkan: 24 Not Complete, 2 Not Fully Complete, 2 New Defect dan 3 New Defect from Rectification Work" },
-    { tarikh: "6 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — bersama Laporan Pemeriksaan Ketiga" },
-    { tarikh: "21 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "7 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — bersama Laporan Pemeriksaan Ketiga" },
+    { tarikh: "22 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
