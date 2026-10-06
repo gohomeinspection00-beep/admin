@@ -12,7 +12,7 @@ thumb.json:
   kicker   default "Defect apa harini??"
   sub      default "Semak sebelum tamat DLP"
   out      output PNG path (default: <work_dir>/thumbnail.png)
-  format   "3:4" (default, 1080x1440 — client asked 2026-10-06) or "9:16" (1080x1920)
+  format   "9:16" (default, 1080x1920, grid-safe: all content inside the centre 3:4) or "3:4" (1080x1440)
 """
 import html, json, os, shutil, subprocess, sys
 
@@ -22,7 +22,7 @@ LOGO = os.path.join(HERE, "..", "goxpert-video", "assets", "logo.png")
 if not shutil.which("hyperframes"):
     sys.exit("hyperframes not found — run: npm i -g hyperframes@0.8.132")
 cfg = json.load(open(sys.argv[1]))
-FMT = cfg.get("format", "3:4")
+FMT = cfg.get("format", "9:16")
 H = {"3:4": 1440, "9:16": 1920}[FMT]
 # 3:4 layout: same design, everything scaled to fit 1440 px height
 CSS_34 = """
@@ -38,6 +38,12 @@ CSS_34 = """
       #small { top: 1124px; font-size: 54px; }
       #pill { top: 1195px; height: 100px; font-size: 80px; }
       #sub { top: 1322px; font-size: 40px; }"""
+# 9:16 = the 3:4 layout moved down 240 px, so everything sits inside the centre 3:4 area that the
+# Instagram / TikTok profile grid shows (client screenshot 2026-10-06: logo + pill were cropped).
+import re
+CSS_916 = re.sub(r"top: (\d+)px", lambda m: f"top: {int(m.group(1)) + 240}px", CSS_34).replace(
+    "rgba(252,209,22,0.97) 27%, rgba(252,209,22,0.5) 36%, rgba(252,209,22,0.12) 44%, rgba(252,209,22,0.12) 64%, rgba(252,209,22,0.6) 71%, rgba(252,209,22,0.97) 77%",
+    "rgba(252,209,22,0.97) 33%, rgba(252,209,22,0.5) 39.5%, rgba(252,209,22,0.12) 45.5%, rgba(252,209,22,0.12) 60.5%, rgba(252,209,22,0.6) 66%, rgba(252,209,22,0.97) 70%")
 base = os.path.dirname(os.path.abspath(sys.argv[1]))
 rel = lambda p: p if os.path.isabs(p) else os.path.join(base, p)
 work = os.path.abspath(sys.argv[2] if len(sys.argv) > 2 else os.path.join(base, "thumb-build"))
@@ -70,7 +76,7 @@ for k, v in {"__LINE1__": cfg["line1"], "__LINE2__": cfg["line2"], "__PILL__": c
              "__STICKER__": cfg.get("sticker", "AWAS!"), "__KICKER__": cfg.get("kicker", "Defect apa harini??"),
              "__SUB__": cfg.get("sub", "Semak sebelum tamat DLP"), "__H__": str(H)}.items():
     page = page.replace(k, e(v))
-page = page.replace("__FORMATCSS__", CSS_34 if FMT == "3:4" else "")
+page = page.replace("__FORMATCSS__", CSS_34 if FMT == "3:4" else CSS_916)
 open(os.path.join(work, "index.html"), "w").write(page)
 
 chk = subprocess.run(["hyperframes", "check"], cwd=work, capture_output=True, text=True)

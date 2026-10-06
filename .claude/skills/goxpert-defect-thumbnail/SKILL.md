@@ -1,6 +1,6 @@
 ---
 name: goxpert-defect-thumbnail
-description: GoXpert Solutions "Defect apa harini??" defects-showcase THUMBNAIL (3:4, 1080×1440) — the client-approved fixed design (yellow background, navy/blue bold Montserrat text, GoXpert logo card, defect photo in a tilted red frame, red sticker, navy pill with the defect name). Use whenever the user sends a screenshot/photo of a defect and asks for a thumbnail/cover, or says "buat thumbnail" for the defects showcase series. Keep every thumbnail identical in layout and colour — only the photo and words change.
+description: GoXpert Solutions "Defect apa harini??" defects-showcase THUMBNAIL (9:16, grid-safe for IG/TikTok) — the client-approved fixed design (yellow background, navy/blue bold Montserrat text, GoXpert logo card, defect photo in a tilted red frame, red sticker, navy pill with the defect name). Use whenever the user sends a screenshot/photo of a defect and asks for a thumbnail/cover, or says "buat thumbnail" for the defects showcase series. Keep every thumbnail identical in layout and colour — only the photo and words change.
 ---
 
 # GoXpert "Defect apa harini??" thumbnail
@@ -16,7 +16,7 @@ client in casual Malay.
 
 | Element | Spec |
 |---|---|
-| Canvas | **1080×1440 PNG (3:4) — default since 2026-10-06** (client asked for "4:3"; Instagram's portrait grid ratio). `"format": "9:16"` still gives the original 1080×1920 layout. The 3:4 layout is the same design scaled (`CSS_34` in make_thumb.py) |
+| Canvas | **1080×1920 (9:16), grid-safe: default since 2026-10-06.** Every element sits inside the centre 3:4 area (y 240–1680), because the Instagram and TikTok profile grids crop covers to 3:4 from the middle (client screenshot: logo and pill were cut off). The same file works as the full Reels/TikTok cover and in the grid. Top/bottom 240 px are plain yellow. `"format": "3:4"` gives a 1080×1440 version of the same layout |
 | Background | the photo blurred 10px, with a yellow `#fcd116` gradient: solid at the top (to ~22%) and bottom (from ~80%), almost clear in the middle so the photo shows behind the card (client asked 2026-10-05) |
 | Logo | `goxpert-video/assets/logo.png` on a white card, radius 26px, top centre (y 150) |
 | Line 1 | SYMPTOM question start — Montserrat 900, uppercase, navy `#161b2e`, white 6px stroke + white hard shadow, max 138px |
@@ -52,7 +52,7 @@ It looks best with line 1 ≤ ~12 characters, line 2 ≤ ~8, pill ≤ ~20, stick
    EOF
    python3 <this skill>/make_thumb.py thumb.json <scratchpad>/thumb-build
    ```
-   Optional keys: `format` ("3:4" default / "9:16"), `bg` (another image for the background), `sticker`, `kicker`, `sub`.
+   Optional keys: `format` ("9:16" default, grid-safe / "3:4"), `bg` (another image for the background), `sticker`, `kicker`, `sub`.
    Video input works too (it takes frame 0). For a specific moment, extract that frame to a JPG first.
 5. If there is a video for it, make the clean video **separately** (the thumbnail does NOT go inside it,
    client rule 2026-10-06): `bash <this skill>/make_video.sh footage.mp4 Video.mp4 [start] [end]`.
