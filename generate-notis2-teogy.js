@@ -38,8 +38,8 @@ const data = {
   kaedahSerahanLaporan: "aplikasi CVConnect",
   tarikhReInspection: "27 Ogos 2026",
 
-  tarikhNotis: "6 Oktober 2026",
-  tarikhDeadline: "21 Oktober 2026",
+  tarikhNotis: "8 Oktober 2026",
+  tarikhDeadline: "23 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -62,8 +62,9 @@ const data = {
     { tarikh: "1 September 2026", peristiwa: "1 kes kecacatan tambahan diserahkan melalui aplikasi CVConnect (Defect 940157-12) — masih Pending" },
     { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/035, dihantar melalui Pos Berdaftar AR" },
     { tarikh: "17 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan, tiada maklum balas rasmi" },
-    { tarikh: "6 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/035" },
-    { tarikh: "21 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "6 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. GXS-RW-2026-00202605 berjumlah RM25,565.00 diperoleh daripada kontraktor berdaftar CIDB" },
+    { tarikh: "8 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/035, bersama sebut harga rasmi pembaikan" },
+    { tarikh: "23 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [
@@ -284,7 +285,12 @@ numPara(5,
 );
 y += 4;
 
-numPara(6, "Sekiranya pembaikan masih tidak disempurnakan selepas tarikh akhir MUKTAMAD tersebut, saya akan TANPA RUJUKAN LANJUT:");
+numPara(6,
+  `Bagi makluman pihak tuan, saya telah pun memperoleh sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor berdaftar CIDB bagi kesemua kerja pembaikan yang masih tertunggak — Go Xpert Solution, No. Sebut Harga GXS-RW-2026-00202605 bertarikh 6 Oktober 2026 — dengan jumlah keseluruhan RM25,565.00 (Ringgit Malaysia: Dua Puluh Lima Ribu Lima Ratus Enam Puluh Lima Sahaja), merangkumi 18 item kerja termasuk kerja pembaikan elektrik oleh pendawai berdaftar, rawatan tetulang terdedah, kerja kalis air (waterproofing) dan pembaikan keretakan keseluruhan rumah. Salinan penuh sebut harga tersebut dilampirkan sebagai LAMPIRAN A. Sekiranya pihak tuan masih gagal menyiapkan semua kerja pembaikan dalam tempoh notis ini, jumlah tersebut atau kos sebenar yang ditanggung akan dituntut sepenuhnya daripada pihak tuan, termasuk melalui tolakan daripada Wang Tahanan lima peratus (5%) yang dipegang oleh peguam pemegang (stakeholder) dan/atau tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR).`
+);
+y += 4;
+
+numPara(7, "Sekiranya pembaikan masih tidak disempurnakan selepas tarikh akhir MUKTAMAD tersebut, saya akan TANPA RUJUKAN LANJUT:");
 y += 2;
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya;");
 bullet("Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh peguam pemegang (stakeholder), M/s K.H. Koh, Azhar & Koh, selaras dengan Klausa 27 Perjanjian Jual Beli;");
@@ -292,7 +298,7 @@ bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempa
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
-numPara(7,
+numPara(8,
   `Merujuk kepada klausa Service of Documents di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui Pos Berdaftar Akuan Terima (AR) dan salinannya dimaklumkan kepada peguam pemegang wang tahanan (stakeholder) untuk makluman dan tindakan lanjut berhubung wang tahanan lima peratus (5%).`
 );
 y += 4;
@@ -305,7 +311,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(8,
+numPara(9,
   `Ini merupakan NOTIS TERAKHIR sebelum tindakan undang-undang dimulakan. Sebarang kegagalan pihak tuan mematuhi notis ini akan dijadikan bukti kegagalan dan keengganan pihak tuan di hadapan Tribunal Tuntutan Pembeli Rumah dan/atau mahkamah yang berbidang kuasa, dan segala kos yang ditanggung akibat kegagalan tersebut akan dituntut sepenuhnya daripada pihak tuan.`
 );
 y += 4;
@@ -362,6 +368,29 @@ drawTable(
   data.kronologi.map(k => [k.tarikh, k.peristiwa]),
   krColW
 );
+
+// ============================================================
+// LAMPIRAN A — SEBUT HARGA (5 muka)
+// ============================================================
+for (let qp = 1; qp <= 5; qp++) {
+  newPage();
+  y = 25;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  const laT = qp === 1 ? "LAMPIRAN A" : "LAMPIRAN A (sambungan)";
+  doc.text(laT, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(laT) / 2, y + 1, pageW / 2 + doc.getTextWidth(laT) / 2, y + 1);
+  y += 5;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.FOOTNOTE);
+  doc.text(`Sebut Harga Rasmi Pembaikan GXS-RW-2026-00202605 — muka ${qp} daripada 5`, pageW / 2, y, { align: "center" });
+  y += 6;
+  const qImg = "data:image/jpeg;base64," + fs.readFileSync(`/home/user/admin/teogy-quot-p${qp}.jpg`).toString("base64");
+  const qW = 150, qH = 150 * 1521 / 1075;
+  const qX = (pageW - qW) / 2;
+  doc.addImage(qImg, "JPEG", qX, y, qW, qH);
+  doc.setLineWidth(0.3); bk();
+  doc.rect(qX, y, qW, qH);
+}
 
 // ============================================================
 // AKUAN TERIMA x 2
