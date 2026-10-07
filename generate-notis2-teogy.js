@@ -60,8 +60,7 @@ const data = {
     { tarikh: "27 Ogos 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "28 Ogos 2026", peristiwa: "8 kes kecacatan baharu diserahkan melalui aplikasi CVConnect (Defect 440028-4, 940037-5, 440046-6, 840052-7, 540067-8, 140075-9, 840083-10, 940098-11) — semua masih Pending" },
     { tarikh: "1 September 2026", peristiwa: "1 kes kecacatan tambahan diserahkan melalui aplikasi CVConnect (Defect 940157-12) — masih Pending" },
-    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/035" },
-    { tarikh: "5 September 2026", peristiwa: "Notis Pertama dihantar melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY — kemudiannya DITERIMA dan diakui oleh wakil pihak pemaju, Puan Norfarhana, dengan tandatangan dan cop syarikat (rujuk Lampiran B)" },
+    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/035, dihantar melalui Pos Berdaftar AR" },
     { tarikh: "17 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan, tiada maklum balas rasmi" },
     { tarikh: "6 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. GXS-RW-2026-00202605 berjumlah RM25,565.00 diperoleh daripada kontraktor berdaftar CIDB" },
     { tarikh: "8 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/035, bersama sebut harga rasmi pembaikan" },
@@ -243,12 +242,12 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}), merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026 yang telah dihantar kepada pihak tuan melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY pada 5 September 2026 dan telah DITERIMA oleh pihak tuan — diakui terima oleh wakil pihak tuan, Puan Norfarhana, dengan tandatangan dan cop syarikat pada kad Akuan Terima (AR) Pos Malaysia (dilampirkan sebagai Lampiran B) — susulan Laporan Pemeriksaan Kecacatan yang dikemukakan melalui aplikasi CVConnect pada 1 dan 2 Julai 2025 (Defect 728811-2 dan 228839-3) selaras dengan Klausa ${data.klausaPembaikan} Perjanjian Jual Beli dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah memberikan tempoh lima belas (15) hari kepada pihak tuan untuk menyiapkan semua kerja pembaikan, iaitu sehingga 17 September 2026.`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}), merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026 yang telah dihantar kepada pihak tuan melalui Pos Berdaftar Akuan Terima (AR), susulan Laporan Pemeriksaan Kecacatan yang dikemukakan melalui aplikasi CVConnect pada 1 dan 2 Julai 2025 (Defect 728811-2 dan 228839-3) selaras dengan Klausa ${data.klausaPembaikan} Perjanjian Jual Beli dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah memberikan tempoh lima belas (15) hari kepada pihak tuan untuk menyiapkan semua kerja pembaikan, iaitu sehingga 17 September 2026.`
 );
 y += 4;
 
 numPara(2,
-  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 17 September 2026 tanpa sebarang pembaikan disempurnakan dan tanpa sebarang maklum balas rasmi daripada pihak tuan. Sehingga tarikh notis ini dikeluarkan, kecacatan yang dilaporkan masih belum diselesaikan, dan kesemua sembilan (9) kes kecacatan yang diserahkan melalui aplikasi CVConnect pada 28 Ogos 2026 dan 1 September 2026 masih berstatus Pending — sebagaimana dibuktikan oleh paparan CVConnect Dashboard pihak tuan sendiri yang dilampirkan sebagai Lampiran C (9 Pending, 0 In Progress). Ini jelas menunjukkan kegagalan pihak tuan mematuhi Notis Pertama. Kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
+  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 17 September 2026 tanpa sebarang pembaikan disempurnakan dan tanpa sebarang maklum balas rasmi daripada pihak tuan. Sehingga tarikh notis ini dikeluarkan, kecacatan yang dilaporkan masih belum diselesaikan, dan kesemua sembilan (9) kes kecacatan yang diserahkan melalui aplikasi CVConnect pada 28 Ogos 2026 dan 1 September 2026 masih berstatus Pending — sebagaimana dibuktikan oleh paparan CVConnect Dashboard pihak tuan sendiri yang dilampirkan sebagai Lampiran B (9 Pending, 0 In Progress). Ini jelas menunjukkan kegagalan pihak tuan mematuhi Notis Pertama. Kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -394,39 +393,12 @@ for (let qp = 1; qp <= 5; qp++) {
 }
 
 // ============================================================
-// LAMPIRAN B — KAD AR NOTIS 1
+// LAMPIRAN B — CVCONNECT DASHBOARD
 // ============================================================
 newPage();
 y = 25;
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
-const lbT = "LAMPIRAN B";
-doc.text(lbT, pageW / 2, y, { align: "center" });
-doc.setLineWidth(0.4);
-doc.line(pageW / 2 - doc.getTextWidth(lbT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lbT) / 2, y + 1);
-y += 6;
-doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-doc.text("Bukti Penghantaran & Penerimaan Notis Pertama (Pos Berdaftar AR)", pageW / 2, y, { align: "center" });
-y += 8;
-
-const arImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/teogy-ar.jpg").toString("base64");
-const arW = 105, arH = 105 * 1400 / 787;
-const arX = (pageW - arW) / 2;
-doc.addImage(arImg, "JPEG", arX, y, arW, arH);
-doc.setLineWidth(0.3); bk();
-doc.rect(arX, y, arW, arH);
-y += arH + 5;
-doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const arCap = "Kad Akuan Terima (AR) Pos Malaysia No. RW214680799MY — Notis Pertama (Ruj: NOTIS-1/2026/035) diposkan pada 5 September 2026 dan diterima serta diakui oleh wakil pihak pemaju, Puan Norfarhana, dengan tandatangan dan cop syarikat. Gambar dirakam pada 23 September 2026.";
-const arCapL = doc.splitTextToSize(arCap, cW - 20);
-for (const c of arCapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
-
-// ============================================================
-// LAMPIRAN C — CVCONNECT DASHBOARD
-// ============================================================
-newPage();
-y = 25;
-doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
-const lcT = "LAMPIRAN C";
+const lcT = "LAMPIRAN B";
 doc.text(lcT, pageW / 2, y, { align: "center" });
 doc.setLineWidth(0.4);
 doc.line(pageW / 2 - doc.getTextWidth(lcT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lcT) / 2, y + 1);
