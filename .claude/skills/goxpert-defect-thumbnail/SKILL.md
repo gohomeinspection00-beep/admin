@@ -39,9 +39,14 @@ It looks best with line 1 ≤ ~12 characters, line 2 ≤ ~8, pill ≤ ~20, stick
    - **pill = the defect name**: "FLOOR TRAP TERSUMBAT", "HOLLOW TILES", "RETAK DINDING".
    - sticker: "AWAS!" by default. Use "BAHAYA!" only when it really is a safety or structural risk.
    - If you can't tell what the defect is, ask before making it. Don't guess a scary label.
-3. Pick the crop: a region `[x, y, w, h]` of the screenshot without phone UI, with the defect
+3. Low-contrast defects (paint patches on a white ceiling, hairline cracks) barely show in the
+   card. Make a contrast-boosted copy of the frame first, e.g.
+   `ffmpeg -i f.jpg -vf "eq=contrast=1.9:saturation=0.8,unsharp=5:5:0.6" f-c.jpg`, and use it as
+   `photo` (keep the original as `bg`). Keep the defect clear of the sticker, which covers the
+   card's bottom-right corner.
+4. Pick the crop: a region `[x, y, w, h]` of the screenshot without phone UI, with the defect
    near the centre (the card is 7:6; the script defaults to a centred 7:6 crop).
-4. Make it. In a fresh session, first run `command -v hyperframes || npm i -g hyperframes@0.8.132`
+5. Make it. In a fresh session, first run `command -v hyperframes || npm i -g hyperframes@0.8.132`
    (don't use `npx -y hyperframes`: it tries a newer version that doesn't exist). Montserrat
    downloads automatically on the first run.
    ```bash
@@ -54,17 +59,17 @@ It looks best with line 1 ≤ ~12 characters, line 2 ≤ ~8, pill ≤ ~20, stick
    ```
    Optional keys: `format` ("9:16" default, grid-safe / "3:4"), `bg` (another image for the background), `sticker`, `kicker`, `sub`.
    Video input works too (it takes frame 0). For a specific moment, extract that frame to a JPG first.
-5. **Always deliver three named files, one per platform** (client rule 2026-10-06, so he doesn't
+6. **Always deliver three named files, one per platform** (client rule 2026-10-06, so he doesn't
    mix them up): `python3 <this skill>/make_all.py thumb.json <out_dir> <Name>` →
    `TikTok_3x4_<Name>.png` (1080×1440, the client said the TikTok 3:4 one is "okey sangat"),
    `IG_9x16_<Name>.png` and `FB_9x16_<Name>.png` (1080×1920, grid-safe). In the reply, list which
    file goes to which platform and how to set it as the cover.
-6. If there is a video for it, make the clean video **separately** (the thumbnail does NOT go inside it,
+7. If there is a video for it, make the clean video **separately** (the thumbnail does NOT go inside it,
    client rule 2026-10-06): `bash <this skill>/make_video.sh footage.mp4 Video.mp4 [start] [end]`.
    It's footage only, no text, sound off, 1080×1920. Send the video and the PNG as two files.
-7. Look at the PNGs yourself (text fits, defect visible, sticker not covering the defect), send it
+8. Look at the PNGs yourself (text fits, defect visible, sticker not covering the defect), send it
    with SendUserFile, and ask: "Thumbnail ni okay, atau nak tukar apa-apa?"
-8. Work in the scratchpad; never commit screenshots or PNGs to the repo.
+9. Work in the scratchpad; never commit screenshots or PNGs to the repo.
 
 `check` may flag `text_occluded` on a long sticker over the photo. That is a false positive (the
 sticker is on top). Contrast warnings on line 2 mean the blue was changed; keep `#084c96`.
