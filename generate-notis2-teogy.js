@@ -248,7 +248,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 17 September 2026 tanpa sebarang pembaikan disempurnakan dan tanpa sebarang maklum balas rasmi daripada pihak tuan. Sehingga tarikh notis ini dikeluarkan, kecacatan yang dilaporkan masih belum diselesaikan, dan kesemua sembilan (9) kes kecacatan yang diserahkan melalui aplikasi CVConnect pada 28 Ogos 2026 dan 1 September 2026 masih berstatus Pending. Ini jelas menunjukkan kegagalan pihak tuan mematuhi Notis Pertama. Kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
+  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 17 September 2026 tanpa sebarang pembaikan disempurnakan dan tanpa sebarang maklum balas rasmi daripada pihak tuan. Sehingga tarikh notis ini dikeluarkan, kecacatan yang dilaporkan masih belum diselesaikan, dan kesemua sembilan (9) kes kecacatan yang diserahkan melalui aplikasi CVConnect pada 28 Ogos 2026 dan 1 September 2026 masih berstatus Pending — sebagaimana dibuktikan oleh paparan CVConnect Dashboard pihak tuan sendiri yang dilampirkan sebagai Lampiran C (9 Pending, 0 In Progress). Ini jelas menunjukkan kegagalan pihak tuan mematuhi Notis Pertama. Kecacatan yang masih wujud dan belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -419,6 +419,33 @@ doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const arCap = "Kad Akuan Terima (AR) Pos Malaysia No. RW214680799MY — Notis Pertama (Ruj: NOTIS-1/2026/035) diposkan pada 5 September 2026 dan diterima serta diakui oleh wakil pihak pemaju, Puan Norfarhana, dengan tandatangan dan cop syarikat. Gambar dirakam pada 23 September 2026.";
 const arCapL = doc.splitTextToSize(arCap, cW - 20);
 for (const c of arCapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN C — CVCONNECT DASHBOARD
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lcT = "LAMPIRAN C";
+doc.text(lcT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lcT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lcT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Status Kes Kecacatan di dalam Aplikasi CVConnect Pihak Pemaju", pageW / 2, y, { align: "center" });
+y += 8;
+
+const cvImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/teogy-cvconnect.jpg").toString("base64");
+const cvW = 85, cvH = 85 * 1280 / 621;
+const cvX = (pageW - cvW) / 2;
+doc.addImage(cvImg, "JPEG", cvX, y, cvW, cvH);
+doc.setLineWidth(0.3); bk();
+doc.rect(cvX, y, cvW, cvH);
+y += cvH + 5;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const cvCap = "Paparan CVConnect Dashboard (Unit L247, Aurora Resort Villas Fasa 1) — 11 kes kecacatan: 9 masih berstatus PENDING (termasuk Defect 940157-12, 940098-11, 840083-10, 140075-9, 540067-8, 840052-7 dan 440046-6), 0 In Progress, dan hanya 2 Completed. Tiada sebarang kerja pembaikan dimulakan terhadap kes-kes yang diserahkan sejak 28 Ogos 2026 dan 1 September 2026.";
+const cvCapL = doc.splitTextToSize(cvCap, cW - 20);
+for (const c of cvCapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
