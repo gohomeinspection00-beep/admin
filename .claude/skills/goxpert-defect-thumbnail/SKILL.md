@@ -37,7 +37,7 @@ It looks best with line 1 ≤ ~12 characters, line 2 ≤ ~8, pill ≤ ~20, stick
    - **line1 + line2 = the symptom the homeowner notices, as a question**: "AIR LAMBAT / TURUN?",
      "TILES BUNYI / KOSONG?", "DINDING / RETAK?". Not the technical name.
    - **pill = the defect name**: "FLOOR TRAP TERSUMBAT", "HOLLOW TILES", "RETAK DINDING".
-   - sticker: "AWAS!" by default. Use "BAHAYA!" only when it really is a safety or structural risk.
+   - sticker: "AWAS!" by default; for cosmetic defects (paint, finishing) the client chose "TAK KEMAS!". Use "BAHAYA!" only when it really is a safety or structural risk.
    - If you can't tell what the defect is, ask before making it. Don't guess a scary label.
 3. Low-contrast defects (paint patches on a white ceiling, hairline cracks) barely show in the
    card. Make a contrast-boosted copy of the frame first, e.g.

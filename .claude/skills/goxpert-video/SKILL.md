@@ -166,6 +166,13 @@ goxpert-defect-thumbnail skill, which he uploads as the cover. He tried the thum
 video (0.7 s, then 2 s) and cancelled it. Build the video with
 `.claude/skills/goxpert-defect-thumbnail/make_video.sh footage.mp4 out.mp4 [start] [end]`.
 He rejected text overlays, PUNCA/RISIKO/CARA ELAK pages and end cards for this series.
+**Exception — a hook line he picks (2026-10-07):** suggest 3–4 casual, relatable Malay hooks
+(cosmetic defects → funny/annoyed tone, e.g. "Rumah baru… tapi siling macam peta dunia";
+serious defects → warning tone). When he chooses one, put it in the video as **static text for the
+whole clip**, approved hook style (League Gothic 116px uppercase in ink 0.92 boxes, last line
+yellow, no emoji, `data-no-timeline`), and place it where it never covers the defect in any frame
+(top: 260px when the defect is lower down; bottom: 440px otherwise). Check snapshots at the start
+and the end of the clip, since phone footage zooms in. Render, then add the silent AAC track.
 Give a post caption ending in a question (e.g. "Pernah jadi kat rumah anda? Komen bawah 👇").
 
 ## 5. Thumbnail (only after "dah siap")
