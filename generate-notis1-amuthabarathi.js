@@ -59,6 +59,8 @@ const data = {
   tempohNotis2: "15",
 
   kecacatan: [
+    { tag: "13", lokasi: "Car Porch — Ceiling", kecacatan: "Kebocoran pada permukaan siling masih ada — disahkan dengan bacaan kamera termal (Leaking on ceiling surface still observed — thermal camera evidence)", status: "Belum Dibaiki" },
+    { tag: "14", lokasi: "Car Porch — Ceiling", kecacatan: "Kebocoran pada siling di dalam ceiling manhole masih ada — berhampiran paip (Still observed leaking on ceiling inside ceiling manhole)", status: "Belum Dibaiki" },
     { tag: "172", lokasi: "Bedroom 3 — Ceiling", kecacatan: "Keretakan pada permukaan siling masih ada (Crack on ceiling surface still observed)", status: "Belum Dibaiki" },
     { tag: "203", lokasi: "AC Ledge — Floor", kecacatan: "Tanda dan kemungkinan air bertakung pada permukaan papak masih ada (Possible and sign of water stagnant on slab surface still observed)", status: "Belum Dibaiki" },
     { tag: "215", lokasi: "Ceiling Area (Family Area) — Ceiling", kecacatan: "Najis kelawar pada ceiling board masih ada (Bat droppings on ceiling board still observed)", status: "Belum Dibaiki" },
@@ -281,7 +283,7 @@ for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus diberikan kepada kluster kecacatan di kawasan bumbung dan papak atas yang kesemuanya masih tidak dibaiki sejak pemeriksaan pertama: air bertakung pada papak di Flat Roof, RC Flat Roof 2 dan AC Ledge (item No. 229, 236 dan 203), kulat yang telah tumbuh pada papak di RC Flat Roof 3 dan Water Tank Area (item No. 239 dan 220) — petanda takungan air dan pendedahan lembapan yang berpanjangan — serta keretakan dan chipping pada genting bumbung di pelbagai lokasi (item No. 243) dan keretakan pada keseluruhan permukaan dinding RC Flat Roof 3 (item No. 240). Kesemua ini mendedahkan rumah kepada risiko kebocoran air hujan dan kerosakan struktur jika dibiarkan. Pihak tuan dituntut membetulkan PUNCA — kecerunan (falls) permukaan papak dan integriti genting/permukaan — dan bukan sekadar pengeringan atau tampalan kosmetik.`
+  `Perhatian khusus dan SEGERA diberikan kepada item No. 13 dan No. 14 — KEBOCORAN pada siling Car Porch yang masih berterusan, disahkan dengan bacaan kamera termal dan kesan kebocoran di dalam ceiling manhole berhampiran paip; pihak tuan dituntut MENGESAN DAN MEMBAIKI PUNCA kebocoran tersebut (termasuk kemungkinan kebocoran paip di dalam ruang siling), dan bukan sekadar mengecat semula kesan air. Perhatian turut diberikan kepada kluster kecacatan di kawasan bumbung dan papak atas yang kesemuanya masih tidak dibaiki sejak pemeriksaan pertama: air bertakung pada papak di Flat Roof, RC Flat Roof 2 dan AC Ledge (item No. 229, 236 dan 203), kulat yang telah tumbuh pada papak di RC Flat Roof 3 dan Water Tank Area (item No. 239 dan 220) — petanda takungan air dan pendedahan lembapan yang berpanjangan — serta keretakan dan chipping pada genting bumbung di pelbagai lokasi (item No. 243) dan keretakan pada keseluruhan permukaan dinding RC Flat Roof 3 (item No. 240). Kesemua ini mendedahkan rumah kepada risiko kebocoran air hujan dan kerosakan struktur jika dibiarkan. Pihak tuan dituntut membetulkan PUNCA — kecerunan (falls) permukaan papak dan integriti genting/permukaan — dan bukan sekadar pengeringan atau tampalan kosmetik.`
 );
 y += 4;
 
