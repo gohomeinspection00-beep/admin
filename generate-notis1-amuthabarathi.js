@@ -291,24 +291,19 @@ doc.text(rjT, mL, y);
 y += 6;
 
 drawTable(
-  ["Kecacatan (Defect)", "No. Tiket", "Alasan Penolakan Pemaju"],
+  ["Kecacatan (Defect)", "No. Tiket (20/5/2026)", "No. Tiket (2/10/2026)", "Alasan Penolakan Pemaju"],
   [
-    ["Tangki air dalam keadaan kotor (Water tank on dirty condition)", "AD11A5793", 'Wear and Tear (not a defect)'],
-    ["Najis kelawar pada ceiling board di dalam ruang siling masih ada (Bat droppings on ceiling board still observed)", "AD11A5787; AD11A4583", 'Wear and Tear (not a defect)'],
-    ["Pintu tidak sejajar — Bedroom 3 (Door have alignment issue)", "AD11A4559", "Not attach thickness"],
-    ["Pintu tidak sejajar — Bedroom 2 (Door have alignment issue)", "AD11A4557", "Not attach thickness"],
-    ["Keretakan pada permukaan siling (Crack on ceiling surface)", "AD11A4544", "Not standard checking CIS7"],
-    ["Keretakan dan chipping pada hampir keseluruhan permukaan dinding (Most of wall surface have crack and chipping)", "AD11A4542", "Not standard checking CIS7"],
-    ["Titik lampu dan kipas mempunyai voltan rendah — 176.9V (Light point and fan point have low voltage)", "AD11A4501", "Checking wrong cable"],
-    ["Kesan kotoran dan permukaan tidak rata pada dinding (Stains and uneven surface on wall)", "AD11A4490", "Not standard checking CIS7"],
-    ["Keretakan dan kemek pada dinding bercat (Crack and dented on painted wall)", "AD11A4491", "Not standard checking CIS7"],
+    ["Tangki air dalam keadaan kotor (Water tank on dirty condition)", "-", "AD11A5793", "Wear and Tear (not a defect)"],
+    ["Najis kelawar pada ceiling board di dalam ruang siling masih ada (Bat droppings on ceiling board still observed)", "AD11A4583", "AD11A5787", "Wear and Tear (not a defect)"],
+    ["Keretakan pada permukaan siling (Crack on ceiling surface)", "AD11A4544", "-", "Not standard checking CIS7"],
+    ["Titik lampu dan kipas mempunyai voltan rendah — 176.9V (Light point and fan point have low voltage)", "AD11A4501", "-", "Checking wrong cable"],
   ],
-  [66, 32, cW - 66 - 32]
+  [58, 28, 28, cW - 58 - 28 - 28]
 );
 y += 5;
 
 numPara(5,
-  `Kesemua penolakan di atas adalah DIPERTIKAIKAN dan tidak boleh diterima, atas alasan berikut: (i) Alasan "Wear and Tear" — kecacatan berkenaan telah dilaporkan seawal 20 Mei 2026, iaitu di dalam Tempoh Liabiliti Kecacatan (DLP) dan dalam tempoh awal milikan; "wear and tear" merujuk kepada kelusuhan akibat penggunaan penghuni dari semasa ke semasa, dan tidak terpakai kepada keadaan yang wujud sejak serahan milikan — malah najis kelawar yang berterusan di dalam ruang siling membuktikan wujudnya bukaan binaan yang belum ditutup, iaitu isu mutu kerja. (ii) Alasan "Not standard checking CIS7" — Perjanjian Jual Beli (Jadual G) TIDAK merujuk kepada CIS 7 sama sekali; kewajipan pihak tuan di bawah Klausa 27(1) adalah membaiki "any defect, shrinkage or other faults... due to defective workmanship or materials" tanpa sebarang ambang toleransi CIS 7. Tambahan pula, CIDB melalui kenyataan media pada November 2024 telah menarik balik "Quality Guidebook for Homeowners (2014)" dengan serta-merta dan mengisytiharkan sebarang petikan daripadanya terbatal, sambil menjelaskan bahawa QLASSIC/CIS 7 merupakan sistem penilaian mutu kerja semasa pembinaan dan BUKAN spesifikasi kecacatan bagi pemeriksaan selepas serahan milikan kosong. Penolakan berasaskan CIS 7 adalah dengan itu tidak sah. (iii) Alasan "Not attach thickness" — ini adalah bantahan prosedur dan bukan penafian kewujudan kecacatan; ketidakjajaran pintu jelas kelihatan dan pemilik bersedia untuk pengukuran bersama. (iv) Alasan "Checking wrong cable" — bacaan voltan 176.9V (berbanding voltan bekalan nominal 230V) diambil pada titik lampu dan kipas berkenaan; dakwaan "salah kabel" tidak disokong sebarang bacaan ujian daripada pihak tuan.`
+  `Kesemua penolakan di atas — yang dibuat semasa submission 20 Mei 2026 dan/atau 2 Oktober 2026 — adalah DIPERTIKAIKAN dan tidak boleh diterima, atas alasan berikut: (i) Alasan "Wear and Tear" — kecacatan berkenaan telah dilaporkan seawal 20 Mei 2026, iaitu di dalam Tempoh Liabiliti Kecacatan (DLP) dan dalam tempoh awal milikan; "wear and tear" merujuk kepada kelusuhan akibat penggunaan penghuni dari semasa ke semasa, dan tidak terpakai kepada keadaan yang wujud sejak serahan milikan — malah najis kelawar yang berterusan di dalam ruang siling membuktikan wujudnya bukaan binaan yang belum ditutup, iaitu isu mutu kerja, manakala kebersihan tangki air adalah keadaan semasa serahan yang menjejaskan bekalan air domestik penghuni. (ii) Alasan "Not standard checking CIS7" — Perjanjian Jual Beli (Jadual G) TIDAK merujuk kepada CIS 7 sama sekali; kewajipan pihak tuan di bawah Klausa 27(1) adalah membaiki "any defect, shrinkage or other faults... due to defective workmanship or materials" tanpa sebarang ambang toleransi CIS 7. Tambahan pula, CIDB melalui kenyataan media pada November 2024 telah menarik balik "Quality Guidebook for Homeowners (2014)" dengan serta-merta dan mengisytiharkan sebarang petikan daripadanya terbatal, sambil menjelaskan bahawa QLASSIC/CIS 7 merupakan sistem penilaian mutu kerja semasa pembinaan dan BUKAN spesifikasi kecacatan bagi pemeriksaan selepas serahan milikan kosong. Penolakan berasaskan CIS 7 adalah dengan itu tidak sah. (iii) Alasan "Checking wrong cable" — bacaan voltan 176.9V (berbanding voltan bekalan nominal 230V) diambil pada titik lampu dan kipas berkenaan oleh Building Surveyor; dakwaan "salah kabel" tidak disokong sebarang bacaan ujian daripada pihak tuan.`
 );
 y += 4;
 
