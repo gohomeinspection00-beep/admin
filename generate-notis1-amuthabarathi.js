@@ -284,17 +284,50 @@ numPara(4,
 );
 y += 4;
 
+checkBreak(50);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+const rjT = "Senarai Kecacatan Yang DITOLAK Oleh Pihak Pemaju (Dipertikaikan):";
+doc.text(rjT, mL, y);
+y += 6;
+
+drawTable(
+  ["Kecacatan (Defect)", "No. Tiket", "Alasan Penolakan Pemaju"],
+  [
+    ["Tangki air dalam keadaan kotor (Water tank on dirty condition)", "AD11A5793", 'Wear and Tear (not a defect)'],
+    ["Najis kelawar pada ceiling board di dalam ruang siling masih ada (Bat droppings on ceiling board still observed)", "AD11A5787; AD11A4583", 'Wear and Tear (not a defect)'],
+    ["Pintu tidak sejajar — Bedroom 3 (Door have alignment issue)", "AD11A4559", "Not attach thickness"],
+    ["Pintu tidak sejajar — Bedroom 2 (Door have alignment issue)", "AD11A4557", "Not attach thickness"],
+    ["Keretakan pada permukaan siling (Crack on ceiling surface)", "AD11A4544", "Not standard checking CIS7"],
+    ["Keretakan dan chipping pada hampir keseluruhan permukaan dinding (Most of wall surface have crack and chipping)", "AD11A4542", "Not standard checking CIS7"],
+    ["Titik lampu dan kipas mempunyai voltan rendah — 176.9V (Light point and fan point have low voltage)", "AD11A4501", "Checking wrong cable"],
+    ["Kesan kotoran dan permukaan tidak rata pada dinding (Stains and uneven surface on wall)", "AD11A4490", "Not standard checking CIS7"],
+    ["Keretakan dan kemek pada dinding bercat (Crack and dented on painted wall)", "AD11A4491", "Not standard checking CIS7"],
+  ],
+  [66, 32, cW - 66 - 32]
+);
+y += 5;
+
 numPara(5,
-  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+  `Kesemua penolakan di atas adalah DIPERTIKAIKAN dan tidak boleh diterima, atas alasan berikut: (i) Alasan "Wear and Tear" — kecacatan berkenaan telah dilaporkan seawal 20 Mei 2026, iaitu di dalam Tempoh Liabiliti Kecacatan (DLP) dan dalam tempoh awal milikan; "wear and tear" merujuk kepada kelusuhan akibat penggunaan penghuni dari semasa ke semasa, dan tidak terpakai kepada keadaan yang wujud sejak serahan milikan — malah najis kelawar yang berterusan di dalam ruang siling membuktikan wujudnya bukaan binaan yang belum ditutup, iaitu isu mutu kerja. (ii) Alasan "Not standard checking CIS7" — Perjanjian Jual Beli (Jadual G) TIDAK merujuk kepada CIS 7 sama sekali; kewajipan pihak tuan di bawah Klausa 27(1) adalah membaiki "any defect, shrinkage or other faults... due to defective workmanship or materials" tanpa sebarang ambang toleransi CIS 7. Tambahan pula, CIDB melalui kenyataan media pada November 2024 telah menarik balik "Quality Guidebook for Homeowners (2014)" dengan serta-merta dan mengisytiharkan sebarang petikan daripadanya terbatal, sambil menjelaskan bahawa QLASSIC/CIS 7 merupakan sistem penilaian mutu kerja semasa pembinaan dan BUKAN spesifikasi kecacatan bagi pemeriksaan selepas serahan milikan kosong. Penolakan berasaskan CIS 7 adalah dengan itu tidak sah. (iii) Alasan "Not attach thickness" — ini adalah bantahan prosedur dan bukan penafian kewujudan kecacatan; ketidakjajaran pintu jelas kelihatan dan pemilik bersedia untuk pengukuran bersama. (iv) Alasan "Checking wrong cable" — bacaan voltan 176.9V (berbanding voltan bekalan nominal 230V) diambil pada titik lampu dan kipas berkenaan; dakwaan "salah kabel" tidak disokong sebarang bacaan ujian daripada pihak tuan.`
 );
 y += 4;
 
 numPara(6,
+  `Sehubungan itu, bagi SETIAP item yang ditolak di atas, pihak tuan dituntut mengemukakan secara BERTULIS dalam tempoh notis ini: (i) justifikasi penuh penolakan berserta dokumen sokongan (termasuk rujukan klausa Perjanjian Jual Beli atau standard yang SAH dan TERPAKAI, dengan rujukan penuh); dan (ii) bagi item voltan rendah, bacaan ujian pihak tuan sendiri berserta kaedah, alat dan nama pegawai kompeten yang menjalankannya. Sekiranya justifikasi bertulis sedemikian tidak dikemukakan, kesemua item tersebut kekal sebagai kecacatan yang WAJIB dibaiki sepenuhnya di bawah Klausa 27(1), dan keengganan pihak tuan akan dikemukakan sebagai bukti di hadapan Tribunal Tuntutan Pembeli Rumah (TTPR) sekiranya tindakan selanjutnya diperlukan.`
+);
+y += 4;
+
+numPara(7,
+  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+);
+y += 4;
+
+numPara(8,
   `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan.`
 );
 y += 4;
 
-numPara(7, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+numPara(9, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -302,7 +335,7 @@ bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak t
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
-numPara(8,
+numPara(10,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -315,7 +348,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(9,
+numPara(11,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
