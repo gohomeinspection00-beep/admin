@@ -6,9 +6,9 @@ const data = {
 
   namaPembeli: "AMUTHABARATHI A/L MANOHARAN",
   alamatPengirim: [
-    "No. 15, Jalan Austin Duta 5/1,",
-    "Taman Austin Duta,",
-    "81100 Johor Bahru,",
+    "No. 17, Jalan Kejayaan 62,",
+    "Taman Universiti,",
+    "81300 Skudai,",
     "Johor.",
   ],
   noKP: "930210-10-5013",
@@ -23,10 +23,16 @@ const data = {
     "Jalan Yong Shook Lin,",
     "46050 Petaling Jaya,",
     "Selangor.",
-  ] : [
+  ] : (process.argv[2] === "CITYPLAZA") ? [
     "17th Floor, Unit 17-01, City Plaza,",
     "Jalan Tebrau,",
     "80250 Johor Bahru,",
+    "Johor.",
+  ] : [
+    "(Pejabat Tapak / Site Office — Austin Duta)",
+    "PTD 182037 & PTD 182038, Ground Floor,",
+    "Jalan Austin Duta, Taman Austin Duta,",
+    "81100 Johor Bahru,",
     "Johor.",
   ],
 
@@ -454,7 +460,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-const outName = (process.argv[2] === "PJ") ? "NOTIS_1_AMUTHABARATHI_PJ.pdf" : "NOTIS_1_AMUTHABARATHI.pdf";
+const outName = (process.argv[2] === "PJ") ? "NOTIS_1_AMUTHABARATHI_PJ.pdf" : (process.argv[2] === "CITYPLAZA") ? "NOTIS_1_AMUTHABARATHI_CITYPLAZA.pdf" : "NOTIS_1_AMUTHABARATHI.pdf";
 fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
 console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
