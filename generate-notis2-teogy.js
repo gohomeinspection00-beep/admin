@@ -60,7 +60,8 @@ const data = {
     { tarikh: "27 Ogos 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "28 Ogos 2026", peristiwa: "8 kes kecacatan baharu diserahkan melalui aplikasi CVConnect (Defect 440028-4, 940037-5, 440046-6, 840052-7, 540067-8, 140075-9, 840083-10, 940098-11) — semua masih Pending" },
     { tarikh: "1 September 2026", peristiwa: "1 kes kecacatan tambahan diserahkan melalui aplikasi CVConnect (Defect 940157-12) — masih Pending" },
-    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/035, dihantar melalui Pos Berdaftar AR" },
+    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/035" },
+    { tarikh: "5 September 2026", peristiwa: "Notis Pertama dihantar melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY dan kemudiannya diterima oleh pihak pemaju" },
     { tarikh: "17 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan, tiada maklum balas rasmi" },
     { tarikh: "6 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. GXS-RW-2026-00202605 berjumlah RM25,565.00 diperoleh daripada kontraktor berdaftar CIDB" },
     { tarikh: "8 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/035, bersama sebut harga rasmi pembaikan" },
@@ -242,7 +243,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}), merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026 yang telah dihantar kepada pihak tuan melalui Pos Berdaftar Akuan Terima (AR), susulan Laporan Pemeriksaan Kecacatan yang dikemukakan melalui aplikasi CVConnect pada 1 dan 2 Julai 2025 (Defect 728811-2 dan 228839-3) selaras dengan Klausa ${data.klausaPembaikan} Perjanjian Jual Beli dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah memberikan tempoh lima belas (15) hari kepada pihak tuan untuk menyiapkan semua kerja pembaikan, iaitu sehingga 17 September 2026.`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}), merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026 yang telah dihantar kepada pihak tuan melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY pada 5 September 2026 dan telah diterima oleh pihak tuan, susulan Laporan Pemeriksaan Kecacatan yang dikemukakan melalui aplikasi CVConnect pada 1 dan 2 Julai 2025 (Defect 728811-2 dan 228839-3) selaras dengan Klausa ${data.klausaPembaikan} Perjanjian Jual Beli dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah memberikan tempoh lima belas (15) hari kepada pihak tuan untuk menyiapkan semua kerja pembaikan, iaitu sehingga 17 September 2026.`
 );
 y += 4;
 
