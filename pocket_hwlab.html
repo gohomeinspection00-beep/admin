@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Peranti Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Panel instrumen: jalur tetap di atas, panel bertindan di bawah, data sentiasa monospace. */
+:root{
+  --bg:#eef1f4; --panel:#ffffff; --line:#c9d2db; --ink:#141a20; --dim:#5b6b7a;
+  --accent:#0b5fa5; --accent-ink:#ffffff;
+  --ok:#1a7a46; --warn:#9a6400; --bad:#b32020;
+  --okbg:#e2f3e9; --warnbg:#fbf0d8; --badbg:#fbe4e4;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10151a; --panel:#182028; --line:#2d3944; --ink:#e4ebf1; --dim:#90a2b2;
+  --accent:#4ea3f0; --accent-ink:#06121d;
+  --ok:#5fd394; --warn:#e3b457; --bad:#f58080;
+  --okbg:#13301f; --warnbg:#322714; --badbg:#36191a;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#10151a; --panel:#182028; --line:#2d3944; --ink:#e4ebf1; --dim:#90a2b2;
+  --accent:#4ea3f0; --accent-ink:#06121d;
+  --ok:#5fd394; --warn:#e3b457; --bad:#f58080;
+  --okbg:#13301f; --warnbg:#322714; --badbg:#36191a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:400 15px/1.5 var(--sans);
+  -webkit-text-size-adjust:100%;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+/* ---------- jalur atas ---------- */
+.top{
+  position:sticky; top:0; z-index:20;
+  background:var(--panel); border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top,0px);
+}
+.top-row{display:flex;align-items:center;gap:10px;padding:10px 16px}
+.brand{font:600 15px/1 var(--sans);letter-spacing:.01em}
+.brand small{display:block;font:400 11px/1.4 var(--mono);color:var(--dim);letter-spacing:.02em;margin-top:3px}
+.top-spacer{flex:1}
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-top:1px solid var(--line)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto; appearance:none; background:none; border:0;
+  border-bottom:2px solid transparent; color:var(--dim);
+  font:500 13px/1 var(--sans); padding:12px 14px; cursor:pointer;
+}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* ---------- panel ---------- */
+.wrap{padding-inline:16px;padding-block:16px;display:flex;flex-direction:column;gap:14px;max-width:760px;margin:0 auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card-h{display:flex;align-items:baseline;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.card-h h2{font:600 13px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase}
+.card-h span{font:400 11px/1 var(--mono);color:var(--dim);margin-left:auto}
+.card-b{padding:14px}
+.card-b>*+*{margin-top:12px}
+p{margin:0;color:var(--dim);font-size:13.5px}
+p strong{color:var(--ink);font-weight:600}
+
+/* ---------- baris semak ---------- */
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.chk:first-child{border-top:0;padding-top:0}
+.chk-dot{flex:0 0 auto;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font:700 11px/1 var(--mono);margin-top:1px}
+.chk-dot.ok{background:var(--okbg);color:var(--ok)}
+.chk-dot.bad{background:var(--badbg);color:var(--bad)}
+.chk-dot.warn{background:var(--warnbg);color:var(--warn)}
+.chk-t{min-width:0;flex:1}
+.chk-t b{display:block;font:600 13.5px/1.35 var(--sans)}
+.chk-t span{display:block;font:400 12.5px/1.45 var(--sans);color:var(--dim);margin-top:2px}
+.chk-t code{font:400 12px/1.4 var(--mono);word-break:break-all}
+
+/* ---------- butang ---------- */
+.btn{
+  appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  font:500 14px/1 var(--sans);padding:12px 16px;border-radius:8px;cursor:pointer;
+  min-height:44px;
+}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px}
+.btn-row .btn{flex:1 1 auto}
+
+/* ---------- medan ---------- */
+label.fld{display:block}
+label.fld>span{display:block;font:500 12px/1 var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+input[type=text],input[type=number],select{
+  width:100%;background:var(--bg);color:var(--ink);
+  border:1px solid var(--line);border-radius:7px;padding:11px 12px;
+  font:400 15px/1.2 var(--mono);min-height:44px;
+}
+input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:-1px}
+
+/* ---------- pentas tekan ---------- */
+.stage{
+  border:2px dashed var(--line);border-radius:10px;background:var(--bg);
+  min-height:120px;display:grid;place-items:center;text-align:center;padding:20px 16px;
+}
+.stage.live{border-style:solid;border-color:var(--accent)}
+.stage-k{font:600 34px/1 var(--mono);word-break:break-all}
+.stage-s{font:400 12.5px/1.5 var(--mono);color:var(--dim);margin-top:8px}
+.stage-idle{font:400 14px/1.5 var(--sans);color:var(--dim)}
+
+/* ---------- log ---------- */
+.log{
+  background:var(--bg);border:1px solid var(--line);border-radius:8px;
+  font:400 12px/1.6 var(--mono);
+  max-height:300px;overflow:auto;-webkit-overflow-scrolling:touch;
+}
+.log-r{display:flex;gap:8px;padding:5px 10px;border-top:1px solid var(--line)}
+.log-r:first-child{border-top:0}
+.log-t{flex:0 0 auto;color:var(--dim);font-variant-numeric:tabular-nums}
+.log-m{min-width:0;flex:1;word-break:break-all;white-space:pre-wrap}
+.log-r.ok .log-m{color:var(--ok)}
+.log-r.bad .log-m{color:var(--bad)}
+.log-r.warn .log-m{color:var(--warn)}
+.log-empty{padding:18px 12px;text-align:center;color:var(--dim);font:400 13px/1.5 var(--sans)}
+
+/* ---------- jadual peta butang ---------- */
+.map{width:100%;border-collapse:collapse;font:400 13px/1.4 var(--mono)}
+.map th{
+  text-align:left;font:500 11px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--dim);padding:8px 10px;border-bottom:1px solid var(--line)
+}
+.map td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.map tr:last-child td{border-bottom:0}
+.map .mk{font:500 13px/1.4 var(--sans)}
+.pill{display:inline-block;padding:2px 7px;border-radius:999px;font:600 11px/1.5 var(--mono)}
+.pill.ok{background:var(--okbg);color:var(--ok)}
+.pill.bad{background:var(--badbg);color:var(--bad)}
+.pill.warn{background:var(--warnbg);color:var(--warn)}
+.tbl-wrap{overflow-x:auto}
+
+/* ---------- nota ---------- */
+.note{
+  border-left:3px solid var(--accent);background:var(--bg);
+  padding:10px 12px;border-radius:0 7px 7px 0;
+  font:400 13px/1.55 var(--sans);color:var(--dim)
+}
+.note.warn{border-left-color:var(--warn)}
+.note.bad{border-left-color:var(--bad)}
+.note b{color:var(--ink)}
+.note code{font:400 12px/1.4 var(--mono);word-break:break-all}
+
+/* ---------- calon penyahkod ---------- */
+.cand{display:flex;gap:10px;align-items:center;padding:9px 10px;border-top:1px solid var(--line);font:400 13px/1.4 var(--mono)}
+.cand:first-child{border-top:0}
+.cand.hit{background:var(--okbg)}
+.cand-v{font-weight:600;min-width:96px;font-variant-numeric:tabular-nums}
+.cand-h{color:var(--dim);font-size:12px;min-width:0;flex:1}
+
+video{width:100%;border-radius:8px;background:#000;display:block;aspect-ratio:4/3;object-fit:contain}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-row">
+    <div class="brand">Peranti Lab<small id="brandSub">GoXpert Pocket · penguji perkakasan</small></div>
+    <div class="top-spacer"></div>
+    <button class="btn" id="themeBtn" type="button" style="padding:9px 12px;min-height:38px">Tema</button>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-tab="env" type="button">Persekitaran</button>
+    <button class="tab" data-tab="remote" type="button">Remote</button>
+    <button class="tab" data-tab="ble" type="button">Laser BLE</button>
+    <button class="tab" data-tab="cam" type="button">Kamera</button>
+    <button class="tab" data-tab="rep" type="button">Laporan</button>
+  </div>
+</div>
+
+<div class="wrap" id="wrap"></div>
+
+<script>
+"use strict";
+
+/* ======================================================================
+   PERATURAN: tiada tekaan. Setiap panel menunjukkan apa yang pelayar
+   betul-betul terima, dan menamakan sebab bila ia tidak dapat apa-apa.
+   ====================================================================== */
+
+var HL = {
+  tab: 'env',
+  keys: [],          // log remote
+  map: {},           // code -> {key,code,count,usable}
+  padSeen: {},
+  padRaf: 0,
+  dev: null,         // peranti BLE
+  server: null,
+  chars: [],         // ciri yang dilanggan
+  pkts: [],          // paket mentah
+  expect: 0,         // bacaan yang meter papar
+  cams: [],
+  stream: null,
+  started: Date.now()
+};
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function clock(){
+  var d = new Date(), p = function(n,w){ return String(n).padStart(w||2,'0'); };
+  return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())+'.'+p(d.getMilliseconds(),3);
+}
+function hex(bytes){
+  var out = [];
+  for (var i=0;i<bytes.length;i++) out.push(bytes[i].toString(16).padStart(2,'0'));
+  return out.join(' ');
+}
+function dvBytes(dv){
+  var a = [];
+  for (var i=0;i<dv.byteLength;i++) a.push(dv.getUint8(i));
+  return a;
+}
+
+/* ======================================================================
+   FUNGSI TULEN — diuji berasingan, tiada sentuhan DOM
+   ====================================================================== */
+
+/* Rangka Bosch GLM: c0 55 10 | jenis(2) | kaunter(2) | v1 v2 v3 (float32 LE) | checksum
+   Sumber: laporan terbuka GLM 50C / 100C / 120C. */
+function hlBosch(b){
+  if (!b || b.length < 20) return null;
+  if (b[0] !== 0xc0 || b[1] !== 0x55) return null;
+  var buf = new Uint8Array(b).buffer, dv = new DataView(buf);
+  return {
+    kind: (b[4] << 8) | b[3],
+    v1: dv.getFloat32(7, true),
+    v2: dv.getFloat32(11, true),
+    v3: dv.getFloat32(15, true)
+  };
+}
+
+/* Setiap cara munasabah untuk membaca satu paket sebagai meter.
+   Ditapis kepada 0.02 m – 200 m, kerana itu julat meter laser sebenar. */
+function hlDecode(b){
+  if (!b || !b.length) return [];
+  var buf = new Uint8Array(b).buffer, dv = new DataView(buf), out = [], i;
+  function add(off, how, m, unit){
+    if (!isFinite(m) || m <= 0.02 || m >= 200) return;
+    out.push({ off:off, how:how, m:m, unit:unit||'m' });
+  }
+  for (i=0; i+4 <= b.length; i++){
+    add(i, 'float32 LE', dv.getFloat32(i, true));
+    add(i, 'float32 BE', dv.getFloat32(i, false));
+    add(i, 'uint32 LE ÷ 1000', dv.getUint32(i, true)/1000);
+    add(i, 'uint32 LE ÷ 10000', dv.getUint32(i, true)/10000);
+    add(i, 'uint32 BE ÷ 1000', dv.getUint32(i, false)/1000);
+  }
+  for (i=0; i+2 <= b.length; i++){
+    add(i, 'uint16 LE ÷ 1000', dv.getUint16(i, true)/1000);
+    add(i, 'uint16 LE ÷ 100', dv.getUint16(i, true)/100);
+    add(i, 'uint16 LE ÷ 10', dv.getUint16(i, true)/10);
+    add(i, 'uint16 BE ÷ 1000', dv.getUint16(i, false)/1000);
+    add(i, 'uint16 BE ÷ 10', dv.getUint16(i, false)/10);
+  }
+  var txt = hlAscii(b);
+  if (txt){
+    var m = txt.match(/-?\d+(?:[.,]\d+)?/);
+    if (m) add(0, 'teks ASCII "'+txt.trim()+'"', parseFloat(m[0].replace(',','.')));
+  }
+  return out;
+}
+
+function hlAscii(b){
+  var s = '', n = 0, i;
+  for (i=0;i<b.length;i++){
+    var c = b[i];
+    if (c >= 32 && c < 127){ s += String.fromCharCode(c); n++; }
+    else s += '.';
+  }
+  return (n >= 3) ? s : '';
+}
+
+/* Kekunci yang benar-benar sampai ke halaman web di Android.
+   Volume ditelan oleh sistem sebelum pelayar nampak — itu sebab
+   butang kamera pada remote murah tidak boleh dipakai. */
+function hlUsable(code, key){
+  var k = String(key||''), c = String(code||'');
+  if (/^Audio(Volume)?(Up|Down|Mute)$/i.test(k) || /^Volume/i.test(c)) return 'no';
+  if (/^(ArrowUp|ArrowDown|ArrowLeft|ArrowRight|Enter|Space|Escape|Tab|Home|End|PageUp|PageDown)$/.test(c)) return 'yes';
+  if (/^[A-Za-z0-9]$/.test(k)) return 'yes';
+  if (c && c !== 'Unidentified') return 'maybe';
+  return 'maybe';
+}
+
+/* Padankan calon dengan bacaan yang meter papar sendiri.
+   Toleransi 5 mm, kerana itu lebih ketat daripada mana-mana meter murah. */
+function hlMatch(cands, expect){
+  if (!expect) return cands;
+  return cands.map(function(c){
+    return Object.assign({}, c, { hit: Math.abs(c.m - expect) <= 0.005 });
+  });
+}
+
+/* ======================================================================
+   UUID — Web Bluetooth hanya mendedahkan servis yang kita isytihar dulu,
+   jadi kita isytihar seluas yang munasabah, dan benarkan tambah tangan.
+   ====================================================================== */
+var UUID_NAMED = {
+  '3ab10100-f831-4395-b29d-570977d5bf94':'Leica DISTO',
+  '6e400001-b5a3-f393-e0a9-e50e24dcca9e':'Nordic UART',
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455':'Microchip UART',
+  '0000fde8-0000-1000-8000-00805f9b34fb':'Robert Bosch GmbH',
+  '0000fe95-0000-1000-8000-00805f9b34fb':'Xiaomi (bersulit)',
+  '0000ffe0-0000-1000-8000-00805f9b34fb':'HM-10 UART',
+  '0000fff0-0000-1000-8000-00805f9b34fb':'Generik FFF0',
+  '0000180a-0000-1000-8000-00805f9b34fb':'Maklumat peranti',
+  '0000180f-0000-1000-8000-00805f9b34fb':'Bateri'
+};
+function u16(n){ return '0000' + n.toString(16).padStart(4,'0') + '-0000-1000-8000-00805f9b34fb'; }
+function hlServices(wide){
+  var list = Object.keys(UUID_NAMED), n;
+  if (wide){
+    for (n = 0xfd00; n <= 0xffff; n++) list.push(u16(n));
+  } else {
+    [0xffe0,0xffe5,0xfff0,0xff00,0xffb0,0xfee7,0xfd00,0xfe95,0xfde8,0x1800,0x1801,0x180a,0x180f]
+      .forEach(function(x){ list.push(u16(x)); });
+  }
+  var seen = {}, out = [];
+  list.forEach(function(x){ x = x.toLowerCase(); if (!seen[x]){ seen[x]=1; out.push(x); } });
+  return out;
+}
+function uuidName(u){
+  u = String(u).toLowerCase();
+  if (UUID_NAMED[u]) return UUID_NAMED[u];
+  var m = u.match(/^0000([0-9a-f]{4})-0000-1000-8000-00805f9b34fb$/);
+  return m ? ('16-bit 0x' + m[1].toUpperCase()) : '';
+}
+
+/* ======================================================================
+   PANEL: PERSEKITARAN
+   ====================================================================== */
+function envFacts(){
+  var ua = navigator.userAgent || '';
+  var and = (ua.match(/Android\s+([\d.]+)/) || [])[1] || null;
+  var chr = (ua.match(/Chrome\/([\d.]+)/) || [])[1] || null;
+  var andMajor = and ? parseInt(and, 10) : 0;
+  var isFile = location.protocol === 'file:';
+  var secure = !!window.isSecureContext;
+  return {
+    origin: location.origin && location.origin !== 'null' ? location.origin : location.protocol,
+    href: location.href,
+    isFile: isFile,
+    secure: secure,
+    ble: !!(navigator.bluetooth && navigator.bluetooth.requestDevice),
+    cam: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+    pad: !!navigator.getGamepads,
+    xr: !!navigator.xr,
+    android: and,
+    androidMajor: andMajor,
+    chrome: chr,
+    ua: ua
+  };
+}
+
+function renderEnv(){
+  var f = envFacts();
+  function row(state, title, body){
+    var sym = state === 'ok' ? '✓' : state === 'bad' ? '✗' : '!';
+    return '<div class="chk"><div class="chk-dot '+state+'">'+sym+'</div>' +
+           '<div class="chk-t"><b>'+title+'</b><span>'+body+'</span></div></div>';
+  }
+  var rows = '';
+
+  rows += row(f.secure ? 'ok' : 'bad', 'Konteks selamat',
+    f.secure
+      ? 'Halaman ini berjalan dalam konteks selamat, jadi Bluetooth dan kamera dibenarkan.'
+      : 'Halaman ini <b>bukan</b> konteks selamat. Bluetooth dan kamera akan ditolak tanpa amaran — itu bukan salah perkakasan awak.');
+
+  rows += row(f.ble ? 'ok' : 'bad', 'Web Bluetooth',
+    f.ble
+      ? 'Tersedia. Tab Laser BLE boleh mengimbas.'
+      : (f.isFile
+          ? 'Tiada. Awak buka fail ini terus dari storan (<code>file://</code>). Chrome tidak beri Web Bluetooth di sini.'
+          : 'Tiada dalam pelayar ini. Guna Chrome di Android — Safari dan iOS tidak menyokong Web Bluetooth langsung.'));
+
+  rows += row(f.cam ? 'ok' : 'bad', 'Kamera',
+    f.cam ? 'Tersedia. Tab Kamera boleh menyenarai dan membuka kamera.'
+          : 'Tiada. Sama puncanya dengan di atas.');
+
+  rows += row(f.pad ? 'ok' : 'warn', 'Gamepad',
+    f.pad ? 'Tersedia. Remote yang menyamar sebagai pad permainan akan dikesan.'
+          : 'Tiada. Remote jenis papan kekunci masih berfungsi.');
+
+  var andState = !f.android ? 'warn' : (f.androidMajor >= 14 ? 'ok' : 'bad');
+  rows += row(andState, 'Android ' + (f.android || 'tidak dikenali'),
+    !f.android
+      ? 'Bukan Android. Endoskop USB tidak akan muncul.'
+      : (f.androidMajor >= 14
+          ? 'Android 14 ke atas, jadi kamera USB-C (endoskop UVC) boleh muncul dalam senarai kamera.'
+          : 'Di bawah Android 14. Endoskop USB <b>tidak</b> akan muncul dalam pelayar, walaupun ia UVC.'));
+
+  rows += row('ok', 'Pelayar',
+    (f.chrome ? 'Chrome ' + f.chrome : 'Bukan Chrome') + ' · <code>' + esc(f.origin) + '</code>');
+
+  var fix = '';
+  if (!f.secure || !f.ble){
+    fix = '<div class="note bad"><b>Cara betulkan.</b> Fail ini perlu disajikan melalui HTTPS. ' +
+          'Awak sudah ada Firebase Hosting dalam projek <code>goxpert-pocket</code> tetapi ia kosong. ' +
+          'Salin fail ini ke <code>pocket/public/</code>, jalankan <code>firebase deploy --only hosting</code>, ' +
+          'kemudian buka pautan <code>.web.app</code> itu di telefon. Pocket sendiri boleh duduk di situ juga.</div>';
+  }
+
+  return '' +
+    '<div class="card"><div class="card-h"><h2>Semakan sendiri</h2><span>' + clock() + '</span></div>' +
+    '<div class="card-b">' +
+      '<p>Sebelum menyalahkan mana-mana alat, periksa sama ada halaman ini dibenarkan bercakap dengannya.</p>' +
+      '<div>' + rows + '</div>' + fix +
+    '</div></div>' +
+
+    '<div class="card"><div class="card-h"><h2>Cara guna</h2></div><div class="card-b">' +
+      '<div class="chk"><div class="chk-dot ok">1</div><div class="chk-t"><b>Remote</b>' +
+        '<span>Pair dalam Tetapan Bluetooth Android dahulu — ia papan kekunci, bukan peranti BLE. Kemudian tekan setiap butang di sini.</span></div></div>' +
+      '<div class="chk"><div class="chk-dot ok">2</div><div class="chk-t"><b>Laser BLE</b>' +
+        '<span>Jangan pair dalam tetapan. Hidupkan meter, tekan Imbas di sini, kemudian ambil satu bacaan pada meter.</span></div></div>' +
+      '<div class="chk"><div class="chk-dot ok">3</div><div class="chk-t"><b>Kamera</b>' +
+        '<span>Palamkan endoskop sebelum menekan Senarai kamera. Panel itu memberitahu resolusi sebenarnya.</span></div></div>' +
+      '<div class="chk"><div class="chk-dot ok">4</div><div class="chk-t"><b>Laporan</b>' +
+        '<span>Salin dan hantar kepada saya. Teks, bukan screenshot — saya boleh baca bait sebenarnya.</span></div></div>' +
+    '</div></div>';
+}
+
+/* ======================================================================
+   PANEL: REMOTE
+   ====================================================================== */
+function renderRemote(){
+  return '' +
+    '<div class="card"><div class="card-h"><h2>Tekan apa-apa butang</h2><span id="rmCount">0</span></div>' +
+    '<div class="card-b">' +
+      '<div class="stage" id="rmStage"><div class="stage-idle">Menunggu tekanan…<br>Pair remote dalam Tetapan Bluetooth dahulu.</div></div>' +
+      '<div class="note warn"><b>Butang volume tidak akan muncul.</b> Android menelannya sebelum sampai ke halaman web. ' +
+        'Kebanyakan remote shutter murah menghantar volume pada butang kameranya — tiada kod yang boleh membetulkan itu.</div>' +
+      '<div class="btn-row"><button class="btn" id="rmClear" type="button">Kosongkan</button></div>' +
+    '</div></div>' +
+
+    '<div class="card"><div class="card-h"><h2>Peta butang</h2><span id="rmMapN">0 kekunci</span></div>' +
+    '<div class="card-b"><div class="tbl-wrap"><table class="map" id="rmMap"><tbody>' +
+      '<tr><td class="log-empty" colspan="4">Belum ada kekunci direkod.</td></tr>' +
+    '</tbody></table></div></div></div>' +
+
+    '<div class="card"><div class="card-h"><h2>Log mentah</h2></div>' +
+    '<div class="card-b"><div class="log" id="rmLog"><div class="log-empty">Kosong</div></div></div></div>';
+}
+
+function rmWire(){
+  HL.onKey = function(e){
+    var usable = hlUsable(e.code, e.key);
+    var id = e.code || e.key || ('kc' + e.keyCode);
+    if (!HL.map[id]) HL.map[id] = { key:e.key, code:e.code, keyCode:e.keyCode, count:0, usable:usable };
+    HL.map[id].count++;
+    HL.keys.push({ t:clock(), key:e.key, code:e.code, keyCode:e.keyCode, repeat:e.repeat, usable:usable });
+    if (HL.keys.length > 200) HL.keys.shift();
+    // Elak halaman menatal bila anak panah ditekan.
+    if (/^(Arrow|Space|PageUp|PageDown|Home|End)/.test(e.code || '')) e.preventDefault();
+    rmPaint(e);
+  };
+  document.addEventListener('keydown', HL.onKey);
+
+  var tick = function(){
+    if (HL.tab !== 'remote') { HL.padRaf = 0; return; }
+    var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (var i=0;i<pads.length;i++){
+      var p = pads[i];
+      if (!p) continue;
+      for (var b=0;b<p.buttons.length;b++){
+        var on = p.buttons[b].pressed, k = i + ':' + b;
+        if (on && !HL.padSeen[k]){
+          var id = 'Gamepad' + b;
+          if (!HL.map[id]) HL.map[id] = { key:'(gamepad)', code:id, keyCode:b, count:0, usable:'yes' };
+          HL.map[id].count++;
+          HL.keys.push({ t:clock(), key:'(gamepad '+(p.id||'')+')', code:id, keyCode:b, repeat:false, usable:'yes' });
+          rmPaint({ key:'Gamepad '+b, code:id, keyCode:b });
+        }
+        HL.padSeen[k] = on;
+      }
+    }
+    HL.padRaf = requestAnimationFrame(tick);
+  };
+  if (!HL.padRaf) tick();
+
+  $('rmClear').addEventListener('click', function(){
+    HL.keys = []; HL.map = {}; rmPaint(null);
+  });
+  rmPaint(null);
+}
+
+function rmPaint(e){
+  var stage = $('rmStage');
+  if (!stage) return;
+  // Bila panel dibina semula, pulihkan tekanan terakhir. Tanpa ini, satu
+  // render semula memadam bacaan yang baru saja diambil oleh pengguna.
+  if (!e && HL.keys.length){
+    var last = HL.keys[HL.keys.length - 1];
+    e = { key:last.key, code:last.code, keyCode:last.keyCode };
+  }
+  if (e){
+    stage.classList.add('live');
+    stage.innerHTML =
+      '<div><div class="stage-k">' + esc(e.key === ' ' ? 'Space' : e.key) + '</div>' +
+      '<div class="stage-s">code ' + esc(e.code || '—') + ' · keyCode ' + esc(e.keyCode) + '</div></div>';
+  } else {
+    stage.classList.remove('live');
+    stage.innerHTML = '<div class="stage-idle">Menunggu tekanan…<br>Pair remote dalam Tetapan Bluetooth dahulu.</div>';
+  }
+  var n = $('rmCount'); if (n) n.textContent = HL.keys.length + ' tekanan';
+
+  var ids = Object.keys(HL.map);
+  var mn = $('rmMapN'); if (mn) mn.textContent = ids.length + ' kekunci';
+  var tb = $('rmMap') && $('rmMap').querySelector('tbody');
+  if (tb){
+    tb.innerHTML = ids.length
+      ? ('<tr><th>Kekunci</th><th>Code</th><th>Kali</th><th>Pakai?</th></tr>' + ids.map(function(id){
+          var m = HL.map[id];
+          var pill = m.usable === 'yes' ? '<span class="pill ok">boleh</span>'
+                   : m.usable === 'no'  ? '<span class="pill bad">tidak</span>'
+                                        : '<span class="pill warn">mungkin</span>';
+          return '<tr><td class="mk">' + esc(m.key === ' ' ? 'Space' : m.key) + '</td>' +
+                 '<td>' + esc(m.code || '—') + '</td>' +
+                 '<td>' + m.count + '</td><td>' + pill + '</td></tr>';
+        }).join(''))
+      : '<tr><td class="log-empty" colspan="4">Belum ada kekunci direkod.</td></tr>';
+  }
+
+  var lg = $('rmLog');
+  if (lg){
+    lg.innerHTML = HL.keys.length
+      ? HL.keys.slice().reverse().map(function(r){
+          var cls = r.usable === 'yes' ? 'ok' : r.usable === 'no' ? 'bad' : 'warn';
+          return '<div class="log-r ' + cls + '"><div class="log-t">' + r.t + '</div>' +
+                 '<div class="log-m">key "' + esc(r.key) + '"  code ' + esc(r.code || '-') +
+                 '  keyCode ' + esc(r.keyCode) + (r.repeat ? '  (ulang)' : '') + '</div></div>';
+        }).join('')
+      : '<div class="log-empty">Kosong</div>';
+  }
+}
+
+function rmUnwire(){
+  if (HL.onKey){ document.removeEventListener('keydown', HL.onKey); HL.onKey = null; }
+  if (HL.padRaf){ cancelAnimationFrame(HL.padRaf); HL.padRaf = 0; }
+}
+
+/* ======================================================================
+   PANEL: LASER BLE
+   ====================================================================== */
+function renderBle(){
+  var f = envFacts();
+  if (!f.ble){
+    return '<div class="card"><div class="card-h"><h2>Laser BLE</h2></div><div class="card-b">' +
+      '<div class="note bad"><b>Web Bluetooth tiada dalam persekitaran ini.</b> Buka tab Persekitaran — ' +
+      'ia menamakan puncanya dan cara membetulkannya. Tiada gunanya menguji meter sebelum itu beres.</div>' +
+      '</div></div>';
+  }
+  return '' +
+    '<div class="card"><div class="card-h"><h2>Sambung</h2><span id="bleState">tiada</span></div>' +
+    '<div class="card-b">' +
+      '<div class="btn-row">' +
+        '<button class="btn pri" id="bleScan" type="button">Imbas peranti</button>' +
+        '<button class="btn" id="bleWide" type="button">Imbas luas</button>' +
+        '<button class="btn" id="bleOff" type="button" disabled>Putus</button>' +
+      '</div>' +
+      '<p><b>Imbas</b> mencuba senarai servis yang biasa. <b>Imbas luas</b> mengisytihar 768 UUID ' +
+      '(0xFD00–0xFFFF) — lebih lambat, tetapi ia menangkap meter yang menggunakan UUID peribadi.</p>' +
+      '<label class="fld"><span>Meter memaparkan (meter)</span>' +
+        '<input type="number" id="bleExpect" step="0.001" inputmode="decimal" placeholder="contoh 3.421"></label>' +
+      '<p>Ambil satu bacaan, taip nombor yang meter itu papar, dan penyahkod yang betul akan bertanda hijau. ' +
+      'Tanpa ini, beberapa cara membaca paket yang sama kelihatan sama munasabah.</p>' +
+    '</div></div>' +
+
+    '<div class="card"><div class="card-h"><h2>Servis dan ciri</h2><span id="bleSvcN"></span></div>' +
+    '<div class="card-b"><div id="bleSvc"><div class="log-empty">Belum bersambung.</div></div></div></div>' +
+
+    '<div class="card"><div class="card-h"><h2>Paket masuk</h2><span id="blePktN">0</span></div>' +
+    '<div class="card-b">' +
+      '<div id="bleCand"></div>' +
+      '<div class="log" id="bleLog"><div class="log-empty">Tiada paket lagi. Ambil bacaan pada meter.</div></div>' +
+    '</div></div>' +
+
+    '<div class="card"><div class="card-h"><h2>Siasat tangan</h2></div><div class="card-b">' +
+      '<p>Tulis bait kepada ciri yang boleh ditulis. Arahan Bosch sudah diisi — ' +
+      '<code>c0550201001a</code> menghidupkan data ukuran, <code>c05601001e</code> mencetus ukuran (hantar dua kali).</p>' +
+      '<label class="fld"><span>Ciri</span><select id="bleWchar"><option value="">—</option></select></label>' +
+      '<label class="fld"><span>Bait (hex)</span><input type="text" id="bleWhex" value="c0550201001a" spellcheck="false"></label>' +
+      '<div class="btn-row">' +
+        '<button class="btn" id="bleWrite" type="button">Tulis</button>' +
+        '<button class="btn" id="bleBosch" type="button">Urutan Bosch</button>' +
+      '</div>' +
+    '</div></div>';
+}
+
+function bleSay(cls, msg){
+  HL.pkts.push({ t:clock(), cls:cls, msg:msg, bytes:null });
+  if (HL.pkts.length > 300) HL.pkts.shift();
+  blePaintLog();
+}
+
+function blePaintLog(){
+  var lg = $('bleLog'); if (!lg) return;
+  var n = $('blePktN');
+  var data = HL.pkts.filter(function(p){ return p.bytes; });
+  if (n) n.textContent = data.length + ' paket';
+  lg.innerHTML = HL.pkts.length
+    ? HL.pkts.slice().reverse().map(function(p){
+        return '<div class="log-r ' + (p.cls||'') + '"><div class="log-t">' + p.t + '</div>' +
+               '<div class="log-m">' + esc(p.msg) + '</div></div>';
+      }).join('')
+    : '<div class="log-empty">Tiada paket lagi. Ambil bacaan pada meter.</div>';
+  blePaintCand();
+}
+
+function blePaintCand(){
+  var box = $('bleCand'); if (!box) return;
+  var last = null, i;
+  for (i = HL.pkts.length - 1; i >= 0; i--){ if (HL.pkts[i].bytes){ last = HL.pkts[i]; break; } }
+  if (!last){ box.innerHTML = ''; return; }
+
+  var bosch = hlBosch(last.bytes);
+  var head = '';
+  if (bosch){
+    head = '<div class="note"><b>Rangka Bosch dikenali.</b> jenis 0x' +
+      bosch.kind.toString(16).padStart(4,'0') + ' · nilai ' +
+      bosch.v1.toFixed(4) + ' m, ' + bosch.v2.toFixed(4) + ' m, ' + bosch.v3.toFixed(4) + ' m</div>';
+  }
+
+  var cands = hlMatch(hlDecode(last.bytes), HL.expect);
+  // Tunjuk padanan dahulu, kemudian yang lain; hadkan supaya senarai kekal boleh dibaca.
+  cands.sort(function(a,b){ return (b.hit?1:0) - (a.hit?1:0); });
+  var show = cands.slice(0, 14);
+  box.innerHTML = head + (show.length
+    ? '<div style="border:1px solid var(--line);border-radius:8px;overflow:hidden">' +
+      show.map(function(c){
+        return '<div class="cand' + (c.hit ? ' hit' : '') + '">' +
+          '<div class="cand-v">' + c.m.toFixed(3) + ' m</div>' +
+          '<div class="cand-h">' + esc(c.how) + ' @ bait ' + c.off + (c.hit ? '  ✓ padan' : '') + '</div></div>';
+      }).join('') + '</div>'
+    : '<div class="note warn">Tiada cara membaca paket ini memberi jarak yang munasabah. ' +
+      'Mungkin ia paket status, bukan ukuran — ambil satu bacaan lagi.</div>');
+}
+
+async function bleScan(wide){
+  var btn = $('bleScan'), btn2 = $('bleWide');
+  btn.disabled = btn2.disabled = true;
+  btn.textContent = 'Mengimbas…';
+  try {
+    var dev = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: hlServices(wide)
+    });
+    HL.dev = dev;
+    HL.pkts = [];
+    bleSay('ok', 'Dipilih: ' + (dev.name || 'tanpa nama') + '  id ' + dev.id);
+    dev.addEventListener('gattserverdisconnected', function(){
+      bleSay('warn', 'Peranti terputus');
+      var s = $('bleState'); if (s) s.textContent = 'terputus';
+      var o = $('bleOff'); if (o) o.disabled = true;
+    });
+    await bleConnect(dev);
+  } catch (err){
+    if (!/cancel/i.test(err.message || '')) bleSay('bad', 'Gagal: ' + err.message);
+  }
+  btn.disabled = btn2.disabled = false;
+  btn.textContent = 'Imbas peranti';
+}
+
+async function bleConnect(dev){
+  var s = $('bleState');
+  if (s) s.textContent = 'menyambung…';
+  var server = await dev.gatt.connect();
+  HL.server = server;
+  if (s) s.textContent = 'bersambung';
+  var off = $('bleOff'); if (off) off.disabled = false;
+
+  var svcs = [];
+  try { svcs = await server.getPrimaryServices(); }
+  catch (e){ bleSay('warn', 'Tidak dapat menyenarai servis: ' + e.message); }
+
+  var html = '', nChar = 0, writables = [];
+  HL.chars = [];
+
+  for (var i=0;i<svcs.length;i++){
+    var sv = svcs[i], chars = [];
+    try { chars = await sv.getCharacteristics(); } catch (e){}
+    var nm = uuidName(sv.uuid);
+    html += '<div class="chk"><div class="chk-dot ok">S</div><div class="chk-t">' +
+            '<b>' + esc(nm || 'Servis') + '</b><span><code>' + esc(sv.uuid) + '</code></span>';
+    for (var j=0;j<chars.length;j++){
+      var ch = chars[j], p = ch.properties, tags = [];
+      if (p.read) tags.push('read');
+      if (p.write) tags.push('write');
+      if (p.writeWithoutResponse) tags.push('writeNR');
+      if (p.notify) tags.push('notify');
+      if (p.indicate) tags.push('indicate');
+      nChar++;
+      html += '<span style="margin-top:4px"><code>' + esc(ch.uuid.slice(0,8)) + '…</code> ' +
+              esc(tags.join(' ')) + '</span>';
+      if (p.write || p.writeWithoutResponse){
+        writables.push(ch);
+        HL.chars.push(ch);
+      }
+      if (p.notify || p.indicate){
+        try {
+          await ch.startNotifications();
+          ch.addEventListener('characteristicvaluechanged', onPacket);
+          bleSay('ok', 'Melanggan ' + ch.uuid.slice(0,8) + '…');
+        } catch (e){
+          bleSay('warn', 'Tidak dapat melanggan ' + ch.uuid.slice(0,8) + ': ' + e.message);
+        }
+      }
+    }
+    html += '</div></div>';
+  }
+
+  var box = $('bleSvc');
+  if (box) box.innerHTML = html || '<div class="note warn"><b>Tiada servis kelihatan.</b> ' +
+    'Web Bluetooth hanya mendedahkan servis yang diisytihar sebelum menyambung. ' +
+    'Cuba <b>Imbas luas</b>. Kalau masih kosong, meter ini menggunakan UUID di luar julat biasa.</div>';
+  var sn = $('bleSvcN'); if (sn) sn.textContent = svcs.length + ' servis · ' + nChar + ' ciri';
+
+  var sel = $('bleWchar');
+  if (sel){
+    sel.innerHTML = '<option value="">—</option>' + writables.map(function(c, k){
+      return '<option value="' + k + '">' + esc(c.uuid.slice(0,13)) + '…</option>';
+    }).join('');
+  }
+}
+
+function onPacket(e){
+  var dv = e.target.value, bytes = dvBytes(dv);
+  HL.pkts.push({
+    t: clock(), cls: 'ok', bytes: bytes,
+    msg: e.target.uuid.slice(0,8) + '  ' + bytes.length + ' bait   ' + hex(bytes)
+  });
+  if (HL.pkts.length > 300) HL.pkts.shift();
+  blePaintLog();
+}
+
+function parseHex(s){
+  var clean = String(s||'').replace(/[^0-9a-fA-F]/g, '');
+  if (clean.length % 2) return null;
+  var out = [];
+  for (var i=0;i<clean.length;i+=2) out.push(parseInt(clean.substr(i,2),16));
+  return out.length ? out : null;
+}
+
+async function bleWriteHex(hexStr){
+  var sel = $('bleWchar');
+  var idx = sel ? sel.value : '';
+  if (idx === ''){ bleSay('warn', 'Pilih satu ciri dahulu.'); return; }
+  var ch = HL.chars[parseInt(idx,10)];
+  var bytes = parseHex(hexStr);
+  if (!ch || !bytes){ bleSay('bad', 'Bait tidak sah.'); return; }
+  try {
+    var buf = new Uint8Array(bytes);
+    if (ch.properties.write) await ch.writeValueWithResponse(buf);
+    else await ch.writeValueWithoutResponse(buf);
+    bleSay('ok', 'Ditulis: ' + hex(bytes));
+  } catch (err){
+    bleSay('bad', 'Tulis gagal: ' + err.message);
+  }
+}
+
+function bleWire(){
+  if (!$('bleScan')) return;
+  $('bleScan').addEventListener('click', function(){ bleScan(false); });
+  $('bleWide').addEventListener('click', function(){ bleScan(true); });
+  $('bleOff').addEventListener('click', function(){
+    if (HL.dev && HL.dev.gatt && HL.dev.gatt.connected) HL.dev.gatt.disconnect();
+  });
+  $('bleExpect').addEventListener('input', function(e){
+    HL.expect = parseFloat(e.target.value) || 0;
+    blePaintCand();
+  });
+  $('bleWrite').addEventListener('click', function(){ bleWriteHex($('bleWhex').value); });
+  $('bleBosch').addEventListener('click', async function(){
+    await bleWriteHex('c0550201001a');
+    await bleWriteHex('c05601001e');
+    await bleWriteHex('c05601001e');
+  });
+  blePaintLog();
+}
+
+/* ======================================================================
+   PANEL: KAMERA
+   ====================================================================== */
+function renderCam(){
+  var f = envFacts();
+  if (!f.cam){
+    return '<div class="card"><div class="card-h"><h2>Kamera</h2></div><div class="card-b">' +
+      '<div class="note bad"><b>Kamera tidak tersedia dalam persekitaran ini.</b> ' +
+      'Buka tab Persekitaran untuk puncanya.</div></div></div>';
+  }
+  return '' +
+    '<div class="card"><div class="card-h"><h2>Kamera yang dilihat</h2><span id="camN"></span></div>' +
+    '<div class="card-b">' +
+      '<div class="btn-row"><button class="btn pri" id="camList" type="button">Senarai kamera</button></div>' +
+      '<p>Palamkan endoskop <b>sebelum</b> menekan. Endoskop UVC muncul sebagai kamera biasa; ' +
+      'yang Wi-Fi tidak akan muncul langsung.</p>' +
+      '<div id="camBox"><div class="log-empty">Belum disemak.</div></div>' +
+    '</div></div>' +
+
+    '<div class="card"><div class="card-h"><h2>Pratonton</h2><span id="camRes"></span></div>' +
+    '<div class="card-b">' +
+      '<video id="camVid" playsinline muted autoplay></video>' +
+      '<p id="camNote">Pilih satu kamera di atas. Resolusi sebenar akan terpapar — ' +
+      'itu jawapan kepada soalan "berapa megapixel" yang penjual tidak jawab.</p>' +
+    '</div></div>';
+}
+
+async function camList(){
+  var btn = $('camList'); btn.disabled = true; btn.textContent = 'Menyemak…';
+  var box = $('camBox');
+  try {
+    // Label kamera hanya terbuka selepas satu kebenaran diberi.
+    try {
+      var s = await navigator.mediaDevices.getUserMedia({ video:true });
+      s.getTracks().forEach(function(t){ t.stop(); });
+    } catch (e){}
+    var all = await navigator.mediaDevices.enumerateDevices();
+    HL.cams = all.filter(function(d){ return d.kind === 'videoinput'; });
+  } catch (e){
+    HL.cams = [];
+    box.innerHTML = '<div class="note bad">Gagal: ' + esc(e.message) + '</div>';
+    btn.disabled = false; btn.textContent = 'Senarai kamera';
+    return;
+  }
+  var n = $('camN'); if (n) n.textContent = HL.cams.length + ' dijumpai';
+  box.innerHTML = HL.cams.length
+    ? HL.cams.map(function(d, i){
+        return '<div class="chk"><div class="chk-dot ok">' + (i+1) + '</div><div class="chk-t">' +
+          '<b>' + esc(d.label || ('Kamera ' + (i+1))) + '</b>' +
+          '<span><code>' + esc(d.deviceId.slice(0,16)) + '…</code></span>' +
+          '<button class="btn" type="button" data-cam="' + i + '" style="margin-top:8px">Buka</button>' +
+        '</div></div>';
+      }).join('')
+    : '<div class="note bad"><b>Tiada kamera dilihat.</b> Benarkan kebenaran kamera, kemudian cuba lagi.</div>';
+
+  box.querySelectorAll('[data-cam]').forEach(function(b){
+    b.addEventListener('click', function(){ camOpen(HL.cams[parseInt(b.dataset.cam,10)]); });
+  });
+  btn.disabled = false; btn.textContent = 'Senarai kamera';
+}
+
+async function camOpen(d){
+  if (!d) return;
+  if (HL.stream){ HL.stream.getTracks().forEach(function(t){ t.stop(); }); HL.stream = null; }
+  var v = $('camVid'), note = $('camNote'), res = $('camRes');
+  try {
+    HL.stream = await navigator.mediaDevices.getUserMedia({
+      video: { deviceId: { exact: d.deviceId }, width:{ ideal:1920 }, height:{ ideal:1080 } }
+    });
+    v.srcObject = HL.stream;
+    var tr = HL.stream.getVideoTracks()[0], st = tr.getSettings ? tr.getSettings() : {};
+    var line = (st.width || '?') + ' × ' + (st.height || '?') +
+               (st.frameRate ? '  @ ' + Math.round(st.frameRate) + ' fps' : '');
+    if (res) res.textContent = line;
+    HL.camInfo = { label: d.label, res: line };
+    var verdict = (st.height >= 720)
+      ? 'Resolusi ini cukup untuk laporan.'
+      : 'Di bawah 720p — nampak kasar dalam laporan bercetak.';
+    if (note) note.innerHTML = '<b>' + esc(d.label || 'Kamera') + '</b> — ' + esc(line) + '. ' + verdict;
+  } catch (e){
+    if (note) note.innerHTML = '<span style="color:var(--bad)">Gagal membuka: ' + esc(e.message) + '</span>';
+  }
+}
+
+function camWire(){
+  if (!$('camList')) return;
+  $('camList').addEventListener('click', camList);
+}
+function camUnwire(){
+  if (HL.stream){ HL.stream.getTracks().forEach(function(t){ t.stop(); }); HL.stream = null; }
+}
+
+/* ======================================================================
+   PANEL: LAPORAN
+   ====================================================================== */
+function buildReport(){
+  var f = envFacts(), L = [];
+  L.push('PERANTI LAB — laporan');
+  L.push('Masa      : ' + new Date().toISOString());
+  L.push('');
+  L.push('[PERSEKITARAN]');
+  L.push('Asal      : ' + f.origin);
+  L.push('Selamat   : ' + (f.secure ? 'ya' : 'TIDAK'));
+  L.push('Bluetooth : ' + (f.ble ? 'ada' : 'TIADA'));
+  L.push('Kamera    : ' + (f.cam ? 'ada' : 'TIADA'));
+  L.push('Gamepad   : ' + (f.pad ? 'ada' : 'tiada'));
+  L.push('Android   : ' + (f.android || '-'));
+  L.push('Chrome    : ' + (f.chrome || '-'));
+  L.push('UA        : ' + f.ua);
+  L.push('');
+
+  L.push('[REMOTE] ' + Object.keys(HL.map).length + ' kekunci unik, ' + HL.keys.length + ' tekanan');
+  Object.keys(HL.map).forEach(function(id){
+    var m = HL.map[id];
+    L.push('  key="' + m.key + '"  code=' + (m.code||'-') + '  keyCode=' + m.keyCode +
+           '  x' + m.count + '  pakai=' + m.usable);
+  });
+  if (!Object.keys(HL.map).length) L.push('  (tiada)');
+  L.push('');
+
+  L.push('[BLE] peranti: ' + (HL.dev ? (HL.dev.name || 'tanpa nama') : 'tiada'));
+  if (HL.expect) L.push('Meter papar: ' + HL.expect + ' m');
+  var data = HL.pkts.filter(function(p){ return p.bytes; });
+  L.push('Paket data: ' + data.length);
+  data.slice(-20).forEach(function(p){
+    L.push('  ' + p.t + '  ' + hex(p.bytes));
+    var bo = hlBosch(p.bytes);
+    if (bo) L.push('      bosch: jenis=0x' + bo.kind.toString(16) + ' v1=' + bo.v1.toFixed(4));
+    hlMatch(hlDecode(p.bytes), HL.expect).filter(function(c){ return c.hit; }).forEach(function(c){
+      L.push('      PADAN: ' + c.m.toFixed(3) + ' m  via ' + c.how + ' @ bait ' + c.off);
+    });
+  });
+  HL.pkts.filter(function(p){ return !p.bytes; }).slice(-30).forEach(function(p){
+    L.push('  ' + p.t + '  ' + p.msg);
+  });
+  L.push('');
+
+  L.push('[KAMERA] ' + HL.cams.length + ' dijumpai');
+  HL.cams.forEach(function(d, i){ L.push('  ' + (i+1) + '. ' + (d.label || '(tanpa label)')); });
+  if (HL.camInfo) L.push('  dibuka: ' + HL.camInfo.label + ' @ ' + HL.camInfo.res);
+  L.push('');
+  L.push('— hujung —');
+  return L.join('\n');
+}
+
+function renderRep(){
+  return '' +
+    '<div class="card"><div class="card-h"><h2>Laporan</h2><span id="repN"></span></div>' +
+    '<div class="card-b">' +
+      '<p>Semua yang dikumpul, sebagai teks. Salin dan hantar — teks lebih baik daripada ' +
+      'screenshot kerana saya boleh baca bait sebenarnya.</p>' +
+      '<div class="btn-row">' +
+        '<button class="btn pri" id="repCopy" type="button">Salin</button>' +
+        '<button class="btn" id="repRefresh" type="button">Muat semula</button>' +
+      '</div>' +
+      '<div class="log" style="max-height:420px"><div class="log-r"><div class="log-m" id="repText"></div></div></div>' +
+    '</div></div>';
+}
+
+function repWire(){
+  var paint = function(){
+    var t = buildReport();
+    $('repText').textContent = t;
+    $('repN').textContent = t.split('\n').length + ' baris';
+  };
+  $('repRefresh').addEventListener('click', paint);
+  $('repCopy').addEventListener('click', function(){
+    var t = buildReport(), btn = $('repCopy');
+    var done = function(){ btn.textContent = 'Disalin'; setTimeout(function(){ btn.textContent = 'Salin'; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(done).catch(function(){ selectReport(); });
+    } else selectReport();
+  });
+  paint();
+}
+
+function selectReport(){
+  var el = $('repText');
+  var r = document.createRange(); r.selectNodeContents(el);
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  $('repCopy').textContent = 'Pilih dan salin';
+}
+
+/* ======================================================================
+   NAVIGASI
+   ====================================================================== */
+function show(tab){
+  // Lepaskan tanpa syarat, walaupun tab yang sama diketik semula. Render
+  // semula mencipta elemen baharu, jadi pendengar lama akan bertindan dan
+  // setiap tekanan akan dikira dua kali.
+  rmUnwire();
+  camUnwire();
+  HL.tab = tab;
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('on', t.dataset.tab === tab); });
+  var w = $('wrap');
+  if (tab === 'env')    { w.innerHTML = renderEnv(); }
+  if (tab === 'remote') { w.innerHTML = renderRemote(); rmWire(); }
+  if (tab === 'ble')    { w.innerHTML = renderBle(); bleWire(); }
+  if (tab === 'cam')    { w.innerHTML = renderCam(); camWire(); }
+  if (tab === 'rep')    { w.innerHTML = renderRep(); repWire(); }
+  window.scrollTo(0, 0);
+}
+
+$('tabs').addEventListener('click', function(e){
+  var b = e.target.closest('.tab');
+  if (!b) return;
+  show(b.dataset.tab);
+  // Lepaskan fokus. Kalau tidak, butang Enter atau Space pada remote
+  // mengaktifkan semula tab ini dan memadam apa yang baru direkod.
+  b.blur();
+});
+
+$('themeBtn').addEventListener('click', function(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var dark = cur ? cur === 'dark'
+    : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+});
+
+$('brandSub').textContent = 'GoXpert Pocket · ' + (location.protocol === 'file:' ? 'fail tempatan' : location.host || 'tempatan');
+show('env');
+
+// Didedahkan supaya ujian unit boleh memanggilnya tanpa DOM.
+if (typeof module !== 'undefined' && module.exports){
+  module.exports = { hlBosch:hlBosch, hlDecode:hlDecode, hlUsable:hlUsable, hlMatch:hlMatch, hlAscii:hlAscii };
+}
+</script>
+</body>
+</html>
