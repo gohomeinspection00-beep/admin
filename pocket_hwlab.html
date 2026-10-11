@@ -209,6 +209,7 @@ var HL = {
   expect: 0,         // bacaan yang meter papar
   cams: [],
   stream: null,
+  mp: { on:false, i:0, caught:[], results:[] },
   started: Date.now()
 };
 
@@ -319,7 +320,8 @@ function hlWheelDir(dx, dy){
    pada baris yang sama dalam peta. */
 function hlSig(ev){
   if (!ev) return '';
-  if (ev.kind === 'key')   return 'key ' + (ev.code || ev.key || ev.keyCode);
+  if (ev.kind === 'key' || ev.kind === 'keyup')
+    return ev.kind + ' ' + (ev.code || ev.key || ev.keyCode);
   if (ev.kind === 'wheel') return 'wheel ' + (ev.ctrl ? 'ctrl+' : '') + hlWheelDir(ev.dx, ev.dy);
   if (ev.kind === 'pad')   return 'gamepad ' + ev.index;
   if (ev.kind === 'click' && ev.detail >= 2) return 'click x' + ev.detail;
@@ -328,17 +330,61 @@ function hlSig(ev){
 
 function hlUsableEv(ev){
   if (!ev) return 'maybe';
-  if (ev.kind === 'key') return hlUsable(ev.code, ev.key);
+  if (ev.kind === 'key' || ev.kind === 'keyup') return hlUsable(ev.code, ev.key);
   // Kalau ia sampai ke sini langsung, halaman boleh membacanya.
   if (/^(wheel|pad|click|dblclick|pointerdown|auxclick|contextmenu|touchstart)$/.test(ev.kind)) return 'yes';
   return 'maybe';
 }
 
+/* ---------- pemetaan berpandu ----------
+   Melihat satu timbunan isyarat tidak memberitahu butang mana menghasilkan
+   yang mana. Pemetaan menanya satu butang pada satu masa, jadi setiap baris
+   mempunyai punca yang pasti — termasuk baris yang tidak menghasilkan apa-apa. */
+var RM_BUTTONS = [
+  { k:'up',    n:'▲ Atas' },
+  { k:'down',  n:'▼ Bawah' },
+  { k:'left',  n:'◀ Kiri' },
+  { k:'right', n:'▶ Kanan' },
+  { k:'mid',   n:'♥ Tengah' },
+  { k:'plus',  n:'⊕ Tambah' },
+  { k:'minus', n:'⊖ Tolak' },
+  { k:'cam',   n:'📷 Kamera' },
+  { k:'mode',  n:'⟳ Mod (atas sekali)' }
+];
+
+function hlUniq(list){
+  var seen = {}, out = [];
+  (list || []).forEach(function(x){ if (!seen[x]){ seen[x] = 1; out.push(x); } });
+  return out;
+}
+
+/* Satu butang berguna kalau ia menghasilkan tepat satu isyarat, setiap kali. */
+function hlMapVerdict(sigs){
+  var u = hlUniq(sigs);
+  if (!u.length) return 'none';
+  if (u.length === 1) return 'clean';
+  return 'noisy';
+}
+
+/* Dua butang yang menghasilkan isyarat yang sama tidak boleh dibezakan,
+   jadi hanya satu daripadanya boleh diikat kepada apa-apa. */
+function hlMapCollide(results){
+  var owner = {}, clash = {};
+  (results || []).forEach(function(r){
+    hlUniq(r.sigs).forEach(function(s){
+      if (owner[s] && owner[s] !== r.n){ clash[s] = hlUniq((clash[s] || [owner[s]]).concat([r.n])); }
+      else owner[s] = r.n;
+    });
+  });
+  return Object.keys(clash).map(function(s){ return { sig:s, names:clash[s] }; });
+}
+
 /* Perihal manusia bagi satu isyarat, untuk lajur butiran. */
 function hlWhat(ev){
   if (!ev) return '';
-  if (ev.kind === 'key')
-    return 'kekunci "' + ev.key + '"  code ' + (ev.code || '-') + '  keyCode ' + ev.keyCode;
+  if (ev.kind === 'key' || ev.kind === 'keyup')
+    return (ev.kind === 'keyup' ? 'lepas ' : '') + 'kekunci "' + ev.key + '"  code ' +
+           (ev.code || '-') + '  keyCode ' + ev.keyCode;
   if (ev.kind === 'wheel')
     return (ev.ctrl ? 'ctrl+roda (Chrome zum)  ' : 'roda  ') +
            'dx ' + Math.round(ev.dx) + '  dy ' + Math.round(ev.dy) + '  mod ' + ev.mode;
@@ -515,6 +561,10 @@ function renderEnv(){
    ====================================================================== */
 function renderRemote(){
   return '' +
+    '<div class="card" data-noprobe><div class="card-h"><h2>Pemetaan berpandu</h2>' +
+      '<span id="mpN"></span></div>' +
+    '<div class="card-b" id="mpBody"></div></div>' +
+
     '<div class="card"><div class="card-h"><h2>Tekan apa-apa butang</h2><span id="rmCount">0</span></div>' +
     '<div class="card-b">' +
       '<div class="stage" id="rmStage" tabindex="0">' +
@@ -551,7 +601,97 @@ function rmRecord(ev){
   HL.map[ev.sig].what = ev.what;
   HL.keys.push(ev);
   if (HL.keys.length > 200) HL.keys.shift();
+  // Semasa pemetaan, setiap isyarat juga dikreditkan kepada butang
+  // yang sedang ditanya, supaya puncanya tidak pernah diteka.
+  if (HL.mp && HL.mp.on){ HL.mp.caught.push(ev.sig); mpPaint(); }
   rmPaint(ev);
+}
+
+/* ---------- pemetaan ---------- */
+function mpPaint(){
+  var box = $('mpBody'); if (!box) return;
+  var M = HL.mp;
+  var head = $('mpN');
+
+  if (!M.on && !M.results.length){
+    if (head) head.textContent = '';
+    box.innerHTML =
+      '<p>Satu timbunan isyarat tidak memberitahu <b>butang mana</b> menghasilkan yang mana. ' +
+      'Ini bertanya satu butang pada satu masa, jadi setiap baris ada punca yang pasti — ' +
+      'termasuk butang yang tidak menghasilkan apa-apa.</p>' +
+      '<div class="btn-row"><button class="btn pri" id="mpGo" type="button">Mulakan pemetaan</button></div>';
+    $('mpGo').addEventListener('click', function(e){ e.stopPropagation(); mpStart(); });
+    return;
+  }
+
+  if (M.on){
+    var b = RM_BUTTONS[M.i];
+    if (head) head.textContent = (M.i + 1) + ' / ' + RM_BUTTONS.length;
+    box.innerHTML =
+      '<div class="stage live" style="min-height:96px"><div>' +
+        '<div class="stage-k" style="font-size:26px">' + esc(b.n) + '</div>' +
+        '<div class="stage-s">' + (M.caught.length
+          ? esc(hlUniq(M.caught).join('  ·  ')) + '   (' + M.caught.length + ')'
+          : 'tekan butang ini sekarang — dua atau tiga kali') + '</div>' +
+      '</div></div>' +
+      '<div class="btn-row">' +
+        '<button class="btn pri" id="mpNext" type="button">' +
+          (M.caught.length ? 'Seterusnya' : 'Tiada apa berlaku') + '</button>' +
+        '<button class="btn" id="mpStop" type="button">Berhenti</button>' +
+      '</div>';
+    $('mpNext').addEventListener('click', function(e){ e.stopPropagation(); mpNext(); });
+    $('mpStop').addEventListener('click', function(e){ e.stopPropagation(); mpEnd(); });
+    return;
+  }
+
+  // Selesai: tunjukkan jadual muktamad.
+  if (head) head.textContent = M.results.length + ' butang';
+  var clashes = hlMapCollide(M.results);
+  var usable = M.results.filter(function(r){ return hlMapVerdict(r.sigs) === 'clean'; });
+  box.innerHTML =
+    '<div class="tbl-wrap"><table class="map" id="mpTbl"><tbody>' +
+    '<tr><th>Butang</th><th>Isyarat</th><th>Hukum</th></tr>' +
+    M.results.map(function(r){
+      var v = hlMapVerdict(r.sigs);
+      var pill = v === 'clean' ? '<span class="pill ok">boleh</span>'
+               : v === 'none'  ? '<span class="pill bad">tiada</span>'
+                               : '<span class="pill warn">bercampur</span>';
+      return '<tr><td class="mk">' + esc(r.n) + '</td>' +
+             '<td>' + (r.sigs.length ? esc(hlUniq(r.sigs).join(', ')) : '—') + '</td>' +
+             '<td>' + pill + '</td></tr>';
+    }).join('') + '</tbody></table></div>' +
+    (clashes.length
+      ? '<div class="note warn"><b>Butang bertindih.</b> ' + clashes.map(function(c){
+          return esc(c.names.join(' dan ')) + ' sama-sama menghantar <code>' + esc(c.sig) + '</code>';
+        }).join('; ') + '. Butang yang berkongsi satu isyarat tidak boleh dibezakan, ' +
+        'jadi hanya satu daripadanya boleh diikat kepada apa-apa.</div>'
+      : '') +
+    '<div class="note' + (usable.length ? '' : ' bad') + '"><b>' + usable.length +
+      ' daripada ' + M.results.length + ' butang boleh dipakai.</b> ' +
+      (usable.length
+        ? 'Yang bertanda <b>tiada</b> menghantar kod peringkat sistem — volume, zum atau navigasi ' +
+          'D-pad — yang Android makan sebelum halaman web nampak. Tiada kod boleh membetulkannya.'
+        : 'Setiap butang dimakan oleh Android. Cuba tekan dan tahan butang ⟳ untuk menukar mod ' +
+          'remote, pair semula, dan jalankan pemetaan ini sekali lagi.') + '</div>' +
+    '<div class="btn-row"><button class="btn" id="mpAgain" type="button">Peta semula</button></div>';
+  $('mpAgain').addEventListener('click', function(e){ e.stopPropagation(); mpStart(); });
+}
+
+function mpStart(){
+  HL.mp = { on:true, i:0, caught:[], results:[] };
+  mpPaint();
+}
+function mpNext(){
+  var M = HL.mp, b = RM_BUTTONS[M.i];
+  M.results.push({ k:b.k, n:b.n, sigs:M.caught.slice() });
+  M.caught = [];
+  M.i++;
+  if (M.i >= RM_BUTTONS.length) M.on = false;
+  mpPaint();
+}
+function mpEnd(){
+  HL.mp.on = false;
+  mpPaint();
 }
 
 function rmWire(){
@@ -570,6 +710,12 @@ function rmWire(){
 
   // passive:false diperlukan, kalau tidak preventDefault diabaikan dan
   // ctrl+roda akan menzum halaman sehingga tidak boleh dibaca.
+  // Sesetengah peranti HID hanya menghantar keyup, atau hanya keypress.
+  // Merekodnya berasingan supaya butang separa kelihatan, bukan hilang.
+  on(document, 'keyup', function(e){
+    rmRecord({ kind:'keyup', key:e.key, code:e.code, keyCode:e.keyCode });
+  });
+
   on(document, 'wheel', function(e){
     if (HL.lock) e.preventDefault();
     rmRecord({ kind:'wheel', dx:e.deltaX, dy:e.deltaY, mode:e.deltaMode, ctrl:e.ctrlKey });
@@ -578,7 +724,8 @@ function rmWire(){
   // Mengetik tab atau butang tema bukan isyarat remote. Tanpa tapisan ini,
   // bertukar ke panel ini merekod klik hantu sebaik ia dibuka.
   var chrome_ = function(e){
-    return !!(e.target && e.target.closest && e.target.closest('.top'));
+    if (!e.target || !e.target.closest) return false;
+    return !!e.target.closest('.top, [data-noprobe]');
   };
 
   on(document, 'click', function(e){
@@ -648,6 +795,7 @@ function rmWire(){
   // Tuntut fokus supaya kekunci sampai tanpa pengguna perlu meneka.
   var st = $('rmStage'); if (st && st.focus) { try { st.focus({ preventScroll:true }); } catch (err) { st.focus(); } }
   rmPaint(null);
+  mpPaint();
 }
 
 function rmPaint(e){
@@ -1066,6 +1214,19 @@ function buildReport(){
   if (!Object.keys(HL.map).length) L.push('  (tiada — semua butang mungkin menghantar kod media)');
   L.push('');
 
+  var M = HL.mp;
+  if (M && M.results.length){
+    L.push('[PEMETAAN] ' + M.results.length + ' butang diuji');
+    M.results.forEach(function(r){
+      L.push('  ' + r.n + '  ->  ' + (r.sigs.length ? hlUniq(r.sigs).join(', ') : '(TIADA APA)') +
+             '   [' + hlMapVerdict(r.sigs) + ']');
+    });
+    hlMapCollide(M.results).forEach(function(c){
+      L.push('  BERTINDIH: ' + c.names.join(' dan ') + ' sama-sama menghantar ' + c.sig);
+    });
+    L.push('');
+  }
+
   L.push('[BLE] peranti: ' + (HL.dev ? (HL.dev.name || 'tanpa nama') : 'tiada'));
   if (HL.expect) L.push('Meter papar: ' + HL.expect + ' m');
   var data = HL.pkts.filter(function(p){ return p.bytes; });
@@ -1179,7 +1340,8 @@ envPlatform().then(function(v){
 // Didedahkan supaya ujian unit boleh memanggilnya tanpa DOM.
 if (typeof module !== 'undefined' && module.exports){
   module.exports = { hlBosch:hlBosch, hlDecode:hlDecode, hlUsable:hlUsable, hlMatch:hlMatch,
-    hlAscii:hlAscii, hlWheelDir:hlWheelDir, hlSig:hlSig, hlUsableEv:hlUsableEv, hlWhat:hlWhat };
+    hlAscii:hlAscii, hlWheelDir:hlWheelDir, hlSig:hlSig, hlUsableEv:hlUsableEv, hlWhat:hlWhat,
+    hlUniq:hlUniq, hlMapVerdict:hlMapVerdict, hlMapCollide:hlMapCollide };
 }
 </script>
 </body>
