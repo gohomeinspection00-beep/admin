@@ -8,8 +8,12 @@ CLIP="$1"; OUT="$2"; SS="${3:-0}"; TO="${4:-}"
 W=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0:s=x "$CLIP" | head -1 | tr -d ',' | tr 'x' '\n' | grep -E '^[0-9]+$' | sort -n | head -1)
 SHARP=""; [ "$W" -lt 1080 ] && SHARP=",hqdn3d=1.2:1.2:2:2,cas=strength=0.55"
 TRIM=(-ss "$SS"); [ -n "$TO" ] && TRIM+=(-to "$TO")
+# bitrate from duration: ~19 MB whatever the length (same rule as goxpert-video share.sh), max 8 Mbps
+D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$CLIP")
+LEN=$(python3 -c "print(float('${TO:-$D}') - float('$SS'))")
+VK=$(python3 -c "d=float('$LEN'); print(int(min(8000, max(1500, (19*8*1024)/d - 160))))")
 ffmpeg -v error -y "${TRIM[@]}" -i "$CLIP" \
   -vf "scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920$SHARP,setsar=1,format=yuv420p,fps=30" \
-  -af "volume=0" -c:v libx264 -preset slow -b:v 8000k -maxrate 12000k -bufsize 16000k -pix_fmt yuv420p \
+  -af "volume=0" -c:v libx264 -preset slow -b:v ${VK}k -maxrate $((VK*3/2))k -bufsize $((VK*2))k -pix_fmt yuv420p \
   -c:a aac -b:a 128k -ar 48000 -ac 2 -movflags +faststart "$OUT"
 ffprobe -v error -show_entries format=duration,size -of compact "$OUT"
