@@ -1070,10 +1070,19 @@ function tcDraw(){
   var dpr = window.devicePixelRatio || 1;
   var W = c.clientWidth, H = c.clientHeight;
   if (!W || !H) return;
-  if (c.width !== Math.round(W * dpr)){ c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+  // Kedua-dua paksi mesti disemak. Masuk skrin penuh menyembunyikan bar
+  // alamat, yang menukar TINGGI sahaja; menyemak lebar sahaja meninggalkan
+  // bitmap pada tinggi lama dan ia diregangkan, jadi setiap titik dilukis
+  // makin jauh ke bawah daripada tempat jari sebenarnya menyentuh.
+  var needW = Math.round(W * dpr), needH = Math.round(H * dpr);
+  if (c.width !== needW || c.height !== needH){ c.width = needW; c.height = needH; }
   var g = c.getContext('2d');
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
   g.clearRect(0, 0, W, H);
+
+  // Titik direkod dalam koordinat viewport, jadi tolak asal kanvas kalau
+  // ia tidak duduk tepat di (0,0).
+  var rect = c.getBoundingClientRect(), ox = rect.left, oy = rect.top;
 
   var line = tcCss('--line', '#ccc'), dim = tcCss('--dim', '#888');
   var accent = tcCss('--accent', '#0b5fa5'), okc = tcCss('--ok', '#1a7a46');
@@ -1095,14 +1104,14 @@ function tcDraw(){
     g.strokeStyle = colour; g.fillStyle = colour; g.lineWidth = width;
     g.lineJoin = g.lineCap = 'round';
     if (pts.length > 1){
-      g.beginPath(); g.moveTo(pts[0].x, pts[0].y);
-      for (var i = 1; i < pts.length; i++) g.lineTo(pts[i].x, pts[i].y);
+      g.beginPath(); g.moveTo(pts[0].x - ox, pts[0].y - oy);
+      for (var i = 1; i < pts.length; i++) g.lineTo(pts[i].x - ox, pts[i].y - oy);
       g.stroke();
     }
     // Bulatan penuh di tempat ia bermula, bulatan kosong di tempat ia tamat.
-    g.beginPath(); g.arc(pts[0].x, pts[0].y, 7, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.arc(pts[0].x - ox, pts[0].y - oy, 7, 0, Math.PI * 2); g.fill();
     var last = pts[pts.length - 1];
-    g.beginPath(); g.arc(last.x, last.y, 7, 0, Math.PI * 2); g.lineWidth = 2; g.stroke();
+    g.beginPath(); g.arc(last.x - ox, last.y - oy, 7, 0, Math.PI * 2); g.lineWidth = 2; g.stroke();
     g.globalAlpha = 1;
   };
 
@@ -1744,7 +1753,16 @@ $('tcFullFing').addEventListener('click', function(){
 $('tcFullRem').addEventListener('click', function(){
   TC.mode = 'remote'; if (TC.pick) TC.pick('remote'); tcFullStat();
 });
+// Masuk dan keluar skrin penuh menukar tinggi viewport tanpa menukar
+// lebarnya, dan bar alamat Android bergerak tanpa membangkitkan 'resize'
+// pada window. Lukis semula pada setiap isyarat yang ada.
 window.addEventListener('resize', function(){ tcDraw(); });
+window.addEventListener('orientationchange', function(){ setTimeout(tcDraw, 120); });
+document.addEventListener('fullscreenchange', function(){ setTimeout(tcDraw, 120); });
+if (window.visualViewport){
+  window.visualViewport.addEventListener('resize', function(){ tcDraw(); });
+  window.visualViewport.addEventListener('scroll', function(){ tcDraw(); });
+}
 
 show('env');
 
