@@ -301,6 +301,57 @@ function hlUsable(code, key){
   return 'maybe';
 }
 
+/* Banyak remote "TikTok" menyamar sebagai penunjuk, bukan papan kekunci:
+   anak panahnya menatal roda, butang tengahnya mengklik, dan +/- menghantar
+   ctrl+roda, yang sebabnya Chrome zum. Semua itu boleh dibaca halaman web. */
+function hlWheelDir(dx, dy){
+  if (Math.abs(dy) >= Math.abs(dx)){
+    if (dy < -0.5) return 'atas';
+    if (dy > 0.5) return 'bawah';
+  } else {
+    if (dx < -0.5) return 'kiri';
+    if (dx > 0.5) return 'kanan';
+  }
+  return 'diam';
+}
+
+/* Satu nama tetap bagi setiap butang, supaya tekanan berulang berkumpul
+   pada baris yang sama dalam peta. */
+function hlSig(ev){
+  if (!ev) return '';
+  if (ev.kind === 'key')   return 'key ' + (ev.code || ev.key || ev.keyCode);
+  if (ev.kind === 'wheel') return 'wheel ' + (ev.ctrl ? 'ctrl+' : '') + hlWheelDir(ev.dx, ev.dy);
+  if (ev.kind === 'pad')   return 'gamepad ' + ev.index;
+  if (ev.kind === 'click' && ev.detail >= 2) return 'click x' + ev.detail;
+  return ev.kind;
+}
+
+function hlUsableEv(ev){
+  if (!ev) return 'maybe';
+  if (ev.kind === 'key') return hlUsable(ev.code, ev.key);
+  // Kalau ia sampai ke sini langsung, halaman boleh membacanya.
+  if (/^(wheel|pad|click|dblclick|pointerdown|auxclick|contextmenu|touchstart)$/.test(ev.kind)) return 'yes';
+  return 'maybe';
+}
+
+/* Perihal manusia bagi satu isyarat, untuk lajur butiran. */
+function hlWhat(ev){
+  if (!ev) return '';
+  if (ev.kind === 'key')
+    return 'kekunci "' + ev.key + '"  code ' + (ev.code || '-') + '  keyCode ' + ev.keyCode;
+  if (ev.kind === 'wheel')
+    return (ev.ctrl ? 'ctrl+roda (Chrome zum)  ' : 'roda  ') +
+           'dx ' + Math.round(ev.dx) + '  dy ' + Math.round(ev.dy) + '  mod ' + ev.mode;
+  if (ev.kind === 'pad') return 'butang gamepad ' + ev.index;
+  if (ev.kind === 'click') return 'klik' + (ev.detail >= 2 ? ' x' + ev.detail + ' (double tap)' : '') +
+                                  '  butang ' + ev.button;
+  if (ev.kind === 'pointerdown') return 'penunjuk turun  jenis ' + (ev.ptype || '-') + '  butang ' + ev.button;
+  if (ev.kind === 'contextmenu') return 'tekan lama / klik kanan';
+  if (ev.kind === 'auxclick') return 'klik tengah atau sisi  butang ' + ev.button;
+  if (ev.kind === 'touchstart') return 'sentuhan';
+  return ev.kind;
+}
+
 /* Padankan calon dengan bacaan yang meter papar sendiri.
    Toleransi 5 mm, kerana itu lebih ketat daripada mana-mana meter murah. */
 function hlMatch(cands, expect){
@@ -348,24 +399,37 @@ function uuidName(u){
 /* ======================================================================
    PANEL: PERSEKITARAN
    ====================================================================== */
+/* Chrome membekukan versi Android dalam User-Agent kepada "10" untuk SETIAP
+   peranti sejak Chrome 110 (2023), dan menukar nama model kepada "K". Membaca
+   nombor itu memberi penggera palsu pada telefon moden, jadi versi sebenar
+   mesti datang daripada Client Hints, yang tak segerak. */
+function envPlatform(){
+  var uad = navigator.userAgentData;
+  if (!uad || !uad.getHighEntropyValues) return Promise.resolve(null);
+  return uad.getHighEntropyValues(['platformVersion','model'])
+    .then(function(v){ return v || null; })
+    .catch(function(){ return null; });
+}
+
 function envFacts(){
   var ua = navigator.userAgent || '';
-  var and = (ua.match(/Android\s+([\d.]+)/) || [])[1] || null;
+  var isAndroid = /Android/i.test(ua);
   var chr = (ua.match(/Chrome\/([\d.]+)/) || [])[1] || null;
-  var andMajor = and ? parseInt(and, 10) : 0;
-  var isFile = location.protocol === 'file:';
-  var secure = !!window.isSecureContext;
+  var real = HL.platVer && HL.platVer.platformVersion
+    ? parseInt(HL.platVer.platformVersion, 10) : null;
   return {
     origin: location.origin && location.origin !== 'null' ? location.origin : location.protocol,
     href: location.href,
-    isFile: isFile,
-    secure: secure,
+    isFile: location.protocol === 'file:',
+    secure: !!window.isSecureContext,
     ble: !!(navigator.bluetooth && navigator.bluetooth.requestDevice),
     cam: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
     pad: !!navigator.getGamepads,
     xr: !!navigator.xr,
-    android: and,
-    androidMajor: andMajor,
+    isAndroid: isAndroid,
+    androidReal: (real || real === 0) ? real : null,
+    model: (HL.platVer && HL.platVer.model) || null,
+    hints: !!(navigator.userAgentData && navigator.userAgentData.getHighEntropyValues),
     chrome: chr,
     ua: ua
   };
@@ -400,13 +464,21 @@ function renderEnv(){
     f.pad ? 'Tersedia. Remote yang menyamar sebagai pad permainan akan dikesan.'
           : 'Tiada. Remote jenis papan kekunci masih berfungsi.');
 
-  var andState = !f.android ? 'warn' : (f.androidMajor >= 14 ? 'ok' : 'bad');
-  rows += row(andState, 'Android ' + (f.android || 'tidak dikenali'),
-    !f.android
-      ? 'Bukan Android. Endoskop USB tidak akan muncul.'
-      : (f.androidMajor >= 14
-          ? 'Android 14 ke atas, jadi kamera USB-C (endoskop UVC) boleh muncul dalam senarai kamera.'
-          : 'Di bawah Android 14. Endoskop USB <b>tidak</b> akan muncul dalam pelayar, walaupun ia UVC.'));
+  if (!f.isAndroid){
+    rows += row('warn', 'Bukan Android', 'Endoskop USB tidak akan muncul pada platform ini.');
+  } else if (f.androidReal == null){
+    rows += row('warn', 'Versi Android tidak dapat disahkan',
+      'Chrome membekukan versi Android dalam User-Agent kepada <b>10</b> untuk setiap peranti, ' +
+      'jadi nombor itu tidak bermakna apa-apa. Pelayar ini tidak memberi versi sebenar melalui ' +
+      'Client Hints, jadi semak sendiri di Tetapan › Tentang telefon. Endoskop USB perlukan Android 14.');
+  } else {
+    rows += row(f.androidReal >= 14 ? 'ok' : 'bad',
+      'Android ' + f.androidReal + (f.model ? ' · ' + esc(f.model) : ''),
+      f.androidReal >= 14
+        ? 'Android 14 ke atas, jadi kamera USB-C (endoskop UVC) boleh muncul dalam senarai kamera.'
+        : 'Di bawah Android 14. Endoskop USB <b>tidak</b> akan muncul dalam pelayar, walaupun ia UVC. ' +
+          '(Angka ini daripada Client Hints, bukan User-Agent, jadi ia versi sebenar.)');
+  }
 
   rows += row('ok', 'Pelayar',
     (f.chrome ? 'Chrome ' + f.chrome : 'Bukan Chrome') + ' · <code>' + esc(f.origin) + '</code>');
@@ -445,34 +517,107 @@ function renderRemote(){
   return '' +
     '<div class="card"><div class="card-h"><h2>Tekan apa-apa butang</h2><span id="rmCount">0</span></div>' +
     '<div class="card-b">' +
-      '<div class="stage" id="rmStage"><div class="stage-idle">Menunggu tekanan…<br>Pair remote dalam Tetapan Bluetooth dahulu.</div></div>' +
-      '<div class="note warn"><b>Butang volume tidak akan muncul.</b> Android menelannya sebelum sampai ke halaman web. ' +
-        'Kebanyakan remote shutter murah menghantar volume pada butang kameranya — tiada kod yang boleh membetulkan itu.</div>' +
-      '<div class="btn-row"><button class="btn" id="rmClear" type="button">Kosongkan</button></div>' +
+      '<div class="stage" id="rmStage" tabindex="0">' +
+        '<div class="stage-idle">Menunggu isyarat…<br>Ketik kotak ini sekali dahulu, kemudian tekan remote.</div></div>' +
+      '<div id="rmFocus"></div>' +
+      '<div class="note"><b>Ini mendengar segalanya.</b> Kekunci, roda tatal, klik, double tap, ' +
+        'tekan lama dan gamepad. Banyak remote menyamar sebagai penunjuk, bukan papan kekunci — ' +
+        'anak panahnya menatal dan +/− menghantar ctrl+roda, yang sebabnya Chrome zum.</div>' +
+      '<div class="note warn"><b>Butang yang langsung tiada kesan di sini menghantar kod media.</b> ' +
+        'Volume dan shutter pergi terus ke Android dan tidak pernah sampai ke halaman web. ' +
+        'Butang itu sahaja yang tidak boleh dipakai, dan tiada kod boleh membetulkannya.</div>' +
+      '<div class="btn-row">' +
+        '<button class="btn" id="rmClear" type="button">Kosongkan</button>' +
+        '<button class="btn" id="rmLock" type="button">Tahan zum: hidup</button>' +
+      '</div>' +
     '</div></div>' +
 
-    '<div class="card"><div class="card-h"><h2>Peta butang</h2><span id="rmMapN">0 kekunci</span></div>' +
+    '<div class="card"><div class="card-h"><h2>Peta butang</h2><span id="rmMapN">0 isyarat</span></div>' +
     '<div class="card-b"><div class="tbl-wrap"><table class="map" id="rmMap"><tbody>' +
-      '<tr><td class="log-empty" colspan="4">Belum ada kekunci direkod.</td></tr>' +
+      '<tr><td class="log-empty" colspan="4">Belum ada isyarat direkod.</td></tr>' +
     '</tbody></table></div></div></div>' +
 
     '<div class="card"><div class="card-h"><h2>Log mentah</h2></div>' +
     '<div class="card-b"><div class="log" id="rmLog"><div class="log-empty">Kosong</div></div></div></div>';
 }
 
+function rmRecord(ev){
+  ev.t = clock();
+  ev.sig = hlSig(ev);
+  ev.usable = hlUsableEv(ev);
+  ev.what = hlWhat(ev);
+  if (!HL.map[ev.sig]) HL.map[ev.sig] = { sig:ev.sig, what:ev.what, count:0, usable:ev.usable };
+  HL.map[ev.sig].count++;
+  HL.map[ev.sig].what = ev.what;
+  HL.keys.push(ev);
+  if (HL.keys.length > 200) HL.keys.shift();
+  rmPaint(ev);
+}
+
 function rmWire(){
-  HL.onKey = function(e){
-    var usable = hlUsable(e.code, e.key);
-    var id = e.code || e.key || ('kc' + e.keyCode);
-    if (!HL.map[id]) HL.map[id] = { key:e.key, code:e.code, keyCode:e.keyCode, count:0, usable:usable };
-    HL.map[id].count++;
-    HL.keys.push({ t:clock(), key:e.key, code:e.code, keyCode:e.keyCode, repeat:e.repeat, usable:usable });
-    if (HL.keys.length > 200) HL.keys.shift();
-    // Elak halaman menatal bila anak panah ditekan.
-    if (/^(Arrow|Space|PageUp|PageDown|Home|End)/.test(e.code || '')) e.preventDefault();
-    rmPaint(e);
+  HL.lock = (HL.lock === undefined) ? true : HL.lock;
+  HL.off = [];
+  var on = function(target, type, fn, opts){
+    target.addEventListener(type, fn, opts);
+    HL.off.push(function(){ target.removeEventListener(type, fn, opts); });
   };
-  document.addEventListener('keydown', HL.onKey);
+
+  on(document, 'keydown', function(e){
+    // Hentikan tatalan supaya panel tidak melompat di bawah jari pengguna.
+    if (HL.lock && /^(Arrow|Space|PageUp|PageDown|Home|End)/.test(e.code || '')) e.preventDefault();
+    rmRecord({ kind:'key', key:e.key, code:e.code, keyCode:e.keyCode, repeat:e.repeat });
+  });
+
+  // passive:false diperlukan, kalau tidak preventDefault diabaikan dan
+  // ctrl+roda akan menzum halaman sehingga tidak boleh dibaca.
+  on(document, 'wheel', function(e){
+    if (HL.lock) e.preventDefault();
+    rmRecord({ kind:'wheel', dx:e.deltaX, dy:e.deltaY, mode:e.deltaMode, ctrl:e.ctrlKey });
+  }, { passive:false });
+
+  // Mengetik tab atau butang tema bukan isyarat remote. Tanpa tapisan ini,
+  // bertukar ke panel ini merekod klik hantu sebaik ia dibuka.
+  var chrome_ = function(e){
+    return !!(e.target && e.target.closest && e.target.closest('.top'));
+  };
+
+  on(document, 'click', function(e){
+    if (chrome_(e)) return;
+    rmRecord({ kind:'click', button:e.button, detail:e.detail });
+  });
+  on(document, 'auxclick', function(e){
+    if (chrome_(e)) return;
+    rmRecord({ kind:'auxclick', button:e.button });
+  });
+  on(document, 'contextmenu', function(e){
+    if (chrome_(e)) return;
+    if (HL.lock) e.preventDefault();
+    rmRecord({ kind:'contextmenu' });
+  });
+  on(document, 'pointerdown', function(e){
+    if (chrome_(e)) return;
+    rmRecord({ kind:'pointerdown', button:e.button, ptype:e.pointerType });
+  });
+  on(document, 'touchstart', function(e){
+    if (chrome_(e)) return;
+    rmRecord({ kind:'touchstart' });
+  }, { passive:true });
+
+  var paintFocus = function(){
+    var box = $('rmFocus'); if (!box) return;
+    var has = document.hasFocus();
+    box.innerHTML = '<div class="chk" style="border-top:0;padding-top:0">' +
+      '<div class="chk-dot ' + (has ? 'ok' : 'bad') + '">' + (has ? '✓' : '✗') + '</div>' +
+      '<div class="chk-t"><b>' + (has ? 'Halaman ini pegang fokus' : 'Halaman ini TIDAK pegang fokus') + '</b>' +
+      '<span>' + (has
+        ? 'Tekanan papan kekunci akan sampai ke sini.'
+        : 'Kekunci pergi ke tempat lain — mungkin bar alamat Chrome. Ketik kotak di atas sekali.') +
+      '</span></div></div>';
+  };
+  on(window, 'focus', paintFocus);
+  on(window, 'blur', paintFocus);
+  on(document, 'visibilitychange', paintFocus);
+  paintFocus();
 
   var tick = function(){
     if (HL.tab !== 'remote') { HL.padRaf = 0; return; }
@@ -481,24 +626,27 @@ function rmWire(){
       var p = pads[i];
       if (!p) continue;
       for (var b=0;b<p.buttons.length;b++){
-        var on = p.buttons[b].pressed, k = i + ':' + b;
-        if (on && !HL.padSeen[k]){
-          var id = 'Gamepad' + b;
-          if (!HL.map[id]) HL.map[id] = { key:'(gamepad)', code:id, keyCode:b, count:0, usable:'yes' };
-          HL.map[id].count++;
-          HL.keys.push({ t:clock(), key:'(gamepad '+(p.id||'')+')', code:id, keyCode:b, repeat:false, usable:'yes' });
-          rmPaint({ key:'Gamepad '+b, code:id, keyCode:b });
-        }
-        HL.padSeen[k] = on;
+        var pressed = p.buttons[b].pressed, k = i + ':' + b;
+        if (pressed && !HL.padSeen[k]) rmRecord({ kind:'pad', index:b, pad:p.id || '' });
+        HL.padSeen[k] = pressed;
       }
     }
     HL.padRaf = requestAnimationFrame(tick);
   };
   if (!HL.padRaf) tick();
 
-  $('rmClear').addEventListener('click', function(){
+  $('rmClear').addEventListener('click', function(e){
+    e.stopPropagation();
     HL.keys = []; HL.map = {}; rmPaint(null);
   });
+  $('rmLock').addEventListener('click', function(e){
+    e.stopPropagation();
+    HL.lock = !HL.lock;
+    $('rmLock').textContent = 'Tahan zum: ' + (HL.lock ? 'hidup' : 'mati');
+  });
+  $('rmLock').textContent = 'Tahan zum: ' + (HL.lock ? 'hidup' : 'mati');
+  // Tuntut fokus supaya kekunci sampai tanpa pengguna perlu meneka.
+  var st = $('rmStage'); if (st && st.focus) { try { st.focus({ preventScroll:true }); } catch (err) { st.focus(); } }
   rmPaint(null);
 }
 
@@ -507,36 +655,36 @@ function rmPaint(e){
   if (!stage) return;
   // Bila panel dibina semula, pulihkan tekanan terakhir. Tanpa ini, satu
   // render semula memadam bacaan yang baru saja diambil oleh pengguna.
-  if (!e && HL.keys.length){
-    var last = HL.keys[HL.keys.length - 1];
-    e = { key:last.key, code:last.code, keyCode:last.keyCode };
-  }
+  // Rekod penuh, bukan salinan separa: hlSig bergantung pada ev.kind, dan
+  // objek yang dipangkas memberi pentas kosong bersempadan hidup.
+  if (!e && HL.keys.length) e = HL.keys[HL.keys.length - 1];
   if (e){
     stage.classList.add('live');
     stage.innerHTML =
-      '<div><div class="stage-k">' + esc(e.key === ' ' ? 'Space' : e.key) + '</div>' +
-      '<div class="stage-s">code ' + esc(e.code || '—') + ' · keyCode ' + esc(e.keyCode) + '</div></div>';
+      '<div><div class="stage-k">' + esc(hlSig(e)) + '</div>' +
+      '<div class="stage-s">' + esc(hlWhat(e)) + '</div></div>';
   } else {
     stage.classList.remove('live');
-    stage.innerHTML = '<div class="stage-idle">Menunggu tekanan…<br>Pair remote dalam Tetapan Bluetooth dahulu.</div>';
+    stage.innerHTML = '<div class="stage-idle">Menunggu isyarat…<br>' +
+      'Ketik kotak ini sekali dahulu, kemudian tekan remote.</div>';
   }
-  var n = $('rmCount'); if (n) n.textContent = HL.keys.length + ' tekanan';
+  var n = $('rmCount'); if (n) n.textContent = HL.keys.length + ' isyarat';
 
   var ids = Object.keys(HL.map);
-  var mn = $('rmMapN'); if (mn) mn.textContent = ids.length + ' kekunci';
+  var mn = $('rmMapN'); if (mn) mn.textContent = ids.length + ' isyarat unik';
   var tb = $('rmMap') && $('rmMap').querySelector('tbody');
   if (tb){
     tb.innerHTML = ids.length
-      ? ('<tr><th>Kekunci</th><th>Code</th><th>Kali</th><th>Pakai?</th></tr>' + ids.map(function(id){
+      ? ('<tr><th>Isyarat</th><th>Butiran</th><th>Kali</th><th>Pakai?</th></tr>' + ids.map(function(id){
           var m = HL.map[id];
           var pill = m.usable === 'yes' ? '<span class="pill ok">boleh</span>'
                    : m.usable === 'no'  ? '<span class="pill bad">tidak</span>'
                                         : '<span class="pill warn">mungkin</span>';
-          return '<tr><td class="mk">' + esc(m.key === ' ' ? 'Space' : m.key) + '</td>' +
-                 '<td>' + esc(m.code || '—') + '</td>' +
+          return '<tr><td class="mk">' + esc(m.sig) + '</td>' +
+                 '<td>' + esc(m.what) + '</td>' +
                  '<td>' + m.count + '</td><td>' + pill + '</td></tr>';
         }).join(''))
-      : '<tr><td class="log-empty" colspan="4">Belum ada kekunci direkod.</td></tr>';
+      : '<tr><td class="log-empty" colspan="4">Belum ada isyarat direkod.</td></tr>';
   }
 
   var lg = $('rmLog');
@@ -545,15 +693,15 @@ function rmPaint(e){
       ? HL.keys.slice().reverse().map(function(r){
           var cls = r.usable === 'yes' ? 'ok' : r.usable === 'no' ? 'bad' : 'warn';
           return '<div class="log-r ' + cls + '"><div class="log-t">' + r.t + '</div>' +
-                 '<div class="log-m">key "' + esc(r.key) + '"  code ' + esc(r.code || '-') +
-                 '  keyCode ' + esc(r.keyCode) + (r.repeat ? '  (ulang)' : '') + '</div></div>';
+                 '<div class="log-m">' + esc(r.sig) + '   ' + esc(r.what) +
+                 (r.repeat ? '  (ulang)' : '') + '</div></div>';
         }).join('')
       : '<div class="log-empty">Kosong</div>';
   }
 }
 
 function rmUnwire(){
-  if (HL.onKey){ document.removeEventListener('keydown', HL.onKey); HL.onKey = null; }
+  if (HL.off){ HL.off.forEach(function(f){ f(); }); HL.off = null; }
   if (HL.padRaf){ cancelAnimationFrame(HL.padRaf); HL.padRaf = 0; }
 }
 
@@ -902,18 +1050,20 @@ function buildReport(){
   L.push('Bluetooth : ' + (f.ble ? 'ada' : 'TIADA'));
   L.push('Kamera    : ' + (f.cam ? 'ada' : 'TIADA'));
   L.push('Gamepad   : ' + (f.pad ? 'ada' : 'tiada'));
-  L.push('Android   : ' + (f.android || '-'));
+  L.push('Android   : ' + (f.isAndroid
+    ? (f.androidReal != null ? f.androidReal + ' (Client Hints)' : 'tidak disahkan — UA beku pada 10')
+    : 'bukan Android'));
+  L.push('Model     : ' + (f.model || '-'));
   L.push('Chrome    : ' + (f.chrome || '-'));
   L.push('UA        : ' + f.ua);
   L.push('');
 
-  L.push('[REMOTE] ' + Object.keys(HL.map).length + ' kekunci unik, ' + HL.keys.length + ' tekanan');
+  L.push('[REMOTE] ' + Object.keys(HL.map).length + ' isyarat unik, ' + HL.keys.length + ' jumlah');
   Object.keys(HL.map).forEach(function(id){
     var m = HL.map[id];
-    L.push('  key="' + m.key + '"  code=' + (m.code||'-') + '  keyCode=' + m.keyCode +
-           '  x' + m.count + '  pakai=' + m.usable);
+    L.push('  ' + m.sig + '   x' + m.count + '   pakai=' + m.usable + '   ' + m.what);
   });
-  if (!Object.keys(HL.map).length) L.push('  (tiada)');
+  if (!Object.keys(HL.map).length) L.push('  (tiada — semua butang mungkin menghantar kod media)');
   L.push('');
 
   L.push('[BLE] peranti: ' + (HL.dev ? (HL.dev.name || 'tanpa nama') : 'tiada'));
@@ -1018,9 +1168,18 @@ $('themeBtn').addEventListener('click', function(){
 $('brandSub').textContent = 'GoXpert Pocket · ' + (location.protocol === 'file:' ? 'fail tempatan' : location.host || 'tempatan');
 show('env');
 
+// Versi Android sebenar tiba lewat. Paparkan semula bila ia sampai, supaya
+// panel tidak terus menunjukkan nombor beku itu.
+envPlatform().then(function(v){
+  if (!v) return;
+  HL.platVer = v;
+  if (HL.tab === 'env') show('env');
+});
+
 // Didedahkan supaya ujian unit boleh memanggilnya tanpa DOM.
 if (typeof module !== 'undefined' && module.exports){
-  module.exports = { hlBosch:hlBosch, hlDecode:hlDecode, hlUsable:hlUsable, hlMatch:hlMatch, hlAscii:hlAscii };
+  module.exports = { hlBosch:hlBosch, hlDecode:hlDecode, hlUsable:hlUsable, hlMatch:hlMatch,
+    hlAscii:hlAscii, hlWheelDir:hlWheelDir, hlSig:hlSig, hlUsableEv:hlUsableEv, hlWhat:hlWhat };
 }
 </script>
 </body>
