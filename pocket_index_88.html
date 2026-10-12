@@ -8524,13 +8524,54 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .fp-segb small{display:block;font-size:10.5px;font-weight:600;color:var(--muted);margin-top:2px;line-height:1.3}
 .fp-segb.on small{color:var(--accent)}
 
+/* Rambut silang, bukan bulatan.
+   Titik yang ditanda mesti kelihatan, dan satu cakera pepejal menyembunyikan
+   tepat tempat yang cuba dikenakan. Lengan memanjang keluar dari bawah jari
+   supaya ia boleh dijajarkan dengan garis pada pelan, dan titik tengah 5px
+   itulah koordinat sebenar. */
 .fp-pin{
   position:absolute;transform:translate(-50%,-50%);z-index:5;
-  width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
-  background:var(--accent);color:#fff;border:2px solid #fff;box-shadow:var(--shadow-2);
+  width:54px;height:54px;touch-action:none;cursor:grab;
 }
-.fp-pin b{font-family:var(--font-mono);font-size:12px;font-weight:700}
-.fp-pin-b{background:var(--warning)}
+.fp-pin::before,.fp-pin::after{
+  content:'';position:absolute;background:var(--accent);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.95);
+}
+.fp-pin::before{left:0;right:0;top:50%;height:1px;margin-top:-.5px}
+.fp-pin::after{top:0;bottom:0;left:50%;width:1px;margin-left:-.5px}
+.fp-pin i{
+  position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;
+  border-radius:50%;background:var(--accent);box-shadow:0 0 0 1.5px #fff;
+}
+.fp-pin b{
+  position:absolute;left:calc(50% + 9px);top:calc(50% - 25px);
+  font-family:var(--font-mono);font-size:10.5px;font-weight:700;line-height:1.5;
+  color:#fff;background:var(--accent);border-radius:5px;padding:0 5px;
+}
+.fp-pin.sel::before,.fp-pin.sel::after{height:1.5px;width:auto}
+.fp-pin.sel::after{width:1.5px;height:auto}
+.fp-pin.sel i{width:7px;height:7px;margin:-3.5px 0 0 -3.5px}
+.fp-pin-b::before,.fp-pin-b::after,.fp-pin-b i,.fp-pin-b b{background:var(--warning)}
+
+/* Laras halus: satu piksel pelan setiap ketikan. Jari tidak boleh lebih
+   tepat daripada kira-kira 5px, dan pelan yang salah jajar di sini menjadi
+   ralat sebenar di tapak. */
+.fp-nudge{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0 2px}
+.fp-nudge-pad{display:grid;grid-template-columns:repeat(3,30px);grid-template-rows:repeat(3,30px);gap:2px}
+.fp-nb{
+  border:1px solid var(--line);background:var(--bg-2);color:var(--fg);
+  border-radius:7px;font-size:14px;line-height:1;display:grid;place-items:center;
+}
+.fp-nb:active{background:var(--accent);color:var(--accent-fg)}
+.fp-nb.blank{border:none;background:none}
+.fp-xy{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);min-width:98px}
+.fp-xy b{display:block;color:var(--fg);font-size:12.5px}
+.fp-which{display:flex;gap:6px;padding-bottom:4px;justify-content:center}
+.fp-wb{
+  padding:5px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--bg-2);color:var(--fg);font-size:12px;font-weight:700;
+}
+.fp-wb.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 
 /* --- lapisan dalam AR --- */
 .fp-ctrl{
@@ -9315,7 +9356,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.0 · build 12 Okt 2026 · Muat naik pelan melalui pemilih app</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.1 · build 12 Okt 2026 · Pin pelan: rambut silang dan laras halus</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -17009,20 +17050,97 @@ function fpScreenTag() {
     '<p class="fp-hint" id="fpTagHint"></p>' +
     '<div class="ip-plan" id="fpBox"><div class="ip-stage" id="fpStage">' +
       '<img src="' + escapeHTML(FP.plan.src) + '" alt="">' +
-      '<div class="fp-pin fp-pin-a" id="fpPinA" style="display:none"><b>1</b></div>' +
-      (two ? '<div class="fp-pin fp-pin-b" id="fpPinB" style="display:none"><b>2</b></div>' : '') +
+      '<div class="fp-pin fp-pin-a" id="fpPinA" style="display:none"><i></i><b>1</b></div>' +
+      (two ? '<div class="fp-pin fp-pin-b" id="fpPinB" style="display:none"><i></i><b>2</b></div>' : '') +
     '</div>' + ipZoomBar() + '</div>' +
-    '<p class="fp-hint">Zum dahulu, kemudian ketik — semakin tepat pin ini, semakin tepat pelan itu duduk di tapak.</p>';
+    (two ? '<div class="fp-which" id="fpWhich">' +
+      '<button class="fp-wb" data-fpsel="a">Titik 1</button>' +
+      '<button class="fp-wb" data-fpsel="b">Titik 2</button></div>' : '') +
+    '<div class="fp-nudge">' +
+      '<div class="fp-xy" id="fpXY"></div>' +
+      '<div class="fp-nudge-pad">' +
+        '<span class="fp-nb blank"></span>' +
+        '<button class="fp-nb" data-fpn="u">↑</button>' +
+        '<span class="fp-nb blank"></span>' +
+        '<button class="fp-nb" data-fpn="l">←</button>' +
+        '<span class="fp-nb blank"></span>' +
+        '<button class="fp-nb" data-fpn="r">→</button>' +
+        '<span class="fp-nb blank"></span>' +
+        '<button class="fp-nb" data-fpn="d">↓</button>' +
+        '<span class="fp-nb blank"></span>' +
+      '</div>' +
+    '</div>' +
+    '<p class="fp-hint">Zum dahulu, kemudian ketik. Seret pin itu untuk melaraskannya, atau guna anak panah — setiap ketikan menggerakkannya satu piksel pelan.</p>';
   foot.innerHTML = '<button class="tool-btn tool-btn-secondary" id="fpBack">Kembali</button>' +
     '<button class="tool-btn tool-btn-primary" id="fpGoAr" disabled>Ke AR →</button>';
   document.getElementById('fpBack').onclick = fpScreenPick;
   document.getElementById('fpGoAr').onclick = function() { fpStartAr(); };
   ipZBind('fpBox', 'fpStage', 'fpplan:' + (FP.plan.id || 'upload'), function(pu, pv) {
-    if (!FP.a) FP.a = { pu: pu, pv: pv };
-    else if (two && !FP.b) FP.b = { pu: pu, pv: pv };
-    else { FP.a = { pu: pu, pv: pv }; FP.b = null; }
+    if (!FP.a) { FP.a = { pu: pu, pv: pv }; FP.sel = 'a'; }
+    else if (two && !FP.b) { FP.b = { pu: pu, pv: pv }; FP.sel = 'b'; }
+    else { FP.a = { pu: pu, pv: pv }; FP.b = null; FP.sel = 'a'; }
     fpPaintPins();
   });
+
+  fpDragPin('fpPinA', 'a');
+  if (two) fpDragPin('fpPinB', 'b');
+
+  body.querySelectorAll('[data-fpn]').forEach(function(b2) {
+    b2.addEventListener('click', function() { fpNudge(b2.dataset.fpn); });
+  });
+  body.querySelectorAll('[data-fpsel]').forEach(function(b2) {
+    b2.addEventListener('click', function() { FP.sel = b2.dataset.fpsel; fpPaintPins(); });
+  });
+  fpPaintPins();
+}
+
+/** Seret pin itu sendiri. Mengetik semula akan meletakkan titik baharu;
+ *  melaraskan yang sedia ada memerlukan gerakan yang tidak dikira ketikan,
+ *  jadi pin menangkap penunjuknya sendiri dan menghalang zum daripada
+ *  melihatnya. */
+function fpDragPin(id, which) {
+  const el = document.getElementById(id);
+  const stage = document.getElementById('fpStage');
+  if (!el || !stage) return;
+  let on = false;
+  el.addEventListener('pointerdown', function(e) {
+    e.stopPropagation(); e.preventDefault();
+    on = true; FP.sel = which;
+    el.setPointerCapture(e.pointerId);
+    el.style.cursor = 'grabbing';
+    fpPaintPins();
+  });
+  el.addEventListener('pointermove', function(e) {
+    if (!on) return;
+    e.stopPropagation(); e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const pu = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100));
+    const pv = Math.max(0, Math.min(100, (e.clientY - r.top) / r.height * 100));
+    FP[which] = { pu: pu, pv: pv };
+    fpPaintPins();
+  });
+  const up = function(e) {
+    if (!on) return;
+    on = false; el.style.cursor = 'grab';
+    try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+  };
+  el.addEventListener('pointerup', up);
+  el.addEventListener('pointercancel', up);
+}
+
+/** Satu piksel pelan setiap ketikan, tidak kira zum. Pada pelan 2500px
+ *  lebar itu 0.04% — lebih halus daripada yang jari boleh capai. */
+function fpNudge(dir) {
+  const which = FP.sel || 'a';
+  const p = FP[which];
+  if (!p || !FP.plan) { showToast('Ketik pada pelan dahulu'); return; }
+  const du = 100 / Math.max(1, FP.plan.W);
+  const dv = 100 / Math.max(1, FP.plan.H);
+  if (dir === 'l') p.pu = Math.max(0, p.pu - du);
+  if (dir === 'r') p.pu = Math.min(100, p.pu + du);
+  if (dir === 'u') p.pv = Math.max(0, p.pv - dv);
+  if (dir === 'd') p.pv = Math.min(100, p.pv + dv);
   fpPaintPins();
 }
 function fpPaintPins() {
@@ -17030,6 +17148,24 @@ function fpPaintPins() {
   const A = document.getElementById('fpPinA'), B = document.getElementById('fpPinB');
   if (A) { A.style.display = FP.a ? 'block' : 'none'; if (FP.a) { A.style.left = FP.a.pu + '%'; A.style.top = FP.a.pv + '%'; } }
   if (B) { B.style.display = FP.b ? 'block' : 'none'; if (FP.b) { B.style.left = FP.b.pu + '%'; B.style.top = FP.b.pv + '%'; } }
+  if (!FP.sel || !FP[FP.sel]) FP.sel = FP.a ? 'a' : null;
+  if (A) A.classList.toggle('sel', FP.sel === 'a');
+  if (B) B.classList.toggle('sel', FP.sel === 'b');
+  document.querySelectorAll('[data-fpsel]').forEach(function(w) {
+    w.classList.toggle('on', w.dataset.fpsel === FP.sel);
+    w.disabled = !FP[w.dataset.fpsel];
+  });
+
+  // Koordinat sebenar, dalam piksel pelan. Peratusan tidak bermakna apa-apa
+  // kepada surveyor; piksel boleh disemak terhadap pelan itu sendiri.
+  const xy = document.getElementById('fpXY');
+  if (xy) {
+    const sel = FP.sel && FP[FP.sel];
+    xy.innerHTML = sel
+      ? '<b>' + Math.round(sel.pu * FP.plan.W / 100) + ', ' + Math.round(sel.pv * FP.plan.H / 100) + ' px</b>' +
+        'Titik ' + (FP.sel === 'b' ? '2' : '1') + ' \u00b7 pelan ' + FP.plan.W + '\u00d7' + FP.plan.H
+      : '<b>\u2014</b>Ketik pada pelan';
+  }
   const hint = document.getElementById('fpTagHint');
   const go = document.getElementById('fpGoAr');
   const ready = two ? !!(FP.a && FP.b) : !!FP.a;
@@ -17052,7 +17188,24 @@ function fpPaintPins() {
 // ---------- 4. SESI AR ----------
 async function fpStartAr() {
   const btn = document.getElementById('fpGoAr');
-  if (btn) { btn.disabled = true; btn.textContent = 'Memuatkan…'; }
+
+  // Semak DAHULU, sebelum memuatkan apa-apa. Tanpa ini butang itu berkata
+  // "Memuatkan…", menarik pustaka 3D sebanyak beberapa ratus kilobait, dan
+  // kemudian gagal pada requestSession yang tidak wujud — yang kelihatan
+  // seperti butang yang rosak dan bukan ciri yang tiada.
+  if (!window.isSecureContext || !navigator.xr) {
+    showToast(window.PocketNative
+      ? 'Hamparan AR perlukan Chrome \u2014 buka Pocket di sana untuk langkah ini'
+      : 'Pelayar ini tiada WebXR', 'error');
+    const st2 = document.getElementById('fpStatus');
+    if (st2) { st2.className = 'ar-status warn'; }
+    return;
+  }
+  let okAr = false;
+  try { okAr = await navigator.xr.isSessionSupported('immersive-ar'); } catch (e) {}
+  if (!okAr) { showToast('Telefon ini tidak menyokong AR', 'error'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Memuatkan\u2026'; }
   try { await loadThree(); }
   catch (e) { showToast('Gagal memuatkan pustaka 3D'); if (btn) { btn.disabled = false; btn.textContent = 'Ke AR →'; } return; }
   const THREE = window.THREE;
