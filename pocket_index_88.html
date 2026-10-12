@@ -9426,7 +9426,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.6 · build 12 Okt 2026 · Model 3D dalam AR, potong atas dan bawah</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.7 · build 12 Okt 2026 · Model 3D tanpa job, three.js dalam app</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -16215,15 +16215,42 @@ document.querySelectorAll('.fab-option').forEach(function(opt) {
 // =======================================================
 let _threeLoading = null;
 
+// Salinan dalam app dahulu, CDN kemudian.
+//
+// Di tapak, telefon pada "SOS only" tidak dapat memuatkan GLTFLoader dari
+// cdnjs — jadi model tidak boleh dibuka, jadi titik tidak boleh ditanda,
+// jadi AR tidak boleh dimasuki langsung, walaupun skrin AR app itu sendiri
+// tidak perlukan rangkaian sama sekali. APK membungkus three.js dan
+// menghidangkannya dari /lib/ pada asal yang sama.
+//
+// Tiada semakan "adakah kita dalam app": laluan pertama cuma 404 di luar
+// APK dan kita jatuh ke CDN. Satu peraturan, dua tempat, tiada cabang.
+const PK_LIB = ['/lib/', 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/'];
+
+function pkScript(rel) {
+  return new Promise(function(resolve, reject) {
+    let i = 0;
+    const next = function() {
+      if (i >= PK_LIB.length) {
+        reject(new Error('Tiada sambungan untuk memuatkan ' + rel.split('/').pop()));
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = PK_LIB[i++] + rel;
+      s.onload = function() { resolve(); };
+      s.onerror = function() { s.remove(); next(); };
+      document.head.appendChild(s);
+    };
+    next();
+  });
+}
+
 function loadThree() {
   if (window.THREE) return Promise.resolve();
   if (_threeLoading) return _threeLoading;
-  _threeLoading = new Promise(function(resolve, reject) {
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-    s.onload = function() { resolve(); };
-    s.onerror = function() { _threeLoading = null; reject(new Error('Failed to load 3D library')); };
-    document.head.appendChild(s);
+  _threeLoading = pkScript('three.min.js').catch(function(e) {
+    _threeLoading = null;
+    throw e;
   });
   return _threeLoading;
 }
@@ -33225,7 +33252,8 @@ try { msWire(); } catch (e) { console.warn('[Messages wire]', e.message); }
 // Matematik jajaran diasingkan sebagai fungsi tulen supaya boleh diuji
 // tanpa telefon dan tanpa WebGL.
 
-const MD_FIELD = 'models';          // medan tatasusunan pada dokumen inspection
+const MD_FIELD = 'models';          // medan lama pada dokumen inspection
+const MD_STORE = 'pocket_models_v1';   // senarai model, telefon ini
 const MD_MAXTRI = 900000;           // di atas ini, telefon pertengahan tercungap
 const MD_WARNTRI = 500000;
 
@@ -33346,24 +33374,16 @@ let _mdThree = null, _mdGltf = null, _mdUsdz = null;
 const MD_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/';
 const MD_JSD = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/';
 
-function mdScript(src) {
-  return new Promise(function(res, rej) {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = function() { res(); };
-    s.onerror = function() { rej(new Error('Tiada sambungan untuk memuatkan ' + src.split('/').pop())); };
-    document.head.appendChild(s);
-  });
-}
+function mdScript(rel) { return pkScript(rel); }
 // GLTFLoader ialah skrip klasik yang melekat pada THREE global, sama
 // seperti three.min.js yang app ini sudah guna — tiada modul bercampur.
 function mdLoadGltf() {
   if (_mdGltf) return _mdGltf;
   _mdGltf = (async function() {
     await loadThree();
-    if (!window.THREE.GLTFLoader) await mdScript(MD_CDN + 'loaders/GLTFLoader.js');
+    if (!window.THREE.GLTFLoader) await mdScript('loaders/GLTFLoader.js');
     if (!window.THREE.DRACOLoader) {
-      try { await mdScript(MD_CDN + 'loaders/DRACOLoader.js'); } catch (e) {}
+      try { await mdScript('loaders/DRACOLoader.js'); } catch (e) {}
     }
     if (!window.THREE.GLTFLoader) throw new Error('GLTFLoader tidak dimuatkan');
     return window.THREE.GLTFLoader;
@@ -33376,6 +33396,9 @@ function mdMakeLoader() {
   if (THREE.DRACOLoader) {
     try {
       const d = new THREE.DRACOLoader();
+      // Penyahkod Draco ialah wasm yang tidak dibungkus dalam APK, jadi
+      // model termampat tetap perlukan talian. Ia dikatakan pada skrin
+      // semakan, bukan dibiar gagal senyap di tapak.
       d.setDecoderPath(MD_CDN + 'libs/draco/');
       l.setDRACOLoader(d);
     } catch (e) {}
@@ -33383,19 +33406,37 @@ function mdMakeLoader() {
   return l;
 }
 
+/**
+ * Senarai model hidup dalam TELEFON INI, bukan pada dokumen job.
+ *
+ * Dahulu ia satu medan pada dokumen inspection, yang bermakna alat ini mati
+ * sepenuhnya sehingga satu job dibuka. Lebih teruk: bait GLB sentiasa hanya
+ * dalam telefon, jadi membuka job yang sama pada telefon lain memberi satu
+ * senarai model yang tidak boleh dibuka. Firestore menyimpan janji yang ia
+ * tidak boleh tunaikan.
+ *
+ * Galeri pelan lantai sudah begini sejak awal. Model mengikut.
+ */
 function mdList() {
-  if (typeof IP === 'undefined' || !IP.insp) return [];
-  const a = IP.insp[MD_FIELD];
-  return Array.isArray(a) ? a : [];
+  let rows = [];
+  try { rows = JSON.parse(localStorage.getItem(MD_STORE) || '[]'); } catch (e) {}
+  if (!Array.isArray(rows)) rows = [];
+  // Model yang diimport sebelum perubahan ini hidup pada dokumen job.
+  // Ditarik masuk sekali, supaya tiada sesiapa kehilangan apa yang mereka
+  // sudah ada.
+  if (typeof IP !== 'undefined' && IP.insp && Array.isArray(IP.insp[MD_FIELD])) {
+    let moved = false;
+    IP.insp[MD_FIELD].forEach(function(m) {
+      if (m && m.id && !rows.some(function(x) { return x.id === m.id; })) {
+        rows.push(m); moved = true;
+      }
+    });
+    if (moved) mdSaveList(rows);
+  }
+  return rows;
 }
-// Satu entri kecil pada dokumen inspection yang sedia ada. Tiada
-// koleksi baharu bermakna tiada bacaan baharu bila job dibuka.
 async function mdSaveList(rows) {
-  if (typeof IP === 'undefined' || !IP.id) return;
-  const patch = {};
-  patch[MD_FIELD] = rows;
-  await ipPatch(patch);
-  if (IP.insp) IP.insp[MD_FIELD] = rows;
+  try { localStorage.setItem(MD_STORE, JSON.stringify(rows)); } catch (e) {}
 }
 function mdKey(id) { return 'model:' + id; }
 async function mdHave(id) {
@@ -33492,12 +33533,7 @@ async function mdScreenList() {
   MD.view = 'list';
   const body = document.getElementById('toolModalBody');
   const foot = document.getElementById('toolModalFoot');
-  if (typeof IP === 'undefined' || !IP.id) {
-    body.innerHTML = '<div class="md-empty"><b>Buka satu inspection dahulu</b>Model disimpan pada job, supaya penemuan dan model bercakap tentang bangunan yang sama.</div>';
-    foot.innerHTML = '<button class="tool-btn tool-btn-primary" id="mdClose">Tutup</button>';
-    document.getElementById('mdClose').onclick = closeTool;
-    return;
-  }
+  const hasJob = !(typeof IP === 'undefined' || !IP.id);
   const rows = mdList();
   let h = '<div class="md-disk" id="mdDisk"><div class="md-disk-t"><b>Simpanan telefon</b><span>mengira…</span></div>' +
     '<div class="md-bar"><i style="width:0%;background:var(--accent)"></i></div></div>';
@@ -33514,7 +33550,15 @@ async function mdScreenList() {
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>';
     }).join('') + '</div>';
   }
-  h += '<p class="md-note">Fail tinggal dalam telefon ini. Firestore hanya menyimpan nama, saiz dan unit — lebih kurang 180 bait satu model, pada dokumen job yang sedia ada.</p>';
+  h += '<p class="md-note">Fail dan senarainya tinggal dalam telefon ini. Tiada apa pergi ke Firestore.</p>';
+  if (!hasJob) {
+    // Dikatakan di sini dan bukan ditemui di hujung pusingan AR, selepas
+    // sepuluh sisihan ditanda.
+    h += '<div class="md-chk warn"><div><b>Tiada inspection dibuka</b>' +
+      '<span>Lihat, potong dan jajar semuanya jalan. Hanya tanda sisihan yang ' +
+      'perlukan satu job, kerana satu penemuan milik satu inspection — butang itu ' +
+      'akan kelabu dalam AR.</span></div></div>';
+  }
   body.innerHTML = h;
   foot.innerHTML = '<button class="tool-btn tool-btn-secondary" id="mdAdd">Tambah GLB</button>' +
     '<input type="file" id="mdFile" accept=".glb,model/gltf-binary" hidden>' +
@@ -33627,7 +33671,7 @@ function mdScreenCheck() {
     '<div class="md-kv"><b>Fail</b><span>' + mdFmtBytes(p.file.size) + '</span></div>' +
     '<div class="md-kv"><b>Saiz model</b><span>' + (p.bb.x * u.f).toFixed(1) + ' × ' + (p.bb.z * u.f).toFixed(1) + ' × ' + (p.bb.y * u.f).toFixed(1) + ' m</span></div>' +
     '<div class="md-kv"><b>Unit</b><span>' + escapeHTML(u.k) + (u.f !== 1 ? ' → m (×' + u.f + ')' : '') + '</span></div>' +
-    '<div class="md-kv"><b>Ke Firestore</b><span>~180 bait</span></div>' +
+    '<div class="md-kv"><b>Ke Firestore</b><span>tiada</span></div>' +
     '<div class="md-fld"><label>Nama</label><input id="mdName" value="' + escapeHTML(p.file.name.replace(/\.glb$/i, '')) + '" maxlength="60"></div>';
   body.innerHTML = h;
   body.onclick = function(e) {
@@ -34045,7 +34089,11 @@ async function mdStartArNative() {
     marks: MD.marks.slice(0, need).map(function(v) { return { x: v.x, y: v.y, z: v.z }; }),
     name: (MD.meta && MD.meta.name) || '',
     h: (MD.meta && MD.meta.h) || 3,
-    hide: Object.keys(MD.hidden).filter(function(k) { return MD.hidden[k]; })
+    hide: Object.keys(MD.hidden).filter(function(k) { return MD.hidden[k]; }),
+    // Tanda sisihan menulis satu penemuan, dan satu penemuan milik satu
+    // inspection. Skrin AR mematikan butang itu bila tiada job, supaya ia
+    // diketahui pada mulanya dan bukan selepas sepuluh tanda.
+    job: !!(typeof IP !== 'undefined' && IP.id)
   });
   let r = '';
   try { r = String(N.arModel(spec) || ''); } catch (e) { r = 'gagal'; }

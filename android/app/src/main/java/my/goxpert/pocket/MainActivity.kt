@@ -310,7 +310,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            server = LocalServer(uvc, pocketFile, pickDir, modelDir)
+            server = LocalServer(uvc, pocketFile, pickDir, modelDir, assets)
                 .also { it.start(0, true) }
             uvc.say("Pelayan hidup pada $HOME")
         } catch (e: Throwable) {

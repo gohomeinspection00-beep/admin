@@ -84,6 +84,9 @@ class ArModelActivity : Activity() {
     private var need = 2
     private var modelName = ""
     private var modelH = 3f
+    /** Satu penemuan milik satu inspection. Tanpa job terbuka, tanda sisihan
+     *  tiada tempat untuk pergi, jadi butangnya kekal mati dan berkata kenapa. */
+    private var hasJob = true
     private val marks = ArrayList<FloatArray>()      // ruang model, dalam METER
 
     // ---------- memuat ----------
@@ -148,6 +151,7 @@ class ArModelActivity : Activity() {
             need = if (j.optInt("pins", 2) >= 2) 2 else 1
             modelName = j.optString("name", "")
             modelH = j.optDouble("h", 3.0).toFloat().let { if (it > 0.2f) it else 3f }
+            hasJob = j.optBoolean("job", true)
             // Kumpulan yang disembunyikan dalam pelihat 3D kekal tersembunyi
             // di sini. Tiada kawalan baharu pada skrin AR: penapis dibuat di
             // tempat ia senang dibuat, dan dibawa masuk.
@@ -308,7 +312,9 @@ class ArModelActivity : Activity() {
             isEnabled = false
             setOnClickListener { wantShot = true; isEnabled = false }
         }
-        flagBtn = icon(R.drawable.ic_flag, "Tanda sisihan", C_DEV).apply {
+        flagBtn = icon(R.drawable.ic_flag,
+            if (hasJob) "Tanda sisihan" else "Tanda sisihan — buka satu inspection dahulu",
+            C_DEV).apply {
             isEnabled = false
             setOnClickListener { wantDev = true }
         }
@@ -587,7 +593,8 @@ class ArModelActivity : Activity() {
         placeBtn.isEnabled = ready && !placed && aim != null
         placeBtn.alpha = if (placeBtn.isEnabled) 1f else 0.3f
         placeBtn.visibility = if (placed) View.GONE else View.VISIBLE
-        for (b in listOf(xrayBtn, lockBtn, shotBtn, flagBtn)) b.isEnabled = placed
+        for (b in listOf(xrayBtn, lockBtn, shotBtn)) b.isEnabled = placed
+        flagBtn.isEnabled = placed && hasJob
         // Jajar semula mesti hidup sebaik titik pertama ditanda. Tanpa ini,
         // satu titik yang tersalah letak tidak boleh dibuang sama sekali.
         resetBtn.isEnabled = placed || tagged.isNotEmpty()
@@ -621,6 +628,8 @@ class ArModelActivity : Activity() {
             !tracking && why.isNotEmpty() -> why
             !tracking -> "Gerak telefon perlahan supaya ARCore nampak permukaan…"
             locked -> "Model dikunci. Ketik mangga kuning untuk melaras semula."
+            placed && !hasJob ->
+                "Model diletak. Tanda sisihan mati — buka satu inspection dahulu."
             placed && need == 2 -> "Model diletak. Potong pada paras mata untuk masuk ke dalamnya."
             placed -> "Model diletak. Putar sehingga ia padan dengan bangunan."
             planeCount == 0 ->

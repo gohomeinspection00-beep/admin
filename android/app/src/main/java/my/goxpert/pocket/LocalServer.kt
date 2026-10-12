@@ -20,7 +20,8 @@ class LocalServer(
     private val uvc: UvcSource,
     private val pocketFile: File,
     private val pickDir: File,
-    private val modelDir: File
+    private val modelDir: File,
+    private val assets: android.content.res.AssetManager
 ) : NanoHTTPD(HOST, PORT) {
 
     override fun serve(session: IHTTPSession): Response {
@@ -32,6 +33,7 @@ class LocalServer(
                 uri == "/uvc/stream"   -> stream()
                 uri == "/uvc/debug"    -> debug()
                 uri == "/model" -> model(session)
+                uri.startsWith("/lib/") -> lib(uri.removePrefix("/lib/"))
                 uri.startsWith("/pick/") -> picked(uri.removePrefix("/pick/"))
                 else                   -> pocket()
             }
@@ -164,6 +166,35 @@ class LocalServer(
             noCache(newFixedLengthResponse(
                 Response.Status.INTERNAL_ERROR, "text/plain",
                 "${e.javaClass.simpleName}: ${e.message}"))
+        }
+    }
+
+    /**
+     * three.js, dihidangkan dari dalam APK.
+     *
+     * Pelihat 3D dan dua skrin AR lama memuatkannya dari cdnjs. Itu baik di
+     * pejabat dan mati di tapak: telefon pada "SOS only" tidak dapat
+     * memuatkan GLTFLoader, jadi model tidak boleh dibuka, jadi titik tidak
+     * boleh ditanda, jadi AR tidak boleh dimasuki langsung — walaupun skrin
+     * AR itu sendiri tidak perlukan rangkaian sama sekali.
+     *
+     * 700 KB dalam APK ialah harga yang murah untuk membuang kebergantungan
+     * itu sepenuhnya. Halaman cuba laluan ini dahulu dan jatuh ke CDN hanya
+     * bila ia tiada — iaitu dalam Chrome, bukan di sini.
+     */
+    private fun lib(name: String): Response {
+        // Hanya fail yang app sendiri bungkuskan, supaya URL yang disusun
+        // sendiri tidak boleh membaca apa-apa lain dalam aset.
+        if (!Regex("^(three\\.min\\.js|loaders/(GLTF|DRACO)Loader\\.js)$").matches(name)) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.FORBIDDEN, "text/plain", "nama tidak sah"))
+        }
+        return try {
+            val ins = assets.open("lib/$name")
+            newChunkedResponse(Response.Status.OK, "application/javascript", ins)
+                .also { it.addHeader("Cache-Control", "max-age=86400") }
+        } catch (e: Throwable) {
+            noCache(newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "tiada"))
         }
     }
 
