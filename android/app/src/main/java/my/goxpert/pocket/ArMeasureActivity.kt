@@ -109,6 +109,19 @@ class ArMeasureActivity : Activity() {
     @Volatile private var cloud: FloatArray = FloatArray(0)
     @Volatile private var planeCount = 0
 
+    /**
+     * Cincin reticle, sebagai titik dunia yang terletak DI ATAS permukaan
+     * yang ditujui.
+     *
+     * Satu bulatan rata di tengah skrin tidak boleh memberitahu apa-apa
+     * tentang permukaan di bawahnya: ia kelihatan sama sama ada ARCore
+     * terkunci pada lantai, pada dinding, atau pada tiada apa-apa. Satu
+     * cincin yang dilukis dalam satah itu condong bersamanya, jadi bentuknya
+     * sendiri ialah jawapan kepada "ia nampak satah tak" — dan itulah yang
+     * laluan WebXR lama lakukan.
+     */
+    @Volatile private var ring: FloatArray = FloatArray(0)
+
     /** Tempat reticle sedang menyentuh dunia, atau null bila tiada satah. */
     @Volatile private var aim: FloatArray? = null
     @Volatile private var tracking = false
@@ -330,8 +343,17 @@ class ArMeasureActivity : Activity() {
      */
     inner class Overlay(ctx: android.content.Context) : View(ctx) {
         private val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(255, 196, 0) }
-        private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        private val hoop = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE; strokeWidth = dp(3).toFloat(); color = Color.WHITE
+        }
+        private val hoopDot = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(120, 255, 255, 255)
+        }
+        private val aimEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = dp(3).toFloat(); color = Color.rgb(255, 196, 0)
+        }
+        private val aimFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL; color = Color.argb(60, 255, 196, 0)
         }
         private val line = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE; strokeWidth = dp(3).toFloat(); color = Color.rgb(255, 196, 0)
@@ -395,10 +417,36 @@ class ArMeasureActivity : Activity() {
                 c.drawPath(path, planeEdge)
             }
 
-            // Reticle: sentiasa di tengah, pejal bila ia menyentuh sesuatu.
-            ring.color = if (aim != null) Color.rgb(255, 196, 0) else Color.argb(120, 255, 255, 255)
-            c.drawCircle(cx, cy, dp(13).toFloat(), ring)
-            if (aim != null) c.drawCircle(cx, cy, dp(4).toFloat(), dot)
+            // Reticle. Bila ARCore terkunci pada permukaan, cincin itu
+            // dilukis DI ATAS permukaan itu dan condong bersamanya; bila
+            // tidak, yang tinggal hanyalah bulatan rata yang tidak berpura-
+            // pura tahu apa-apa tentang dunia.
+            val rg = ring
+            var drew = false
+            if (rg.size >= 9) {
+                path.reset()
+                var started = false
+                var k = 0
+                while (k + 2 < rg.size) {
+                    val sp = toScreen(floatArrayOf(rg[k], rg[k + 1], rg[k + 2]))
+                    if (sp != null) {
+                        if (!started) { path.moveTo(sp[0], sp[1]); started = true }
+                        else path.lineTo(sp[0], sp[1])
+                    }
+                    k += 3
+                }
+                if (started) {
+                    path.close()
+                    c.drawPath(path, aimFill)
+                    c.drawPath(path, aimEdge)
+                    drew = true
+                }
+            }
+            if (!drew) {
+                hoop.color = Color.argb(120, 255, 255, 255)
+                c.drawCircle(cx, cy, dp(13).toFloat(), hoop)
+            }
+            c.drawCircle(cx, cy, dp(3).toFloat(), if (drew) dot else hoopDot)
 
             val world = ptsNow
             val screen = ArrayList<FloatArray?>(world.size)
@@ -523,6 +571,23 @@ class ArMeasureActivity : Activity() {
                     if (rank == 0) break
                 }
             } catch (e: Throwable) { /* bingkai ini tiada hit; cuba yang seterusnya */ }
+
+            // Cincin dibina daripada pose hit itu sendiri: paksi Y pose itu
+            // ialah normal permukaan, jadi satu bulatan dalam XZ tempatannya
+            // terletak rata pada permukaan itu.
+            ring = if (hit == null) FloatArray(0) else {
+                val po = hit.hitPose
+                val n = 28
+                val r = 0.05f
+                val w = FloatArray(n * 3)
+                for (k in 0 until n) {
+                    val a2 = (k.toFloat() / n) * 6.2831855f
+                    val wp = po.transformPoint(floatArrayOf(
+                        r * kotlin.math.cos(a2), 0f, r * kotlin.math.sin(a2)))
+                    w[k * 3] = wp[0]; w[k * 3 + 1] = wp[1]; w[k * 3 + 2] = wp[2]
+                }
+                w
+            }
 
             val had = aim != null
             aim = found
