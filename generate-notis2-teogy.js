@@ -18,7 +18,13 @@ const data = {
 
   namaPemaju: "COUNTRY VIEW RESOURCES SDN BHD",
   noSyarikat: "(200001021248 / 523855-A)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "MGMT") ? [
+    "(Pejabat Pengurusan / Management Office)",
+    "Aurora Resort, Aurora Sentral,",
+    "Jalan Aurora Utama,",
+    "79100 Iskandar Puteri,",
+    "Johor.",
+  ] : [
     "No. 26-01, Level 26, Mail Box 261,",
     "Menara Landmark, No. 12, Jalan Ngee Heng,",
     "80000 Johor Bahru,",
@@ -38,8 +44,8 @@ const data = {
   kaedahSerahanLaporan: "aplikasi CVConnect",
   tarikhReInspection: "27 Ogos 2026",
 
-  tarikhNotis: "8 Oktober 2026",
-  tarikhDeadline: "23 Oktober 2026",
+  tarikhNotis: "12 Oktober 2026",
+  tarikhDeadline: "27 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -66,8 +72,8 @@ const data = {
     { tarikh: "23 September 2026", peristiwa: "Notis Pertama DITERIMA oleh pihak pemaju — diakui oleh Puan Norfarhana dengan tandatangan dan cop rasmi syarikat (rujuk Lampiran C)" },
     { tarikh: "17 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan, tiada maklum balas rasmi" },
     { tarikh: "6 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. GXS-RW-2026-00202605 berjumlah RM25,565.00 diperoleh daripada kontraktor berdaftar CIDB" },
-    { tarikh: "8 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/035, bersama sebut harga rasmi pembaikan" },
-    { tarikh: "23 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "12 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/035, bersama sebut harga rasmi pembaikan" },
+    { tarikh: "27 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [
@@ -512,6 +518,6 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_2_TEOGEOKYAN.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_2_TEOGEOKYAN.pdf");
+fs.writeFileSync("/home/user/admin/" + ((process.argv[2] === "MGMT") ? "NOTIS_2_TEOGEOKYAN_MGMT.pdf" : "NOTIS_2_TEOGEOKYAN.pdf"), Buffer.from(out));
+console.log("PDF generated: " + ((process.argv[2] === "MGMT") ? "NOTIS_2_TEOGEOKYAN_MGMT.pdf" : "NOTIS_2_TEOGEOKYAN.pdf"));
 console.log(`Total pages: ${totalPages}`);
