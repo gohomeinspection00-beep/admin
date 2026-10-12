@@ -9315,7 +9315,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.4 · build 12 Okt 2026 · Endoskop (anotasi gambar sokongan)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.5 · build 12 Okt 2026 · Suara remote melalui TTS app</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -21346,13 +21346,22 @@ function tcWire() {
       // Android menyekat pertuturan sehingga satu ketikan sebenar berlaku,
       // jadi bangkitkan enjin itu sekarang, semasa ketikan ini masih sah.
       try {
-        const w = new SpeechSynthesisUtterance(' ');
-        w.volume = 0; speechSynthesis.speak(w);
+        if (window.speechSynthesis) {
+          const w = new SpeechSynthesisUtterance(' ');
+          w.volume = 0; speechSynthesis.speak(w);
+        }
       } catch (e) {}
+      var src = pkVoiceFrom();
       tgSay('Remote on. ' + tgStatus());
-      showToast('Remote mode on \u2014 gestures count, voice reads back');
+      if (src === 'apk-lama') {
+        showToast('Remote on \u2014 pasang semula APK terkini untuk suara', 'error');
+      } else if (src === 'tiada' || src === 'app-mati') {
+        showToast('Remote on \u2014 telefon ini tiada suara TTS, bip sahaja', 'error');
+      } else {
+        showToast('Remote mode on \u2014 gestures count, voice reads back');
+      }
     } else {
-      try { speechSynthesis.cancel(); } catch (e) {}
+      pkSayStop();
       showToast('Remote mode off');
     }
   });
@@ -21431,16 +21440,57 @@ function tgHelp(cts) {
   ];
 }
 
-function tgSay(text) {
-  if (!TC.voice || !window.speechSynthesis || !text) return;
+/** Satu pintu untuk pertuturan.
+ *
+ *  API Web Speech tidak dihantar bersama WebView Android. Objek
+ *  speechSynthesis ada, jadi setiap semakan ciri lulus, tetapi getVoices()
+ *  pulangkan senarai kosong dan speak() tidak mengeluarkan bunyi dan tidak
+ *  melaporkan apa-apa. Itulah sebabnya mod remote bercakap dalam Chrome dan
+ *  senyap di dalam app. App menyediakan TTS Android sebenar; guna itu bila
+ *  ada, dan jatuh ke pelayar bila tidak.
+ *
+ *  Pulangkan true hanya bila sesuatu benar-benar mengambil teks itu. */
+function pkSay(text, lang, rate) {
+  if (!text) return false;
+  var N = window.PocketNative;
+  if (N && typeof N.say === 'function') {
+    try { return String(N.say(String(text), rate || 1)) === 'ok'; } catch (e) { return false; }
+  }
+  if (!window.speechSynthesis) return false;
   try {
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(String(text));
-    u.lang = 'en-GB';
-    u.rate = 1.15;   // kiraan pendek, jadi laju sedikit menjimatkan masa
+    u.lang = lang || 'en-GB';
+    u.rate = rate || 1;
     u.volume = 1;
     speechSynthesis.speak(u);
-  } catch (e) {}
+    return true;
+  } catch (e) { return false; }
+}
+
+function pkSayStop() {
+  var N = window.PocketNative;
+  if (N && typeof N.sayStop === 'function') { try { N.sayStop(); } catch (e) {} }
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+}
+
+/** Dari mana suara itu datang, kalau ada. Mod remote berkata begini dan
+ *  bukannya senyap, kerana senyap ialah aduan yang membawa kita ke sini. */
+function pkVoiceFrom() {
+  var N = window.PocketNative;
+  if (N && typeof N.say === 'function') {
+    var live = true;
+    try { if (typeof N.canSay === 'function') live = !!N.canSay(); } catch (e) {}
+    return live ? 'app' : 'app-mati';
+  }
+  if (N) return 'apk-lama';
+  return window.speechSynthesis ? 'pelayar' : 'tiada';
+}
+
+function tgSay(text) {
+  if (!TC.voice || !text) return;
+  // 1.15: kiraan pendek, jadi laju sedikit menjimatkan masa.
+  pkSay(text, 'en-GB', 1.15);
 }
 
 function tgStatus() {

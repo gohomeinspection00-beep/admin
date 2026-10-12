@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
 import android.provider.MediaStore
+import android.speech.tts.TextToSpeech
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.webkit.GeolocationPermissions
@@ -34,12 +35,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
     private lateinit var uvc: UvcSource
     private var server: LocalServer? = null
+
+    /**
+     * API Web Speech tidak dihantar bersama WebView Android: objek
+     * speechSynthesis ada, getVoices() pulangkan senarai kosong, dan speak()
+     * tidak mengeluarkan apa-apa bunyi dan tidak melaporkan apa-apa. Itulah
+     * sebabnya mod remote Tally bercakap dalam Chrome tetapi senyap di dalam
+     * app. Ini ialah TTS Android sebenar, didedahkan kepada halaman itu.
+     */
+    private var tts: TextToSpeech? = null
+    @Volatile private var ttsOk = false
 
     private val pocketFile: File get() = File(filesDir, "pocket.html")
 
@@ -98,6 +110,19 @@ class MainActivity : AppCompatActivity() {
 
         uvc = UvcSource(this)
         uvc.start()
+
+        tts = TextToSpeech(this) { st ->
+            ttsOk = st == TextToSpeech.SUCCESS
+            if (ttsOk) {
+                // Kiraan dibaca dalam bahasa Inggeris ("Hollow, 3"), jadi
+                // cuba bahasa itu dahulu dan jatuh ke bahasa peranti.
+                val r = runCatching { tts?.setLanguage(Locale.UK) }.getOrNull()
+                if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    runCatching { tts?.setLanguage(Locale.getDefault()) }
+                }
+            }
+            uvc.say("TTS: " + if (ttsOk) "sedia" else "tidak tersedia (kod $st)")
+        }
 
         try {
             server = LocalServer(uvc, pocketFile, pickDir).also { it.start(0, true) }
@@ -342,6 +367,31 @@ class MainActivity : AppCompatActivity() {
                 "gagal: ${e.message}"
             }
 
+        /** Baca satu baris. QUEUE_FLUSH: kiraan laju tidak menimbun baris
+         *  gilir, yang terakhir sahaja kedengaran. */
+        @JavascriptInterface
+        fun say(text: String, rate: Float): String {
+            val t = tts
+            if (t == null || !ttsOk) return "tiada"
+            return try {
+                t.setSpeechRate(if (rate > 0f) rate else 1f)
+                t.speak(text, TextToSpeech.QUEUE_FLUSH, null, "pocket")
+                "ok"
+            } catch (e: Throwable) {
+                "gagal: ${e.message}"
+            }
+        }
+
+        @JavascriptInterface
+        fun sayStop(): String {
+            runCatching { tts?.stop() }
+            return "ok"
+        }
+
+        /** Jambatan itu wujud tetapi enjin itu mungkin tidak. */
+        @JavascriptInterface
+        fun canSay(): Boolean = ttsOk
+
         @JavascriptInterface
         fun savePdf(b64: String, name: String): String {
             return try {
@@ -428,6 +478,8 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         server?.stop()
         uvc.stop()
+        runCatching { tts?.stop(); tts?.shutdown() }
+        tts = null
     }
 
     companion object {
