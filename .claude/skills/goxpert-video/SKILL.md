@@ -134,6 +134,21 @@ project (`--sdr --crf 18`), then concat in front of the main render with ffmpeg
 Keep the hook's SFX ≤ 0.3–0.35 so it is not louder than the body (check RMS of the first
 2.5 s vs the next seconds).
 
+## 4c. Photo slideshow / tips post (no footage)
+
+When the client sends only photos of a process (e.g. Kad AR / Pos Daftar), build a 9:16 slide
+video: hook (full-bleed photo + question + yellow answer block) → "Kenapa …?" reasons slide →
+one slide per step (photo top 1250 px with slow zoom, ink panel with yellow step square,
+"LANGKAH n/N", League Gothic title, 3 mono body lines, dashed yellow highlight box + label on
+the key spot) → proof chip → standard end card. No voice → SFX only. Also export each slide's
+hold frame as a JPG carousel (Threads/IG) zipped next to the video. Reference:
+`templates/photo-slides/build.py`.
+
+**Privacy (mandatory, ask first):** documents in his photos show buyers' names, addresses, phones,
+tracking numbers, barcodes, QR/payment refs and developer names. Blur them all before building
+with `scripts/photo_blur.py` (pixelate + Gaussian, boxes in 1500×2000 preview space), then check
+zoomed crops of every blurred photo — residual handwriting and receipt refs are easy to miss.
+
 ## 5. Thumbnail (only after "dah siap")
 
 `templates/thumbnail/index.html` — 1080×1920 single-frame composition: blurred footage
