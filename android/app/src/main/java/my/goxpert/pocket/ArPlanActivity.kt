@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
@@ -45,10 +44,12 @@ import kotlin.math.sqrt
  * Versi web melukis pelan sebagai mesh bertekstur dalam Three.js di atas
  * sesi WebXR. Tiada satu pun daripada itu wujud dalam WebView, tetapi
  * hamparan itu sendiri tidak memerlukan enjin 3D: pelan ialah satu segi
- * empat rata, dan satu segi empat rata yang diunjurkan ke skrin ialah
- * sekadar empat titik. Canvas Android memetakan bitmap kepada empat titik
- * dengan setPolyToPoly, yang memberi perspektif yang betul, jadi lapisan 2D
- * yang sama yang melukis kursor melukis pelan juga.
+ * empat rata, jadi ia empat bucu, satu tekstur dan satu jalur segi tiga.
+ * Itu dilukis dalam bingkai GL yang sama dengan imej kamera — lihat
+ * ArPlanQuad untuk sebab mengapa lapisan 2D tidak mencukupi di sini.
+ *
+ * Benda kecil — kursor, titik yang diletak — kekal pada lapisan 2D, di mana
+ * jurang satu bingkai terlalu halus untuk dilihat.
  *
  * Matematik jajaran ialah port langsung fungsi fpFrom1/fpFrom2/fpMap dalam
  * Pocket, supaya pelan duduk di tempat yang sama sama ada ia dibuka di sini
@@ -63,8 +64,15 @@ class ArPlanActivity : Activity() {
     private lateinit var readout: TextView
     private lateinit var placeBtn: Button
     private lateinit var resetBtn: Button
+    private lateinit var lockBtn: Button
 
     private val bg = ArBackground()
+    private val planGl = ArPlanQuad()
+    @Volatile private var glReady = false
+
+    /** Dikunci: pelan berhenti dibina semula, jadi tiada slider, anchor
+     *  atau ketikan yang terlepas boleh mengalihkannya. */
+    @Volatile private var locked = false
 
     private var plan: Bitmap? = null
     private var planW = 0f
@@ -157,17 +165,25 @@ class ArPlanActivity : Activity() {
 
         // Lut sinar: pelan mesti boleh dilihat menembusi untuk dibandingkan
         // dengan apa yang sebenarnya ada di sana.
+        bar.addView(Button(this).apply {
+            text = "Cermin"; isAllCaps = false
+            setOnClickListener { if (!locked) { flip = !flip; rebuild(); paintText() } }
+            layoutParams = LinearLayout.LayoutParams(-2, dp(40))
+        })
         bar.addView(row("Lut sinar", 20, 95, 65) { v ->
             opacity = v / 100f; paintText(); overlay.postInvalidate()
         })
         bar.addView(row(if (mode == "wall") "Dalam" else "Tinggi", 0, 100, 50) { v ->
+            if (locked) return@row
             lift = (v - 50) / 100f * 2f      // -1 m .. +1 m
             rebuild(); paintText()
         })
         if (!twoPin) {
-            bar.addView(row("Putar", 0, 360, 0) { v -> theta = v.toFloat(); rebuild(); paintText() })
+            bar.addView(row("Putar", 0, 360, 0) { v ->
+                if (!locked) { theta = v.toFloat(); rebuild(); paintText() }
+            })
             bar.addView(row("Skala", 10, 400, 100) { v ->
-                mPerPx = (10f * (v / 100f)) / planW; rebuild(); paintText()
+                if (!locked) { mPerPx = (10f * (v / 100f)) / planW; rebuild(); paintText() }
             })
         }
 
@@ -181,12 +197,21 @@ class ArPlanActivity : Activity() {
         }
         resetBtn = mk("Mula semula", 1f).apply {
             isEnabled = false
-            setOnClickListener { wantReset = true }
+            setOnClickListener { locked = false; wantReset = true }
         }
         placeBtn = mk("Letak titik 1", 1.5f).apply { setOnClickListener { wantPlace = true } }
-        val flipBtn = mk("Cermin", 1f).apply { setOnClickListener { flip = !flip; rebuild() } }
+        lockBtn = mk("Kunci", 1f).apply {
+            isEnabled = false
+            setOnClickListener {
+                locked = !locked
+                if (!locked) rebuild()
+                paintText()
+                Toast.makeText(this@ArPlanActivity,
+                    if (locked) "Pelan dikunci" else "Pelan dibuka", Toast.LENGTH_SHORT).show()
+            }
+        }
         val doneBtn = mk("Tutup", 1f).apply { setOnClickListener { finish() } }
-        btns.addView(resetBtn); btns.addView(placeBtn); btns.addView(flipBtn); btns.addView(doneBtn)
+        btns.addView(resetBtn); btns.addView(placeBtn); btns.addView(lockBtn); btns.addView(doneBtn)
         bar.addView(btns, LinearLayout.LayoutParams(-1, -2))
 
         root.addView(bar, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.BOTTOM })
@@ -354,6 +379,7 @@ class ArPlanActivity : Activity() {
 
     /** Bina semula daripada anchor dan laras semasa. */
     private fun rebuild() {
+        if (locked) return
         val n = anchors.size
         if (n == 0) { state = null; quad = FloatArray(0); return }
         val a0 = anchors[0].pose
@@ -383,15 +409,18 @@ class ArPlanActivity : Activity() {
     private fun paintText() {
         val n = anchors.size
         val need = if (twoPin) 2 else 1
-        placeBtn.isEnabled = n < need
+        placeBtn.isEnabled = n < need && !locked
         placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Siap"
         resetBtn.isEnabled = n > 0
+        lockBtn.isEnabled = state != null
+        lockBtn.text = if (locked) "Buka" else "Kunci"
 
         hint.text = when {
             !tracking && why.isNotEmpty() -> why
             !tracking -> "Gerak telefon perlahan supaya ARCore nampak lantai…"
             planeCount == 0 ->
                 "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, halakan ke lantai bercorak."
+            locked -> "Pelan dikunci. Tekan Buka untuk melaras semula."
             n >= need -> "Pelan diletak. Laras dengan slider di bawah."
             aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
             n == 0 -> "Halakan ke tempat sebenar titik ${if (twoPin) "1" else "jangkar"} pada pelan, kemudian Letak"
@@ -419,14 +448,7 @@ class ArPlanActivity : Activity() {
             style = Paint.Style.FILL; color = Color.argb(60, 255, 196, 0)
         }
         private val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(255, 196, 0) }
-        private val img = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
-        private val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE; strokeWidth = dp(2).toFloat(); color = Color.argb(200, 90, 200, 255)
-        }
         private val path = android.graphics.Path()
-        private val m = Matrix()
-        private val src = FloatArray(8)
-        private val dst = FloatArray(8)
         private val out = FloatArray(4)
 
         private fun toScreen(x: Float, y: Float, z: Float): FloatArray? {
@@ -442,37 +464,9 @@ class ArPlanActivity : Activity() {
         }
 
         override fun onDraw(c: Canvas) {
-            val bmp = plan
-            val q = quad
-
-            // Pelan itu sendiri: satu segi empat rata, jadi empat titik yang
-            // diunjurkan sudah cukup. setPolyToPoly memberi perspektif yang
-            // betul tanpa satu pun segi tiga bertekstur.
-            if (bmp != null && !bmp.isRecycled && q.size == 12) {
-                var okAll = true
-                for (k in 0 until 4) {
-                    val sp = toScreen(q[k * 3], q[k * 3 + 1], q[k * 3 + 2])
-                    if (sp == null) { okAll = false; break }
-                    dst[k * 2] = sp[0]; dst[k * 2 + 1] = sp[1]
-                }
-                if (okAll) {
-                    src[0] = 0f; src[1] = 0f
-                    src[2] = bmp.width.toFloat(); src[3] = 0f
-                    src[4] = bmp.width.toFloat(); src[5] = bmp.height.toFloat()
-                    src[6] = 0f; src[7] = bmp.height.toFloat()
-                    if (m.setPolyToPoly(src, 0, dst, 0, 4)) {
-                        img.alpha = (opacity * 255).toInt().coerceIn(0, 255)
-                        c.drawBitmap(bmp, m, img)
-                        path.reset()
-                        path.moveTo(dst[0], dst[1])
-                        path.lineTo(dst[2], dst[3])
-                        path.lineTo(dst[4], dst[5])
-                        path.lineTo(dst[6], dst[7])
-                        path.close()
-                        c.drawPath(path, edge)
-                    }
-                }
-            }
+            // Pelan itu sendiri dilukis dalam GL, bersama kamera. Yang
+            // tinggal di sini ialah benda kecil, di mana jurang satu bingkai
+            // tidak kelihatan.
 
             // Titik yang sudah diletak.
             for (an in anchors) {
@@ -520,6 +514,7 @@ class ArPlanActivity : Activity() {
         override fun onSurfaceCreated(g: GL10?, c: EGLConfig?) {
             GLES20.glClearColor(0f, 0f, 0f, 1f)
             bg.create()
+            plan?.let { b2 -> if (!b2.isRecycled) { planGl.create(b2); glReady = true } }
         }
 
         override fun onSurfaceChanged(g: GL10?, w: Int, h: Int) {
@@ -624,6 +619,14 @@ class ArPlanActivity : Activity() {
             }
 
             rebuild()
+
+            // Pelan dilukis DI SINI, dalam bingkai yang sama dengan imej
+            // kamera. Melukisnya pada lapisan 2D di atas bermakna ia sentiasa
+            // satu dua bingkai di belakang, yang kelihatan seperti pelan yang
+            // berenang walaupun titiknya tidak bergerak.
+            val q = quad
+            if (glReady && q.size == 12) planGl.draw(vp, q, opacity)
+
             if (changed) runOnUiThread { paintText() }
             overlay.postInvalidateOnAnimation()
         }
