@@ -9315,7 +9315,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.6 · build 12 Okt 2026 · Suara penterjemah melalui TTS app</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.7 · build 12 Okt 2026 · Jambatan app: suara, kongsi, skrin, pautan</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -11182,9 +11182,18 @@ function appendMessage(msg, animate = true) {
   
   const img = wrap.querySelector('.msg-img');
   if (img) {
+    // window.open('', '_blank') tidak membuka apa-apa dalam WebView, jadi
+    // gambar dibesarkan di sini dan bukan dalam tetingkap yang tidak wujud.
     img.addEventListener('click', () => {
-      const w = window.open('', '_blank');
-      if (w) w.document.write(`<img src="${msg.image}" style="max-width:100%">`);
+      const box = document.createElement('div');
+      box.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.92);' +
+        'display:grid;place-items:center;padding:16px';
+      const big = document.createElement('img');
+      big.src = msg.image;
+      big.style.cssText = 'max-width:100%;max-height:100%;border-radius:10px';
+      box.appendChild(big);
+      box.addEventListener('click', () => box.remove());
+      document.body.appendChild(box);
     });
   }
 }
@@ -11794,39 +11803,26 @@ async function voice_processQuery(query) {
 }
 
 function voice_speak(text) {
-  if (!('speechSynthesis' in window)) { 
+  voice_stopSpeaking();
+  const lang = voice_currentLang || pocketConfig?.voiceLang || 'ms-MY';
+  // pkSay guna TTS Android di dalam app dan pelayar di luar. API Web Speech
+  // tidak dihantar bersama WebView, jadi laluan lama senyap di sana.
+  const started = pkSay(text, lang, 1, function() {
+    voice_isSpeaking = false;
     setVoiceState('ready');
-    showToast('TTS not supported', 'error');
+  });
+  if (!started) {
+    voice_isSpeaking = false;
+    setVoiceState('ready');
+    showToast('Telefon ini tiada suara TTS', 'error');
     return;
   }
-  voice_stopSpeaking();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = voice_currentLang || pocketConfig?.voiceLang || 'ms-MY';
-  utter.rate = 1.0; utter.pitch = 1.0;
-  const voices = speechSynthesis.getVoices();
-  const langPrefix = (utter.lang || '').split('-')[0];
-  const preferred = voices.find(function(v) { return v.lang.startsWith(langPrefix); }) ||
-                    voices.find(function(v) { return v.lang.startsWith('ms'); }) ||
-                    voices.find(function(v) { return v.lang.startsWith('en'); });
-  if (preferred) utter.voice = preferred;
-  utter.onstart = function() {
-    voice_isSpeaking = true;
-    setVoiceState('speaking');
-  };
-  utter.onend = function() {
-    voice_isSpeaking = false;
-    setVoiceState('ready');
-  };
-  utter.onerror = function() {
-    voice_isSpeaking = false;
-    setVoiceState('ready');
-    showToast('TTS error', 'error');
-  };
-  speechSynthesis.speak(utter);
+  voice_isSpeaking = true;
+  setVoiceState('speaking');
 }
 
 function voice_stopSpeaking() {
-  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  pkSayStop();
   voice_isSpeaking = false;
 }
 function voice_stopAll() { 
@@ -21518,11 +21514,23 @@ function tgHelp(cts) {
  *  ada, dan jatuh ke pelayar bila tidak.
  *
  *  Pulangkan true hanya bila sesuatu benar-benar mengambil teks itu. */
-function pkSay(text, lang, rate) {
+var _pkSayDone = null;
+window.pkSaid = function (k) {
+  if (k !== 'end') return;
+  var fn = _pkSayDone; _pkSayDone = null;
+  if (fn) { try { fn(); } catch (e) {} }
+};
+
+function pkSay(text, lang, rate, onDone) {
   if (!text) return false;
+  _pkSayDone = null;
   var N = window.PocketNative;
   if (N && typeof N.say === 'function') {
-    try { return String(N.say(String(text), rate || 1)) === 'ok'; } catch (e) { return false; }
+    try {
+      var ok = String(N.say(String(text), rate || 1)) === 'ok';
+      if (ok && onDone) _pkSayDone = onDone;
+      return ok;
+    } catch (e) { return false; }
   }
   if (!window.speechSynthesis) return false;
   try {
@@ -21531,12 +21539,193 @@ function pkSay(text, lang, rate) {
     u.lang = lang || 'en-GB';
     u.rate = rate || 1;
     u.volume = 1;
+    if (onDone) {
+      u.onend = function () { onDone(); };
+      u.onerror = function () { onDone(); };
+    }
     speechSynthesis.speak(u);
     return true;
   } catch (e) { return false; }
 }
 
+/* ============ JAMBATAN APP ANDROID ============
+   WebView menghantar Blink tanpa beberapa API yang Chrome ada: pertuturan
+   kedua-dua arah, Web Share, Wake Lock dan Web Bluetooth. Objeknya memang
+   tiada, jadi setiap semakan ciri gagal dan ciri itu mati tanpa bunyi dan
+   tanpa ralat — itulah corak setiap pepijat "tak menjadi" setakat ini.
+
+   App menyediakan gantian Android untuk semuanya kecuali Bluetooth. Di sini
+   gantian itu dipakaikan antara muka web yang sama, supaya kod lain dalam
+   fail ini tidak perlu tahu di mana ia berjalan, dan supaya pelayar biasa
+   tidak berubah langsung.
+   ============================================= */
+
+/** Buka pautan di luar app. Dalam WebView, window.open('_blank') memuat URL
+ *  itu DI SINI dan menggantikan Pocket. */
+function pkOpen(url) {
+  var N = window.PocketNative;
+  if (N && typeof N.openUrl === 'function') {
+    try { N.openUrl(String(url)); return true; } catch (e) {}
+  }
+  try { window.open(url, '_blank', 'noopener'); return true; } catch (e) { return false; }
+}
+
+(function () {
+  var N = window.PocketNative;
+  if (!N) return;
+
+  /* Umpukan biasa kepada navigator.share gagal SENYAP bila sifat itu wujud
+     sebagai bukan-boleh-tulis, yang berlaku pada sesetengah binaan. Takrif
+     sifat itu terus, dan jatuh kepada umpukan bila itu pun ditolak. */
+  var def = function (obj, key, val) {
+    try {
+      Object.defineProperty(obj, key, {
+        configurable: true, writable: true, enumerable: false, value: val
+      });
+      return obj[key] === val;
+    } catch (e) {
+      try { obj[key] = val; return obj[key] === val; } catch (e2) { return false; }
+    }
+  };
+
+  // ---- Web Share ----
+  if (typeof N.share === 'function' && !navigator.share) {
+    var b64 = function (blob) {
+      return new Promise(function (res, rej) {
+        var r = new FileReader();
+        r.onload = function () { res(String(r.result).split(',')[1] || ''); };
+        r.onerror = rej;
+        r.readAsDataURL(blob);
+      });
+    };
+    def(navigator, 'share', async function (d) {
+      d = d || {};
+      var text = [d.title, d.text, d.url].filter(Boolean).join('\n');
+      var f = (d.files && d.files[0]) || null;
+      var data = '', name = '', mime = '';
+      if (f) {
+        data = await b64(f);
+        name = f.name || 'pocket';
+        mime = f.type || 'application/octet-stream';
+      }
+      var r = String(N.share(text, data, name, mime) || '');
+      if (r !== 'ok') throw new Error(r || 'kongsi gagal');
+    });
+    def(navigator, 'canShare', function (d) {
+      return !!(d && (d.text || d.title || d.url || (d.files && d.files.length)));
+    });
+  }
+
+  // ---- Wake Lock ----
+  // Dikira: dua skrin boleh memintanya, dan skrin pertama yang ditutup tidak
+  // sepatutnya membenarkan telefon padam di bawah skrin kedua.
+  if (typeof N.keepAwake === 'function' && !navigator.wakeLock) {
+    var held = 0;
+    def(navigator, 'wakeLock', {
+      request: function () {
+        held++;
+        try { N.keepAwake(true); } catch (e) {}
+        var fns = [];
+        var sen = {
+          type: 'screen',
+          released: false,
+          addEventListener: function (k, fn) { if (k === 'release') fns.push(fn); },
+          removeEventListener: function (k, fn) {
+            fns = fns.filter(function (x) { return x !== fn; });
+          },
+          release: function () {
+            if (sen.released) return Promise.resolve();
+            sen.released = true;
+            held = Math.max(0, held - 1);
+            if (!held) { try { N.keepAwake(false); } catch (e) {} }
+            fns.forEach(function (fn) { try { fn(); } catch (e) {} });
+            return Promise.resolve();
+          }
+        };
+        return Promise.resolve(sen);
+      }
+    });
+  }
+
+  // ---- Pengecaman pertuturan ----
+  if (typeof N.listenStart === 'function' &&
+      !window.SpeechRecognition && !window.webkitSpeechRecognition) {
+
+    var live = null;
+
+    // Bentuk peristiwa yang sama seperti pelayar: satu keputusan pada indeks
+    // sifar, kerana SpeechRecognizer Android memulangkan keseluruhan teks
+    // setakat ini setiap kali dan bukan serpihan.
+    var ev = function (text, fin) {
+      var alt = { transcript: String(text || ''), confidence: 0.9 };
+      var one = [alt];
+      one.isFinal = !!fin;
+      return { resultIndex: 0, results: [one] };
+    };
+
+    function PkRecog() {
+      this.lang = 'en-US';
+      this.continuous = false;
+      this.interimResults = true;
+      this.maxAlternatives = 1;
+      this.onstart = null;
+      this.onresult = null;
+      this.onerror = null;
+      this.onend = null;
+      this.onspeechend = null;
+      this._done = true;
+    }
+    PkRecog.prototype._fire = function (k, a, fin) {
+      try {
+        if (k === 'start' && this.onstart) this.onstart({});
+        else if (k === 'result' && this.onresult) this.onresult(ev(a, fin));
+        else if (k === 'error' && this.onerror) this.onerror({ error: a || 'aborted' });
+        else if (k === 'end' && this.onend) this.onend({});
+      } catch (e) {}
+    };
+    PkRecog.prototype.start = function () {
+      if (live && live !== this) { try { live.abort(); } catch (e) {} }
+      live = this;
+      this._done = false;
+      var r = '';
+      try { r = String(N.listenStart(String(this.lang || 'en-US')) || ''); }
+      catch (e) { r = 'gagal'; }
+      if (r !== 'ok') {
+        var self = this;
+        // Tak segerak, supaya pemanggil sempat memasang pengendalinya.
+        setTimeout(function () {
+          self._fire('error', r === 'tiada-kebenaran' ? 'not-allowed' : 'service-not-allowed');
+          if (!self._done) { self._done = true; live = null; self._fire('end'); }
+        }, 0);
+      }
+    };
+    PkRecog.prototype.stop = function () { try { N.listenStop(); } catch (e) {} };
+    PkRecog.prototype.abort = function () { try { N.listenAbort(); } catch (e) {} };
+    PkRecog.prototype.addEventListener = function (k, fn) { this['on' + k] = fn; };
+    PkRecog.prototype.removeEventListener = function (k) { this['on' + k] = null; };
+
+    window.pkRecog = function (kind, a) {
+      var r = live;
+      if (!r) return;
+      if (kind === 'start') return r._fire('start');
+      if (kind === 'partial') return r._fire('result', a, false);
+      if (kind === 'final') return r._fire('result', a, true);
+      if (kind === 'error') return r._fire('error', a);
+      if (kind === 'end') {
+        if (r._done) return;
+        r._done = true;
+        live = null;
+        return r._fire('end');
+      }
+    };
+
+    def(window, 'SpeechRecognition', PkRecog);
+    def(window, 'webkitSpeechRecognition', PkRecog);
+  }
+})();
+
 function pkSayStop() {
+  _pkSayDone = null;
   var N = window.PocketNative;
   if (N && typeof N.sayStop === 'function') { try { N.sayStop(); } catch (e) {} }
   try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
@@ -23850,8 +24039,16 @@ async function hwBle() {
   let avail = has;
   try { if (has && navigator.bluetooth.getAvailability) avail = await navigator.bluetooth.getAvailability(); } catch (e) {}
   if (!has) {
-    el.innerHTML = '<div class="hw-chk bad"><div><b>Pelayar ini tiada Web Bluetooth</b>' +
-      '<span>Perlukan Chrome pada Android, melalui https://. iPhone dan Safari tidak menyokongnya langsung — tiada kod boleh menampung itu.</span></div></div>';
+    // Di dalam app, "guna Chrome" ialah nasihat yang betul tetapi sebabnya
+    // berbeza, dan surveyor yang berdiri di tapak patut tahu alat mana lagi
+    // yang masih boleh dipakai di sini.
+    const inApp = !!window.PocketNative;
+    el.innerHTML = '<div class="hw-chk bad"><div><b>' +
+      (inApp ? 'App ini tiada Web Bluetooth' : 'Pelayar ini tiada Web Bluetooth') + '</b><span>' +
+      (inApp
+        ? 'WebView Android tidak menghantar Web Bluetooth, dan tiada jambatan boleh menampungnya \u2014 ia satu tindanan protokol penuh, bukan satu panggilan. Untuk meter laser, buka Pocket dalam Chrome. Setiap alat lain kekal berfungsi di sini.'
+        : 'Perlukan Chrome pada Android, melalui https://. iPhone dan Safari tidak menyokongnya langsung \u2014 tiada kod boleh menampung itu.') +
+      '</span></div></div>';
     return;
   }
   el.innerHTML =
@@ -29823,7 +30020,7 @@ async function ipShareFinding(fid) {
   } catch (e) {
     if (e && e.name === 'AbortError') return;
   }
-  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  pkOpen('https://wa.me/?text=' + encodeURIComponent(text));
 }
 
 // ---------- 8. LAPORAN PDF ----------
@@ -32128,7 +32325,7 @@ async function msOpenCard(mid) {
   if (!m) return;
   const c = m.card || {};
   if (m.kind === 'place' && c.lat != null) {
-    window.open('https://maps.google.com/?q=' + c.lat + ',' + c.lng, '_blank', 'noopener');
+    pkOpen('https://maps.google.com/?q=' + c.lat + ',' + c.lng);
     return;
   }
   if (m.kind === 'sos') { if (typeof sosOpen === 'function') sosOpen(); return; }

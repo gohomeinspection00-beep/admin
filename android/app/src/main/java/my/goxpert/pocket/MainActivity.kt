@@ -15,7 +15,11 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
 import android.provider.MediaStore
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.webkit.GeolocationPermissions
@@ -25,7 +29,10 @@ import android.webkit.WebChromeClient
 import android.webkit.ValueCallback
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebResourceRequest
 import android.webkit.WebViewClient
+import android.view.WindowManager
+import androidx.core.content.FileProvider
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -52,6 +59,96 @@ class MainActivity : AppCompatActivity() {
      */
     private var tts: TextToSpeech? = null
     @Volatile private var ttsOk = false
+
+    /**
+     * API Web Speech untuk pengecaman juga tidak wujud dalam WebView, jadi
+     * window.SpeechRecognition adalah undefined dan setiap butang mikrofon
+     * dalam Pocket mati. Ini SpeechRecognizer Android, dibentangkan supaya
+     * halaman itu boleh memakaikan antara muka yang sama di atasnya.
+     */
+    private var rec: SpeechRecognizer? = null
+    private var recOn = false
+
+    private fun sayEvent(k: String) {
+        val js = "window.pkSaid && window.pkSaid(" + jsStr(k) + ")"
+        runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
+    }
+
+    /** Halaman mendengar melalui satu fungsi; setiap peristiwa pergi ke sana. */
+    private fun recEvent(kind: String, a: String = "", b: String = "") {
+        val js = "window.pkRecog && window.pkRecog(" +
+            jsStr(kind) + "," + jsStr(a) + "," + jsStr(b) + ")"
+        runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
+    }
+
+    private fun jsStr(v: String): String {
+        val sb = StringBuilder("\"")
+        for (c in v) when (c) {
+            '\\' -> sb.append("\\\\")
+            '"'  -> sb.append("\\\"")
+            '\n' -> sb.append("\\n")
+            '\r' -> sb.append("\\r")
+            '\t' -> sb.append("\\t")
+            '<'  -> sb.append("\\u003c")
+            else -> if (c < ' ') sb.append("\\u%04x".format(c.code)) else sb.append(c)
+        }
+        return sb.append("\"").toString()
+    }
+
+    /** Nama ralat Android dipetakan kepada nama API Web, supaya kod halaman
+     *  yang sedia ada tidak perlu belajar perbendaharaan kata kedua. */
+    private fun recErrName(code: Int): String = when (code) {
+        SpeechRecognizer.ERROR_AUDIO -> "audio-capture"
+        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "not-allowed"
+        SpeechRecognizer.ERROR_NETWORK,
+        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "network"
+        SpeechRecognizer.ERROR_NO_MATCH -> "no-speech"
+        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "no-speech"
+        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "aborted"
+        SpeechRecognizer.ERROR_CLIENT -> "aborted"
+        else -> "audio-capture"
+    }
+
+    private fun recBuild() {
+        if (rec != null) return
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            uvc.say("Pengecaman suara: tiada perkhidmatan pada telefon ini")
+            return
+        }
+        rec = SpeechRecognizer.createSpeechRecognizer(this).apply {
+            setRecognitionListener(object : RecognitionListener {
+                override fun onReadyForSpeech(p: Bundle?) { recEvent("start") }
+                override fun onBeginningOfSpeech() {}
+                override fun onRmsChanged(v: Float) {}
+                override fun onBufferReceived(b: ByteArray?) {}
+                override fun onEndOfSpeech() {}
+                override fun onEvent(t: Int, p: Bundle?) {}
+
+                override fun onPartialResults(p: Bundle?) {
+                    val t = p?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        ?.firstOrNull().orEmpty()
+                    if (t.isNotEmpty()) recEvent("partial", t)
+                }
+
+                override fun onResults(p: Bundle?) {
+                    val t = p?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        ?.firstOrNull().orEmpty()
+                    recOn = false
+                    if (t.isNotEmpty()) recEvent("final", t)
+                    recEvent("end")
+                }
+
+                override fun onError(code: Int) {
+                    recOn = false
+                    // Tiada padanan selepas senyap bukan kegagalan yang perlu
+                    // dilaporkan; ia cuma tiada apa yang dikatakan.
+                    val name = recErrName(code)
+                    if (name != "no-speech") recEvent("error", name)
+                    recEvent("end")
+                }
+            })
+        }
+    }
 
     private val pocketFile: File get() = File(filesDir, "pocket.html")
 
@@ -121,6 +218,17 @@ class MainActivity : AppCompatActivity() {
                     runCatching { tts?.setLanguage(Locale.getDefault()) }
                 }
             }
+            if (ttsOk) runCatching {
+                // Chat suara menukar keadaan pada mula dan tamat ucapan.
+                // Tanpa peristiwa ini ia kekal pada "sedang bercakap"
+                // selama-lamanya, yang lebih teruk daripada senyap.
+                tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                    override fun onStart(id: String?) { sayEvent("start") }
+                    override fun onDone(id: String?) { sayEvent("end") }
+                    @Deprecated("Diperlukan oleh kelas asas")
+                    override fun onError(id: String?) { sayEvent("end") }
+                })
+            }
             uvc.say("TTS: " + if (ttsOk) "sedia" else "tidak tersedia (kod $st)")
         }
 
@@ -147,7 +255,20 @@ class MainActivity : AppCompatActivity() {
                 allowFileAccess = false
                 allowContentAccess = false
             }
-            webViewClient = WebViewClient()
+            webViewClient = object : WebViewClient() {
+                // window.open(url, "_blank") dalam WebView tanpa berbilang
+                // tetingkap memuat URL itu DI SINI, menggantikan Pocket:
+                // mengetik pautan Maps atau WhatsApp membuang pengguna keluar
+                // dari app dan satu-satunya jalan balik ialah butang kembali.
+                // Apa-apa yang bukan pelayan tempatan kita pergi ke pelayar.
+                override fun shouldOverrideUrlLoading(
+                    v: WebView?, req: WebResourceRequest?
+                ): Boolean = leaveApp(req?.url?.toString())
+
+                @Suppress("DEPRECATION")
+                override fun shouldOverrideUrlLoading(v: WebView?, url: String?): Boolean =
+                    leaveApp(url)
+            }
             // Satu WebView tanpa pengendali ini menelan setiap muat turun
             // secara senyap. Pocket menyimpan PDF melalui jambatan di bawah,
             // tetapi ini menangkap apa-apa yang lain.
@@ -269,6 +390,28 @@ class MainActivity : AppCompatActivity() {
      * menghantar bait PDF ke sini sebagai base64 dan kita menulisnya ke
      * folder Muat Turun telefon, di mana mana-mana app boleh membukanya.
      */
+    /** Benar bila URL itu dikendalikan di luar: pergi ke pelayar dan biarkan
+     *  Pocket di tempatnya. */
+    private fun leaveApp(url: String?): Boolean {
+        if (url.isNullOrEmpty()) return false
+        val u = url.lowercase()
+        if (u.startsWith("http://localhost:${LocalServer.PORT}")) return false
+        // Senarai putih, bukan senarai hitam: blob: dan data: milik halaman
+        // itu sendiri, dan menghantarnya ke ACTION_VIEW cuma menghasilkan
+        // ralat yang mengelirukan bila laluan sedia ada akan berjaya.
+        val out = u.startsWith("http://") || u.startsWith("https://") ||
+            u.startsWith("mailto:") || u.startsWith("tel:") || u.startsWith("sms:") ||
+            u.startsWith("geo:") || u.startsWith("whatsapp:") || u.startsWith("intent:")
+        if (!out) return false
+        return try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            true
+        } catch (e: Throwable) {
+            toast("Tiada app untuk membuka pautan ini")
+            true
+        }
+    }
+
     /**
      * Pemilih Foto Android bila ada (API 33+): ia tidak perlukan satu pun
      * kebenaran dan hanya menunjukkan gambar. Di bawah itu, SAF.
@@ -433,6 +576,119 @@ class MainActivity : AppCompatActivity() {
                 "gagal: ${e.message}"
             }
 
+        /** Buka pautan di luar app. */
+        /** Benar bila telefon ini boleh mendengar langsung. */
+        @JavascriptInterface
+        fun canListen(): Boolean =
+            try { SpeechRecognizer.isRecognitionAvailable(this@MainActivity) }
+            catch (e: Throwable) { false }
+
+        @JavascriptInterface
+        fun listenStart(bcp: String): String {
+            if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+                runOnUiThread { askPerms.launch(arrayOf(Manifest.permission.RECORD_AUDIO)) }
+                return "tiada-kebenaran"
+            }
+            var out = "ok"
+            runOnUiThread {
+                recBuild()
+                val r = rec
+                if (r == null) { out = "tiada"; recEvent("error", "service-not-allowed"); recEvent("end"); return@runOnUiThread }
+                runCatching {
+                    if (recOn) r.cancel()
+                    val i = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                        putExtra(RecognizerIntent.EXTRA_LANGUAGE, bcp)
+                        putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                    }
+                    recOn = true
+                    r.startListening(i)
+                }.onFailure {
+                    recOn = false
+                    out = "gagal: ${it.message}"
+                    recEvent("error", "aborted"); recEvent("end")
+                }
+            }
+            return out
+        }
+
+        /** Berhenti dan simpan apa yang didengar; batal buang semuanya. */
+        @JavascriptInterface
+        fun listenStop(): String {
+            runOnUiThread { runCatching { rec?.stopListening() } }
+            return "ok"
+        }
+
+        @JavascriptInterface
+        fun listenAbort(): String {
+            runOnUiThread { runCatching { rec?.cancel() }; recOn = false }
+            recEvent("end")
+            return "ok"
+        }
+
+        @JavascriptInterface
+        fun openUrl(url: String): String =
+            try {
+                runOnUiThread { leaveApp(url) }
+                "ok"
+            } catch (e: Throwable) { "gagal: ${e.message}" }
+
+        /**
+         * API Web Share tidak wujud dalam WebView, jadi navigator.share
+         * adalah undefined dan setiap butang kongsi jatuh ke salin-teks atau
+         * tidak melakukan apa-apa. Ini ialah ACTION_SEND Android.
+         *
+         * Fail dihantar sebagai base64 dan ditulis ke cache, kemudian
+         * dikongsi melalui FileProvider: Uri fail mentah dilarang sejak
+         * Android 7.
+         */
+        @JavascriptInterface
+        fun share(text: String, b64: String, name: String, mime: String): String {
+            return try {
+                val i = Intent(Intent.ACTION_SEND)
+                if (b64.isEmpty()) {
+                    i.type = "text/plain"
+                    i.putExtra(Intent.EXTRA_TEXT, text)
+                } else {
+                    val dir = File(cacheDir, "share").apply { mkdirs() }
+                    dir.listFiles()?.forEach { runCatching { it.delete() } }
+                    val f = File(dir, if (name.isEmpty()) "pocket.bin" else name)
+                    FileOutputStream(f).use { it.write(Base64.decode(b64, Base64.DEFAULT)) }
+                    val u = FileProvider.getUriForFile(
+                        this@MainActivity, "$packageName.files", f)
+                    i.type = if (mime.isEmpty()) "application/octet-stream" else mime
+                    i.putExtra(Intent.EXTRA_STREAM, u)
+                    if (text.isNotEmpty()) i.putExtra(Intent.EXTRA_TEXT, text)
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                runOnUiThread {
+                    runCatching { startActivity(Intent.createChooser(i, "Kongsi")) }
+                }
+                "ok"
+            } catch (e: Throwable) {
+                uvc.say("Kongsi gagal: ${e.message}")
+                "gagal: ${e.message}"
+            }
+        }
+
+        /**
+         * Screen Wake Lock API tidak wujud dalam WebView, jadi skrin padam
+         * di tengah pemeriksaan. Ini bendera Android yang sepadan.
+         */
+        @JavascriptInterface
+        fun keepAwake(on: Boolean): String {
+            runOnUiThread {
+                runCatching {
+                    if (on) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+            }
+            return "ok"
+        }
+
         @JavascriptInterface
         fun sayStop(): String {
             runCatching { tts?.stop() }
@@ -531,6 +787,8 @@ class MainActivity : AppCompatActivity() {
         uvc.stop()
         runCatching { tts?.stop(); tts?.shutdown() }
         tts = null
+        runCatching { rec?.destroy() }
+        rec = null
     }
 
     companion object {
