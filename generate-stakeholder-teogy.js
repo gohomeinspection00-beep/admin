@@ -108,7 +108,7 @@ para(
 y += 4;
 
 para(
-  "I wish to bring to your attention that a substantial number of defect rectification works have not been completed by the Developer despite numerous written and verbal complaints and inspections, and/or the Developer has failed, neglected or refused to attend to them. Among others, the latest Re-Inspection on 27 August 2026 confirmed the defects remain unresolved, and all nine (9) further defect cases submitted through CVConnect on 28 August 2026 and 1 September 2026 remain in \"Pending\" status to date. A copy of the list of outstanding defects is attached herewith for your record, and an official repair quotation amounting to RM25,565.00 has been obtained."
+  "I wish to bring to your attention that a substantial number of defect rectification works have not been completed by the Developer despite numerous written and verbal complaints and inspections, and/or the Developer has failed, neglected or refused to attend to them. Among others, the latest Re-Inspection on 27 August 2026 confirmed the defects remain unresolved, and all nine (9) further defect cases submitted through CVConnect on 28 August 2026 and 1 September 2026 remain in \"Pending\" status to date. A copy of the list of outstanding defects, together with the supporting documents, will be forwarded to your firm by e-mail (khkohjoetan@yahoo.com; khkjoetan@gmail.com) for your record, and an official repair quotation amounting to RM25,565.00 has been obtained."
 );
 y += 4;
 
@@ -143,7 +143,7 @@ for (const l of ccL) { checkBreak(5); doc.text(l, mL + 5, y); y += 4.5; }
 y += 4;
 
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL); bk();
-doc.text("Encl.:", mL, y); y += 5;
+doc.text("To follow by e-mail:", mL, y); y += 5;
 doc.setFont("helvetica", "normal");
 doc.text("1. List of outstanding defects (as per Second and Final Notice Ref: NOTIS-2/2026/035)", mL + 5, y); y += 4.5;
 doc.text("2. Copy of AR card No. RW214680799MY (proof of service of First Notice)", mL + 5, y); y += 4.5;
