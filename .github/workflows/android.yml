@@ -13,25 +13,56 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
+      # Imej ubuntu-latest sudah membawa SDK Android dengan lesen diterima,
+      # jadi memasangnya semula hanya menambah satu titik kegagalan.
+      - name: Show the SDK we were given
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls "$ANDROID_HOME/platforms" || true
 
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Build debug APK
+        id: build
         working-directory: android
-        run: gradle --no-daemon assembleDebug
+        run: |
+          set -o pipefail
+          gradle --no-daemon --stacktrace assembleDebug 2>&1 | tee build.log
 
-      - name: Where did it land
+      # Log penuh disekat di belakang storan blob, yang tidak semua orang
+      # boleh capai. Ringkasan langkah boleh dibaca melalui API, jadi ralat
+      # diletakkan di situ dan bukan hanya dalam log.
+      - name: Put the errors somewhere readable
         if: always()
         working-directory: android
-        run: find . -name '*.apk' -print
+        run: |
+          {
+            echo '### Build output'
+            echo '```'
+            grep -nE "^e: |error:|FAILURE|What went wrong|Caused by|Could not|Unresolved reference|> Task .* FAILED" build.log | head -80 || echo '(tiada baris ralat dipadankan)'
+            echo '```'
+            echo '### Last 60 lines'
+            echo '```'
+            tail -60 build.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-log
+          path: android/build.log
+          if-no-files-found: warn
 
       - uses: actions/upload-artifact@v4
         if: success()
