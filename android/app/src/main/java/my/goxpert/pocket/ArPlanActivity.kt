@@ -70,6 +70,8 @@ class ArPlanActivity : Activity() {
     private lateinit var resetBtn: Button
     private lateinit var lockBtn: Button
     private lateinit var shotBtn: Button
+    private lateinit var flipBtn: Button
+    private lateinit var warn: TextView
 
     private val bg = ArBackground()
     private val planGl = ArPlanQuad()
@@ -168,9 +170,20 @@ class ArPlanActivity : Activity() {
 
         val bar = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.argb(190, 0, 0, 0))
-            setPadding(dp(12), dp(8), dp(12), dp(14))
+            setBackgroundColor(Color.argb(205, 0, 0, 0))
+            // Pelapik bawah yang lebih besar: bar navigasi sistem duduk di
+            // atas tetingkap ini dan memotong baris terakhir.
+            setPadding(dp(12), dp(8), dp(12), dp(30))
         }
+
+        warn = TextView(this).apply {
+            setTextColor(Color.rgb(255, 214, 102))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            setPadding(dp(10), dp(7), dp(10), dp(7))
+            setBackgroundColor(Color.argb(60, 255, 196, 0))
+            visibility = View.GONE
+        }
+        bar.addView(warn, LinearLayout.LayoutParams(-1, -2))
 
         readout = TextView(this).apply {
             setTextColor(Color.WHITE)
@@ -182,11 +195,6 @@ class ArPlanActivity : Activity() {
 
         // Lut sinar: pelan mesti boleh dilihat menembusi untuk dibandingkan
         // dengan apa yang sebenarnya ada di sana.
-        bar.addView(Button(this).apply {
-            text = "Cermin"; isAllCaps = false
-            setOnClickListener { if (!locked) { flip = !flip; rebuild(); paintText() } }
-            layoutParams = LinearLayout.LayoutParams(-2, dp(40))
-        })
         bar.addView(row("Lut sinar", 20, 95, 65, { v -> "$v%" }) { v ->
             opacity = v / 100f; paintText(); overlay.postInvalidate()
         })
@@ -206,19 +214,40 @@ class ArPlanActivity : Activity() {
             })
         }
 
-        val btns = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setPadding(0, dp(8), 0, 0)
+        // Lima butang teks dalam satu baris pada skrin telefon memberi
+        // kira-kira 70dp setiap satu, yang memotong setiap label kepada
+        // "Mul a" dan "Kun ci". Tiga baris, dengan tindakan utama sendirian
+        // di atas: setiap perkataan muat, dan apa yang perlu ditekan
+        // seterusnya ialah yang paling besar.
+        fun mk(label: String, w: Float, primary: Boolean = false): Button =
+            Button(this).apply {
+                text = label
+                isAllCaps = false
+                maxLines = 1
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, if (primary) 15f else 13f)
+                layoutParams = LinearLayout.LayoutParams(0, dp(if (primary) 52 else 46), w)
+                    .apply { marginEnd = dp(6); topMargin = dp(6) }
+            }
+        fun rowOf(vararg b2: Button): LinearLayout =
+            LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                b2.forEach { addView(it) }
+            }
+
+        placeBtn = mk("Letak titik 1", 1f, true).apply { setOnClickListener { wantPlace = true } }
+        bar.addView(rowOf(placeBtn), LinearLayout.LayoutParams(-1, -2))
+
+        // Cermin duduk pertama kerana ia jawapan kepada soalan yang paling
+        // kerap: jajaran dua titik menetapkan satu garis, bukan sisi mana
+        // menghadap ke atas, jadi pelan boleh mendarat bercermin dan satu
+        // ketikan membetulkannya.
+        flipBtn = mk("Cermin", 1f).apply {
+            setOnClickListener {
+                if (locked) {
+                    Toast.makeText(this@ArPlanActivity, "Buka kunci dahulu", Toast.LENGTH_SHORT).show()
+                } else { flip = !flip; rebuild(); paintText() }
+            }
         }
-        fun mk(label: String, w: Float): Button = Button(this).apply {
-            text = label; isAllCaps = false
-            layoutParams = LinearLayout.LayoutParams(0, dp(50), w).apply { marginEnd = dp(6) }
-        }
-        resetBtn = mk("Mula semula", 1f).apply {
-            isEnabled = false
-            setOnClickListener { locked = false; wantReset = true }
-        }
-        placeBtn = mk("Letak titik 1", 1.5f).apply { setOnClickListener { wantPlace = true } }
         lockBtn = mk("Kunci", 1f).apply {
             isEnabled = false
             setOnClickListener {
@@ -231,12 +260,16 @@ class ArPlanActivity : Activity() {
         }
         shotBtn = mk("Snap", 1f).apply {
             isEnabled = false
-            setOnClickListener { wantShot = true; isEnabled = false; text = "..." }
+            setOnClickListener { wantShot = true; isEnabled = false; text = "\u2026" }
+        }
+        bar.addView(rowOf(flipBtn, lockBtn, shotBtn), LinearLayout.LayoutParams(-1, -2))
+
+        resetBtn = mk("Mula semula", 1f).apply {
+            isEnabled = false
+            setOnClickListener { locked = false; wantReset = true }
         }
         val doneBtn = mk("Tutup", 1f).apply { setOnClickListener { finish() } }
-        btns.addView(resetBtn); btns.addView(placeBtn); btns.addView(lockBtn)
-        btns.addView(shotBtn); btns.addView(doneBtn)
-        bar.addView(btns, LinearLayout.LayoutParams(-1, -2))
+        bar.addView(rowOf(resetBtn, doneBtn), LinearLayout.LayoutParams(-1, -2))
 
         root.addView(bar, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.BOTTOM })
         setContentView(root)
@@ -470,10 +503,11 @@ class ArPlanActivity : Activity() {
         val n = anchors.size
         val need = if (twoPin) 2 else 1
         placeBtn.isEnabled = n < need && !locked
-        placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Siap"
+        placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Pelan diletak ✓"
         resetBtn.isEnabled = n > 0
         lockBtn.isEnabled = state != null
-        lockBtn.text = if (locked) "Buka" else "Kunci"
+        lockBtn.text = if (locked) "Buka kunci" else "Kunci"
+        flipBtn.isEnabled = state != null && !locked
         if (!wantShot) { shotBtn.isEnabled = state != null; shotBtn.text = "Snap" }
 
         hint.text = when {
@@ -481,14 +515,29 @@ class ArPlanActivity : Activity() {
             !tracking -> "Gerak telefon perlahan supaya ARCore nampak lantai…"
             planeCount == 0 ->
                 "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, halakan ke lantai bercorak."
-            locked -> "Pelan dikunci. Tekan Buka untuk melaras semula."
-            n >= need -> "Pelan diletak. Laras dengan slider di bawah."
+            locked -> "Pelan dikunci. Tekan Buka kunci untuk melaras semula."
+            // Ketaksaan yang paling kerap mengelirukan, dinamakan sebaik
+            // pelan muncul dan bukan dibiarkan untuk ditemui sendiri.
+            n >= need -> "Pelan diletak. Teks terbalik? Tekan Cermin. Laras tinggi dengan slider."
             aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
             n == 0 -> "Halakan ke tempat sebenar titik ${if (twoPin) "1" else "jangkar"} pada pelan, kemudian Letak"
             else -> "Halakan ke tempat sebenar titik 2, kemudian Letak"
         }
 
         val st = state
+        // Skala yang tidak munasabah bermakna dua titik diletak terlalu
+        // rapat di tapak: ralat beberapa sentimeter antara dua anchor yang
+        // berjarak setengah meter mendarabkan merentasi seluruh pelan.
+        val wideM = if (st == null) 0f else planW * st.s
+        warn.visibility = if (st != null && twoPin && (wideM < 0.8f || wideM > 120f))
+            View.VISIBLE else View.GONE
+        if (warn.visibility == View.VISIBLE) {
+            warn.text = String.format(
+                "Pelan keluar %.2f m lebar — dua titik di tapak terlalu %s. " +
+                "Tekan Mula semula dan letak semula lebih %s.",
+                wideM, if (wideM < 0.8f) "rapat" else "jauh",
+                if (wideM < 0.8f) "jauh" else "rapat")
+        }
         readout.text = if (st == null) "—" else {
             val wide = planW * st.s
             val gap = if (mode == "wall") ""
