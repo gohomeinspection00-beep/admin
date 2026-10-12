@@ -214,41 +214,51 @@ class ArPlanActivity : Activity() {
             })
         }
 
-        // Lima butang teks dalam satu baris pada skrin telefon memberi
-        // kira-kira 70dp setiap satu, yang memotong setiap label kepada
-        // "Mul a" dan "Kun ci". Tiga baris, dengan tindakan utama sendirian
-        // di atas: setiap perkataan muat, dan apa yang perlu ditekan
-        // seterusnya ialah yang paling besar.
-        fun mk(label: String, w: Float, primary: Boolean = false): Button =
+        // Ikon dengan label kecil di bawahnya, bukan teks sahaja.
+        //
+        // Teks sahaja memaksa pilihan antara muat dan faham: lima perkataan
+        // Melayu bersebelahan pada skrin telefon memberi kira-kira 70dp
+        // setiap satu, yang memotong "Mula semula" kepada "Mul a". Satu ikon
+        // dengan perkataan di BAWAHnya mendapat lebar penuh butang untuk
+        // perkataan itu, jadi kelima-limanya muat dalam satu baris dan setiap
+        // satu masih bernama.
+        fun icon(res: Int, label: String): Button =
             Button(this).apply {
                 text = label
                 isAllCaps = false
                 maxLines = 1
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, if (primary) 15f else 13f)
-                layoutParams = LinearLayout.LayoutParams(0, dp(if (primary) 52 else 46), w)
-                    .apply { marginEnd = dp(6); topMargin = dp(6) }
-            }
-        fun rowOf(vararg b2: Button): LinearLayout =
-            LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                b2.forEach { addView(it) }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10.5f)
+                setCompoundDrawablesWithIntrinsicBounds(0, res, 0, 0)
+                compoundDrawablePadding = dp(3)
+                setPadding(dp(2), dp(7), dp(2), dp(7))
+                layoutParams = LinearLayout.LayoutParams(0, dp(68), 1f)
+                    .apply { marginEnd = dp(5); topMargin = dp(7) }
             }
 
-        placeBtn = mk("Letak titik 1", 1f, true).apply { setOnClickListener { wantPlace = true } }
-        bar.addView(rowOf(placeBtn), LinearLayout.LayoutParams(-1, -2))
+        placeBtn = Button(this).apply {
+            isAllCaps = false
+            maxLines = 1
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pin, 0, 0, 0)
+            compoundDrawablePadding = dp(8)
+            setOnClickListener { wantPlace = true }
+            layoutParams = LinearLayout.LayoutParams(-1, dp(52))
+                .apply { topMargin = dp(7) }
+        }
+        bar.addView(placeBtn)
 
         // Cermin duduk pertama kerana ia jawapan kepada soalan yang paling
         // kerap: jajaran dua titik menetapkan satu garis, bukan sisi mana
         // menghadap ke atas, jadi pelan boleh mendarat bercermin dan satu
         // ketikan membetulkannya.
-        flipBtn = mk("Cermin", 1f).apply {
+        flipBtn = icon(R.drawable.ic_flip, "Cermin").apply {
             setOnClickListener {
                 if (locked) {
                     Toast.makeText(this@ArPlanActivity, "Buka kunci dahulu", Toast.LENGTH_SHORT).show()
                 } else { flip = !flip; rebuild(); paintText() }
             }
         }
-        lockBtn = mk("Kunci", 1f).apply {
+        lockBtn = icon(R.drawable.ic_lock, "Kunci").apply {
             isEnabled = false
             setOnClickListener {
                 locked = !locked
@@ -258,18 +268,22 @@ class ArPlanActivity : Activity() {
                     if (locked) "Pelan dikunci" else "Pelan dibuka", Toast.LENGTH_SHORT).show()
             }
         }
-        shotBtn = mk("Snap", 1f).apply {
+        shotBtn = icon(R.drawable.ic_camera, "Snap").apply {
             isEnabled = false
             setOnClickListener { wantShot = true; isEnabled = false; text = "\u2026" }
         }
-        bar.addView(rowOf(flipBtn, lockBtn, shotBtn), LinearLayout.LayoutParams(-1, -2))
-
-        resetBtn = mk("Mula semula", 1f).apply {
+        resetBtn = icon(R.drawable.ic_reset, "Mula").apply {
             isEnabled = false
             setOnClickListener { locked = false; wantReset = true }
         }
-        val doneBtn = mk("Tutup", 1f).apply { setOnClickListener { finish() } }
-        bar.addView(rowOf(resetBtn, doneBtn), LinearLayout.LayoutParams(-1, -2))
+        val doneBtn = icon(R.drawable.ic_close, "Tutup").apply {
+            setOnClickListener { finish() }
+        }
+        bar.addView(LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            addView(flipBtn); addView(lockBtn); addView(shotBtn)
+            addView(resetBtn); addView(doneBtn)
+        }, LinearLayout.LayoutParams(-1, -2))
 
         root.addView(bar, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.BOTTOM })
         setContentView(root)
@@ -504,11 +518,16 @@ class ArPlanActivity : Activity() {
         val need = if (twoPin) 2 else 1
         placeBtn.isEnabled = n < need && !locked
         placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Pelan diletak ✓"
-        resetBtn.isEnabled = n > 0
+        // Ikon mangga bertukar bersama keadaannya: satu mangga tertutup yang
+        // bermaksud "tekan untuk kunci" dan satu yang bermaksud "sudah
+        // dikunci" ialah dua perkara berbeza.
+        lockBtn.setCompoundDrawablesWithIntrinsicBounds(
+            0, if (locked) R.drawable.ic_unlock else R.drawable.ic_lock, 0, 0)
         lockBtn.isEnabled = state != null
         lockBtn.text = if (locked) "Buka kunci" else "Kunci"
         flipBtn.isEnabled = state != null && !locked
         if (!wantShot) { shotBtn.isEnabled = state != null; shotBtn.text = "Snap" }
+        resetBtn.isEnabled = n > 0
 
         hint.text = when {
             !tracking && why.isNotEmpty() -> why

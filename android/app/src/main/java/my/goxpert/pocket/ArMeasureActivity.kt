@@ -174,17 +174,28 @@ class ArMeasureActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             setPadding(0, dp(10), 0, 0)
         }
-        fun mk(label: String, weight: Float): Button =
+        // Ikon di sebelah label, sama seperti skrin pelan: satu bar AR tidak
+        // sepatutnya kelihatan seperti dua app yang berbeza.
+        fun mk(label: String, weight: Float, res: Int): Button =
             Button(this).apply {
                 text = label
                 isAllCaps = false
+                maxLines = 1
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                setCompoundDrawablesWithIntrinsicBounds(res, 0, 0, 0)
+                compoundDrawablePadding = dp(5)
+                setPadding(dp(6), 0, dp(6), 0)
                 layoutParams = LinearLayout.LayoutParams(0, dp(52), weight)
                     .apply { marginEnd = dp(6) }
             }
 
-        undoBtn = mk("Undo", 1f).apply { isEnabled = false; setOnClickListener { undo() } }
-        val place = mk("Letak titik", 1.6f).apply { setOnClickListener { place() } }
-        doneBtn = mk("Siap", 1f).apply { isEnabled = false; setOnClickListener { finishWith() } }
+        undoBtn = mk("Undo", 1f, R.drawable.ic_undo).apply {
+            isEnabled = false; setOnClickListener { undo() }
+        }
+        val place = mk("Letak", 1.4f, R.drawable.ic_pin).apply { setOnClickListener { place() } }
+        doneBtn = mk("Siap", 1f, R.drawable.ic_check).apply {
+            isEnabled = false; setOnClickListener { finishWith() }
+        }
 
         row.addView(undoBtn); row.addView(place); row.addView(doneBtn)
         bar.addView(row, LinearLayout.LayoutParams(-1, -2))

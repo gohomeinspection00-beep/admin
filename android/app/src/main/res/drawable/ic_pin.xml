@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Letak titik: rambut silang dengan titik tengah, sama seperti kursor. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp"
+    android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="1.9"
+        android:strokeLineCap="round"
+        android:pathData="M12,2 L12,7 M12,17 L12,22 M2,12 L7,12 M17,12 L22,12" />
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="1.9"
+        android:pathData="M12,12 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M12,12 m-1.6,0 a1.6,1.6 0 1,0 3.2,0 a1.6,1.6 0 1,0 -3.2,0" />
+</vector>
