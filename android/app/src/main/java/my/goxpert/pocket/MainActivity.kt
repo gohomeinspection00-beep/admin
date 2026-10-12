@@ -20,6 +20,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.speech.tts.Voice
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.webkit.GeolocationPermissions
@@ -68,6 +69,46 @@ class MainActivity : AppCompatActivity() {
      */
     private var rec: SpeechRecognizer? = null
     private var recOn = false
+
+    /**
+     * Suara terbaik yang enjin ini ada untuk satu bahasa.
+     *
+     * setLanguage sahaja memberi apa sahaja yang enjin anggap lalai, yang
+     * biasanya suara terbenam yang kecil dan terdengar seperti robot. Suara
+     * neural untuk bahasa yang sama duduk dalam senarai yang sama dan
+     * melaporkan kualiti yang lebih tinggi; enjin tidak memilihnya sendiri.
+     *
+     * Kualiti dahulu, kemudian negara yang sepadan. Pada kualiti yang sama,
+     * suara yang tidak memerlukan rangkaian menang: di tapak, isyarat tidak
+     * boleh diharap, dan suara yang senyap lebih teruk daripada suara yang
+     * kurang cantik.
+     */
+    private fun bestVoice(loc: Locale): Voice? {
+        val t = tts ?: return null
+        val all = runCatching { t.voices }.getOrNull() ?: return null
+        val want = loc.language.lowercase()
+        val fit = all.filter { v ->
+            val lang = runCatching { v.locale.language.lowercase() }.getOrNull()
+            lang == want && v.features?.contains(
+                TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) != true
+        }
+        if (fit.isEmpty()) return null
+        return fit.sortedWith(
+            compareByDescending<Voice> { it.quality }
+                .thenByDescending { it.locale.country.equals(loc.country, true) }
+                .thenBy { it.isNetworkConnectionRequired }
+        ).firstOrNull()
+    }
+
+    /** Tetapkan bahasa DAN suara terbaiknya. Benar kalau bahasa itu ada. */
+    private fun useLang(bcp: String): Boolean {
+        val t = tts ?: return false
+        val loc = runCatching { Locale.forLanguageTag(bcp) }.getOrNull() ?: return false
+        val r = runCatching { t.setLanguage(loc) }.getOrNull() ?: return false
+        if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) return false
+        bestVoice(loc)?.let { v -> runCatching { t.voice = v } }
+        return true
+    }
 
     private fun sayEvent(k: String) {
         val js = "window.pkSaid && window.pkSaid(" + jsStr(k) + ")"
@@ -213,9 +254,9 @@ class MainActivity : AppCompatActivity() {
             if (ttsOk) {
                 // Kiraan dibaca dalam bahasa Inggeris ("Hollow, 3"), jadi
                 // cuba bahasa itu dahulu dan jatuh ke bahasa peranti.
-                val r = runCatching { tts?.setLanguage(Locale.UK) }.getOrNull()
-                if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    runCatching { tts?.setLanguage(Locale.getDefault()) }
+                if (!useLang("en-GB")) useLang(Locale.getDefault().toLanguageTag())
+                runCatching {
+                    uvc.say("Suara TTS: " + (tts?.voice?.name ?: "(lalai)"))
                 }
             }
             if (ttsOk) runCatching {
@@ -301,12 +342,16 @@ class MainActivity : AppCompatActivity() {
                     // Laluan ini kekal untuk apa-apa <input type=file> lain.
                     filePick?.onReceiveValue(null)
                     filePick = cb
-                    val wantsImage = params?.acceptTypes?.any {
+                    // capture="environment" bermakna ambil gambar BARU.
+                    // Menghalakannya ke pemilih foto membuka galeri dan bukan
+                    // kamera, jadi biarkan intent asal mengendalikan itu.
+                    val wantsCamera = params?.isCaptureEnabled ?: false
+                    val wantsImage = !wantsCamera && (params?.acceptTypes?.any {
                         it.startsWith("image/") || it == ".jpg" || it == ".png"
-                    } ?: false
+                    } ?: false)
                     return try {
                         val it0 = if (wantsImage) imagePickIntent() else params!!.createIntent()
-                        uvc.say("onShowFileChooser: gambar=$wantsImage")
+                        uvc.say("onShowFileChooser: galeri=$wantsImage kamera=$wantsCamera")
                         pickFiles.launch(it0)
                         true
                     } catch (e: Throwable) {
@@ -533,9 +578,7 @@ class MainActivity : AppCompatActivity() {
             val t = tts
             if (t == null || !ttsOk) return "tiada"
             return try {
-                val r = t.setLanguage(Locale.forLanguageTag(bcp))
-                if (r == TextToSpeech.LANG_MISSING_DATA ||
-                    r == TextToSpeech.LANG_NOT_SUPPORTED) return "tiada-bahasa"
+                if (!useLang(bcp)) return "tiada-bahasa"
                 t.setSpeechRate(if (rate > 0f) rate else 1f)
                 t.speak(text, TextToSpeech.QUEUE_FLUSH, null, "pocket")
                 "ok"

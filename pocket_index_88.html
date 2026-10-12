@@ -9315,7 +9315,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.7 · build 12 Okt 2026 · Jambatan app: suara, kongsi, skrin, pautan</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.8 · build 12 Okt 2026 · Suara ikut bahasa, AR dikatakan</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -16266,11 +16266,18 @@ function armScreenStart() {
   const statusEl = document.getElementById('arStatus');
   if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
     statusEl.className = 'ar-status warn';
-    statusEl.innerHTML = 'AR tidak boleh jalan di sini. Ia perlukan:<br>' +
-      '• Chrome pada telefon <b>Android yang menyokong ARCore</b><br>' +
-      '• App dibuka melalui <b>https://</b><br><br>' +
-      'iPhone tiada WebXR langsung — itu had Safari, bukan app ini. Guna <b>Crack Ruler</b> untuk ukur dari gambar.';
-    startBtn.textContent = 'AR tiada di sini';
+    // Di dalam app, konteks ini memang selamat dan telefon ini memang
+    // menyokong ARCore — yang hilang ialah WebXR itu sendiri, yang dihantar
+    // dalam Chrome dan bukan dalam WebView. Menyenaraikan "perlukan https"
+    // di sini akan menghantar surveyor memburu masalah yang tidak wujud.
+    statusEl.innerHTML = window.PocketNative
+      ? 'App ini tiada WebXR. Ia dihantar dalam Chrome, bukan dalam WebView yang app ini dibina atas, dan ia satu tindanan penjejakan penuh — tiada jambatan boleh menampungnya.<br><br>' +
+        'Untuk AR, buka Pocket dalam <b>Chrome</b>. Di sini, <b>Crack Ruler</b> mengukur dari gambar, dan setiap alat lain kekal berfungsi.'
+      : 'AR tidak boleh jalan di sini. Ia perlukan:<br>' +
+        '• Chrome pada telefon <b>Android yang menyokong ARCore</b><br>' +
+        '• App dibuka melalui <b>https://</b><br><br>' +
+        'iPhone tiada WebXR langsung — itu had Safari, bukan app ini. Guna <b>Crack Ruler</b> untuk ukur dari gambar.';
+    startBtn.textContent = window.PocketNative ? 'AR perlukan Chrome' : 'AR tiada di sini';
     return;
   }
   navigator.xr.isSessionSupported('immersive-ar').then(function(ok) {
@@ -21525,11 +21532,22 @@ function pkSay(text, lang, rate, onDone) {
   if (!text) return false;
   _pkSayDone = null;
   var N = window.PocketNative;
-  if (N && typeof N.say === 'function') {
+  if (N && typeof N.sayIn === 'function') {
+    // sayIn dan bukan say: say tidak mengambil bahasa, jadi ia membaca
+    // dengan apa sahaja bahasa yang terakhir ditetapkan. Chat bercakap
+    // Melayu, enjin masih pada Inggeris dari permulaan, dan hasilnya ialah
+    // perkataan Melayu disebut oleh suara Inggeris — itulah bunyi robot itu.
     try {
-      var ok = String(N.say(String(text), rate || 1)) === 'ok';
+      var ok = String(N.sayIn(String(text), lang || 'en-GB', rate || 1)) === 'ok';
       if (ok && onDone) _pkSayDone = onDone;
       return ok;
+    } catch (e) { return false; }
+  }
+  if (N && typeof N.say === 'function') {
+    try {
+      var ok2 = String(N.say(String(text), rate || 1)) === 'ok';
+      if (ok2 && onDone) _pkSayDone = onDone;
+      return ok2;
     } catch (e) { return false; }
   }
   if (!window.speechSynthesis) return false;
