@@ -20,7 +20,7 @@ STEPS = [
      None, None),
     ("s4", "p06.jpg", 0.75, "Tampal barcode AR",
      ["Barcode “FOR ARCARD PURPOSES”", "ditampal di ruang No. Pos Daftar.", "Simpan “Customer’s copy”."],
-     (190, 600, 400, 110), "FOR ARCARD PURPOSES"),
+     (176, 684, 350, 96), "TAMPAL DI SINI"),
     ("s5", "p10.jpg", 0.62, "Lekat Kad AR di belakang",
      ["Tanggalkan pita pelekat dan", "lekat Kad AR di belakang", "sampul."],
      None, None),
@@ -30,10 +30,27 @@ STEPS = [
     ("s7", "p12.jpg", 0.40, "Hantar & simpan resit",
      ["Simpan resit pengeposan (ada", "cop tarikh) & borang PD1.", "Contoh: 3 surat = RM13.80."],
      (500, 400, 190, 190), "COP TARIKH"),
-    ("s8", "p01.jpg", 0.75, "Kad AR dipulangkan",
-     ["Penerima tandatangan bahagian B.", "Kad AR dipulangkan kepada anda", "= BUKTI notis diterima."],
-     (540, 420, 490, 520), "BAHAGIAN B"),
+    ("s8", "p14.jpg", 0.90, "Kad AR dipulangkan",
+     ["Penerima tandatangan & cop", "bahagian B. Kad dipulangkan", "kepada anda = BUKTI diterima."],
+     (548, 372, 516, 612), "DITANDATANGANI & DICOP"),
 ]
+DOWN = '<svg viewBox="0 0 24 24" class="ico"><path d="M12 3v16M5 13l7 7 7-7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="square"/></svg>'
+# Extra annotations drawn inside a slide's zooming photo wrapper (same coordinates as the highlight boxes)
+EXTRA = {
+    "s2": '<span class="note" id="n-send" style="left:187px;top:214px">PENGIRIM → BELAKANG</span>'
+          '<span class="note" id="n-recv" style="left:598px;top:226px">PENERIMA → DEPAN</span>'
+          '<span class="note" id="n-ar" style="left:800px;top:530px">KAD AR</span>'
+          '<span class="note" id="n-pd" style="left:70px;top:1012px">PELEKAT POS DAFTAR</span>'
+          '<span class="note" id="n-stamp" style="left:560px;top:962px">SETEM</span>',
+    "s4": '<span id="z-arrow" class="z-arrow">' + DOWN + '</span>'
+          '<div id="z-card" class="z-card"><img src="assets/p06-zoom.jpg" alt="" /><span class="z-label">ZOOM</span></div>',
+}
+EXTRA_JS = {
+    "s2": 'tl.fromTo(["#n-send", "#n-recv", "#n-ar", "#n-pd", "#n-stamp"], { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.25, ease: "back.out(2)", stagger: 0.32 }, START + 1.0);',
+    "s4": 'tl.fromTo("#z-arrow", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, START + 1.5);\n'
+          '      tl.fromTo("#z-card", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.8)", transformOrigin: "30% 0%" }, START + 1.7);',
+}
+
 HOOK = 3.2
 WHY = 5.6
 STEP_D = 4.6
@@ -69,7 +86,7 @@ for k, (st, du, sid, photo, py, title, body, hl, hll) in enumerate(SLIDES):
         hl_html = f'<span id="{sid}-hl" class="hl-box" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px"><span class="hl-label">{hll}</span></span>'
     lines = "".join(f'<span class="body-line">{l}</span>' for l in body)
     slides_html.append(f'''      <div id="{sid}" class="slide clip" data-start="{round(st, 2)}" data-duration="{du}" data-track-index="2">
-        <div class="photo"><div id="{sid}-wrap" class="photo-wrap"><img src="assets/{photo}" alt="" style="object-position: 50% {int(py * 100)}%" />{hl_html}</div></div>
+        <div class="photo"><div id="{sid}-wrap" class="photo-wrap"><img src="assets/{photo}" alt="" style="object-position: 50% {int(py * 100)}%" />{hl_html}{EXTRA.get(sid, "")}</div></div>
         <div class="panel">
           <div class="step-row"><span id="{sid}-num" class="step-num">{k + 1}</span><span class="step-of">LANGKAH {k + 1}/{len(SLIDES)}</span></div>
           <span class="mask"><span id="{sid}-title" class="step-title">{title}</span></span>
@@ -82,6 +99,8 @@ for k, (st, du, sid, photo, py, title, body, hl, hll) in enumerate(SLIDES):
       tl.fromTo("#{sid}-num", {{ scale: 0, rotation: -30 }}, {{ scale: 1, rotation: 0, duration: 0.35, ease: "back.out(2.4)" }}, {round(s0 + 0.3, 2)});
       tl.fromTo("#{sid}-title", {{ yPercent: 105 }}, {{ yPercent: 0, duration: 0.3, ease: "power4.out" }}, {round(s0 + 0.35, 2)});
       tl.fromTo("#{sid}-body .body-line", {{ opacity: 0, x: -24 }}, {{ opacity: 1, x: 0, duration: 0.25, ease: "power3.out", stagger: 0.12 }}, {round(s0 + 0.6, 2)});''')
+    if sid in EXTRA_JS:
+        slides_js.append("      " + EXTRA_JS[sid].replace("START", str(s0)))
     if hl:
         slides_js.append(f'''      tl.fromTo("#{sid}-hl", {{ opacity: 0, scale: 1.25 }}, {{ opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }}, {round(s0 + 1.1, 2)});''')
 LAST = SLIDES[-1]
@@ -105,6 +124,11 @@ html = f'''<!doctype html>
       .step-title {{ display: block; font-family: var(--display); font-size: 124px; line-height: 0.95; color: var(--paper); text-transform: uppercase; white-space: nowrap; }}
       .step-body {{ display: flex; flex-direction: column; gap: 8px; }}
       .body-line {{ display: block; font-family: var(--mono); font-weight: 700; font-size: 44px; line-height: 1.32; color: var(--paper); }}
+      .note {{ position: absolute; display: block; padding: 8px 16px 6px; background: var(--accent); color: var(--ink); font-family: var(--mono); font-weight: 700; font-size: 30px; white-space: nowrap; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); }}
+      .z-arrow {{ position: absolute; left: 318px; top: 786px; display: block; color: var(--accent); font-size: 72px; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5)); }}
+      .z-card {{ position: absolute; left: 70px; top: 872px; padding: 12px; background: #ffffff; border: 6px solid var(--accent); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5); }}
+      .z-card img {{ display: block; width: 900px; height: 218px; object-fit: cover; }}
+      .z-label {{ position: absolute; left: -6px; top: -46px; display: block; padding: 6px 14px 4px; background: var(--ink); color: var(--accent); font-family: var(--mono); font-weight: 700; font-size: 28px; letter-spacing: 0.1em; }}
       .hl-box {{ position: absolute; border: 8px dashed var(--accent); box-shadow: 0 0 0 4px rgba(29, 26, 51, 0.45); }}
       .hl-label {{ position: absolute; left: -8px; top: -62px; display: block; padding: 8px 16px 6px; background: var(--accent); color: var(--ink); font-family: var(--mono); font-weight: 700; font-size: 32px; white-space: nowrap; }}
 

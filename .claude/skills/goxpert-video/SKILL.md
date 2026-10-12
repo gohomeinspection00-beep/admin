@@ -142,12 +142,17 @@ one slide per step (photo top 1250 px with slow zoom, ink panel with yellow step
 "LANGKAH n/N", League Gothic title, 3 mono body lines, dashed yellow highlight box + label on
 the key spot) → proof chip → standard end card. No voice → SFX only. Also export each slide's
 hold frame as a JPG carousel (Threads/IG) zipped next to the video. Reference:
-`templates/photo-slides/build.py`.
+`templates/photo-slides/build.py`. Pointing at small details: `EXTRA`/`EXTRA_JS` add yellow
+`.note` labels (staggered pop-in) and a down-arrow + white `.z-card` zoom inset (a pre-cropped
+JPG of the detail, e.g. `assets/p06-zoom.jpg`) inside the slide's zooming photo wrapper.
 
 **Privacy (mandatory, ask first):** documents in his photos show buyers' names, addresses, phones,
 tracking numbers, barcodes, QR/payment refs and developer names. Blur them all before building
 with `scripts/photo_blur.py` (pixelate + Gaussian, boxes in 1500×2000 preview space), then check
 zoomed crops of every blurred photo — residual handwriting and receipt refs are easy to miss.
+Keep printed form headings (Daripada/Pengirim, Kepada/Penerima) readable and blur only the filled-in
+details. `NATIVE` boxes use the photo's own pixels (phone screenshots etc.); `LIGHT` boxes get a
+soft box-blur so a barcode still reads as a barcode while the number is unreadable.
 
 ## 5. Thumbnail (only after "dah siap")
 
