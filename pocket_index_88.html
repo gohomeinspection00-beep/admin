@@ -2063,12 +2063,15 @@ body.en-open{overflow:hidden}
 
 .en-pick{flex:none;display:flex;align-items:center;gap:7px;padding:9px 12px;
   border-bottom:1px solid var(--line);background:var(--bg-2)}
-.en-pick span{flex:1;min-width:0;font-size:12px;font-weight:600;color:var(--fg-dim)}
+.en-pick span{flex:none;font-size:12px;font-weight:600;color:var(--fg-dim);white-space:nowrap}
+.en-pick .en-tool{flex:1;min-width:0;padding:7px 6px;font-size:11.5px;white-space:nowrap}
 .en-tick{position:absolute;left:6px;bottom:6px;width:28px;height:28px;border-radius:50%;
   display:grid;place-items:center;font:700 15px/1 var(--font-body);
   background:rgba(0,0,0,.55);color:transparent;border:2px solid rgba(255,255,255,.8)}
 .en-tick.on{background:var(--accent);border-color:#fff;color:#fff}
 
+.en-src{position:absolute;left:38px;top:7px;padding:2px 6px;border-radius:6px;
+  background:rgba(0,0,0,.6);color:#fff;font:600 9px/1.5 var(--font-body)}
 .en-pages{display:flex;flex-direction:column;gap:14px;padding:14px 12px}
 .en-page-w{position:relative;border-radius:8px;overflow:hidden;
   box-shadow:0 2px 14px rgba(0,0,0,.28);background:#fff}
@@ -9290,7 +9293,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.0 · build 12 Okt 2026 · Endoskop (pilih, pratonton, muat turun)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.1 · build 12 Okt 2026 · Endoskop (import gambar, simpan ke telefon)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -22531,6 +22534,7 @@ function enLive(ov) {
     body +
     '<div class="en-stat" id="enStat">' + escapeHTML(enLine(st)) + '</div>' +
     '<div class="en-bar">' +
+      '<button class="en-btn" id="enAdd">Tambah</button>' +
       '<button class="en-btn" id="enGal">' + (n ? n + ' gambar' : 'Galeri') + '</button>' +
       '<button class="en-shut" id="enShot"' + (st && st.opened ? '' : ' disabled') + ' aria-label="Tangkap"></button>' +
       '<button class="en-btn" id="enRep"' + (n ? '' : ' disabled') + '>Laporan</button>' +
@@ -22539,6 +22543,7 @@ function enLive(ov) {
   if (st && st.opened) document.getElementById('enView').src = '/uvc/stream';
   document.getElementById('enBack').addEventListener('click', enClose);
   document.getElementById('enMenu').addEventListener('click', enSessMenu);
+  document.getElementById('enAdd').addEventListener('click', enImport);
   document.getElementById('enGal').addEventListener('click', function() { EN.view = 'gallery'; enRender(); });
   document.getElementById('enRep').addEventListener('click', function() { EN.view = 'report'; enRender(); });
   var sh = document.getElementById('enShot');
@@ -22555,14 +22560,7 @@ async function enSnap() {
     var blob = await r.blob();
     if (!blob.size) throw new Error('bingkai kosong');
 
-    var id = 'sh_' + Date.now();
-    var full = await ipShrinkTo(blob, 1600, 0.85);
-    var thumb = await ipShrinkTo(blob, 360, 0.72);
-    await lbPut(EN_K.img + id, full, 'image/jpeg');
-    await lbPut(EN_K.th + id, thumb, 'image/jpeg');
-
-    EN.sess.shots.push({ id: id, t: Date.now(), title: '', desc: '', loc: '', sev: '',
-                         marks: [], pick: true });
+    await enAddShot(blob, 'uvc');
     EN.dirty = true;
     await enSaveSess(EN.sess);
 
@@ -22618,21 +22616,26 @@ async function enGallery(ov) {
       '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>') +
     (shots.length
       ? '<div class="en-pick"><span id="enPickN"></span>' +
-        '<button class="en-tool" id="enAll">Pilih semua</button>' +
-        '<button class="en-tool" id="enNone">Kosongkan</button></div>'
+        '<button class="en-tool" id="enAll">Semua</button>' +
+        '<button class="en-tool" id="enNone">Kosong</button>' +
+        '<button class="en-tool" id="enDlSel">Simpan ke telefon</button></div>'
       : '') +
     '<div class="en-scroll"><div class="en-grid" id="enGrid">' +
       (shots.length ? '' : '<div class="en-empty">Belum ada gambar. Kembali ke pandangan langsung dan tekan butang tangkap.</div>') +
     '</div></div>' +
     '<div class="en-bar">' +
-      '<button class="en-btn" id="enLive">Pandangan langsung</button>' +
+      '<button class="en-btn" id="enLive">Langsung</button>' +
+      '<button class="en-btn" id="enAdd2">Tambah gambar</button>' +
       '<button class="en-btn pri" id="enRep"' + (shots.length ? '' : ' disabled') + '>Laporan</button>' +
     '</div>';
 
   document.getElementById('enBack').addEventListener('click', function() { EN.view = 'live'; enRender(); });
   document.getElementById('enMenu').addEventListener('click', enSessMenu);
   document.getElementById('enLive').addEventListener('click', function() { EN.view = 'live'; enRender(); });
+  document.getElementById('enAdd2').addEventListener('click', enImport);
   document.getElementById('enRep').addEventListener('click', function() { EN.view = 'report'; enRender(); });
+  var dls = document.getElementById('enDlSel');
+  if (dls) dls.addEventListener('click', enSaveSelected);
 
   var grid = document.getElementById('enGrid');
   for (var i = 0; i < shots.length; i++) {
@@ -22644,6 +22647,7 @@ async function enGallery(ov) {
     cell.innerHTML = '<span class="en-n">' + (i + 1) + '</span>' +
       (s.sev ? '<span class="en-sev" style="background:' + sev.c + '">' + escapeHTML(sev.n) + '</span>' : '') +
       '<span class="en-tick' + (enPicked(s) ? ' on' : '') + '" data-tick="' + i + '">✓</span>' +
+      (s.src === 'import' ? '<span class="en-src">Import</span>' : '') +
       (s.title ? '<span class="en-cap">' + escapeHTML(s.title) + '</span>' : '') +
       ((s.marks && s.marks.length) ? '<span class="en-mk">✎</span>' : '');
     grid.appendChild(cell);
@@ -22688,7 +22692,7 @@ function enPickCount() {
   var el = document.getElementById('enPickN');
   if (!el) return;
   var n = enPickList().length, t = EN.sess.shots.length;
-  el.textContent = n + ' daripada ' + t + ' dipilih';
+  el.textContent = n + ' / ' + t + ' dipilih';
   var rep = document.getElementById('enRep');
   if (rep) rep.disabled = !n;
 }
@@ -22730,6 +22734,7 @@ async function enEdit(ov) {
     '<div class="en-bar">' +
       '<button class="en-btn" id="enPrev"' + (EN.shot > 0 ? '' : ' disabled') + '>Sebelum</button>' +
       '<button class="en-btn pri" id="enSave">Simpan</button>' +
+      '<button class="en-btn" id="enToPhone">Ke telefon</button>' +
       '<button class="en-btn" id="enNext"' + (EN.shot < EN.sess.shots.length - 1 ? '' : ' disabled') + '>Seterusnya</button>' +
     '</div>';
 
@@ -22745,6 +22750,10 @@ async function enEdit(ov) {
   });
   document.getElementById('enNext').addEventListener('click', async function() {
     await enGrab(); EN.shot++; enRender();
+  });
+  document.getElementById('enToPhone').addEventListener('click', async function() {
+    await enGrab();
+    await enSaveImg(EN.sess.shots[EN.shot], EN.shot);
   });
   document.getElementById('enUndo').addEventListener('click', function() {
     s.marks.pop(); EN.dirty = true; enPaintCv();
@@ -22858,6 +22867,86 @@ function enWireCv(cv, s) {
 }
 
 /* ---------- 4. LAPORAN ---------- */
+
+/** Satu gambar ke dalam sesi, dari endoskop atau dari telefon. */
+async function enAddShot(blob, src) {
+  var id = 'sh_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  var full = await ipShrinkTo(blob, 1600, 0.85);
+  var thumb = await ipShrinkTo(blob, 360, 0.72);
+  await lbPut(EN_K.img + id, full, 'image/jpeg');
+  await lbPut(EN_K.th + id, thumb, 'image/jpeg');
+  EN.sess.shots.push({ id: id, t: Date.now(), title: '', desc: '', loc: '', sev: '',
+                       marks: [], pick: true, src: src || 'uvc' });
+  return id;
+}
+
+/** Gambar dari telefon. Tiada atribut capture, jadi galeri boleh dipilih
+ *  dan bukan hanya kamera. Dalam WebView ini hanya berfungsi kerana app
+ *  melaksanakan onShowFileChooser. */
+function enImport() {
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.multiple = true;
+  inp.style.display = 'none';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', async function() {
+    var files = Array.prototype.slice.call(inp.files || []);
+    inp.remove();
+    if (!files.length) return;
+    showToast('Memasukkan ' + files.length + ' gambar…');
+    for (var i = 0; i < files.length; i++) {
+      try { await enAddShot(files[i], 'import'); } catch (e) {}
+    }
+    await enSaveSess(EN.sess);
+    EN.view = 'gallery';
+    enRender();
+    showToast(files.length + ' gambar dimasukkan');
+  });
+  inp.click();
+}
+
+/** Gambar dengan tandanya dibakar masuk, sebagai base64 mentah. */
+async function enFlatB64(s) {
+  var flat = await enFlat(s, 1600);
+  if (!flat) return null;
+  return flat.data.split(',')[1] || null;
+}
+
+function enImgName(s, i) {
+  var bit = s.title ? enSlug(s.title) : ('gambar-' + (i + 1));
+  return enSlug(EN.sess.name) + '-' + bit + '.jpg';
+}
+
+/** Ke galeri telefon melalui jambatan app; dalam pelayar biasa, muat turun. */
+async function enSaveImg(s, i, quiet) {
+  var b64 = await enFlatB64(s);
+  if (!b64) { if (!quiet) showToast('Gambar tidak dijumpai'); return false; }
+  var name = enImgName(s, i);
+  if (window.PocketNative && window.PocketNative.saveImage) {
+    var msg = window.PocketNative.saveImage(b64, name);
+    if (!quiet) showToast(msg || 'Disimpan ke galeri');
+    return true;
+  }
+  var a = document.createElement('a');
+  a.href = 'data:image/jpeg;base64,' + b64;
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  if (!quiet) showToast('Dimuat turun');
+  return true;
+}
+
+async function enSaveSelected() {
+  var list = enPickList();
+  if (!list.length) { showToast('Tiada gambar dipilih'); return; }
+  showToast('Menyimpan ' + list.length + ' gambar…');
+  var done = 0;
+  for (var i = 0; i < list.length; i++) {
+    var at = EN.sess.shots.indexOf(list[i]);
+    if (await enSaveImg(list[i], at, true)) done++;
+  }
+  showToast(done + ' gambar disimpan ke galeri telefon');
+}
 
 /** Gambar lama tiada medan pick, jadi anggap ia dipilih. */
 function enPicked(s) { return s.pick !== false; }
@@ -23014,7 +23103,8 @@ async function enBuildDoc() {
 
     var ty = top + 7 + imgH;
     doc.setTextColor(90); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6);
-    var meta = [enStamp(s.t), s.loc].filter(Boolean).join('   ·   ');
+    var meta = [enStamp(s.t), s.loc, s.src === 'import' ? 'gambar diimport' : '']
+      .filter(Boolean).join('   ·   ');
     if (meta) { doc.text(meta, M, ty); ty += 5; }
     if (s.desc) {
       doc.setTextColor(40); doc.setFontSize(9.6);

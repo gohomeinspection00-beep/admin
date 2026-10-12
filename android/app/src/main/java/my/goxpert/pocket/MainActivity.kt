@@ -18,6 +18,7 @@ import android.webkit.GeolocationPermissions
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
+import android.webkit.ValueCallback
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -51,6 +52,18 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Throwable) {
             toast("Gagal memuat: ${e.message}")
         }
+    }
+
+    private var filePick: ValueCallback<Array<Uri>>? = null
+
+    private val pickFiles = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { res ->
+        val cb = filePick ?: return@registerForActivityResult
+        filePick = null
+        cb.onReceiveValue(
+            WebChromeClient.FileChooserParams.parseResult(res.resultCode, res.data)
+        )
     }
 
     private val askPerms = registerForActivityResult(
@@ -107,6 +120,25 @@ class MainActivity : AppCompatActivity() {
                 override fun onGeolocationPermissionsShowPrompt(
                     origin: String?, callback: GeolocationPermissions.Callback?
                 ) { callback?.invoke(origin, true, false) }
+
+                // Tanpa ini, mengetik butang pilih fail dalam Pocket tidak
+                // membuka apa-apa, dan WebView tidak melaporkan sebarang ralat.
+                override fun onShowFileChooser(
+                    view: WebView?,
+                    cb: ValueCallback<Array<Uri>>?,
+                    params: FileChooserParams?
+                ): Boolean {
+                    filePick?.onReceiveValue(null)
+                    filePick = cb
+                    return try {
+                        pickFiles.launch(params!!.createIntent())
+                        true
+                    } catch (e: Throwable) {
+                        filePick = null
+                        toast("Tidak dapat membuka pemilih fail")
+                        false
+                    }
+                }
             }
         }
 
@@ -211,6 +243,53 @@ class MainActivity : AppCompatActivity() {
                 "Disimpan ke Muat Turun"
             } catch (e: Throwable) {
                 val m = "Gagal menyimpan: " + (e.message ?: e.javaClass.simpleName)
+                runOnUiThread { toast(m) }
+                m
+            }
+        }
+
+        /**
+         * Gambar endoskop ke galeri telefon. Sama seperti PDF: WebView tiada
+         * muat turun, jadi bait datang ke sini dan kita menulisnya melalui
+         * MediaStore supaya app galeri benar-benar menemuinya.
+         */
+        @JavascriptInterface
+        fun saveImage(b64: String, name: String): String {
+            return try {
+                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                val safe = if (name.endsWith(".jpg", true)) name else "$name.jpg"
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val cv = ContentValues().apply {
+                        put(MediaStore.Images.Media.DISPLAY_NAME, safe)
+                        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                        put(MediaStore.Images.Media.RELATIVE_PATH,
+                            Environment.DIRECTORY_PICTURES + "/GoXpert Pocket")
+                        put(MediaStore.Images.Media.IS_PENDING, 1)
+                    }
+                    val uri = contentResolver.insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv
+                    ) ?: return "Tidak dapat membuat fail"
+                    contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
+                    cv.clear()
+                    cv.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    contentResolver.update(uri, cv, null, null)
+                } else {
+                    @Suppress("DEPRECATION")
+                    val dir = File(
+                        Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES), "GoXpert Pocket")
+                    dir.mkdirs()
+                    val f = File(dir, safe)
+                    FileOutputStream(f).use { it.write(bytes) }
+                    // Tanpa imbasan, app galeri tidak akan melihat fail lama ini.
+                    @Suppress("DEPRECATION")
+                    sendBroadcast(android.content.Intent(
+                        android.content.Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                        Uri.fromFile(f)))
+                }
+                "Disimpan ke galeri"
+            } catch (e: Throwable) {
+                val m = "Gagal menyimpan gambar: " + (e.message ?: e.javaClass.simpleName)
                 runOnUiThread { toast(m) }
                 m
             }
