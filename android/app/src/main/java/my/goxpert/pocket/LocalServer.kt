@@ -1,0 +1,163 @@
+package my.goxpert.pocket
+
+import fi.iki.elonen.NanoHTTPD
+import java.io.File
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
+import java.net.InetAddress
+
+/**
+ * Pocket dihidangkan dari sini, dan bingkai endoskop juga, supaya kedua-duanya
+ * berada pada asal yang sama. Tiada CORS, tiada kandungan campuran.
+ *
+ * Hos mesti "localhost" dan bukan 127.0.0.1: WebView Android hanya mengira
+ * https, file, dan nama hos localhost yang tepat sebagai konteks selamat.
+ * Dapat ini salah dan kamera, Bluetooth serta GPS dalam Pocket mati senyap.
+ *
+ * Port tetap, bukan dipilih bebas. Port yang berubah bermakna asal yang
+ * berubah, dan IndexedDB Pocket kosong setiap kali app dibuka.
+ */
+class LocalServer(
+    private val uvc: UvcSource,
+    private val pocketFile: File
+) : NanoHTTPD(InetAddress.getByName("127.0.0.1"), PORT) {
+
+    override fun serve(session: IHTTPSession): Response {
+        val uri = session.uri ?: "/"
+        return try {
+            when {
+                uri == "/uvc/status"   -> status()
+                uri == "/uvc/snapshot" -> snapshot()
+                uri == "/uvc/stream"   -> stream()
+                uri == "/uvc/debug"    -> debug()
+                else                   -> pocket()
+            }
+        } catch (e: Throwable) {
+            newFixedLengthResponse(
+                Response.Status.INTERNAL_ERROR, "text/plain",
+                "${e.javaClass.simpleName}: ${e.message}"
+            )
+        }
+    }
+
+    private fun noCache(r: Response): Response {
+        // Fail Pocket boleh ditukar tanpa memasang semula APK, jadi ia tidak
+        // boleh disimpan dalam cache.
+        r.addHeader("Cache-Control", "no-store, must-revalidate")
+        r.addHeader("Pragma", "no-cache")
+        return r
+    }
+
+    private fun pocket(): Response {
+        if (!pocketFile.exists()) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.OK, "text/html; charset=utf-8", SETUP_PAGE))
+        }
+        return noCache(newChunkedResponse(
+            Response.Status.OK, "text/html; charset=utf-8", pocketFile.inputStream()))
+    }
+
+    private fun status(): Response {
+        val j = buildString {
+            append("{")
+            append("\"ok\":true,")
+            append("\"opened\":").append(uvc.opened).append(",")
+            append("\"frames\":").append(uvc.frameCount).append(",")
+            append("\"width\":").append(uvc.width).append(",")
+            append("\"height\":").append(uvc.height).append(",")
+            append("\"hasFrame\":").append(uvc.latestJpeg != null).append(",")
+            append("\"device\":\"").append(uvc.deviceName.replace("\"", "'")).append("\"")
+            append("}")
+        }
+        return noCache(newFixedLengthResponse(Response.Status.OK, "application/json", j))
+    }
+
+    private fun snapshot(): Response {
+        val jpg = uvc.latestJpeg
+            ?: return noCache(newFixedLengthResponse(
+                Response.Status.SERVICE_UNAVAILABLE, "text/plain", "tiada bingkai"))
+        return noCache(newFixedLengthResponse(
+            Response.Status.OK, "image/jpeg", jpg.inputStream(), jpg.size.toLong()))
+    }
+
+    private fun debug(): Response {
+        val t = buildString {
+            append("PERANTI: ").append(uvc.deviceName.ifEmpty { "(tiada)" }).append('\n')
+            append("DIBUKA : ").append(uvc.opened).append('\n')
+            append("BINGKAI: ").append(uvc.frameCount).append('\n')
+            append("SAIZ   : ").append(uvc.width).append(" x ").append(uvc.height).append('\n')
+            append("POCKET : ").append(if (pocketFile.exists()) "${pocketFile.length()} bait" else "belum dimuat").append('\n')
+            append("\n--- log ---\n")
+            uvc.logLines().forEach { append(it).append('\n') }
+        }
+        return noCache(newFixedLengthResponse(Response.Status.OK, "text/plain; charset=utf-8", t))
+    }
+
+    /**
+     * MJPEG sebagai multipart/x-mixed-replace. Pelayar menyahkodnya dalam C++,
+     * jadi tiada JavaScript dalam laluan panas dan Pocket cuma perlukan satu
+     * tag img.
+     */
+    private fun stream(): Response {
+        val pipeIn = PipedInputStream(64 * 1024)
+        val pipeOut = PipedOutputStream(pipeIn)
+
+        Thread({
+            try {
+                var sent = 0L
+                while (true) {
+                    val jpg = uvc.latestJpeg
+                    if (jpg != null) {
+                        val head = ("--$BOUNDARY\r\n" +
+                            "Content-Type: image/jpeg\r\n" +
+                            "Content-Length: ${jpg.size}\r\n\r\n").toByteArray()
+                        pipeOut.write(head)
+                        pipeOut.write(jpg)
+                        pipeOut.write("\r\n".toByteArray())
+                        pipeOut.flush()
+                        sent++
+                    }
+                    // Kira-kira 15 bingkai sesaat. Endoskop ini jarang
+                    // melebihi itu, dan ia memadai untuk memandu probe.
+                    Thread.sleep(66)
+                }
+            } catch (_: Throwable) {
+                // Pelayar menutup imej itu; itu cara biasa strim ini berakhir.
+            } finally {
+                try { pipeOut.close() } catch (_: Throwable) {}
+            }
+        }, "uvc-stream").apply { isDaemon = true }.start()
+
+        val r = newChunkedResponse(
+            Response.Status.OK, "multipart/x-mixed-replace; boundary=$BOUNDARY", pipeIn)
+        r.addHeader("Cache-Control", "no-store")
+        return r
+    }
+
+    companion object {
+        const val PORT = 8765
+        private const val BOUNDARY = "pocketframe"
+
+        /** Ditunjukkan sebelum fail Pocket dimuat, supaya skrin tidak kosong. */
+        private val SETUP_PAGE = """
+            <!doctype html><meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>GoXpert Pocket</title>
+            <style>
+              body{margin:0;font:16px/1.6 system-ui,sans-serif;background:#10151a;color:#e4ebf1;
+                   display:grid;place-items:center;min-height:100vh;padding:24px}
+              div{max-width:420px}
+              h1{font-size:20px;margin:0 0 12px}
+              p{color:#90a2b2;margin:0 0 10px}
+              code{font-family:ui-monospace,monospace;color:#4ea3f0}
+            </style>
+            <div>
+              <h1>Fail Pocket belum dimuat</h1>
+              <p>Tekan butang menu di penjuru atas, pilih <b>Muat fail Pocket</b>,
+                 dan pilih <code>pocket_index_88.html</code> dari telefon awak.</p>
+              <p>Fail itu disalin ke dalam app, jadi awak boleh menukarnya bila-bila
+                 tanpa memasang semula APK.</p>
+            </div>
+        """.trimIndent()
+    }
+}

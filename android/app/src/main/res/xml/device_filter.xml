@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Kelas 14 (0x0E) ialah USB Video Class. Subkelas 1 ialah VideoControl,
+         iaitu antara muka yang setiap kamera UVC dedahkan. Menapis mengikut
+         kelas dan bukan VID/PID bermakna mana-mana endoskop UVC dikenali,
+         bukan hanya model yang satu ini. -->
+    <usb-device class="239" subclass="2" protocol="1" />
+    <usb-device class="14" subclass="1" />
+    <usb-device class="14" />
+</resources>
