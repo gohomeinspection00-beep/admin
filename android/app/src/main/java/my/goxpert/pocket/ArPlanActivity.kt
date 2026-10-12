@@ -9,7 +9,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import android.content.ContentValues
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -65,6 +69,7 @@ class ArPlanActivity : Activity() {
     private lateinit var placeBtn: Button
     private lateinit var resetBtn: Button
     private lateinit var lockBtn: Button
+    private lateinit var shotBtn: Button
 
     private val bg = ArBackground()
     private val planGl = ArPlanQuad()
@@ -89,6 +94,17 @@ class ArPlanActivity : Activity() {
     @Volatile private var aim: FloatArray? = null
     @Volatile private var ring: FloatArray = FloatArray(0)
     @Volatile private var quad: FloatArray = FloatArray(0)   // 4 bucu dunia
+
+    /**
+     * Garis tegak dari setiap bucu pelan turun ke satah yang dikesan.
+     *
+     * Slider tinggi mengangkat pelan, tetapi pelan yang terapung di udara
+     * kelihatan sama seperti pelan yang duduk di lantai apabila dilihat dari
+     * atas — tiada apa pada skrin yang berkata berapa jauh ia naik. Garis
+     * ini ialah jarak itu, dilukis.
+     */
+    @Volatile private var drops: FloatArray = FloatArray(0)
+    @Volatile private var baseY = 0f
     @Volatile private var tracking = false
     @Volatile private var why = ""
     @Volatile private var planeCount = 0
@@ -96,6 +112,7 @@ class ArPlanActivity : Activity() {
     private var smooth: FloatArray? = null
     @Volatile private var wantPlace = false
     @Volatile private var wantReset = false
+    @Volatile private var wantShot = false
 
     /** Laras selepas pelan diletak. */
     @Volatile private var opacity = 0.65f
@@ -212,8 +229,13 @@ class ArPlanActivity : Activity() {
                     if (locked) "Pelan dikunci" else "Pelan dibuka", Toast.LENGTH_SHORT).show()
             }
         }
+        shotBtn = mk("Snap", 1f).apply {
+            isEnabled = false
+            setOnClickListener { wantShot = true; isEnabled = false; text = "..." }
+        }
         val doneBtn = mk("Tutup", 1f).apply { setOnClickListener { finish() } }
-        btns.addView(resetBtn); btns.addView(placeBtn); btns.addView(lockBtn); btns.addView(doneBtn)
+        btns.addView(resetBtn); btns.addView(placeBtn); btns.addView(lockBtn)
+        btns.addView(shotBtn); btns.addView(doneBtn)
         bar.addView(btns, LinearLayout.LayoutParams(-1, -2))
 
         root.addView(bar, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.BOTTOM })
@@ -423,6 +445,24 @@ class ArPlanActivity : Activity() {
                 c[0][0], c[0][1], c[0][2], c[1][0], c[1][1], c[1][2],
                 c[2][0], c[2][1], c[2][2], c[3][0], c[3][1], c[3][2])
         }
+
+        // Satah yang dikesan duduk pada ketinggian anchor; pelan duduk pada
+        // ketinggian itu campur lift. Garis dari satu ke satu lagi ialah
+        // jarak yang slider itu sedang menetapkan.
+        baseY = a0.ty()
+        val q = quad
+        drops = if (mode == "wall" || q.size != 12 || abs(lift) < 0.015f) FloatArray(0) else {
+            val out = FloatArray(4 * 6)
+            for (k in 0 until 4) {
+                out[k * 6]     = q[k * 3]
+                out[k * 6 + 1] = q[k * 3 + 1]
+                out[k * 6 + 2] = q[k * 3 + 2]
+                out[k * 6 + 3] = q[k * 3]
+                out[k * 6 + 4] = baseY
+                out[k * 6 + 5] = q[k * 3 + 2]
+            }
+            out
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -434,6 +474,7 @@ class ArPlanActivity : Activity() {
         resetBtn.isEnabled = n > 0
         lockBtn.isEnabled = state != null
         lockBtn.text = if (locked) "Buka" else "Kunci"
+        if (!wantShot) { shotBtn.isEnabled = state != null; shotBtn.text = "Snap" }
 
         hint.text = when {
             !tracking && why.isNotEmpty() -> why
@@ -450,9 +491,86 @@ class ArPlanActivity : Activity() {
         val st = state
         readout.text = if (st == null) "—" else {
             val wide = planW * st.s
-            String.format("Lebar pelan %.2f m · %s %+.2f m · %d%%",
-                wide, if (mode == "wall") "dalam" else "tinggi", lift, (opacity * 100).toInt())
+            val gap = if (mode == "wall") ""
+                else if (abs(lift) < 0.015f) " · pada satah"
+                else String.format(" · %.0f cm %s satah", abs(lift) * 100,
+                    if (lift > 0) "atas" else "bawah")
+            String.format("%.2f m lebar%s · %d%%", wide, gap, (opacity * 100).toInt())
         }
+    }
+
+    /**
+     * Gambar skrin AR, ke galeri telefon.
+     *
+     * Dibaca daripada buffer GL dan bukan daripada paparan: itu memberi
+     * kamera dan pelan tepat seperti yang dilihat, tanpa kursor dan butang
+     * yang tiada tempat dalam laporan. glReadPixels memulangkan baris dari
+     * bawah ke atas, jadi ia dibalikkan.
+     *
+     * Dipanggil pada benang GL, selepas semuanya dilukis.
+     */
+    private fun grab() {
+        val w = gl.width
+        val h = gl.height
+        if (w <= 0 || h <= 0) { runOnUiThread { paintText() }; return }
+        val buf = java.nio.ByteBuffer.allocateDirect(w * h * 4)
+            .order(java.nio.ByteOrder.nativeOrder())
+        GLES20.glReadPixels(0, 0, w, h, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf)
+        buf.rewind()
+        val px = IntArray(w * h)
+        buf.asIntBuffer().get(px)
+        // RGBA daripada GL, ARGB untuk Bitmap, dan terbalik menegak.
+        val out = IntArray(w * h)
+        for (y in 0 until h) {
+            val src = y * w
+            val dst = (h - 1 - y) * w
+            for (x in 0 until w) {
+                val c = px[src + x]
+                val r = c and 0xff
+                val g2 = (c shr 8) and 0xff
+                val b2 = (c shr 16) and 0xff
+                out[dst + x] = (0xff shl 24) or (r shl 16) or (g2 shl 8) or b2
+            }
+        }
+        val bmp = Bitmap.createBitmap(out, w, h, Bitmap.Config.ARGB_8888)
+        val name = "goxpert-pelan-" + System.currentTimeMillis() + ".jpg"
+        val okSave = runCatching { saveToGallery(bmp, name) }.getOrDefault(false)
+        bmp.recycle()
+        runOnUiThread {
+            Toast.makeText(this,
+                if (okSave) "Disimpan ke galeri" else "Tidak dapat menyimpan gambar",
+                Toast.LENGTH_SHORT).show()
+            paintText()
+        }
+    }
+
+    private fun saveToGallery(bmp: Bitmap, name: String): Boolean {
+        val dir = Environment.DIRECTORY_PICTURES + "/GoXpert Pocket"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val cv = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, name)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.RELATIVE_PATH, dir)
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+            val uri = contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv) ?: return false
+            contentResolver.openOutputStream(uri)?.use {
+                bmp.compress(Bitmap.CompressFormat.JPEG, 92, it)
+            } ?: return false
+            cv.clear(); cv.put(MediaStore.Images.Media.IS_PENDING, 0)
+            contentResolver.update(uri, cv, null, null)
+            return true
+        }
+        val folder = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "GoXpert Pocket").apply { mkdirs() }
+        val f = File(folder, name)
+        java.io.FileOutputStream(f).use { bmp.compress(Bitmap.CompressFormat.JPEG, 92, it) }
+        // Tanpa imbasan, galeri tidak akan menemuinya pada Android lama.
+        android.media.MediaScannerConnection.scanFile(
+            this, arrayOf(f.absolutePath), arrayOf("image/jpeg"), null)
+        return true
     }
 
     // ---------- lapisan 2D ----------
@@ -645,7 +763,25 @@ class ArPlanActivity : Activity() {
             // satu dua bingkai di belakang, yang kelihatan seperti pelan yang
             // berenang walaupun titiknya tidak bergerak.
             val q = quad
-            if (glReady && q.size == 12) planGl.draw(vp, q, opacity)
+            if (glReady && q.size == 12) {
+                planGl.draw(vp, q, opacity)
+                val dp2 = drops
+                if (dp2.size >= 6) {
+                    // Kuning, sama seperti kursor: ini ukuran, bukan hiasan.
+                    planGl.lines(vp, dp2, 1f, 0.77f, 0f, 0.95f, 4f)
+                    // Bayang pelan pada satah itu sendiri, supaya mata boleh
+                    // melihat di mana ia akan jatuh.
+                    val sh = FloatArray(8 * 3)
+                    for (k in 0 until 4) {
+                        val n2 = (k + 1) % 4
+                        sh[k * 6]     = q[k * 3];     sh[k * 6 + 1] = baseY; sh[k * 6 + 2] = q[k * 3 + 2]
+                        sh[k * 6 + 3] = q[n2 * 3];    sh[k * 6 + 4] = baseY; sh[k * 6 + 5] = q[n2 * 3 + 2]
+                    }
+                    planGl.lines(vp, sh, 1f, 0.77f, 0f, 0.4f, 2f)
+                }
+            }
+
+            if (wantShot) { wantShot = false; grab() }
 
             if (changed) runOnUiThread { paintText() }
             overlay.postInvalidateOnAnimation()

@@ -8564,6 +8564,29 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   position:absolute;left:4px;bottom:26px;font-size:9px;font-weight:700;
   padding:1px 5px;border-radius:20px;background:var(--accent);color:var(--accent-fg);
 }
+/* Kotak pelan dihadkan tingginya pada skrin tanda.
+   Satu pelan potret pada lebar penuh menjadi lebih tinggi daripada skrin,
+   dan kerana kotak itu menangkap seretan untuk pan dan zum, tiada jalan
+   tinggal untuk menatal ke kawalan di bawahnya — ia hanya tidak boleh
+   dicapai. Zum dan pan di dalam kotak ini menggantikan penatalan. */
+#fpBox{max-height:44vh}
+
+.fp-home{display:grid;gap:10px;margin-bottom:4px}
+.fp-big{
+  display:flex;gap:12px;align-items:center;padding:15px;text-align:left;
+  border:1px solid var(--line);border-radius:14px;background:var(--bg-2);color:var(--fg);
+}
+.fp-big.pri{border-color:var(--accent);background:var(--accent-soft)}
+.fp-big-i{
+  flex:none;width:42px;height:42px;border-radius:11px;display:grid;place-items:center;
+  background:var(--bg);border:1px solid var(--line);color:var(--accent);
+}
+.fp-big.pri .fp-big-i{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.fp-big-t{flex:1;min-width:0}
+.fp-big-t b{display:block;font-size:14px;font-weight:700}
+.fp-big-t span{display:block;font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:2px}
+.fp-big-c{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+
 .fp-empty{
   padding:14px;border:1px dashed var(--line);border-radius:12px;
   font-size:11.5px;color:var(--muted);line-height:1.5;text-align:center;margin-bottom:10px;
@@ -9403,7 +9426,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.3 · build 12 Okt 2026 · Galeri pelan dan skrin AR yang dibaiki</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.4 · build 12 Okt 2026 · Galeri dahulu, snap AR, garis tinggi</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -17062,8 +17085,77 @@ function openARFloorPlan() {
   document.getElementById('toolModalIcon').innerHTML = fpIco();
   document.getElementById('toolModalName').textContent = 'AR Floor Plan';
   document.getElementById('toolModalDesc').textContent = 'Letakkan pelan atas tapak sebenar';
-  fpScreenPick();
+  // Pelan yang sudah dijajarkan ialah kerja yang sudah dibuat. Kalau ada,
+  // ia ditawarkan dahulu dan bukan dikuburkan di bawah skrin muat naik.
+  if (fpSaved().length) fpScreenHome(); else fpScreenPick();
   showToolModal();
+}
+
+/** Mula baharu, atau sambung yang sudah dijajarkan. */
+function fpScreenHome() {
+  const body = document.getElementById('toolModalBody');
+  const foot = document.getElementById('toolModalFoot');
+  const saved = fpSaved();
+  const last = saved[0];
+
+  let h = '<div class="fp-home">' +
+    '<button class="fp-big pri" id="fpHomeNew">' +
+      '<span class="fp-big-i">' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>' +
+      '</span>' +
+      '<span class="fp-big-t"><b>Pelan baharu</b>' +
+        '<span>Muat naik pelan, atau pilih satu daripada inspection ini.</span></span>' +
+    '</button>';
+
+  if (last) {
+    h += '<button class="fp-big" id="fpHomeLast">' +
+      '<span class="fp-big-i">' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>' +
+      '</span>' +
+      '<span class="fp-big-t"><b>Sambung yang terakhir</b>' +
+        '<span>' + escapeHTML(last.name || 'Pelan') + ' \u00b7 ' +
+        (last.b ? '2 titik' : (last.a ? '1 titik' : 'belum ditanda')) + ' \u00b7 ' +
+        fpWhen(last.at) + '</span></span>' +
+    '</button>';
+  }
+  h += '</div>';
+
+  h += '<div class="fp-sec"><span class="fp-sec-l">Semua pelan tersimpan</span>' +
+    '<span class="fp-sec-r"></span><span class="fp-big-c">' + saved.length + '</span></div>' +
+    '<div class="fp-grid">';
+  saved.forEach(function(r) {
+    h += '<div class="fp-save">' +
+      '<button class="fp-x" data-fpdrop="' + escapeHTML(r.id) + '" aria-label="Buang">\u00d7</button>' +
+      (r.a ? '<span class="fp-save-p">' + (r.b ? '2' : '1') + ' titik</span>' : '') +
+      '<button class="fp-card" data-fpsaved="' + escapeHTML(r.id) + '">' +
+        (r.thumb ? '<img src="data:image/jpeg;base64,' + r.thumb + '" alt="">' : '<span class="fp-card-no">?</span>') +
+        '<span class="fp-card-n">' + escapeHTML(r.name || 'Pelan') + '</span></button>' +
+    '</div>';
+  });
+  h += '</div>';
+
+  body.innerHTML = h;
+  foot.innerHTML = '<button class="tool-btn tool-btn-secondary" id="fpHomeSkip">Pilih pelan \u2192</button>';
+
+  document.getElementById('fpHomeNew').onclick = function() { fpClearPlan(true); };
+  document.getElementById('fpHomeSkip').onclick = fpScreenPick;
+  const lb = document.getElementById('fpHomeLast');
+  if (lb) lb.onclick = function() { fpOpenSaved(last.id); };
+  body.onclick = function(e) {
+    const dr = e.target.closest('[data-fpdrop]');
+    if (dr) { e.stopPropagation(); fpDropSaved(dr.dataset.fpdrop); return; }
+    const sv = e.target.closest('[data-fpsaved]');
+    if (sv) { fpOpenSaved(sv.dataset.fpsaved); return; }
+  };
+}
+
+function fpWhen(t) {
+  if (!t) return '';
+  const d = Math.floor((Date.now() - t) / 86400000);
+  if (d <= 0) return 'hari ini';
+  if (d === 1) return 'semalam';
+  if (d < 30) return d + ' hari lalu';
+  return new Date(t).toLocaleDateString('en-MY', { day: 'numeric', month: 'short' });
 }
 
 // Pelan inspection sudah ada dalam app — termasuk muka surat PDF yang
@@ -17147,7 +17239,9 @@ function fpScreenPick() {
     '</div>' +
     '<div id="fpStatus" class="ar-status"></div>';
   body.innerHTML = h;
-  foot.innerHTML = '<button class="tool-btn tool-btn-primary" id="fpNext"' + (FP.plan ? '' : ' disabled') + '>Tanda pada pelan →</button>';
+  foot.innerHTML =
+    (fpSaved().length ? '<button class="tool-btn tool-btn-secondary" id="fpHome">Galeri</button>' : '') +
+    '<button class="tool-btn tool-btn-primary" id="fpNext"' + (FP.plan ? '' : ' disabled') + '>Tanda pada pelan →</button>';
 
   const st = document.getElementById('fpStatus');
   // App menghamparkan pelan sendiri sekarang, jadi tiada apa yang perlu
@@ -17190,6 +17284,8 @@ function fpScreenPick() {
     if (e.target.closest('#fpPickFile')) fpPickPlan();
   };
   document.getElementById('fpNext').onclick = fpScreenTag;
+  const hb = document.getElementById('fpHome');
+  if (hb) hb.onclick = fpScreenHome;
 }
 
 /** Pelan dari telefon. Satu gambar sahaja: pelan ini yang akan dijajarkan. */

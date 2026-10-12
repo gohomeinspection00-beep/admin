@@ -128,6 +128,31 @@ class ArPlanQuad {
         GLES20.glDisable(GLES20.GL_BLEND)
     }
 
+    /** Segmen garis sewenang-wenang dalam ruang dunia: 6 apungan setiap
+     *  segmen. Dilukis dengan program yang sama dalam mod warna rata. */
+    fun lines(vp: FloatArray, pts: FloatArray, r: Float, g: Float, b: Float, a: Float, w: Float) {
+        if (program == 0 || pts.size < 6) return
+        if (lineBuf == null || lineBuf!!.capacity() < pts.size) lineBuf = buf(FloatArray(pts.size))
+        val lb = lineBuf!!
+        lb.clear(); lb.put(pts); lb.position(0)
+
+        GLES20.glUseProgram(program)
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+        GLES20.glUniformMatrix4fv(uMvp, 1, false, vp, 0)
+        GLES20.glUniform1f(uFlat, 1f)
+        GLES20.glUniform4f(uColour, r, g, b, a)
+        GLES20.glLineWidth(w)
+        GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 0, lb)
+        GLES20.glEnableVertexAttribArray(aPos)
+        GLES20.glDrawArrays(GLES20.GL_LINES, 0, pts.size / 3)
+        GLES20.glDisableVertexAttribArray(aPos)
+        GLES20.glDisable(GLES20.GL_BLEND)
+    }
+
+    private var lineBuf: FloatBuffer? = null
+
     private fun buf(v: FloatArray): FloatBuffer =
         ByteBuffer.allocateDirect(v.size * 4).order(ByteOrder.nativeOrder())
             .asFloatBuffer().apply { put(v); position(0) }
