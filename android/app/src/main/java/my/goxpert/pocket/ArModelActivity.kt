@@ -84,7 +84,6 @@ class ArModelActivity : Activity() {
     private var unitF = 1f
     private var need = 2
     private var modelName = ""
-    private var modelH = 3f
     /** Satu penemuan milik satu inspection. Tanpa job terbuka, tanda sisihan
      *  tiada tempat untuk pergi, jadi butangnya kekal mati dan berkata kenapa. */
     private var hasJob = true
@@ -110,6 +109,21 @@ class ArModelActivity : Activity() {
     @Volatile private var locked = false
     @Volatile private var yawDeg = 0f
     @Volatile private var rms = 0f
+    /**
+     * Skala yang diukur daripada titik-titik itu, dan DIGUNAKAN.
+     *
+     * Dahulu ia dikunci pada 1 dan hanya dilaporkan, yang bermakna unit model
+     * mesti betul sebelum apa-apa boleh padan — dan bila ia salah, model
+     * mendarat 11 kali terlalu besar dan tiada apa yang boleh dibuat di
+     * tapak. Tetapi dua titik pada model dan dua titik di tapak SUDAH
+     * menentukan skala; tiada sebab untuk bertanya tentang unit dan kemudian
+     * mengabaikan apa yang baru saja diukur.
+     *
+     * Harganya: dengan dua titik sahaja, satu ketikan yang tersasar
+     * meregangkan model dan bukan menaikkan ralat. Tiga atau empat titik
+     * mengembalikan semakan itu, kerana satu yang buruk kemudian bercanggah
+     * dengan baki yang sepadan.
+     */
     @Volatile private var measured = 1f
 
     /** Letak model: terjemah × yaw × skala-unit, lajur-utama. */
@@ -162,7 +176,6 @@ class ArModelActivity : Activity() {
             // lain.
             need = j.optInt("pins", 2).coerceIn(1, 6)
             modelName = j.optString("name", "")
-            modelH = j.optDouble("h", 3.0).toFloat().let { if (it > 0.2f) it else 3f }
             hasJob = j.optBoolean("job", true)
             // Kumpulan yang disembunyikan dalam pelihat 3D kekal tersembunyi
             // di sini. Tiada kawalan baharu pada skrin AR: penapis dibuat di
@@ -242,10 +255,14 @@ class ArModelActivity : Activity() {
         }
         bar.addView(readout, LinearLayout.LayoutParams(-1, -2))
 
-        // Julat potong daripada tinggi model, bukan nilai tetap: keratan
-        // rentas satu meter dan bangunan dua tingkat memerlukan slider yang
-        // berbeza, dan slider 0–4 m tidak berguna untuk kedua-duanya.
-        val cm = ((modelH + 1f) * 100f).toInt().coerceIn(120, 4000)
+        // Julat potong tetap 0–8 m, dan bukan daripada tinggi model.
+        //
+        // Tinggi yang dilaporkan datang daripada unit yang dipilih semasa
+        // import, dan unit itu boleh salah — skala sebenar hanya diketahui
+        // SELEPAS dua titik diletak, yang terlalu lewat untuk membina
+        // slider. Lapan meter meliputi dua tingkat, iaitu setakat mana
+        // sesiapa memotong.
+        val cm = 800
 
         // Potong dari ATAS: pada nilai maksimum ia tutup, kerana itulah
         // keadaan di mana tiada apa dibuang.
@@ -497,8 +514,8 @@ class ArModelActivity : Activity() {
     private fun yawApply(p: FloatArray, c: Float, s: Float) =
         floatArrayOf(p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c)
 
-    private fun placePt(p: FloatArray, yaw: Float, t: FloatArray): FloatArray {
-        val r = yawApply(p, cos(yaw), sin(yaw))
+    private fun placePt(p: FloatArray, yaw: Float, t: FloatArray, sc: Float): FloatArray {
+        val r = yawApply(floatArrayOf(p[0] * sc, p[1] * sc, p[2] * sc), cos(yaw), sin(yaw))
         return floatArrayOf(r[0] + t[0], r[1] + t[1], r[2] + t[2])
     }
 
@@ -513,15 +530,16 @@ class ArModelActivity : Activity() {
      */
     private fun placedMark(i: Int): FloatArray {
         val yaw = Math.toRadians(yawDeg.toDouble()).toFloat()
-        val r = yawApply(marks[i], cos(yaw), sin(yaw))
-        return floatArrayOf(r[0] + model[12], r[1] + model[13], r[2] + model[14])
+        return placePt(marks[i], yaw, floatArrayOf(model[12], model[13], model[14]), measured)
     }
 
     /** Arah bertentangan: satu titik dunia balik kepada ruang model. */
     private fun unplace(w: FloatArray): FloatArray {
         val yaw = Math.toRadians(yawDeg.toDouble()).toFloat()
         val d = floatArrayOf(w[0] - model[12], w[1] - model[13], w[2] - model[14])
-        return yawApply(d, cos(-yaw), sin(-yaw))
+        val r = yawApply(d, cos(-yaw), sin(-yaw))
+        val sc = if (measured > 1e-6f) measured else 1f
+        return floatArrayOf(r[0] / sc, r[1] / sc, r[2] / sc)
     }
 
     /**
@@ -534,8 +552,10 @@ class ArModelActivity : Activity() {
      */
     private fun solveOne(m: FloatArray, w: FloatArray) {
         val yaw = Math.toRadians(yawDeg.toDouble()).toFloat()
+        // Satu titik tidak boleh mengukur skala, jadi unit model mesti betul
+        // dalam mod ini — itulah satu-satunya tempat ia masih penting.
         val r = yawApply(m, cos(yaw), sin(yaw))
-        setPlacement(yaw, floatArrayOf(w[0] - r[0], w[1] - r[1], w[2] - r[2]))
+        setPlacement(yaw, floatArrayOf(w[0] - r[0], w[1] - r[1], w[2] - r[2]), 1f)
         rms = 0f; measured = 1f
     }
 
@@ -566,14 +586,19 @@ class ArModelActivity : Activity() {
             sw += hypot(bx, bz)
         }
         if (abs(num) < 1e-12f && abs(den) < 1e-12f) return false   // titik bertindih
+        // Terlalu rapat untuk mengukur apa-apa. Dua titik 10 cm berjauhan di
+        // tapak memberi skala yang ditentukan oleh ralat ARCore sahaja, dan
+        // meregangkan seluruh bangunan mengikutnya.
+        if (sm < 1e-4f || sw < 0.25f) return false
         val yaw = atan2(num, den)
-        measured = if (sm > 1e-9f) sw / sm else 1f
-        val r = yawApply(mc, cos(yaw), sin(yaw))
+        val sc = (sw / sm).coerceIn(1e-4f, 1e4f)
+        measured = sc
+        val r = yawApply(floatArrayOf(mc[0] * sc, mc[1] * sc, mc[2] * sc), cos(yaw), sin(yaw))
         val t = floatArrayOf(wc[0] - r[0], wc[1] - r[1], wc[2] - r[2])
-        setPlacement(yaw, t)
+        setPlacement(yaw, t, sc)
         var sq = 0f
         for ((m, w) in pairs) {
-            val p = placePt(m, yaw, t)
+            val p = placePt(m, yaw, t, sc)
             val dx = p[0] - w[0]; val dy = p[1] - w[1]; val dz = p[2] - w[2]
             sq += dx * dx + dy * dy + dz * dz
         }
@@ -588,10 +613,10 @@ class ArModelActivity : Activity() {
         return floatArrayOf(o[0] / n, o[1] / n, o[2] / n)
     }
 
-    /** Terjemah × yaw × skala-unit, sebagai matriks lajur-utama untuk GL. */
-    private fun setPlacement(yaw: Float, t: FloatArray) {
+    /** Terjemah × yaw × (skala-unit × skala-diukur), lajur-utama untuk GL. */
+    private fun setPlacement(yaw: Float, t: FloatArray, sc: Float) {
         yawDeg = ((Math.toDegrees(yaw.toDouble()) + 360.0) % 360.0).toFloat()
-        val c = cos(yaw); val s = sin(yaw); val f = unitF
+        val c = cos(yaw); val s = sin(yaw); val f = unitF * sc
         model = floatArrayOf(
             f * c, 0f, -f * s, 0f,
             0f, f, 0f, 0f,
@@ -608,30 +633,6 @@ class ArModelActivity : Activity() {
     }
 
     // ---------- teks ----------
-
-    /**
-     * Bila skala yang diukur ialah nisbah KEMAS antara dua unit, katakan
-     * unit mana — kerana itulah yang sebenarnya berlaku hampir setiap kali.
-     *
-     * "Skala diukur 0.100" ialah teka-teki. "Model ini nampak dalam
-     * milimeter, bukan sentimeter" ialah arahan.
-     */
-    private fun unitHint(): String {
-        val known = listOf(
-            1f to "meter", 0.001f to "milimeter", 0.01f to "sentimeter",
-            0.3048f to "kaki", 0.0254f to "inci")
-        val want = unitF * measured
-        val now = known.firstOrNull { abs(it.first / unitF - 1f) < 0.01f }?.second
-        for ((f, n) in known) {
-            if (f == unitF) continue
-            if (abs(want / f - 1f) < 0.04f) {
-                return " Model ini nampak dalam $n" +
-                    (if (now != null) ", bukan $now" else "") +
-                    " \u2014 tukar unit pada skrin semakan Pocket."
-            }
-        }
-        return ""
-    }
 
     private fun fmtMm(m: Float): String {
         val mm = m * 1000f
@@ -672,8 +673,9 @@ class ArModelActivity : Activity() {
             !ready -> "Membaca model…"
             !placed -> modelName.ifBlank { "Model 3D" } +
                 " · ${tagged.size}/$need titik di tapak"
-            need >= 2 -> "Ralat padanan ${fmtMm(rms)} · $need titik · skala " +
-                String.format("%.3f", measured)
+            need >= 2 -> "Ralat padanan ${fmtMm(rms)} · $need titik · model diskala " +
+                (if (measured >= 1f) String.format("%.2f×", measured)
+                 else String.format("1/%.1f", 1f / measured))
             else -> "Satu titik · putar ${Math.round(yawDeg)}°"
         }
 
@@ -700,20 +702,13 @@ class ArModelActivity : Activity() {
         // kosong — dan skrin kosong tanpa sebab kelihatan seperti bug.
         val clash = placed && cutHiOn && cutLoOn && cutLo >= cutHi
         val bad = placed && need >= 2 && rms > 0.12f
-        // Skala dikunci pada 1, jadi model yang tidak sepadan TIDAK akan
-        // padan walau di mana diletak — ia hanya akan "lari". 0.7–1.4 terlalu
-        // longgar untuk mengatakannya: 5% merentasi 8 m sudah 40 cm.
-        val offScale = placed && need >= 2 && (measured < 0.97f || measured > 1.03f)
-        warn.visibility = if (clash || bad || offScale) View.VISIBLE else View.GONE
+        warn.visibility = if (clash || bad) View.VISIBLE else View.GONE
         warn.text = when {
             clash -> "Potong bawah lebih tinggi daripada potong atas — tiada apa " +
                 "untuk dilihat. Turunkan potong bawah."
-            bad -> "Ralat padanan ${fmtMm(rms)} — satu sudut mungkin tersalah pilih. " +
-                "Ketik Jajar semula dan cuba dua sudut yang lebih jauh."
-            else -> "Skala diukur " + String.format("%.3f", measured) +
-                " — ia patut 1.000. Jarak sebenar antara sudut itu " +
-                String.format("%.0f", measured * 100) + "% daripada jarak pada model, " +
-                "jadi model ini tidak akan padan walau di mana diletak." + unitHint()
+            else -> "Ralat padanan ${fmtMm(rms)} — satu sudut mungkin tersalah pilih. " +
+                "Ketik ↻ dan cuba sudut yang lebih jauh" +
+                (if (need < 3) ", atau guna tiga titik supaya yang tersilap menonjol." else ".")
         }
         overlay.postInvalidate()
     }
@@ -1036,13 +1031,15 @@ class ArModelActivity : Activity() {
                         baseY = fresh[0][1]
                         if (!placed) { placed = true; changed = true }
                     } else if (!placed) {
-                        // Dua titik yang bertindih tidak menentukan arah.
+                        // Titik yang bertindih tidak menentukan arah mahupun
+                        // skala.
                         anchors.forEach { runCatching { it.detach() } }
                         anchors.clear(); tagged = emptyList()
                         changed = true
                         runOnUiThread {
                             Toast.makeText(this@ArModelActivity,
-                                "Dua titik itu terlalu rapat — cuba dua sudut yang berjauhan",
+                                "Titik itu terlalu rapat untuk mengukur skala — " +
+                                "cuba sudut yang berjauhan",
                                 Toast.LENGTH_LONG).show()
                         }
                     }

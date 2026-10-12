@@ -9434,7 +9434,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.0 · build 12 Okt 2026 · Jajaran: unit, skala, dan ralat setiap sudut</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.1 · build 12 Okt 2026 · Skala diukur dari titik, bukan ditanya</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -33735,12 +33735,17 @@ function mdScreenCheck() {
   const span = p.bb.span * u.f;
   let h = '<div class="md-sec"><span class="md-sec-l">Semakan sebelum simpan</span><span class="md-sec-r"></span></div>';
 
+  // Unit bukan lagi keputusan yang menentukan. AR mengukur skala sendiri
+  // daripada titik yang diletak, jadi tetapan ini hanya mengubah saiz yang
+  // dipaparkan — bukan sama ada model akan padan di tapak.
   if (p.guess && p.guess.k !== 'm') {
-    h += '<div class="md-chk bad"><div><b>Unit nampak ' + escapeHTML(p.guess.n.toLowerCase()) + '</b>' +
-      '<span>Model ini ' + Math.round(p.bb.span).toLocaleString('en-MY') + ' unit pada paksi terpanjang. Kalau meter, itu ' +
-      (p.bb.span / 1000).toFixed(1) + ' km. Dalam ' + escapeHTML(p.guess.n.toLowerCase()) + ' ia ' + p.guess.span.toFixed(1) + ' m — itu saiz bangunan.</span></div></div>';
+    h += '<div class="md-chk good"><div><b>Unit nampak ' + escapeHTML(p.guess.n.toLowerCase()) + '</b>' +
+      '<span>' + Math.round(p.bb.span).toLocaleString('en-MY') + ' unit pada paksi terpanjang, iaitu ' +
+      p.guess.span.toFixed(1) + ' m dalam ' + escapeHTML(p.guess.n.toLowerCase()) + '. ' +
+      'AR mengukur skala sebenar daripada titik yang awak letak, jadi tetapan ini hanya ' +
+      'mengubah saiz yang dipaparkan di sini.</span></div></div>';
   } else {
-    h += '<div class="md-chk good"><div><b>Unit nampak meter</b><span>Paksi terpanjang ' + span.toFixed(1) + ' m. Tiada penukaran perlu.</span></div></div>';
+    h += '<div class="md-chk good"><div><b>Unit nampak meter</b><span>Paksi terpanjang ' + span.toFixed(1) + ' m.</span></div></div>';
   }
   if (p.tris > MD_MAXTRI) {
     h += '<div class="md-chk bad"><div><b>' + mdFmtTri(p.tris) + ' segi tiga — terlalu berat</b>' +
@@ -34512,7 +34517,12 @@ async function mdStartAr() {
       // ralat, dan dengan tiga atau empat ia boleh menunjukkan titik MANA
       // yang tersilap — dua hanya boleh berkata bahawa kedua-duanya tidak
       // bersetuju.
-      MD.st = mdFromPairs(modelPts.map(function(m, i) { return { m: m, w: worldPts[i] }; }));
+      // lockScale = false: dua titik pada model dan dua di tapak sudah
+      // menentukan skala. Mengunci ia pada 1 bermakna unit model mesti betul
+      // dahulu, dan bila ia salah tiada apa boleh dibuat di tapak.
+      MD.st = mdFromPairs(modelPts.map(function(m, i) {
+        return { m: m, w: worldPts[i] };
+      }), false);
       if (!MD.st) { showToast('Titik-titik itu bertindih — cuba lagi'); worldPts.length = 0; return; }
     } else {
       MD.st = mdFrom1(modelPts[0], worldPts[0], mdRad(MD.yaw), 1);
