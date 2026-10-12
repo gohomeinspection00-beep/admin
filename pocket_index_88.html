@@ -9179,7 +9179,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.6 · build 12 Okt 2026 · Tally (mod remote, kitar jenis)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.7 · build 12 Okt 2026 · Tally (sebut nama setiap kali)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -21212,7 +21212,6 @@ function tcWire() {
         const w = new SpeechSynthesisUtterance(' ');
         w.volume = 0; speechSynthesis.speak(w);
       } catch (e) {}
-      TG.saidType = -1;
       tgSay('Remote on. ' + tgStatus());
       showToast('Remote mode on \u2014 gestures count, voice reads back');
     } else {
@@ -21312,15 +21311,16 @@ function tgStatus() {
     (TC.cts.length > 1 ? ', total ' + tcTotal() : '');
 }
 
-// Sebut nama jenis hanya bila ia berubah sejak kiraan terakhir. Mengulang
-// "Hollow" lima puluh kali melambatkan kerja; menyebutnya sekali selepas
-// bertukar memberitahu surveyor di mana dia berada.
+// Sentiasa sebut nama jenis bersama kiraannya. Di tapak yang bising,
+// mendengar "tiga" sahaja boleh terkena pada mana-mana pembilang, dan
+// kesilapan itu hanya ditemui semasa menyemak. Satu jenis sahaja tidak
+// mempunyai kekaburan itu, jadi nombor memadai.
+// Setiap sebutan membatalkan yang sebelumnya, jadi mengira laju tidak
+// menimbun baris gilir — yang terakhir sahaja kedengaran.
 function tgCount(i) {
   var c = TC.cts[i];
   if (!c) return;
-  var fresh = (TG.saidType !== i);
-  TG.saidType = i;
-  tgSay(fresh && TC.cts.length > 1 ? (c.n + ', ' + c.v) : String(c.v));
+  tgSay(TC.cts.length > 1 ? (c.n + ', ' + c.v) : String(c.v));
 }
 
 function tgDo(kind) {
@@ -21341,7 +21341,6 @@ function tgDo(kind) {
     else {
       i = slot.a === 'prev' ? (TC.active - 1 + n) % n : (TC.active + 1) % n;
       TC.active = i;
-      TG.saidType = i;            // baru diumumkan, jadi jangan ulang
       tcRender(); tcSaveDraft(); tcBuzz(9);
       c = TC.cts[i];
       tgSay(c.n + ', ' + c.v);
@@ -21353,7 +21352,6 @@ function tgDo(kind) {
     else {
       tcUndo();
       c = TC.cts[TC.active];
-      TG.saidType = TC.active;   // undo boleh melompat jenis, jadi namakannya
       tgSay('undo, ' + (c ? c.n + ' ' + c.v : ''));
     }
   } else {
