@@ -20,12 +20,15 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Coordinates2d
 import com.google.ar.core.Frame
+import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
 import com.google.ar.core.Point
 import com.google.ar.core.Session
+import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import java.nio.ByteBuffer
@@ -62,8 +65,34 @@ class ArMeasureActivity : Activity() {
 
     private val bg = Background()
 
-    /** Titik yang diletak, dalam ruang dunia. */
-    private val pts = ArrayList<FloatArray>()
+    /**
+     * Titik yang diletak, sebagai Anchor.
+     *
+     * Bukan koordinat mentah. ARCore memperbaik anggarannya tentang dunia
+     * sepanjang masa: bila lebih banyak permukaan dikesan, ia membetulkan
+     * di mana ia fikir segala-galanya berada. Satu titik yang disimpan
+     * sebagai (x,y,z) pada satu bingkai berada di tempat yang salah pada
+     * bingkai berikutnya — ia hanyut bila surveyor maju, dan kelihatan
+     * betul semula bila dia berundur ke tempat asal, kerana anggaran itu
+     * menumpu semula di sana. Anchor ialah jawapan ARCore sendiri: ia
+     * dilekatkan pada permukaan sebenar dan posenya dikemas kini setiap
+     * bingkai, jadi ia kekal di mana ia diletak.
+     *
+     * Disentuh hanya pada benang GL; benang UI membaca ptsNow.
+     */
+    private val anchors = ArrayList<Anchor>()
+
+    /** Gambaran pose semasa, diterbitkan untuk benang UI setiap bingkai. */
+    @Volatile private var ptsNow: List<FloatArray> = emptyList()
+
+    /**
+     * HitResult hanya sah sehingga update() berikutnya, jadi anchor mesti
+     * dibuat pada benang GL dalam bingkai yang sama dengan hit itu. Butang
+     * menaikkan bendera; bingkai seterusnya melakukannya.
+     */
+    @Volatile private var wantPlace = false
+    @Volatile private var wantUndo = false
+    @Volatile private var why = ""
 
     /** Tempat reticle sedang menyentuh dunia, atau null bila tiada satah. */
     @Volatile private var aim: FloatArray? = null
@@ -157,6 +186,12 @@ class ArMeasureActivity : Activity() {
                         planeFindingMode = Config.PlaneFindingMode.HORIZONTAL_AND_VERTICAL
                         updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
                         focusMode = Config.FocusMode.AUTO
+                        // Kedalaman menjadikan hit-test tepat pada permukaan
+                        // yang satahnya belum penuh dikesan. Tidak semua
+                        // telefon ada, jadi tanya dahulu.
+                        if (s.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+                            depthMode = Config.DepthMode.AUTOMATIC
+                        }
                     })
                 }
             } catch (e: Throwable) {
@@ -186,6 +221,8 @@ class ArMeasureActivity : Activity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        anchors.forEach { runCatching { it.detach() } }
+        anchors.clear()
         runCatching { session?.close() }
         session = null
     }
@@ -199,19 +236,14 @@ class ArMeasureActivity : Activity() {
     // ---------- titik ----------
 
     private fun place() {
-        val p = aim
-        if (p == null) {
+        if (aim == null) {
             Toast.makeText(this, "Belum ada satah di tengah skrin", Toast.LENGTH_SHORT).show()
             return
         }
-        pts.add(p.copyOf())
-        runOnUiThread { paintText() }
+        wantPlace = true
     }
 
-    private fun undo() {
-        if (pts.isNotEmpty()) pts.removeAt(pts.size - 1)
-        paintText()
-    }
+    private fun undo() { wantUndo = true }
 
     private fun dist(a: FloatArray, b: FloatArray): Float {
         val dx = a[0] - b[0]; val dy = a[1] - b[1]; val dz = a[2] - b[2]
@@ -220,10 +252,11 @@ class ArMeasureActivity : Activity() {
 
     /** Panjang setakat ini, termasuk segmen hidup ke reticle. */
     private fun liveLen(): Float {
+        val p = ptsNow
         var m = 0f
-        for (i in 1 until pts.size) m += dist(pts[i - 1], pts[i])
+        for (i in 1 until p.size) m += dist(p[i - 1], p[i])
         val a = aim
-        if (a != null && pts.isNotEmpty()) m += dist(pts[pts.size - 1], a)
+        if (a != null && p.isNotEmpty()) m += dist(p[p.size - 1], a)
         return m
     }
 
@@ -234,28 +267,30 @@ class ArMeasureActivity : Activity() {
 
     @SuppressLint("SetTextI18n")
     private fun paintText() {
+        val p = ptsNow
         val need = if (kind == "dist") 2 else 3
-        undoBtn.isEnabled = pts.isNotEmpty()
-        doneBtn.isEnabled = pts.size >= need
+        undoBtn.isEnabled = p.isNotEmpty()
+        doneBtn.isEnabled = p.size >= need
 
-        readout.text = when {
-            pts.isEmpty() -> "—"
-            else -> fmt(liveLen())
-        }
+        readout.text = if (p.isEmpty()) "—" else fmt(liveLen())
         hint.text = when {
+            // Sebab sebenar ARCore hilang jejak, dan bukan "cuba lagi": di
+            // tapak, "terlalu gelap" dan "gerak terlalu laju" ialah dua
+            // masalah berbeza dengan dua penyelesaian berbeza.
+            !tracking && why.isNotEmpty() -> why
             !tracking -> "Gerak telefon perlahan supaya ARCore nampak permukaan…"
             aim == null -> "Halakan bulatan ke permukaan"
-            kind == "dist" && pts.isEmpty() -> "Ketik Letak titik pada hujung pertama"
-            kind == "dist" && pts.size == 1 -> "Jalan ke hujung kedua, letak titik lagi"
+            kind == "dist" && p.isEmpty() -> "Ketik Letak titik pada hujung pertama"
+            kind == "dist" && p.size == 1 -> "Jalan ke hujung kedua, letak titik lagi"
             kind == "dist" -> "Tekan Siap, atau Undo untuk ubah"
-            pts.size < 3 -> "Letak titik demi titik sepanjang dinding (${pts.size})"
-            else -> "${pts.size} titik · tekan Siap"
+            p.size < 3 -> "Letak titik demi titik sepanjang dinding (${p.size})"
+            else -> "${p.size} titik · tekan Siap"
         }
     }
 
     private fun finishWith() {
         val sb = StringBuilder("[")
-        pts.forEachIndexed { i, p ->
+        ptsNow.forEachIndexed { i, p ->
             if (i > 0) sb.append(',')
             sb.append("{\"x\":").append(p[0])
                 .append(",\"y\":").append(p[1])
@@ -308,22 +343,24 @@ class ArMeasureActivity : Activity() {
             c.drawCircle(cx, cy, dp(13).toFloat(), ring)
             if (aim != null) c.drawCircle(cx, cy, dp(4).toFloat(), dot)
 
-            val screen = ArrayList<FloatArray?>(pts.size)
-            for (p in pts) screen.add(toScreen(p))
+            val world = ptsNow
+            val screen = ArrayList<FloatArray?>(world.size)
+            for (p in world) screen.add(toScreen(p))
 
             for (i in 1 until screen.size) {
                 val a = screen[i - 1] ?: continue
                 val b = screen[i] ?: continue
                 c.drawLine(a[0], a[1], b[0], b[1], line)
-                tag(c, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, fmt(dist(pts[i - 1], pts[i])))
+                tag(c, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, fmt(dist(world[i - 1], world[i])))
             }
 
             // Segmen hidup dari titik terakhir ke reticle.
             val last = screen.lastOrNull()
-            if (last != null && aim != null) {
+            val tip = aim
+            if (last != null && tip != null && world.isNotEmpty()) {
                 c.drawLine(last[0], last[1], cx, cy, line)
                 tag(c, (last[0] + cx) / 2, (last[1] + cy) / 2,
-                    fmt(dist(pts[pts.size - 1], aim!!)))
+                    fmt(dist(world[world.size - 1], tip)))
             }
 
             // Gelung tertutup untuk luas.
@@ -372,7 +409,18 @@ class ArMeasureActivity : Activity() {
 
             val cam = frame.camera
             val ok = cam.trackingState == TrackingState.TRACKING
-            if (tracking != ok) { tracking = ok; runOnUiThread { paintText() } }
+            val reason = if (ok) "" else when (cam.trackingFailureReason) {
+                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Terlalu gelap — hidupkan lampu"
+                TrackingFailureReason.EXCESSIVE_MOTION -> "Gerak telefon lebih perlahan"
+                TrackingFailureReason.INSUFFICIENT_FEATURES ->
+                    "Permukaan ini terlalu kosong — halakan ke sesuatu yang bercorak"
+                TrackingFailureReason.CAMERA_UNAVAILABLE -> "Kamera diambil oleh app lain"
+                else -> ""
+            }
+            if (tracking != ok || why != reason) {
+                tracking = ok; why = reason
+                runOnUiThread { paintText() }
+            }
             if (!ok) {
                 if (aim != null) { aim = null; postOverlay() }
                 return
@@ -387,6 +435,7 @@ class ArMeasureActivity : Activity() {
             // dengan telefon dan bukan dengan jari, jadi tiada ketikan untuk
             // terlepas dan tangan yang memegang telefon tidak menggoyangnya.
             var found: FloatArray? = null
+            var hit: HitResult? = null
             try {
                 val hits = frame.hitTest(gl.width / 2f, gl.height / 2f)
                 for (h in hits) {
@@ -396,6 +445,7 @@ class ArMeasureActivity : Activity() {
                             Point.OrientationMode.ESTIMATED_SURFACE_NORMAL)
                     if (inside) {
                         found = floatArrayOf(h.hitPose.tx(), h.hitPose.ty(), h.hitPose.tz())
+                        hit = h
                         break
                     }
                 }
@@ -403,13 +453,50 @@ class ArMeasureActivity : Activity() {
 
             val had = aim != null
             aim = found
-            if (had != (found != null)) runOnUiThread { paintText() }
+
+            // Anchor dicipta di sini dan bukan dalam pengendali butang: satu
+            // HitResult hanya sah sehingga update() berikutnya, jadi ia mesti
+            // digunakan dalam bingkai yang melahirkannya.
+            var changed = false
+            if (wantPlace) {
+                wantPlace = false
+                hit?.let { h ->
+                    runCatching { anchors.add(h.trackable.createAnchor(h.hitPose)) }
+                        .onSuccess { changed = true }
+                }
+            }
+            if (wantUndo) {
+                wantUndo = false
+                if (anchors.isNotEmpty()) {
+                    runCatching { anchors.removeAt(anchors.size - 1).detach() }
+                    changed = true
+                }
+            }
+
+            // Pose segar setiap bingkai: itulah sebabnya anchor digunakan.
+            // Anchor yang ARCore belum jejak semula ditinggalkan di tempat
+            // terakhirnya dan bukan dilompat ke asalan.
+            val fresh = ArrayList<FloatArray>(anchors.size)
+            val prev = ptsNow
+            anchors.forEachIndexed { i, an ->
+                if (an.trackingState == TrackingState.TRACKING) {
+                    val po = an.pose
+                    fresh.add(floatArrayOf(po.tx(), po.ty(), po.tz()))
+                } else if (i < prev.size) {
+                    fresh.add(prev[i])
+                } else {
+                    fresh.add(floatArrayOf(0f, 0f, 0f))
+                }
+            }
+            ptsNow = fresh
+
+            if (changed || had != (found != null)) runOnUiThread { paintText() }
             postOverlay()
         }
 
         private fun postOverlay() {
             overlay.postInvalidateOnAnimation()
-            if (pts.isNotEmpty()) runOnUiThread { readout.text = fmt(liveLen()) }
+            if (ptsNow.isNotEmpty()) runOnUiThread { readout.text = fmt(liveLen()) }
         }
     }
 
