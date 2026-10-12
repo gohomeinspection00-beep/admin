@@ -17,7 +17,6 @@ import android.provider.MediaStore
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
-import android.widget.Button
 import android.widget.FrameLayout
 import android.graphics.drawable.GradientDrawable
 import android.widget.ImageButton
@@ -68,7 +67,7 @@ class ArPlanActivity : Activity() {
     private lateinit var overlay: Overlay
     private lateinit var hint: TextView
     private lateinit var readout: TextView
-    private lateinit var placeBtn: Button
+    private lateinit var placeBtn: ImageButton
     private lateinit var resetBtn: ImageButton
     private lateinit var lockBtn: ImageButton
     private lateinit var shotBtn: ImageButton
@@ -244,15 +243,22 @@ class ArPlanActivity : Activity() {
                     .apply { marginStart = dp(5); marginEnd = dp(5); topMargin = dp(10) }
             }
 
-        placeBtn = Button(this).apply {
-            isAllCaps = false
-            maxLines = 1
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
-            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pin, 0, 0, 0)
-            compoundDrawablePadding = dp(8)
+        // Tiada teks di sini juga. Nombor titik yang sedang diletak sudah
+        // berada pada baris petunjuk di atas skrin; mengulanginya pada butang
+        // membayarnya dengan ruang kamera.
+        placeBtn = ImageButton(this).apply {
+            setImageResource(R.drawable.ic_pin)
+            setColorFilter(Color.WHITE)
+            contentDescription = "Letak titik"
+            scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+            background = GradientDrawable().apply {
+                cornerRadius = dp(14).toFloat()
+                setColor(C_PRIMARY)
+            }
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Letak titik"
             setOnClickListener { wantPlace = true }
-            layoutParams = LinearLayout.LayoutParams(-1, dp(52))
-                .apply { topMargin = dp(7) }
+            layoutParams = LinearLayout.LayoutParams(-1, dp(54)).apply { topMargin = dp(8) }
         }
         bar.addView(placeBtn)
 
@@ -526,7 +532,11 @@ class ArPlanActivity : Activity() {
         val n = anchors.size
         val need = if (twoPin) 2 else 1
         placeBtn.isEnabled = n < need && !locked
-        placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Pelan diletak"
+        placeBtn.alpha = if (placeBtn.isEnabled) 1f else 0.3f
+        placeBtn.contentDescription =
+            if (n < need) "Letak titik ${n + 1}" else "Pelan sudah diletak"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            placeBtn.tooltipText = placeBtn.contentDescription
         // Ikon mangga bertukar bersama keadaannya, dan warnanya juga: kuning
         // bermakna sesuatu sedang ditahan, yang perlu kelihatan tanpa dibaca.
         lockBtn.setImageResource(if (locked) R.drawable.ic_unlock else R.drawable.ic_lock)
@@ -545,13 +555,13 @@ class ArPlanActivity : Activity() {
             !tracking -> "Gerak telefon perlahan supaya ARCore nampak lantai…"
             planeCount == 0 ->
                 "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, halakan ke lantai bercorak."
-            locked -> "Pelan dikunci. Tekan Buka kunci untuk melaras semula."
+            locked -> "Pelan dikunci. Ketik mangga kuning untuk melaras semula."
             // Ketaksaan yang paling kerap mengelirukan, dinamakan sebaik
             // pelan muncul dan bukan dibiarkan untuk ditemui sendiri.
-            n >= need -> "Pelan diletak. Teks terbalik? Tekan Cermin. Laras tinggi dengan slider."
+            n >= need -> "Pelan diletak. Teks terbalik? Ketik ikon sian. Laras tinggi dengan slider."
             aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
-            n == 0 -> "Halakan ke tempat sebenar titik ${if (twoPin) "1" else "jangkar"} pada pelan, kemudian Letak"
-            else -> "Halakan ke tempat sebenar titik 2, kemudian Letak"
+            n == 0 -> "Halakan ke tempat sebenar titik ${if (twoPin) "1" else "jangkar"} pada pelan, kemudian ketik butang biru"
+            else -> "Halakan ke tempat sebenar titik 2, kemudian ketik butang biru"
         }
 
         val st = state
@@ -564,7 +574,7 @@ class ArPlanActivity : Activity() {
         if (warn.visibility == View.VISIBLE) {
             warn.text = String.format(
                 "Pelan keluar %.2f m lebar — dua titik di tapak terlalu %s. " +
-                "Tekan Mula semula dan letak semula lebih %s.",
+                "Ketik ikon pusing dan letak semula lebih %s.",
                 wideM, if (wideM < 0.8f) "rapat" else "jauh",
                 if (wideM < 0.8f) "jauh" else "rapat")
         }
@@ -868,6 +878,7 @@ class ArPlanActivity : Activity() {
     }
 
     companion object {
+        private const val C_PRIMARY = 0xFF2563EB.toInt()
         private const val C_FLIP = 0xFF22D3EE.toInt()
         private const val C_SNAP = 0xFFFFFFFF.toInt()
         private const val C_PLAIN = 0xFFD6DEE6.toInt()

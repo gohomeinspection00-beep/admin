@@ -15,7 +15,6 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.FrameLayout
 import android.graphics.drawable.GradientDrawable
 import android.widget.ImageButton
@@ -59,7 +58,7 @@ class ArMeasureActivity : Activity() {
     private lateinit var hint: TextView
     private lateinit var undoBtn: ImageButton
     private lateinit var doneBtn: ImageButton
-    private lateinit var placeBtn: Button
+    private lateinit var placeBtn: ImageButton
 
     private val bg = ArBackground()
 
@@ -177,15 +176,19 @@ class ArMeasureActivity : Activity() {
         // Susunan yang sama seperti skrin pelan: satu tindakan utama yang
         // lebar penuh, kemudian satu baris ikon bulat berwarna. Dua skrin AR
         // dalam app yang sama tidak sepatutnya kelihatan seperti dua app.
-        placeBtn = Button(this).apply {
-            text = "Letak titik"
-            isAllCaps = false
-            maxLines = 1
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
-            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pin, 0, 0, 0)
-            compoundDrawablePadding = dp(8)
+        placeBtn = ImageButton(this).apply {
+            setImageResource(R.drawable.ic_pin)
+            setColorFilter(Color.WHITE)
+            contentDescription = "Letak titik"
+            scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+            background = GradientDrawable().apply {
+                cornerRadius = dp(14).toFloat()
+                setColor(C_PRIMARY)
+            }
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Letak titik"
             setOnClickListener { place() }
-            layoutParams = LinearLayout.LayoutParams(-1, dp(52)).apply { topMargin = dp(8) }
+            layoutParams = LinearLayout.LayoutParams(-1, dp(54)).apply { topMargin = dp(8) }
         }
         bar.addView(placeBtn)
 
@@ -327,6 +330,7 @@ class ArMeasureActivity : Activity() {
         undoBtn.isEnabled = p.isNotEmpty()
         doneBtn.isEnabled = p.size >= need
         placeBtn.isEnabled = aim != null
+        placeBtn.alpha = if (placeBtn.isEnabled) 1f else 0.3f
         for (b2 in listOf(undoBtn, doneBtn)) b2.alpha = if (b2.isEnabled) 1f else 0.35f
 
         readout.text = if (p.isEmpty()) "—" else fmt(liveLen())
@@ -342,11 +346,11 @@ class ArMeasureActivity : Activity() {
                 "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, " +
                 "halakan ke permukaan bercorak — lantai kosong dan dinding putih sukar."
             aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
-            kind == "dist" && p.isEmpty() -> "Ketik Letak titik pada hujung pertama"
-            kind == "dist" && p.size == 1 -> "Jalan ke hujung kedua, letak titik lagi"
-            kind == "dist" -> "Tekan Siap, atau Undo untuk ubah"
-            p.size < 3 -> "Letak titik demi titik sepanjang dinding (${p.size})"
-            else -> "${p.size} titik · tekan Siap"
+            kind == "dist" && p.isEmpty() -> "Ketik butang biru pada hujung pertama"
+            kind == "dist" && p.size == 1 -> "Jalan ke hujung kedua, ketik butang biru lagi"
+            kind == "dist" -> "Ketik bulatan hijau bila siap · anak panah untuk buang titik"
+            p.size < 3 -> "Ketik butang biru titik demi titik sepanjang dinding (${p.size})"
+            else -> "${p.size} titik · ketik bulatan hijau"
         }
     }
 
@@ -703,6 +707,7 @@ class ArMeasureActivity : Activity() {
     }
 
     companion object {
+        private const val C_PRIMARY = 0xFF2563EB.toInt()
         private const val C_PLAIN = 0xFFD6DEE6.toInt()
         private const val C_DONE = 0xFF4ADE80.toInt()
         private const val C_CLOSE = 0xFFFF7A7A.toInt()
