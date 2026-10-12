@@ -1978,7 +1978,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .tc-overlay.tc-rem .tc-hd,.tc-overlay.tc-rem .tc-foot{position:relative;z-index:6}
 .tg-bar{position:relative;z-index:6;display:flex;align-items:center;gap:9px;padding:8px 13px;background:var(--accent);color:var(--accent-fg)}
 .tg-bar b{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;flex:none}
-.tg-bar span{font-size:11.5px;opacity:.92;min-width:0;flex:1;text-align:right}
+.tg-bar span{font-family:var(--font-mono);font-size:20px;font-weight:700;line-height:1;min-width:0;flex:1;text-align:right;font-variant-numeric:tabular-nums}
 @keyframes tgFlash{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
 .tg-flash{animation:tgFlash .18s ease-out}
 .tg-help{padding:9px 13px;border-bottom:1px solid var(--line);background:var(--bg-2);
@@ -9179,7 +9179,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.5 · build 12 Okt 2026 · Tally (satu butang satu jenis)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.6 · build 12 Okt 2026 · Tally (mod remote, kitar jenis)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -21146,7 +21146,8 @@ function tcRender() {
       (TC.editId ? 'Update' : 'Save') + '</button></div>';
 
   if (TC.remote) {
-    h += '<div class="tg-bar"><b>Mod remote</b><span id="tgLast">tekan butang</span></div>' +
+    h += '<div class="tg-bar"><b>' + peEsc((TC.cts[TC.active] || {}).n || 'Mod remote') +
+      '</b><span id="tgLast">' + ((TC.cts[TC.active] || {}).v || 0) + '</span></div>' +
       '<div class="tg-help">' + tgHelp(TC.cts).map(function(p) {
         return '<i>' + p[0] + '</i> ' + peEsc(p[1]);
       }).join(' &middot; ') + '</div>';
@@ -21163,7 +21164,7 @@ function tcRender() {
       '<span class="tc-flash"></span>' +
       '<span class="tc-top"><span class="tc-dot" style="background:' + col + '"></span>' +
         '<span class="tc-nm">' + peEsc(c.n) + '</span>' +
-        '<span class="tc-key">' + (TC.remote ? (tgGlyphFor(i, TC.cts.length) || '\u2014') : (i + 1)) + '</span></span>' +
+        '<span class="tc-key">' + (i + 1) + '</span></span>' +
       '<span class="tc-bot"><span class="tc-num" style="color:' + col + '">' + c.v + '</span>' +
         '<button class="tc-minus" data-tcm="' + i + '" aria-label="minus">−</button></span>' +
     '</div>';
@@ -21211,6 +21212,7 @@ function tcWire() {
         const w = new SpeechSynthesisUtterance(' ');
         w.volume = 0; speechSynthesis.speak(w);
       } catch (e) {}
+      TG.saidType = -1;
       tgSay('Remote on. ' + tgStatus());
       showToast('Remote mode on \u2014 gestures count, voice reads back');
     } else {
@@ -21268,52 +21270,29 @@ var TG_GLYPH = {
   tap:'♥', down:'▲', up:'▼', left:'◀', right:'▶',
   out:'⊕', in:'⊖'
 };
-// Urutan butang diberikan kepada jenis. Menukar jenis dahulu bermakna tiga
-// tekanan untuk satu kiraan pada dinding yang berselang-seli, jadi setiap
-// jenis mendapat butangnya sendiri selagi butang mencukupi.
-var TG_ORDER = ['tap', 'down', 'up', 'left', 'right'];
-
-function tgDirect(n) { return n >= 1 && n <= TG_ORDER.length; }
-
-// Apa yang satu gerak isyarat lakukan, dengan n jenis sedang dikira.
-function tgSlot(kind, n) {
-  if (kind === 'in')  return { a:'undo' };
-  if (kind === 'out') return { a:'status' };
-  if (tgDirect(n)) {
-    var i = TG_ORDER.indexOf(kind);
-    if (i >= 0 && i < n) return { a:'add', i:i };
-    // ▼ masih lapang dengan satu atau dua jenis, jadi jadikan ia tolak.
-    if (kind === 'up' && n < 3) return { a:'sub' };
-    return { a:'' };
-  }
-  // Enam jenis melebihi butang yang ada, jadi ◀ ▶ kembali menukar jenis.
+// ♥ ialah butang tengah yang besar: ia dijumpai dengan rasa, tanpa
+// memandang. Butang anak panah kecil dan perlu dibidik. Jadi mengira
+// sentiasa pada satu butang yang sama, dan ◀ ▶ menukar jenis — lima
+// puluh kiraan ialah lima puluh tekanan pada butang yang sama.
+function tgSlot(kind) {
   if (kind === 'tap' || kind === 'down') return { a:'add' };
   if (kind === 'up')    return { a:'sub' };
   if (kind === 'left')  return { a:'prev' };
   if (kind === 'right') return { a:'next' };
+  if (kind === 'out')   return { a:'status' };
+  if (kind === 'in')    return { a:'undo' };
   return { a:'' };
 }
 
-// Butang mana milik jenis ke-i, atau '' kalau tiada.
-function tgGlyphFor(i, n) {
-  if (!tgDirect(n) || i >= n) return '';
-  return TG_GLYPH[TG_ORDER[i]] || '';
-}
-
-// Baris bantuan yang menamakan jenis sebenar, bukan arahan generik.
+// Baris bantuan, menamakan jenis semasa supaya satu pandangan memadai.
 function tgHelp(cts) {
-  const n = cts.length, parts = [];
-  if (tgDirect(n)) {
-    cts.forEach(function(c, i) { parts.push([tgGlyphFor(i, n), c.n]); });
-    if (n < 3) parts.push([TG_GLYPH.up, 'tolak']);
-  } else {
-    parts.push([TG_GLYPH.tap + ' ' + TG_GLYPH.down, 'tambah']);
-    parts.push([TG_GLYPH.up, 'tolak']);
-    parts.push([TG_GLYPH.left + ' ' + TG_GLYPH.right, 'tukar jenis']);
-  }
-  parts.push([TG_GLYPH.out, 'sebut jumlah']);
-  parts.push([TG_GLYPH.in, 'undo']);
-  return parts;
+  return [
+    [TG_GLYPH.tap + ' ' + TG_GLYPH.down, 'tambah'],
+    [TG_GLYPH.up, 'tolak'],
+    [TG_GLYPH.left + ' ' + TG_GLYPH.right, 'tukar jenis'],
+    [TG_GLYPH.out, 'sebut jumlah'],
+    [TG_GLYPH.in, 'undo']
+  ];
 }
 
 function tgSay(text) {
@@ -21333,27 +21312,36 @@ function tgStatus() {
     (TC.cts.length > 1 ? ', total ' + tcTotal() : '');
 }
 
+// Sebut nama jenis hanya bila ia berubah sejak kiraan terakhir. Mengulang
+// "Hollow" lima puluh kali melambatkan kerja; menyebutnya sekali selepas
+// bertukar memberitahu surveyor di mana dia berada.
+function tgCount(i) {
+  var c = TC.cts[i];
+  if (!c) return;
+  var fresh = (TG.saidType !== i);
+  TG.saidType = i;
+  tgSay(fresh && TC.cts.length > 1 ? (c.n + ', ' + c.v) : String(c.v));
+}
+
 function tgDo(kind) {
   if (!kind) return;
-  var n = TC.cts.length, slot = tgSlot(kind, n), c, i;
+  var n = TC.cts.length, slot = tgSlot(kind), c, i;
 
   if (slot.a === 'add') {
-    i = (slot.i == null) ? TC.active : slot.i;
-    c = TC.cts[i];
+    c = TC.cts[TC.active];
     if (!c) return;
-    tcBump(i, 1);
-    // Dengan beberapa jenis, sebut namanya juga: menekan butang yang salah
-    // mesti kedengaran salah serta-merta, bukan ditemui semasa menyemak.
-    tgSay(n > 1 ? (c.n + ', ' + c.v) : String(c.v));
+    tcBump(TC.active, 1);
+    tgCount(TC.active);
   } else if (slot.a === 'sub') {
     c = TC.cts[TC.active];
     if (!c || c.v <= 0) { tgSay('zero'); }
-    else { tcBump(TC.active, -1); tgSay(n > 1 ? (c.n + ', ' + c.v) : String(c.v)); }
+    else { tcBump(TC.active, -1); tgCount(TC.active); }
   } else if (slot.a === 'prev' || slot.a === 'next') {
     if (n < 2) { tgSay('one type only'); }
     else {
       i = slot.a === 'prev' ? (TC.active - 1 + n) % n : (TC.active + 1) % n;
       TC.active = i;
+      TG.saidType = i;            // baru diumumkan, jadi jangan ulang
       tcRender(); tcSaveDraft(); tcBuzz(9);
       c = TC.cts[i];
       tgSay(c.n + ', ' + c.v);
@@ -21362,7 +21350,12 @@ function tgDo(kind) {
     tgSay(tgStatus());
   } else if (slot.a === 'undo') {
     if (!TC.hist.length) { tgSay('nothing to undo'); }
-    else { tcUndo(); c = TC.cts[TC.active]; tgSay('undo, ' + (c ? c.n + ' ' + c.v : '')); }
+    else {
+      tcUndo();
+      c = TC.cts[TC.active];
+      TG.saidType = TC.active;   // undo boleh melompat jenis, jadi namakannya
+      tgSay('undo, ' + (c ? c.n + ' ' + c.v : ''));
+    }
   } else {
     return;   // butang tidak diberikan apa-apa pada bilangan jenis ini
   }
@@ -21373,14 +21366,8 @@ function tgDo(kind) {
 function tgFlash(kind) {
   var el = document.getElementById('tgLast');
   if (!el) return;
-  var n = TC.cts.length, slot = tgSlot(kind, n), g = TG_GLYPH[kind] || '', name = '';
-  if (slot.a === 'add')         name = (TC.cts[slot.i == null ? TC.active : slot.i] || {}).n || 'tambah';
-  else if (slot.a === 'sub')    name = 'tolak';
-  else if (slot.a === 'prev')   name = 'jenis sebelum';
-  else if (slot.a === 'next')   name = 'jenis seterusnya';
-  else if (slot.a === 'status') name = 'sebut jumlah';
-  else if (slot.a === 'undo')   name = 'undo';
-  el.textContent = name ? (g + '  ' + name) : '';
+  var c = TC.cts[TC.active];
+  el.textContent = c ? String(c.v) : '';
   el.classList.remove('tg-flash');
   void el.offsetWidth;          // paksa animasi bermula semula
   el.classList.add('tg-flash');
