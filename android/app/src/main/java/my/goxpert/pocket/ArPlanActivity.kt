@@ -1,0 +1,631 @@
+package my.goxpert.pocket
+
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.opengl.GLES20
+import android.opengl.GLSurfaceView
+import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.TextView
+import android.widget.Toast
+import com.google.ar.core.Anchor
+import com.google.ar.core.Config
+import com.google.ar.core.Frame
+import com.google.ar.core.HitResult
+import com.google.ar.core.Plane
+import com.google.ar.core.Session
+import com.google.ar.core.TrackingFailureReason
+import com.google.ar.core.TrackingState
+import com.google.ar.core.exceptions.CameraNotAvailableException
+import org.json.JSONObject
+import java.io.File
+import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.opengles.GL10
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
+import kotlin.math.sqrt
+
+/**
+ * Pelan lantai dihamparkan pada tapak sebenar, di dalam app.
+ *
+ * Versi web melukis pelan sebagai mesh bertekstur dalam Three.js di atas
+ * sesi WebXR. Tiada satu pun daripada itu wujud dalam WebView, tetapi
+ * hamparan itu sendiri tidak memerlukan enjin 3D: pelan ialah satu segi
+ * empat rata, dan satu segi empat rata yang diunjurkan ke skrin ialah
+ * sekadar empat titik. Canvas Android memetakan bitmap kepada empat titik
+ * dengan setPolyToPoly, yang memberi perspektif yang betul, jadi lapisan 2D
+ * yang sama yang melukis kursor melukis pelan juga.
+ *
+ * Matematik jajaran ialah port langsung fungsi fpFrom1/fpFrom2/fpMap dalam
+ * Pocket, supaya pelan duduk di tempat yang sama sama ada ia dibuka di sini
+ * atau dalam Chrome.
+ */
+class ArPlanActivity : Activity() {
+
+    private var session: Session? = null
+    private lateinit var gl: GLSurfaceView
+    private lateinit var overlay: Overlay
+    private lateinit var hint: TextView
+    private lateinit var readout: TextView
+    private lateinit var placeBtn: Button
+    private lateinit var resetBtn: Button
+
+    private val bg = ArBackground()
+
+    private var plan: Bitmap? = null
+    private var planW = 0f
+    private var planH = 0f
+    private var mode = "floor"
+    private var twoPin = false
+    private var au = 0f; private var av = 0f      // pin A dalam piksel pelan
+    private var bu = 0f; private var bv = 0f
+
+    /** Titik dunia yang dipilih, sebagai Anchor supaya ia tidak hanyut. */
+    private val anchors = ArrayList<Anchor>()
+
+    @Volatile private var vp = FloatArray(16)
+    @Volatile private var aim: FloatArray? = null
+    @Volatile private var ring: FloatArray = FloatArray(0)
+    @Volatile private var quad: FloatArray = FloatArray(0)   // 4 bucu dunia
+    @Volatile private var tracking = false
+    @Volatile private var why = ""
+    @Volatile private var planeCount = 0
+
+    private var smooth: FloatArray? = null
+    @Volatile private var wantPlace = false
+    @Volatile private var wantReset = false
+
+    /** Laras selepas pelan diletak. */
+    @Volatile private var opacity = 0.65f
+    @Volatile private var lift = 0f          // tinggi (lantai) atau dalam (dinding)
+    @Volatile private var theta = 0f         // putaran, mod satu pin sahaja
+    @Volatile private var mPerPx = 0f        // skala, mod satu pin sahaja
+    @Volatile private var flip = false
+
+    @SuppressLint("SetTextI18n")
+    override fun onCreate(st: Bundle?) {
+        super.onCreate(st)
+
+        val path = intent.getStringExtra("plan").orEmpty()
+        plan = runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
+        if (plan == null) { bail("Pelan tidak dapat dibaca"); return }
+
+        runCatching {
+            val j = JSONObject(intent.getStringExtra("spec") ?: "{}")
+            planW = j.optDouble("W", plan!!.width.toDouble()).toFloat()
+            planH = j.optDouble("H", plan!!.height.toDouble()).toFloat()
+            mode = j.optString("mode", "floor")
+            twoPin = j.optInt("pins", 1) >= 2
+            au = (j.optDouble("au", 50.0) / 100.0).toFloat() * planW
+            av = (j.optDouble("av", 50.0) / 100.0).toFloat() * planH
+            bu = (j.optDouble("bu", 50.0) / 100.0).toFloat() * planW
+            bv = (j.optDouble("bv", 50.0) / 100.0).toFloat() * planH
+        }
+        if (planW <= 0f || planH <= 0f) { bail("Saiz pelan tidak sah"); return }
+        // Lebar 10 m ialah teka-teka pertama yang munasabah untuk satu bilik;
+        // mod satu pin membiarkan ia dilaras.
+        mPerPx = 10f / planW
+
+        gl = GLSurfaceView(this).apply {
+            preserveEGLContextOnPause = true
+            setEGLContextClientVersion(2)
+            setEGLConfigChooser(8, 8, 8, 8, 16, 0)
+            setRenderer(Renderer())
+            renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+        }
+        overlay = Overlay(this)
+
+        val root = FrameLayout(this)
+        root.addView(gl, FrameLayout.LayoutParams(-1, -1))
+        root.addView(overlay, FrameLayout.LayoutParams(-1, -1))
+
+        hint = TextView(this).apply {
+            setTextColor(Color.WHITE)
+            setBackgroundColor(Color.argb(140, 0, 0, 0))
+            setPadding(dp(14), dp(10), dp(14), dp(10))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+        }
+        root.addView(hint, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.TOP })
+
+        val bar = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Color.argb(190, 0, 0, 0))
+            setPadding(dp(12), dp(8), dp(12), dp(14))
+        }
+
+        readout = TextView(this).apply {
+            setTextColor(Color.WHITE)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, dp(6))
+        }
+        bar.addView(readout, LinearLayout.LayoutParams(-1, -2))
+
+        // Lut sinar: pelan mesti boleh dilihat menembusi untuk dibandingkan
+        // dengan apa yang sebenarnya ada di sana.
+        bar.addView(row("Lut sinar", 20, 95, 65) { v ->
+            opacity = v / 100f; paintText(); overlay.postInvalidate()
+        })
+        bar.addView(row(if (mode == "wall") "Dalam" else "Tinggi", 0, 100, 50) { v ->
+            lift = (v - 50) / 100f * 2f      // -1 m .. +1 m
+            rebuild(); paintText()
+        })
+        if (!twoPin) {
+            bar.addView(row("Putar", 0, 360, 0) { v -> theta = v.toFloat(); rebuild(); paintText() })
+            bar.addView(row("Skala", 10, 400, 100) { v ->
+                mPerPx = (10f * (v / 100f)) / planW; rebuild(); paintText()
+            })
+        }
+
+        val btns = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, dp(8), 0, 0)
+        }
+        fun mk(label: String, w: Float): Button = Button(this).apply {
+            text = label; isAllCaps = false
+            layoutParams = LinearLayout.LayoutParams(0, dp(50), w).apply { marginEnd = dp(6) }
+        }
+        resetBtn = mk("Mula semula", 1f).apply {
+            isEnabled = false
+            setOnClickListener { wantReset = true }
+        }
+        placeBtn = mk("Letak titik 1", 1.5f).apply { setOnClickListener { wantPlace = true } }
+        val flipBtn = mk("Cermin", 1f).apply { setOnClickListener { flip = !flip; rebuild() } }
+        val doneBtn = mk("Tutup", 1f).apply { setOnClickListener { finish() } }
+        btns.addView(resetBtn); btns.addView(placeBtn); btns.addView(flipBtn); btns.addView(doneBtn)
+        bar.addView(btns, LinearLayout.LayoutParams(-1, -2))
+
+        root.addView(bar, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.BOTTOM })
+        setContentView(root)
+        paintText()
+    }
+
+    private fun row(label: String, min: Int, max: Int, start: Int, onSet: (Int) -> Unit): View {
+        val wrap = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        wrap.addView(TextView(this).apply {
+            text = label
+            setTextColor(Color.argb(210, 255, 255, 255))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            width = dp(66)
+        })
+        val sb = SeekBar(this).apply {
+            this.max = max - min
+            progress = start - min
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(s: SeekBar?, p: Int, fromUser: Boolean) {
+                    onSet(p + min)
+                }
+                override fun onStartTrackingTouch(s: SeekBar?) {}
+                override fun onStopTrackingTouch(s: SeekBar?) {}
+            })
+        }
+        wrap.addView(sb, LinearLayout.LayoutParams(0, -2, 1f))
+        return wrap
+    }
+
+    private fun dp(v: Int): Int =
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, v.toFloat(), resources.displayMetrics).toInt()
+
+    private fun bail(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+        finish()
+    }
+
+    // ---------- kitaran hayat ----------
+
+    private var resumed = false
+
+    override fun onResume() {
+        super.onResume()
+        if (plan == null) return
+        if (session == null) {
+            session = try {
+                Session(this).also { s ->
+                    s.configure(Config(s).apply {
+                        planeFindingMode = Config.PlaneFindingMode.HORIZONTAL_AND_VERTICAL
+                        updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+                        focusMode = Config.FocusMode.AUTO
+                        depthMode = Config.DepthMode.DISABLED
+                        instantPlacementMode = Config.InstantPlacementMode.DISABLED
+                        lightEstimationMode = Config.LightEstimationMode.DISABLED
+                        cloudAnchorMode = Config.CloudAnchorMode.DISABLED
+                    })
+                }
+            } catch (e: Throwable) { bail("AR tidak dapat dimulakan"); return }
+        }
+        try { session?.resume(); resumed = true }
+        catch (e: CameraNotAvailableException) { session = null; bail("Kamera tidak tersedia"); return }
+        gl.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (resumed) { gl.onPause(); session?.pause(); resumed = false }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        anchors.forEach { runCatching { it.detach() } }
+        anchors.clear()
+        runCatching { session?.close() }
+        session = null
+        plan?.recycle(); plan = null
+    }
+
+    // ---------- matematik jajaran (port daripada Pocket) ----------
+
+    private fun sub(a: FloatArray, b: FloatArray) =
+        floatArrayOf(a[0] - b[0], a[1] - b[1], a[2] - b[2])
+    private fun len(a: FloatArray) = sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
+    private fun norm(a: FloatArray): FloatArray {
+        val l = len(a)
+        return if (l > 1e-9f) floatArrayOf(a[0] / l, a[1] / l, a[2] / l) else floatArrayOf(1f, 0f, 0f)
+    }
+    private fun horiz(a: FloatArray) = floatArrayOf(a[0], 0f, a[2])
+    /** Serenjang mendatar: UP x dir. */
+    private fun perp(dir: FloatArray, f: Boolean): FloatArray {
+        // UP x dir, dengan UP = (0,1,0), yang memberi (dz, 0, -dx).
+        val d = norm(dir)
+        val q = norm(floatArrayOf(d[2], 0f, -d[0]))
+        return if (f) floatArrayOf(-q[0], -q[1], -q[2]) else q
+    }
+
+    /** eu, ev, skala dan asalan — cukup untuk memetakan mana-mana piksel
+     *  pelan kepada kedudukan dunia. */
+    private class St(
+        val au: Float, val av: Float, val A: FloatArray,
+        val eu: FloatArray, val ev: FloatArray, val s: Float
+    )
+
+    @Volatile private var state: St? = null
+
+    private fun from1(A: FloatArray): St? {
+        val t = theta * Math.PI.toFloat() / 180f
+        val dir = floatArrayOf(cos(t), 0f, sin(t))
+        val eu: FloatArray
+        val ev: FloatArray
+        if (mode == "wall") {
+            eu = if (flip) floatArrayOf(-dir[0], -dir[1], -dir[2]) else dir
+            ev = floatArrayOf(0f, -1f, 0f)
+        } else {
+            eu = dir
+            ev = perp(dir, flip)
+        }
+        if (mPerPx <= 0f || !mPerPx.isFinite()) return null
+        return St(au, av, A, eu, ev, mPerPx)
+    }
+
+    private fun from2(A: FloatArray, B: FloatArray): St? {
+        val du = bu - au
+        val dv = bv - av
+        val L = hypot(du, dv)
+        if (L < 1e-6f) return null
+        val dx = du / L
+        val dy = dv / L
+        val D = sub(B, A)
+        val s: Float
+        val eu: FloatArray
+        val ev: FloatArray
+        if (mode == "wall") {
+            s = len(D) / L
+            val Dh = horiz(D)
+            var e = if (len(Dh) > 1e-6f) norm(Dh) else floatArrayOf(1f, 0f, 0f)
+            if (flip) e = floatArrayOf(-e[0], -e[1], -e[2])
+            eu = e
+            ev = floatArrayOf(0f, -1f, 0f)
+        } else {
+            val Dh = horiz(D)
+            s = len(Dh) / L
+            val wd = norm(Dh)
+            val wp = perp(wd, flip)
+            eu = floatArrayOf(wd[0] * dx - wp[0] * dy, wd[1] * dx - wp[1] * dy, wd[2] * dx - wp[2] * dy)
+            ev = floatArrayOf(wd[0] * dy + wp[0] * dx, wd[1] * dy + wp[1] * dx, wd[2] * dy + wp[2] * dx)
+        }
+        if (s <= 0f || !s.isFinite()) return null
+        return St(au, av, A, eu, ev, s)
+    }
+
+    private fun map(st: St, u: Float, v: Float): FloatArray {
+        val du = u - st.au
+        val dv = v - st.av
+        return floatArrayOf(
+            st.A[0] + (st.eu[0] * du + st.ev[0] * dv) * st.s,
+            st.A[1] + (st.eu[1] * du + st.ev[1] * dv) * st.s,
+            st.A[2] + (st.eu[2] * du + st.ev[2] * dv) * st.s)
+    }
+
+    /** Bina semula daripada anchor dan laras semasa. */
+    private fun rebuild() {
+        val n = anchors.size
+        if (n == 0) { state = null; quad = FloatArray(0); return }
+        val a0 = anchors[0].pose
+        val up = if (mode == "wall") {
+            // "Dalam" menolak pelan menjauhi dinding, pada normalnya.
+            val st0 = state
+            val e = st0?.eu ?: floatArrayOf(1f, 0f, 0f)
+            val p = perp(e, false)
+            floatArrayOf(p[0] * lift, p[1] * lift, p[2] * lift)
+        } else floatArrayOf(0f, lift, 0f)
+
+        val A = floatArrayOf(a0.tx() + up[0], a0.ty() + up[1], a0.tz() + up[2])
+        val st = if (twoPin && n >= 2) {
+            val b0 = anchors[1].pose
+            from2(A, floatArrayOf(b0.tx() + up[0], b0.ty() + up[1], b0.tz() + up[2]))
+        } else from1(A)
+        state = st
+        quad = if (st == null) FloatArray(0) else {
+            val c = arrayOf(map(st, 0f, 0f), map(st, planW, 0f), map(st, planW, planH), map(st, 0f, planH))
+            floatArrayOf(
+                c[0][0], c[0][1], c[0][2], c[1][0], c[1][1], c[1][2],
+                c[2][0], c[2][1], c[2][2], c[3][0], c[3][1], c[3][2])
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun paintText() {
+        val n = anchors.size
+        val need = if (twoPin) 2 else 1
+        placeBtn.isEnabled = n < need
+        placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Siap"
+        resetBtn.isEnabled = n > 0
+
+        hint.text = when {
+            !tracking && why.isNotEmpty() -> why
+            !tracking -> "Gerak telefon perlahan supaya ARCore nampak lantai…"
+            planeCount == 0 ->
+                "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, halakan ke lantai bercorak."
+            n >= need -> "Pelan diletak. Laras dengan slider di bawah."
+            aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
+            n == 0 -> "Halakan ke tempat sebenar titik ${if (twoPin) "1" else "jangkar"} pada pelan, kemudian Letak"
+            else -> "Halakan ke tempat sebenar titik 2, kemudian Letak"
+        }
+
+        val st = state
+        readout.text = if (st == null) "—" else {
+            val wide = planW * st.s
+            String.format("Lebar pelan %.2f m · %s %+.2f m · %d%%",
+                wide, if (mode == "wall") "dalam" else "tinggi", lift, (opacity * 100).toInt())
+        }
+    }
+
+    // ---------- lapisan 2D ----------
+
+    inner class Overlay(ctx: android.content.Context) : View(ctx) {
+        private val hoop = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = dp(3).toFloat(); color = Color.argb(120, 255, 255, 255)
+        }
+        private val aimEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = dp(3).toFloat(); color = Color.rgb(255, 196, 0)
+        }
+        private val aimFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL; color = Color.argb(60, 255, 196, 0)
+        }
+        private val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(255, 196, 0) }
+        private val img = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
+        private val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = dp(2).toFloat(); color = Color.argb(200, 90, 200, 255)
+        }
+        private val path = android.graphics.Path()
+        private val m = Matrix()
+        private val src = FloatArray(8)
+        private val dst = FloatArray(8)
+        private val out = FloatArray(4)
+
+        private fun toScreen(x: Float, y: Float, z: Float): FloatArray? {
+            val v = vp
+            out[0] = v[0] * x + v[4] * y + v[8] * z + v[12]
+            out[1] = v[1] * x + v[5] * y + v[9] * z + v[13]
+            out[2] = v[2] * x + v[6] * y + v[10] * z + v[14]
+            out[3] = v[3] * x + v[7] * y + v[11] * z + v[15]
+            if (out[3] <= 0.0001f) return null
+            return floatArrayOf(
+                (out[0] / out[3] * 0.5f + 0.5f) * width,
+                (1f - (out[1] / out[3] * 0.5f + 0.5f)) * height)
+        }
+
+        override fun onDraw(c: Canvas) {
+            val bmp = plan
+            val q = quad
+
+            // Pelan itu sendiri: satu segi empat rata, jadi empat titik yang
+            // diunjurkan sudah cukup. setPolyToPoly memberi perspektif yang
+            // betul tanpa satu pun segi tiga bertekstur.
+            if (bmp != null && !bmp.isRecycled && q.size == 12) {
+                var okAll = true
+                for (k in 0 until 4) {
+                    val sp = toScreen(q[k * 3], q[k * 3 + 1], q[k * 3 + 2])
+                    if (sp == null) { okAll = false; break }
+                    dst[k * 2] = sp[0]; dst[k * 2 + 1] = sp[1]
+                }
+                if (okAll) {
+                    src[0] = 0f; src[1] = 0f
+                    src[2] = bmp.width.toFloat(); src[3] = 0f
+                    src[4] = bmp.width.toFloat(); src[5] = bmp.height.toFloat()
+                    src[6] = 0f; src[7] = bmp.height.toFloat()
+                    if (m.setPolyToPoly(src, 0, dst, 0, 4)) {
+                        img.alpha = (opacity * 255).toInt().coerceIn(0, 255)
+                        c.drawBitmap(bmp, m, img)
+                        path.reset()
+                        path.moveTo(dst[0], dst[1])
+                        path.lineTo(dst[2], dst[3])
+                        path.lineTo(dst[4], dst[5])
+                        path.lineTo(dst[6], dst[7])
+                        path.close()
+                        c.drawPath(path, edge)
+                    }
+                }
+            }
+
+            // Titik yang sudah diletak.
+            for (an in anchors) {
+                if (an.trackingState != TrackingState.TRACKING) continue
+                val p = an.pose
+                val sp = toScreen(p.tx(), p.ty(), p.tz()) ?: continue
+                c.drawCircle(sp[0], sp[1], dp(6).toFloat(), dot)
+            }
+
+            // Reticle, terletak pada permukaan.
+            val cx = width / 2f
+            val cy = height / 2f
+            val rg = ring
+            var drew = false
+            if (rg.size >= 9) {
+                path.reset()
+                var started = false
+                var k = 0
+                while (k + 2 < rg.size) {
+                    val sp = toScreen(rg[k], rg[k + 1], rg[k + 2])
+                    if (sp != null) {
+                        if (!started) { path.moveTo(sp[0], sp[1]); started = true }
+                        else path.lineTo(sp[0], sp[1])
+                    }
+                    k += 3
+                }
+                if (started) {
+                    path.close()
+                    c.drawPath(path, aimFill)
+                    c.drawPath(path, aimEdge)
+                    drew = true
+                }
+            }
+            if (!drew) c.drawCircle(cx, cy, dp(13).toFloat(), hoop)
+        }
+    }
+
+    // ---------- GL ----------
+
+    inner class Renderer : GLSurfaceView.Renderer {
+        private val proj = FloatArray(16)
+        private val view = FloatArray(16)
+        private val mul = FloatArray(16)
+
+        override fun onSurfaceCreated(g: GL10?, c: EGLConfig?) {
+            GLES20.glClearColor(0f, 0f, 0f, 1f)
+            bg.create()
+        }
+
+        override fun onSurfaceChanged(g: GL10?, w: Int, h: Int) {
+            GLES20.glViewport(0, 0, w, h)
+            session?.setDisplayGeometry(windowManager.defaultDisplay.rotation, w, h)
+        }
+
+        override fun onDrawFrame(g: GL10?) {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
+            val s = session ?: return
+            s.setCameraTextureName(bg.textureId)
+            val frame: Frame = try { s.update() } catch (e: Throwable) { return }
+            bg.draw(frame)
+
+            val cam = frame.camera
+            val ok = cam.trackingState == TrackingState.TRACKING
+            val reason = if (ok) "" else when (cam.trackingFailureReason) {
+                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Terlalu gelap — hidupkan lampu"
+                TrackingFailureReason.EXCESSIVE_MOTION -> "Gerak telefon lebih perlahan"
+                TrackingFailureReason.INSUFFICIENT_FEATURES ->
+                    "Permukaan ini terlalu kosong — halakan ke sesuatu yang bercorak"
+                else -> ""
+            }
+            if (tracking != ok || why != reason) {
+                tracking = ok; why = reason; runOnUiThread { paintText() }
+            }
+            if (!ok) return
+
+            cam.getProjectionMatrix(proj, 0, 0.05f, 100f)
+            cam.getViewMatrix(view, 0)
+            android.opengl.Matrix.multiplyMM(mul, 0, proj, 0, view, 0)
+            vp = mul.copyOf()
+
+            var nPlane = 0
+            runCatching {
+                for (pl in s.getAllTrackables(Plane::class.java)) {
+                    if (pl.trackingState == TrackingState.TRACKING && pl.subsumedBy == null) nPlane++
+                }
+            }
+            if (planeCount != nPlane) { planeCount = nPlane; runOnUiThread { paintText() } }
+
+            var hit: HitResult? = null
+            runCatching {
+                hit = frame.hitTest(gl.width / 2f, gl.height / 2f).firstOrNull {
+                    val t = it.trackable
+                    t is Plane && t.isPoseInPolygon(it.hitPose) &&
+                        t.trackingState == TrackingState.TRACKING
+                }
+            }
+            val h = hit
+            val rawHit = if (h == null) null
+                else floatArrayOf(h.hitPose.tx(), h.hitPose.ty(), h.hitPose.tz())
+
+            if (rawHit == null) smooth = null
+            else {
+                val sm = smooth
+                val d = if (sm == null) 99f
+                    else sqrt((sm[0] - rawHit[0]) * (sm[0] - rawHit[0]) +
+                              (sm[1] - rawHit[1]) * (sm[1] - rawHit[1]) +
+                              (sm[2] - rawHit[2]) * (sm[2] - rawHit[2]))
+                smooth = if (sm == null || d > 0.35f) rawHit.copyOf()
+                else floatArrayOf(
+                    sm[0] + (rawHit[0] - sm[0]) * 0.28f,
+                    sm[1] + (rawHit[1] - sm[1]) * 0.28f,
+                    sm[2] + (rawHit[2] - sm[2]) * 0.28f)
+            }
+            val shown = smooth
+            aim = shown
+
+            ring = if (h == null || shown == null || rawHit == null) FloatArray(0) else {
+                val po = h.hitPose
+                val dx = shown[0] - rawHit[0]
+                val dy = shown[1] - rawHit[1]
+                val dz = shown[2] - rawHit[2]
+                val n = 28
+                val r = 0.05f
+                val w = FloatArray(n * 3)
+                for (k in 0 until n) {
+                    val a2 = (k.toFloat() / n) * 6.2831855f
+                    val wp = po.transformPoint(floatArrayOf(r * cos(a2), 0f, r * sin(a2)))
+                    w[k * 3] = wp[0] + dx; w[k * 3 + 1] = wp[1] + dy; w[k * 3 + 2] = wp[2] + dz
+                }
+                w
+            }
+
+            var changed = false
+            if (wantPlace) {
+                wantPlace = false
+                val need = if (twoPin) 2 else 1
+                if (anchors.size < need) h?.let { hh ->
+                    runCatching { anchors.add(hh.trackable.createAnchor(hh.hitPose)) }
+                        .onSuccess { changed = true }
+                }
+            }
+            if (wantReset) {
+                wantReset = false
+                anchors.forEach { runCatching { it.detach() } }
+                anchors.clear()
+                state = null; quad = FloatArray(0)
+                lift = 0f
+                changed = true
+            }
+
+            rebuild()
+            if (changed) runOnUiThread { paintText() }
+            overlay.postInvalidateOnAnimation()
+        }
+    }
+}

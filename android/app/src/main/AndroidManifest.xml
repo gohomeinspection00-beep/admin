@@ -76,6 +76,12 @@
         <meta-data android:name="com.google.ar.core" android:value="optional" />
 
         <activity
+            android:name=".ArPlanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation|density|fontScale|uiMode|locale|layoutDirection" />
+
+        <activity
             android:name=".ArMeasureActivity"
             android:exported="false"
             android:screenOrientation="portrait"

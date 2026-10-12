@@ -689,6 +689,54 @@ class MainActivity : AppCompatActivity() {
             return out
         }
 
+        /**
+         * Hamparkan pelan lantai pada tapak sebenar.
+         *
+         * Pelan datang sebagai base64 dan bukan sebagai URL: ia mungkin
+         * sebuah blob yang hanya wujud dalam halaman itu, dan Activity AR
+         * tidak boleh mengambilnya dari sana.
+         */
+        @JavascriptInterface
+        fun arPlan(b64: String, spec: String): String {
+            return try {
+                val dir = File(cacheDir, "plan").apply { mkdirs() }
+                dir.listFiles()?.forEach { runCatching { it.delete() } }
+                val f = File(dir, "plan.jpg")
+                FileOutputStream(f).use { it.write(Base64.decode(b64, Base64.DEFAULT)) }
+                if (f.length() <= 0L) return "gagal: pelan kosong"
+                var out = "ok"
+                runOnUiThread {
+                    val av = runCatching {
+                        ArCoreApk.getInstance().checkAvailability(this@MainActivity)
+                    }.getOrNull()
+                    if (av != ArCoreApk.Availability.SUPPORTED_INSTALLED) {
+                        out = if (av == ArCoreApk.Availability.SUPPORTED_NOT_INSTALLED ||
+                                  av == ArCoreApk.Availability.SUPPORTED_APK_TOO_OLD) {
+                            runCatching { ArCoreApk.getInstance().requestInstall(this@MainActivity, true) }
+                            "pasang"
+                        } else "tiada"
+                        return@runOnUiThread
+                    }
+                    if (ContextCompat.checkSelfPermission(
+                            this@MainActivity, Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        askPerms.launch(arrayOf(Manifest.permission.CAMERA))
+                        out = "tiada-kebenaran"
+                        return@runOnUiThread
+                    }
+                    runCatching {
+                        startActivity(Intent(this@MainActivity, ArPlanActivity::class.java)
+                            .putExtra("plan", f.absolutePath)
+                            .putExtra("spec", spec))
+                    }.onFailure { out = "gagal: ${it.message}" }
+                }
+                out
+            } catch (e: Throwable) {
+                uvc.say("Hamparan pelan gagal: ${e.message}")
+                "gagal: ${e.message}"
+            }
+        }
+
         /** Benar bila telefon ini boleh mendengar langsung. */
         @JavascriptInterface
         fun canListen(): Boolean =
