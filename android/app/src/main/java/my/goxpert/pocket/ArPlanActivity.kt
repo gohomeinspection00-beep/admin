@@ -170,19 +170,21 @@ class ArPlanActivity : Activity() {
             setOnClickListener { if (!locked) { flip = !flip; rebuild(); paintText() } }
             layoutParams = LinearLayout.LayoutParams(-2, dp(40))
         })
-        bar.addView(row("Lut sinar", 20, 95, 65) { v ->
+        bar.addView(row("Lut sinar", 20, 95, 65, { v -> "$v%" }) { v ->
             opacity = v / 100f; paintText(); overlay.postInvalidate()
         })
-        bar.addView(row(if (mode == "wall") "Dalam" else "Tinggi", 0, 100, 50) { v ->
+        bar.addView(row(if (mode == "wall") "Dalam" else "Tinggi", 0, 100, 50,
+            { v -> String.format("%+.2f m", (v - 50) / 100f * 2f) }) { v ->
             if (locked) return@row
             lift = (v - 50) / 100f * 2f      // -1 m .. +1 m
             rebuild(); paintText()
         })
         if (!twoPin) {
-            bar.addView(row("Putar", 0, 360, 0) { v ->
+            bar.addView(row("Putar", 0, 360, 0, { v -> "$v\u00b0" }) { v ->
                 if (!locked) { theta = v.toFloat(); rebuild(); paintText() }
             })
-            bar.addView(row("Skala", 10, 400, 100) { v ->
+            bar.addView(row("Skala", 10, 400, 100,
+                { v -> String.format("%.1f m", 10f * (v / 100f)) }) { v ->
                 if (!locked) { mPerPx = (10f * (v / 100f)) / planW; rebuild(); paintText() }
             })
         }
@@ -219,7 +221,15 @@ class ArPlanActivity : Activity() {
         paintText()
     }
 
-    private fun row(label: String, min: Int, max: Int, start: Int, onSet: (Int) -> Unit): View {
+    /**
+     * Satu slider dengan nilainya kelihatan.
+     *
+     * Slider tanpa nombor memberitahu arah tetapi bukan jumlah: "lebih
+     * tinggi" boleh dilihat, "+0.35 m" tidak, dan ketinggian ialah tepat
+     * jenis perkara yang surveyor perlu tahu dan bukan sekadar rasa.
+     */
+    private fun row(label: String, min: Int, max: Int, start: Int,
+                    fmt: (Int) -> String, onSet: (Int) -> Unit): View {
         val wrap = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
@@ -228,13 +238,22 @@ class ArPlanActivity : Activity() {
             text = label
             setTextColor(Color.argb(210, 255, 255, 255))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-            width = dp(66)
+            width = dp(62)
         })
+        val value = TextView(this).apply {
+            setTextColor(Color.WHITE)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            typeface = android.graphics.Typeface.MONOSPACE
+            gravity = Gravity.END
+            width = dp(62)
+            text = fmt(start)
+        }
         val sb = SeekBar(this).apply {
             this.max = max - min
             progress = start - min
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(s: SeekBar?, p: Int, fromUser: Boolean) {
+                    value.text = fmt(p + min)
                     onSet(p + min)
                 }
                 override fun onStartTrackingTouch(s: SeekBar?) {}
@@ -242,6 +261,7 @@ class ArPlanActivity : Activity() {
             })
         }
         wrap.addView(sb, LinearLayout.LayoutParams(0, -2, 1f))
+        wrap.addView(value)
         return wrap
     }
 

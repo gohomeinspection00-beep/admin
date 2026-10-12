@@ -8524,6 +8524,51 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .fp-segb small{display:block;font-size:10.5px;font-weight:600;color:var(--muted);margin-top:2px;line-height:1.3}
 .fp-segb.on small{color:var(--accent)}
 
+/* --- kad pelan terpilih --- */
+/* Skrin ini dahulu tidak pernah berkata pelan mana yang sedang dipegang:
+   satu pelan dimuat naik dan satu-satunya kesannya ialah butang Seterusnya
+   hidup. Kad ini ialah keadaan itu, dinyatakan. */
+.fp-cur{
+  display:flex;gap:11px;align-items:flex-start;padding:11px;
+  border:1px solid var(--accent);border-radius:13px;background:var(--accent-soft);
+  margin-bottom:12px;
+}
+.fp-cur-im{
+  flex:none;width:86px;height:66px;border-radius:9px;object-fit:contain;
+  background:var(--bg);border:1px solid var(--line);
+}
+.fp-cur-b{flex:1;min-width:0}
+.fp-cur-n{font-size:13.5px;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.fp-cur-m{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:3px}
+.fp-cur-s{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.fp-tag{
+  font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:20px;
+  background:var(--bg);border:1px solid var(--line);color:var(--muted);
+}
+.fp-tag.ok{border-color:var(--accent);color:var(--accent)}
+.fp-cur-x{display:flex;gap:6px;margin-top:8px}
+.fp-cur-x button{
+  flex:1;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
+  background:var(--bg);color:var(--fg);font-size:11.5px;font-weight:700;
+}
+.fp-cur-x button.warn{color:#B91C1C;border-color:#F0B9B9}
+
+/* --- galeri pelan tersimpan --- */
+.fp-save{position:relative}
+.fp-save .fp-x{
+  position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;
+  background:#B91C1C;color:#fff;border:1.5px solid var(--bg);font-size:12px;
+  line-height:1;display:grid;place-items:center;z-index:2;
+}
+.fp-save-p{
+  position:absolute;left:4px;bottom:26px;font-size:9px;font-weight:700;
+  padding:1px 5px;border-radius:20px;background:var(--accent);color:var(--accent-fg);
+}
+.fp-empty{
+  padding:14px;border:1px dashed var(--line);border-radius:12px;
+  font-size:11.5px;color:var(--muted);line-height:1.5;text-align:center;margin-bottom:10px;
+}
+
 /* Rambut silang, bukan bulatan.
    Titik yang ditanda mesti kelihatan, dan satu cakera pepejal menyembunyikan
    tepat tempat yang cuba dikenakan. Lengan memanjang keluar dari bawah jari
@@ -9358,7 +9403,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.2 · build 12 Okt 2026 · Hamparan pelan AR dalam app</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.3 · build 12 Okt 2026 · Galeri pelan dan skrin AR yang dibaiki</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -16902,6 +16947,99 @@ let FP = {
 };
 let _fpObjUrl = null;
 
+/* Pelan yang disimpan, dengan titiknya.
+   Menjajarkan pelan dengan betul mengambil masa, dan sebelum ini kerja itu
+   hilang sebaik sahaja tool ditutup. Indeks duduk dalam localStorage dan
+   gambar penuh dalam IndexedDB, corak yang sama seperti pelan inspection. */
+const FP_STORE = 'pocket_fpplans_v1';
+const FP_KEY = 'fpsave:';
+
+function fpSaved() {
+  try {
+    const r = JSON.parse(localStorage.getItem(FP_STORE) || '[]');
+    return Array.isArray(r) ? r : [];
+  } catch (e) { return []; }
+}
+function fpSavedPut(list) {
+  try { localStorage.setItem(FP_STORE, JSON.stringify(list.slice(0, 40))); } catch (e) {}
+}
+
+/** Simpan pelan semasa bersama titiknya. Dipanggil bila ia benar-benar
+ *  digunakan, bukan bila ia dimuat naik: pelan yang tidak pernah ditanda
+ *  tiada apa yang berbaloi disimpan. */
+async function fpSave() {
+  const P = FP.plan;
+  if (!P || !FP.a) return null;
+  const id = P.savedId || ('fp' + Date.now().toString(36));
+  try {
+    const blob = await fpPlanBlob();
+    if (blob) await lbPut(FP_KEY + id, blob, 'image/jpeg');
+  } catch (e) {}
+  let thumb = '';
+  try {
+    const t = await ipShrinkTo(await fpPlanBlob(), 220, 0.7);
+    thumb = await lbBlobToB64(t);
+  } catch (e) {}
+  const row = {
+    id: id, name: P.name || 'Pelan', W: P.W, H: P.H,
+    mode: FP.mode, pins: FP.pins,
+    a: FP.a ? { pu: FP.a.pu, pv: FP.a.pv } : null,
+    b: FP.b ? { pu: FP.b.pu, pv: FP.b.pv } : null,
+    thumb: thumb, at: Date.now()
+  };
+  const list = fpSaved().filter(function(x) { return x.id !== id; });
+  list.unshift(row);
+  fpSavedPut(list);
+  FP.plan.savedId = id;
+  return row;
+}
+
+async function fpOpenSaved(id) {
+  const row = fpSaved().filter(function(x) { return x.id === id; })[0];
+  if (!row) return;
+  let src = row.thumb ? 'data:image/jpeg;base64,' + row.thumb : '';
+  try {
+    const rec = await lbGet(FP_KEY + id);
+    if (rec && rec.blob) {
+      if (_fpObjUrl) URL.revokeObjectURL(_fpObjUrl);
+      _fpObjUrl = URL.createObjectURL(rec.blob);
+      src = _fpObjUrl;
+    }
+  } catch (e) {}
+  const im = new Image();
+  im.onload = function() {
+    FP.plan = { id: '', savedId: id, name: row.name, src: src,
+                W: row.W, H: row.H, fromInsp: false, img: im };
+    FP.mode = row.mode || 'floor';
+    FP.pins = row.pins || 'two';
+    FP.a = row.a || null;
+    FP.b = row.b || null;
+    FP.sel = FP.a ? 'a' : null;
+    FP.st = null;
+    fpScreenPick();
+    showToast(row.a ? 'Pelan dan titiknya dibuka semula' : 'Pelan dibuka');
+  };
+  im.onerror = function() { showToast('Tidak dapat membuka pelan itu', 'error'); };
+  im.src = src;
+}
+
+async function fpDropSaved(id) {
+  if (!confirm('Buang pelan tersimpan ini?')) return;
+  fpSavedPut(fpSaved().filter(function(x) { return x.id !== id; }));
+  try { await lbDrop(FP_KEY + id); } catch (e) {}
+  if (FP.plan && FP.plan.savedId === id) fpClearPlan(true);
+  else fpScreenPick();
+  showToast('Pelan dibuang');
+}
+
+/** Lupakan pelan semasa. */
+function fpClearPlan(quiet) {
+  if (_fpObjUrl) { URL.revokeObjectURL(_fpObjUrl); _fpObjUrl = null; }
+  FP.plan = null; FP.a = null; FP.b = null; FP.sel = null; FP.st = null;
+  fpScreenPick();
+  if (!quiet) showToast('Pelan dibuang');
+}
+
 function fpIco() {
   return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1.6"/><path d="M3 9.5h11M14 3v18M14 15h7"/></svg>';
 }
@@ -16935,7 +17073,52 @@ function fpScreenPick() {
   const body = document.getElementById('toolModalBody');
   const foot = document.getElementById('toolModalFoot');
   const have = (typeof IP !== 'undefined' && IP.plans) ? IP.plans : [];
+  const saved = fpSaved();
   let h = '';
+
+  // Pelan yang sedang dipegang, dinyatakan: nama, saiz sebenar, sama ada
+  // ia sudah ditanda, dan dua butang untuk menukarnya atau membuangnya.
+  if (FP.plan) {
+    const nPin = (FP.b ? 2 : (FP.a ? 1 : 0));
+    const want = FP.pins === 'two' ? 2 : 1;
+    h += '<div class="fp-cur">' +
+      '<img class="fp-cur-im" src="' + escapeHTML(FP.plan.src) + '" alt="">' +
+      '<div class="fp-cur-b">' +
+        '<div class="fp-cur-n">' + escapeHTML(FP.plan.name || 'Pelan') + '</div>' +
+        '<div class="fp-cur-m">' + FP.plan.W + ' \u00d7 ' + FP.plan.H + ' px</div>' +
+        '<div class="fp-cur-s">' +
+          '<span class="fp-tag">' + (FP.plan.fromInsp ? 'Dari inspection' :
+             (FP.plan.savedId ? 'Tersimpan' : 'Dimuat naik')) + '</span>' +
+          '<span class="fp-tag ' + (nPin >= want ? 'ok' : '') + '">' +
+            (nPin >= want ? nPin + ' titik siap' : nPin + ' / ' + want + ' titik') + '</span>' +
+          '<span class="fp-tag">' + (FP.mode === 'wall' ? 'Dinding' : 'Lantai') + '</span>' +
+        '</div>' +
+        '<div class="fp-cur-x">' +
+          '<button id="fpChange">Tukar pelan</button>' +
+          '<button class="warn" id="fpClear">Buang</button>' +
+        '</div>' +
+      '</div></div>';
+  } else {
+    h += '<div class="fp-empty">Belum ada pelan dipilih. Pilih satu di bawah, atau muat naik gambar pelan dari telefon.</div>';
+  }
+
+  // Pelan yang sudah dijajarkan sebelum ini, dengan titiknya.
+  if (saved.length) {
+    h += '<div class="fp-sec"><span class="fp-sec-l">Pelan tersimpan</span><span class="fp-sec-r"></span></div>' +
+      '<div class="fp-grid">';
+    saved.forEach(function(r) {
+      const on = FP.plan && FP.plan.savedId === r.id;
+      h += '<div class="fp-save">' +
+        '<button class="fp-x" data-fpdrop="' + escapeHTML(r.id) + '" aria-label="Buang">\u00d7</button>' +
+        (r.a ? '<span class="fp-save-p">' + (r.b ? '2' : '1') + ' titik</span>' : '') +
+        '<button class="fp-card' + (on ? ' on' : '') + '" data-fpsaved="' + escapeHTML(r.id) + '">' +
+          (r.thumb ? '<img src="data:image/jpeg;base64,' + r.thumb + '" alt="">' : '<span class="fp-card-no">?</span>') +
+          '<span class="fp-card-n">' + escapeHTML(r.name || 'Pelan') + '</span></button>' +
+      '</div>';
+    });
+    h += '</div>';
+  }
+
   if (have.length) {
     h += '<div class="fp-sec"><span class="fp-sec-l">Pelan dalam ' + escapeHTML((IP.insp && IP.insp.title) || 'inspection ini') + '</span><span class="fp-sec-r"></span></div>' +
       '<div class="fp-grid">';
@@ -16945,7 +17128,7 @@ function fpScreenPick() {
         '<span class="fp-card-n">' + escapeHTML(p.name || 'Plan') + '</span></button>';
     });
     h += '</div>';
-  } else {
+  } else if (!saved.length) {
     h += '<p class="fp-hint">Tiada pelan dalam inspection aktif. Muat naik satu di sini, atau tambah pelan pada inspection dahulu supaya pin penemuan boleh muncul sekali.</p>';
   }
   h += '<button class="fp-up" id="fpPickFile">' +
@@ -16967,14 +17150,19 @@ function fpScreenPick() {
   foot.innerHTML = '<button class="tool-btn tool-btn-primary" id="fpNext"' + (FP.plan ? '' : ' disabled') + '>Tanda pada pelan →</button>';
 
   const st = document.getElementById('fpStatus');
-  if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
+  // App menghamparkan pelan sendiri sekarang, jadi tiada apa yang perlu
+  // diamarankan di sini.
+  if (window.PocketNative && typeof window.PocketNative.arPlan === 'function') {
+    st.className = 'ar-status ok';
+    st.innerHTML = 'AR sedia dalam app ini \u2014 muat naik, tanda, dan hamparkan pelan di tapak.';
+  } else if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
     st.className = 'ar-status warn';
     // Di dalam app, memuat naik dan menanda berfungsi sepenuhnya; hanya
     // langkah hamparan AR yang tidak, kerana ia melukis pelan bertekstur
     // dalam adegan 3D dan itu WebXR. AR Measurement berjalan secara native
     // di sini kerana ia hanya perlu memulangkan titik.
     st.innerHTML = window.PocketNative
-      ? 'Muat naik pelan dan tanda titik berfungsi di sini. Langkah <b>hamparan AR</b> tidak \u2014 ia melukis pelan dalam adegan 3D, dan itu WebXR, yang dihantar dalam Chrome dan bukan dalam WebView. Untuk hamparan, buka Pocket dalam <b>Chrome</b>.'
+      ? 'App ini terlalu lama untuk hamparan AR \u2014 pasang semula APK terkini. Muat naik pelan dan tanda titik tetap berfungsi di sini.'
       : 'AR perlukan Chrome pada Android yang menyokong ARCore, melalui https://. iPhone tiada WebXR langsung. Awak masih boleh menanda pada pelan di sini, tetapi langkah AR tidak akan bermula.';
   } else {
     navigator.xr.isSessionSupported('immersive-ar').then(function(okAr) {
@@ -16983,6 +17171,12 @@ function fpScreenPick() {
   }
 
   body.onclick = function(e) {
+    const dr = e.target.closest('[data-fpdrop]');
+    if (dr) { e.stopPropagation(); fpDropSaved(dr.dataset.fpdrop); return; }
+    const sv = e.target.closest('[data-fpsaved]');
+    if (sv) { fpOpenSaved(sv.dataset.fpsaved); return; }
+    if (e.target.closest('#fpChange')) { fpPickPlan(); return; }
+    if (e.target.closest('#fpClear')) { fpClearPlan(); return; }
     const c = e.target.closest('[data-fpplan]');
     if (c) { fpUsePlan(c.dataset.fpplan); return; }
     const m = e.target.closest('[data-fpmode]');
@@ -17075,6 +17269,7 @@ function fpScreenTag() {
         '<span class="fp-nb blank"></span>' +
       '</div>' +
     '</div>' +
+    '<p class="fp-hint" id="fpScaleHint"></p>' +
     '<p class="fp-hint">Zum dahulu, kemudian ketik. Seret pin itu untuk melaraskannya, atau guna anak panah — setiap ketikan menggerakkannya satu piksel pelan.</p>';
   foot.innerHTML = '<button class="tool-btn tool-btn-secondary" id="fpBack">Kembali</button>' +
     '<button class="tool-btn tool-btn-primary" id="fpGoAr" disabled>Ke AR →</button>';
@@ -17209,6 +17404,28 @@ function fpPaintPins() {
              : 'Satu titik siap. Ketik di tempat lain untuk memindahkannya.');
   }
   if (go) go.disabled = !ready;
+  // Apa yang dua titik ini sebenarnya menetapkan, dinyatakan dalam unit yang
+  // bermakna: jarak antara mereka, dan apa maksudnya untuk ketepatan
+  // merentasi seluruh pelan.
+  const sh = document.getElementById('fpScaleHint');
+  if (sh && FP.plan) {
+    if (two && FP.a && FP.b) {
+      const d2 = Math.hypot((FP.b.pu - FP.a.pu) * FP.plan.W / 100,
+                            (FP.b.pv - FP.a.pv) * FP.plan.H / 100);
+      const frac = d2 / Math.max(1, Math.hypot(FP.plan.W, FP.plan.H));
+      sh.innerHTML = 'Jarak antara dua titik: <b>' + Math.round(d2) + ' px</b> (' +
+        Math.round(frac * 100) + '% pepenjuru pelan). ' +
+        (frac < 0.25
+          ? 'Terlalu rapat — ralat kecil di sini membesar merentasi seluruh pelan.'
+          : 'Jarak yang baik. Di AR, jarak sebenar antara dua titik ini menetapkan skala pelan.');
+    } else if (two) {
+      sh.textContent = 'Dua titik menetapkan putaran dan skala terus di AR — tiada laras manual diperlukan.';
+    } else {
+      sh.innerHTML = 'Satu titik ialah jangkar sahaja. Di AR awak laras <b>putar</b>, <b>skala</b> dan ' +
+        (FP.mode === 'wall' ? '<b>dalam</b>' : '<b>tinggi</b>') + ' sendiri dengan slider.';
+    }
+  }
+
   if (ready && two && FP.a && FP.b) {
     const d = Math.hypot((FP.b.pu - FP.a.pu) * FP.plan.W / 100, (FP.b.pv - FP.a.pv) * FP.plan.H / 100);
     if (d < FP.plan.W * 0.08) {
@@ -17235,6 +17452,9 @@ async function fpStartArNative() {
     if (msg) showToast(msg, bad ? 'error' : '');
   };
   try {
+    // Disimpan pada ambang AR, bukan pada muat naik: pelan yang sudah
+    // ditanda ialah kerja yang berbaloi dibawa pulang.
+    try { await fpSave(); } catch (e) {}
     const blob = await fpPlanBlob();
     if (!blob) return done('Tidak dapat membaca pelan itu', true);
     const b64 = await lbBlobToB64(blob);
@@ -17296,6 +17516,7 @@ async function fpStartAr() {
   try { okAr = await navigator.xr.isSessionSupported('immersive-ar'); } catch (e) {}
   if (!okAr) { showToast('Telefon ini tidak menyokong AR', 'error'); return; }
 
+  try { await fpSave(); } catch (e) {}
   if (btn) { btn.disabled = true; btn.textContent = 'Memuatkan\u2026'; }
   try { await loadThree(); }
   catch (e) { showToast('Gagal memuatkan pustaka 3D'); if (btn) { btn.disabled = false; btn.textContent = 'Ke AR →'; } return; }
