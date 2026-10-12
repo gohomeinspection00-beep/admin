@@ -23,11 +23,9 @@ import android.widget.Toast
 import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Coordinates2d
-import com.google.ar.core.DepthPoint
 import com.google.ar.core.Frame
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
-import com.google.ar.core.Point
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
@@ -106,7 +104,6 @@ class ArMeasureActivity : Activity() {
      * yang ARCore perlukan.
      */
     @Volatile private var outlines: List<FloatArray> = emptyList()
-    @Volatile private var cloud: FloatArray = FloatArray(0)
     @Volatile private var planeCount = 0
 
     /**
@@ -121,6 +118,9 @@ class ArMeasureActivity : Activity() {
      * laluan WebXR lama lakukan.
      */
     @Volatile private var ring: FloatArray = FloatArray(0)
+
+    /** Kedudukan kursor yang ditapis; aim menunjuk kepadanya. */
+    private var smooth: FloatArray? = null
 
     /** Tempat reticle sedang menyentuh dunia, atau null bila tiada satah. */
     @Volatile private var aim: FloatArray? = null
@@ -214,12 +214,13 @@ class ArMeasureActivity : Activity() {
                         planeFindingMode = Config.PlaneFindingMode.HORIZONTAL_AND_VERTICAL
                         updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
                         focusMode = Config.FocusMode.AUTO
-                        // Kedalaman menjadikan hit-test tepat pada permukaan
-                        // yang satahnya belum penuh dikesan. Tidak semua
-                        // telefon ada, jadi tanya dahulu.
-                        if (s.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
-                            depthMode = Config.DepthMode.AUTOMATIC
-                        }
+                        // Setiap ciri yang dihidupkan ialah kerja setiap
+                        // bingkai, dan kerja setiap bingkai ialah ketaran.
+                        // Tiada satu pun daripada ini digunakan di sini.
+                        depthMode = Config.DepthMode.DISABLED
+                        instantPlacementMode = Config.InstantPlacementMode.DISABLED
+                        lightEstimationMode = Config.LightEstimationMode.DISABLED
+                        cloudAnchorMode = Config.CloudAnchorMode.DISABLED
                     })
                 }
             } catch (e: Throwable) {
@@ -362,7 +363,6 @@ class ArMeasureActivity : Activity() {
             color = Color.WHITE; textSize = dp(14).toFloat(); textAlign = Paint.Align.CENTER
         }
         private val lblBg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(190, 0, 0, 0) }
-        private val spec = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(150, 255, 255, 255) }
         private val planeFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL; color = Color.argb(38, 90, 170, 255)
         }
@@ -389,15 +389,6 @@ class ArMeasureActivity : Activity() {
         override fun onDraw(c: Canvas) {
             val cx = width / 2f
             val cy = height / 2f
-
-            // Awan titik dahulu, paling belakang: ia padat dan hanya petunjuk.
-            val cl = cloud
-            var i = 0
-            while (i + 2 < cl.size) {
-                val sp = toScreen(floatArrayOf(cl[i], cl[i + 1], cl[i + 2]))
-                if (sp != null) c.drawCircle(sp[0], sp[1], dp(1).toFloat(), spec)
-                i += 3
-            }
 
             // Garis luar setiap satah yang dikesan.
             for (poly in outlines) {
@@ -542,41 +533,56 @@ class ArMeasureActivity : Activity() {
             var found: FloatArray? = null
             var hit: HitResult? = null
             try {
-                // Satah diutamakan, tetapi bukan satu-satunya jawapan yang
-                // boleh diterima.
-                //
-                // Penapis lama menolak DepthPoint sepenuhnya — dan mod
-                // kedalaman baru sahaja dihidupkan, yang bermakna pada
-                // telefon yang menyokongnya, hit yang paling tepat ialah
-                // yang dibuang. Ia juga hanya menerima Point yang melaporkan
-                // ESTIMATED_SURFACE_NORMAL, yang jarang berlaku: kebanyakan
-                // titik ciri melaporkan INITIALIZED_TO_IDENTITY, jadi cabang
-                // itu hampir tidak pernah berjalan dan permukaan yang
-                // satahnya belum terbentuk tidak boleh diukur langsung.
-                var rank = 99
-                for (h in frame.hitTest(gl.width / 2f, gl.height / 2f)) {
-                    val t = h.trackable
-                    val r = when {
-                        t is Plane && t.isPoseInPolygon(h.hitPose) &&
-                            t.trackingState == TrackingState.TRACKING -> 0
-                        t is DepthPoint -> 1
-                        t is Point -> 2
-                        else -> 99
-                    }
-                    if (r < rank) {
-                        rank = r
-                        hit = h
-                        found = floatArrayOf(h.hitPose.tx(), h.hitPose.ty(), h.hitPose.tz())
-                    }
-                    if (rank == 0) break
+                // Satah SAHAJA. Titik ciri dan titik kedalaman juga
+                // memulangkan hit, tetapi kedudukannya berubah beberapa
+                // sentimeter setiap bingkai — kursor yang mengikutinya
+                // bergegar sepanjang masa, yang membuat seluruh skrin
+                // kelihatan tidak stabil. Satah ialah anggaran yang ARCore
+                // sendiri sudah tapis merentasi banyak bingkai.
+                val hits = frame.hitTest(gl.width / 2f, gl.height / 2f).filter {
+                    val t = it.trackable
+                    t is Plane && t.isPoseInPolygon(it.hitPose) &&
+                        t.trackingState == TrackingState.TRACKING
                 }
+                // Selepas titik pertama diletak, terima hanya satah pada
+                // ketinggian yang lebih kurang sama. Tanpa ini, kursor
+                // melompat ke meja atau ke dinding di tengah ukuran dan
+                // bacaannya menjadi karut tanpa amaran.
+                val firstY = ptsNow.firstOrNull()?.get(1)
+                hit = if (firstY == null) hits.firstOrNull()
+                      else hits.firstOrNull { kotlin.math.abs(it.hitPose.ty() - firstY) < 0.12f }
+                          ?: hits.firstOrNull()
+                hit?.let { found = floatArrayOf(it.hitPose.tx(), it.hitPose.ty(), it.hitPose.tz()) }
             } catch (e: Throwable) { /* bingkai ini tiada hit; cuba yang seterusnya */ }
+
+            // Tapis lulus-rendah pada kedudukan kursor.
+            //
+            // Walaupun dengan satah sahaja, hit berubah sedikit setiap
+            // bingkai, dan pada 30 bingkai sesaat getaran kecil itu ialah
+            // apa yang membuat skrin memeningkan. Lompatan besar dibiarkan
+            // melalui: itu permukaan yang berbeza, bukan bunyi, dan
+            // melicinkannya akan membuat kursor merayap ke sasaran baharu.
+            if (found == null) {
+                smooth = null
+            } else {
+                val sm = smooth
+                smooth = if (sm == null || dist(sm, found) > 0.35f) found.copyOf()
+                else floatArrayOf(
+                    sm[0] + (found[0] - sm[0]) * SMOOTH,
+                    sm[1] + (found[1] - sm[1]) * SMOOTH,
+                    sm[2] + (found[2] - sm[2]) * SMOOTH)
+            }
+            val shown = smooth
 
             // Cincin dibina daripada pose hit itu sendiri: paksi Y pose itu
             // ialah normal permukaan, jadi satu bulatan dalam XZ tempatannya
-            // terletak rata pada permukaan itu.
-            ring = if (hit == null) FloatArray(0) else {
+            // terletak rata pada permukaan itu. Ia dialihkan ke kedudukan
+            // yang ditapis supaya cincin dan titik bergerak sebagai satu.
+            ring = if (hit == null || shown == null || found == null) FloatArray(0) else {
                 val po = hit.hitPose
+                val dx = shown[0] - found[0]
+                val dy = shown[1] - found[1]
+                val dz = shown[2] - found[2]
                 val n = 28
                 val r = 0.05f
                 val w = FloatArray(n * 3)
@@ -584,13 +590,13 @@ class ArMeasureActivity : Activity() {
                     val a2 = (k.toFloat() / n) * 6.2831855f
                     val wp = po.transformPoint(floatArrayOf(
                         r * kotlin.math.cos(a2), 0f, r * kotlin.math.sin(a2)))
-                    w[k * 3] = wp[0]; w[k * 3 + 1] = wp[1]; w[k * 3 + 2] = wp[2]
+                    w[k * 3] = wp[0] + dx; w[k * 3 + 1] = wp[1] + dy; w[k * 3 + 2] = wp[2] + dz
                 }
                 w
             }
 
             val had = aim != null
-            aim = found
+            aim = shown
 
             // Anchor dicipta di sini dan bukan dalam pengendali butang: satu
             // HitResult hanya sah sehingga update() berikutnya, jadi ia mesti
@@ -636,35 +642,6 @@ class ArMeasureActivity : Activity() {
             } catch (e: Throwable) { /* satah berubah di bawah kita; bingkai berikutnya */ }
             outlines = outs
             if (planeCount != nPlane) { planeCount = nPlane; runOnUiThread { paintText() } }
-
-            // Awan titik: ini yang muncul DAHULU, sebelum mana-mana satah
-            // terbentuk. Ia satu-satunya petunjuk bahawa ARCore sedang
-            // melihat tekstur yang mencukupi, dan bila ia kosong, jawapannya
-            // ialah hidupkan lampu atau halakan ke sesuatu yang bercorak.
-            var pc: com.google.ar.core.PointCloud? = null
-            try {
-                pc = frame.acquirePointCloud()
-                val b = pc.points
-                val total = b.limit() / 4
-                val cap = 240
-                val step = if (total > cap) total / cap else 1
-                val arr = FloatArray(minOf(total, cap) * 3)
-                var k = 0; var i = 0
-                while (i < total && k + 3 <= arr.size) {
-                    if (b.get(i * 4 + 3) > 0.25f) {
-                        arr[k] = b.get(i * 4)
-                        arr[k + 1] = b.get(i * 4 + 1)
-                        arr[k + 2] = b.get(i * 4 + 2)
-                        k += 3
-                    }
-                    i += step
-                }
-                cloud = if (k == arr.size) arr else arr.copyOf(k)
-            } catch (e: Throwable) {
-                // Awan titik tidak sentiasa ada; ia bukan kegagalan.
-            } finally {
-                runCatching { pc?.release() }
-            }
 
             // Pose segar setiap bingkai: itulah sebabnya anchor digunakan.
             // Anchor yang ARCore belum jejak semula ditinggalkan di tempat
@@ -778,5 +755,12 @@ class ArMeasureActivity : Activity() {
             GLES20.glCompileShader(id)
             return id
         }
+    }
+
+    companion object {
+        /** Berapa banyak setiap bingkai menggerakkan kursor ke arah hit
+         *  mentah. Rendah bermakna tenang tetapi lambat; ini kompromi yang
+         *  masih terasa segera di tangan. */
+        private const val SMOOTH = 0.28f
     }
 }
