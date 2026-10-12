@@ -19,7 +19,8 @@ import java.io.PipedOutputStream
 class LocalServer(
     private val uvc: UvcSource,
     private val pocketFile: File,
-    private val pickDir: File
+    private val pickDir: File,
+    private val modelDir: File
 ) : NanoHTTPD(HOST, PORT) {
 
     override fun serve(session: IHTTPSession): Response {
@@ -30,6 +31,7 @@ class LocalServer(
                 uri == "/uvc/snapshot" -> snapshot()
                 uri == "/uvc/stream"   -> stream()
                 uri == "/uvc/debug"    -> debug()
+                uri == "/model" -> model(session)
                 uri.startsWith("/pick/") -> picked(uri.removePrefix("/pick/"))
                 else                   -> pocket()
             }
@@ -103,6 +105,66 @@ class LocalServer(
         }
         return noCache(newFixedLengthResponse(
             Response.Status.OK, "image/jpeg", f.inputStream(), f.length()))
+    }
+
+    /**
+     * Model 3D masuk ke dalam app melalui sini, dan bukan melalui jambatan
+     * JavaScript.
+     *
+     * Fail GLB ialah berpuluh megabait. Sebagai base64 ia menjadi sepertiga
+     * lebih besar lagi, dan satu rentetan sebesar itu melintasi jambatan
+     * bermakna satu salinan dalam JavaScript, satu lagi dalam Java, dan
+     * kemungkinan besar kehabisan memori. Di sini ia satu PUT ke asal yang
+     * SAMA yang Pocket sendiri dihidangkan dari — tiada CORS, tiada
+     * pengekodan, dan ia mengalir terus ke cakera.
+     *
+     * Satu fail sahaja disimpan. Model sebelumnya dibuang pada setiap PUT,
+     * kerana cache yang mengumpul fail 30 MB akan memenuhi telefon.
+     */
+    private fun model(session: IHTTPSession): Response {
+        if (session.method != Method.PUT && session.method != Method.POST) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.METHOD_NOT_ALLOWED, "text/plain", "PUT sahaja"))
+        }
+        val len = (session.headers["content-length"] ?: "0").toLongOrNull() ?: 0L
+        if (len <= 0L) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.BAD_REQUEST, "text/plain", "tiada panjang"))
+        }
+        if (len > 120L * 1024 * 1024) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.BAD_REQUEST, "text/plain", "terlalu besar"))
+        }
+        return try {
+            modelDir.mkdirs()
+            modelDir.listFiles()?.forEach { runCatching { it.delete() } }
+            val f = File(modelDir, "model.glb")
+            var left = len
+            val buf = ByteArray(64 * 1024)
+            java.io.FileOutputStream(f).use { out ->
+                val ins = session.inputStream
+                while (left > 0) {
+                    val want = minOf(left, buf.size.toLong()).toInt()
+                    val got = ins.read(buf, 0, want)
+                    if (got <= 0) break
+                    out.write(buf, 0, got)
+                    left -= got
+                }
+            }
+            // Separuh fail ialah fail rosak, dan lebih baik ia ditolak di
+            // sini daripada menjadi "model tidak dapat dibaca" nanti.
+            if (left > 0L || f.length() != len) {
+                runCatching { f.delete() }
+                return noCache(newFixedLengthResponse(
+                    Response.Status.INTERNAL_ERROR, "text/plain", "terputus"))
+            }
+            noCache(newFixedLengthResponse(
+                Response.Status.OK, "application/json", "{\"ok\":true,\"bytes\":${f.length()}}"))
+        } catch (e: Throwable) {
+            noCache(newFixedLengthResponse(
+                Response.Status.INTERNAL_ERROR, "text/plain",
+                "${e.javaClass.simpleName}: ${e.message}"))
+        }
     }
 
     private fun debug(): Response {

@@ -9426,7 +9426,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.5 · build 12 Okt 2026 · Banyak ukuran dalam satu pusingan AR</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.6 · build 12 Okt 2026 · Model 3D dalam AR, potong atas dan bawah</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -33337,7 +33337,8 @@ function mdFmtTri(n) {
 // ---------- 2. KEADAAN + SIMPANAN ----------
 let MD = {
   view: 'list', id: null, meta: null, obj: null, raw: null,
-  clip: 1.6, clipOn: false, xray: false, groups: [], hidden: {},
+  clip: 1.6, clipOn: false, clipLo: 0, clipLoOn: false,
+  xray: false, groups: [], hidden: {},
   marks: [], pins: 'two', yaw: 0, scale: 1, st: null, busy: false,
   unit: null, pending: null
 };
@@ -33714,9 +33715,10 @@ function mdViewer() {
     '<div class="md-chips" id="mdChips"></div>' +
     '<div class="md-stage" id="mdStage"></div>' +
     '<div class="md-vbot">' +
-      '<div class="md-slide"><b>Potong</b><span class="md-track" id="mdTrack"><i></i><u></u></span><span class="md-val" id="mdClipV">tutup</span></div>' +
+      '<div class="md-slide"><b>Potong atas</b><span class="md-track" id="mdTrack"><i></i><u></u></span><span class="md-val" id="mdClipV">tutup</span></div>' +
+      '<div class="md-slide"><b>Potong bawah</b><span class="md-track" id="mdTrackLo"><i></i><u></u></span><span class="md-val" id="mdClipLoV">tutup</span></div>' +
       '<div class="md-vbar">' +
-        '<button class="md-vb" id="mdClipBtn">Potong</button>' +
+        '<button class="md-vb" id="mdClipBtn">Tutup potong</button>' +
         '<button class="md-vb" id="mdXray">X-ray</button>' +
         '<button class="md-vb" id="mdMark">Tanda</button>' +
         '<button class="md-vb" id="mdFit">Muat</button>' +
@@ -33756,7 +33758,14 @@ function mdViewer() {
   // Satah potong: tanpa memotong, awak berdiri muka-ke-muka dengan
   // dinding dan tidak nampak apa-apa. Ini kawalan melihat, bukan
   // kawalan meletak — ia sama dalam AR dan di luar AR.
+  //
+  // Dua satah, bukan satu. Yang pertama membuang apa yang di ATAS parasnya
+  // — itulah keratan pelan yang biasa. Yang kedua membuang apa yang di
+  // BAWAH, untuk menanggalkan lantai dan tingkat bawah dan memandang ke
+  // atas. Hidupkan kedua-duanya dan yang tinggal ialah satu jalur mendatar:
+  // 2.2 m sampai 2.8 m ialah ruang siling dengan duct dan paipnya.
   const plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+  const planeLo = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const mats = [];
   MD.obj.traverse(function(o) {
     if (!o.isMesh || !o.material) return;
@@ -33770,16 +33779,32 @@ function mdViewer() {
     });
   });
   function applyClip() {
-    const on = MD.clipOn;
+    const span = Math.max(0.5, bb.y);
     plane.constant = bb.box.min.y + MD.clip;
-    mats.forEach(function(m) { m.clippingPlanes = on ? [plane] : []; m.clipShadows = on; m.needsUpdate = true; });
+    // Satah dengan normal menghala ATAS menyimpan apa yang di atas
+    // parasnya, jadi pemalarnya ialah paras itu dinegatifkan.
+    planeLo.constant = -(bb.box.min.y + MD.clipLo);
+    const list = [];
+    if (MD.clipOn) list.push(plane);
+    if (MD.clipLoOn) list.push(planeLo);
+    mats.forEach(function(m) {
+      m.clippingPlanes = list; m.clipShadows = list.length > 0; m.needsUpdate = true;
+    });
     const v = ov.querySelector('#mdClipV');
-    if (v) v.textContent = on ? MD.clip.toFixed(2) + ' m' : 'tutup';
-    ov.querySelector('#mdClipBtn').classList.toggle('on', on);
-    const tr = ov.querySelector('#mdTrack');
-    const pc = Math.max(0, Math.min(1, MD.clip / Math.max(0.5, bb.y)));
-    tr.querySelector('i').style.width = (pc * 100) + '%';
-    tr.querySelector('u').style.left = (pc * 100) + '%';
+    if (v) v.textContent = MD.clipOn ? MD.clip.toFixed(2) + ' m' : 'tutup';
+    const vl = ov.querySelector('#mdClipLoV');
+    if (vl) vl.textContent = MD.clipLoOn ? MD.clipLo.toFixed(2) + ' m' : 'tutup';
+    ov.querySelector('#mdClipBtn').classList.toggle('on', list.length > 0);
+    const bar = function(id, val) {
+      const tr = ov.querySelector(id);
+      if (!tr) return;
+      const pc = Math.max(0, Math.min(1, val / span)) * 100;
+      tr.querySelector('i').style.width = pc + '%';
+      tr.querySelector('u').style.left = pc + '%';
+    };
+    bar('#mdTrack', MD.clip);
+    bar('#mdTrackLo', MD.clipLo);
+    paintHint();
   }
   function applyXray() {
     mats.forEach(function(m) {
@@ -33831,10 +33856,22 @@ function mdViewer() {
   function paintHint() {
     const need = MD.pins === 'two' ? 2 : 1;
     const hint = ov.querySelector('#mdVHint');
+    if (!hint) return;
+    // Dua potongan yang bertindih bukan ralat, tetapi ia bermakna skrin
+    // kosong — dan skrin kosong tanpa sebab kelihatan seperti bug.
+    if (MD.clipOn && MD.clipLoOn && MD.clipLo >= MD.clip) {
+      hint.innerHTML = '<b>Dua potongan bertindih</b> — tiada apa untuk dilihat. ' +
+        'Turunkan potong bawah.';
+      return;
+    }
     if (!MD.markMode) { hint.textContent = ''; return; }
     if (MD.marks.length >= need) {
+      // Dalam meter sebenar, bukan unit model: "jarak model 4200.00 m" ialah
+      // cara yang salah untuk menulis 4.2 m dalam fail milimeter.
+      const uf = (MD.meta && MD.meta.f) || 1;
       hint.innerHTML = MD.marks.length + ' titik dipilih' +
-        (MD.marks.length === 2 ? ' · jarak model ' + MD.marks[0].distanceTo(MD.marks[1]).toFixed(2) + ' m' : '') +
+        (MD.marks.length === 2
+          ? ' · jarak model ' + (MD.marks[0].distanceTo(MD.marks[1]) * uf).toFixed(2) + ' m' : '') +
         ' — tekan <b>Jajar</b>';
     } else {
       hint.innerHTML = 'Ketik ' + (MD.marks.length === 0 ? 'titik pertama' : 'titik kedua') +
@@ -33886,7 +33923,11 @@ function mdViewer() {
     MD.hidden[k] = !MD.hidden[k];
     applyHide();
   });
-  ov.querySelector('#mdClipBtn').onclick = function() { MD.clipOn = !MD.clipOn; applyClip(); };
+  // Satu ketikan mengembalikan model penuh. Dengan dua slider, "hidup/mati"
+  // tiada makna tunggal lagi, tetapi "tutup semuanya" ada.
+  ov.querySelector('#mdClipBtn').onclick = function() {
+    MD.clipOn = false; MD.clipLoOn = false; applyClip();
+  };
   ov.querySelector('#mdXray').onclick = function() { MD.xray = !MD.xray; applyXray(); };
   ov.querySelector('#mdFit').onclick = function() { cam.r = bb.span * 1.7; cam.th = Math.PI * 0.25; cam.ph = Math.PI * 0.32; place(); };
   ov.querySelector('#mdMark').onclick = function() {
@@ -33895,15 +33936,19 @@ function mdViewer() {
     if (!MD.markMode) { MD.marks = []; clearDots(); }
     paintHint();
   };
-  const tr = ov.querySelector('#mdTrack');
-  const slide = function(e) {
-    const r = tr.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-    MD.clip = x * Math.max(0.5, bb.y);
-    MD.clipOn = true; applyClip();
+  const bindTrack = function(id, set) {
+    const tr = ov.querySelector(id);
+    if (!tr) return;
+    const slide = function(e) {
+      const r = tr.getBoundingClientRect();
+      set(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * Math.max(0.5, bb.y));
+      applyClip();
+    };
+    tr.addEventListener('pointerdown', function(e) { tr.setPointerCapture(e.pointerId); slide(e); });
+    tr.addEventListener('pointermove', function(e) { if (e.buttons) slide(e); });
   };
-  tr.addEventListener('pointerdown', function(e) { tr.setPointerCapture(e.pointerId); slide(e); });
-  tr.addEventListener('pointermove', function(e) { if (e.buttons) slide(e); });
+  bindTrack('#mdTrack', function(v) { MD.clip = v; MD.clipOn = true; });
+  bindTrack('#mdTrackLo', function(v) { MD.clipLo = v; MD.clipLoOn = v > 0.001; });
 
   ov.querySelector('#mdVBack').onclick = function() { mdCloseViewer(); openModel3D(); };
   ov.querySelector('#mdVAr').onclick = function() {
@@ -33939,7 +33984,136 @@ function mdCloseViewer() {
 }
 
 // ---------- 8. AR: JAJAR DAN BERJALAN DI DALAMNYA ----------
+
+/** Apa yang app kata tentang AR, atau '' bila kita bukan dalam app. */
+function mdArNative() {
+  var N = window.PocketNative;
+  if (!N || typeof N.arModel !== 'function' || typeof N.arState !== 'function') return '';
+  try { return String(N.arState() || 'tiada'); } catch (e) { return 'tiada'; }
+}
+
+/**
+ * Hantar model ke skrin AR app.
+ *
+ * Fail GLB asal yang dihantar, bukan geometri yang three.js sudah parse:
+ * app ada parsernya sendiri dalam Kotlin, yang bermakna AR tidak perlukan
+ * CDN sama sekali — penting, sebab skrin ini dibuka di tapak dan kerap
+ * tanpa talian.
+ *
+ * Ia pergi melalui PUT ke pelayan tempatan app dan bukan melalui jambatan
+ * JavaScript. Satu model 30 MB sebagai base64 ialah 40 MB rentetan, satu
+ * salinan di setiap sisi jambatan, dan kemungkinan besar kehabisan memori.
+ */
+async function mdStartArNative() {
+  const N = window.PocketNative;
+  const need = MD.pins === 'two' ? 2 : 1;
+  if (!MD.id || MD.marks.length < need) {
+    showToast('Tanda ' + need + ' titik pada model dahulu');
+    return;
+  }
+  let rec = null;
+  try { rec = await lbGet(mdKey(MD.id)); } catch (e) {}
+  if (!rec || !rec.blob) { showToast('Fail model tiada dalam telefon ini'); return; }
+
+  showToast('Menghantar model ke AR\u2026');
+  try {
+    const r = await fetch('/model', { method: 'PUT', body: rec.blob });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+  } catch (e) {
+    showToast('Tidak dapat hantar model ke AR: ' + (e.message || e), 'error');
+    return;
+  }
+
+  window.pkArModel = async function(json, err, rms, scale) {
+    if (err) { showToast('AR: ' + err, 'error'); openModel3D(); return; }
+    let list = [];
+    try { list = JSON.parse(json || '[]'); } catch (e) {}
+    const n = await mdSaveDevs(list);
+    const bits = [];
+    if (rms > 0) bits.push('ralat padanan ' +
+      (rms < 1 ? Math.round(rms * 1000) + ' mm' : Number(rms).toFixed(2) + ' m'));
+    if (scale > 0) bits.push('skala diukur ' + Number(scale).toFixed(3));
+    openModel3D();
+    if (n) showToast(n + ' sisihan jadi penemuan' + (bits.length ? ' \u00b7 ' + bits.join(' \u00b7 ') : ''));
+    else if (bits.length) showToast(bits.join(' \u00b7 '));
+    if (typeof ipRender === 'function' && typeof IP !== 'undefined' && IP.id) ipRender();
+  };
+
+  const spec = JSON.stringify({
+    f: (MD.meta && MD.meta.f) || 1,
+    pins: need,
+    marks: MD.marks.slice(0, need).map(function(v) { return { x: v.x, y: v.y, z: v.z }; }),
+    name: (MD.meta && MD.meta.name) || '',
+    h: (MD.meta && MD.meta.h) || 3,
+    hide: Object.keys(MD.hidden).filter(function(k) { return MD.hidden[k]; })
+  });
+  let r = '';
+  try { r = String(N.arModel(spec) || ''); } catch (e) { r = 'gagal'; }
+  if (r === 'ok') { mdCloseViewer(); return; }
+  showToast(
+    r === 'pasang' ? 'Google sedang memasang Play Services for AR. Cuba lagi selepas ia siap.' :
+    r === 'tiada-kebenaran' ? 'Benarkan kamera, kemudian tekan Jajar lagi.' :
+    r === 'tiada' ? 'Telefon ini tidak menyokong ARCore.' :
+    r === 'tiada-fail' ? 'Model tidak sampai ke app. Cuba lagi.' :
+    'AR tidak dapat dibuka: ' + r, 'error');
+}
+
+/**
+ * Sisihan yang ditanda dalam AR jadi penemuan biasa — koleksi yang sama,
+ * laporan yang sama, tiada yang baharu.
+ *
+ * Ditulis selepas keluar dari AR dan bukan semasa di dalamnya: di tapak
+ * tiada talian, dan satu tulisan Firestore yang gagal di tengah pusingan
+ * hanya memberi toast yang hilang bersama skrin.
+ */
+async function mdSaveDevs(list) {
+  if (!list || !list.length) return 0;
+  if (typeof IP === 'undefined' || !IP.id || !currentUser) {
+    showToast('Buka satu inspection dahulu — sisihan tidak dapat disimpan', 'error');
+    return 0;
+  }
+  let sp = IP.spaces[0];
+  if (!sp) {
+    const nid = await ipAddSpace(null, null, '');
+    sp = IP.spaces.filter(function(x) { return x.id === nid; })[0];
+  }
+  if (!sp) { showToast('Tidak dapat buat ruang'); return 0; }
+  let n = 0;
+  for (let i = 0; i < list.length; i++) {
+    const m = list[i];
+    try {
+      const no = ipFindingsIn(sp.id).length + 1;
+      const data = {
+        spaceId: sp.id, spaceKey: sp.key, no: no,
+        element: '', defectType: '',
+        desc: 'Sisihan daripada model 3D "' + ((MD.meta && MD.meta.name) || '') + '".',
+        rate: '', priority: '', cost: '', action: '', locationText: '',
+        planId: '', px: null, py: null, photoN: 0, source: 'ar-model',
+        model: { id: MD.id, name: (MD.meta && MD.meta.name) || '',
+                 mx: +Number(m.mx || 0).toFixed(3),
+                 my: +Number(m.my || 0).toFixed(3),
+                 mz: +Number(m.mz || 0).toFixed(3) },
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      const ref = await ipSub('findings').add(data);
+      IP.findings.push(Object.assign({ id: ref.id }, data));
+      n++;
+    } catch (e) { /* teruskan: satu yang gagal tidak patut membuang yang lain */ }
+  }
+  try { await ipCounts(); } catch (e) {}
+  if (n < list.length) {
+    showToast((list.length - n) + ' daripada ' + list.length +
+      ' sisihan tidak dapat disimpan — cuba lagi bila ada talian', 'error');
+  }
+  return n;
+}
+
 async function mdStartAr() {
+  // App dahulu. WebView tiada WebXR sama sekali, jadi dalam APK ini
+  // satu-satunya laluan yang hidup; dalam Chrome ia tidak wujud dan kita
+  // jatuh ke WebXR di bawah.
+  if (mdArNative()) { await mdStartArNative(); return; }
   const THREE = window.THREE;
   if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) { mdNoAr(); return; }
   let okAr = false;
@@ -33947,7 +34121,13 @@ async function mdStartAr() {
   if (!okAr) { mdNoAr(); return; }
 
   const need = MD.pins === 'two' ? 2 : 1;
-  const modelPts = MD.marks.slice(0, need).map(function(v) { return mdV(v.x, v.y, v.z); });
+  const _uf = (MD.meta && MD.meta.f) || 1;
+  // Dalam METER. Tanpa penukaran ini, jajaran diselesaikan dalam unit
+  // mentah sementara mesh dilukis pada skala unit, dan model milimeter
+  // mendarat seribu kali jauh dari tempat sepatutnya.
+  const modelPts = MD.marks.slice(0, need).map(function(v) {
+    return mdV(v.x * _uf, v.y * _uf, v.z * _uf);
+  });
   mdCloseViewer();
 
   let ov = document.getElementById('mdArOv');
@@ -34095,8 +34275,12 @@ async function mdStartAr() {
         element: '', defectType: '', desc: 'Sisihan daripada model 3D "' + MD.meta.name + '".',
         rate: '', priority: '', cost: '', action: '', locationText: '',
         planId: '', px: null, py: null, photoN: 0, source: 'ar-model',
+        // Dalam unit model MENTAH, ruang yang sama dengan MD.marks dan
+        // dengan yang skrin AR app pulangkan, supaya satu penemuan bermakna
+        // perkara yang sama tidak kira laluan mana yang membuatnya.
         model: { id: MD.id, name: MD.meta.name,
-                 mx: +m.x.toFixed(3), my: +m.y.toFixed(3), mz: +m.z.toFixed(3),
+                 mx: +(m.x / _uf).toFixed(3), my: +(m.y / _uf).toFixed(3),
+                 mz: +(m.z / _uf).toFixed(3),
                  rms: MD.st.rms ? +MD.st.rms.toFixed(3) : 0 },
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -34213,7 +34397,16 @@ function mdNoAr() {
   openModel3D();
   const body = document.getElementById('toolModalBody');
   const foot = document.getElementById('toolModalFoot');
-  body.innerHTML = '<div class="md-chk warn"><div><b>AR langsung tiada di sini</b>' +
+  // Dalam app tetapi tanpa arModel bermakna APK lama, bukan pelayar tanpa
+  // WebXR. Mengatakan "guna Chrome" kepada seseorang yang sudah berada dalam
+  // app menghantar mereka ke arah yang salah.
+  const oldApk = !!window.PocketNative && typeof window.PocketNative.arModel !== 'function';
+  body.innerHTML = (oldApk
+    ? '<div class="md-chk warn"><div><b>APK ini terlalu lama untuk AR model</b>' +
+      '<span>Skrin AR model ada dalam versi app yang lebih baharu. Pasang APK ' +
+      'terkini, kemudian Muat fail Pocket semula.</span></div></div>'
+    : '') +
+    '<div class="md-chk warn"><div><b>AR langsung tiada di sini</b>' +
     '<span>WebXR perlukan Chrome pada Android yang menyokong ARCore, melalui https://.' +
     (ios ? ' iPhone tiada WebXR langsung — tetapi Safari ada AR Quick Look, dan itu cukup untuk meletakkan model dalam bilik.' : '') +
     '</span></div></div>' +

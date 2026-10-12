@@ -9,11 +9,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
-import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -34,7 +31,6 @@ import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import org.json.JSONObject
-import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.math.abs
@@ -599,31 +595,10 @@ class ArPlanActivity : Activity() {
      * Dipanggil pada benang GL, selepas semuanya dilukis.
      */
     private fun grab() {
-        val w = gl.width
-        val h = gl.height
-        if (w <= 0 || h <= 0) { runOnUiThread { paintText() }; return }
-        val buf = java.nio.ByteBuffer.allocateDirect(w * h * 4)
-            .order(java.nio.ByteOrder.nativeOrder())
-        GLES20.glReadPixels(0, 0, w, h, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf)
-        buf.rewind()
-        val px = IntArray(w * h)
-        buf.asIntBuffer().get(px)
-        // RGBA daripada GL, ARGB untuk Bitmap, dan terbalik menegak.
-        val out = IntArray(w * h)
-        for (y in 0 until h) {
-            val src = y * w
-            val dst = (h - 1 - y) * w
-            for (x in 0 until w) {
-                val c = px[src + x]
-                val r = c and 0xff
-                val g2 = (c shr 8) and 0xff
-                val b2 = (c shr 16) and 0xff
-                out[dst + x] = (0xff shl 24) or (r shl 16) or (g2 shl 8) or b2
-            }
-        }
-        val bmp = Bitmap.createBitmap(out, w, h, Bitmap.Config.ARGB_8888)
+        val bmp = ArShot.capture(gl.width, gl.height)
+        if (bmp == null) { runOnUiThread { paintText() }; return }
         val name = "goxpert-pelan-" + System.currentTimeMillis() + ".jpg"
-        val okSave = runCatching { saveToGallery(bmp, name) }.getOrDefault(false)
+        val okSave = runCatching { ArShot.save(this, bmp, name) }.getOrDefault(false)
         bmp.recycle()
         runOnUiThread {
             Toast.makeText(this,
@@ -631,35 +606,6 @@ class ArPlanActivity : Activity() {
                 Toast.LENGTH_SHORT).show()
             paintText()
         }
-    }
-
-    private fun saveToGallery(bmp: Bitmap, name: String): Boolean {
-        val dir = Environment.DIRECTORY_PICTURES + "/GoXpert Pocket"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val cv = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, name)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.RELATIVE_PATH, dir)
-                put(MediaStore.Images.Media.IS_PENDING, 1)
-            }
-            val uri = contentResolver.insert(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv) ?: return false
-            contentResolver.openOutputStream(uri)?.use {
-                bmp.compress(Bitmap.CompressFormat.JPEG, 92, it)
-            } ?: return false
-            cv.clear(); cv.put(MediaStore.Images.Media.IS_PENDING, 0)
-            contentResolver.update(uri, cv, null, null)
-            return true
-        }
-        val folder = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-            "GoXpert Pocket").apply { mkdirs() }
-        val f = File(folder, name)
-        java.io.FileOutputStream(f).use { bmp.compress(Bitmap.CompressFormat.JPEG, 92, it) }
-        // Tanpa imbasan, galeri tidak akan menemuinya pada Android lama.
-        android.media.MediaScannerConnection.scanFile(
-            this, arrayOf(f.absolutePath), arrayOf("image/jpeg"), null)
-        return true
     }
 
     // ---------- lapisan 2D ----------

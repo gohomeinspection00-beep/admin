@@ -197,6 +197,9 @@ class MainActivity : AppCompatActivity() {
     /** Gambar yang baru dipilih, menunggu halaman mengambilnya. */
     private val pickDir: File get() = File(cacheDir, "pick")
 
+    /** Model 3D terakhir yang Pocket PUT ke pelayan tempatan. */
+    private val modelDir: File get() = File(cacheDir, "model")
+
     /**
      * Pemilih gambar app sendiri.
      *
@@ -251,6 +254,26 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
     }
 
+    /**
+     * Skrin model AR memulangkan sisihan yang ditanda, dalam ruang model.
+     * Pocket menulisnya sebagai penemuan biasa — koleksi yang sama, laporan
+     * yang sama. Ia ditulis selepas keluar dan bukan semasa di dalam AR,
+     * kerana di tapak tiada talian dan satu tulisan Firestore yang gagal di
+     * tengah ukuran hanya memberi toast yang hilang.
+     */
+    private val arModelResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { res ->
+        val devs = if (res.resultCode == RESULT_OK)
+            res.data?.getStringExtra("devs").orEmpty() else ""
+        val err = res.data?.getStringExtra("error").orEmpty()
+        val rms = res.data?.getFloatExtra("rms", 0f) ?: 0f
+        val sc = res.data?.getFloatExtra("scale", 1f) ?: 1f
+        val js = "window.pkArModel && window.pkArModel(" +
+            jsStr(devs) + "," + jsStr(err) + "," + rms + "," + sc + ")"
+        runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
+    }
+
     private val askPerms = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { /* Pocket sendiri akan beritahu apa yang kurang. */ }
@@ -287,7 +310,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            server = LocalServer(uvc, pocketFile, pickDir).also { it.start(0, true) }
+            server = LocalServer(uvc, pocketFile, pickDir, modelDir)
+                .also { it.start(0, true) }
             uvc.say("Pelayan hidup pada $HOME")
         } catch (e: Throwable) {
             uvc.say("Pelayan GAGAL bermula: ${e.message}")
@@ -735,6 +759,48 @@ class MainActivity : AppCompatActivity() {
                 uvc.say("Hamparan pelan gagal: ${e.message}")
                 "gagal: ${e.message}"
             }
+        }
+
+        /**
+         * Buka model 3D dalam AR.
+         *
+         * Fail itu sendiri tidak melalui sini — Pocket PUT ia ke
+         * http://localhost/model dahulu, kerana GLB berpuluh megabait dan
+         * base64 merentasi jambatan JavaScript akan menggandakan saiznya dan
+         * menggandakan salinannya. Yang melintasi sini hanyalah spec: faktor
+         * unit, titik tanda, dan kumpulan yang disembunyikan.
+         */
+        @JavascriptInterface
+        fun arModel(spec: String): String {
+            val f = File(modelDir, "model.glb")
+            if (!f.exists() || f.length() <= 0L) return "tiada-fail"
+            var out = "ok"
+            runOnUiThread {
+                try {
+                    val av = ArCoreApk.getInstance().checkAvailability(this@MainActivity)
+                    if (av == ArCoreApk.Availability.SUPPORTED_NOT_INSTALLED ||
+                        av == ArCoreApk.Availability.SUPPORTED_APK_TOO_OLD) {
+                        ArCoreApk.getInstance().requestInstall(this@MainActivity, true)
+                        out = "pasang"; return@runOnUiThread
+                    }
+                    if (av != ArCoreApk.Availability.SUPPORTED_INSTALLED) {
+                        out = "tiada"; return@runOnUiThread
+                    }
+                    if (ContextCompat.checkSelfPermission(
+                            this@MainActivity, Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        askPerms.launch(arrayOf(Manifest.permission.CAMERA))
+                        out = "tiada-kebenaran"; return@runOnUiThread
+                    }
+                    arModelResult.launch(
+                        Intent(this@MainActivity, ArModelActivity::class.java)
+                            .putExtra("model", f.absolutePath)
+                            .putExtra("spec", spec))
+                } catch (e: Throwable) {
+                    out = "gagal: ${e.message}"
+                }
+            }
+            return out
         }
 
         /** Benar bila telefon ini boleh mendengar langsung. */
