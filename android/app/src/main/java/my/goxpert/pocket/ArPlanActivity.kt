@@ -19,6 +19,8 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
+import android.graphics.drawable.GradientDrawable
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
@@ -67,10 +69,10 @@ class ArPlanActivity : Activity() {
     private lateinit var hint: TextView
     private lateinit var readout: TextView
     private lateinit var placeBtn: Button
-    private lateinit var resetBtn: Button
-    private lateinit var lockBtn: Button
-    private lateinit var shotBtn: Button
-    private lateinit var flipBtn: Button
+    private lateinit var resetBtn: ImageButton
+    private lateinit var lockBtn: ImageButton
+    private lateinit var shotBtn: ImageButton
+    private lateinit var flipBtn: ImageButton
     private lateinit var warn: TextView
 
     private val bg = ArBackground()
@@ -208,31 +210,38 @@ class ArPlanActivity : Activity() {
             bar.addView(row("Putar", 0, 360, 0, { v -> "$v\u00b0" }) { v ->
                 if (!locked) { theta = v.toFloat(); rebuild(); paintText() }
             })
-            bar.addView(row("Skala", 10, 400, 100,
-                { v -> String.format("%.1f m", 10f * (v / 100f)) }) { v ->
+            // Turun ke 10 cm: pelan satu bilik kecil, keratan rentas, atau
+            // lakaran kecacatan semuanya jauh lebih kecil daripada satu meter,
+            // dan had lama pada 1 m menjadikannya tidak boleh dijajarkan.
+            bar.addView(row("Skala", 1, 400, 100,
+                { v -> val m = 10f * (v / 100f)
+                       if (m < 1f) String.format("%.0f cm", m * 100) else String.format("%.1f m", m) }) { v ->
                 if (!locked) { mPerPx = (10f * (v / 100f)) / planW; rebuild(); paintText() }
             })
         }
 
-        // Ikon dengan label kecil di bawahnya, bukan teks sahaja.
+        // Ikon sahaja, dalam bulatan, setiap satu dengan warnanya sendiri.
         //
-        // Teks sahaja memaksa pilihan antara muat dan faham: lima perkataan
-        // Melayu bersebelahan pada skrin telefon memberi kira-kira 70dp
-        // setiap satu, yang memotong "Mula semula" kepada "Mul a". Satu ikon
-        // dengan perkataan di BAWAHnya mendapat lebar penuh butang untuk
-        // perkataan itu, jadi kelima-limanya muat dalam satu baris dan setiap
-        // satu masih bernama.
-        fun icon(res: Int, label: String): Button =
-            Button(this).apply {
-                text = label
-                isAllCaps = false
-                maxLines = 1
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10.5f)
-                setCompoundDrawablesWithIntrinsicBounds(0, res, 0, 0)
-                compoundDrawablePadding = dp(3)
-                setPadding(dp(2), dp(7), dp(2), dp(7))
-                layoutParams = LinearLayout.LayoutParams(0, dp(68), 1f)
-                    .apply { marginEnd = dp(5); topMargin = dp(7) }
+        // Warna ialah apa yang menjadikan ikon boleh dibaca sepintas lalu:
+        // lima bentuk kelabu yang serupa memerlukan pembacaan, lima warna
+        // berbeza tidak. Merah ialah keluar, kuning ialah dikunci, sian ialah
+        // tindakan yang paling kerap diperlukan.
+        fun icon(res: Int, desc: String, tint: Int): ImageButton =
+            ImageButton(this).apply {
+                setImageResource(res)
+                setColorFilter(tint)
+                contentDescription = desc
+                scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(Color.argb(38, 255, 255, 255))
+                    setStroke(dp(1), Color.argb(55, 255, 255, 255))
+                }
+                setPadding(dp(13), dp(13), dp(13), dp(13))
+                // Tekan lama menamakannya, untuk bentuk yang belum dikenali.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = desc
+                layoutParams = LinearLayout.LayoutParams(0, dp(54), 1f)
+                    .apply { marginStart = dp(5); marginEnd = dp(5); topMargin = dp(10) }
             }
 
         placeBtn = Button(this).apply {
@@ -251,14 +260,14 @@ class ArPlanActivity : Activity() {
         // kerap: jajaran dua titik menetapkan satu garis, bukan sisi mana
         // menghadap ke atas, jadi pelan boleh mendarat bercermin dan satu
         // ketikan membetulkannya.
-        flipBtn = icon(R.drawable.ic_flip, "Cermin").apply {
+        flipBtn = icon(R.drawable.ic_flip, "Cermin", C_FLIP).apply {
             setOnClickListener {
                 if (locked) {
                     Toast.makeText(this@ArPlanActivity, "Buka kunci dahulu", Toast.LENGTH_SHORT).show()
                 } else { flip = !flip; rebuild(); paintText() }
             }
         }
-        lockBtn = icon(R.drawable.ic_lock, "Kunci").apply {
+        lockBtn = icon(R.drawable.ic_lock, "Kunci", C_PLAIN).apply {
             isEnabled = false
             setOnClickListener {
                 locked = !locked
@@ -268,15 +277,15 @@ class ArPlanActivity : Activity() {
                     if (locked) "Pelan dikunci" else "Pelan dibuka", Toast.LENGTH_SHORT).show()
             }
         }
-        shotBtn = icon(R.drawable.ic_camera, "Snap").apply {
+        shotBtn = icon(R.drawable.ic_camera, "Snap", C_SNAP).apply {
             isEnabled = false
-            setOnClickListener { wantShot = true; isEnabled = false; text = "\u2026" }
+            setOnClickListener { wantShot = true; isEnabled = false }
         }
-        resetBtn = icon(R.drawable.ic_reset, "Mula").apply {
+        resetBtn = icon(R.drawable.ic_reset, "Mula semula", C_PLAIN).apply {
             isEnabled = false
             setOnClickListener { locked = false; wantReset = true }
         }
-        val doneBtn = icon(R.drawable.ic_close, "Tutup").apply {
+        val doneBtn = icon(R.drawable.ic_close, "Tutup", C_CLOSE).apply {
             setOnClickListener { finish() }
         }
         bar.addView(LinearLayout(this).apply {
@@ -517,16 +526,18 @@ class ArPlanActivity : Activity() {
         val n = anchors.size
         val need = if (twoPin) 2 else 1
         placeBtn.isEnabled = n < need && !locked
-        placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Pelan diletak ✓"
-        // Ikon mangga bertukar bersama keadaannya: satu mangga tertutup yang
-        // bermaksud "tekan untuk kunci" dan satu yang bermaksud "sudah
-        // dikunci" ialah dua perkara berbeza.
-        lockBtn.setCompoundDrawablesWithIntrinsicBounds(
-            0, if (locked) R.drawable.ic_unlock else R.drawable.ic_lock, 0, 0)
+        placeBtn.text = if (n < need) "Letak titik ${n + 1}" else "Pelan diletak"
+        // Ikon mangga bertukar bersama keadaannya, dan warnanya juga: kuning
+        // bermakna sesuatu sedang ditahan, yang perlu kelihatan tanpa dibaca.
+        lockBtn.setImageResource(if (locked) R.drawable.ic_unlock else R.drawable.ic_lock)
+        lockBtn.setColorFilter(if (locked) C_LOCKED else C_PLAIN)
+        for (b2 in listOf(flipBtn, lockBtn, shotBtn, resetBtn)) b2.alpha = if (b2.isEnabled) 1f else 0.35f
         lockBtn.isEnabled = state != null
-        lockBtn.text = if (locked) "Buka kunci" else "Kunci"
+        lockBtn.contentDescription = if (locked) "Buka kunci" else "Kunci"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            lockBtn.tooltipText = lockBtn.contentDescription
         flipBtn.isEnabled = state != null && !locked
-        if (!wantShot) { shotBtn.isEnabled = state != null; shotBtn.text = "Snap" }
+        if (!wantShot) shotBtn.isEnabled = state != null
         resetBtn.isEnabled = n > 0
 
         hint.text = when {
@@ -854,5 +865,13 @@ class ArPlanActivity : Activity() {
             if (changed) runOnUiThread { paintText() }
             overlay.postInvalidateOnAnimation()
         }
+    }
+
+    companion object {
+        private const val C_FLIP = 0xFF22D3EE.toInt()
+        private const val C_SNAP = 0xFFFFFFFF.toInt()
+        private const val C_PLAIN = 0xFFD6DEE6.toInt()
+        private const val C_LOCKED = 0xFFFFC400.toInt()
+        private const val C_CLOSE = 0xFFFF7A7A.toInt()
     }
 }
