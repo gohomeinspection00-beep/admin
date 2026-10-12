@@ -55,13 +55,15 @@ const data = {
   ],
 
   kronologi: [
+    { tarikh: "21 Disember 2023", peristiwa: "Perjanjian Jual Beli (Sale and Purchase Agreement) ditandatangani — Jadual H (Ruj: 8428-23/eSPA/141223/247/01), Lot 247, Aurora Resort Fasa 1" },
     { tarikh: "1 & 2 Julai 2025", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan melalui aplikasi CVConnect — Defect 728811-2 dan 228839-3" },
     { tarikh: "Ogos 2025", peristiwa: "Tamat tempoh 30 hari pembaikan oleh pemaju — pembaikan masih belum disempurnakan" },
     { tarikh: "27 Ogos 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "28 Ogos 2026", peristiwa: "8 kes kecacatan baharu diserahkan melalui aplikasi CVConnect (Defect 440028-4, 940037-5, 440046-6, 840052-7, 540067-8, 140075-9, 840083-10, 940098-11) — semua masih Pending" },
     { tarikh: "1 September 2026", peristiwa: "1 kes kecacatan tambahan diserahkan melalui aplikasi CVConnect (Defect 940157-12) — masih Pending" },
     { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/035" },
-    { tarikh: "5 September 2026", peristiwa: "Notis Pertama dihantar melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY dan kemudiannya diterima oleh pihak pemaju" },
+    { tarikh: "5 September 2026", peristiwa: "Notis Pertama dihantar melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY" },
+    { tarikh: "23 September 2026", peristiwa: "Notis Pertama DITERIMA oleh pihak pemaju — diakui oleh Puan Norfarhana dengan tandatangan dan cop rasmi syarikat (rujuk Lampiran C)" },
     { tarikh: "17 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan, tiada maklum balas rasmi" },
     { tarikh: "6 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. GXS-RW-2026-00202605 berjumlah RM25,565.00 diperoleh daripada kontraktor berdaftar CIDB" },
     { tarikh: "8 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/035, bersama sebut harga rasmi pembaikan" },
@@ -243,7 +245,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}), merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026 yang telah dihantar kepada pihak tuan melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY pada 5 September 2026 dan telah diterima oleh pihak tuan, susulan Laporan Pemeriksaan Kecacatan yang dikemukakan melalui aplikasi CVConnect pada 1 dan 2 Julai 2025 (Defect 728811-2 dan 228839-3) selaras dengan Klausa ${data.klausaPembaikan} Perjanjian Jual Beli dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah memberikan tempoh lima belas (15) hari kepada pihak tuan untuk menyiapkan semua kerja pembaikan, iaitu sehingga 17 September 2026.`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli (Jadual H, Akta Pemajuan Perumahan 1966) bertarikh 21 Disember 2023 dengan rujukan 8428-23/eSPA/141223/247/01 (Lot 247, Aurora Resort Fasa 1), merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026 yang telah dihantar kepada pihak tuan melalui Pos Berdaftar Akuan Terima (AR) No. RW214680799MY pada 5 September 2026 dan telah DITERIMA oleh pihak tuan pada 23 September 2026 — diakui terima oleh wakil pihak tuan, Puan Norfarhana, dengan tandatangan dan cop rasmi syarikat pada kad Akuan Terima (AR) Pos Malaysia (dilampirkan sebagai Lampiran C) — susulan Laporan Pemeriksaan Kecacatan yang dikemukakan melalui aplikasi CVConnect pada 1 dan 2 Julai 2025 (Defect 728811-2 dan 228839-3) selaras dengan Klausa 30(1) Jadual H Perjanjian Jual Beli dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118]. Notis Pertama tersebut telah memberikan tempoh lima belas (15) hari kepada pihak tuan untuk menyiapkan semua kerja pembaikan, iaitu sehingga 17 September 2026.`
 );
 y += 4;
 
@@ -277,12 +279,12 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Klausa ${data.klausaPembaikan} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam Tempoh Liabiliti Kecacatan (DLP — Defect Liability Period), dalam masa tiga puluh (30) hari selepas menerima notis bertulis daripada pembeli.`
+  `Klausa 30(1) Jadual H Perjanjian Jual Beli memperuntukkan bahawa apa-apa kecacatan, pengecutan atau kerosakan lain (any defect, shrinkage or other faults) yang menjadi ketara dalam tempoh dua puluh empat (24) bulan selepas pembeli mengambil milikan kosong, yang disebabkan oleh mutu kerja atau bahan yang cacat, hendaklah dibaiki dan diperbetulkan oleh pemaju atas kos dan belanjanya sendiri dalam masa tiga puluh (30) hari selepas menerima notis bertulis daripada pembeli.`
 );
 y += 4;
 
 numPara(5,
-  `Dengan ini, saya mengeluarkan NOTIS KEDUA iaitu NOTIS AKHIR (FINAL NOTICE) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan tiada sebarang lanjutan masa akan diberikan selepasnya. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan melalui kedua-dua notis, selaras dengan Klausa ${data.klausaPembaikan} Perjanjian Jual Beli.`
+  `Dengan ini, saya mengeluarkan NOTIS KEDUA iaitu NOTIS AKHIR (FINAL NOTICE) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan tiada sebarang lanjutan masa akan diberikan selepasnya. Notis Kedua ini menjadikan keseluruhan tempoh tiga puluh (30) hari telah diperuntukkan kepada pihak tuan melalui kedua-dua notis, selaras dengan Klausa 30(1) Jadual H Perjanjian Jual Beli.`
 );
 y += 4;
 
@@ -294,13 +296,13 @@ y += 4;
 numPara(7, "Sekiranya pembaikan masih tidak disempurnakan selepas tarikh akhir MUKTAMAD tersebut, saya akan TANPA RUJUKAN LANJUT:");
 y += 2;
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya;");
-bullet("Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh peguam pemegang (stakeholder), M/s K.H. Koh, Azhar & Koh, selaras dengan Klausa 27 Perjanjian Jual Beli;");
+bullet("Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh peguam pemegang (stakeholder), M/s K.H. Koh, Azhar & Koh, selaras dengan Klausa 30(2) Jadual H Perjanjian Jual Beli;");
 bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempatan (KPKT) serta pihak berkuasa berkaitan; dan/atau");
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
 numPara(8,
-  `Merujuk kepada klausa Service of Documents di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui Pos Berdaftar Akuan Terima (AR) dan salinannya dimaklumkan kepada peguam pemegang wang tahanan (stakeholder) untuk makluman dan tindakan lanjut berhubung wang tahanan lima peratus (5%).`
+  `Merujuk kepada Klausa 32(1) (Service of Documents) Jadual H Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi. Notis ini dihantar melalui Pos Berdaftar Akuan Terima (AR) dan salinannya dimaklumkan kepada peguam pemegang wang tahanan (stakeholder) untuk makluman dan tindakan lanjut berhubung wang tahanan lima peratus (5%).`
 );
 y += 4;
 
@@ -419,6 +421,33 @@ doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const cvCap = "Paparan CVConnect Dashboard (Unit L247, Aurora Resort Villas Fasa 1) — 11 kes kecacatan: 9 masih berstatus PENDING (termasuk Defect 940157-12, 940098-11, 840083-10, 140075-9, 540067-8, 840052-7 dan 440046-6), 0 In Progress, dan hanya 2 Completed. Tiada sebarang kerja pembaikan dimulakan terhadap kes-kes yang diserahkan sejak 28 Ogos 2026 dan 1 September 2026.";
 const cvCapL = doc.splitTextToSize(cvCap, cW - 20);
 for (const c of cvCapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN C — KAD AR NOTIS 1
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lc2T = "LAMPIRAN C";
+doc.text(lc2T, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lc2T) / 2, y + 1, pageW / 2 + doc.getTextWidth(lc2T) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Penghantaran & Penerimaan Notis Pertama (Pos Berdaftar AR)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const ar2Img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/teogy-ar.jpg").toString("base64");
+const ar2W = 92, ar2H = 92 * 1920 / 1080;
+const ar2X = (pageW - ar2W) / 2;
+doc.addImage(ar2Img, "JPEG", ar2X, y, ar2W, ar2H);
+doc.setLineWidth(0.3); bk();
+doc.rect(ar2X, y, ar2W, ar2H);
+y += ar2H + 5;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const ar2Cap = "Kad Akuan Terima (AR) Pos Malaysia No. RW214680799MY — Notis Pertama (Ruj: NOTIS-1/2026/035) diposkan pada 5 September 2026 kepada Country View Resources Sdn Bhd dan DITERIMA pada 23 September 2026, diakui oleh Puan Norfarhana dengan tandatangan dan cop rasmi syarikat (Reg. No. 200001021248 / 523855-A), disahkan oleh Penyelia Serahan Pos Malaysia.";
+const ar2CapL = doc.splitTextToSize(ar2Cap, cW - 20);
+for (const c of ar2CapL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // AKUAN TERIMA x 2
