@@ -4,7 +4,6 @@ import fi.iki.elonen.NanoHTTPD
 import java.io.File
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
-import java.net.InetAddress
 
 /**
  * Pocket dihidangkan dari sini, dan bingkai endoskop juga, supaya kedua-duanya
@@ -20,7 +19,7 @@ import java.net.InetAddress
 class LocalServer(
     private val uvc: UvcSource,
     private val pocketFile: File
-) : NanoHTTPD(InetAddress.getByName("127.0.0.1"), PORT) {
+) : NanoHTTPD(HOST, PORT) {
 
     override fun serve(session: IHTTPSession): Response {
         val uri = session.uri ?: "/"
@@ -135,6 +134,8 @@ class LocalServer(
     }
 
     companion object {
+        /** Nama yang sama yang WebView sambung kepadanya. */
+        const val HOST = "localhost"
         const val PORT = 8765
         private const val BOUNDARY = "pocketframe"
 
