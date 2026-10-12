@@ -9426,7 +9426,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.4 · build 12 Okt 2026 · Galeri dahulu, snap AR, garis tinggi</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.5 · build 12 Okt 2026 · Banyak ukuran dalam satu pusingan AR</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -16369,14 +16369,26 @@ function armStartNative(statusEl, btn) {
       statusEl.textContent = err;
       return;
     }
-    var pts = [];
-    try { pts = JSON.parse(json || '[]'); } catch (e) {}
-    if (!pts.length) { statusEl.className = 'ar-status'; statusEl.textContent = 'Dibatalkan.'; return; }
-    var kind = ARM.mode === 'dist' ? 'dist' : ARM.mode;
-    if (kind !== 'dist' && pts.length > 2) kind = 'area';
-    var it = armAdd(kind, pts);
+    var raw = [];
+    try { raw = JSON.parse(json || '[]'); } catch (e) {}
+    // APK baharu memulangkan senarai UKURAN — satu senarai titik bagi
+    // setiap ukuran, jadi satu pusingan AR boleh membawa balik 2+2+2 titik
+    // sebagai tiga ukuran berasingan. APK lama memulangkan satu senarai
+    // titik rata. Kedua-duanya diterima: APK dan HTML dipasang secara
+    // berasingan, jadi salah satu daripadanya akan sentiasa lebih lama.
+    var groups = (raw.length && Array.isArray(raw[0])) ? raw : (raw.length ? [raw] : []);
+    groups = groups.filter(function (g) { return g && g.length >= 2; });
+    if (!groups.length) { statusEl.className = 'ar-status'; statusEl.textContent = 'Dibatalkan.'; return; }
+    var added = groups.map(function (g) {
+      var k = ARM.mode === 'dist' ? 'dist' : ARM.mode;
+      if (k !== 'dist' && g.length > 2) k = 'area';
+      return armAdd(k, g);
+    });
     statusEl.className = 'ar-status ok';
-    statusEl.textContent = it.label + ': ' + armSummary(it);
+    statusEl.textContent = added.length === 1
+      ? (added[0].label + ': ' + armSummary(added[0]))
+      : (added.length + ' ukuran ditambah \u00b7 ' +
+         added.map(function (x) { return armSummary(x); }).join(' \u00b7 '));
     armScreenList();
   };
   var r = '';
