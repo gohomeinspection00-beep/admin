@@ -8729,6 +8729,11 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .md-track.off i{background:rgba(255,255,255,.22)}
 .md-track u{position:absolute;top:50%;left:0;width:17px;height:17px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.5)}
 .md-val{font-family:var(--font-mono);font-size:11px;color:#a5f3fc;flex:none;width:52px;text-align:right}
+.md-pins{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:11px;background:rgba(255,255,255,.07)}
+.md-pins b{font-size:10.5px;font-weight:700;color:#cbd5e1;flex:1;white-space:nowrap}
+.md-pin{width:30px;height:28px;border-radius:8px;background:rgba(255,255,255,.1);color:#cbd5e1;
+  font-size:12.5px;font-weight:700;border:none;flex:none}
+.md-pin.on{background:#22d3ee;color:#04222a}
 .md-vbar{display:flex;gap:12px;justify-content:center;padding-top:2px}
 .md-vb{flex:none;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.09);
   border:1px solid rgba(255,255,255,.14);color:#d6dee6;display:grid;place-items:center;padding:0}
@@ -9429,7 +9434,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.8 · build 12 Okt 2026 · Model hitam dibaiki, pelihat 3D dikemas</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.9 · build 12 Okt 2026 · Zum cubit, 1–4 titik jajaran, sampai ke AR</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -33338,6 +33343,24 @@ function mdFromPairs(pairs, lockScale) {
   st.rms = Math.sqrt(sq / pairs.length);
   return st;
 }
+/**
+ * Berapa titik jajaran yang dipilih.
+ *
+ * Dahulu ia 'one' atau 'two' dan tiada kawalan untuk menukarnya, jadi ia
+ * sentiasa dua. Dua sudah menyelesaikan yaw dan memberi satu nombor ralat,
+ * tetapi ralat daripada dua titik hanya memberitahu bahawa kedua-duanya
+ * bersetuju — ia tidak boleh memberitahu yang MANA satu tersilap. Tiga atau
+ * empat boleh, kerana satu titik yang buruk kemudian menonjol daripada yang
+ * lain.
+ */
+function mdNeed() {
+  const p = MD.pins;
+  if (p === 'one') return 1;
+  if (p === 'two') return 2;
+  const n = parseInt(p, 10);
+  return (n >= 1 && n <= 6) ? n : 2;
+}
+
 function mdDeg(rad) { return (rad * 180 / Math.PI + 360) % 360; }
 function mdRad(deg) { return deg * Math.PI / 180; }
 
@@ -33651,9 +33674,10 @@ async function mdScreenList() {
 async function mdDelete(id) {
   const m = mdList().filter(function(x) { return x.id === id; })[0];
   if (!m) return;
-  if (!confirm('Buang "' + m.name + '" dari telefon ini?\n\nEntri kecilnya kekal pada job, jadi awak masih tahu job ini ada model itu. Muat naik semula bila perlu.')) return;
+  if (!confirm('Buang "' + m.name + '" dari telefon ini?\n\nFail dan entrinya kedua-duanya hilang \u2014 tiada salinan di tempat lain. Muat naik semula bila perlu.')) return;
   try { await lbDrop(mdKey(id)); } catch (e) {}
-  showToast('Fail dibuang dari telefon ini');
+  await mdSaveList(mdList().filter(function(x) { return x.id !== id; }));
+  showToast('Model dibuang dari telefon ini');
   mdScreenList();
 }
 
@@ -33791,6 +33815,12 @@ async function mdOpen(id) {
     mdTame(MD.obj);
     MD.groups = mdGroups(MD.obj);
     MD.hidden = {}; MD.marks = []; MD.st = null; MD.yaw = 0;
+    // Pilihan bilangan titik kekal antara model: seorang surveyor yang suka
+    // tiga titik tidak patut memilihnya semula setiap kali.
+    try {
+      const sv = parseInt(localStorage.getItem('pocket_md_pins') || '', 10);
+      if (sv >= 1 && sv <= 6) MD.pins = sv;
+    } catch (e) {}
     closeTool();
     mdViewer();
   } catch (e) {
@@ -33815,6 +33845,7 @@ function mdViewer() {
     '<div class="md-chips" id="mdChips"></div>' +
     '<div class="md-stage" id="mdStage"></div>' +
     '<div class="md-vbot">' +
+      '<div class="md-pins" id="mdPins" style="display:none"></div>' +
       '<div class="md-slide"><b>Potong atas</b><span class="md-track" id="mdTrack"><i></i><u></u></span><span class="md-val" id="mdClipV">tutup</span></div>' +
       '<div class="md-slide"><b>Potong bawah</b><span class="md-track" id="mdTrackLo"><i></i><u></u></span><span class="md-val" id="mdClipLoV">tutup</span></div>' +
       // Ikon sahaja, seperti dua skrin AR. Empat blok teks di bawah dua
@@ -33966,10 +33997,24 @@ function mdViewer() {
     // titik yang diketik lebih jujur daripada sudut yang jauh.
     return (best && bd < bb.span * 0.03) ? best : hit.point.clone();
   }
+  function paintPins() {
+    const el = ov.querySelector('#mdPins');
+    if (!el) return;
+    // Hanya semasa mod tanda. Di luar itu ia satu baris lagi untuk dibaca
+    // pada skrin yang sepatutnya menunjukkan bangunan.
+    el.style.display = MD.markMode ? '' : 'none';
+    if (!MD.markMode) return;
+    const n = mdNeed();
+    el.innerHTML = '<b>Titik jajaran</b>' + [1, 2, 3, 4].map(function(k) {
+      return '<button class="md-pin' + (k === n ? ' on' : '') + '" data-mdpin="' + k + '">' + k + '</button>';
+    }).join('');
+  }
+
   function paintHint() {
-    const need = MD.pins === 'two' ? 2 : 1;
+    const need = mdNeed();
     const hint = ov.querySelector('#mdVHint');
     if (!hint) return;
+    paintPins();
     // Butang utama menyebut langkah SETERUSNYA, bukan destinasi. Sebelum ini
     // ia berkata "Jajar" sepanjang masa dan menekannya tidak membuka AR —
     // ia menyalakan mod tanda, yang mengejutkan setiap kali.
@@ -33990,23 +34035,69 @@ function mdViewer() {
       // cara yang salah untuk menulis 4.2 m dalam fail milimeter.
       const uf = (MD.meta && MD.meta.f) || 1;
       hint.innerHTML = MD.marks.length + ' titik dipilih' +
-        (MD.marks.length === 2
-          ? ' · jarak model ' + (MD.marks[0].distanceTo(MD.marks[1]) * uf).toFixed(2) + ' m' : '') +
+        (MD.marks.length >= 2
+          ? ' · titik 1→2 ialah ' + (MD.marks[0].distanceTo(MD.marks[1]) * uf).toFixed(2) + ' m' : '') +
         ' — tekan <b>Jajar</b>';
     } else {
-      hint.innerHTML = 'Ketik ' + (MD.marks.length === 0 ? 'titik pertama' : 'titik kedua') +
+      hint.innerHTML = 'Titik <b>' + (MD.marks.length + 1) + '</b> daripada ' + need +
         ' — pilih <b>sudut</b>, bukan tengah dinding';
     }
   }
 
-  let drag = null, moved = 0, pinch = 0;
+  // Zum dan geser dua jari.
+  //
+  // Sebelum ini satu-satunya zum ialah roda tetikus, dan telefon tiada roda
+  // tetikus — jadi pada peranti yang alat ini dibina untuk, tiada zum
+  // langsung. Pembolehubah 'pinch' wujud sejak awal dan tidak pernah
+  // digunakan.
+  //
+  // Geser dua jari menggerakkan PUSAT orbit, bukan kamera. Tanpa itu, model
+  // yang dipotong terbuka tetap berputar mengelilingi tengahnya dan sudut
+  // yang awak nak periksa sentiasa terkeluar dari skrin.
+  const pts = new Map();
+  let drag = null, moved = 0, gest = null, mode = null;
   const loc = function(e) { const r = stage.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const two = function() {
+    const a = Array.from(pts.values());
+    const dx = a[0].x - a[1].x, dy = a[0].y - a[1].y;
+    return { d: Math.hypot(dx, dy), cx: (a[0].x + a[1].x) / 2, cy: (a[0].y + a[1].y) / 2 };
+  };
+  const zoom = function(f) {
+    cam.r = Math.max(bb.span * 0.04, Math.min(bb.span * 8, cam.r * f));
+  };
+  const panBy = function(dx, dy) {
+    camera.updateMatrixWorld();
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+    const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+    // Skala supaya satu piksel menggerakkan lebih kurang satu piksel pada
+    // kedalaman pusat, tidak kira sejauh mana kamera berada.
+    const k = (2 * cam.r * Math.tan((camera.fov * Math.PI / 180) / 2)) /
+              Math.max(1, stage.clientHeight);
+    ctr.addScaledVector(right, -dx * k);
+    ctr.addScaledVector(up, dy * k);
+  };
+
   stage.addEventListener('pointerdown', function(e) {
-    stage.setPointerCapture(e.pointerId);
-    drag = loc(e); moved = 0;
+    try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+    pts.set(e.pointerId, loc(e));
+    if (pts.size === 1) { drag = loc(e); moved = 0; mode = 'orbit'; }
+    else if (pts.size === 2) {
+      mode = 'pinch'; gest = two(); drag = null;
+      moved = 999;   // dua jari bukan ketikan
+    }
   });
   stage.addEventListener('pointermove', function(e) {
-    if (!drag) return;
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, loc(e));
+    if (mode === 'pinch' && pts.size >= 2) {
+      const g = two();
+      if (gest && gest.d > 4 && g.d > 4) {
+        zoom(gest.d / g.d);
+        panBy(g.cx - gest.cx, g.cy - gest.cy);
+      }
+      gest = g; place(); return;
+    }
+    if (mode !== 'orbit' || !drag) return;
     const p = loc(e);
     const dx = p.x - drag.x, dy = p.y - drag.y;
     moved += Math.abs(dx) + Math.abs(dy);
@@ -34014,27 +34105,46 @@ function mdViewer() {
     cam.ph = Math.max(0.08, Math.min(Math.PI - 0.08, cam.ph - dy * 0.008));
     drag = p; place();
   });
-  stage.addEventListener('pointerup', function(e) {
-    const was = drag; drag = null;
-    if (!was || moved > 9) return;
+  const lift = function(e) {
+    pts.delete(e.pointerId);
+    if (pts.size < 2) gest = null;
+    if (pts.size > 0) { drag = null; return; }      // jari lain masih turun
+    const was = drag, m = mode;
+    drag = null; mode = null;
+    if (m !== 'orbit' || !was || moved > 9) return;
     if (!MD.markMode) return;
     const p = loc(e);
     const nd = { x: (p.x / stage.clientWidth) * 2 - 1, y: -(p.y / stage.clientHeight) * 2 + 1 };
     ray.setFromCamera(nd, camera);
     const hits = ray.intersectObject(MD.obj, true).filter(function(h) { return h.object.visible; });
     if (!hits.length) { showToast('Tiada permukaan di situ'); return; }
-    const need = MD.pins === 'two' ? 2 : 1;
+    const need = mdNeed();
     if (MD.marks.length >= need) { MD.marks = []; clearDots(); }
     const v = snapVertex(hits[0]);
     MD.marks.push(v); addDot(v, MD.marks.length - 1);
     paintHint();
+  };
+  stage.addEventListener('pointerup', lift);
+  stage.addEventListener('pointercancel', function(e) {
+    pts.delete(e.pointerId);
+    if (pts.size < 2) gest = null;
+    if (pts.size === 0) { drag = null; mode = null; }
   });
-  stage.addEventListener('pointercancel', function() { drag = null; });
   stage.addEventListener('wheel', function(e) {
     e.preventDefault();
-    cam.r = Math.max(bb.span * 0.12, Math.min(bb.span * 8, cam.r * (e.deltaY > 0 ? 1.12 : 1 / 1.12)));
+    zoom(e.deltaY > 0 ? 1.12 : 1 / 1.12);
     place();
   }, { passive: false });
+
+  ov.querySelector('#mdPins').addEventListener('click', function(e) {
+    const b = e.target.closest('[data-mdpin]');
+    if (!b) return;
+    MD.pins = parseInt(b.dataset.mdpin, 10);
+    // Tukar kiraan bermakna tanda lama tidak lagi sepadan dengannya.
+    MD.marks = []; clearDots();
+    try { localStorage.setItem('pocket_md_pins', String(MD.pins)); } catch (err) {}
+    paintHint();
+  });
 
   ov.querySelector('#mdChips').addEventListener('click', function(e) {
     const b = e.target.closest('[data-mdg]');
@@ -34049,7 +34159,11 @@ function mdViewer() {
     MD.clipOn = false; MD.clipLoOn = false; applyClip();
   };
   ov.querySelector('#mdXray').onclick = function() { MD.xray = !MD.xray; applyXray(); };
-  ov.querySelector('#mdFit').onclick = function() { cam.r = bb.span * 1.7; cam.th = Math.PI * 0.25; cam.ph = Math.PI * 0.32; place(); };
+  ov.querySelector('#mdFit').onclick = function() {
+    bb.box.getCenter(ctr);
+    cam.r = bb.span * 1.7; cam.th = Math.PI * 0.25; cam.ph = Math.PI * 0.32;
+    place();
+  };
   ov.querySelector('#mdMark').onclick = function() {
     MD.markMode = !MD.markMode;
     ov.querySelector('#mdMark').classList.toggle('on', MD.markMode);
@@ -34078,7 +34192,7 @@ function mdViewer() {
   ov.querySelector('#mdVBack').onclick = function() { mdCloseViewer(); openModel3D(); };
   ov.querySelector('#mdVAr').onclick = function() {
     if (!MD.markMode || !MD.marks.length) {
-      showToast('Tekan Tanda dahulu, kemudian ketik ' + (MD.pins === 'two' ? 'dua sudut' : 'satu sudut') + ' pada model');
+      showToast('Tekan Tanda dahulu, kemudian ketik ' + mdNeed() + ' sudut pada model');
       MD.markMode = true;
       ov.querySelector('#mdMark').classList.add('on');
       paintHint();
@@ -34104,7 +34218,10 @@ function mdViewer() {
     const ro = new ResizeObserver(resize);
     ro.observe(stage);
   }
-  MD._viewer = { renderer: renderer, scene: scene, stop: false };
+  // Kamera dan sasarannya didedahkan supaya keadaan pelihat boleh dibaca
+  // dari luar penutupan ini — ujian memerlukannya, dan ia percuma.
+  MD._viewer = { renderer: renderer, scene: scene, camera: camera,
+                 cam: cam, ctr: ctr, bb: bb, stop: false };
   (function loop() {
     if (!document.getElementById('mdView')) { renderer.dispose(); return; }
     renderer.render(scene, camera);
@@ -34141,7 +34258,7 @@ function mdArNative() {
  */
 async function mdStartArNative() {
   const N = window.PocketNative;
-  const need = MD.pins === 'two' ? 2 : 1;
+  const need = mdNeed();
   if (!MD.id || MD.marks.length < need) {
     showToast('Tanda ' + need + ' titik pada model dahulu');
     return;
@@ -34259,7 +34376,7 @@ async function mdStartAr() {
   try { okAr = await navigator.xr.isSessionSupported('immersive-ar'); } catch (e) {}
   if (!okAr) { mdNoAr(); return; }
 
-  const need = MD.pins === 'two' ? 2 : 1;
+  const need = mdNeed();
   const _uf = (MD.meta && MD.meta.f) || 1;
   // Dalam METER. Tanpa penukaran ini, jajaran diselesaikan dalam unit
   // mentah sementara mesh dilukis pada skala unit, dan model milimeter
@@ -34374,9 +34491,13 @@ async function mdStartAr() {
     }
   }
   function align() {
-    if (MD.pins === 'two') {
-      MD.st = mdFromPairs([{ m: modelPts[0], w: worldPts[0] }, { m: modelPts[1], w: worldPts[1] }]);
-      if (!MD.st) { showToast('Dua titik itu bertindih — cuba lagi'); worldPts.length = 0; return; }
+    if (need >= 2) {
+      // Semua pasangan, bukan dua yang pertama. Lebihan itu menjadi nombor
+      // ralat, dan dengan tiga atau empat ia boleh menunjukkan titik MANA
+      // yang tersilap — dua hanya boleh berkata bahawa kedua-duanya tidak
+      // bersetuju.
+      MD.st = mdFromPairs(modelPts.map(function(m, i) { return { m: m, w: worldPts[i] }; }));
+      if (!MD.st) { showToast('Titik-titik itu bertindih — cuba lagi'); worldPts.length = 0; return; }
     } else {
       MD.st = mdFrom1(modelPts[0], worldPts[0], mdRad(MD.yaw), 1);
     }
@@ -34385,9 +34506,9 @@ async function mdStartAr() {
     applySt(); applyClip(); applyXray(); paintRes();
     tagBtn.style.display = 'none';
     ['mdArClip', 'mdArXray', 'mdArPin', 'mdArRedo'].forEach(function(k) { ov.querySelector('#' + k).style.display = ''; });
-    if (MD.pins === 'one') { ov.querySelector('#mdArYawL').style.display = ''; ov.querySelector('#mdArYawR').style.display = ''; }
+    if (need === 1) { ov.querySelector('#mdArYawL').style.display = ''; ov.querySelector('#mdArYawR').style.display = ''; }
     ctl.style.display = '';
-    hintEl.textContent = MD.pins === 'two'
+    hintEl.textContent = need >= 2
       ? 'Model diletak. Potong pada paras mata untuk masuk ke dalamnya.'
       : 'Model diletak. Putar sehingga ia padan dengan bangunan.';
   }

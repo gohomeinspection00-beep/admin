@@ -148,7 +148,11 @@ class ArModelActivity : Activity() {
         runCatching {
             val j = JSONObject(intent.getStringExtra("spec") ?: "{}")
             unitF = j.optDouble("f", 1.0).toFloat().let { if (it > 0f) it else 1f }
-            need = if (j.optInt("pins", 2) >= 2) 2 else 1
+            // Satu hingga enam. Dua menyelesaikan yaw dan memberi satu
+            // nombor ralat; tiga atau empat boleh menunjukkan titik MANA
+            // yang tersilap, kerana satu yang buruk menonjol daripada yang
+            // lain.
+            need = j.optInt("pins", 2).coerceIn(1, 6)
             modelName = j.optString("name", "")
             modelH = j.optDouble("h", 3.0).toFloat().let { if (it > 0.2f) it else 3f }
             hasJob = j.optBoolean("job", true)
@@ -514,12 +518,16 @@ class ArModelActivity : Activity() {
     }
 
     /**
-     * Dua titik: yaw diselesaikan, dan lebihannya menjadi nombor ralat.
-     * Empat yang tidak diketahui, enam persamaan. 18 mm bermakna pilihan awak
-     * bersetuju; 300 mm bermakna satu daripadanya tersilap — dan awak tahu
-     * sebelum berjalan keliling bangunan.
+     * Dua titik atau lebih: yaw diselesaikan, dan lebihannya menjadi nombor
+     * ralat. 18 mm bermakna pilihan awak bersetuju; 300 mm bermakna satu
+     * daripadanya tersilap — dan awak tahu sebelum berjalan keliling
+     * bangunan.
+     *
+     * Dengan dua titik, ralat hanya boleh berkata bahawa kedua-duanya tidak
+     * bersetuju. Dengan tiga atau empat ia boleh menunjukkan yang MANA,
+     * kerana satu titik yang buruk menonjol daripada baki yang sepadan.
      */
-    private fun solveTwo(pairs: List<Pair<FloatArray, FloatArray>>): Boolean {
+    private fun solveMany(pairs: List<Pair<FloatArray, FloatArray>>): Boolean {
         if (pairs.size < 2) return false
         val mc = mean(pairs.map { it.first })
         val wc = mean(pairs.map { it.second })
@@ -617,8 +625,8 @@ class ArModelActivity : Activity() {
         readout.text = when {
             !ready -> "Membaca model…"
             !placed -> modelName.ifBlank { "Model 3D" } +
-                " · ${marks.size} titik ditanda · ${tagged.size}/$need di tapak"
-            need == 2 -> "Ralat padanan ${fmtMm(rms)} · skala diukur " +
+                " · ${tagged.size}/$need titik di tapak"
+            need >= 2 -> "Ralat padanan ${fmtMm(rms)} · $need titik · skala " +
                 String.format("%.3f", measured)
             else -> "Satu titik · putar ${Math.round(yawDeg)}°"
         }
@@ -630,23 +638,23 @@ class ArModelActivity : Activity() {
             locked -> "Model dikunci. Ketik mangga kuning untuk melaras semula."
             placed && !hasJob ->
                 "Model diletak. Tanda sisihan mati — buka satu inspection dahulu."
-            placed && need == 2 -> "Model diletak. Potong pada paras mata untuk masuk ke dalamnya."
+            placed && need >= 2 -> "Model diletak. Potong pada paras mata untuk masuk ke dalamnya."
             placed -> "Model diletak. Putar sehingga ia padan dengan bangunan."
             planeCount == 0 ->
                 "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, " +
                 "halakan ke lantai bercorak."
             aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
             tagged.isEmpty() ->
-                "Berdiri di sudut yang awak tanda sebagai titik 1, halakan ke situ, " +
-                "ketik butang biru"
-            else -> "Sekarang sudut titik 2 · ketik butang biru"
+                "Berdiri di sudut yang awak tanda sebagai titik 1 daripada $need, " +
+                "halakan ke situ, ketik butang biru"
+            else -> "Sekarang sudut titik ${tagged.size + 1} daripada $need · ketik butang biru"
         }
 
         // Dua potongan yang bertindih bukan ralat, tetapi ia bermakna skrin
         // kosong — dan skrin kosong tanpa sebab kelihatan seperti bug.
         val clash = placed && cutHiOn && cutLoOn && cutLo >= cutHi
-        val bad = placed && need == 2 && rms > 0.12f
-        val offScale = placed && need == 2 && (measured < 0.7f || measured > 1.4f)
+        val bad = placed && need >= 2 && rms > 0.12f
+        val offScale = placed && need >= 2 && (measured < 0.7f || measured > 1.4f)
         warn.visibility = if (clash || bad || offScale) View.VISIBLE else View.GONE
         warn.text = when {
             clash -> "Potong bawah lebih tinggi daripada potong atas — tiada apa " +
@@ -947,10 +955,8 @@ class ArModelActivity : Activity() {
 
             if (fresh.size >= need && uploaded) {
                 if (!locked) {
-                    val okSolve = if (need == 2) {
-                        solveTwo(listOf(
-                            marks[0] to fresh[0],
-                            marks[1] to fresh[1]))
+                    val okSolve = if (need >= 2) {
+                        solveMany((0 until need).map { marks[it] to fresh[it] })
                     } else { solveOne(marks[0], fresh[0]); true }
                     if (okSolve) {
                         baseY = fresh[0][1]
