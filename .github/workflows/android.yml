@@ -9,6 +9,9 @@ on:
       - '.github/workflows/android.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -80,3 +83,18 @@ jobs:
           name: pocket-apk
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      # Artifact ialah zip yang perlukan log masuk, yang menyusahkan dari
+      # telefon. Keluaran memberi pautan .apk terus yang boleh diketik dan
+      # dipasang terus.
+      - name: Publish the APK as a direct download
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK=$(find android/app/build/outputs/apk/debug -name '*.apk' | head -1)
+          cp "$APK" GoXpertPocket.apk
+          gh release delete apk-latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create apk-latest GoXpertPocket.apk \
+            --title "Pocket APK (terkini)" \
+            --notes "Dibina dari ${{ github.sha }}. Muat turun GoXpertPocket.apk, pasang, kemudian menu tiga titik > Muat fail Pocket."
