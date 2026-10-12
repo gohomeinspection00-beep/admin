@@ -3,6 +3,8 @@ package my.goxpert.pocket
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.Intent
+import android.graphics.Bitmap
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -13,6 +15,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
 import android.provider.MediaStore
+import android.graphics.BitmapFactory
 import android.util.Base64
 import android.webkit.GeolocationPermissions
 import android.webkit.JavascriptInterface
@@ -25,6 +28,7 @@ import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -38,6 +42,24 @@ class MainActivity : AppCompatActivity() {
     private var server: LocalServer? = null
 
     private val pocketFile: File get() = File(filesDir, "pocket.html")
+
+    /** Gambar yang baru dipilih, menunggu halaman mengambilnya. */
+    private val pickDir: File get() = File(cacheDir, "pick")
+
+    /**
+     * Pemilih gambar app sendiri.
+     *
+     * <input type=file> dalam WebView bergantung pada onShowFileChooser dan
+     * satu ValueCallback yang hidup dalam WebView itu. App pergi ke belakang
+     * semasa pemilih di depan, dan kalau Android memusnahkan Activity ini
+     * sementara itu, panggilan balik itu mati bersamanya: pengguna memilih
+     * gambar dan tiada apa-apa yang masuk, tanpa satu pun ralat. Laluan ini
+     * tidak memegang apa-apa merentasi sempadan itu — hasilnya ditulis ke
+     * cakera, dan halaman diberitahu nama failnya selepas ia pulang.
+     */
+    private val pickImg = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { res -> onPicked(res) }
 
     private val pickPocket = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -78,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         uvc.start()
 
         try {
-            server = LocalServer(uvc, pocketFile).also { it.start(0, true) }
+            server = LocalServer(uvc, pocketFile, pickDir).also { it.start(0, true) }
             uvc.say("Pelayan hidup pada $HOME")
         } catch (e: Throwable) {
             uvc.say("Pelayan GAGAL bermula: ${e.message}")
@@ -128,13 +150,22 @@ class MainActivity : AppCompatActivity() {
                     cb: ValueCallback<Array<Uri>>?,
                     params: FileChooserParams?
                 ): Boolean {
+                    // Pocket memilih gambar melalui PocketNative.pickImages,
+                    // yang tidak memegang apa-apa merentasi sempadan Activity.
+                    // Laluan ini kekal untuk apa-apa <input type=file> lain.
                     filePick?.onReceiveValue(null)
                     filePick = cb
+                    val wantsImage = params?.acceptTypes?.any {
+                        it.startsWith("image/") || it == ".jpg" || it == ".png"
+                    } ?: false
                     return try {
-                        pickFiles.launch(params!!.createIntent())
+                        val it0 = if (wantsImage) imagePickIntent() else params!!.createIntent()
+                        uvc.say("onShowFileChooser: gambar=$wantsImage")
+                        pickFiles.launch(it0)
                         true
                     } catch (e: Throwable) {
                         filePick = null
+                        uvc.say("onShowFileChooser gagal: ${e.message}")
                         toast("Tidak dapat membuka pemilih fail")
                         false
                     }
@@ -213,7 +244,88 @@ class MainActivity : AppCompatActivity() {
      * menghantar bait PDF ke sini sebagai base64 dan kita menulisnya ke
      * folder Muat Turun telefon, di mana mana-mana app boleh membukanya.
      */
+    /**
+     * Pemilih Foto Android bila ada (API 33+): ia tidak perlukan satu pun
+     * kebenaran dan hanya menunjukkan gambar. Di bawah itu, SAF.
+     */
+    private fun imagePickIntent(): Intent =
+        if (Build.VERSION.SDK_INT >= 33) {
+            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 20)
+            }
+        } else {
+            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "image/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            }
+        }
+
+    /**
+     * Setiap gambar disahkod dan ditulis semula sebagai JPEG, bukan disalin
+     * mentah: pemilih itu boleh memulangkan HEIC, dan WebView lama tidak
+     * boleh melukisnya di atas kanvas. Menyahkod di sini bermakna halaman
+     * sentiasa menerima sesuatu yang ia pasti boleh baca.
+     */
+    private fun onPicked(res: ActivityResult) {
+        val uris = ArrayList<Uri>()
+        val d = res.data
+        if (res.resultCode == RESULT_OK && d != null) {
+            d.clipData?.let { c -> for (i in 0 until c.itemCount) uris.add(c.getItemAt(i).uri) }
+            if (uris.isEmpty()) d.data?.let { uris.add(it) }
+        }
+        uvc.say("Pemilih gambar: kod=${res.resultCode}, ${uris.size} dipilih")
+
+        pickDir.mkdirs()
+        pickDir.listFiles()?.forEach { runCatching { it.delete() } }
+
+        val names = ArrayList<String>()
+        uris.forEachIndexed { i, u ->
+            try {
+                // inSampleSize dahulu, supaya gambar 50 MP tidak membunuh app.
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                contentResolver.openInputStream(u)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+                var scale = 1
+                while (maxOf(bounds.outWidth, bounds.outHeight) / scale > 2400) scale *= 2
+                val opts = BitmapFactory.Options().apply { inSampleSize = scale }
+                val bmp = contentResolver.openInputStream(u)?.use {
+                    BitmapFactory.decodeStream(it, null, opts)
+                } ?: throw IllegalStateException("tidak boleh disahkod")
+                val f = File(pickDir, "p$i.jpg")
+                FileOutputStream(f).use { out ->
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 88, out)
+                }
+                bmp.recycle()
+                if (f.length() > 0) {
+                    names.add("/pick/" + f.name)
+                    uvc.say("Gambar $i: ${bounds.outWidth}x${bounds.outHeight} -> ${f.length()} bait")
+                } else uvc.say("Gambar $i: fail kosong")
+            } catch (e: Throwable) {
+                uvc.say("Gambar $i gagal: ${e.javaClass.simpleName}: ${e.message}")
+            }
+        }
+
+        val js = "window.enPickDone && window.enPickDone([" +
+            names.joinToString(",") { "\"$it\"" } + "])"
+        runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
+    }
+
     inner class Native {
+        /**
+         * Halaman meminta gambar; app membuka pemilih dan memanggil
+         * window.enPickDone bila ia pulang. Memulangkan "ok" bermakna pemilih
+         * dilancarkan, bukan bermakna pengguna memilih apa-apa.
+         */
+        @JavascriptInterface
+        fun pickImages(): String =
+            try {
+                runOnUiThread { pickImg.launch(imagePickIntent()) }
+                "ok"
+            } catch (e: Throwable) {
+                uvc.say("Pemilih gagal dibuka: ${e.message}")
+                "gagal: ${e.message}"
+            }
+
         @JavascriptInterface
         fun savePdf(b64: String, name: String): String {
             return try {

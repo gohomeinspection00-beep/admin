@@ -18,7 +18,8 @@ import java.io.PipedOutputStream
  */
 class LocalServer(
     private val uvc: UvcSource,
-    private val pocketFile: File
+    private val pocketFile: File,
+    private val pickDir: File
 ) : NanoHTTPD(HOST, PORT) {
 
     override fun serve(session: IHTTPSession): Response {
@@ -29,6 +30,7 @@ class LocalServer(
                 uri == "/uvc/snapshot" -> snapshot()
                 uri == "/uvc/stream"   -> stream()
                 uri == "/uvc/debug"    -> debug()
+                uri.startsWith("/pick/") -> picked(uri.removePrefix("/pick/"))
                 else                   -> pocket()
             }
         } catch (e: Throwable) {
@@ -77,6 +79,30 @@ class LocalServer(
                 Response.Status.SERVICE_UNAVAILABLE, "text/plain", "tiada bingkai"))
         return noCache(newFixedLengthResponse(
             Response.Status.OK, "image/jpeg", jpg.inputStream(), jpg.size.toLong()))
+    }
+
+    /**
+     * Gambar yang baru dipilih dari telefon. App menyalinnya ke cakera dan
+     * menyebut nama fail ini kepada halaman; halaman cuma fetch ia seperti
+     * mana-mana gambar lain. Tiada rentetan base64 besar melintasi jambatan
+     * JavaScript, dan tiada hasil Intent untuk hilang.
+     *
+     * Nama dihadkan kepada fail yang app sendiri tulis, jadi URL yang disusun
+     * sendiri tidak boleh membaca apa-apa lain.
+     */
+    private fun picked(name: String): Response {
+        val safe = name.substringAfterLast('/')
+        if (!Regex("^p\\d+\\.jpg$").matches(safe)) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.FORBIDDEN, "text/plain", "nama tidak sah"))
+        }
+        val f = File(pickDir, safe)
+        if (!f.exists()) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.NOT_FOUND, "text/plain", "tiada"))
+        }
+        return noCache(newFixedLengthResponse(
+            Response.Status.OK, "image/jpeg", f.inputStream(), f.length()))
     }
 
     private fun debug(): Response {
