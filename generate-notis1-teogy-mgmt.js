@@ -286,7 +286,7 @@ numPara(4,
 y += 4;
 
 numPara(5,
-  `Melalui notis ini, Pejabat Pengurusan pihak tuan adalah dituntut untuk memastikan semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya SEBELUM ATAU PADA 27 OKTOBER 2026 — iaitu tarikh akhir MUKTAMAD yang sama sebagaimana dinyatakan di dalam Notis Kedua yang telah diserahkan ke pejabat pemaju di Menara Landmark. Untuk kejelasan, notis ini TIDAK melanjutkan tempoh tersebut; ia dikemukakan kepada Pejabat Pengurusan supaya tiada pihak di dalam organisasi pihak tuan boleh mendakwa tidak dimaklumkan mengenai tuntutan ini.`
+  `Melalui notis ini, Pejabat Pengurusan pihak tuan adalah dituntut untuk memastikan semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh LIMA BELAS (15) HARI dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada 27 OKTOBER 2026 — selaras dengan tarikh akhir muktamad yang telah dinyatakan di dalam Notis Kedua yang diserahkan ke pejabat pemaju di Menara Landmark. Sekiranya pembaikan masih tidak disempurnakan dalam tempoh tersebut, NOTIS KEDUA iaitu NOTIS AKHIR (FINAL NOTICE) akan MENYUSUL dan dikemukakan kepada Pejabat Pengurusan pihak tuan selepas tamat tempoh lima belas (15) hari ini, tanpa rujukan lanjut`
 );
 y += 4;
 
