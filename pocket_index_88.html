@@ -9315,7 +9315,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.8 · build 12 Okt 2026 · Suara ikut bahasa, AR dikatakan</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.9 · build 12 Okt 2026 · AR dalam app melalui ARCore</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -16240,6 +16240,45 @@ function openARMeasure() {
   showToolModal();
 }
 
+/** Apa yang app kata tentang AR, atau '' bila kita bukan dalam app. */
+function armNative() {
+  var N = window.PocketNative;
+  if (!N || typeof N.arStart !== 'function' || typeof N.arState !== 'function') return '';
+  try { return String(N.arState() || 'tiada'); } catch (e) { return 'tiada'; }
+}
+
+/** Skrin AR app memulangkan titik; semua yang lain sudah wujud di sini. */
+function armStartNative(statusEl, btn) {
+  var N = window.PocketNative;
+  window.pkAr = function(json, err) {
+    btn.disabled = false;
+    btn.textContent = ARM.items.length ? 'Sambung mengukur' : 'Mula AR';
+    if (err) {
+      statusEl.className = 'ar-status warn';
+      statusEl.textContent = err;
+      return;
+    }
+    var pts = [];
+    try { pts = JSON.parse(json || '[]'); } catch (e) {}
+    if (!pts.length) { statusEl.className = 'ar-status'; statusEl.textContent = 'Dibatalkan.'; return; }
+    var kind = ARM.mode === 'dist' ? 'dist' : ARM.mode;
+    if (kind !== 'dist' && pts.length > 2) kind = 'area';
+    var it = armAdd(kind, pts);
+    statusEl.className = 'ar-status ok';
+    statusEl.textContent = it.label + ': ' + armSummary(it);
+    armScreenList();
+  };
+  var r = '';
+  try { r = String(N.arStart(ARM.mode || 'dist') || ''); } catch (e) { r = 'gagal'; }
+  if (r === 'ok') { btn.disabled = true; btn.textContent = 'AR terbuka\u2026'; return; }
+  statusEl.className = 'ar-status warn';
+  statusEl.textContent =
+    r === 'pasang' ? 'Google sedang memasang Play Services for AR. Cuba lagi selepas ia siap.' :
+    r === 'tiada-kebenaran' ? 'Benarkan kamera, kemudian tekan Mula lagi.' :
+    r === 'tiada' ? 'Telefon ini tidak menyokong ARCore.' :
+    'AR tidak dapat dibuka: ' + r;
+}
+
 function armScreenStart() {
   const body = document.getElementById('toolModalBody');
   const foot = document.getElementById('toolModalFoot');
@@ -16264,6 +16303,33 @@ function armScreenStart() {
 
   const startBtn = document.getElementById('arStartBtn');
   const statusEl = document.getElementById('arStatus');
+
+  // App Android menjalankan ARCore sendiri. WebXR dikompil ke dalam Chrome
+  // dan tidak boleh disuntik ke dalam WebView, tetapi ARCore ialah pustaka
+  // Android biasa, jadi app itu membuka skrin AR-nya sendiri dan memulangkan
+  // titik yang sama yang laluan WebXR hasilkan. Semua yang datang selepas
+  // ini — jarak, luas, label, senarai, storan — tidak berubah.
+  const arN = armNative();
+  if (arN) {
+    if (arN === 'tiada') {
+      statusEl.className = 'ar-status warn';
+      statusEl.innerHTML = 'Telefon ini tidak menyokong ARCore. Itu senarai peranti Google, bukan had app ini \u2014 tiada kod boleh mengubahnya.<br><br>Guna <b>Crack Ruler</b> untuk ukur dari gambar.';
+      startBtn.textContent = 'AR tidak disokong';
+      return;
+    }
+    if (arN === 'pasang') {
+      statusEl.className = 'ar-status warn';
+      statusEl.innerHTML = 'Telefon ini boleh menjalankan AR, tetapi <b>Google Play Services for AR</b> belum dipasang. Tekan Mula dan Google akan memasangnya.';
+    } else {
+      statusEl.className = 'ar-status';
+      statusEl.textContent = 'AR sedia.';
+    }
+    startBtn.disabled = false;
+    startBtn.textContent = ARM.items.length ? 'Sambung mengukur' : 'Mula AR';
+    startBtn.onclick = function() { armStartNative(statusEl, startBtn); };
+    return;
+  }
+
   if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
     statusEl.className = 'ar-status warn';
     // Di dalam app, konteks ini memang selamat dan telefon ini memang

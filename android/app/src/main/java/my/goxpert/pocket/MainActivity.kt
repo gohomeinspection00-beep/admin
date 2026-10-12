@@ -34,6 +34,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebViewClient
 import android.view.WindowManager
 import androidx.core.content.FileProvider
+import com.google.ar.core.ArCoreApk
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -236,6 +237,18 @@ class MainActivity : AppCompatActivity() {
         cb.onReceiveValue(
             WebChromeClient.FileChooserParams.parseResult(res.resultCode, res.data)
         )
+    }
+
+    /** Titik dari Activity AR, dihantar kembali ke Pocket apa adanya. */
+    private val arMeasure = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { res ->
+        val pts = if (res.resultCode == RESULT_OK)
+            res.data?.getStringExtra("pts").orEmpty() else ""
+        val err = res.data?.getStringExtra("error").orEmpty()
+        val js = "window.pkAr && window.pkAr(" +
+            jsStr(pts) + "," + jsStr(err) + ")"
+        runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
     }
 
     private val askPerms = registerForActivityResult(
@@ -620,6 +633,62 @@ class MainActivity : AppCompatActivity() {
             }
 
         /** Buka pautan di luar app. */
+        /**
+         * Apa yang telefon ini boleh buat dengan AR, dalam satu perkataan.
+         *
+         * "ok" sedia; "pasang" bermakna telefon disahkan tetapi Google Play
+         * Services for AR belum dipasang, yang boleh dibaiki; "tiada"
+         * bermakna peranti ini tidak disokong dan tiada kod akan mengubah
+         * itu; "tunggu" bermakna ARCore masih menyemak.
+         */
+        @JavascriptInterface
+        fun arState(): String =
+            try {
+                when (ArCoreApk.getInstance().checkAvailability(this@MainActivity)) {
+                    ArCoreApk.Availability.SUPPORTED_INSTALLED -> "ok"
+                    ArCoreApk.Availability.SUPPORTED_APK_TOO_OLD,
+                    ArCoreApk.Availability.SUPPORTED_NOT_INSTALLED -> "pasang"
+                    ArCoreApk.Availability.UNKNOWN_CHECKING -> "tunggu"
+                    else -> "tiada"
+                }
+            } catch (e: Throwable) { "tiada" }
+
+        /**
+         * Buka skrin AR. Bila ARCore belum dipasang, Google sendiri
+         * mengendalikan pemasangan itu; kita cuma memintanya.
+         */
+        @JavascriptInterface
+        fun arStart(kind: String): String {
+            var out = "ok"
+            runOnUiThread {
+                try {
+                    val av = ArCoreApk.getInstance().checkAvailability(this@MainActivity)
+                    if (av == ArCoreApk.Availability.SUPPORTED_NOT_INSTALLED ||
+                        av == ArCoreApk.Availability.SUPPORTED_APK_TOO_OLD) {
+                        ArCoreApk.getInstance().requestInstall(this@MainActivity, true)
+                        out = "pasang"
+                        return@runOnUiThread
+                    }
+                    if (av != ArCoreApk.Availability.SUPPORTED_INSTALLED) {
+                        out = "tiada"; return@runOnUiThread
+                    }
+                    if (ContextCompat.checkSelfPermission(
+                            this@MainActivity, Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        askPerms.launch(arrayOf(Manifest.permission.CAMERA))
+                        out = "tiada-kebenaran"; return@runOnUiThread
+                    }
+                    arMeasure.launch(
+                        Intent(this@MainActivity, ArMeasureActivity::class.java)
+                            .putExtra("kind", kind))
+                } catch (e: Throwable) {
+                    uvc.say("AR gagal dibuka: ${e.message}")
+                    out = "gagal: ${e.message}"
+                }
+            }
+            return out
+        }
+
         /** Benar bila telefon ini boleh mendengar langsung. */
         @JavascriptInterface
         fun canListen(): Boolean =

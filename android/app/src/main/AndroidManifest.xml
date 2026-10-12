@@ -70,6 +70,17 @@
                 android:resource="@xml/device_filter" />
         </activity>
 
+        <!-- AR dibuka hanya bila pengguna memintanya, jadi "optional":
+             telefon tanpa ARCore tetap memasang app ini dan setiap alat
+             lain kekal berfungsi. -->
+        <meta-data android:name="com.google.ar.core" android:value="optional" />
+
+        <activity
+            android:name=".ArMeasureActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation|density|fontScale|uiMode|locale|layoutDirection" />
+
         <!-- Uri fail mentah dilarang sejak Android 7, jadi fail yang
              dikongsi keluar melalui penyedia ini. -->
         <provider

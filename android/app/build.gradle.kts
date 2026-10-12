@@ -10,7 +10,9 @@ android {
     defaultConfig {
         applicationId = "my.goxpert.pocket"
         // Pustaka UVC menyokong Android 5.0 ke atas.
-        minSdk = 21
+        // ARCore memerlukan 24; stack UVC sendiri menyokong 21, tetapi
+        // telefon yang boleh menjalankan AR semuanya jauh melepasi ini.
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -42,4 +44,8 @@ dependencies {
     implementation("com.herohan:UVCAndroid:1.0.13")
     // Pelayan HTTP kecil supaya Pocket dan strim berada pada asal yang sama.
     implementation("org.nanohttpd:nanohttpd:2.3.1")
+    // ARCore. WebXR dikompil ke dalam Chrome dan tidak boleh disuntik ke
+    // dalam WebView, tetapi ARCore ialah pustaka Android biasa, jadi app ini
+    // boleh menjalankan AR sendiri dan menghantar titiknya kembali ke Pocket.
+    implementation("com.google.ar:core:1.42.0")
 }
