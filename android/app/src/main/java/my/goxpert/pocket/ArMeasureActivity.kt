@@ -21,6 +21,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.google.ar.core.Config
+import com.google.ar.core.Coordinates2d
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.Point
@@ -464,8 +465,8 @@ class ArMeasureActivity : Activity() {
         fun draw(frame: Frame) {
             if (frame.hasDisplayGeometryChanged()) {
                 frame.transformCoordinates2d(
-                    com.google.ar.core.Coordinates2d.OPENGL_NORMALIZED_DEVICE_COORDS, coords,
-                    com.google.ar.core.Coordinates2d.TEXTURE_NORMALIZED, texCoords)
+                    Coordinates2d.OPENGL_NORMALIZED_DEVICE_COORDINATES, coords,
+                    Coordinates2d.TEXTURE_NORMALIZED, texCoords)
             }
             if (frame.timestamp == 0L) return   // belum ada bingkai
 
