@@ -1974,6 +1974,19 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .tc-act:disabled{opacity:0.4}
 .tc-act.tc-on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
 
+.en-wait{padding:22px 10px;text-align:center;color:var(--muted);font-size:13px}
+.en-view{background:#000;border-radius:12px;overflow:hidden;aspect-ratio:4/3;display:grid;place-items:center}
+.en-view img{width:100%;height:100%;object-fit:contain;display:block}
+.en-stat{margin-top:9px;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-align:center}
+.en-row{display:flex;gap:8px;margin-top:11px}
+.en-row .tool-btn{flex:1}
+.en-note{margin-top:9px;font-size:11.5px;line-height:1.55;color:var(--fg-dim);text-align:center}
+.en-msg{display:flex;flex-direction:column;gap:3px;padding:11px 13px;margin-bottom:9px;border-radius:11px;
+  background:var(--bg-2);border-left:3px solid var(--accent)}
+.en-msg.warn{border-left-color:var(--warn,#9a6400)}
+.en-msg.ok{border-left-color:var(--ok,#1a7a46)}
+.en-msg b{font-size:13.5px}
+.en-msg span{font-size:12.5px;line-height:1.55;color:var(--fg-dim)}
 .tc-cap{position:absolute;inset:0;z-index:5;touch-action:none;-webkit-user-select:none;user-select:none;background:transparent}
 .tc-overlay.tc-rem .tc-hd,.tc-overlay.tc-rem .tc-foot{position:relative;z-index:6}
 .tg-bar{position:relative;z-index:6;display:flex;align-items:center;gap:9px;padding:8px 13px;background:var(--accent);color:var(--accent-fg)}
@@ -9179,7 +9192,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.7 · build 12 Okt 2026 · Tally (sebut nama setiap kali)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.8 · build 12 Okt 2026 · Endoskop (app Android)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -12959,6 +12972,7 @@ function openTool(toolKey) {
   else if (toolKey === 'arfloorplan') openARFloorPlan();
   else if (toolKey === 'model3d') openModel3D();
   else if (toolKey === 'hardware') openHardware();
+  else if (toolKey === 'endoscope') openEndoscope();
   else if (toolKey === 'sketch2real') openSketchToReal();
   else if (toolKey === 'planeditor') openPlanEditor();
   else if (toolKey === 'quantity') openQuantityScanner();
@@ -21695,6 +21709,7 @@ const NT_ICONS = {
   quantity:'<circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/>',
   voicetranslate:'<path d="M12 18.5a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v8.5a3 3 0 0 0 3 3z"/><path d="M5.5 13v2.5a6.5 6.5 0 0 0 13 0V13M12 22v-1.5"/>',
   converter:'<rect x="3.5" y="3" width="17" height="18" rx="2.5"/><path d="M7.5 8h9M8 13h2M8 17h2M14 13h2M14 17h2"/>',
+  endoscope:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>',
   counter:'<path d="M5 4v16M9.5 4v16M14 4v16M18.5 4v16"/><path d="M3 14.5 21 9"/>'
 };
 
@@ -21709,6 +21724,7 @@ const NT_TOOLS = [
   { id:'arfloorplan',    name:'AR Floor Plan',    cat:'measure', req:'AR',     kw:'overlay plan floor' },
   { id:'model3d',        name:'Model 3D',         cat:'plan',    kw:'glb gltf bim ifc revit model 3d ar usdz walk clash deviation x-ray section' },
   { id:'hardware',       name:'Peranti',          cat:'util',    kw:'bluetooth ble laser distance disto meter remote gamepad shutter kamera camera usb test uji perkakasan' },
+  { id:'endoscope',      name:'Endoskop',         cat:'util',    kw:'endoscope borescope usb uvc camera probe paip pipe rongga cavity siling ceiling drain' },
   { id:'sketch2real',    name:'Sketch to Real',   cat:'plan',    req:'AI',     kw:'drawing clean vector plan' },
   { id:'planeditor',     name:'Plan Editor',      cat:'plan',    kw:'draw annotate canvas markup' },
   { id:'voicetranslate', name:'Voice Translator', cat:'util',    req:'AI',     kw:'speak language contractor phrasebook worker bangla tamil nepali offline' },
@@ -22141,6 +22157,161 @@ function prWire() {
   });
 }
 try { prWire(); } catch (e) { console.warn('[Profile wire]', e.message); }
+// =======================================================
+// TOOL: ENDOSKOP — kamera USB melalui app Android
+//
+// Android pada telefon ini tidak mendaftarkan endoskop UVC pada perkhidmatan
+// kamera, jadi getUserMedia tidak akan pernah melihatnya dan tiada kod dalam
+// halaman ini boleh mengubah itu. App Android membuka peranti itu sendiri dan
+// menghidangkan bingkainya pada asal yang sama, jadi di sini ia cuma satu tag
+// img: pelayar menyahkod MJPEG dalam C++, dan tiada JavaScript dalam laluan
+// bingkai.
+//
+// Bila Pocket dibuka di luar app itu, /uvc/status tidak menjawab dan alat ini
+// berkata begitu dan bukannya gagal senyap.
+// =======================================================
+
+var EN = { st: null, timer: 0, shots: 0 };
+
+/** Sahkan jawapan itu benar-benar datang dari app, bukan halaman ralat. */
+function enValid(j) {
+  return !!(j && j.ok === true && typeof j.opened === 'boolean');
+}
+
+/** Ayat satu baris tentang apa yang app itu nampak. */
+function enLine(st) {
+  if (!st) return 'App tidak menjawab';
+  if (!st.opened) return 'App berjalan, endoskop belum dicolok';
+  var size = (st.width && st.height) ? (st.width + ' × ' + st.height) : 'saiz belum diketahui';
+  if (!st.hasFrame) return 'Endoskop dibuka, menunggu bingkai pertama · ' + size;
+  return size + ' · ' + st.frames + ' bingkai';
+}
+
+async function enProbe(ms) {
+  var ctl = new AbortController();
+  var t = setTimeout(function() { ctl.abort(); }, ms || 1500);
+  try {
+    var r = await fetch('/uvc/status', { signal: ctl.signal, cache: 'no-store' });
+    if (!r.ok) return null;
+    var j = await r.json();
+    return enValid(j) ? j : null;
+  } catch (e) {
+    return null;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function openEndoscope() {
+  document.getElementById('toolModalIcon').innerHTML =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>';
+  document.getElementById('toolModalName').textContent = 'Endoskop';
+  document.getElementById('toolModalDesc').textContent = 'Kamera USB dalam paip, rongga dan siling';
+  document.getElementById('toolModalBody').innerHTML =
+    '<div id="enBody"><div class="en-wait">Mencari app…</div></div>';
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn tool-btn-primary" id="enClose">Tutup</button>';
+  showToolModal();
+  document.getElementById('enClose').addEventListener('click', closeEndoscope);
+  enRefresh();
+}
+
+function closeEndoscope() {
+  if (EN.timer) { clearInterval(EN.timer); EN.timer = 0; }
+  // Lepaskan strim: selagi img itu wujud, app terus menghantar bingkai.
+  var img = document.getElementById('enView');
+  if (img) img.src = '';
+  if (typeof closeTool === 'function') closeTool();
+}
+
+async function enRefresh() {
+  var st = await enProbe();
+  EN.st = st;
+  enPaint();
+  if (!EN.timer) EN.timer = setInterval(enTick, 2500);
+}
+
+async function enTick() {
+  if (!document.getElementById('enBody')) { clearInterval(EN.timer); EN.timer = 0; return; }
+  var was = EN.st && EN.st.opened;
+  EN.st = await enProbe();
+  var now = EN.st && EN.st.opened;
+  // Lukis semula hanya bila keadaan bertukar, supaya strim tidak dimulakan
+  // semula setiap kali pemeriksaan berjalan.
+  if (was !== now) enPaint(); else enStat();
+}
+
+function enStat() {
+  var el = document.getElementById('enStat');
+  if (el) el.textContent = enLine(EN.st);
+}
+
+function enPaint() {
+  var box = document.getElementById('enBody');
+  if (!box) return;
+  var st = EN.st;
+
+  if (!st) {
+    box.innerHTML =
+      '<div class="en-msg"><b>Alat ini perlukan app Pocket untuk Android</b>' +
+      '<span>Endoskop USB tidak kelihatan kepada mana-mana pelayar pada telefon ini — ' +
+      'Android tidak mendaftarkannya sebagai kamera. App itu membukanya terus dan ' +
+      'menghantar gambarnya ke sini.</span></div>' +
+      '<div class="en-msg ok"><b>Semua alat lain kekal berfungsi</b>' +
+      '<span>Ini satu-satunya bahagian Pocket yang memerlukan app itu.</span></div>';
+    return;
+  }
+
+  if (!st.opened) {
+    box.innerHTML =
+      '<div class="en-msg warn"><b>Endoskop belum dicolok</b>' +
+      '<span>Colokkan ia ke port USB-C dan benarkan bila Android bertanya. ' +
+      'Skrin ini akan berubah sendiri.</span></div>' +
+      '<div class="en-stat" id="enStat">' + escapeHTML(enLine(st)) + '</div>' +
+      '<div class="en-row"><button class="tool-btn" id="enDbg">Diagnostik</button></div>';
+    var d = document.getElementById('enDbg');
+    if (d) d.addEventListener('click', function() { window.open('/uvc/debug', '_blank'); });
+    return;
+  }
+
+  box.innerHTML =
+    '<div class="en-view"><img id="enView" alt="Pandangan endoskop"></div>' +
+    '<div class="en-stat" id="enStat">' + escapeHTML(enLine(st)) + '</div>' +
+    '<div class="en-row">' +
+      '<button class="tool-btn tool-btn-primary" id="enShot">Tangkap ke penemuan</button>' +
+      '<button class="tool-btn" id="enDbg">Diagnostik</button>' +
+    '</div>' +
+    '<div class="en-note" id="enNote">Gambar disimpan sebagai penemuan baharu dalam inspection semasa.</div>';
+
+  // Dipasang selepas markup wujud, supaya strim bermula sekali sahaja.
+  document.getElementById('enView').src = '/uvc/stream';
+  document.getElementById('enShot').addEventListener('click', enShot);
+  document.getElementById('enDbg').addEventListener('click', function() {
+    window.open('/uvc/debug', '_blank');
+  });
+}
+
+async function enShot() {
+  var btn = document.getElementById('enShot');
+  var note = document.getElementById('enNote');
+  if (btn) { btn.disabled = true; btn.textContent = 'Menangkap…'; }
+  try {
+    var r = await fetch('/uvc/snapshot', { cache: 'no-store' });
+    if (!r.ok) throw new Error('app tiada bingkai sedia');
+    var blob = await r.blob();
+    if (!blob.size) throw new Error('bingkai kosong');
+    var file = new File([blob], 'endoskop-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+    // Laluan yang sama dengan setiap tangkapan lain: ia mencipta penemuan,
+    // menyimpan gambar penuh dan membuat thumbnailnya.
+    await smSaveCapture(file);
+    EN.shots++;
+    if (note) note.textContent = EN.shots + ' gambar endoskop disimpan dalam sesi ini.';
+  } catch (e) {
+    if (note) note.textContent = 'Gagal: ' + e.message;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Tangkap ke penemuan'; }
+}
+
 // =======================================================
 // TOOL: PERANTI (HW) — uji laser BLE, remote dan kamera
 // =======================================================
@@ -28894,7 +29065,8 @@ const SM_TOOLS = [
   { k:'compass', n:'Compass',     d:'Arah dan bearing',                    i:'compass', run:function(){ smTool('compass'); } },
   { k:'qty',     n:'Quantity',    d:'Kira rebar daripada gambar',          i:'qty',     run:function(){ smTool('quantity'); } },
   { k:'calc',    n:'Calculator',  d:'Kiraan tapak dan saintifik',          i:'calc',    run:function(){ smTool('converter'); } },
-  { k:'trans',   n:'Translator',  d:'Bercakap dengan pekerja',             i:'trans',   run:function(){ smTool('voicetranslate'); } }
+  { k:'trans',   n:'Translator',  d:'Bercakap dengan pekerja',             i:'trans',   run:function(){ smTool('voicetranslate'); } },
+  { k:'endo',    n:'Endoskop',    d:'Kamera USB dalam paip dan rongga',    i:'endoscope', run:function(){ smTool('endoscope'); } }
 ];
 const SM_DEFAULT = ['plan','finds','scan','crack','tally','lib','sos','ai'];
 const SM_PRESETS = {
