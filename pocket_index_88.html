@@ -9434,7 +9434,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.9 · build 12 Okt 2026 · Zum cubit, 1–4 titik jajaran, sampai ke AR</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.0 · build 12 Okt 2026 · Jajaran: unit, skala, dan ralat setiap sudut</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -33373,16 +33373,33 @@ const MD_UNITS = [
   { k: 'ft', n: 'Kaki',      f: 0.3048 },
   { k: 'in', n: 'Inci',      f: 0.0254 }
 ];
-// Bangunan yang munasabah: antara 2 m dan 300 m pada paksi terpanjang.
-// Faktor yang membawa model ke dalam julat itu hampir pasti unitnya.
+/**
+ * Teka unit model. Memulangkan null bila meter ialah jawapannya.
+ *
+ * Meter DAHULU, dan bukan pertandingan antara lima unit. Spesifikasi glTF
+ * sendiri menyatakan panjang dalam meter, jadi kalau membacanya begitu sudah
+ * memberi saiz bangunan yang munasabah, itulah jawapannya — meneka
+ * mengatasi spesifikasi format itu sendiri hanya memperkenalkan kesilapan.
+ * Satu model 30 unit ialah bangunan 30 m, bukan 9.1 m dalam kaki.
+ *
+ * Hanya bila bacaan meter mustahil barulah unit lain dipertimbangkan, dan di
+ * situ sauhnya 10 m — tapak rumah teres biasa, iaitu domain alat ini. Satu
+ * model 8400 unit ialah 8.4 m dalam milimeter, bukan 84 m dalam sentimeter.
+ *
+ * Unit yang tersalah teka bermakna model mendarat pada SAIZ yang salah, dan
+ * sudutnya tidak akan padan walau di mana ia diletak — ia cuma "lari". Skrin
+ * semakan menyenaraikan setiap unit dengan saiznya, jadi tekaan ini satu
+ * lalai, bukan satu keputusan.
+ */
 function mdGuessUnit(spanMetres) {
   if (!isFinite(spanMetres) || spanMetres <= 0) return null;
+  if (spanMetres >= 2 && spanMetres <= 300) return null;      // meter
   let best = null;
   MD_UNITS.forEach(function(u) {
+    if (u.k === 'm') return;
     const v = spanMetres * u.f;
     if (v < 2 || v > 300) return;
-    // Paling hampir dengan 30 m, saiz bangunan biasa dalam skala log.
-    const d = Math.abs(Math.log(v / 30));
+    const d = Math.abs(Math.log(v / 10));
     if (!best || d < best.d) best = { k: u.k, n: u.n, f: u.f, span: v, d: d };
   });
   return best;
@@ -34019,7 +34036,7 @@ function mdViewer() {
     // ia berkata "Jajar" sepanjang masa dan menekannya tidak membuka AR —
     // ia menyalakan mod tanda, yang mengejutkan setiap kali.
     const pill = ov.querySelector('#mdVAr');
-    if (pill) pill.textContent = MD.marks.length >= need ? 'Jajar' : 'Tanda';
+    if (pill) pill.textContent = MD.marks.length >= need ? 'AR' : 'Tanda';
     const cb = ov.querySelector('#mdClipBtn');
     if (cb) cb.disabled = !(MD.clipOn || MD.clipLoOn);
     // Dua potongan yang bertindih bukan ralat, tetapi ia bermakna skrin
@@ -34031,16 +34048,17 @@ function mdViewer() {
     }
     if (!MD.markMode) { hint.textContent = ''; return; }
     if (MD.marks.length >= need) {
-      // Dalam meter sebenar, bukan unit model: "jarak model 4200.00 m" ialah
-      // cara yang salah untuk menulis 4.2 m dalam fail milimeter.
-      const uf = (MD.meta && MD.meta.f) || 1;
+      // MD.marks sudah dalam METER: mdOpen menskala objek dengan faktor
+      // unit, dan snapVertex memulangkan koordinat DUNIA. Mendarabkannya
+      // dengan faktor itu lagi sekali — yang pernah dibuat di sini — ialah
+      // pendaraban dua kali, dan model milimeter mendarat seribu kali jauh.
       hint.innerHTML = MD.marks.length + ' titik dipilih' +
         (MD.marks.length >= 2
-          ? ' · titik 1→2 ialah ' + (MD.marks[0].distanceTo(MD.marks[1]) * uf).toFixed(2) + ' m' : '') +
-        ' — tekan <b>Jajar</b>';
+          ? ' · titik 1→2 ialah ' + MD.marks[0].distanceTo(MD.marks[1]).toFixed(2) + ' m' : '') +
+        ' — tekan <b>AR</b>';
     } else {
       hint.innerHTML = 'Titik <b>' + (MD.marks.length + 1) + '</b> daripada ' + need +
-        ' — pilih <b>sudut</b>, bukan tengah dinding';
+        ' — pilih sudut di <b>paras lantai</b>, bukan tengah dinding';
     }
   }
 
@@ -34192,7 +34210,7 @@ function mdViewer() {
   ov.querySelector('#mdVBack').onclick = function() { mdCloseViewer(); openModel3D(); };
   ov.querySelector('#mdVAr').onclick = function() {
     if (!MD.markMode || !MD.marks.length) {
-      showToast('Tekan Tanda dahulu, kemudian ketik ' + mdNeed() + ' sudut pada model');
+      showToast('Tekan Tanda dahulu, kemudian ketik ' + mdNeed() + ' sudut lantai pada model');
       MD.markMode = true;
       ov.querySelector('#mdMark').classList.add('on');
       paintHint();
@@ -34377,13 +34395,11 @@ async function mdStartAr() {
   if (!okAr) { mdNoAr(); return; }
 
   const need = mdNeed();
-  const _uf = (MD.meta && MD.meta.f) || 1;
-  // Dalam METER. Tanpa penukaran ini, jajaran diselesaikan dalam unit
-  // mentah sementara mesh dilukis pada skala unit, dan model milimeter
-  // mendarat seribu kali jauh dari tempat sepatutnya.
-  const modelPts = MD.marks.slice(0, need).map(function(v) {
-    return mdV(v.x * _uf, v.y * _uf, v.z * _uf);
-  });
+  // Apa adanya. MD.marks ialah koordinat DUNIA pelihat, dan pelihat
+  // menskala model dengan faktor unit — jadi ia sudah meter, dan
+  // applySt menggunakan faktor itu pada mesh MENTAH. Kedua-dua belah
+  // bersetuju hanya kalau tiada penukaran berlaku di sini.
+  const modelPts = MD.marks.slice(0, need).map(function(v) { return mdV(v.x, v.y, v.z); });
   mdCloseViewer();
 
   let ov = document.getElementById('mdArOv');
@@ -34484,7 +34500,7 @@ async function mdStartAr() {
       resEl.innerHTML = '<b>Ralat padanan</b><em>' + MD.st.pairs + ' titik · skala diukur ' +
         (MD.st.measured || 1).toFixed(3) + '</em><span class="' + (bad ? 'bad' : '') + '">' +
         (mm < 1000 ? Math.round(mm) + ' mm' : (mm / 1000).toFixed(2) + ' m') + '</span>';
-      if (bad) showToast('Ralat besar — satu pilihan mungkin tersilap. Tekan Jajar untuk ulang.');
+      if (bad) showToast('Ralat besar — satu pilihan mungkin tersilap. Tekan Jajar semula untuk ulang.');
     } else {
       resEl.innerHTML = '<b>Putar</b><em>satu titik tidak boleh tentukan arah</em><span style="color:#a5f3fc">' +
         Math.round(mdDeg(MD.st.yaw)) + '°</span>';
@@ -34535,12 +34551,11 @@ async function mdStartAr() {
         element: '', defectType: '', desc: 'Sisihan daripada model 3D "' + MD.meta.name + '".',
         rate: '', priority: '', cost: '', action: '', locationText: '',
         planId: '', px: null, py: null, photoN: 0, source: 'ar-model',
-        // Dalam unit model MENTAH, ruang yang sama dengan MD.marks dan
-        // dengan yang skrin AR app pulangkan, supaya satu penemuan bermakna
-        // perkara yang sama tidak kira laluan mana yang membuatnya.
+        // Meter ruang model, ruang yang sama dengan MD.marks dan dengan yang
+        // skrin AR app pulangkan, supaya satu penemuan bermakna perkara yang
+        // sama tidak kira laluan mana yang membuatnya.
         model: { id: MD.id, name: MD.meta.name,
-                 mx: +(m.x / _uf).toFixed(3), my: +(m.y / _uf).toFixed(3),
-                 mz: +(m.z / _uf).toFixed(3),
+                 mx: +m.x.toFixed(3), my: +m.y.toFixed(3), mz: +m.z.toFixed(3),
                  rms: MD.st.rms ? +MD.st.rms.toFixed(3) : 0 },
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()

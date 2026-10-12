@@ -50,13 +50,14 @@ import kotlin.math.sqrt
  * WebXR. Jadi matematik jajaran, bentuk kawalan dan makna setiap nombor
  * dipindahkan ke sini apa adanya, dan ARCore mengambil tempat WebXR.
  *
- * Satu perkara dibetulkan semasa memindah, dan bukan disalin: laluan web
- * menyelesaikan jajaran dalam unit model mentah tetapi melukis mesh pada
- * skala unit, jadi mana-mana model yang bukan dalam meter akan mendarat
- * salah. Di sini titik tanda ditukar ke meter dahulu, dan faktor unit hidup
- * dalam matriks letak sahaja. Kesan sampingannya berguna: "skala diukur"
- * menjadi semakan sebenar — ia patut hampir 1.000, dan 0.312 bermakna
- * setting unit salah atau satu sudut tersalah pilih.
+ * Satu perjanjian dipegang ketat di kedua-dua belah: titik ruang model
+ * sentiasa dalam METER, dan faktor unit hidup dalam matriks letak sahaja.
+ * Pelihat 3D menskala model dengan faktor itu, jadi titik yang diketik di
+ * sana sudah meter; menukarnya semula di sini ialah pendaraban dua kali.
+ *
+ * "Skala diukur" ialah semakan yang terbit daripada perjanjian itu: ia patut
+ * 1.000, dan apa-apa yang lain bermakna model ini tidak akan padan walau di
+ * mana ia diletak.
  */
 class ArModelActivity : Activity() {
 
@@ -87,7 +88,14 @@ class ArModelActivity : Activity() {
     /** Satu penemuan milik satu inspection. Tanpa job terbuka, tanda sisihan
      *  tiada tempat untuk pergi, jadi butangnya kekal mati dan berkata kenapa. */
     private var hasJob = true
-    private val marks = ArrayList<FloatArray>()      // ruang model, dalam METER
+    /**
+     * Titik tanda, dalam METER ruang model.
+     *
+     * Pocket menghantarnya begitu dan bukan dalam unit model mentah: pelihat
+     * 3D menskala model dengan faktor unit, dan titik yang diketik ialah
+     * koordinat DUNIA pelihat. Faktor unit hidup dalam matriks letak sahaja.
+     */
+    private val marks = ArrayList<FloatArray>()
 
     // ---------- memuat ----------
     @Volatile private var parsed: Glb.Model? = null
@@ -166,9 +174,9 @@ class ArModelActivity : Activity() {
             if (mk != null) for (k in 0 until mk.length()) {
                 val o = mk.optJSONObject(k) ?: continue
                 marks.add(floatArrayOf(
-                    (o.optDouble("x", 0.0) * unitF).toFloat(),
-                    (o.optDouble("y", 0.0) * unitF).toFloat(),
-                    (o.optDouble("z", 0.0) * unitF).toFloat()))
+                    o.optDouble("x", 0.0).toFloat(),
+                    o.optDouble("y", 0.0).toFloat(),
+                    o.optDouble("z", 0.0).toFloat()))
             }
         }
         if (marks.size < need) { bail("Tanda $need titik pada model dahulu"); return }
@@ -421,12 +429,11 @@ class ArModelActivity : Activity() {
         val sb = StringBuilder("[")
         devs.forEachIndexed { i, d ->
             if (i > 0) sb.append(',')
-            // Dipulangkan dalam UNIT MODEL mentah, bukan meter: itulah ruang
-            // yang tanda pada model hidup di dalamnya, jadi penemuan boleh
-            // dibandingkan dengan pelihat 3D nanti.
-            sb.append("{\"mx\":").append(d.m[0] / unitF)
-                .append(",\"my\":").append(d.m[1] / unitF)
-                .append(",\"mz\":").append(d.m[2] / unitF).append('}')
+            // Meter ruang model — ruang yang sama dengan titik tanda, jadi
+            // penemuan boleh dibandingkan dengan pelihat 3D nanti.
+            sb.append("{\"mx\":").append(d.m[0])
+                .append(",\"my\":").append(d.m[1])
+                .append(",\"mz\":").append(d.m[2]).append('}')
         }
         sb.append(']')
         // NaN melintasi ke JavaScript sebagai token yang bukan nombor dan
@@ -493,6 +500,21 @@ class ArModelActivity : Activity() {
     private fun placePt(p: FloatArray, yaw: Float, t: FloatArray): FloatArray {
         val r = yawApply(p, cos(yaw), sin(yaw))
         return floatArrayOf(r[0] + t[0], r[1] + t[1], r[2] + t[2])
+    }
+
+    /**
+     * Di mana model SEBENARNYA meletakkan sudut yang ditanda ke-i.
+     *
+     * Jurang antara ini dan titik yang surveyor tanda di tapak ialah ralat
+     * jajaran, satu sudut pada satu masa. Satu nombor RMS memberitahu bahawa
+     * ada sesuatu tidak kena; garis yang dilukis di sini memberitahu sudut
+     * MANA, dan ke arah mana ia tersasar — itulah jawapan kepada "model ini
+     * nampak lari".
+     */
+    private fun placedMark(i: Int): FloatArray {
+        val yaw = Math.toRadians(yawDeg.toDouble()).toFloat()
+        val r = yawApply(marks[i], cos(yaw), sin(yaw))
+        return floatArrayOf(r[0] + model[12], r[1] + model[13], r[2] + model[14])
     }
 
     /** Arah bertentangan: satu titik dunia balik kepada ruang model. */
@@ -587,6 +609,30 @@ class ArModelActivity : Activity() {
 
     // ---------- teks ----------
 
+    /**
+     * Bila skala yang diukur ialah nisbah KEMAS antara dua unit, katakan
+     * unit mana — kerana itulah yang sebenarnya berlaku hampir setiap kali.
+     *
+     * "Skala diukur 0.100" ialah teka-teki. "Model ini nampak dalam
+     * milimeter, bukan sentimeter" ialah arahan.
+     */
+    private fun unitHint(): String {
+        val known = listOf(
+            1f to "meter", 0.001f to "milimeter", 0.01f to "sentimeter",
+            0.3048f to "kaki", 0.0254f to "inci")
+        val want = unitF * measured
+        val now = known.firstOrNull { abs(it.first / unitF - 1f) < 0.01f }?.second
+        for ((f, n) in known) {
+            if (f == unitF) continue
+            if (abs(want / f - 1f) < 0.04f) {
+                return " Model ini nampak dalam $n" +
+                    (if (now != null) ", bukan $now" else "") +
+                    " \u2014 tukar unit pada skrin semakan Pocket."
+            }
+        }
+        return ""
+    }
+
     private fun fmtMm(m: Float): String {
         val mm = m * 1000f
         return if (mm < 1000f) "${Math.round(mm)} mm" else String.format("%.2f m", m)
@@ -654,7 +700,10 @@ class ArModelActivity : Activity() {
         // kosong — dan skrin kosong tanpa sebab kelihatan seperti bug.
         val clash = placed && cutHiOn && cutLoOn && cutLo >= cutHi
         val bad = placed && need >= 2 && rms > 0.12f
-        val offScale = placed && need >= 2 && (measured < 0.7f || measured > 1.4f)
+        // Skala dikunci pada 1, jadi model yang tidak sepadan TIDAK akan
+        // padan walau di mana diletak — ia hanya akan "lari". 0.7–1.4 terlalu
+        // longgar untuk mengatakannya: 5% merentasi 8 m sudah 40 cm.
+        val offScale = placed && need >= 2 && (measured < 0.97f || measured > 1.03f)
         warn.visibility = if (clash || bad || offScale) View.VISIBLE else View.GONE
         warn.text = when {
             clash -> "Potong bawah lebih tinggi daripada potong atas — tiada apa " +
@@ -662,8 +711,9 @@ class ArModelActivity : Activity() {
             bad -> "Ralat padanan ${fmtMm(rms)} — satu sudut mungkin tersalah pilih. " +
                 "Ketik Jajar semula dan cuba dua sudut yang lebih jauh."
             else -> "Skala diukur " + String.format("%.3f", measured) +
-                " — ia patut hampir 1.000. Unit model mungkin salah, atau satu " +
-                "sudut bukan sudut yang sama."
+                " — ia patut 1.000. Jarak sebenar antara sudut itu " +
+                String.format("%.0f", measured * 100) + "% daripada jarak pada model, " +
+                "jadi model ini tidak akan padan walau di mana diletak." + unitHint()
         }
         overlay.postInvalidate()
     }
@@ -684,6 +734,10 @@ class ArModelActivity : Activity() {
             style = Paint.Style.FILL; color = Color.argb(60, 255, 196, 0)
         }
         private val devPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = C_DEV }
+        private val fitDot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = C_XRAY }
+        private val fitLine = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = dp(2).toFloat(); color = C_XRAY
+        }
         private val lbl = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.WHITE; textSize = dp(13).toFloat(); textAlign = Paint.Align.CENTER
         }
@@ -762,10 +816,30 @@ class ArModelActivity : Activity() {
             c.drawCircle(cx, cy, dp(3).toFloat(), dot)
 
             // Titik jajaran, supaya jelas sudut mana yang sudah ditanda.
-            for ((i, w) in tagged.withIndex()) {
-                val sp = toScreen(w) ?: continue
+            //
+            // Selepas model mendarat, setiap satu dipasangkan dengan tempat
+            // model SEBENARNYA meletakkan sudut itu. Garis antara keduanya
+            // ialah ralat, dilukis — dan jaraknya dalam mm di sebelahnya.
+            // Satu nombor RMS berkata "ada yang tidak kena"; ini berkata
+            // sudut mana, dan ke arah mana.
+            val list = tagged
+            for (i in list.indices) {
+                val sp = toScreen(list[i]) ?: continue
                 c.drawCircle(sp[0], sp[1], dp(7).toFloat(), dot)
-                tag(c, sp[0], sp[1] - dp(20), "Titik ${i + 1}")
+                if (!placed || i >= marks.size) {
+                    tag(c, sp[0], sp[1] - dp(20), "Titik ${i + 1}")
+                    continue
+                }
+                val mw = placedMark(i)
+                val mp = toScreen(mw)
+                val gap = dist(mw, list[i])
+                if (mp != null && gap > 0.02f) {
+                    c.drawLine(sp[0], sp[1], mp[0], mp[1], fitLine)
+                    c.drawCircle(mp[0], mp[1], dp(5).toFloat(), fitDot)
+                }
+                tag(c, sp[0], sp[1] - dp(20),
+                    "Titik ${i + 1} · " + if (gap < 1f) "${Math.round(gap * 1000)} mm"
+                                          else String.format("%.2f m", gap))
             }
 
             // Sisihan yang ditanda.
