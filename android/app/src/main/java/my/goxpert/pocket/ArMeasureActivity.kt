@@ -562,15 +562,18 @@ class ArMeasureActivity : Activity() {
             // apa yang membuat skrin memeningkan. Lompatan besar dibiarkan
             // melalui: itu permukaan yang berbeza, bukan bunyi, dan
             // melicinkannya akan membuat kursor merayap ke sasaran baharu.
-            if (found == null) {
+            // val tempatan: found ditangkap oleh closure di atas, jadi
+            // Kotlin tidak boleh smart-cast ia.
+            val raw = found
+            if (raw == null) {
                 smooth = null
             } else {
                 val sm = smooth
-                smooth = if (sm == null || dist(sm, found) > 0.35f) found.copyOf()
+                smooth = if (sm == null || dist(sm, raw) > 0.35f) raw.copyOf()
                 else floatArrayOf(
-                    sm[0] + (found[0] - sm[0]) * SMOOTH,
-                    sm[1] + (found[1] - sm[1]) * SMOOTH,
-                    sm[2] + (found[2] - sm[2]) * SMOOTH)
+                    sm[0] + (raw[0] - sm[0]) * SMOOTH,
+                    sm[1] + (raw[1] - sm[1]) * SMOOTH,
+                    sm[2] + (raw[2] - sm[2]) * SMOOTH)
             }
             val shown = smooth
 
@@ -578,11 +581,11 @@ class ArMeasureActivity : Activity() {
             // ialah normal permukaan, jadi satu bulatan dalam XZ tempatannya
             // terletak rata pada permukaan itu. Ia dialihkan ke kedudukan
             // yang ditapis supaya cincin dan titik bergerak sebagai satu.
-            ring = if (hit == null || shown == null || found == null) FloatArray(0) else {
+            ring = if (hit == null || shown == null || raw == null) FloatArray(0) else {
                 val po = hit.hitPose
-                val dx = shown[0] - found[0]
-                val dy = shown[1] - found[1]
-                val dz = shown[2] - found[2]
+                val dx = shown[0] - raw[0]
+                val dy = shown[1] - raw[1]
+                val dz = shown[2] - raw[2]
                 val n = 28
                 val r = 0.05f
                 val w = FloatArray(n * 3)
@@ -597,6 +600,7 @@ class ArMeasureActivity : Activity() {
 
             val had = aim != null
             aim = shown
+            val gotHit = raw != null
 
             // Anchor dicipta di sini dan bukan dalam pengendali butang: satu
             // HitResult hanya sah sehingga update() berikutnya, jadi ia mesti
@@ -660,7 +664,7 @@ class ArMeasureActivity : Activity() {
             }
             ptsNow = fresh
 
-            if (changed || had != (found != null)) runOnUiThread { paintText() }
+            if (changed || had != gotHit) runOnUiThread { paintText() }
             postOverlay()
         }
 
