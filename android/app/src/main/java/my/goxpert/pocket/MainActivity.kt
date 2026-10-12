@@ -2,15 +2,20 @@ package my.goxpert.pocket
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
+import android.provider.MediaStore
+import android.util.Base64
 import android.webkit.GeolocationPermissions
+import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -23,6 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
 
@@ -82,6 +88,16 @@ class MainActivity : AppCompatActivity() {
                 allowContentAccess = false
             }
             webViewClient = WebViewClient()
+            // Satu WebView tanpa pengendali ini menelan setiap muat turun
+            // secara senyap. Pocket menyimpan PDF melalui jambatan di bawah,
+            // tetapi ini menangkap apa-apa yang lain.
+            setDownloadListener { url, _, _, _, _ ->
+                toast(
+                    if (url.startsWith("blob:") || url.startsWith("data:"))
+                        "Guna butang Muat turun dalam Pocket untuk fail ini"
+                    else "Muat turun tidak disokong di sini"
+                )
+            }
             webChromeClient = object : WebChromeClient() {
                 // Pocket meminta kamera telefon, mikrofon dan lokasi sendiri.
                 // Tanpa ini permintaan itu ditolak senyap dalam WebView.
@@ -110,6 +126,7 @@ class MainActivity : AppCompatActivity() {
             topMargin = 8; rightMargin = 8
         })
 
+        web.addJavascriptInterface(Native(), "PocketNative")
         setContentView(root)
         requestNeeded()
         web.loadUrl(HOME)
@@ -157,6 +174,48 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()
+
+    /**
+     * Dalam WebView, doc.save() daripada jsPDF tidak melakukan apa-apa: ia
+     * bergantung pada muat turun pelayar, yang tiada di sini. Pocket
+     * menghantar bait PDF ke sini sebagai base64 dan kita menulisnya ke
+     * folder Muat Turun telefon, di mana mana-mana app boleh membukanya.
+     */
+    inner class Native {
+        @JavascriptInterface
+        fun savePdf(b64: String, name: String): String {
+            return try {
+                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                val safe = if (name.endsWith(".pdf", true)) name else "$name.pdf"
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val cv = ContentValues().apply {
+                        put(MediaStore.Downloads.DISPLAY_NAME, safe)
+                        put(MediaStore.Downloads.MIME_TYPE, "application/pdf")
+                        put(MediaStore.Downloads.IS_PENDING, 1)
+                    }
+                    val uri = contentResolver.insert(
+                        MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv
+                    ) ?: return "Tidak dapat membuat fail"
+                    contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
+                    cv.clear()
+                    cv.put(MediaStore.Downloads.IS_PENDING, 0)
+                    contentResolver.update(uri, cv, null, null)
+                } else {
+                    @Suppress("DEPRECATION")
+                    val dir = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS)
+                    dir.mkdirs()
+                    FileOutputStream(File(dir, safe)).use { it.write(bytes) }
+                }
+                runOnUiThread { toast("Disimpan ke Muat Turun: $safe") }
+                "Disimpan ke Muat Turun"
+            } catch (e: Throwable) {
+                val m = "Gagal menyimpan: " + (e.message ?: e.javaClass.simpleName)
+                runOnUiThread { toast(m) }
+                m
+            }
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
