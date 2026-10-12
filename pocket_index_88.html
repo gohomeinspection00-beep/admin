@@ -1974,19 +1974,102 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .tc-act:disabled{opacity:0.4}
 .tc-act.tc-on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
 
-.en-wait{padding:22px 10px;text-align:center;color:var(--muted);font-size:13px}
-.en-view{background:#000;border-radius:12px;overflow:hidden;aspect-ratio:4/3;display:grid;place-items:center}
-.en-view img{width:100%;height:100%;object-fit:contain;display:block}
-.en-stat{margin-top:9px;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-align:center}
-.en-row{display:flex;gap:8px;margin-top:11px}
-.en-row .tool-btn{flex:1}
-.en-note{margin-top:9px;font-size:11.5px;line-height:1.55;color:var(--fg-dim);text-align:center}
-.en-msg{display:flex;flex-direction:column;gap:3px;padding:11px 13px;margin-bottom:9px;border-radius:11px;
-  background:var(--bg-2);border-left:3px solid var(--accent)}
-.en-msg.warn{border-left-color:var(--warn,#9a6400)}
-.en-msg.ok{border-left-color:var(--ok,#1a7a46)}
+body.en-open{overflow:hidden}
+.en-ov{position:fixed;inset:0;z-index:3400;display:flex;flex-direction:column;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);
+  -webkit-user-select:none;user-select:none}
+.en-hd{display:flex;align-items:center;gap:9px;flex:none;
+  padding:calc(env(safe-area-inset-top) + 11px) 12px 10px;border-bottom:1px solid var(--line)}
+.en-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;
+  background:var(--surface);border:1px solid var(--line);color:var(--fg)}
+.en-hd-t{flex:1;min-width:0}
+.en-hd-t h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.en-hd-t p{margin:1px 0 0;font-size:11px;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.en-stage{flex:1;min-height:0;background:#000;display:grid;place-items:center;overflow:hidden}
+.en-stage img{width:100%;height:100%;object-fit:contain;display:block}
+.en-stat{flex:none;padding:7px 12px;text-align:center;
+  font-family:var(--font-mono);font-size:11px;color:var(--muted);
+  border-top:1px solid var(--line)}
+
+.en-bar{flex:none;display:flex;align-items:center;gap:9px;
+  padding:10px 12px calc(env(safe-area-inset-bottom) + 12px);
+  border-top:1px solid var(--line);background:var(--bg)}
+.en-btn{flex:1;min-height:46px;padding:9px 10px;border-radius:12px;
+  background:var(--bg-2);border:1px solid var(--line);color:var(--fg);
+  font-size:13px;font-weight:600}
+.en-btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.en-btn:disabled{opacity:.4}
+.en-shut{flex:none;width:66px;height:66px;border-radius:50%;border:4px solid var(--accent);
+  background:var(--accent);box-shadow:0 0 0 3px var(--bg) inset}
+.en-shut:active{transform:scale(.94)}
+.en-shut:disabled{opacity:.35}
+
+.en-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.en-pad{padding:14px 13px}
+.en-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px}
+.en-cell{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;
+  background:#000 center/cover no-repeat;border:1px solid var(--line);padding:0}
+.en-n{position:absolute;top:6px;left:6px;min-width:21px;height:21px;border-radius:7px;
+  background:rgba(0,0,0,.66);color:#fff;font:700 11px/21px var(--font-mono);text-align:center}
+.en-sev{position:absolute;top:6px;right:6px;padding:2px 6px;border-radius:7px;
+  color:#fff;font:700 9.5px/1.5 var(--font-body)}
+.en-cap{position:absolute;left:0;right:0;bottom:0;padding:14px 7px 5px;
+  background:linear-gradient(transparent,rgba(0,0,0,.78));color:#fff;
+  font:600 10.5px/1.3 var(--font-body);text-align:left;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.en-mk{position:absolute;bottom:5px;right:6px;color:#fff;font-size:13px;
+  text-shadow:0 1px 3px rgba(0,0,0,.9)}
+.en-empty{grid-column:1/-1;padding:40px 18px;text-align:center;
+  color:var(--muted);font-size:13px;line-height:1.6}
+
+.en-canvas-wrap{background:#000;display:grid;place-items:center;touch-action:none}
+.en-canvas-wrap canvas{max-width:100%;max-height:52vh;width:auto;height:auto;
+  display:block;touch-action:none}
+.en-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;
+  border-bottom:1px solid var(--line)}
+.en-col{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);padding:0;flex:none}
+.en-col.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.en-sp{flex:1}
+.en-tool{padding:7px 11px;border-radius:9px;background:var(--bg-2);
+  border:1px solid var(--line);color:var(--fg);font-size:12px;font-weight:600}
+.en-tool.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+
+.en-form{display:flex;flex-direction:column;gap:11px;padding:13px}
+.en-form label{display:flex;flex-direction:column;gap:5px;
+  font-size:11.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.en-form input,.en-form select,.en-form textarea{
+  width:100%;padding:11px 12px;border-radius:11px;border:1.5px solid var(--line-2);
+  background:var(--bg-2);color:var(--fg);font:400 15px/1.45 var(--font-body);
+  text-transform:none;letter-spacing:normal;-webkit-user-select:text;user-select:text}
+.en-form textarea{resize:vertical}
+.en-form input:focus,.en-form select:focus,.en-form textarea:focus{
+  outline:none;border-color:var(--accent)}
+
+.en-sum{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.en-sum div{flex:1;min-width:72px;padding:11px 9px;border-radius:12px;
+  background:var(--bg-2);border:1px solid var(--line);text-align:center}
+.en-sum b{display:block;font:700 21px/1 var(--font-mono);color:var(--accent)}
+.en-sum span{display:block;margin-top:3px;font-size:10.5px;color:var(--muted)}
+
+.en-msg{display:flex;flex-direction:column;gap:3px;padding:11px 13px;margin-bottom:9px;
+  border-radius:11px;background:var(--bg-2);border-left:3px solid var(--accent)}
+.en-msg.warn{border-left-color:#9A6400}
+.en-msg.ok{border-left-color:#1A7A46}
 .en-msg b{font-size:13.5px}
 .en-msg span{font-size:12.5px;line-height:1.55;color:var(--fg-dim)}
+
+.en-ask{position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.55);
+  display:flex;align-items:flex-end}
+.en-ask-p{width:100%;background:var(--bg);border-radius:18px 18px 0 0;
+  padding:16px 14px calc(env(safe-area-inset-bottom) + 16px)}
+.en-ask-p h3{margin:0 0 10px;font-size:14px;font-weight:700}
+.en-ask-p button{display:block;width:100%;text-align:left;margin-bottom:7px;
+  padding:13px 14px;border-radius:12px;background:var(--bg-2);
+  border:1px solid var(--line);color:var(--fg);font-size:14px}
+.en-ask-p button.x{text-align:center;color:var(--muted);background:none;border-color:transparent}
 .tc-cap{position:absolute;inset:0;z-index:5;touch-action:none;-webkit-user-select:none;user-select:none;background:transparent}
 .tc-overlay.tc-rem .tc-hd,.tc-overlay.tc-rem .tc-foot{position:relative;z-index:6}
 .tg-bar{position:relative;z-index:6;display:flex;align-items:center;gap:9px;padding:8px 13px;background:var(--accent);color:var(--accent-fg)}
@@ -9192,7 +9275,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.8 · build 12 Okt 2026 · Endoskop (app Android)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.9 · build 12 Okt 2026 · Endoskop (sesi, anotasi, laporan)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -22167,23 +22250,165 @@ try { prWire(); } catch (e) { console.warn('[Profile wire]', e.message); }
 // img: pelayar menyahkod MJPEG dalam C++, dan tiada JavaScript dalam laluan
 // bingkai.
 //
-// Bila Pocket dibuka di luar app itu, /uvc/status tidak menjawab dan alat ini
-// berkata begitu dan bukannya gagal senyap.
+// Gambar endoskop TIDAK masuk ke dalam inspection. Ia hidup dalam sesinya
+// sendiri, dengan laporannya sendiri — kerja paip dan rongga selalunya
+// pekerjaan berasingan daripada condition survey.
 // =======================================================
 
-var EN = { st: null, timer: 0, shots: 0 };
+var EN = {
+  st: null, timer: 0, view: 'live',
+  sess: null, shot: null,
+  tool: 'arrow', colour: '#E11D48', pen: 4,
+  draw: null, dirty: false
+};
 
-/** Sahkan jawapan itu benar-benar datang dari app, bukan halaman ralat. */
-function enValid(j) {
-  return !!(j && j.ok === true && typeof j.opened === 'boolean');
+var EN_K = { idx: 'endo:index', s: 'endo:s:', img: 'endo:i:', th: 'endo:t:' };
+var EN_SEV = [
+  { k: '',     n: 'Tiada', c: '#64748B' },
+  { k: 'info', n: 'Nota',  c: '#0B5FA5' },
+  { k: 'minor',n: 'Kecil', c: '#9A6400' },
+  { k: 'major',n: 'Besar', c: '#C2410C' },
+  { k: 'crit', n: 'Kritikal', c: '#B91C1C' }
+];
+var EN_COLS = ['#E11D48', '#F59E0B', '#10B981', '#2563EB', '#FFFFFF', '#111827'];
+
+/* ---------- fungsi tulen ---------- */
+
+/** Koordinat disimpan 0..1 supaya tanda kekal betul pada mana-mana saiz. */
+function enNorm(x, y, w, h) {
+  return [Math.max(0, Math.min(1, x / w)), Math.max(0, Math.min(1, y / h))];
 }
 
-/** Ayat satu baris tentang apa yang app itu nampak. */
+function enSev(k) {
+  for (var i = 0; i < EN_SEV.length; i++) if (EN_SEV[i].k === k) return EN_SEV[i];
+  return EN_SEV[0];
+}
+
+function enStamp(ts) {
+  var d = new Date(ts);
+  var p = function(n) { return String(n).padStart(2, '0'); };
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+         ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+/** Nama fail yang selamat untuk perkongsian. */
+function enSlug(s) {
+  return String(s || 'endoskop').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'endoskop';
+}
+
+/** Lukis tanda ke konteks pada saiz piksel yang diberi. */
+function enDrawMarks(ctx, marks, w, h) {
+  if (!marks) return;
+  // Lebar garis berskala dengan imej, supaya anotasi kelihatan sama tebal
+  // pada skrin kecil dan dalam PDF.
+  var unit = Math.max(w, h) / 400;
+  for (var i = 0; i < marks.length; i++) {
+    var m = marks[i];
+    if (!m || !m.p || !m.p.length) continue;
+    ctx.save();
+    ctx.strokeStyle = m.c || '#E11D48';
+    ctx.fillStyle = m.c || '#E11D48';
+    ctx.lineWidth = Math.max(1, (m.w || 4) * unit);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    var pt = function(k) { return [m.p[k][0] * w, m.p[k][1] * h]; };
+
+    if (m.k === 'free') {
+      ctx.beginPath();
+      var a = pt(0); ctx.moveTo(a[0], a[1]);
+      for (var j = 1; j < m.p.length; j++) { var b = pt(j); ctx.lineTo(b[0], b[1]); }
+      ctx.stroke();
+    } else if (m.k === 'circle' && m.p.length > 1) {
+      var c0 = pt(0), c1 = pt(1);
+      var rx = Math.abs(c1[0] - c0[0]) / 2, ry = Math.abs(c1[1] - c0[1]) / 2;
+      ctx.beginPath();
+      ctx.ellipse((c0[0] + c1[0]) / 2, (c0[1] + c1[1]) / 2, Math.max(2, rx), Math.max(2, ry), 0, 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (m.k === 'arrow' && m.p.length > 1) {
+      var s = pt(0), e = pt(1);
+      ctx.beginPath(); ctx.moveTo(s[0], s[1]); ctx.lineTo(e[0], e[1]); ctx.stroke();
+      var ang = Math.atan2(e[1] - s[1], e[0] - s[0]);
+      var head = Math.max(8, 14 * unit);
+      ctx.beginPath();
+      ctx.moveTo(e[0], e[1]);
+      ctx.lineTo(e[0] - head * Math.cos(ang - 0.42), e[1] - head * Math.sin(ang - 0.42));
+      ctx.lineTo(e[0] - head * Math.cos(ang + 0.42), e[1] - head * Math.sin(ang + 0.42));
+      ctx.closePath(); ctx.fill();
+    } else if (m.k === 'text' && m.s) {
+      var t = pt(0);
+      var size = Math.max(11, 16 * unit);
+      ctx.font = '700 ' + size + 'px system-ui, sans-serif';
+      var wd = ctx.measureText(m.s).width;
+      ctx.fillStyle = 'rgba(0,0,0,.62)';
+      ctx.fillRect(t[0] - 5, t[1] - size, wd + 10, size + 9);
+      ctx.fillStyle = m.c || '#fff';
+      ctx.fillText(m.s, t[0], t[1] + 2);
+    }
+    ctx.restore();
+  }
+}
+
+/* ---------- simpanan ---------- */
+
+async function enLoadIndex() {
+  try {
+    var r = await lbGet(EN_K.idx);
+    if (!r || !r.blob) return [];
+    return JSON.parse(await r.blob.text()) || [];
+  } catch (e) { return []; }
+}
+async function enSaveIndex(list) {
+  await lbPut(EN_K.idx, new Blob([JSON.stringify(list)], { type: 'application/json' }), 'application/json');
+}
+async function enLoadSess(id) {
+  try {
+    var r = await lbGet(EN_K.s + id);
+    if (!r || !r.blob) return null;
+    return JSON.parse(await r.blob.text());
+  } catch (e) { return null; }
+}
+async function enSaveSess(sess) {
+  if (!sess) return;
+  sess.updatedAt = Date.now();
+  await lbPut(EN_K.s + sess.id,
+    new Blob([JSON.stringify(sess)], { type: 'application/json' }), 'application/json');
+  var idx = await enLoadIndex();
+  var row = { id: sess.id, name: sess.name, site: sess.site,
+              n: sess.shots.length, createdAt: sess.createdAt, updatedAt: sess.updatedAt };
+  var at = idx.findIndex(function(x) { return x.id === sess.id; });
+  if (at >= 0) idx[at] = row; else idx.unshift(row);
+  await enSaveIndex(idx);
+  EN.dirty = false;
+}
+async function enDropSess(id) {
+  var s = await enLoadSess(id);
+  if (s) for (var i = 0; i < s.shots.length; i++) {
+    try { await lbDrop(EN_K.img + s.shots[i].id); } catch (e) {}
+    try { await lbDrop(EN_K.th + s.shots[i].id); } catch (e) {}
+  }
+  try { await lbDrop(EN_K.s + id); } catch (e) {}
+  var idx = await enLoadIndex();
+  await enSaveIndex(idx.filter(function(x) { return x.id !== id; }));
+}
+
+function enNewSess() {
+  var now = Date.now();
+  return {
+    id: 'es_' + now, name: 'Endoskop ' + enStamp(now).slice(0, 10),
+    site: '', createdAt: now, updatedAt: now, shots: []
+  };
+}
+
+/* ---------- sambungan app ---------- */
+
+function enValid(j) { return !!(j && j.ok === true && typeof j.opened === 'boolean'); }
+
 function enLine(st) {
   if (!st) return 'App tidak menjawab';
   if (!st.opened) return 'App berjalan, endoskop belum dicolok';
   var size = (st.width && st.height) ? (st.width + ' × ' + st.height) : 'saiz belum diketahui';
-  if (!st.hasFrame) return 'Endoskop dibuka, menunggu bingkai pertama · ' + size;
+  if (!st.hasFrame) return 'Dibuka, menunggu bingkai pertama · ' + size;
   return size + ' · ' + st.frames + ' bingkai';
 }
 
@@ -22195,121 +22420,578 @@ async function enProbe(ms) {
     if (!r.ok) return null;
     var j = await r.json();
     return enValid(j) ? j : null;
-  } catch (e) {
-    return null;
-  } finally {
-    clearTimeout(t);
-  }
+  } catch (e) { return null; } finally { clearTimeout(t); }
 }
 
-function openEndoscope() {
-  document.getElementById('toolModalIcon').innerHTML =
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>';
-  document.getElementById('toolModalName').textContent = 'Endoskop';
-  document.getElementById('toolModalDesc').textContent = 'Kamera USB dalam paip, rongga dan siling';
-  document.getElementById('toolModalBody').innerHTML =
-    '<div id="enBody"><div class="en-wait">Mencari app…</div></div>';
-  document.getElementById('toolModalFoot').innerHTML =
-    '<button class="tool-btn tool-btn-primary" id="enClose">Tutup</button>';
-  showToolModal();
-  document.getElementById('enClose').addEventListener('click', closeEndoscope);
-  enRefresh();
-}
+/* ---------- skrin penuh ---------- */
 
-function closeEndoscope() {
-  if (EN.timer) { clearInterval(EN.timer); EN.timer = 0; }
-  // Lepaskan strim: selagi img itu wujud, app terus menghantar bingkai.
-  var img = document.getElementById('enView');
-  if (img) img.src = '';
+async function openEndoscope() {
   if (typeof closeTool === 'function') closeTool();
-}
+  enKill();
 
-async function enRefresh() {
-  var st = await enProbe();
-  EN.st = st;
-  enPaint();
+  EN.sess = EN.sess || enNewSess();
+  EN.view = 'live';
+
+  var ov = document.createElement('div');
+  ov.id = 'enOv';
+  ov.className = 'en-ov';
+  document.body.appendChild(ov);
+  document.body.classList.add('en-open');
+
+  EN.st = await enProbe();
+  enRender();
   if (!EN.timer) EN.timer = setInterval(enTick, 2500);
 }
 
+function enKill() {
+  if (EN.timer) { clearInterval(EN.timer); EN.timer = 0; }
+  var img = document.getElementById('enView');
+  if (img) img.src = '';
+  var ov = document.getElementById('enOv');
+  if (ov) ov.remove();
+  document.body.classList.remove('en-open');
+}
+
+async function enClose() {
+  if (EN.sess && EN.sess.shots.length && EN.dirty) await enSaveSess(EN.sess);
+  enKill();
+}
+
 async function enTick() {
-  if (!document.getElementById('enBody')) { clearInterval(EN.timer); EN.timer = 0; return; }
+  if (!document.getElementById('enOv')) { clearInterval(EN.timer); EN.timer = 0; return; }
+  if (EN.view !== 'live') return;
   var was = EN.st && EN.st.opened;
   EN.st = await enProbe();
   var now = EN.st && EN.st.opened;
-  // Lukis semula hanya bila keadaan bertukar, supaya strim tidak dimulakan
-  // semula setiap kali pemeriksaan berjalan.
-  if (was !== now) enPaint(); else enStat();
+  if (was !== now) enRender();
+  else { var el = document.getElementById('enStat'); if (el) el.textContent = enLine(EN.st); }
 }
 
-function enStat() {
-  var el = document.getElementById('enStat');
-  if (el) el.textContent = enLine(EN.st);
+function enRender() {
+  var ov = document.getElementById('enOv');
+  if (!ov) return;
+  if (EN.view === 'live')    return enLive(ov);
+  if (EN.view === 'gallery') return enGallery(ov);
+  if (EN.view === 'edit')    return enEdit(ov);
+  if (EN.view === 'report')  return enReport(ov);
 }
 
-function enPaint() {
-  var box = document.getElementById('enBody');
-  if (!box) return;
-  var st = EN.st;
+function enHead(title, sub, right) {
+  return '<div class="en-hd">' +
+    '<button class="en-ic" id="enBack" aria-label="Kembali">' +
+      '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>' +
+    '</button>' +
+    '<div class="en-hd-t"><h2>' + escapeHTML(title) + '</h2><p>' + escapeHTML(sub || '') + '</p></div>' +
+    (right || '') + '</div>';
+}
 
+/* ---------- 1. LANGSUNG ---------- */
+
+function enLive(ov) {
+  var st = EN.st, n = EN.sess.shots.length;
+
+  var body;
   if (!st) {
-    box.innerHTML =
+    body = '<div class="en-pad">' +
       '<div class="en-msg"><b>Alat ini perlukan app Pocket untuk Android</b>' +
       '<span>Endoskop USB tidak kelihatan kepada mana-mana pelayar pada telefon ini — ' +
       'Android tidak mendaftarkannya sebagai kamera. App itu membukanya terus dan ' +
       'menghantar gambarnya ke sini.</span></div>' +
       '<div class="en-msg ok"><b>Semua alat lain kekal berfungsi</b>' +
-      '<span>Ini satu-satunya bahagian Pocket yang memerlukan app itu.</span></div>';
-    return;
-  }
-
-  if (!st.opened) {
-    box.innerHTML =
+      '<span>Ini satu-satunya bahagian Pocket yang memerlukan app itu.</span></div></div>';
+  } else if (!st.opened) {
+    body = '<div class="en-pad">' +
       '<div class="en-msg warn"><b>Endoskop belum dicolok</b>' +
       '<span>Colokkan ia ke port USB-C dan benarkan bila Android bertanya. ' +
-      'Skrin ini akan berubah sendiri.</span></div>' +
-      '<div class="en-stat" id="enStat">' + escapeHTML(enLine(st)) + '</div>' +
-      '<div class="en-row"><button class="tool-btn" id="enDbg">Diagnostik</button></div>';
-    var d = document.getElementById('enDbg');
-    if (d) d.addEventListener('click', function() { window.open('/uvc/debug', '_blank'); });
-    return;
+      'Skrin ini akan berubah sendiri.</span></div></div>';
+  } else {
+    body = '<div class="en-stage"><img id="enView" alt="Pandangan endoskop"></div>';
   }
 
-  box.innerHTML =
-    '<div class="en-view"><img id="enView" alt="Pandangan endoskop"></div>' +
+  ov.innerHTML =
+    enHead(EN.sess.name, n + ' gambar dalam sesi ini',
+      '<button class="en-ic" id="enMenu" aria-label="Sesi">' +
+      '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>') +
+    body +
     '<div class="en-stat" id="enStat">' + escapeHTML(enLine(st)) + '</div>' +
-    '<div class="en-row">' +
-      '<button class="tool-btn tool-btn-primary" id="enShot">Tangkap ke penemuan</button>' +
-      '<button class="tool-btn" id="enDbg">Diagnostik</button>' +
-    '</div>' +
-    '<div class="en-note" id="enNote">Gambar disimpan sebagai penemuan baharu dalam inspection semasa.</div>';
+    '<div class="en-bar">' +
+      '<button class="en-btn" id="enGal">' + (n ? n + ' gambar' : 'Galeri') + '</button>' +
+      '<button class="en-shut" id="enShot"' + (st && st.opened ? '' : ' disabled') + ' aria-label="Tangkap"></button>' +
+      '<button class="en-btn" id="enRep"' + (n ? '' : ' disabled') + '>Laporan</button>' +
+    '</div>';
 
-  // Dipasang selepas markup wujud, supaya strim bermula sekali sahaja.
-  document.getElementById('enView').src = '/uvc/stream';
-  document.getElementById('enShot').addEventListener('click', enShot);
-  document.getElementById('enDbg').addEventListener('click', function() {
-    window.open('/uvc/debug', '_blank');
-  });
+  if (st && st.opened) document.getElementById('enView').src = '/uvc/stream';
+  document.getElementById('enBack').addEventListener('click', enClose);
+  document.getElementById('enMenu').addEventListener('click', enSessMenu);
+  document.getElementById('enGal').addEventListener('click', function() { EN.view = 'gallery'; enRender(); });
+  document.getElementById('enRep').addEventListener('click', function() { EN.view = 'report'; enRender(); });
+  var sh = document.getElementById('enShot');
+  if (sh) sh.addEventListener('click', enSnap);
 }
 
-async function enShot() {
+async function enSnap() {
   var btn = document.getElementById('enShot');
-  var note = document.getElementById('enNote');
-  if (btn) { btn.disabled = true; btn.textContent = 'Menangkap…'; }
+  var stat = document.getElementById('enStat');
+  if (btn) btn.disabled = true;
   try {
     var r = await fetch('/uvc/snapshot', { cache: 'no-store' });
     if (!r.ok) throw new Error('app tiada bingkai sedia');
     var blob = await r.blob();
     if (!blob.size) throw new Error('bingkai kosong');
-    var file = new File([blob], 'endoskop-' + Date.now() + '.jpg', { type: 'image/jpeg' });
-    // Laluan yang sama dengan setiap tangkapan lain: ia mencipta penemuan,
-    // menyimpan gambar penuh dan membuat thumbnailnya.
-    await smSaveCapture(file);
-    EN.shots++;
-    if (note) note.textContent = EN.shots + ' gambar endoskop disimpan dalam sesi ini.';
+
+    var id = 'sh_' + Date.now();
+    var full = await ipShrinkTo(blob, 1600, 0.85);
+    var thumb = await ipShrinkTo(blob, 360, 0.72);
+    await lbPut(EN_K.img + id, full, 'image/jpeg');
+    await lbPut(EN_K.th + id, thumb, 'image/jpeg');
+
+    EN.sess.shots.push({ id: id, t: Date.now(), title: '', desc: '', loc: '', sev: '', marks: [] });
+    EN.dirty = true;
+    await enSaveSess(EN.sess);
+
+    if (typeof tcBuzz === 'function') tcBuzz(14);
+    if (stat) stat.textContent = EN.sess.shots.length + ' gambar disimpan';
+    var g = document.getElementById('enGal');
+    if (g) g.textContent = EN.sess.shots.length + ' gambar';
+    var rp = document.getElementById('enRep');
+    if (rp) rp.disabled = false;
   } catch (e) {
-    if (note) note.textContent = 'Gagal: ' + e.message;
+    if (stat) stat.textContent = 'Gagal: ' + e.message;
   }
-  if (btn) { btn.disabled = false; btn.textContent = 'Tangkap ke penemuan'; }
+  if (btn) btn.disabled = false;
+}
+
+function enSessMenu() {
+  enAsk('Sesi', [
+    ['Namakan sesi ini', async function() {
+      var v = prompt('Nama sesi', EN.sess.name);
+      if (v && v.trim()) { EN.sess.name = v.trim(); await enSaveSess(EN.sess); enRender(); }
+    }],
+    ['Lokasi atau projek', async function() {
+      var v = prompt('Lokasi / projek', EN.sess.site || '');
+      if (v !== null) { EN.sess.site = v.trim(); await enSaveSess(EN.sess); enRender(); }
+    }],
+    ['Sesi baharu', async function() {
+      if (EN.sess.shots.length) await enSaveSess(EN.sess);
+      EN.sess = enNewSess(); EN.view = 'live'; enRender();
+    }],
+    ['Buka sesi lama', enPickSess]
+  ]);
+}
+
+async function enPickSess() {
+  var idx = await enLoadIndex();
+  if (!idx.length) { showToast('Tiada sesi tersimpan'); return; }
+  enAsk('Sesi tersimpan', idx.slice(0, 12).map(function(r) {
+    return [r.name + '  ·  ' + r.n + ' gambar  ·  ' + enStamp(r.createdAt).slice(0, 10),
+      async function() {
+        var s = await enLoadSess(r.id);
+        if (s) { EN.sess = s; EN.view = 'gallery'; enRender(); }
+      }];
+  }));
+}
+
+/* ---------- 2. GALERI ---------- */
+
+async function enGallery(ov) {
+  var shots = EN.sess.shots;
+  ov.innerHTML =
+    enHead(EN.sess.name, (EN.sess.site ? EN.sess.site + ' · ' : '') + shots.length + ' gambar',
+      '<button class="en-ic" id="enMenu" aria-label="Sesi">' +
+      '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>') +
+    '<div class="en-scroll"><div class="en-grid" id="enGrid">' +
+      (shots.length ? '' : '<div class="en-empty">Belum ada gambar. Kembali ke pandangan langsung dan tekan butang tangkap.</div>') +
+    '</div></div>' +
+    '<div class="en-bar">' +
+      '<button class="en-btn" id="enLive">Pandangan langsung</button>' +
+      '<button class="en-btn pri" id="enRep"' + (shots.length ? '' : ' disabled') + '>Laporan</button>' +
+    '</div>';
+
+  document.getElementById('enBack').addEventListener('click', function() { EN.view = 'live'; enRender(); });
+  document.getElementById('enMenu').addEventListener('click', enSessMenu);
+  document.getElementById('enLive').addEventListener('click', function() { EN.view = 'live'; enRender(); });
+  document.getElementById('enRep').addEventListener('click', function() { EN.view = 'report'; enRender(); });
+
+  var grid = document.getElementById('enGrid');
+  for (var i = 0; i < shots.length; i++) {
+    var s = shots[i];
+    var cell = document.createElement('button');
+    cell.className = 'en-cell';
+    cell.dataset.i = i;
+    var sev = enSev(s.sev);
+    cell.innerHTML = '<span class="en-n">' + (i + 1) + '</span>' +
+      (s.sev ? '<span class="en-sev" style="background:' + sev.c + '">' + escapeHTML(sev.n) + '</span>' : '') +
+      (s.title ? '<span class="en-cap">' + escapeHTML(s.title) + '</span>' : '') +
+      ((s.marks && s.marks.length) ? '<span class="en-mk">✎</span>' : '');
+    grid.appendChild(cell);
+    try {
+      var rec = await lbGet(EN_K.th + s.id);
+      if (rec && rec.blob) cell.style.backgroundImage = 'url(' + URL.createObjectURL(rec.blob) + ')';
+    } catch (e) {}
+  }
+  grid.addEventListener('click', function(e) {
+    var c = e.target.closest('.en-cell');
+    if (!c) return;
+    EN.shot = +c.dataset.i;
+    EN.view = 'edit';
+    enRender();
+  });
+}
+
+/* ---------- 3. EDIT ---------- */
+
+async function enEdit(ov) {
+  var s = EN.sess.shots[EN.shot];
+  if (!s) { EN.view = 'gallery'; return enRender(); }
+
+  ov.innerHTML =
+    enHead('Gambar ' + (EN.shot + 1), enStamp(s.t),
+      '<button class="en-ic" id="enDel" aria-label="Buang">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg></button>') +
+    '<div class="en-scroll">' +
+      '<div class="en-canvas-wrap"><canvas id="enCv"></canvas></div>' +
+      '<div class="en-tools">' +
+        EN_COLS.map(function(c) {
+          return '<button class="en-col' + (c === EN.colour ? ' on' : '') + '" data-col="' + c +
+                 '" style="background:' + c + '" aria-label="Warna"></button>';
+        }).join('') +
+        '<span class="en-sp"></span>' +
+        [['arrow', 'Anak panah'], ['circle', 'Bulatan'], ['free', 'Pen'], ['text', 'Teks']].map(function(t) {
+          return '<button class="en-tool' + (t[0] === EN.tool ? ' on' : '') + '" data-tool="' + t[0] + '">' + t[1] + '</button>';
+        }).join('') +
+        '<button class="en-tool" id="enUndo">Undo</button>' +
+      '</div>' +
+      '<div class="en-form">' +
+        '<label>Tajuk<input type="text" id="enTitle" placeholder="Retak pada sambungan paip" value="' + escapeHTML(s.title || '') + '"></label>' +
+        '<label>Lokasi<input type="text" id="enLoc" placeholder="Bilik air tingkat 2, di bawah sinki" value="' + escapeHTML(s.loc || '') + '"></label>' +
+        '<label>Tahap<select id="enSevSel">' +
+          EN_SEV.map(function(x) {
+            return '<option value="' + x.k + '"' + (x.k === (s.sev || '') ? ' selected' : '') + '>' + x.n + '</option>';
+          }).join('') +
+        '</select></label>' +
+        '<label>Penerangan<textarea id="enDesc" rows="4" placeholder="Apa yang kelihatan, dan apa maknanya">' + escapeHTML(s.desc || '') + '</textarea></label>' +
+      '</div>' +
+    '</div>' +
+    '<div class="en-bar">' +
+      '<button class="en-btn" id="enPrev"' + (EN.shot > 0 ? '' : ' disabled') + '>Sebelum</button>' +
+      '<button class="en-btn pri" id="enSave">Simpan</button>' +
+      '<button class="en-btn" id="enNext"' + (EN.shot < EN.sess.shots.length - 1 ? '' : ' disabled') + '>Seterusnya</button>' +
+    '</div>';
+
+  document.getElementById('enBack').addEventListener('click', async function() {
+    await enGrab(); EN.view = 'gallery'; enRender();
+  });
+  document.getElementById('enDel').addEventListener('click', enDelShot);
+  document.getElementById('enSave').addEventListener('click', async function() {
+    await enGrab(); showToast('Disimpan');
+  });
+  document.getElementById('enPrev').addEventListener('click', async function() {
+    await enGrab(); EN.shot--; enRender();
+  });
+  document.getElementById('enNext').addEventListener('click', async function() {
+    await enGrab(); EN.shot++; enRender();
+  });
+  document.getElementById('enUndo').addEventListener('click', function() {
+    s.marks.pop(); EN.dirty = true; enPaintCv();
+  });
+  ov.querySelectorAll('[data-col]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      EN.colour = b.dataset.col;
+      ov.querySelectorAll('[data-col]').forEach(function(x) { x.classList.toggle('on', x === b); });
+    });
+  });
+  ov.querySelectorAll('[data-tool]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      EN.tool = b.dataset.tool;
+      ov.querySelectorAll('[data-tool]').forEach(function(x) { x.classList.toggle('on', x === b); });
+    });
+  });
+
+  await enLoadCv(s);
+}
+
+/** Baca medan borang ke dalam gambar, kemudian simpan sesi. */
+async function enGrab() {
+  var s = EN.sess.shots[EN.shot];
+  if (!s) return;
+  var g = function(id) { var e = document.getElementById(id); return e ? e.value : ''; };
+  s.title = g('enTitle').trim();
+  s.loc = g('enLoc').trim();
+  s.desc = g('enDesc').trim();
+  s.sev = g('enSevSel');
+  await enSaveSess(EN.sess);
+}
+
+async function enDelShot() {
+  var s = EN.sess.shots[EN.shot];
+  if (!s) return;
+  if (!confirm('Buang gambar ' + (EN.shot + 1) + '?')) return;
+  try { await lbDrop(EN_K.img + s.id); } catch (e) {}
+  try { await lbDrop(EN_K.th + s.id); } catch (e) {}
+  EN.sess.shots.splice(EN.shot, 1);
+  await enSaveSess(EN.sess);
+  EN.view = 'gallery';
+  enRender();
+}
+
+async function enLoadCv(s) {
+  var cv = document.getElementById('enCv');
+  if (!cv) return;
+  var rec = null;
+  try { rec = await lbGet(EN_K.img + s.id); } catch (e) {}
+  if (!rec || !rec.blob) { cv.width = 4; cv.height = 3; return; }
+
+  var url = URL.createObjectURL(rec.blob);
+  var img = new Image();
+  await new Promise(function(res) { img.onload = res; img.onerror = res; img.src = url; });
+  EN.draw = { img: img, url: url, w: img.width || 640, h: img.height || 480 };
+  // Kanvas dilukis pada resolusi imej penuh dan diskalakan oleh CSS, supaya
+  // anotasi kekal tajam pada skrin dan dalam PDF.
+  cv.width = EN.draw.w;
+  cv.height = EN.draw.h;
+  enPaintCv();
+  enWireCv(cv, s);
+}
+
+function enPaintCv() {
+  var cv = document.getElementById('enCv');
+  if (!cv || !EN.draw) return;
+  var g = cv.getContext('2d');
+  g.clearRect(0, 0, cv.width, cv.height);
+  g.drawImage(EN.draw.img, 0, 0, cv.width, cv.height);
+  enDrawMarks(g, EN.sess.shots[EN.shot].marks, cv.width, cv.height);
+}
+
+function enWireCv(cv, s) {
+  var live = null;
+  var at = function(e) {
+    var r = cv.getBoundingClientRect();
+    return enNorm(e.clientX - r.left, e.clientY - r.top, r.width, r.height);
+  };
+
+  cv.addEventListener('pointerdown', function(e) {
+    e.preventDefault();
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    if (EN.tool === 'text') {
+      var t = prompt('Teks label');
+      if (t && t.trim()) {
+        s.marks.push({ k: 'text', c: EN.colour, w: EN.pen, p: [at(e)], s: t.trim() });
+        EN.dirty = true; enPaintCv();
+      }
+      return;
+    }
+    live = { k: EN.tool, c: EN.colour, w: EN.pen, p: [at(e)] };
+    s.marks.push(live);
+  });
+  cv.addEventListener('pointermove', function(e) {
+    if (!live) return;
+    var p = at(e);
+    if (live.k === 'free') live.p.push(p);
+    else live.p[1] = p;
+    enPaintCv();
+  });
+  var end = function() {
+    if (!live) return;
+    // Ketikan tanpa gerakan tidak meninggalkan tanda yang bermakna.
+    if (live.p.length < 2) s.marks.pop();
+    live = null;
+    EN.dirty = true;
+    enPaintCv();
+  };
+  cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointercancel', end);
+}
+
+/* ---------- 4. LAPORAN ---------- */
+
+function enReport(ov) {
+  var shots = EN.sess.shots;
+  var withNote = shots.filter(function(s) { return s.title || s.desc; }).length;
+  var bySev = {};
+  shots.forEach(function(s) { var k = s.sev || ''; bySev[k] = (bySev[k] || 0) + 1; });
+
+  ov.innerHTML =
+    enHead('Laporan endoskop', EN.sess.name) +
+    '<div class="en-scroll"><div class="en-pad">' +
+      '<div class="en-form">' +
+        '<label>Tajuk laporan<input type="text" id="enRTitle" value="' + escapeHTML(EN.sess.name) + '"></label>' +
+        '<label>Lokasi atau projek<input type="text" id="enRSite" placeholder="Alamat atau nama projek" value="' + escapeHTML(EN.sess.site || '') + '"></label>' +
+        '<label>Disediakan oleh<input type="text" id="enRBy" placeholder="Nama awak" value="' + escapeHTML(enWho()) + '"></label>' +
+        '<label>Ringkasan<textarea id="enRSum" rows="3" placeholder="Apa yang diperiksa, dan kesimpulannya">' + escapeHTML(EN.sess.summary || '') + '</textarea></label>' +
+      '</div>' +
+      '<div class="en-sum">' +
+        '<div><b>' + shots.length + '</b><span>gambar</span></div>' +
+        '<div><b>' + withNote + '</b><span>bernota</span></div>' +
+        EN_SEV.filter(function(x) { return x.k && bySev[x.k]; }).map(function(x) {
+          return '<div><b style="color:' + x.c + '">' + bySev[x.k] + '</b><span>' + x.n + '</span></div>';
+        }).join('') +
+      '</div>' +
+      (withNote < shots.length
+        ? '<div class="en-msg warn"><b>' + (shots.length - withNote) + ' gambar tiada tajuk atau penerangan</b>' +
+          '<span>Ia tetap masuk dalam laporan, tetapi gambar tanpa ayat jarang membantu pembaca.</span></div>'
+        : '') +
+    '</div></div>' +
+    '<div class="en-bar">' +
+      '<button class="en-btn" id="enBackG">Galeri</button>' +
+      '<button class="en-btn pri" id="enPdf">Buat PDF</button>' +
+    '</div>';
+
+  document.getElementById('enBack').addEventListener('click', function() { EN.view = 'gallery'; enRender(); });
+  document.getElementById('enBackG').addEventListener('click', function() { EN.view = 'gallery'; enRender(); });
+  document.getElementById('enPdf').addEventListener('click', enPdf);
+}
+
+function enWho() {
+  try {
+    if (typeof currentUser !== 'undefined' && currentUser)
+      return currentUser.displayName || currentUser.email || '';
+  } catch (e) {}
+  return '';
+}
+
+/** Imej dengan tandanya dibakar masuk, untuk PDF. */
+async function enFlat(s, maxW) {
+  var rec = null;
+  try { rec = await lbGet(EN_K.img + s.id); } catch (e) {}
+  if (!rec || !rec.blob) return null;
+  var url = URL.createObjectURL(rec.blob);
+  var img = new Image();
+  await new Promise(function(r) { img.onload = r; img.onerror = r; img.src = url; });
+  var sc = Math.min(1, (maxW || 1200) / (img.width || 1));
+  var w = Math.max(1, Math.round((img.width || 640) * sc));
+  var h = Math.max(1, Math.round((img.height || 480) * sc));
+  var c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  var g = c.getContext('2d');
+  g.drawImage(img, 0, 0, w, h);
+  enDrawMarks(g, s.marks, w, h);
+  URL.revokeObjectURL(url);
+  return { data: c.toDataURL('image/jpeg', 0.84), w: w, h: h };
+}
+
+async function enPdf() {
+  var btn = document.getElementById('enPdf');
+  if (typeof window.jspdf === 'undefined') { showToast('Pustaka PDF belum dimuat', 'error'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Membina…'; }
+
+  var g = function(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  EN.sess.name = g('enRTitle') || EN.sess.name;
+  EN.sess.site = g('enRSite');
+  EN.sess.summary = g('enRSum');
+  var by = g('enRBy');
+  await enSaveSess(EN.sess);
+
+  try {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    var W = 210, H = 297, M = 16;
+    var shots = EN.sess.shots;
+
+    // ---- muka depan ----
+    doc.setFillColor(11, 95, 165); doc.rect(0, 0, W, 54, 'F');
+    doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(21);
+    doc.text('Laporan Endoskop', M, 26);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    doc.text(EN.sess.name, M, 36, { maxWidth: W - M * 2 });
+
+    doc.setTextColor(30);
+    var y = 70;
+    var row = function(k, v) {
+      if (!v) return;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+      doc.text(k.toUpperCase(), M, y);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+      var lines = doc.splitTextToSize(String(v), W - M * 2);
+      doc.text(lines, M, y + 6);
+      y += 6 + lines.length * 5.4 + 7;
+    };
+    row('Lokasi', EN.sess.site);
+    row('Disediakan oleh', by);
+    row('Tarikh', enStamp(EN.sess.createdAt));
+    row('Jumlah gambar', String(shots.length));
+    row('Ringkasan', EN.sess.summary);
+
+    doc.setDrawColor(200); doc.line(M, H - 22, W - M, H - 22);
+    doc.setFontSize(8.5); doc.setTextColor(120);
+    doc.text('Dijana oleh GoXpert Pocket · ' + enStamp(Date.now()), M, H - 15);
+
+    // ---- gambar, dua satu muka ----
+    var perPage = 2;
+    for (var i = 0; i < shots.length; i++) {
+      if (i % perPage === 0) doc.addPage();
+      var slot = i % perPage;
+      var top = 18 + slot * 132;
+      var s = shots[i];
+
+      doc.setTextColor(30);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+      doc.text((i + 1) + '.  ' + (s.title || 'Tanpa tajuk'), M, top, { maxWidth: W - M * 2 - 30 });
+
+      if (s.sev) {
+        var sv = enSev(s.sev);
+        var rgb = [parseInt(sv.c.slice(1, 3), 16), parseInt(sv.c.slice(3, 5), 16), parseInt(sv.c.slice(5, 7), 16)];
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+        doc.roundedRect(W - M - 26, top - 4.6, 26, 6.4, 1.6, 1.6, 'F');
+        doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.6);
+        doc.text(sv.n.toUpperCase(), W - M - 13, top, { align: 'center' });
+      }
+
+      var flat = await enFlat(s, 1200);
+      var imgH = 0;
+      if (flat) {
+        var maxW = W - M * 2, maxH = 78;
+        var sc = Math.min(maxW / flat.w, maxH / flat.h);
+        var iw = flat.w * sc, ih = flat.h * sc;
+        doc.addImage(flat.data, 'JPEG', M, top + 5, iw, ih);
+        imgH = ih;
+      }
+
+      var ty = top + 7 + imgH;
+      doc.setTextColor(90); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6);
+      var meta = [enStamp(s.t), s.loc].filter(Boolean).join('   ·   ');
+      if (meta) { doc.text(meta, M, ty); ty += 5; }
+      if (s.desc) {
+        doc.setTextColor(40); doc.setFontSize(9.6);
+        doc.text(doc.splitTextToSize(s.desc, W - M * 2), M, ty + 1);
+      }
+    }
+
+    // ---- nombor muka surat ----
+    var pages = doc.internal.getNumberOfPages();
+    for (var p = 2; p <= pages; p++) {
+      doc.setPage(p);
+      doc.setFontSize(8.5); doc.setTextColor(140);
+      doc.text(EN.sess.name + '  ·  ' + (p - 1) + ' / ' + (pages - 1), W / 2, H - 9, { align: 'center' });
+    }
+
+    var name = 'endoskop-' + enSlug(EN.sess.name) + '.pdf';
+    doc.save(name);
+    showToast('PDF siap: ' + shots.length + ' gambar');
+  } catch (e) {
+    showToast('Gagal membina PDF: ' + e.message, 'error');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Buat PDF'; }
+}
+
+/* ---------- dialog kecil ---------- */
+
+function enAsk(title, rows) {
+  var old = document.getElementById('enAsk');
+  if (old) old.remove();
+  var d = document.createElement('div');
+  d.id = 'enAsk';
+  d.className = 'en-ask';
+  d.innerHTML = '<div class="en-ask-p"><h3>' + escapeHTML(title) + '</h3>' +
+    rows.map(function(r, i) { return '<button data-ai="' + i + '">' + escapeHTML(r[0]) + '</button>'; }).join('') +
+    '<button class="x" data-ax="1">Batal</button></div>';
+  document.body.appendChild(d);
+  d.addEventListener('click', function(e) {
+    if (e.target === d || e.target.dataset.ax) { d.remove(); return; }
+    var b = e.target.closest('[data-ai]');
+    if (!b) return;
+    d.remove();
+    rows[+b.dataset.ai][1]();
+  });
 }
 
 // =======================================================
