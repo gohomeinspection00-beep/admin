@@ -9315,7 +9315,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.5 · build 12 Okt 2026 · Suara remote melalui TTS app</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.6 · build 12 Okt 2026 · Suara penterjemah melalui TTS app</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -18391,12 +18391,61 @@ function vtVoiceFor(k) {
   }
   return exact || loose;
 }
-function vtHasVoice(k) { return !!vtVoiceFor(k); }
+/* Dalam app Android, speechSynthesis.getVoices() pulangkan senarai kosong
+   walaupun telefon itu boleh bercakap sepuluh bahasa: API Web Speech tidak
+   dihantar bersama WebView. Itulah sebabnya setiap bahasa ditanda NO VOICE
+   di dalam app. Tanya TTS Android sendiri melalui app bila ia ada.
+
+   Diperiksa sekali dan disimpan: ia satu lompatan JNI setiap bahasa, dan
+   senarai itu dilukis semula setiap kali skrin bertukar. Enjin itu bermula
+   secara tak segerak, jadi gambaran itu hanya diambil selepas ia berkata ia
+   sedia, dan sehingga itu kita cuba lagi. */
+var _vtNat = null;
+function vtNativeVoices() {
+  var N = window.PocketNative;
+  if (!N || typeof N.sayIn !== 'function' || typeof N.canSayIn !== 'function') return null;
+  var live = true;
+  try { if (typeof N.canSay === 'function') live = !!N.canSay(); } catch (e) { live = false; }
+  if (!live) return null;
+  if (_vtNat) return _vtNat;
+  var map = {};
+  for (var i = 0; i < VT_LANGS.length; i++) {
+    try { map[VT_LANGS[i].k] = !!N.canSayIn(VT_LANGS[i].bcp); }
+    catch (e) { map[VT_LANGS[i].k] = false; }
+  }
+  _vtNat = map;
+  return _vtNat;
+}
+
+/** Benar bila app boleh bercakap, tetapi tidak dalam setiap bahasa. */
+function vtCanInstall() {
+  var N = window.PocketNative;
+  if (!N || typeof N.installVoices !== 'function') return false;
+  var nat = vtNativeVoices();
+  if (!nat) return false;
+  for (var i = 0; i < VT_LANGS.length; i++) if (!nat[VT_LANGS[i].k]) return true;
+  return false;
+}
+
+function vtInstallVoices() {
+  var N = window.PocketNative;
+  if (!N || typeof N.installVoices !== 'function') return;
+  _vtNat = null;   // periksa semula bila pengguna kembali
+  try { N.installVoices(); } catch (e) {}
+  showToast('Pilih bahasa yang hendak dipasang, kemudian kembali ke sini');
+}
+
+function vtHasVoice(k) {
+  var nat = vtNativeVoices();
+  if (nat) return !!nat[k];
+  return !!vtVoiceFor(k);
+}
 
 // iOS menyekat speak() yang datang selepas await melainkan speechSynthesis
 // telah disentuh dahulu di dalam gerak isyarat pengguna sebenar. Sekali sahaja.
 let _vtPrimed = false;
 function vtPrimeSpeech() {
+  if (vtNativeVoices()) return;   // TTS Android tidak perlu dibangkitkan
   if (_vtPrimed || !window.speechSynthesis) return;
   _vtPrimed = true;
   try {
@@ -18408,7 +18457,15 @@ function vtPrimeSpeech() {
 
 // Pulangkan true jika benar-benar dibaca, false jika peranti tiada suara.
 function vtSpeak(text, k, rate) {
-  if (!window.speechSynthesis || !text) return false;
+  if (!text) return false;
+  const nat = vtNativeVoices();
+  if (nat) {
+    if (!nat[k]) return false;
+    try {
+      return String(window.PocketNative.sayIn(String(text), vtL(k).bcp, rate || 1)) === 'ok';
+    } catch (e) { return false; }
+  }
+  if (!window.speechSynthesis) return false;
   const v = vtVoiceFor(k);
   if (!v) return false;
   try {
@@ -18750,9 +18807,20 @@ function vtOpenPick(which) {
       '<span class="vt-tag ' + (l.book ? 'off' : 'ai') + '">' + (l.book ? 'OFFLINE' : 'AI ONLY') + '</span>' +
       '<span class="vt-tag ' + (vtHasVoice(l.k) ? 'voice' : 'novoice') + '">' + (vtHasVoice(l.k) ? 'VOICE' : 'NO VOICE') + '</span></button>';
   }
+  // "Tiada suara" sepatutnya satu benda yang boleh dibaiki. Android boleh
+  // memasang data bahasa yang hilang, jadi tawarkan itu di sini dan bukan
+  // membiarkan senarai itu kelihatan rosak.
+  if (vtCanInstall()) {
+    h += '<button class="vt-lg" id="vtInst"><span class="col">' +
+      '<span class="n">Pasang suara yang hilang</span>' +
+      '<span class="s">Android memasang data bahasa untuk yang bertanda NO VOICE</span>' +
+      '</span></button>';
+  }
   h += '</div></div>';
   const sh = document.getElementById('vtSheet');
   sh.innerHTML = h; sh.dataset.which = which; sh.classList.add('on');
+  const ib = document.getElementById('vtInst');
+  if (ib) ib.addEventListener('click', function(e) { e.stopPropagation(); vtInstallVoices(); });
 }
 
 // ---------- 8. KAD TUNJUK ----------
@@ -19000,7 +19068,7 @@ function vtWireInputs() {
 
 function vtCloseAll() {
   try { if (_vtRecog) _vtRecog.abort(); } catch (e) {}
-  try { speechSynthesis.cancel(); } catch (e) {}
+  pkSayStop();
   VT.listening = false;
   ['vtOverlay', 'vtSheet', 'vtBig'].forEach(function(id) {
     const el = document.getElementById(id);

@@ -382,6 +382,57 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        /** Baca dalam satu bahasa tertentu. TextToSpeech tiada bahasa
+         *  per-ucapan, jadi bahasa ditetapkan dahulu; QUEUE_FLUSH bermakna
+         *  hanya ucapan terakhir yang penting. */
+        @JavascriptInterface
+        fun sayIn(text: String, bcp: String, rate: Float): String {
+            val t = tts
+            if (t == null || !ttsOk) return "tiada"
+            return try {
+                val r = t.setLanguage(Locale.forLanguageTag(bcp))
+                if (r == TextToSpeech.LANG_MISSING_DATA ||
+                    r == TextToSpeech.LANG_NOT_SUPPORTED) return "tiada-bahasa"
+                t.setSpeechRate(if (rate > 0f) rate else 1f)
+                t.speak(text, TextToSpeech.QUEUE_FLUSH, null, "pocket")
+                "ok"
+            } catch (e: Throwable) {
+                "gagal: ${e.message}"
+            }
+        }
+
+        /** Satu bahasa pada satu masa: enjin boleh ada tetapi data bahasa
+         *  itu tidak dipasang, dan kedua-duanya kelihatan sama dari halaman
+         *  melainkan kita bertanya. */
+        @JavascriptInterface
+        fun canSayIn(bcp: String): Boolean {
+            val t = tts
+            if (t == null || !ttsOk) return false
+            return try {
+                when (t.isLanguageAvailable(Locale.forLanguageTag(bcp))) {
+                    TextToSpeech.LANG_AVAILABLE,
+                    TextToSpeech.LANG_COUNTRY_AVAILABLE,
+                    TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE -> true
+                    else -> false
+                }
+            } catch (e: Throwable) { false }
+        }
+
+        /** Android boleh memasang data suara yang hilang; "tiada suara"
+         *  sepatutnya satu benda yang boleh dibaiki, bukan jalan buntu. */
+        @JavascriptInterface
+        fun installVoices(): String =
+            try {
+                runOnUiThread {
+                    runCatching {
+                        startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA))
+                    }
+                }
+                "ok"
+            } catch (e: Throwable) {
+                "gagal: ${e.message}"
+            }
+
         @JavascriptInterface
         fun sayStop(): String {
             runCatching { tts?.stop() }
