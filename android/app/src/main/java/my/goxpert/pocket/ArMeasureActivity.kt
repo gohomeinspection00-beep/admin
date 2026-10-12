@@ -23,6 +23,7 @@ import android.widget.Toast
 import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Coordinates2d
+import com.google.ar.core.DepthPoint
 import com.google.ar.core.Frame
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
@@ -93,6 +94,20 @@ class ArMeasureActivity : Activity() {
     @Volatile private var wantPlace = false
     @Volatile private var wantUndo = false
     @Volatile private var why = ""
+
+    /**
+     * Apa yang ARCore sedang nampak, dilukis supaya surveyor tahu sama ada
+     * ia sedang bekerja.
+     *
+     * Tanpa ini, satu-satunya maklum balas ialah reticle, yang hanya bertukar
+     * bila tengah skrin kebetulan mengenai satah. "Tiada satah dijumpai" dan
+     * "satah dijumpai tetapi awak tidak menghalakannya" kelihatan sama, dan
+     * tiada apa yang memberitahu bahawa menggerakkan telefon ke sisi itulah
+     * yang ARCore perlukan.
+     */
+    @Volatile private var outlines: List<FloatArray> = emptyList()
+    @Volatile private var cloud: FloatArray = FloatArray(0)
+    @Volatile private var planeCount = 0
 
     /** Tempat reticle sedang menyentuh dunia, atau null bila tiada satah. */
     @Volatile private var aim: FloatArray? = null
@@ -279,7 +294,12 @@ class ArMeasureActivity : Activity() {
             // masalah berbeza dengan dua penyelesaian berbeza.
             !tracking && why.isNotEmpty() -> why
             !tracking -> "Gerak telefon perlahan supaya ARCore nampak permukaan…"
-            aim == null -> "Halakan bulatan ke permukaan"
+            // "Belum jumpa apa-apa" dan "jumpa, tapi awak tidak menghalakannya"
+            // ialah dua masalah berbeza, jadi ia dikatakan secara berbeza.
+            planeCount == 0 ->
+                "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, " +
+                "halakan ke permukaan bercorak — lantai kosong dan dinding putih sukar."
+            aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
             kind == "dist" && p.isEmpty() -> "Ketik Letak titik pada hujung pertama"
             kind == "dist" && p.size == 1 -> "Jalan ke hujung kedua, letak titik lagi"
             kind == "dist" -> "Tekan Siap, atau Undo untuk ubah"
@@ -320,6 +340,15 @@ class ArMeasureActivity : Activity() {
             color = Color.WHITE; textSize = dp(14).toFloat(); textAlign = Paint.Align.CENTER
         }
         private val lblBg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(190, 0, 0, 0) }
+        private val spec = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(150, 255, 255, 255) }
+        private val planeFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL; color = Color.argb(38, 90, 170, 255)
+        }
+        private val planeEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE; strokeWidth = dp(2).toFloat()
+            color = Color.argb(150, 120, 190, 255)
+        }
+        private val path = android.graphics.Path()
         private val out = FloatArray(4)
 
         /** null bila titik itu di belakang kamera. */
@@ -336,9 +365,37 @@ class ArMeasureActivity : Activity() {
         }
 
         override fun onDraw(c: Canvas) {
-            // Reticle: sentiasa di tengah, pejal bila ia menyentuh sesuatu.
             val cx = width / 2f
             val cy = height / 2f
+
+            // Awan titik dahulu, paling belakang: ia padat dan hanya petunjuk.
+            val cl = cloud
+            var i = 0
+            while (i + 2 < cl.size) {
+                val sp = toScreen(floatArrayOf(cl[i], cl[i + 1], cl[i + 2]))
+                if (sp != null) c.drawCircle(sp[0], sp[1], dp(1).toFloat(), spec)
+                i += 3
+            }
+
+            // Garis luar setiap satah yang dikesan.
+            for (poly in outlines) {
+                val n = poly.size / 3
+                if (n < 3) continue
+                path.reset()
+                var started = false
+                for (k in 0 until n) {
+                    val sp = toScreen(floatArrayOf(poly[k * 3], poly[k * 3 + 1], poly[k * 3 + 2]))
+                        ?: continue
+                    if (!started) { path.moveTo(sp[0], sp[1]); started = true }
+                    else path.lineTo(sp[0], sp[1])
+                }
+                if (!started) continue
+                path.close()
+                c.drawPath(path, planeFill)
+                c.drawPath(path, planeEdge)
+            }
+
+            // Reticle: sentiasa di tengah, pejal bila ia menyentuh sesuatu.
             ring.color = if (aim != null) Color.rgb(255, 196, 0) else Color.argb(120, 255, 255, 255)
             c.drawCircle(cx, cy, dp(13).toFloat(), ring)
             if (aim != null) c.drawCircle(cx, cy, dp(4).toFloat(), dot)
@@ -437,17 +494,33 @@ class ArMeasureActivity : Activity() {
             var found: FloatArray? = null
             var hit: HitResult? = null
             try {
-                val hits = frame.hitTest(gl.width / 2f, gl.height / 2f)
-                for (h in hits) {
+                // Satah diutamakan, tetapi bukan satu-satunya jawapan yang
+                // boleh diterima.
+                //
+                // Penapis lama menolak DepthPoint sepenuhnya — dan mod
+                // kedalaman baru sahaja dihidupkan, yang bermakna pada
+                // telefon yang menyokongnya, hit yang paling tepat ialah
+                // yang dibuang. Ia juga hanya menerima Point yang melaporkan
+                // ESTIMATED_SURFACE_NORMAL, yang jarang berlaku: kebanyakan
+                // titik ciri melaporkan INITIALIZED_TO_IDENTITY, jadi cabang
+                // itu hampir tidak pernah berjalan dan permukaan yang
+                // satahnya belum terbentuk tidak boleh diukur langsung.
+                var rank = 99
+                for (h in frame.hitTest(gl.width / 2f, gl.height / 2f)) {
                     val t = h.trackable
-                    val inside = (t is Plane && t.isPoseInPolygon(h.hitPose)) ||
-                        (t is Point && t.orientationMode ==
-                            Point.OrientationMode.ESTIMATED_SURFACE_NORMAL)
-                    if (inside) {
-                        found = floatArrayOf(h.hitPose.tx(), h.hitPose.ty(), h.hitPose.tz())
-                        hit = h
-                        break
+                    val r = when {
+                        t is Plane && t.isPoseInPolygon(h.hitPose) &&
+                            t.trackingState == TrackingState.TRACKING -> 0
+                        t is DepthPoint -> 1
+                        t is Point -> 2
+                        else -> 99
                     }
+                    if (r < rank) {
+                        rank = r
+                        hit = h
+                        found = floatArrayOf(h.hitPose.tx(), h.hitPose.ty(), h.hitPose.tz())
+                    }
+                    if (rank == 0) break
                 }
             } catch (e: Throwable) { /* bingkai ini tiada hit; cuba yang seterusnya */ }
 
@@ -471,6 +544,61 @@ class ArMeasureActivity : Activity() {
                     runCatching { anchors.removeAt(anchors.size - 1).detach() }
                     changed = true
                 }
+            }
+
+            // Apa yang ARCore nampak, dikumpul untuk dilukis.
+            val outs = ArrayList<FloatArray>()
+            var nPlane = 0
+            try {
+                for (pl in s.getAllTrackables(Plane::class.java)) {
+                    if (pl.trackingState != TrackingState.TRACKING) continue
+                    // Satah yang telah diserap ke dalam satah lain yang lebih
+                    // besar akan dilukis dua kali kalau tidak dilangkau.
+                    if (pl.subsumedBy != null) continue
+                    nPlane++
+                    val poly = pl.polygon ?: continue
+                    val n = poly.limit() / 2
+                    if (n < 3) continue
+                    val pose = pl.centerPose
+                    val w = FloatArray(n * 3)
+                    for (i in 0 until n) {
+                        val wp = pose.transformPoint(
+                            floatArrayOf(poly.get(i * 2), 0f, poly.get(i * 2 + 1)))
+                        w[i * 3] = wp[0]; w[i * 3 + 1] = wp[1]; w[i * 3 + 2] = wp[2]
+                    }
+                    outs.add(w)
+                }
+            } catch (e: Throwable) { /* satah berubah di bawah kita; bingkai berikutnya */ }
+            outlines = outs
+            if (planeCount != nPlane) { planeCount = nPlane; runOnUiThread { paintText() } }
+
+            // Awan titik: ini yang muncul DAHULU, sebelum mana-mana satah
+            // terbentuk. Ia satu-satunya petunjuk bahawa ARCore sedang
+            // melihat tekstur yang mencukupi, dan bila ia kosong, jawapannya
+            // ialah hidupkan lampu atau halakan ke sesuatu yang bercorak.
+            var pc: com.google.ar.core.PointCloud? = null
+            try {
+                pc = frame.acquirePointCloud()
+                val b = pc.points
+                val total = b.limit() / 4
+                val cap = 240
+                val step = if (total > cap) total / cap else 1
+                val arr = FloatArray(minOf(total, cap) * 3)
+                var k = 0; var i = 0
+                while (i < total && k + 3 <= arr.size) {
+                    if (b.get(i * 4 + 3) > 0.25f) {
+                        arr[k] = b.get(i * 4)
+                        arr[k + 1] = b.get(i * 4 + 1)
+                        arr[k + 2] = b.get(i * 4 + 2)
+                        k += 3
+                    }
+                    i += step
+                }
+                cloud = if (k == arr.size) arr else arr.copyOf(k)
+            } catch (e: Throwable) {
+                // Awan titik tidak sentiasa ada; ia bukan kegagalan.
+            } finally {
+                runCatching { pc?.release() }
             }
 
             // Pose segar setiap bingkai: itulah sebabnya anchor digunakan.
