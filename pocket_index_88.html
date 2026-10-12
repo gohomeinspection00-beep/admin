@@ -23046,21 +23046,29 @@ function enPickImages(done) {
   inp.click();
 }
 
-/** Dipanggil oleh app Android selepas pemilihnya ditutup. */
-window.enPickDone = async function(urls) {
+/** Dipanggil oleh app Android selepas pemilihnya ditutup.
+ *
+ *  dipilih ialah berapa banyak yang pengguna tanda. Ia datang berasingan
+ *  daripada senarai fail supaya "batal" dan "dipilih tetapi tiada satu pun
+ *  dapat dibaca" tidak kelihatan sama; yang kedua mesti dikatakan. */
+window.enPickDone = async function(urls, dipilih) {
   var cb = EN.pickCb;
   EN.pickCb = null;
   if (typeof cb !== 'function') return;
-  var out = [], bad = 0;
-  for (var i = 0; i < (urls || []).length; i++) {
+  var list = urls || [];
+  var want = (typeof dipilih === 'number') ? dipilih : list.length;
+  var out = [];
+  for (var i = 0; i < list.length; i++) {
     try {
-      var r = await fetch(urls[i], { cache: 'no-store' });
-      if (!r.ok) { bad++; continue; }
+      var r = await fetch(list[i], { cache: 'no-store' });
+      if (!r.ok) continue;
       var b = await r.blob();
-      if (b.size) out.push(b); else bad++;
-    } catch (e) { bad++; }
+      if (b.size) out.push(b);
+    } catch (e) {}
   }
-  cb(out, (bad && !out.length) ? (bad + ' gambar tidak dapat dibaca') : null);
+  cb(out, (want && !out.length)
+    ? (want + ' gambar dipilih tetapi tiada satu pun dapat dibaca')
+    : null);
 };
 
 function enPickSubs(shot, done) {

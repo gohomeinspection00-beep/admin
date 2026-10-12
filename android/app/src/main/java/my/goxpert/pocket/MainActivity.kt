@@ -274,8 +274,24 @@ class MainActivity : AppCompatActivity() {
             d.clipData?.let { c -> for (i in 0 until c.itemCount) uris.add(c.getItemAt(i).uri) }
             if (uris.isEmpty()) d.data?.let { uris.add(it) }
         }
-        uvc.say("Pemilih gambar: kod=${res.resultCode}, ${uris.size} dipilih")
+        val picked = uris.size
+        uvc.say("Pemilih gambar: kod=${res.resultCode}, $picked dipilih")
 
+        // Menyahkod dan mengekod semula sehingga 20 gambar mengambil masa
+        // beberapa saat. Di atas thread utama itu app yang tergantung, jadi
+        // kerja itu dibuat di belakang dan hanya hasilnya kembali ke sini.
+        Thread({ decodePicked(uris, picked) }, "pick-decode")
+            .apply { isDaemon = true }.start()
+    }
+
+    /**
+     * Bilangan yang dipilih dihantar bersama nama fail, supaya halaman boleh
+     * membezakan "pengguna menekan batal" daripada "gambar dipilih tetapi
+     * tiada satu pun dapat dibaca". Tanpa itu, kegagalan sahkod akan nampak
+     * sama seperti batal: senyap, iaitu pepijat yang sama yang kita baru
+     * hilangkan.
+     */
+    private fun decodePicked(uris: List<Uri>, picked: Int) {
         pickDir.mkdirs()
         pickDir.listFiles()?.forEach { runCatching { it.delete() } }
 
@@ -306,7 +322,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val js = "window.enPickDone && window.enPickDone([" +
-            names.joinToString(",") { "\"$it\"" } + "])"
+            names.joinToString(",") { "\"$it\"" } + "], $picked)"
         runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
     }
 
