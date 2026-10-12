@@ -42,6 +42,9 @@ jobs:
       # Log penuh disekat di belakang storan blob, yang tidak semua orang
       # boleh capai. Ringkasan langkah boleh dibaca melalui API, jadi ralat
       # diletakkan di situ dan bukan hanya dalam log.
+      # Ringkasan langkah untuk dibaca manusia, dan anotasi untuk dibaca
+      # melalui API: log penuh dan artifact kedua-duanya duduk di belakang
+      # storan blob yang tidak semua rangkaian boleh capai.
       - name: Put the errors somewhere readable
         if: always()
         working-directory: android
@@ -56,6 +59,13 @@ jobs:
             tail -60 build.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          grep -E "^e: |error:|What went wrong|Caused by|Could not|Unresolved reference" build.log \
+            | head -40 | while IFS= read -r line; do
+              printf '::error::%s\n' "${line//$'\r'/}"
+            done
+          tail -25 build.log | while IFS= read -r line; do
+              printf '::warning::%s\n' "${line//$'\r'/}"
+            done
 
       - uses: actions/upload-artifact@v4
         if: always()
