@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -16,6 +17,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
+import android.graphics.drawable.GradientDrawable
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -54,8 +57,9 @@ class ArMeasureActivity : Activity() {
     private lateinit var overlay: Overlay
     private lateinit var readout: TextView
     private lateinit var hint: TextView
-    private lateinit var undoBtn: Button
-    private lateinit var doneBtn: Button
+    private lateinit var undoBtn: ImageButton
+    private lateinit var doneBtn: ImageButton
+    private lateinit var placeBtn: Button
 
     private val bg = ArBackground()
 
@@ -170,35 +174,51 @@ class ArMeasureActivity : Activity() {
         }
         bar.addView(readout, LinearLayout.LayoutParams(-1, -2))
 
-        val row = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setPadding(0, dp(10), 0, 0)
+        // Susunan yang sama seperti skrin pelan: satu tindakan utama yang
+        // lebar penuh, kemudian satu baris ikon bulat berwarna. Dua skrin AR
+        // dalam app yang sama tidak sepatutnya kelihatan seperti dua app.
+        placeBtn = Button(this).apply {
+            text = "Letak titik"
+            isAllCaps = false
+            maxLines = 1
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pin, 0, 0, 0)
+            compoundDrawablePadding = dp(8)
+            setOnClickListener { place() }
+            layoutParams = LinearLayout.LayoutParams(-1, dp(52)).apply { topMargin = dp(8) }
         }
-        // Ikon di sebelah label, sama seperti skrin pelan: satu bar AR tidak
-        // sepatutnya kelihatan seperti dua app yang berbeza.
-        fun mk(label: String, weight: Float, res: Int): Button =
-            Button(this).apply {
-                text = label
-                isAllCaps = false
-                maxLines = 1
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-                setCompoundDrawablesWithIntrinsicBounds(res, 0, 0, 0)
-                compoundDrawablePadding = dp(5)
-                setPadding(dp(6), 0, dp(6), 0)
-                layoutParams = LinearLayout.LayoutParams(0, dp(52), weight)
-                    .apply { marginEnd = dp(6) }
+        bar.addView(placeBtn)
+
+        fun icon(res: Int, desc: String, tint: Int): ImageButton =
+            ImageButton(this).apply {
+                setImageResource(res)
+                setColorFilter(tint)
+                contentDescription = desc
+                scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(Color.argb(38, 255, 255, 255))
+                    setStroke(dp(1), Color.argb(55, 255, 255, 255))
+                }
+                setPadding(dp(13), dp(13), dp(13), dp(13))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = desc
+                layoutParams = LinearLayout.LayoutParams(0, dp(54), 1f)
+                    .apply { marginStart = dp(6); marginEnd = dp(6); topMargin = dp(10) }
             }
 
-        undoBtn = mk("Undo", 1f, R.drawable.ic_undo).apply {
+        undoBtn = icon(R.drawable.ic_undo, "Undo", C_PLAIN).apply {
             isEnabled = false; setOnClickListener { undo() }
         }
-        val place = mk("Letak", 1.4f, R.drawable.ic_pin).apply { setOnClickListener { place() } }
-        doneBtn = mk("Siap", 1f, R.drawable.ic_check).apply {
+        doneBtn = icon(R.drawable.ic_check, "Siap", C_DONE).apply {
             isEnabled = false; setOnClickListener { finishWith() }
         }
-
-        row.addView(undoBtn); row.addView(place); row.addView(doneBtn)
-        bar.addView(row, LinearLayout.LayoutParams(-1, -2))
+        val closeBtn = icon(R.drawable.ic_close, "Batal", C_CLOSE).apply {
+            setOnClickListener { finish() }
+        }
+        bar.addView(LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            addView(undoBtn); addView(doneBtn); addView(closeBtn)
+        }, LinearLayout.LayoutParams(-1, -2))
 
         root.addView(bar, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.BOTTOM })
         setContentView(root)
@@ -306,6 +326,8 @@ class ArMeasureActivity : Activity() {
         val need = if (kind == "dist") 2 else 3
         undoBtn.isEnabled = p.isNotEmpty()
         doneBtn.isEnabled = p.size >= need
+        placeBtn.isEnabled = aim != null
+        for (b2 in listOf(undoBtn, doneBtn)) b2.alpha = if (b2.isEnabled) 1f else 0.35f
 
         readout.text = if (p.isEmpty()) "—" else fmt(liveLen())
         hint.text = when {
@@ -681,6 +703,10 @@ class ArMeasureActivity : Activity() {
     }
 
     companion object {
+        private const val C_PLAIN = 0xFFD6DEE6.toInt()
+        private const val C_DONE = 0xFF4ADE80.toInt()
+        private const val C_CLOSE = 0xFFFF7A7A.toInt()
+
         /** Berapa banyak setiap bingkai menggerakkan kursor ke arah hit
          *  mentah. Rendah bermakna tenang tetapi lambat; ini kompromi yang
          *  masih terasa segera di tangan. */
