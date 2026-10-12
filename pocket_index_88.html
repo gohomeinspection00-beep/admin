@@ -9315,7 +9315,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.9 · build 12 Okt 2026 · AR dalam app melalui ARCore</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v4.0 · build 12 Okt 2026 · Muat naik pelan melalui pemilih app</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -16907,8 +16907,7 @@ function fpScreenPick() {
   }
   h += '<button class="fp-up" id="fpPickFile">' +
     '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8 12 3 7 8M12 3v12"/></svg>' +
-    '<span>' + (FP.plan && !FP.plan.fromInsp ? escapeHTML(FP.plan.name) : 'Muat naik gambar lain') + '</span></button>' +
-    '<input type="file" accept="image/*" id="fpFile" hidden>';
+    '<span>' + (FP.plan && !FP.plan.fromInsp ? escapeHTML(FP.plan.name) : 'Muat naik gambar lain') + '</span></button>';
 
   h += '<div class="fp-sec"><span class="fp-sec-l">Pelan ini untuk</span><span class="fp-sec-r"></span></div>' +
     '<div class="fp-seg">' +
@@ -16927,7 +16926,13 @@ function fpScreenPick() {
   const st = document.getElementById('fpStatus');
   if (!window.isSecureContext || !('xr' in navigator) || !navigator.xr) {
     st.className = 'ar-status warn';
-    st.innerHTML = 'AR perlukan Chrome pada Android yang menyokong ARCore, melalui https://. iPhone tiada WebXR langsung. Awak masih boleh menanda pada pelan di sini, tetapi langkah AR tidak akan bermula.';
+    // Di dalam app, memuat naik dan menanda berfungsi sepenuhnya; hanya
+    // langkah hamparan AR yang tidak, kerana ia melukis pelan bertekstur
+    // dalam adegan 3D dan itu WebXR. AR Measurement berjalan secara native
+    // di sini kerana ia hanya perlu memulangkan titik.
+    st.innerHTML = window.PocketNative
+      ? 'Muat naik pelan dan tanda titik berfungsi di sini. Langkah <b>hamparan AR</b> tidak \u2014 ia melukis pelan dalam adegan 3D, dan itu WebXR, yang dihantar dalam Chrome dan bukan dalam WebView. Untuk hamparan, buka Pocket dalam <b>Chrome</b>.'
+      : 'AR perlukan Chrome pada Android yang menyokong ARCore, melalui https://. iPhone tiada WebXR langsung. Awak masih boleh menanda pada pelan di sini, tetapi langkah AR tidak akan bermula.';
   } else {
     navigator.xr.isSessionSupported('immersive-ar').then(function(okAr) {
       if (!okAr) { st.className = 'ar-status warn'; st.innerHTML = 'Telefon atau pelayar ini tidak menyokong AR langsung.'; }
@@ -16941,25 +16946,36 @@ function fpScreenPick() {
     if (m) { FP.mode = m.dataset.fpmode; fpScreenPick(); return; }
     const pn = e.target.closest('[data-fppins]');
     if (pn) { FP.pins = pn.dataset.fppins; fpScreenPick(); return; }
-    if (e.target.closest('#fpPickFile')) document.getElementById('fpFile').click();
+    // Melalui pintu pemilih gambar yang sama seperti seluruh app: dalam
+    // WebView, <input type=file> bergantung pada panggilan balik yang mati
+    // kalau Android menyingkirkan Activity semasa pemilih di depan, jadi
+    // pelan yang dipilih tidak pernah masuk dan tiada ralat dikeluarkan.
+    if (e.target.closest('#fpPickFile')) fpPickPlan();
   };
-  const fi = document.getElementById('fpFile');
-  if (fi) fi.onchange = function() {
-    const f = fi.files && fi.files[0];
+  document.getElementById('fpNext').onclick = fpScreenTag;
+}
+
+/** Pelan dari telefon. Satu gambar sahaja: pelan ini yang akan dijajarkan. */
+function fpPickPlan() {
+  pkPickImages(function(files, err) {
+    if (err) return showToast('Pemilih gambar: ' + err, 'error');
+    const f = files && files[0];
     if (!f) return;
     if (_fpObjUrl) URL.revokeObjectURL(_fpObjUrl);
     _fpObjUrl = URL.createObjectURL(f);
     const im = new Image();
     im.onload = function() {
-      FP.plan = { id: '', name: f.name.replace(/\.[a-z]+$/i, ''), src: _fpObjUrl,
+      // Blob dari pemilih app tiada nama; fail dari pelayar ada.
+      const nm = (f.name || '').replace(/\.[a-z0-9]+$/i, '') || 'Pelan dimuat naik';
+      FP.plan = { id: '', name: nm, src: _fpObjUrl,
                   W: im.naturalWidth, H: im.naturalHeight, fromInsp: false, img: im };
       FP.a = FP.b = null; FP.st = null;
       fpScreenPick();
+      showToast('Pelan dimuat: ' + im.naturalWidth + ' \u00d7 ' + im.naturalHeight);
     };
-    im.onerror = function() { showToast('Tidak dapat membaca gambar itu'); };
+    im.onerror = function() { showToast('Tidak dapat membaca gambar itu', 'error'); };
     im.src = _fpObjUrl;
-  };
-  document.getElementById('fpNext').onclick = fpScreenTag;
+  });
 }
 
 // Gambar penuh pelan ada dalam telefon (IndexedDB); thumbnail Firestore
@@ -23507,14 +23523,15 @@ async function enDropSub(shot, id) {
  *  done(senarai, ralat) — senarai ialah Blob atau File, keduanya boleh
  *  terus masuk ke enAddShot dan enAddSub.
  */
-function enPickImages(done) {
+var _pkPickCb = null;
+function pkPickImages(done) {
   var N = window.PocketNative;
   if (N && typeof N.pickImages === 'function') {
-    EN.pickCb = done;
+    _pkPickCb = done;
     var r = '';
     try { r = String(N.pickImages() || ''); }
     catch (e) { r = 'ralat: ' + (e.message || e); }
-    if (r !== 'ok') { EN.pickCb = null; done([], r || 'app tidak membuka pemilih'); }
+    if (r !== 'ok') { _pkPickCb = null; done([], r || 'app tidak membuka pemilih'); }
     return;
   }
   var inp = document.createElement('input');
@@ -23537,8 +23554,8 @@ function enPickImages(done) {
  *  daripada senarai fail supaya "batal" dan "dipilih tetapi tiada satu pun
  *  dapat dibaca" tidak kelihatan sama; yang kedua mesti dikatakan. */
 window.enPickDone = async function(urls, dipilih) {
-  var cb = EN.pickCb;
-  EN.pickCb = null;
+  var cb = _pkPickCb;
+  _pkPickCb = null;
   if (typeof cb !== 'function') return;
   var list = urls || [];
   var want = (typeof dipilih === 'number') ? dipilih : list.length;
@@ -23556,8 +23573,11 @@ window.enPickDone = async function(urls, dipilih) {
     : null);
 };
 
+/** Nama lama, dikekalkan kerana modul endoskop memanggilnya. */
+function enPickImages(done) { return pkPickImages(done); }
+
 function enPickSubs(shot, done) {
-  enPickImages(async function(files, err) {
+  pkPickImages(async function(files, err) {
     if (err) { showToast('Pemilih gambar: ' + err, 'error'); if (done) done(0); return; }
     if (!files.length) { if (done) done(0); return; }
     var n = 0, bad = [];
@@ -23609,7 +23629,7 @@ async function enAddShot(blob, src) {
  *  dan bukan hanya kamera. Dalam WebView ini hanya berfungsi kerana app
  *  melaksanakan onShowFileChooser. */
 function enImport() {
-  enPickImages(async function(files, err) {
+  pkPickImages(async function(files, err) {
     if (err) return showToast('Pemilih gambar: ' + err, 'error');
     if (!files.length) return;
     showToast('Memasukkan ' + files.length + ' gambar…');
