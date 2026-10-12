@@ -1969,11 +1969,22 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 @keyframes tc-fl{from{opacity:0.16}to{opacity:0}}
 @media (prefers-reduced-motion:reduce){.tc-card.tc-hit .tc-flash{animation:none}.tc-card:active{transform:none}}
 
-.tc-foot{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:9px 12px calc(env(safe-area-inset-bottom) + 13px);border-top:1px solid var(--line);background:var(--bg)}
-.tc-act{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:11px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:10.5px;font-weight:600}
+.tc-foot{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:9px 12px calc(env(safe-area-inset-bottom) + 13px);border-top:1px solid var(--line);background:var(--bg)}
+.tc-act{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 2px;border-radius:11px;background:var(--bg-2);border:1px solid var(--line);color:var(--fg);font-size:10px;font-weight:600;min-width:0}
 .tc-act:disabled{opacity:0.4}
 .tc-act.tc-on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
 
+.tc-cap{position:absolute;inset:0;z-index:5;touch-action:none;-webkit-user-select:none;user-select:none;background:transparent}
+.tc-overlay.tc-rem .tc-hd,.tc-overlay.tc-rem .tc-foot{position:relative;z-index:6}
+.tg-bar{position:relative;z-index:6;display:flex;align-items:center;gap:9px;padding:8px 13px;background:var(--accent);color:var(--accent-fg)}
+.tg-bar b{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;flex:none}
+.tg-bar span{font-size:11.5px;opacity:.92;min-width:0;flex:1;text-align:right}
+@keyframes tgFlash{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.tg-flash{animation:tgFlash .18s ease-out}
+.tg-help{padding:9px 13px;border-bottom:1px solid var(--line);background:var(--bg-2);
+  font-size:11px;line-height:1.7;color:var(--fg-dim);position:relative;z-index:6}
+.tg-help i{font-style:normal;font-weight:700;color:var(--fg)}
+@media (prefers-reduced-motion:reduce){.tg-flash{animation:none}}
 .tc-sheet{position:fixed;inset:0;z-index:3300;display:none}
 .tc-sheet.tc-open{display:block}
 .tc-sheet .tc-scrim{position:absolute;inset:0;background:var(--overlay)}
@@ -9168,7 +9179,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.4 · build 20 Sep 2026 · Peranti (uji BLE)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v2.5 · build 12 Okt 2026 · Tally (mod remote)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -20922,7 +20933,10 @@ const TC_DRAFT = 'pocket_tally_draft_v2';
 
 let TC = {
   cts: [], active: 0, hist: [], sound: true, buzz: true,
-  entries: [], editId: null, countedOn: ''
+  entries: [], editId: null, countedOn: '',
+  // Mod remote: gerak isyarat jadi arahan, dan kiraan disebut kuat supaya
+  // surveyor tidak perlu memandang telefon langsung.
+  remote: false, voice: true
 };
 let _tcAudio = null, _tcKeyBound = false;
 
@@ -20931,6 +20945,7 @@ const TC_I = {
   undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
   vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>',
+  rem:'<rect x="7" y="2" width="10" height="20" rx="4"/><circle cx="12" cy="9" r="1.6"/><path d="M12 14v4"/>',
   mute:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M22 9l-6 6M16 9l6 6"/>',
   trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
   x:'<path d="M18 6L6 18M6 6l12 12"/>',
@@ -21130,6 +21145,14 @@ function tcRender() {
     '<button class="tc-savebtn" id="tcSaveBtn"' + (tcTotal() ? '' : ' disabled') + '>' +
       (TC.editId ? 'Update' : 'Save') + '</button></div>';
 
+  if (TC.remote) {
+    h += '<div class="tg-bar"><b>Mod remote</b><span id="tgLast">tekan butang</span></div>' +
+      '<div class="tg-help">' +
+        '<i>\u2665</i> atau <i>\u25b2</i> tambah &middot; <i>\u25bc</i> tolak &middot; ' +
+        '<i>\u25c0 \u25b6</i> tukar jenis &middot; <i>\u2295</i> sebut jumlah &middot; <i>\u2296</i> undo' +
+      '</div>';
+  }
+
   h += '<div class="tc-total"><span class="n">' + tcTotal() + '</span><span class="l">total</span>' +
     '<span class="k">' + TC.cts.map(function(c) { return peEsc(c.n) + ' ' + c.v; }).join('<br>') + '</span></div>';
 
@@ -21150,12 +21173,18 @@ function tcRender() {
 
   h += '<div class="tc-foot">' +
     '<button class="tc-act" id="tcUndo"' + (TC.hist.length ? '' : ' disabled') + '>' + tcSvg(TC_I.undo) + 'Undo</button>' +
-    '<button class="tc-act" id="tcAdd"' + (TC.cts.length >= 6 ? ' disabled' : '') + '>' + tcSvg(TC_I.plus) + 'Add type</button>' +
+    '<button class="tc-act" id="tcAdd"' + (TC.cts.length >= 6 ? ' disabled' : '') + '>' + tcSvg(TC_I.plus) + 'Add</button>' +
+    '<button class="tc-act ' + (TC.remote ? 'tc-on' : '') + '" id="tcRem">' + tcSvg(TC_I.rem) + 'Remote</button>' +
     '<button class="tc-act ' + (TC.sound ? 'tc-on' : '') + '" id="tcSound">' + tcSvg(TC.sound ? TC_I.vol : TC_I.mute) + 'Sound</button>' +
     '<button class="tc-act" id="tcCfg">' + tcSvg(TC_I.cog) + 'Types</button>' +
   '</div>';
 
+  // Lapisan tangkapan diletak selepas kandungan supaya ia menutupi kad,
+  // tetapi tajuk dan kaki diangkat di atasnya supaya butang kekal boleh ditekan.
+  if (TC.remote) h += '<div class="tc-cap" id="tcCap"></div>';
+
   ov.innerHTML = h;
+  ov.classList.toggle('tc-rem', !!TC.remote);
   tcWire();
 }
 
@@ -21173,6 +21202,24 @@ function tcWire() {
   document.getElementById('tcBack').addEventListener('click', function() { tcCloseAll(); openCounter(); });
   document.getElementById('tcUndo').addEventListener('click', tcUndo);
   document.getElementById('tcAdd').addEventListener('click', function() { tcAddType(); tcRender(); tcSaveDraft(); });
+  document.getElementById('tcRem').addEventListener('click', function() {
+    TC.remote = !TC.remote;
+    tcRender();
+    if (TC.remote) {
+      // Android menyekat pertuturan sehingga satu ketikan sebenar berlaku,
+      // jadi bangkitkan enjin itu sekarang, semasa ketikan ini masih sah.
+      try {
+        const w = new SpeechSynthesisUtterance(' ');
+        w.volume = 0; speechSynthesis.speak(w);
+      } catch (e) {}
+      tgSay('Remote on. ' + tgStatus());
+      showToast('Remote mode on \u2014 gestures count, voice reads back');
+    } else {
+      try { speechSynthesis.cancel(); } catch (e) {}
+      showToast('Remote mode off');
+    }
+  });
+  if (TC.remote) tgWire();
   document.getElementById('tcSound').addEventListener('click', function() {
     TC.sound = !TC.sound; tcRender();
     showToast(TC.sound ? 'Sound on' : 'Sound off');
@@ -21181,8 +21228,165 @@ function tcWire() {
   document.getElementById('tcSaveBtn').addEventListener('click', tcOpenSave);
 }
 
+// ---------- MOD REMOTE: pengecam gerak isyarat ----------
+// Remote PLOKAMA memandu skrin sentuh, bukan papan kekunci. Setiap butangnya
+// menghasilkan satu gerak isyarat yang boleh diukur, jadi Tally mengecam
+// bentuk gerakan itu dan bukan cuba mengecam remote itu sendiri. Kesannya
+// jari surveyor melakukan perkara yang sama, yang memang kita mahukan.
+//
+// Diukur pada remote sebenar:
+//   butang ▲  -> sapu ke BAWAH 406 px dalam 41 ms
+//   butang ▼  -> sapu ke ATAS  406 px dalam 50 ms
+//   butang ◀  -> sapu kiri 180 px, butang ▶ -> sapu kanan 180 px
+//   butang ♥  -> ketik, 4.7 ms, tiada gerakan
+//   butang ⊕⊖ -> dua sentuhan serentak, jarak mengembang atau menguncup
+// Butang kamera menghantar Volume dan tidak pernah sampai ke halaman web.
+
+var TG_TAP = 22;      // di bawah ini dikira ketikan, bukan sapuan
+var TG_PINCH = 12;    // perubahan jarak minimum sebelum cubitan bermakna
+
+var TG = { pts: {}, pinch: null, last: '', lastT: 0 };
+
+function tgDist(a, b) {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+}
+
+// g: { dx, dy, fingers, spread }
+function tgClassify(g) {
+  if (!g) return '';
+  if (g.fingers >= 2) {
+    if (Math.abs(g.spread) < TG_PINCH) return '';
+    return g.spread > 0 ? 'out' : 'in';
+  }
+  var adx = Math.abs(g.dx), ady = Math.abs(g.dy);
+  if (adx < TG_TAP && ady < TG_TAP) return 'tap';
+  if (ady >= adx) return g.dy > 0 ? 'down' : 'up';
+  return g.dx > 0 ? 'right' : 'left';
+}
+
+// Butang pada remote, bukan arah gerakan: butang ▲ menyapu ke bawah.
+var TG_MAP = {
+  tap:   { b:'♥', n:'Tambah 1' },
+  down:  { b:'▲', n:'Tambah 1' },
+  up:    { b:'▼', n:'Tolak 1' },
+  left:  { b:'◀', n:'Jenis sebelum' },
+  right: { b:'▶', n:'Jenis seterusnya' },
+  out:   { b:'⊕', n:'Sebut jumlah' },
+  in:    { b:'⊖', n:'Undo' }
+};
+
+function tgSay(text) {
+  if (!TC.voice || !window.speechSynthesis || !text) return;
+  try {
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(String(text));
+    u.lang = 'en-GB';
+    u.rate = 1.15;   // kiraan pendek, jadi laju sedikit menjimatkan masa
+    u.volume = 1;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+function tgStatus() {
+  return TC.cts.map(function(c) { return c.n + ' ' + c.v; }).join(', ') +
+    (TC.cts.length > 1 ? ', total ' + tcTotal() : '');
+}
+
+function tgDo(kind) {
+  if (!kind) return;
+  var c, i;
+  if (kind === 'tap' || kind === 'down') {
+    tcBump(TC.active, 1);
+    c = TC.cts[TC.active];
+    tgSay(c ? String(c.v) : '');
+  } else if (kind === 'up') {
+    c = TC.cts[TC.active];
+    if (!c || c.v <= 0) { tgSay('zero'); }
+    else { tcBump(TC.active, -1); tgSay(String(c.v)); }
+  } else if (kind === 'left' || kind === 'right') {
+    if (TC.cts.length < 2) { tgSay('one type only'); }
+    else {
+      i = kind === 'left'
+        ? (TC.active - 1 + TC.cts.length) % TC.cts.length
+        : (TC.active + 1) % TC.cts.length;
+      TC.active = i;
+      tcRender(); tcSaveDraft(); tcBuzz(9);
+      c = TC.cts[i];
+      tgSay(c.n + ', ' + c.v);
+    }
+  } else if (kind === 'out') {
+    tgSay(tgStatus());
+  } else if (kind === 'in') {
+    if (!TC.hist.length) { tgSay('nothing to undo'); }
+    else { tcUndo(); c = TC.cts[TC.active]; tgSay('undo, ' + (c ? c.v : '')); }
+  }
+  TG.last = kind; TG.lastT = Date.now();
+  tgFlash(kind);
+}
+
+function tgFlash(kind) {
+  var el = document.getElementById('tgLast');
+  if (!el) return;
+  var m = TG_MAP[kind];
+  el.textContent = m ? (m.b + '  ' + m.n) : '';
+  el.classList.remove('tg-flash');
+  void el.offsetWidth;          // paksa animasi bermula semula
+  el.classList.add('tg-flash');
+}
+
+function tgWire() {
+  var cap = document.getElementById('tcCap');
+  if (!cap) return;
+  TG.pts = {}; TG.pinch = null;
+
+  cap.addEventListener('pointerdown', function(e) {
+    e.preventDefault();
+    var p = { x0:e.clientX, y0:e.clientY, x:e.clientX, y:e.clientY, t:Date.now() };
+    TG.pts[e.pointerId] = p;
+    try { cap.setPointerCapture(e.pointerId); } catch (err) {}
+    var ids = Object.keys(TG.pts);
+    if (ids.length === 2) {
+      // Cubitan: ingat jarak pembukaan supaya arahnya boleh dibandingkan.
+      TG.pinch = { d0: tgDist(TG.pts[ids[0]], TG.pts[ids[1]]), done:false };
+    }
+  });
+
+  cap.addEventListener('pointermove', function(e) {
+    var p = TG.pts[e.pointerId];
+    if (!p) return;
+    p.x = e.clientX; p.y = e.clientY;
+  });
+
+  var end = function(e) {
+    var p = TG.pts[e.pointerId];
+    if (!p) return;
+    delete TG.pts[e.pointerId];
+
+    if (TG.pinch && !TG.pinch.done) {
+      // Selesaikan cubitan sekali sahaja, pada jari pertama yang diangkat.
+      var others = Object.keys(TG.pts);
+      if (others.length) {
+        var q = TG.pts[others[0]];
+        TG.pinch.done = true;
+        tgDo(tgClassify({ fingers:2, spread: tgDist(p, q) - TG.pinch.d0 }));
+      }
+      return;
+    }
+    if (TG.pinch) {
+      // Jari kedua cubitan yang sama: sudah dikendalikan.
+      if (!Object.keys(TG.pts).length) TG.pinch = null;
+      return;
+    }
+    tgDo(tgClassify({ dx: p.x - p.x0, dy: p.y - p.y0, fingers:1 }));
+  };
+  cap.addEventListener('pointerup', end);
+  cap.addEventListener('pointercancel', end);
+}
+
+
 // Remote tripod Bluetooth berpasangan sebagai papan kekunci, jadi kita dengar
-// kekunci dan bukan cuba bercakap dengan peranti itu.
+// kekunci dan bukan cuba bercakap dengan peranti itu. Remote yang memandu
+// skrin sentuh dikendalikan oleh tgWire di atas.
 function tcBindKeys() {
   if (_tcKeyBound) return;
   _tcKeyBound = true;
