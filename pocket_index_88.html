@@ -2083,6 +2083,10 @@ body.en-open{overflow:hidden}
 .en-sub-x{position:absolute;top:-6px;right:-6px;width:21px;height:21px;border-radius:50%;
   background:#B91C1C;color:#fff;border:2px solid var(--bg);
   font:700 12px/1 var(--font-body);padding:0}
+.en-note2{padding:10px 13px 2px;font-size:12px;color:var(--muted)}
+.en-sub-pen{position:absolute;bottom:3px;left:3px;min-width:17px;height:17px;padding:0 3px;
+  border-radius:9px;background:var(--accent);color:var(--accent-fg);font-size:10px;
+  font-weight:700;display:grid;place-items:center;pointer-events:none}
 .en-sub-add{flex:none;width:56px;height:56px;border-radius:9px;
   background:var(--bg-2);border:1.5px dashed var(--line-2);color:var(--muted);
   font:300 26px/1 var(--font-body);padding:0}
@@ -9311,7 +9315,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.3 · build 12 Okt 2026 · Endoskop (pemilih gambar asli)</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v3.4 · build 12 Okt 2026 · Endoskop (anotasi gambar sokongan)</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -22537,10 +22541,11 @@ function enRemember() {
 function enRender() {
   var ov = document.getElementById('enOv');
   if (!ov) return;
+  if (EN.view !== 'edit') EN.sub = null;
   enRemember();
   if (EN.view === 'live')    return enLive(ov);
   if (EN.view === 'gallery') return enGallery(ov);
-  if (EN.view === 'edit')    return enEdit(ov);
+  if (EN.view === 'edit')    return EN.sub ? enEditSub(ov) : enEdit(ov);
   if (EN.view === 'report')  return enReport(ov);
   if (EN.view === 'preview') return enPreviewView(ov);
 }
@@ -22761,17 +22766,7 @@ async function enEdit(ov) {
     '<div class="en-scroll">' +
       '<div class="en-canvas-wrap"><canvas id="enCv"></canvas></div>' +
       '<div class="en-subs" id="enSubs"></div>' +
-      '<div class="en-tools">' +
-        EN_COLS.map(function(c) {
-          return '<button class="en-col' + (c === EN.colour ? ' on' : '') + '" data-col="' + c +
-                 '" style="background:' + c + '" aria-label="Warna"></button>';
-        }).join('') +
-        '<span class="en-sp"></span>' +
-        [['arrow', 'Anak panah'], ['circle', 'Bulatan'], ['free', 'Pen'], ['text', 'Teks']].map(function(t) {
-          return '<button class="en-tool' + (t[0] === EN.tool ? ' on' : '') + '" data-tool="' + t[0] + '">' + t[1] + '</button>';
-        }).join('') +
-        '<button class="en-tool" id="enUndo">Undo</button>' +
-      '</div>' +
+      enToolsHtml() +
       '<div class="en-form">' +
         '<label>Tajuk<input type="text" id="enTitle" placeholder="Retak pada sambungan paip" value="' + escapeHTML(s.title || '') + '"></label>' +
         '<label>Lokasi<input type="text" id="enLoc" placeholder="Bilik air tingkat 2, di bawah sinki" value="' + escapeHTML(s.loc || '') + '"></label>' +
@@ -22798,8 +22793,14 @@ async function enEdit(ov) {
     await enGrab(); EN.view = 'gallery'; enRender();
   });
   document.getElementById('enDel').addEventListener('click', enDelShot);
-  document.getElementById('enSave').addEventListener('click', function() {
-    enFlash('enSave', 'Simpan', enGrab());
+  // Simpan bermakna "siap dengan gambar ini": ia menulis dan kembali ke
+  // galeri, jadi gambar seterusnya satu ketikan sahaja. Medan sudah pun
+  // disimpan semasa ditaip, jadi tiada apa yang bergantung pada butang ini.
+  document.getElementById('enSave').addEventListener('click', async function() {
+    await enGrab();
+    EN.view = 'gallery';
+    enRender();
+    showToast('Gambar ' + (EN.shot + 1) + ' disimpan');
   });
   document.getElementById('enPrev').addEventListener('click', async function() {
     await enGrab(); EN.shot--; enRender();
@@ -22813,21 +22814,7 @@ async function enEdit(ov) {
       await enSaveImg(EN.sess.shots[EN.shot], EN.shot);
     })());
   });
-  document.getElementById('enUndo').addEventListener('click', function() {
-    s.marks.pop(); EN.dirty = true; enPaintCv();
-  });
-  ov.querySelectorAll('[data-col]').forEach(function(b) {
-    b.addEventListener('click', function() {
-      EN.colour = b.dataset.col;
-      ov.querySelectorAll('[data-col]').forEach(function(x) { x.classList.toggle('on', x === b); });
-    });
-  });
-  ov.querySelectorAll('[data-tool]').forEach(function(b) {
-    b.addEventListener('click', function() {
-      EN.tool = b.dataset.tool;
-      ov.querySelectorAll('[data-tool]').forEach(function(x) { x.classList.toggle('on', x === b); });
-    });
-  });
+  enWireTools(ov);
 
   // Simpan automatik. Butang Simpan kekal sebagai kepastian, tetapi tiada
   // apa-apa yang bergantung padanya lagi: kerja ditulis semasa ditaip, jadi
@@ -22853,6 +22840,78 @@ async function enEdit(ov) {
   await enPaintSubs(s);
 }
 
+function enToolsHtml() {
+  return '<div class="en-tools">' +
+    EN_COLS.map(function(c) {
+      return '<button class="en-col' + (c === EN.colour ? ' on' : '') + '" data-col="' + c +
+             '" style="background:' + c + '" aria-label="Warna"></button>';
+    }).join('') +
+    '<span class="en-sp"></span>' +
+    [['arrow', 'Anak panah'], ['circle', 'Bulatan'], ['free', 'Pen'], ['text', 'Teks']].map(function(t) {
+      return '<button class="en-tool' + (t[0] === EN.tool ? ' on' : '') + '" data-tool="' + t[0] + '">' + t[1] + '</button>';
+    }).join('') +
+    '<button class="en-tool" id="enUndo">Undo</button>' +
+  '</div>';
+}
+
+function enWireTools(ov) {
+  var u = document.getElementById('enUndo');
+  if (u) u.addEventListener('click', function() {
+    var t = enTarget(); if (t) t.marks.pop();
+    EN.dirty = true; enPaintCv();
+  });
+  ov.querySelectorAll('[data-col]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      EN.colour = b.dataset.col;
+      ov.querySelectorAll('[data-col]').forEach(function(x) { x.classList.toggle('on', x === b); });
+    });
+  });
+  ov.querySelectorAll('[data-tool]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      EN.tool = b.dataset.tool;
+      ov.querySelectorAll('[data-tool]').forEach(function(x) { x.classList.toggle('on', x === b); });
+    });
+  });
+}
+
+/** Anotasi pada satu gambar sokongan. Alat dan kanvas yang sama; tiada medan
+ *  borang, kerana tajuk dan penerangan milik gambar utama. */
+async function enEditSub(ov) {
+  var s = EN.sess.shots[EN.shot];
+  var at = s ? (s.subs || []).indexOf(EN.sub) : -1;
+  if (at < 0) { EN.sub = null; return enRender(); }
+
+  ov.innerHTML =
+    enHead('Gambar sokongan ' + (at + 1), 'untuk gambar ' + (EN.shot + 1),
+      '<button class="en-ic" id="enSubDel" aria-label="Buang">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg></button>') +
+    '<div class="en-scroll">' +
+      '<div class="en-canvas-wrap"><canvas id="enCv"></canvas></div>' +
+      enToolsHtml() +
+      '<div class="en-note2">Tanda di sini muncul pada gambar sokongan ini dalam laporan.</div>' +
+    '</div>' +
+    '<div class="en-bar">' +
+      '<button class="en-btn pri big" id="enSubDone">Simpan</button>' +
+    '</div>';
+
+  var back = async function() {
+    await enSaveSess(EN.sess);
+    EN.sub = null;
+    enRender();
+  };
+  document.getElementById('enBack').addEventListener('click', back);
+  document.getElementById('enSubDone').addEventListener('click', back);
+  document.getElementById('enSubDel').addEventListener('click', async function() {
+    if (!confirm('Buang gambar sokongan ' + (at + 1) + '?')) return;
+    await enDropSub(s, EN.sub);
+    EN.sub = null;
+    enRender();
+  });
+
+  enWireTools(ov);
+  await enLoadCv(enSubObj(s, EN.sub));
+}
+
 async function enPaintSubs(s) {
   var box = document.getElementById('enSubs');
   if (!box) return;
@@ -22863,7 +22922,11 @@ async function enPaintSubs(s) {
   for (var i = 0; i < subs.length; i++) {
     var cell = document.createElement('div');
     cell.className = 'en-sub';
-    cell.innerHTML = '<button class="en-sub-x" data-subx="' + subs[i] + '" aria-label="Buang">\u00d7</button>';
+    cell.setAttribute('data-subedit', subs[i]);
+    var nMk = ((s.subMk || {})[subs[i]] || []).length;
+    cell.innerHTML =
+      '<button class="en-sub-x" data-subx="' + subs[i] + '" aria-label="Buang">\u00d7</button>' +
+      '<span class="en-sub-pen">' + (nMk ? nMk : '\u270e') + '</span>';
     box.appendChild(cell);
     try {
       var rec = await lbGet(EN_K.th + subs[i]);
@@ -22881,9 +22944,17 @@ async function enPaintSubs(s) {
     enPickSubs(s, function(n) { if (n) enPaintSubs(s); });
   });
   box.querySelectorAll('[data-subx]').forEach(function(b) {
-    b.addEventListener('click', async function() {
+    b.addEventListener('click', async function(e) {
+      e.stopPropagation();
       await enDropSub(s, b.dataset.subx);
       enPaintSubs(s);
+    });
+  });
+  box.querySelectorAll('[data-subedit]').forEach(function(c) {
+    c.addEventListener('click', async function() {
+      await enGrab();
+      EN.sub = c.dataset.subedit;
+      enRender();
     });
   });
 }
@@ -22892,6 +22963,9 @@ async function enPaintSubs(s) {
 async function enGrab() {
   var s = EN.sess.shots[EN.shot];
   if (!s) return;
+  // Borang itu tiada dalam editor gambar sokongan. Membaca medan yang tiada
+  // memulangkan rentetan kosong, yang akan memadam tajuk dan penerangan.
+  if (!document.getElementById('enTitle')) return;
   var g = function(id) { var e = document.getElementById(id); return e ? e.value : ''; };
   s.title = g('enTitle').trim();
   s.loc = g('enLoc').trim();
@@ -22935,13 +23009,32 @@ async function enLoadCv(s) {
   enWireCv(cv, s);
 }
 
+/** Tanda bagi satu gambar sokongan, disimpan pada gambar utama yang
+ *  memilikinya. Senarai subs kekal senarai id supaya sesi lama tetap
+ *  terbuka; tanda itu hidup di sebelahnya. Tatasusunan itu dikongsi melalui
+ *  rujukan, jadi melukis padanya menulis terus ke dalam sesi. */
+function enSubObj(shot, id) {
+  if (!shot.subMk) shot.subMk = {};
+  if (!shot.subMk[id]) shot.subMk[id] = [];
+  return { id: id, marks: shot.subMk[id] };
+}
+
+/** Apa yang kanvas sedang tunjukkan: gambar utama, atau satu sokongan. */
+function enTarget() {
+  var s = EN.sess && EN.sess.shots[EN.shot];
+  if (!s) return null;
+  return EN.sub ? enSubObj(s, EN.sub) : s;
+}
+
 function enPaintCv() {
   var cv = document.getElementById('enCv');
   if (!cv || !EN.draw) return;
+  var t = enTarget();
+  if (!t) return;
   var g = cv.getContext('2d');
   g.clearRect(0, 0, cv.width, cv.height);
   g.drawImage(EN.draw.img, 0, 0, cv.width, cv.height);
-  enDrawMarks(g, EN.sess.shots[EN.shot].marks, cv.width, cv.height);
+  enDrawMarks(g, t.marks, cv.width, cv.height);
 }
 
 function enWireCv(cv, s) {
@@ -23002,6 +23095,7 @@ async function enAddSub(shot, blob) {
 
 async function enDropSub(shot, id) {
   shot.subs = (shot.subs || []).filter(function(x) { return x !== id; });
+  if (shot.subMk) delete shot.subMk[id];
   try { await lbDrop(EN_K.img + id); } catch (e) {}
   try { await lbDrop(EN_K.th + id); } catch (e) {}
   await enSaveSess(EN.sess);
@@ -23269,24 +23363,6 @@ async function enFlat(s, maxW) {
   return { data: c.toDataURL('image/jpeg', 0.84), w: w, h: h };
 }
 
-/** Imej tanpa tanda, untuk gambar sokongan. */
-async function enRawImg(id, maxW) {
-  var rec = null;
-  try { rec = await lbGet(EN_K.img + id); } catch (e) {}
-  if (!rec || !rec.blob) return null;
-  var url = URL.createObjectURL(rec.blob);
-  var img = new Image();
-  await new Promise(function(r) { img.onload = r; img.onerror = r; img.src = url; });
-  var sc = Math.min(1, (maxW || 700) / (img.width || 1));
-  var w = Math.max(1, Math.round((img.width || 640) * sc));
-  var h = Math.max(1, Math.round((img.height || 480) * sc));
-  var c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  c.getContext('2d').drawImage(img, 0, 0, w, h);
-  URL.revokeObjectURL(url);
-  return { data: c.toDataURL('image/jpeg', 0.8), w: w, h: h };
-}
-
 /** Kumpul medan borang ke dalam sesi, supaya ia bertahan. */
 async function enGrabReport() {
   var g = function(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; };
@@ -23354,40 +23430,56 @@ async function enBuildDoc() {
       doc.text(sv.n.toUpperCase(), W - M - 13, top, { align: 'center' });
     }
 
+    // Dua lajur: gambar di kiri, butiran di sebelahnya. Membaca penerangan
+    // di tepi gambar yang diterangkannya lebih mudah daripada di bawahnya,
+    // dan ia memberi ruang kepada gambar sokongan untuk menjadi cukup besar
+    // untuk dilihat.
     var subs = (s.subs || []).slice(0, 3);
+    var colW = (W - M * 2) * 0.56;
+    var txtX = M + colW + 7;
+    var txtW = W - M - txtX;
+
     var flat = await enFlat(s, 1200);
     var imgH = 0;
     if (flat) {
-      var maxW = W - M * 2, maxH = subs.length ? 58 : 78;
-      var sc = Math.min(maxW / flat.w, maxH / flat.h);
-      var iw = flat.w * sc, ih = flat.h * sc;
-      doc.addImage(flat.data, 'JPEG', M, top + 5, iw, ih);
-      imgH = ih;
+      var maxH = subs.length ? 66 : 96;
+      var sc = Math.min(colW / flat.w, maxH / flat.h);
+      doc.addImage(flat.data, 'JPEG', M, top + 5, flat.w * sc, flat.h * sc);
+      imgH = flat.h * sc;
     }
 
-    // Gambar sokongan: satu baris kecil di bawah yang utama.
     if (subs.length) {
-      var sx = M, sy = top + 7 + imgH, sh2 = 21;
+      var gap = 3;
+      var boxW = (colW - gap * (subs.length - 1)) / subs.length;
+      var boxH = Math.min(42, boxW * 0.8);
+      var sx = M, sy = top + 8 + imgH;
       for (var k = 0; k < subs.length; k++) {
-        var sd = await enRawImg(subs[k], 700);
+        // enFlat dan bukan enRawImg: gambar sokongan kini boleh dianotasi,
+        // dan tanda itu mesti sampai ke laporan.
+        var sd = await enFlat(enSubObj(s, subs[k]), 900);
         if (!sd) continue;
-        var ssc = sh2 / sd.h, sw = sd.w * ssc;
-        if (sx + sw > W - M) break;
-        doc.addImage(sd.data, 'JPEG', sx, sy, sw, sh2);
-        sx += sw + 3;
+        var ssc = Math.min(boxW / sd.w, boxH / sd.h);
+        doc.addImage(sd.data, 'JPEG', sx, sy, sd.w * ssc, sd.h * ssc);
+        sx += boxW + gap;
       }
-      imgH += sh2 + 4;
+      imgH += boxH + 4;
     }
 
-    var ty = top + 7 + imgH;
-    doc.setTextColor(90); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6);
-    var meta = [enStamp(s.t), s.loc, s.src === 'import' ? 'gambar diimport' : '']
-      .filter(Boolean).join('   ·   ');
-    if (meta) { doc.text(meta, M, ty); ty += 5; }
-    if (s.desc) {
-      doc.setTextColor(40); doc.setFontSize(9.6);
-      doc.text(doc.splitTextToSize(s.desc, W - M * 2), M, ty + 1);
-    }
+    var ty = top + 7;
+    var note = function(text, size, grey) {
+      if (!text) return;
+      doc.setTextColor(grey ? 110 : 40);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(size);
+      var ls = doc.splitTextToSize(String(text), txtW);
+      doc.text(ls, txtX, ty);
+      ty += ls.length * (size * 0.46) + 3.4;
+    };
+    note(enStamp(s.t), 8.4, true);
+    note(s.loc, 8.8, true);
+    if (s.src === 'import') note('gambar diimport', 8.4, true);
+    if (subs.length) note(subs.length + ' gambar sokongan', 8.4, true);
+    ty += 1.5;
+    note(s.desc, 9.6, false);
   }
 
   var pages = doc.internal.getNumberOfPages();
