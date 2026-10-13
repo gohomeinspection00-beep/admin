@@ -7845,22 +7845,6 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 }
 .sl-vial.level .sl-vbub{background:var(--success)}
 
-/* Dinding dilihat dari sisi: satu garis tegak lurus putus-putus, dan
-   satu garis pepejal yang condong seperti dinding itu condong. */
-.sl-wall{position:relative;width:100%;height:150px;border-radius:16px;
-  background:var(--surface);border:2px solid var(--line-2);overflow:hidden}
-.sl-wall.level{border-color:var(--success);background:var(--success-soft)}
-.sl-wall-ref{position:absolute;left:50%;top:9%;bottom:16%;width:0;
-  border-left:2px dashed var(--line-2)}
-.sl-wall-line{position:absolute;left:50%;top:9%;bottom:16%;width:0;
-  border-left:3px solid var(--accent);transform-origin:50% 100%;will-change:transform}
-.sl-wall.level .sl-wall-line{border-color:var(--success)}
-.sl-wall-floor{position:absolute;left:10%;right:10%;bottom:16%;height:2px;background:var(--line-2)}
-.sl-wall-tag{position:absolute;left:0;right:0;bottom:4px;text-align:center;
-  font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.04em}
-.sl-sub{margin-top:9px;text-align:center;font-size:11.5px;color:var(--muted)}
-.sl-sub b{color:var(--fg);font-weight:650;font-variant-numeric:tabular-nums}
-
 .sl-hint{margin-top:15px;text-align:center;font-size:12px;line-height:1.5;color:var(--muted);min-height:34px}
 .sl-zeroed{color:var(--success);font-weight:600}
 
@@ -9450,7 +9434,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.3 · build 13 Okt 2026 · Spirit level: dinding, bukan hanya lantai</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.2 · build 13 Okt 2026 · Kamera atau fail, pada setiap input gambar</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -14282,10 +14266,10 @@ let spiritOrientationHandler = null;
 
 const SL_TOL = 0.3;     // darjah dianggap rata
 const SL_ALPHA = 0.14;  // pekali penapis laluan rendah
-let slMode = 'auto';    // auto | flat | wall
+let slMode = 'auto';    // auto | flat | edge
 let slShown = 'flat';
 let slHeld = false;
-let slZero = { x: 0, y: 0, phi: 0, lean: 0 };
+let slZero = { x: 0, y: 0, phi: 0 };
 let slZeroed = false;
 let slSm = { x: 0, y: 0, z: 9.81 };
 let slHave = false;
@@ -14342,7 +14326,7 @@ function openSpiritLevel() {
 function slOpenMeasure() {
   slHead('Spirit Level', 'Level & plumb');
   slMode = 'auto'; slShown = 'flat'; slHeld = false;
-  slZero = { x: 0, y: 0, phi: 0, lean: 0 }; slZeroed = false;
+  slZero = { x: 0, y: 0, phi: 0 }; slZeroed = false;
   slHave = false; slSm = { x: 0, y: 0, z: 9.81 };
 
   if (typeof DeviceMotionEvent === 'undefined') {
@@ -14379,7 +14363,7 @@ function slRenderMeasure() {
     '<div class="sl-modes" role="group" aria-label="Mode">' +
       '<button type="button" id="slMAuto" aria-pressed="true">Auto</button>' +
       '<button type="button" id="slMFlat" aria-pressed="false">Flat</button>' +
-      '<button type="button" id="slMEdge" aria-pressed="false">Wall</button>' +
+      '<button type="button" id="slMEdge" aria-pressed="false">Edge</button>' +
     '</div>' +
     '<div class="sl-read" id="slRead">' +
       '<div class="sl-deg" id="slDeg">0.0°</div>' +
@@ -14392,17 +14376,15 @@ function slRenderMeasure() {
         '<div class="sl-target"></div><div class="sl-bub" id="slBub"></div>' +
       '</div>' +
       '<div class="sl-edge" id="slEdgeWrap" hidden>' +
-        '<div class="sl-wall" id="slWall">' +
-          '<div class="sl-wall-floor"></div>' +
-          '<div class="sl-wall-ref"></div>' +
-          '<div class="sl-wall-line" id="slWallLine"></div>' +
-          '<div class="sl-wall-tag">side view</div>' +
+        '<div class="sl-horizon" id="slHorizon">' +
+          '<div class="sl-href"></div>' +
+          '<div class="sl-htick" style="left:14%"></div><div class="sl-htick" style="left:50%"></div><div class="sl-htick" style="right:14%"></div>' +
+          '<div class="sl-hline" id="slHline"></div>' +
         '</div>' +
         '<div class="sl-vial" id="slVial"><div class="sl-vmark a"></div><div class="sl-vmark b"></div><div class="sl-vbub" id="slVbub"></div></div>' +
-        '<div class="sl-sub" id="slSub"></div>' +
       '</div>' +
     '</div>' +
-    '<div class="sl-hint" id="slHint">Lay the phone flat on the surface, or press its back against a wall.</div>';
+    '<div class="sl-hint" id="slHint">Lay the phone on the surface, or stand an edge against it.</div>';
 
   document.getElementById('toolModalFoot').innerHTML =
     '<button class="tool-btn tool-btn-secondary" id="slZeroBtn">Zero</button>' +
@@ -14411,7 +14393,7 @@ function slRenderMeasure() {
 
   document.getElementById('slMAuto').addEventListener('click', function() { slSetMode('auto'); });
   document.getElementById('slMFlat').addEventListener('click', function() { slSetMode('flat'); });
-  document.getElementById('slMEdge').addEventListener('click', function() { slSetMode('wall'); });
+  document.getElementById('slMEdge').addEventListener('click', function() { slSetMode('edge'); });
   document.getElementById('slZeroBtn').addEventListener('click', slDoZero);
   document.getElementById('slHoldBtn').addEventListener('click', slToggleHold);
   document.getElementById('slSaveBtn').addEventListener('click', function() { slOpenForm(); });
@@ -14432,7 +14414,7 @@ function slSetMode(m) {
   slMode = m;
   document.getElementById('slMAuto').setAttribute('aria-pressed', String(m === 'auto'));
   document.getElementById('slMFlat').setAttribute('aria-pressed', String(m === 'flat'));
-  document.getElementById('slMEdge').setAttribute('aria-pressed', String(m === 'wall'));
+  document.getElementById('slMEdge').setAttribute('aria-pressed', String(m === 'edge'));
   if (m !== 'auto') slShow(m);
 }
 
@@ -14442,12 +14424,12 @@ function slShow(which) {
   const d = document.getElementById('slDial');
   const e = document.getElementById('slEdgeWrap');
   if (d) d.hidden = which !== 'flat';
-  if (e) e.hidden = which !== 'wall';
+  if (e) e.hidden = which !== 'edge';
   const h = document.getElementById('slHint');
   if (h && !slZeroed) {
     h.textContent = which === 'flat'
       ? 'Flat · phone lying on the surface'
-      : 'Wall · phone back against the vertical surface';
+      : 'Edge · stand an edge against the surface';
   }
 }
 
@@ -14455,32 +14437,10 @@ function slPhi() {
   return Math.atan2(slSm.x, -slSm.y) * 180 / Math.PI;
 }
 
-/**
- * Berapa jauh permukaan menegak itu condong daripada tegak lurus.
- *
- * Belakang telefon rapat pada dinding, jadi normal dinding itu ialah paksi z
- * telefon — keluar dari skrin. Dinding yang betul-betul tegak bermakna paksi
- * itu mendatar, iaitu graviti tiada komponen z langsung. Jadi condongnya
- * ialah asin(gz/|g|), dan ia tidak bergantung sedikit pun pada bagaimana
- * telefon dipusingkan pada muka dinding itu.
- *
- * Mod lama mengukur putaran DI SEKITAR paksi itu dan bukan condongnya, jadi
- * dinding yang terpesong sepuluh darjah dibaca "rata, 0.0°". Nombor itu
- * betul untuk soalan lain — adakah tepi telefon sejajar dengan garis tegak —
- * dan ia kekal, sebagai bacaan kedua.
- *
- * Tandanya: positif bermakna bahagian atas condong MENJAUHI awak.
- */
-function slLean() {
-  const m = Math.sqrt(slSm.x * slSm.x + slSm.y * slSm.y + slSm.z * slSm.z) || 1;
-  return Math.asin(Math.max(-1, Math.min(1, slSm.z / m))) * 180 / Math.PI;
-}
-
 function slDoZero() {
   if (!slHave) { showToast('No sensor reading yet', 'error'); return; }
   if (slShown === 'flat') { slZero.x = slSm.x; slZero.y = slSm.y; }
   else {
-    slZero.lean = slLean();
     const phi = slPhi();
     slZero.phi = phi - Math.round(phi / 90) * 90;
   }
@@ -14513,7 +14473,7 @@ function slRenderReading() {
 
   if (slMode === 'auto') {
     if (vertMag > horizMag + 2.0) slShow('flat');
-    else if (horizMag > vertMag + 2.0) slShow('wall');
+    else if (horizMag > vertMag + 2.0) slShow('edge');
   }
 
   let isLevel, value, sub = null;
@@ -14527,36 +14487,25 @@ function slRenderReading() {
     if (bub) bub.style.transform = 'translate(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px)';
     dial.classList.toggle('level', isLevel);
   } else {
-    const lean = slLean() - slZero.lean;
-    value = Math.abs(lean);
-    isLevel = value < SL_TOL;
-    sub = isLevel ? 'plumb' : (lean > 0 ? 'back' : 'over');
-
-    const wl = document.getElementById('slWallLine');
-    if (wl) wl.style.transform =
-      'rotate(' + Math.max(-30, Math.min(30, lean)).toFixed(2) + 'deg)';
-    const vbub = document.getElementById('slVbub');
-    if (vbub) vbub.style.transform =
-      'translateX(' + Math.max(-92, Math.min(92, lean * 9)).toFixed(1) + 'px)';
-    const wrap = document.getElementById('slWall');
-    const vl = document.getElementById('slVial');
-    if (wrap) wrap.classList.toggle('level', isLevel);
-    if (vl) vl.classList.toggle('level', isLevel);
-
-    // Bacaan kedua: putaran telefon pada muka dinding. Ia tidak memberitahu
-    // apa-apa tentang dinding, tetapi ia memberitahu sama ada tepi telefon
-    // sejajar dengan garis tegak — iaitu soalan yang mod lama jawab.
     const phi = slPhi() - slZero.phi;
-    const rot = phi - Math.round(phi / 90) * 90;
-    const sb = document.getElementById('slSub');
-    if (sb) sb.innerHTML = 'Phone rotated <b>' + Math.abs(rot).toFixed(1) +
-      '°</b> on the wall face';
-
+    const nearest = Math.round(phi / 90) * 90;
+    const dev = phi - nearest;
+    value = Math.abs(dev);
+    isLevel = value < SL_TOL;
+    sub = (Math.abs(nearest % 180) === 90) ? 'plumb' : 'level';
+    const hline = document.getElementById('slHline');
+    const vbub = document.getElementById('slVbub');
+    if (hline) hline.style.transform = 'rotate(' + (-dev).toFixed(2) + 'deg)';
+    if (vbub) vbub.style.transform = 'translateX(' + Math.max(-92, Math.min(92, dev * 9)).toFixed(1) + 'px)';
+    const hz = document.getElementById('slHorizon');
+    const vl = document.getElementById('slVial');
+    if (hz) hz.classList.toggle('level', isLevel);
+    if (vl) vl.classList.toggle('level', isLevel);
     const h = document.getElementById('slHint');
     if (h && !slZeroed) {
-      h.textContent = isLevel ? 'Wall is plumb.'
-        : (lean > 0 ? 'Top leans AWAY from you by ' + value.toFixed(1) + '°'
-                    : 'Top leans TOWARD you by ' + value.toFixed(1) + '°');
+      h.textContent = sub === 'plumb'
+        ? 'Plumb · side edge against the vertical surface'
+        : 'Level · bottom edge on the horizontal surface';
     }
   }
 
@@ -14602,10 +14551,7 @@ function stopSpiritLevel() {
 // ---------- 3. BORANG (cipta + edit) ----------
 function slCapCard(r) {
   const cls = r.isLevel ? ' level' : '';
-  const what = r.mode === 'flat' ? 'Horizontal surface'
-    : r.sub === 'back' ? 'Vertical surface — top leans away'
-    : r.sub === 'over' ? 'Vertical surface — top leans toward you'
-    : 'Vertical surface — plumb';
+  const what = r.mode === 'flat' ? 'Flat surface' : (r.sub === 'plumb' ? 'Plumb (vertical)' : 'Level (horizontal)');
   const zt = r.zeroed ? 'Zeroed before reading' : 'Not zeroed';
   return '<div class="sl-cap' + cls + '">' +
     '<span class="sl-cap-n">' + (r.isLevel ? '0.0' : Number(r.degrees).toFixed(1)) + '°</span>' +
@@ -14832,7 +14778,7 @@ function slOpenEntry(id) {
   html += slCapCard(en);
   html += '<div class="br-res" style="margin-top:0"><div class="br-res-body" style="border-top:0">' +
     '<div class="br-res-row"><em>Reading</em><span>' + en.degrees.toFixed(1) + '° ' +
-      (en.isLevel ? 'within tolerance' : 'out of ' + (en.mode === 'flat' ? 'level' : 'plumb')) + '</span></div>' +
+      (en.isLevel ? 'within tolerance' : 'out of ' + (en.mode === 'flat' ? 'level' : (en.sub === 'plumb' ? 'plumb' : 'level'))) + '</span></div>' +
     (en.element ? '<div class="br-res-row"><em>Element</em><span>' + escapeHTML(en.element) + '</span></div>' : '') +
     (en.location ? '<div class="br-res-row"><em>Location</em><span>' + escapeHTML(en.location) + '</span></div>' : '') +
     '<div class="br-res-row"><em>Method</em><span>' + (en.zeroed ? 'Zeroed on a reference surface first' : 'Measured without zeroing') + '</span></div>' +
