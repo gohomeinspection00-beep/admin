@@ -1178,11 +1178,18 @@ class MainActivity : AppCompatActivity() {
         fun saveImage(b64: String, name: String): String {
             return try {
                 val bytes = Base64.decode(b64, Base64.DEFAULT)
-                val safe = if (name.endsWith(".jpg", true)) name else "$name.jpg"
+                // PNG dibiarkan sebagai PNG. Pelan lantai ialah garisan hitam
+                // atas putih, dan JPEG meninggalkan bayang pada setiap dinding.
+                val png = name.endsWith(".png", true)
+                val mime = if (png) "image/png" else "image/jpeg"
+                val safe = when {
+                    png || name.endsWith(".jpg", true) -> name
+                    else -> "$name.jpg"
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     val cv = ContentValues().apply {
                         put(MediaStore.Images.Media.DISPLAY_NAME, safe)
-                        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                        put(MediaStore.Images.Media.MIME_TYPE, mime)
                         put(MediaStore.Images.Media.RELATIVE_PATH,
                             Environment.DIRECTORY_PICTURES + "/GoXpert Pocket")
                         put(MediaStore.Images.Media.IS_PENDING, 1)

@@ -1550,23 +1550,38 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 }
 .ar-btn:disabled{opacity:0.45}
 
+/* Sketch to Real — pilih gambar */
+.sk-up{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;margin-top:12px;padding:19px 14px;box-sizing:border-box;
+  border:1.5px dashed var(--line);border-radius:var(--radius);
+  background:rgba(127,127,127,0.05);color:var(--muted);
+  font-size:13.5px;font-weight:600;text-align:center;
+}
+.sk-up svg{flex:none}
+.sk-pv{
+  width:100%;max-height:32vh;object-fit:contain;
+  margin-top:12px;border-radius:var(--radius);
+  border:1px solid var(--line);background:#fff;box-sizing:border-box;
+}
+
 /* Sketch to Real — result */
 .sk-result{
   width:100%;background:#fff;border-radius:var(--radius);overflow:auto;
-  max-height:48vh;border:1px solid var(--border);padding:8px;
+  max-height:48vh;border:1px solid var(--line);padding:8px;
 }
 .sk-result svg{width:100%;height:auto;display:block}
 .sk-actions{display:flex;gap:8px;width:100%}
 .sk-actions .tool-btn{flex:1}
 .sk-notes{
   width:100%;margin-top:12px;padding:11px 12px;border-radius:var(--radius);
-  border:1px solid var(--border);background:rgba(127,127,127,0.06);color:inherit;
+  border:1px solid var(--line);background:rgba(127,127,127,0.06);color:inherit;
   font-family:var(--font-body);font-size:13px;resize:vertical;min-height:62px;
   line-height:1.4;box-sizing:border-box;
 }
 .sk-spin{
   display:inline-block;width:13px;height:13px;border-radius:50%;
-  border:2px solid var(--border);border-top-color:var(--accent);
+  border:2px solid var(--line);border-top-color:var(--accent);
   animation:sk-rot 0.8s linear infinite;vertical-align:-2px;margin-right:5px;
 }
 @keyframes sk-rot{to{transform:rotate(360deg)}}
@@ -9471,7 +9486,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.4 · build 13 Okt 2026 · Spirit level: putar, dan skrin penuh</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.4 · build 13 Okt 2026 · Sketch to Real: simpan, saiz, rupa; fabric luar talian</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -16289,17 +16304,18 @@ let _threeLoading = null;
 // Tiada semakan "adakah kita dalam app": laluan pertama cuma 404 di luar
 // APK dan kita jatuh ke CDN. Satu peraturan, dua tempat, tiada cabang.
 const PK_LIB = ['/lib/', 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/'];
+const PK_FAB = ['/lib/', 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/'];
 
-function pkScript(rel, check) {
+function pkScriptFrom(bases, rel, check) {
   return new Promise(function(resolve, reject) {
     let i = 0;
     const next = function() {
-      if (i >= PK_LIB.length) {
+      if (i >= bases.length) {
         reject(new Error('Tiada sambungan untuk memuatkan ' + rel.split('/').pop()));
         return;
       }
       const s = document.createElement('script');
-      s.src = PK_LIB[i++] + rel;
+      s.src = bases[i++] + rel;
       // onload tidak mencukupi. APK LAMA menghidangkan halaman Pocket untuk
       // setiap URL yang tidak dikenalinya, termasuk /lib/three.min.js — jadi
       // tag skrip memuatkan HTML, membalingnya sebagai ralat sintaks, dan
@@ -16314,6 +16330,45 @@ function pkScript(rel, check) {
     };
     next();
   });
+}
+
+function pkScript(rel, check) { return pkScriptFrom(PK_LIB, rel, check); }
+
+/**
+ * Simpan satu gambar data-URL ke galeri telefon.
+ *
+ * WebView menelan <a download> tanpa sebarang ralat: klik itu tidak
+ * melemparkan apa-apa, jadi kod yang berkata "Saved" selepasnya berbohong
+ * dan surveyor pulang dari tapak tanpa fail. Dalam app ia mesti melalui
+ * jambatan; kalau jambatan itu tiada, APK itu lebih lama daripada fail
+ * Pocket ini dan kita berkata begitu.
+ */
+function pkSaveImage(dataUrl, base) {
+  const say = function(m) { if (typeof showToast === 'function') showToast(m); };
+  const comma = (dataUrl || '').indexOf(',');
+  if (comma < 0) { say('Gambar tidak sah'); return false; }
+  // PNG dikekalkan sebagai PNG. Pelan lantai ialah garisan hitam atas putih,
+  // dan JPEG meninggalkan bayang di sekeliling setiap dinding.
+  const png = dataUrl.slice(0, comma).indexOf('png') !== -1;
+  const name = base + (png ? '.png' : '.jpg');
+  const b64 = dataUrl.slice(comma + 1);
+  const N = window.PocketNative;
+  if (N && N.saveImage) {
+    let msg;
+    try { msg = N.saveImage(b64, name); }
+    catch (e) { say('Gagal menyimpan: ' + (e.message || e)); return false; }
+    say(msg || 'Disimpan ke galeri');
+    return true;
+  }
+  if (N) {
+    say('APK lama \u2014 pasang APK terkini untuk simpan ke galeri');
+    return false;
+  }
+  const a = document.createElement('a');
+  a.href = dataUrl; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  say('Dimuat turun');
+  return true;
 }
 
 function loadThree() {
@@ -18046,12 +18101,12 @@ function openSketchToReal(retain) {
       '<div class="ar-step"><span class="ar-step-n">2</span><span>AI redraws it as a clean floor-plan image.</span></div>' +
       '<div class="ar-step"><span class="ar-step-n">3</span><span>Save it, or send it straight to AR Floor Plan.</span></div>' +
     '</div>' +
-    '<div class="fp-upload" id="skUpload">' +
+    '<div class="sk-up" id="skUpload">' +
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
       '<span id="skUploadText">Tap to photo or upload your sketch</span>' +
     '</div>' +
     '<input type="file" accept="image/*" id="skFile" style="display:none">' +
-    '<img id="skPreview" class="fp-preview" style="display:none" alt="">' +
+    '<img id="skPreview" class="sk-pv" style="display:none" alt="">' +
     '<textarea id="skNotes" class="sk-notes" placeholder="Optional notes for the AI (helps a lot) — e.g. left = Bed 1, top-right = Bathroom, bottom-right = Toilet, main door at bottom-left, room ~3m x 4m"></textarea>' +
     '<div id="skStatus" class="ar-status"></div>';
 
@@ -18067,19 +18122,30 @@ function openSketchToReal(retain) {
   _skState = null;
 
   uploadEl.addEventListener('click', function() { fileInput.click(); });
-  fileInput.addEventListener('change', function() {
+  fileInput.addEventListener('change', async function() {
     const f = fileInput.files && fileInput.files[0];
     if (!f) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      _skState = { dataUrl: ev.target.result };
-      const pv = document.getElementById('skPreview');
-      if (pv) { pv.src = _skState.dataUrl; pv.style.display = 'block'; }
-      const t = document.getElementById('skUploadText'); if (t) t.textContent = 'Change photo';
-      mainBtn.textContent = '✨ Redraw with AI';
-      statusEl.className = 'ar-status'; statusEl.textContent = '';
-    };
-    reader.readAsDataURL(f);
+    // Gambar terus dari kamera telefon ialah 12 MP: 4 MB base64 untuk
+    // dihantar atas data mudah alih, 48 MB bitmap untuk WebView lukis, dan
+    // putaran EXIF yang Gemini tidak baca — lakaran masuk mengiring dan
+    // keluar mengiring. Satu laluan kanvas membetulkan ketiga-tiganya, dan
+    // itulah yang setiap alat lain dalam Pocket sudah buat.
+    statusEl.className = 'ar-status';
+    statusEl.textContent = 'Menyiapkan gambar…';
+    let url;
+    try {
+      url = await resizeImage(f, 1600);
+    } catch (e) {
+      statusEl.className = 'ar-status warn';
+      statusEl.textContent = 'Tidak dapat membaca gambar itu';
+      return;
+    }
+    _skState = { dataUrl: url };
+    const pv = document.getElementById('skPreview');
+    if (pv) { pv.src = url; pv.style.display = 'block'; }
+    const t = document.getElementById('skUploadText'); if (t) t.textContent = 'Change photo';
+    mainBtn.textContent = '✨ Redraw with AI';
+    statusEl.textContent = '';
   });
 
   if (retain && retain.dataUrl) {
@@ -18124,7 +18190,7 @@ function showSketchResult(imgUrl) {
   document.getElementById('toolModalFoot').innerHTML =
     '<div class="sk-actions">' +
       '<button class="tool-btn" id="skRedo">Redo</button>' +
-      '<button class="tool-btn" id="skSave">Save PNG</button>' +
+      '<button class="tool-btn" id="skSave">Save image</button>' +
       '<button class="tool-btn tool-btn-primary" id="skToAR">Use in AR</button>' +
     '</div>';
   document.getElementById('skRedo').onclick = function() { openSketchToReal({ dataUrl: _skState && _skState.dataUrl, notes: _skState && _skState.notes }); };
@@ -18216,15 +18282,7 @@ function svgToImage(svg) {
 }
 
 function saveSketchPNG(imgUrl) {
-  try {
-    const a = document.createElement('a');
-    a.href = imgUrl;
-    a.download = 'floorplan-' + Date.now() + '.png';
-    a.click();
-    if (typeof showToast === 'function') showToast('Saved');
-  } catch (e) {
-    if (typeof showToast === 'function') showToast('Save failed: ' + e.message);
-  }
+  return pkSaveImage(imgUrl, 'floorplan-' + Date.now());
 }
 
 function sketchToAR(imgUrl) { fpUseImage(imgUrl, 'Sketch'); }
@@ -18236,13 +18294,11 @@ let _fabricLoading = null;
 function loadFabric() {
   if (window.fabric) return Promise.resolve();
   if (_fabricLoading) return _fabricLoading;
-  _fabricLoading = new Promise(function(resolve, reject) {
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js';
-    s.onload = function() { resolve(); };
-    s.onerror = function() { _fabricLoading = null; reject(new Error('Failed to load drawing library')); };
-    document.head.appendChild(s);
-  });
+  // Salinan dalam APK dahulu, CDN hanya dalam pelayar. Sebelum ini Plan
+  // Editor mati sepenuhnya di tapak tanpa liputan — masalah yang sama
+  // yang mematikan penonton 3D.
+  _fabricLoading = pkScriptFrom(PK_FAB, 'fabric.min.js', function() { return !!window.fabric; })
+    .catch(function(e) { _fabricLoading = null; throw e; });
   return _fabricLoading;
 }
 
@@ -18878,7 +18934,7 @@ function buildPlanEditor() {
     canvas.requestRenderAll();
     const url = canvas.toDataURL({ format: 'png', multiplier: 2 });
     if (hadGrid) { canvas.backgroundColor = makeGridPattern(); canvas.requestRenderAll(); }
-    const a = document.createElement('a'); a.href = url; a.download = 'plan-' + Date.now() + '.png'; a.click();
+    pkSaveImage(url, 'plan-' + Date.now());
   }
   function useInAR() {
     canvas.discardActiveObject(); canvas.requestRenderAll();

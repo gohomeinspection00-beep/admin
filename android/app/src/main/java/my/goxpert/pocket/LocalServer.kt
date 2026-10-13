@@ -170,22 +170,24 @@ class LocalServer(
     }
 
     /**
-     * three.js, dihidangkan dari dalam APK.
+     * three.js dan fabric.js, dihidangkan dari dalam APK.
      *
-     * Pelihat 3D dan dua skrin AR lama memuatkannya dari cdnjs. Itu baik di
-     * pejabat dan mati di tapak: telefon pada "SOS only" tidak dapat
-     * memuatkan GLTFLoader, jadi model tidak boleh dibuka, jadi titik tidak
-     * boleh ditanda, jadi AR tidak boleh dimasuki langsung — walaupun skrin
-     * AR itu sendiri tidak perlukan rangkaian sama sekali.
+     * Pelihat 3D, dua skrin AR lama dan Plan Editor memuatkannya dari cdnjs.
+     * Itu baik di pejabat dan mati di tapak: telefon pada "SOS only" tidak
+     * dapat memuatkan GLTFLoader, jadi model tidak boleh dibuka, jadi titik
+     * tidak boleh ditanda, jadi AR tidak boleh dimasuki langsung — walaupun
+     * skrin AR itu sendiri tidak perlukan rangkaian sama sekali. Plan Editor
+     * pula tidak membuka apa-apa selain satu mesej ralat.
      *
-     * 700 KB dalam APK ialah harga yang murah untuk membuang kebergantungan
+     * 1 MB dalam APK ialah harga yang murah untuk membuang kebergantungan
      * itu sepenuhnya. Halaman cuba laluan ini dahulu dan jatuh ke CDN hanya
      * bila ia tiada — iaitu dalam Chrome, bukan di sini.
      */
     private fun lib(name: String): Response {
         // Hanya fail yang app sendiri bungkuskan, supaya URL yang disusun
         // sendiri tidak boleh membaca apa-apa lain dalam aset.
-        if (!Regex("^(three\\.min\\.js|loaders/(GLTF|DRACO)Loader\\.js)$").matches(name)) {
+        if (!Regex("^(three\\.min\\.js|fabric\\.min\\.js|loaders/(GLTF|DRACO)Loader\\.js)$")
+                .matches(name)) {
             return noCache(newFixedLengthResponse(
                 Response.Status.FORBIDDEN, "text/plain", "nama tidak sah"))
         }
