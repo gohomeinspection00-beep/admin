@@ -7848,7 +7848,24 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 /* Landskap: tingginya kira-kira 390px, dan susunan potret memerlukan lebih
    600px. Dua lajur — bacaan di sebelah dail — dan bukan satu lajur yang
    perlu ditatal untuk melihat nombornya. */
+/* Landskap, skrin pendek: modal menjadi skrin penuh.
+   Kad terapung 480×354 meninggalkan kira-kira 190px untuk kandungan sebaik
+   tajuk dan bar butang mengambil bahagian mereka — tidak cukup, jadi
+   nombornya terpotong separuh. Skrin penuh mengembalikan setiap piksel,
+   dan tajuknya mengecil kepada satu baris. */
 @media (orientation: landscape) and (max-height: 560px) {
+  .tool-modal.tool-full,
+  .tool-modal.tool-full.show{
+    left:0;top:0;transform:none;
+    width:100%;max-width:none;height:100%;max-height:none;
+    border:none;border-radius:0;
+  }
+  .tool-modal.tool-full .tool-modal-head{padding:8px 14px 7px}
+  .tool-modal.tool-full .tool-modal-icon{width:26px;height:26px}
+  .tool-modal.tool-full .tool-modal-desc{display:none}
+  .tool-modal.tool-full .tool-modal-body{padding:10px 16px}
+  .tool-modal.tool-full .tool-modal-foot{padding:9px 16px}
+
   .sl-stage-row{display:flex;align-items:center;gap:20px}
   .sl-stage-row > .sl-read{flex:0 0 132px;margin:0}
   .sl-stage-row > .sl-stage{flex:1;min-width:0;max-width:none;margin:0}
@@ -9454,7 +9471,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.3 · build 13 Okt 2026 · Spirit level berputar ikut telefon</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.4 · build 13 Okt 2026 · Spirit level: putar, dan skrin penuh</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -13248,6 +13265,7 @@ let _toolHideT = null;
 function closeTool() {
   // Stop sensors if running
   if (typeof stopSpiritLevel === 'function') stopSpiritLevel();
+  toolModal.classList.remove('tool-full');
   if (typeof stopCompass === 'function') stopCompass();
   
   toolModal.classList.remove('show');
@@ -14431,6 +14449,7 @@ function slRenderMeasure() {
   document.getElementById('slSaveBtn').addEventListener('click', function() { slOpenForm(); });
 
   startSpiritLevel();
+  toolModal.classList.add('tool-full');
 
   setTimeout(function() {
     if (!slHave) {
