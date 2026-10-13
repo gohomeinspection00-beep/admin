@@ -199,6 +199,7 @@ class MainActivity : AppCompatActivity() {
 
     /** Model 3D terakhir yang Pocket PUT ke pelayan tempatan. */
     private val modelDir: File get() = File(cacheDir, "model")
+    private val inspDir: File get() = File(cacheDir, "insp")
 
     /** Gambar yang baru diambil dengan kamera, menunggu diserahkan. */
     private val shotDir: File get() = File(cacheDir, "shot")
@@ -306,6 +307,38 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
     }
 
+    private val arInspectResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { res ->
+        val ok = res.resultCode == RESULT_OK
+        val err = res.data?.getStringExtra("error").orEmpty()
+        val js = "window.pkArInspect && window.pkArInspect(" + ok + "," + jsStr(err) + ")"
+        runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
+    }
+
+    /**
+     * Null bermakna AR boleh dimulakan. Selainnya ialah sebab, dalam
+     * perkataan yang halaman Pocket sudah tahu kendalikan.
+     */
+    private fun arNotReady(): String? {
+        val av = runCatching {
+            ArCoreApk.getInstance().checkAvailability(this)
+        }.getOrNull()
+        if (av != ArCoreApk.Availability.SUPPORTED_INSTALLED) {
+            return if (av == ArCoreApk.Availability.SUPPORTED_NOT_INSTALLED ||
+                       av == ArCoreApk.Availability.SUPPORTED_APK_TOO_OLD) {
+                runCatching { ArCoreApk.getInstance().requestInstall(this, true) }
+                "pasang"
+            } else "tiada"
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            askPerms.launch(arrayOf(Manifest.permission.CAMERA))
+            return "tiada-kebenaran"
+        }
+        return null
+    }
+
     private val askPerms = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { /* Pocket sendiri akan beritahu apa yang kurang. */ }
@@ -342,7 +375,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            server = LocalServer(uvc, pocketFile, pickDir, modelDir, assets)
+            server = LocalServer(uvc, pocketFile, pickDir, modelDir, inspDir, assets)
                 .also { it.start(0, true) }
             uvc.say("Pelayan hidup pada $HOME")
         } catch (e: Throwable) {
@@ -943,6 +976,31 @@ class MainActivity : AppCompatActivity() {
                 uvc.say("Hamparan pelan gagal: ${e.message}")
                 "gagal: ${e.message}"
             }
+        }
+
+        /**
+         * AR Inspection: tanda defect dalam ruang, dan buka semula di
+         * tempat yang sama.
+         *
+         * Bungkusan zon sudah berada dalam cakera melalui PUT /insp sebelum
+         * ini, dan hasilnya keluar melalui fail juga. Yang melintasi
+         * jambatan di sini hanyalah "mula".
+         */
+        @JavascriptInterface
+        fun arInspect(): String {
+            val f = File(inspDir, "in.json")
+            if (!f.exists() || f.length() <= 0L) return "tiada-fail"
+            var out = "ok"
+            runOnUiThread {
+                val bad = arNotReady()
+                if (bad != null) { out = bad; return@runOnUiThread }
+                runCatching {
+                    arInspectResult.launch(
+                        Intent(this@MainActivity, ArInspectActivity::class.java)
+                            .putExtra("bundle", f.absolutePath))
+                }.onFailure { out = "gagal: ${it.message}" }
+            }
+            return out
         }
 
         /**

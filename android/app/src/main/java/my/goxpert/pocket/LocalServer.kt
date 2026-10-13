@@ -21,6 +21,7 @@ class LocalServer(
     private val pocketFile: File,
     private val pickDir: File,
     private val modelDir: File,
+    private val inspDir: File,
     private val assets: android.content.res.AssetManager
 ) : NanoHTTPD(HOST, PORT) {
 
@@ -33,6 +34,8 @@ class LocalServer(
                 uri == "/uvc/stream"   -> stream()
                 uri == "/uvc/debug"    -> debug()
                 uri == "/model" -> model(session)
+                uri == "/insp" -> inspPut(session)
+                uri.startsWith("/insp/") -> inspGet(uri.removePrefix("/insp/"))
                 uri.startsWith("/lib/") -> lib(uri.removePrefix("/lib/"))
                 uri.startsWith("/pick/") -> picked(uri.removePrefix("/pick/"))
                 else                   -> pocket()
@@ -167,6 +170,85 @@ class LocalServer(
                 Response.Status.INTERNAL_ERROR, "text/plain",
                 "${e.javaClass.simpleName}: ${e.message}"))
         }
+    }
+
+    /**
+     * Bungkusan AR Inspection masuk, dan hasilnya keluar.
+     *
+     * Satu zon membawa titik kunci, setiap defect dengan gambar kecilnya,
+     * dan kemudian memulangkan setiap defect baharu dengan gambar penuhnya.
+     * Tiada satu pun daripada itu boleh melalui Intent: had urus niaga
+     * Binder ialah satu megabait untuk SELURUH proses, dan tiga puluh gambar
+     * melepasinya dengan mudah. Ia juga tidak sesuai sebagai hujah jambatan
+     * JavaScript, kerana ia kemudian mesti disalin ke dalam Intent itu juga.
+     *
+     * Jadi ia melalui cakera, sama seperti GLB di atas: halaman PUT satu
+     * fail, app membacanya, app menulis hasilnya, halaman fetch ia balik.
+     */
+    private fun inspPut(session: IHTTPSession): Response {
+        if (session.method != Method.PUT && session.method != Method.POST) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.METHOD_NOT_ALLOWED, "text/plain", "PUT sahaja"))
+        }
+        val len = (session.headers["content-length"] ?: "0").toLongOrNull() ?: 0L
+        if (len <= 0L) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.BAD_REQUEST, "text/plain", "tiada panjang"))
+        }
+        if (len > 64L * 1024 * 1024) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.BAD_REQUEST, "text/plain", "terlalu besar"))
+        }
+        return try {
+            inspDir.mkdirs()
+            // Hasil lama dibuang di sini dan bukan selepas dibaca: halaman
+            // sudah mengambil apa yang ia perlukan sebelum ia PUT lagi
+            // sekali, dan gambar yang tertinggal ialah cakera yang hilang.
+            inspDir.listFiles()?.forEach { runCatching { it.delete() } }
+            val f = File(inspDir, "in.json")
+            var left = len
+            val buf = ByteArray(64 * 1024)
+            java.io.FileOutputStream(f).use { out ->
+                val ins = session.inputStream
+                while (left > 0) {
+                    val want = minOf(left, buf.size.toLong()).toInt()
+                    val got = ins.read(buf, 0, want)
+                    if (got <= 0) break
+                    out.write(buf, 0, got)
+                    left -= got
+                }
+            }
+            if (left > 0L || f.length() != len) {
+                runCatching { f.delete() }
+                return noCache(newFixedLengthResponse(
+                    Response.Status.INTERNAL_ERROR, "text/plain", "terputus"))
+            }
+            noCache(newFixedLengthResponse(
+                Response.Status.OK, "application/json", "{\"ok\":true}"))
+        } catch (e: Throwable) {
+            noCache(newFixedLengthResponse(
+                Response.Status.INTERNAL_ERROR, "text/plain",
+                "${e.javaClass.simpleName}: ${e.message}"))
+        }
+    }
+
+    /** Hasil zon, dan gambar yang skrin AR tulis. Nama dihadkan kepada apa
+     *  yang app sendiri hasilkan. */
+    private fun inspGet(name: String): Response {
+        val safe = name.substringAfterLast('/')
+        val json = safe == "out.json"
+        if (!json && !Regex("^[dl]\\d+\\.jpg$").matches(safe)) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.FORBIDDEN, "text/plain", "nama tidak sah"))
+        }
+        val f = File(inspDir, safe)
+        if (!f.exists()) {
+            return noCache(newFixedLengthResponse(
+                Response.Status.NOT_FOUND, "text/plain", "tiada"))
+        }
+        return noCache(newFixedLengthResponse(
+            Response.Status.OK, if (json) "application/json" else "image/jpeg",
+            f.inputStream(), f.length()))
     }
 
     /**

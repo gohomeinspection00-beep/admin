@@ -1550,6 +1550,116 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 }
 .ar-btn:disabled{opacity:0.45}
 
+/* AR Inspection */
+.ari-big{
+  display:flex;align-items:center;gap:11px;width:100%;margin-bottom:10px;
+  padding:14px 13px;border-radius:13px;border:1px solid var(--line);
+  background:var(--bg-2);color:inherit;text-align:left;box-sizing:border-box;
+}
+.ari-big.pri{border-color:var(--accent);background:var(--accent-soft)}
+.ari-big-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ari-big-t b{font-size:14.5px}
+.ari-big-t span{font-size:12.5px;color:var(--muted);line-height:1.35}
+.ari-sec{
+  font-size:11.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+  color:var(--muted);margin:16px 0 8px;
+}
+.ari-row{
+  display:flex;align-items:center;gap:10px;width:100%;margin-bottom:8px;
+  padding:11px 12px;border-radius:11px;border:1px solid var(--line);
+  background:var(--bg);color:inherit;text-align:left;box-sizing:border-box;
+}
+.ari-row-b{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.ari-row-b b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ari-row-b > span{font-size:12px;color:var(--muted)}
+.ari-go{color:var(--muted-2);font-size:20px;line-height:1;flex:none}
+.ari-tags{display:flex;gap:5px;flex-wrap:wrap}
+.ari-tag{
+  font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:999px;
+  background:var(--surface);color:var(--muted);border:1px solid var(--line);
+}
+.ari-tag.ok{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line)}
+.ari-empty{
+  font-size:12.5px;color:var(--muted);line-height:1.5;padding:12px 13px;
+  border-radius:11px;background:var(--surface);margin-top:4px;
+}
+.ari-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;min-width:0}
+.ari-head b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ari-back{
+  flex:none;font-size:12.5px;font-weight:600;color:var(--accent);
+  padding:5px 9px;border-radius:8px;background:var(--accent-soft);
+  border:1px solid var(--accent-line);max-width:48%;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ari-need{display:flex;align-items:center;gap:8px;margin:12px 0 6px;font-size:13px}
+.ari-nbtn{
+  width:42px;height:38px;border-radius:10px;font-size:15px;font-weight:700;
+  border:1px solid var(--line);background:var(--bg);color:inherit;
+}
+.ari-nbtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.ari-fine{font-size:11.5px;color:var(--muted);line-height:1.5}
+.ari-locks{
+  display:flex;flex-direction:column;gap:4px;padding:11px 12px;margin-bottom:4px;
+  border-radius:11px;border:1px solid var(--accent-line);background:var(--accent-soft);
+}
+.ari-locks b{font-size:13.5px}
+.ari-locks > span{font-size:12px;color:var(--muted)}
+.ari-lrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.ari-lk{position:relative;width:62px;height:47px;flex:none}
+.ari-lk img{
+  width:100%;height:100%;object-fit:cover;border-radius:8px;
+  border:1px solid var(--accent-line);background:var(--bg);display:block;
+}
+.ari-lk-x{
+  display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  border-radius:8px;border:1px dashed var(--line-2);color:var(--muted-2);font-size:14px;
+}
+.ari-lk b{
+  position:absolute;left:3px;top:3px;min-width:16px;height:16px;padding:0 3px;
+  border-radius:8px;background:rgba(0,0,0,0.7);color:#fff;
+  font-size:10.5px;line-height:16px;text-align:center;
+}
+.ari-ds{display:flex;flex-direction:column;gap:8px}
+.ari-d{
+  display:flex;align-items:stretch;gap:10px;width:100%;padding:9px;
+  border-radius:11px;border:1px solid var(--line);background:var(--bg);
+  color:inherit;text-align:left;box-sizing:border-box;
+}
+.ari-d-im{
+  flex:none;width:74px;height:60px;border-radius:8px;object-fit:cover;
+  background:var(--surface);border:1px solid var(--line);display:block;
+}
+.ari-d-no{border-style:dashed}
+.ari-d-b{display:flex;flex-direction:column;gap:4px;align-items:flex-start;flex:1;min-width:0}
+.ari-d-t{width:100%;min-width:0}
+.ari-d-t b{font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ari-chip{
+  font-size:10.5px;font-weight:700;color:#fff;padding:2px 8px;border-radius:999px;
+}
+.ari-d-n{
+  font-size:11.5px;color:var(--muted);line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.ari-foot,.ari-erow{display:flex;gap:8px;width:100%}
+.ari-foot .tool-btn,.ari-erow .tool-btn{flex:1}
+.ari-menu{display:flex;flex-direction:column;gap:7px;width:100%}
+.ari-edit{display:flex;flex-direction:column;gap:9px;width:100%}
+.ari-in{
+  width:100%;padding:10px 11px;border-radius:9px;border:1px solid var(--line);
+  background:var(--bg);color:inherit;font-family:var(--font-body);font-size:13px;
+  box-sizing:border-box;resize:vertical;
+}
+textarea.ari-in{min-height:52px;line-height:1.4}
+.ari-sev{display:flex;gap:6px}
+.ari-sbtn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:7px 2px;border-radius:9px;border:1px solid var(--line);
+  background:var(--bg);color:var(--muted);min-width:0;
+}
+.ari-sbtn b{font-size:13px}
+.ari-sbtn span{font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ari-sbtn.on{background:var(--h);border-color:var(--h);color:#fff}
+
 /* Sketch to Real — pilih gambar */
 .sk-up{
   display:flex;align-items:center;justify-content:center;gap:9px;
@@ -9486,7 +9596,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.4 · build 13 Okt 2026 · Sketch to Real: simpan, saiz, rupa; fabric luar talian</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.4 · build 13 Okt 2026 · AR Inspection: defect ditanda dalam ruang</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -13260,6 +13370,7 @@ function openTool(toolKey) {
   else if (toolKey === 'crackruler') openCrackRuler();
   else if (toolKey === 'armeasure') openARMeasure();
   else if (toolKey === 'arfloorplan') openARFloorPlan();
+  else if (toolKey === 'arinspect') openARInspect();
   else if (toolKey === 'model3d') openModel3D();
   else if (toolKey === 'hardware') openHardware();
   else if (toolKey === 'endoscope') openEndoscope();
@@ -18083,6 +18194,624 @@ async function fpStartAr() {
       } else L.el.style.display = 'none';
     }
   });
+}
+
+// =======================================================
+// TOOL: AR INSPECTION (ARI) — defect ditanda dalam ruang
+// =======================================================
+//
+// Setiap alat AR lain dalam Pocket hidup untuk satu sesi. Yang ini hidup
+// merentasi lawatan: defect ditanda hari ini mesti muncul semula pada
+// retak yang sama tiga bulan kemudian, selepas pembaikan.
+//
+// ARCore tidak boleh menyimpan peta sesuatu tempat — tutup app dan setiap
+// koordinatnya hilang. Jadi defect tidak pernah disimpan dalam koordinat
+// ARCore. Ia disimpan dalam bingkai ZON, yang ditakrifkan oleh beberapa
+// titik kunci pada ciri yang tidak bergerak: bucu dinding, bucu kusen
+// pintu, penjuru tiang. Lawatan berikutnya menanda semula titik itu, dan
+// semuanya kembali. Matematiknya ada dalam ArFit.kt, diuji berasingan.
+//
+// Alat ini berdiri sendiri. Tiada inspection perlu dibuka dahulu, kerana
+// defect selalunya ditanda sebelum sesiapa memutuskan laporan mana ia
+// masuk. Butang "Hantar ke inspection" wujud untuk bila keputusan itu
+// dibuat.
+
+const ARI_STORE = 'pocket_arinsp_v1';
+const ARI_KEY = 'arinsp:';
+const ARI_SEV = [
+  { code: 'N1', name: 'Normal',    hue: '#3B82F6' },
+  { code: 'R2', name: 'Rutin',     hue: '#F59E0B' },
+  { code: 'U3', name: 'Mendesak',  hue: '#F97316' },
+  { code: 'E4', name: 'Kecemasan', hue: '#DC2626' }
+];
+
+const ARI = { ispId: '', zoneId: '', pending: null };
+
+function ariAll() {
+  try {
+    const r = JSON.parse(localStorage.getItem(ARI_STORE) || '[]');
+    return Array.isArray(r) ? r : [];
+  } catch (e) { return []; }
+}
+function ariPut(list) {
+  // Hanya nombor dan teks di sini. Gambar hidup dalam IndexedDB, kerana
+  // satu zon dengan dua puluh defect akan meletupkan kuota localStorage
+  // pada gambar pertama.
+  try { localStorage.setItem(ARI_STORE, JSON.stringify(list.slice(0, 60))); return true; }
+  catch (e) { showToast('Simpanan telefon penuh'); return false; }
+}
+function ariId(p) {
+  return (p || 'k') + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+function ariInsp(id) { return ariAll().filter(function(x) { return x.id === id; })[0] || null; }
+function ariZone(isp, zid) {
+  if (!isp) return null;
+  return (isp.zones || []).filter(function(z) { return z.id === zid; })[0] || null;
+}
+function ariSave(isp) {
+  const list = ariAll().filter(function(x) { return x.id !== isp.id; });
+  list.unshift(isp);
+  return ariPut(list);
+}
+function ariInApp() {
+  return !!(window.PocketNative && typeof window.PocketNative.arInspect === 'function');
+}
+function ariIco() {
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M12 2 3 6.5v11L12 22l9-4.5v-11z"/><path d="M3 6.5 12 11l9-4.5M12 11v11"/>' +
+    '<circle cx="12" cy="11" r="1.6" fill="currentColor"/></svg>';
+}
+function ariWhen(t) {
+  if (!t) return '';
+  const d = new Date(t);
+  const days = Math.floor((Date.now() - t) / 86400000);
+  if (days === 0) return 'hari ini';
+  if (days === 1) return 'semalam';
+  if (days < 30) return days + ' hari lalu';
+  return d.toLocaleDateString();
+}
+function ariCount(z) { return (z.defects || []).length; }
+function ariMm(m) {
+  const mm = m * 1000;
+  return mm < 1000 ? Math.round(mm) + ' mm' : m.toFixed(2) + ' m';
+}
+/** Sejauh mana defect akan muncul daripada tempat sebenarnya. */
+function ariGrade(m) {
+  if (m < 0.05) return 'bagus';
+  if (m < 0.15) return 'boleh pakai';
+  return 'lemah';
+}
+function ariReady(z) { return (z.locks || []).length >= 2; }
+
+// ---------- skrin ----------
+
+function openARInspect() {
+  document.getElementById('toolModalIcon').innerHTML = ariIco();
+  document.getElementById('toolModalName').textContent = 'AR Inspection';
+  document.getElementById('toolModalDesc').textContent = 'Tanda defect di tempatnya, jumpa semula nanti';
+  ariHome();
+  showToolModal();
+}
+
+function ariHome() {
+  const list = ariAll();
+  let h = '';
+  if (!ariInApp()) {
+    h += '<div class="ar-status warn">Alat ini perlukan app GoXpert Pocket — ' +
+         'AR tidak wujud dalam pelayar telefon. Rekod lama masih boleh dibaca di sini.</div>';
+  }
+  h += '<button class="ari-big pri" id="ariNew">' +
+       '<span class="ari-big-t"><b>Inspection baharu</b>' +
+       '<span>Satu bangunan atau satu unit. Zon ditambah di dalamnya.</span></span></button>';
+  if (!list.length) {
+    h += '<div class="ari-empty">Belum ada apa-apa. Mula dengan satu inspection, ' +
+         'kemudian satu zon untuk setiap ruang — Ruang Tamu, Bilik 1, Dapur.</div>';
+  } else {
+    h += '<div class="ari-sec">Rekod tersimpan</div>';
+    for (let i = 0; i < list.length; i++) {
+      const x = list[i];
+      const nz = (x.zones || []).length;
+      const nd = (x.zones || []).reduce(function(a, z) { return a + ariCount(z); }, 0);
+      h += '<button class="ari-row" data-isp="' + escapeHTML(x.id) + '">' +
+        '<span class="ari-row-b"><b>' + escapeHTML(x.name || 'Inspection') + '</b>' +
+        '<span>' + nz + ' zon · ' + nd + ' defect · ' + ariWhen(x.at) + '</span></span>' +
+        '<span class="ari-go">›</span></button>';
+    }
+  }
+  document.getElementById('toolModalBody').innerHTML = h;
+  document.getElementById('toolModalFoot').innerHTML = '';
+  document.getElementById('ariNew').onclick = function() {
+    const n = prompt('Nama inspection — alamat atau nombor unit:', '');
+    if (n === null) return;
+    const isp = { id: ariId('i'), name: n.trim() || 'Inspection', at: Date.now(), zones: [] };
+    if (!ariSave(isp)) return;
+    ARI.ispId = isp.id;
+    ariInspScreen();
+  };
+  const rows = document.querySelectorAll('[data-isp]');
+  for (let i = 0; i < rows.length; i++) {
+    rows[i].onclick = function() { ARI.ispId = this.getAttribute('data-isp'); ariInspScreen(); };
+  }
+}
+
+function ariInspScreen() {
+  const isp = ariInsp(ARI.ispId);
+  if (!isp) { ariHome(); return; }
+  const zones = isp.zones || [];
+  let h = '<div class="ari-head"><button class="ari-back" id="ariBack">‹ Semua</button>' +
+          '<b>' + escapeHTML(isp.name) + '</b></div>';
+  h += '<button class="ari-big pri" id="ariNewZone">' +
+       '<span class="ari-big-t"><b>Zon baharu</b>' +
+       '<span>Satu ruang dengan titik kuncinya sendiri.</span></span></button>';
+  if (!zones.length) {
+    h += '<div class="ari-empty">Setiap zon ada set titik kuncinya sendiri, jadi satu rumah ' +
+         'penuh dipecah ikut ruang. Itu juga yang membuat setiap zon boleh dibuka semula ' +
+         'sendiri tanpa berjalan ke seluruh bangunan.</div>';
+  }
+  for (let i = 0; i < zones.length; i++) {
+    const z = zones[i];
+    const tag = ariReady(z)
+      ? '<span class="ari-tag ok">' + z.locks.length + ' titik kunci</span>'
+      : '<span class="ari-tag">belum ditanda</span>';
+    h += '<button class="ari-row" data-zone="' + escapeHTML(z.id) + '">' +
+      '<span class="ari-row-b"><b>' + escapeHTML(z.name) + '</b>' +
+      '<span>' + ariCount(z) + ' defect · ' + ariWhen(z.at) + '</span>' +
+      '<span class="ari-tags">' + tag + '</span></span>' +
+      '<span class="ari-go">›</span></button>';
+  }
+  document.getElementById('toolModalBody').innerHTML = h;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<button class="tool-btn" id="ariDelIsp">Buang inspection</button>';
+  document.getElementById('ariBack').onclick = ariHome;
+  document.getElementById('ariNewZone').onclick = function() {
+    const n = prompt('Nama zon — ruang mana?', '');
+    if (n === null) return;
+    const z = { id: ariId('z'), name: n.trim() || 'Zon', at: Date.now(), need: 3, locks: [], defects: [] };
+    isp.zones = (isp.zones || []).concat([z]);
+    if (!ariSave(isp)) return;
+    ARI.zoneId = z.id;
+    ariZoneScreen();
+  };
+  document.getElementById('ariDelIsp').onclick = async function() {
+    if (!confirm('Buang "' + isp.name + '" dan semua zonnya?')) return;
+    for (const z of (isp.zones || [])) await ariDropPhotos(z);
+    ariPut(ariAll().filter(function(x) { return x.id !== isp.id; }));
+    ariHome();
+  };
+  const rows = document.querySelectorAll('[data-zone]');
+  for (let i = 0; i < rows.length; i++) {
+    rows[i].onclick = function() { ARI.zoneId = this.getAttribute('data-zone'); ariZoneScreen(); };
+  }
+}
+
+async function ariZoneScreen() {
+  const isp = ariInsp(ARI.ispId);
+  const z = ariZone(isp, ARI.zoneId);
+  if (!z) { ariInspScreen(); return; }
+  const ready = ariReady(z);
+  let h = '<div class="ari-head"><button class="ari-back" id="ariBack">‹ ' +
+          escapeHTML(isp.name) + '</button><b>' + escapeHTML(z.name) + '</b></div>';
+
+  if (!ready) {
+    h += '<div class="ar-status">Zon ini belum ada titik kunci. Buka AR, tanda ' + (z.need || 3) +
+         ' ciri yang tidak akan bergerak, dan selepas itu setiap defect boleh dijumpai semula ' +
+         'di tempat yang sama.</div>';
+    h += '<div class="ari-need">Berapa titik kunci?' +
+      [3, 4, 5].map(function(n) {
+        return '<button class="ari-nbtn' + ((z.need || 3) === n ? ' on' : '') +
+               '" data-need="' + n + '">' + n + '</button>';
+      }).join('') + '</div>' +
+      '<div class="ari-fine">Tiga ialah minimum. Dengan dua sahaja, nombor ralat yang app papar ' +
+      'lebih kecil daripada ralat sebenar — dua titik sentiasa muat sempurna, jadi tiada lebihan ' +
+      'untuk mendedahkan bucu yang tersilap tanda.</div>';
+  } else {
+    h += '<div class="ari-locks"><b>' + z.locks.length + ' titik kunci</b>' +
+         '<span>' + (z.rms != null
+            ? 'Padanan terakhir ' + ariMm(z.rms) + ' \u00b7 ' + ariGrade(z.rms) +
+              ' \u00b7 ' + ariWhen(z.rmsAt)
+            : 'Tanda semula titik ini untuk membuka zon di tempatnya.') + '</span>' +
+         '<div class="ari-lrow" id="ariLrow"></div></div>';
+  }
+
+  const ds = (z.defects || []).slice();
+  if (ds.length) {
+    h += '<div class="ari-sec">' + ds.length + ' defect</div><div class="ari-ds" id="ariDs"></div>';
+  } else if (ready) {
+    h += '<div class="ari-empty">Belum ada defect. Buka AR dan tekan butang kamera ' +
+         'sambil membidik satu.</div>';
+  }
+  document.getElementById('toolModalBody').innerHTML = h;
+  document.getElementById('toolModalFoot').innerHTML =
+    '<div class="ari-foot">' +
+      '<button class="tool-btn" id="ariZoneMore">Lagi</button>' +
+      '<button class="tool-btn tool-btn-primary" id="ariGo">' +
+        (ready ? 'Buka AR di sini' : 'Tanda titik kunci') + '</button>' +
+    '</div>';
+
+  document.getElementById('ariBack').onclick = ariInspScreen;
+  const nb = document.querySelectorAll('[data-need]');
+  for (let i = 0; i < nb.length; i++) {
+    nb[i].onclick = function() {
+      z.need = parseInt(this.getAttribute('data-need'), 10);
+      ariSave(isp); ariZoneScreen();
+    };
+  }
+  document.getElementById('ariGo').onclick = function() { ariEnterAR(ready ? 'open' : 'new'); };
+  document.getElementById('ariZoneMore').onclick = function() { ariZoneMenu(isp, z); };
+
+  if (ready) await ariPaintLocks(z);
+  if (ds.length) await ariPaintDefects(isp, z);
+}
+
+function ariZoneMenu(isp, z) {
+  const foot = document.getElementById('toolModalFoot');
+  foot.innerHTML =
+    '<div class="ari-menu">' +
+      '<button class="tool-btn" id="ariRename">Tukar nama zon</button>' +
+      '<button class="tool-btn" id="ariSend">Hantar ke inspection</button>' +
+      '<button class="tool-btn" id="ariRelock">Buang titik kunci</button>' +
+      '<button class="tool-btn" id="ariDelZone">Buang zon</button>' +
+      '<button class="tool-btn tool-btn-primary" id="ariMenuBack">Kembali</button>' +
+    '</div>';
+  document.getElementById('ariMenuBack').onclick = ariZoneScreen;
+  document.getElementById('ariRename').onclick = function() {
+    const n = prompt('Nama zon:', z.name);
+    if (n === null) return;
+    z.name = n.trim() || z.name; ariSave(isp); ariZoneScreen();
+  };
+  document.getElementById('ariSend').onclick = function() { ariExport(isp, z); };
+  document.getElementById('ariRelock').onclick = async function() {
+    if (!confirm('Buang ' + z.locks.length + ' titik kunci?\n\nDefect kekal, tetapi zon ini ' +
+                 'tidak boleh dibuka semula di tempatnya sehingga titik baharu ditanda — ' +
+                 'dan titik baharu itu TIDAK akan padan dengan defect yang sedia ada.')) return;
+    for (const l of z.locks) if (l.shot) await lbDrop(ARI_KEY + l.shot);
+    z.locks = [];
+    ariSave(isp); ariZoneScreen();
+  };
+  document.getElementById('ariDelZone').onclick = async function() {
+    if (!confirm('Buang zon "' + z.name + '" dan ' + ariCount(z) + ' defectnya?')) return;
+    await ariDropPhotos(z);
+    isp.zones = (isp.zones || []).filter(function(x) { return x.id !== z.id; });
+    ariSave(isp); ariInspScreen();
+  };
+}
+
+async function ariDropPhotos(z) {
+  for (const d of (z.defects || [])) if (d.shot) await lbDrop(ARI_KEY + d.shot);
+  for (const l of (z.locks || [])) if (l.shot) await lbDrop(ARI_KEY + l.shot);
+}
+
+async function ariUrl(key) {
+  if (!key) return '';
+  const rec = await lbGet(ARI_KEY + key);
+  if (!rec || !rec.blob) return '';
+  return URL.createObjectURL(rec.blob);
+}
+
+async function ariPaintLocks(z) {
+  const row = document.getElementById('ariLrow');
+  if (!row) return;
+  let h = '';
+  for (let i = 0; i < z.locks.length; i++) {
+    const u = await ariUrl(z.locks[i].shot);
+    h += '<div class="ari-lk">' + (u ? '<img src="' + u + '" alt="">' : '<span class="ari-lk-x">?</span>') +
+         '<b>' + (i + 1) + '</b></div>';
+  }
+  row.innerHTML = h;
+}
+
+async function ariPaintDefects(isp, z) {
+  const box = document.getElementById('ariDs');
+  if (!box) return;
+  let h = '';
+  for (let i = 0; i < z.defects.length; i++) {
+    const d = z.defects[i];
+    const s = ARI_SEV[Math.min(3, Math.max(0, d.sev | 0))];
+    const u = await ariUrl(d.shot);
+    h += '<button class="ari-d" data-def="' + escapeHTML(d.id) + '">' +
+      (u ? '<img class="ari-d-im" src="' + u + '" alt="">'
+         : '<span class="ari-d-im ari-d-no"></span>') +
+      '<span class="ari-d-b">' +
+        '<span class="ari-d-t"><b>' + (i + 1) + '. ' +
+          escapeHTML(d.title || s.name) + '</b></span>' +
+        '<span class="ari-chip" style="background:' + s.hue + '">' + s.code + ' ' + s.name + '</span>' +
+        (d.note ? '<span class="ari-d-n">' + escapeHTML(d.note) + '</span>' : '') +
+      '</span></button>';
+  }
+  box.innerHTML = h;
+  const bs = box.querySelectorAll('[data-def]');
+  for (let i = 0; i < bs.length; i++) {
+    bs[i].onclick = function() { ariEditDefect(isp, z, this.getAttribute('data-def')); };
+  }
+}
+
+function ariEditDefect(isp, z, id) {
+  const d = (z.defects || []).filter(function(x) { return x.id === id; })[0];
+  if (!d) return;
+  const foot = document.getElementById('toolModalFoot');
+  foot.innerHTML =
+    '<div class="ari-edit">' +
+      '<input class="ari-in" id="ariT" placeholder="Defect apa?" value="' +
+        escapeHTML(d.title || '') + '">' +
+      '<div class="ari-sev" id="ariSev">' +
+        ARI_SEV.map(function(s, i) {
+          return '<button class="ari-sbtn' + (i === (d.sev | 0) ? ' on' : '') +
+                 '" data-sev="' + i + '" style="--h:' + s.hue + '">' +
+                 '<b>' + s.code + '</b><span>' + s.name + '</span></button>';
+        }).join('') +
+      '</div>' +
+      '<textarea class="ari-in" id="ariN" placeholder="Nota (pilihan)">' +
+        escapeHTML(d.note || '') + '</textarea>' +
+      '<div class="ari-erow">' +
+        '<button class="tool-btn" id="ariDDel">Buang</button>' +
+        '<button class="tool-btn" id="ariDCancel">Batal</button>' +
+        '<button class="tool-btn tool-btn-primary" id="ariDSave">Simpan</button>' +
+      '</div>' +
+    '</div>';
+  let sev = d.sev | 0;
+  const sb = foot.querySelectorAll('[data-sev]');
+  for (let i = 0; i < sb.length; i++) {
+    sb[i].onclick = function() {
+      sev = parseInt(this.getAttribute('data-sev'), 10);
+      for (let k = 0; k < sb.length; k++) sb[k].classList.toggle('on', k === sev);
+    };
+  }
+  document.getElementById('ariDCancel').onclick = ariZoneScreen;
+  document.getElementById('ariDSave').onclick = function() {
+    d.title = document.getElementById('ariT').value.trim();
+    d.note = document.getElementById('ariN').value.trim();
+    d.sev = sev;
+    ariSave(isp); ariZoneScreen();
+  };
+  document.getElementById('ariDDel').onclick = async function() {
+    if (!confirm('Buang defect ini?')) return;
+    if (d.shot) await lbDrop(ARI_KEY + d.shot);
+    z.defects = z.defects.filter(function(x) { return x.id !== d.id; });
+    ariSave(isp); ariZoneScreen();
+  };
+}
+
+// ---------- masuk AR ----------
+
+async function ariEnterAR(mode) {
+  const isp = ariInsp(ARI.ispId);
+  const z = ariZone(isp, ARI.zoneId);
+  if (!z) return;
+  if (!ariInApp()) {
+    showToast('Buka dalam app GoXpert Pocket untuk menggunakan AR');
+    return;
+  }
+  const go = document.getElementById('ariGo');
+  if (go) { go.disabled = true; go.textContent = 'Menyiapkan…'; }
+  try {
+    const bundle = await ariBundle(z, mode);
+    const res = await fetch('/insp', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bundle)
+    });
+    if (!res.ok) throw new Error('Pakej zon tidak sampai ke app');
+    ARI.pending = { ispId: isp.id, zoneId: z.id, mode: mode };
+    const out = String(window.PocketNative.arInspect());
+    if (out !== 'ok') {
+      ARI.pending = null;
+      showToast(ariWhyNot(out));
+      if (go) { go.disabled = false; go.textContent = mode === 'open' ? 'Buka AR di sini' : 'Tanda titik kunci'; }
+    }
+  } catch (e) {
+    ARI.pending = null;
+    showToast('Tidak dapat membuka AR: ' + e.message);
+    if (go) { go.disabled = false; go.textContent = mode === 'open' ? 'Buka AR di sini' : 'Tanda titik kunci'; }
+  }
+}
+
+function ariWhyNot(code) {
+  if (code === 'pasang') return 'Pasang Google Play Services for AR dahulu';
+  if (code === 'tiada') return 'Telefon ini tidak menyokong ARCore';
+  if (code === 'tiada-kebenaran') return 'Benarkan kamera, kemudian cuba lagi';
+  if (code === 'tiada-fail') return 'Pakej zon tidak sampai — cuba lagi';
+  return code.replace(/^gagal: /, 'AR gagal: ');
+}
+
+async function ariBundle(z, mode) {
+  const locks = [];
+  for (const l of (z.locks || [])) {
+    locks.push({
+      x: l.x, y: l.y, z: l.z, label: l.label || '',
+      shot: await ariSmall(l.shot, 420)
+    });
+  }
+  const defects = [];
+  for (const d of (z.defects || [])) {
+    defects.push({
+      id: d.id, x: d.x, y: d.y, z: d.z,
+      sev: d.sev | 0, title: d.title || '', note: d.note || '',
+      thumb: await ariSmall(d.shot, 320)
+    });
+  }
+  return {
+    zone: z.name, mode: mode,
+    need: Math.max(2, Math.min(8, mode === 'open' ? locks.length : (z.need || 3))),
+    locks: locks, defects: defects
+  };
+}
+
+/** Gambar kecil sebagai base64, atau kosong. Kad AR 256 px lebar, jadi
+ *  tiada gunanya menghantar gambar penuh merentasi jambatan. */
+async function ariSmall(key, max) {
+  if (!key) return '';
+  try {
+    const rec = await lbGet(ARI_KEY + key);
+    if (!rec || !rec.blob) return '';
+    return await lbBlobToB64(await ipShrinkTo(rec.blob, max, 0.7));
+  } catch (e) { return ''; }
+}
+
+// ---------- hasil daripada skrin AR ----------
+
+window.pkArInspect = async function(ok, err) {
+  const p = ARI.pending;
+  ARI.pending = null;
+  if (!ok) {
+    if (err) showToast(err);
+    if (document.getElementById('ariGo')) ariZoneScreen();
+    return;
+  }
+  if (!p) return;
+  try {
+    const res = await fetch('/insp/out.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('hasil tidak dijumpai');
+    const out = await res.json();
+    await ariMerge(p, out);
+  } catch (e) {
+    showToast('Hasil AR tidak dapat dibaca: ' + e.message);
+  }
+  if (ARI.ispId === p.ispId) ariZoneScreen();
+};
+
+async function ariMerge(p, out) {
+  const isp = ariInsp(p.ispId);
+  const z = ariZone(isp, p.zoneId);
+  if (!z) return;
+
+  // Titik kunci. Nama fail kosong bermakna "kekalkan yang ada" — skrin AR
+  // hanya menulis gambar yang ia tangkap sendiri.
+  const locks = [];
+  const inLocks = out.locks || [];
+  for (let i = 0; i < inLocks.length; i++) {
+    const l = inLocks[i];
+    let key = (z.locks && z.locks[i]) ? z.locks[i].shot : '';
+    if (l.shot) {
+      const k = await ariPull(l.shot, 'l');
+      if (k) { if (key) await lbDrop(ARI_KEY + key); key = k; }
+    }
+    locks.push({ x: l.x, y: l.y, z: l.z, label: l.label || ('Titik ' + (i + 1)), shot: key });
+  }
+  if (out.placed && locks.length) z.locks = locks;
+
+  // Defect yang dibuang dalam AR.
+  const gone = out.removed || [];
+  if (gone.length) {
+    for (const d of z.defects || []) {
+      if (gone.indexOf(d.id) >= 0 && d.shot) await lbDrop(ARI_KEY + d.shot);
+    }
+    z.defects = (z.defects || []).filter(function(d) { return gone.indexOf(d.id) < 0; });
+  }
+
+  // Defect baharu dan yang disunting.
+  let added = 0;
+  for (const d of (out.defects || [])) {
+    const fresh = !!d['new'] || !d.id;
+    const key = d.shot ? await ariPull(d.shot, 'd') : '';
+    if (fresh) {
+      z.defects = (z.defects || []).concat([{
+        id: ariId('d'), x: d.x, y: d.y, z: d.z,
+        sev: d.sev | 0, title: d.title || '', note: d.note || '',
+        shot: key, at: Date.now()
+      }]);
+      added++;
+    } else {
+      const old = (z.defects || []).filter(function(x) { return x.id === d.id; })[0];
+      if (!old) continue;
+      old.x = d.x; old.y = d.y; old.z = d.z;
+      old.sev = d.sev | 0; old.title = d.title || ''; old.note = d.note || '';
+      if (key) { if (old.shot) await lbDrop(ARI_KEY + old.shot); old.shot = key; }
+    }
+  }
+  if (out.placed && typeof out.rms === 'number' && p.mode === 'open') {
+    // Kualiti padanan lawatan ini. Tanpa menyimpannya, nombor itu hilang
+    // sebaik skrin AR ditutup — dan ia satu-satunya petunjuk sama ada
+    // kedudukan defect pada skrin tadi boleh dipercayai.
+    z.rms = out.rms;
+    z.rmsAt = Date.now();
+  }
+  z.at = Date.now();
+  isp.at = Date.now();
+  ariSave(isp);
+  if (added) showToast(added + ' defect baharu ditanda');
+}
+
+/** Satu gambar daripada skrin AR ke dalam IndexedDB. */
+async function ariPull(name, kind) {
+  try {
+    const r = await fetch('/insp/' + name, { cache: 'no-store' });
+    if (!r.ok) return '';
+    const blob = await r.blob();
+    if (!blob || !blob.size) return '';
+    const key = ariId(kind);
+    await lbPut(ARI_KEY + key, blob, 'image/jpeg');
+    return key;
+  } catch (e) { return ''; }
+}
+
+// ---------- hantar ke inspection ----------
+
+/**
+ * Setiap defect menjadi satu finding dalam inspection yang sedang dibuka,
+ * dengan gambarnya dan keutamaan BARIS yang sama.
+ *
+ * Alat ini sengaja tidak memerlukan inspection untuk MULA — defect
+ * selalunya ditanda sebelum sesiapa memutuskan laporan mana ia masuk —
+ * tetapi ia memerlukan satu untuk dihantar ke sana.
+ */
+async function ariExport(isp, z) {
+  if (typeof IP === 'undefined' || !IP.id) {
+    showToast('Buka satu inspection dahulu, kemudian hantar dari sini');
+    return;
+  }
+  if (!currentUser) { showToast('Log masuk dahulu'); return; }
+  const spaces = IP.spaces || [];
+  if (!spaces.length) { showToast('Inspection itu belum ada ruang'); return; }
+  const names = spaces.map(function(s, i) {
+    return (i + 1) + '. ' + (s.name || s.key || 'Ruang');
+  }).join('\n');
+  const pick = prompt('Hantar ' + ariCount(z) + ' defect "' + z.name + '" ke ruang mana?\n\n' +
+                      names + '\n\nTaip nombor:', '1');
+  if (pick === null) return;
+  const n = parseInt(pick, 10);
+  if (!(n >= 1 && n <= spaces.length)) return;
+  const s = spaces[n - 1];
+
+  const btn = document.getElementById('ariSend');
+  if (btn) { btn.disabled = true; btn.textContent = 'Menghantar…'; }
+  let done = 0;
+  try {
+    for (let i = 0; i < z.defects.length; i++) {
+      const d = z.defects[i];
+      const sev = ARI_SEV[Math.min(3, Math.max(0, d.sev | 0))];
+      const data = {
+        spaceId: s.id, spaceKey: s.key,
+        no: ipFindingsIn(s.id).length + 1 + done,
+        element: '', defectType: d.title || sev.name,
+        desc: (d.note || '') +
+          (d.note ? ' ' : '') + '[Ditanda dalam AR — zon ' + z.name + ']',
+        rate: '', priority: sev.code, cost: '', action: '',
+        locationText: z.name,
+        planId: '', px: null, py: null,
+        photoN: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      const doc = await ipSub('findings').add(data);
+      const fid = doc.id;
+      if (d.shot) {
+        const rec = await lbGet(ARI_KEY + d.shot);
+        if (rec && rec.blob) {
+          await lbPut(ipPhotoKey(fid, 0), rec.blob, 'image/jpeg');
+          data.photoN = 1;
+          data.thumb = await ipThumbOf(rec.blob);
+          await ipSub('findings').doc(fid).set(data, { merge: true });
+        }
+      }
+      IP.findings.push(Object.assign({ id: fid }, data));
+      done++;
+    }
+    showToast(done + ' defect masuk ke ' + (s.name || s.key));
+  } catch (e) {
+    showToast('Hantar gagal selepas ' + done + ': ' + e.message);
+  }
+  ariZoneScreen();
 }
 
 // =======================================================
@@ -22964,7 +23693,8 @@ const NT_ICONS = {
   voicetranslate:'<path d="M12 18.5a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v8.5a3 3 0 0 0 3 3z"/><path d="M5.5 13v2.5a6.5 6.5 0 0 0 13 0V13M12 22v-1.5"/>',
   converter:'<rect x="3.5" y="3" width="17" height="18" rx="2.5"/><path d="M7.5 8h9M8 13h2M8 17h2M14 13h2M14 17h2"/>',
   endoscope:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>',
-  counter:'<path d="M5 4v16M9.5 4v16M14 4v16M18.5 4v16"/><path d="M3 14.5 21 9"/>'
+  counter:'<path d="M5 4v16M9.5 4v16M14 4v16M18.5 4v16"/><path d="M3 14.5 21 9"/>',
+  arinspect:'<path d="M12 2 3 6.5v11L12 22l9-4.5v-11z"/><path d="M3 6.5 12 11l9-4.5M12 11v11"/><circle cx="12" cy="11" r="1.6" fill="currentColor"/>'
 };
 
 const NT_TOOLS = [
@@ -22976,6 +23706,7 @@ const NT_TOOLS = [
   { id:'quantity',       name:'Quantity Scanner', cat:'measure', kw:'count bars bundle rebar tally spacing quantity' },
   { id:'armeasure',      name:'AR Measure',       cat:'measure', req:'AR',     kw:'distance length room' },
   { id:'arfloorplan',    name:'AR Floor Plan',    cat:'measure', req:'AR',     kw:'overlay plan floor' },
+  { id:'arinspect',      name:'AR Inspection',    cat:'assess',  req:'AR',     kw:'defect pin tanda ruang zon lawatan semula revisit anchor titik kunci baris' },
   { id:'model3d',        name:'Model 3D',         cat:'plan',    kw:'glb gltf bim ifc revit model 3d ar usdz walk clash deviation x-ray section' },
   { id:'hardware',       name:'Peranti',          cat:'util',    kw:'bluetooth ble laser distance disto meter remote gamepad shutter kamera camera usb test uji perkakasan' },
   { id:'endoscope',      name:'Endoskop',         cat:'util',    kw:'endoscope borescope usb uvc camera probe paip pipe rongga cavity siling ceiling drain' },
