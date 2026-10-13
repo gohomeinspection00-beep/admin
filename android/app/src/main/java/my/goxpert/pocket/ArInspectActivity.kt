@@ -655,6 +655,17 @@ class ArInspectActivity : Activity() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             val s = session ?: return
             if (paused) return
+            // ARCore menyerahkan bingkai kamera sebagai tekstur luaran, dan
+            // ia perlu diberitahu yang MANA. Tanpa baris ini ia melukis ke
+            // dalam tekstur yang tiada siapa membacanya, latar kekal hitam,
+            // dan segala-galanya yang lain — jejakan, hit test, pin —
+            // berjalan betul di atas skrin kosong.
+            //
+            // Dipanggil setiap bingkai dan bukan sekali dalam
+            // onSurfaceCreated: konteks GL boleh dibina semula apabila
+            // skrin dimatikan dan dihidupkan, dan id tekstur lama mati
+            // bersamanya. Tiga skrin AR yang lain melakukannya begini.
+            s.setCameraTextureName(bg.textureId)
             val frame: Frame = try { s.update() } catch (e: Throwable) { return }
 
             bg.draw(frame)
