@@ -18253,7 +18253,11 @@ function ariSave(isp) {
   list.unshift(isp);
   return ariPut(list);
 }
-function ariInApp() {
+function ariInApp() { return !!window.PocketNative; }
+/** Dalam app, DAN APK itu cukup baharu untuk mempunyai skrin ini. Fail
+ *  Pocket boleh ditukar tanpa memasang semula APK, jadi kedua-duanya bukan
+ *  soalan yang sama. */
+function ariCanAR() {
   return !!(window.PocketNative && typeof window.PocketNative.arInspect === 'function');
 }
 function ariIco() {
@@ -18297,9 +18301,12 @@ function openARInspect() {
 function ariHome() {
   const list = ariAll();
   let h = '';
-  if (!ariInApp()) {
-    h += '<div class="ar-status warn">Alat ini perlukan app GoXpert Pocket — ' +
-         'AR tidak wujud dalam pelayar telefon. Rekod lama masih boleh dibaca di sini.</div>';
+  if (!ariCanAR()) {
+    h += '<div class="ar-status warn">' + (ariInApp()
+      ? 'APK lama — pasang APK terkini untuk menggunakan AR Inspection. ' +
+        'Rekod yang sudah ada masih boleh dibaca dan disunting di sini.'
+      : 'Alat ini perlukan app GoXpert Pocket — AR tidak wujud dalam pelayar ' +
+        'telefon. Rekod lama masih boleh dibaca di sini.') + '</div>';
   }
   h += '<button class="ari-big pri" id="ariNew">' +
        '<span class="ari-big-t"><b>Inspection baharu</b>' +
@@ -18578,8 +18585,10 @@ async function ariEnterAR(mode) {
   const isp = ariInsp(ARI.ispId);
   const z = ariZone(isp, ARI.zoneId);
   if (!z) return;
-  if (!ariInApp()) {
-    showToast('Buka dalam app GoXpert Pocket untuk menggunakan AR');
+  if (!ariCanAR()) {
+    showToast(ariInApp()
+      ? 'APK lama — pasang APK terkini untuk menggunakan AR Inspection'
+      : 'Buka dalam app GoXpert Pocket untuk menggunakan AR');
     return;
   }
   const go = document.getElementById('ariGo');
