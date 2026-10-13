@@ -43,8 +43,8 @@ const data = {
   tarikhReInspection: "20 Ogos 2026",
   tarikhSerahanLaporan2: "20 Ogos 2026",
 
-  tarikhNotis: "13 Oktober 2026",
-  tarikhDeadline: "28 Oktober 2026",
+  tarikhNotis: "14 Oktober 2026",
+  tarikhDeadline: "29 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -68,8 +68,8 @@ const data = {
     { tarikh: "3 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/032" },
     { tarikh: "18 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan" },
     { tarikh: "2 Oktober 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 8 kecacatan direkodkan: 5 Not Complete, 2 Not Fully Complete dan 1 kecacatan baru" },
-    { tarikh: "13 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/032" },
-    { tarikh: "28 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "14 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/032" },
+    { tarikh: "29 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [
