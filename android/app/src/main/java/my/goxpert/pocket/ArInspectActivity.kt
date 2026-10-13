@@ -41,6 +41,7 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.abs
 import kotlin.math.sqrt
 
 /**
@@ -87,6 +88,9 @@ class ArInspectActivity : Activity() {
         var id: String,
         var zx: Float, var zy: Float, var zz: Float,
         var sev: Int,
+        /** Jenis, daripada senarai yang sama seperti Site Capture. Ini yang
+         *  menjadi defectType apabila defect ini masuk ke dalam laporan. */
+        var kind: String,
         var title: String,
         var note: String,
         var fresh: Boolean,
@@ -141,6 +145,9 @@ class ArInspectActivity : Activity() {
     @Volatile private var fit: ArFit.Fit? = null
     @Volatile private var rms = 0f
     @Volatile private var badPoint = -1
+    /** Jarak mengufuk terbesar antara titik kunci. Ini yang menentukan
+     *  berapa banyak ralat tanda digandakan pada lawatan berikutnya. */
+    @Volatile private var span = 0f
     @Volatile private var tracking = false
     @Volatile private var why = ""
     @Volatile private var aim: FloatArray? = null
@@ -298,6 +305,7 @@ class ArInspectActivity : Activity() {
                     o.optDouble("y", 0.0).toFloat(),
                     o.optDouble("z", 0.0).toFloat(),
                     o.optInt("sev", 1).coerceIn(0, 3),
+                    o.optString("kind", ""),
                     o.optString("title", ""),
                     o.optString("note", ""),
                     false,
@@ -343,6 +351,7 @@ class ArInspectActivity : Activity() {
                     put("id", d.id)
                     put("x", d.zx.toDouble()); put("y", d.zy.toDouble()); put("z", d.zz.toDouble())
                     put("sev", d.sev)
+                    put("kind", d.kind)
                     put("title", d.title)
                     put("note", d.note)
                     put("shot", d.shot)
@@ -371,6 +380,7 @@ class ArInspectActivity : Activity() {
                 put("mode", if (modeNew) "new" else "open")
                 put("placed", phase == Phase.READY)
                 put("rms", rms.toDouble())
+                put("span", span.toDouble())
                 put("locks", la)
                 put("defects", arr)
                 put("removed", JSONArray(removed))
@@ -510,29 +520,67 @@ class ArInspectActivity : Activity() {
         val pad = dp(16)
         val box = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(pad, dp(8), pad, 0)
+            setPadding(pad, dp(8), pad, dp(4))
         }
         (d.photo ?: d.thumb)?.let { ph ->
             box.addView(ImageView(this).apply {
                 setImageBitmap(ph)
                 adjustViewBounds = true
                 scaleType = ImageView.ScaleType.CENTER_CROP
-            }, LinearLayout.LayoutParams(-1, dp(150)))
+            }, LinearLayout.LayoutParams(-1, dp(140)))
         }
-        val title = EditText(this).apply {
-            hint = "Defect apa? contoh: Retak rambut pada dinding"
-            setText(d.title)
-            setSingleLine()
-        }
-        box.addView(title)
 
-        box.addView(TextView(this).apply {
-            text = "Keutamaan"
-            setPadding(0, dp(12), 0, dp(4))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+        // JENIS dahulu, kerana ia satu ketikan dan ia yang menjadi
+        // defectType dalam laporan. Menaip sambil berdiri di depan
+        // kecacatan, dengan satu tangan memegang telefon, ialah bahagian
+        // paling perlahan dalam seluruh aliran ini.
+        box.addView(label("Jenis"))
+        var kind = d.kind
+        val chips = ArrayList<TextView>()
+        val kindBox = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        var row = newRow()
+        for ((i, t) in ArCardArt.TYPES.withIndex()) {
+            if (i == 4) { kindBox.addView(row); row = newRow() }
+            val b = TextView(this).apply {
+                text = t
+                gravity = Gravity.CENTER
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+                setPadding(dp(6), dp(9), dp(6), dp(9))
+                val lp = LinearLayout.LayoutParams(0, -2, 1f)
+                lp.marginStart = dp(3); lp.marginEnd = dp(3); lp.topMargin = dp(3)
+                layoutParams = lp
+            }
+            chips.add(b); row.addView(b)
+        }
+        // Baris kedua ada tiga daripada empat slot terisi; satu pengisi
+        // menjaga lebarnya sama seperti baris pertama.
+        row.addView(View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(0, 1, 1f)
         })
+        kindBox.addView(row)
+        fun paintKind() {
+            for ((i, b) in chips.withIndex()) {
+                val on = ArCardArt.TYPES[i] == kind
+                b.setTextColor(if (on) Color.WHITE else Color.rgb(90, 95, 105))
+                b.background = GradientDrawable().apply {
+                    cornerRadius = dp(9).toFloat()
+                    setColor(if (on) Color.rgb(27, 79, 216) else Color.argb(26, 128, 128, 128))
+                    setStroke(dp(1), if (on) Color.rgb(27, 79, 216) else Color.argb(50, 128, 128, 128))
+                }
+            }
+        }
+        for ((i, b) in chips.withIndex()) b.setOnClickListener {
+            // Ketik semula untuk membatalkan: salah pilih tidak sepatutnya
+            // memerlukan satu pilihan lain untuk membetulkannya.
+            kind = if (kind == ArCardArt.TYPES[i]) "" else ArCardArt.TYPES[i]
+            paintKind()
+        }
+        paintKind()
+        box.addView(kindBox)
+
+        box.addView(label("Keutamaan"))
         var sev = d.sev
-        val sevRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val sevRow = newRow()
         val btns = ArrayList<TextView>()
         for (i in 0..3) {
             val b = TextView(this).apply {
@@ -561,17 +609,30 @@ class ArInspectActivity : Activity() {
         paintSev()
         box.addView(sevRow)
 
+        box.addView(label("Butiran"))
+        val title = EditText(this).apply {
+            hint = "Contoh: retak rambut 1.2 m dari bucu siling"
+            setText(d.title)
+            setSingleLine()
+        }
+        box.addView(title)
         val note = EditText(this).apply {
-            hint = "Nota (pilihan)"
+            hint = "Nota lanjut (pilihan)"
             setText(d.note)
             minLines = 2
         }
-        box.addView(note, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) })
+        box.addView(note, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
+
+        // Gambar, tujuh chip, empat butang dan dua medan tidak muat pada
+        // telefon pendek, dan AlertDialog memotong apa yang terlebih tanpa
+        // memberitahu sesiapa — butang Simpan termasuk.
+        val scroll = android.widget.ScrollView(this).apply { addView(box) }
 
         val b = AlertDialog.Builder(this)
             .setTitle(if (isNew) "Defect baharu" else "Defect ${liveDefs().indexOf(d) + 1}")
-            .setView(box)
+            .setView(scroll)
             .setPositiveButton("Simpan") { _, _ ->
+                d.kind = kind
                 d.title = title.text.toString().trim()
                 d.sev = sev
                 d.note = note.text.toString().trim()
@@ -596,6 +657,17 @@ class ArInspectActivity : Activity() {
         }
         b.setCancelable(false)
         b.show()
+    }
+
+    private fun label(t: String) = TextView(this).apply {
+        text = t
+        setPadding(0, dp(13), 0, dp(3))
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+    }
+
+    private fun newRow() = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        layoutParams = LinearLayout.LayoutParams(-1, -2)
     }
 
     private fun liveDefs(): List<Def> = synchronized(bank) { defs.filter { !it.removed } }
@@ -745,7 +817,7 @@ class ArInspectActivity : Activity() {
                     if (f0 == null) toast("Zon belum berada")
                     else {
                         val z = ArFit.invert(p, f0)
-                        shotFor = Def("", z[0], z[1], z[2], 1, "", "", true)
+                        shotFor = Def("", z[0], z[1], z[2], 1, "", "", "", true)
                     }
                 }
             }
@@ -770,7 +842,8 @@ class ArInspectActivity : Activity() {
                         // yang lama, setiap suntingan meninggalkan satu
                         // tekstur dalam GPU sehingga skrin ditutup.
                         if (d.tex != 0) cards.drop(d.tex)
-                        d.tex = cards.upload(ArCardArt.card(d.thumb, i + 1, d.title, d.sev))
+                        d.tex = cards.upload(
+                            ArCardArt.card(d.thumb, i + 1, d.kind, d.title, d.sev))
                         d.dirty = false
                     }
                 }
@@ -869,6 +942,7 @@ class ArInspectActivity : Activity() {
                     }
                 }
                 fit = f0; rms = 0f; badPoint = -1
+                span = ArFit.span(world)
             } else {
                 val zone = lockList().map { floatArrayOf(it.zx, it.zy, it.zz) }
                 // Bentuk diperiksa SEBELUM dipadankan. Padanan akan sentiasa
@@ -898,6 +972,35 @@ class ArInspectActivity : Activity() {
                 phase = Phase.READY
                 paintUi()
             }
+            warnSpan()
+        }
+
+        /**
+         * Titik kunci yang rapat menggandakan ralat.
+         *
+         * Yaw diselesaikan daripada arah ANTARA titik, jadi ralat tanda
+         * dibahagi dengan jarak antaranya: 2 cm merentasi 0.5 m ialah
+         * sudut empat kali lebih besar daripada 2 cm merentasi 2 m, dan
+         * defect di hujung bilik bergerak mengikut sudut itu. Tiga titik
+         * pada tiga jubin bersebelahan memberi zon yang padan dengan
+         * cantik dan meletakkan setiap defect setengah meter tersasar.
+         */
+        private fun warnSpan() {
+            val sp = span
+            if (sp >= 2f) return
+            runOnUiThread {
+                if (isFinishing) return@runOnUiThread
+                AlertDialog.Builder(this@ArInspectActivity)
+                    .setTitle("Titik kunci terlalu rapat: ${fmtMm(sp)}")
+                    .setMessage("Yaw dikira daripada arah antara titik, jadi ralat menanda " +
+                        "dibahagi dengan jarak antaranya. Pada ${fmtMm(sp)}, tersilap 2 cm " +
+                        "semasa menanda semula boleh menggerakkan defect di hujung bilik " +
+                        "lebih sepuluh sentimeter.\n\nLetak titik pada bucu yang BERJAUHAN " +
+                        "— hujung dinding yang bertentangan, bukan tiga jubin bersebelahan.")
+                    .setPositiveButton("Tanda semula") { _, _ -> wantReset = true }
+                    .setNegativeButton("Teruskan", null)
+                    .show()
+            }
         }
 
         private fun accept(zone: List<FloatArray>, world: List<FloatArray>) {
@@ -908,16 +1011,28 @@ class ArInspectActivity : Activity() {
                 return
             }
             fit = f0; rms = f0.rms; badPoint = f0.worst
+            span = ArFit.span(world)
             runOnUiThread {
                 if (isFinishing) return@runOnUiThread
                 phase = Phase.READY
                 paintUi()
+                if (f0.rms <= 0.15f) { warnSpan(); return@runOnUiThread }
                 if (f0.rms > 0.15f) {
                     AlertDialog.Builder(this@ArInspectActivity)
                         .setTitle("Padanan lemah: ${fmtMm(f0.rms)}")
                         .setMessage("Defect akan muncul lebih kurang sejauh itu daripada " +
-                            "tempat sebenarnya. Tanda semula dengan lebih tepat, atau teruskan " +
-                            "kalau anggaran sudah memadai.")
+                            "tempat sebenarnya." +
+                            (if (f0.worst >= 0)
+                                " Titik ${f0.worst + 1} paling tidak sepadan, tersasar " +
+                                "${fmtMm(f0.worstErr)} daripada tempat yang direkod." else "") +
+                            // Punca yang paling lazim, dan yang paling mudah dibetulkan.
+                            (if (span < 2f)
+                                "\n\nTitik kunci zon ini hanya ${fmtMm(span)} berjauhan. " +
+                                "Yaw dikira daripada arah antara titik, jadi pada jarak itu " +
+                                "tersilap sedikit semasa menanda semula menjadi ralat besar " +
+                                "di hujung bilik." else "") +
+                            "\n\nTanda semula dengan lebih tepat, atau teruskan kalau " +
+                            "anggaran sudah memadai.")
                         .setPositiveButton("Tanda semula") { _, _ -> wantReset = true }
                         .setNegativeButton("Teruskan", null)
                         .show()
@@ -935,17 +1050,58 @@ class ArInspectActivity : Activity() {
         }
 
         /** Ketik satu kad atau pin untuk membukanya. */
+        /**
+         * Ketik satu defect untuk membukanya.
+         *
+         * Sasaran ialah KAD, bukan pin. Kad itulah benda besar di skrin —
+         * pin sebesar ibu jari duduk setengah meter di bawahnya, dan
+         * menguji jarak ke pin bermakna mengetik kad tidak membuka apa-apa.
+         *
+         * Yang paling hadapan menang bila kad bertindih, sama seperti apa
+         * yang dilihat: kad hadapan dilukis di atas yang belakang.
+         */
         private fun doTap(x: Float, y: Float) {
             val f0 = fit ?: return
             if (phase != Phase.READY) return
             val live = liveDefs()
             var best = -1
-            var bestD = dp(64).toFloat()
+            var bestDepth = Float.MAX_VALUE
+            val slack = dp(10).toFloat()
+
             for ((i, d) in live.withIndex()) {
                 val wpt = ArFit.apply(floatArrayOf(d.zx, d.zy, d.zz), f0)
-                val sp = project(wpt) ?: continue
-                val dd = sqrt((sp[0] - x) * (sp[0] - x) + (sp[1] - y) * (sp[1] - y))
-                if (dd < bestD) { bestD = dd; best = i }
+                val dx = wpt[0] - camPos[0]
+                val dy = wpt[1] - camPos[1]
+                val dz = wpt[2] - camPos[2]
+                val dist = sqrt(dx * dx + dy * dy + dz * dz).coerceAtLeast(0.05f)
+                if (dist >= bestDepth) continue
+
+                var hit = false
+                // Saiz dan syarat yang SAMA seperti ArCards.draw; kalau
+                // kedua-duanya berbeza, awak akan mengetik tempat kosong.
+                val aimed = (dx * camFwd[0] + dy * camFwd[1] + dz * camFwd[2]) / dist > 0.985f
+                if (d.tex != 0 && (dist <= 3.5f || aimed)) {
+                    val h = (dist * 0.20f).coerceIn(0.13f, 0.60f)
+                    val cy = wpt[1] + h * 0.5f + 0.12f
+                    val mid = project(floatArrayOf(wpt[0], cy, wpt[2]))
+                    val topP = project(floatArrayOf(wpt[0], cy + h * 0.5f, wpt[2]))
+                    if (mid != null && topP != null) {
+                        val hh = abs(topP[1] - mid[1])
+                        val hw = hh * (ArCardArt.W.toFloat() / ArCardArt.H)
+                        hit = x >= mid[0] - hw - slack && x <= mid[0] + hw + slack &&
+                              y >= mid[1] - hh - slack && y <= mid[1] + hh + slack
+                    }
+                }
+                if (!hit) {
+                    // Kad tertutup: pin sahaja yang kelihatan, jadi pin
+                    // yang menjadi sasaran.
+                    val sp = project(wpt)
+                    if (sp != null) {
+                        val r = dp(40).toFloat()
+                        hit = abs(sp[0] - x) <= r && abs(sp[1] - y) <= r
+                    }
+                }
+                if (hit) { best = i; bestDepth = dist }
             }
             if (best < 0) return
             val d = live[best]

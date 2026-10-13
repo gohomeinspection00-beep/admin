@@ -152,7 +152,7 @@ class ArCards {
             val show = it.tex != 0 && (openAll || d <= openTo || aimed)
 
             if (show) {
-                val h = (d * 0.16f).coerceIn(0.10f, 0.50f)
+                val h = (d * 0.20f).coerceIn(0.13f, 0.60f)
                 val w = h * it.aspect
                 // Naik mengikut graviti dan bukan mengikut atas kamera: kad
                 // kekal di ATAS defect walaupun telefon dicondongkan.

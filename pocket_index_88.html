@@ -1650,6 +1650,12 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
   box-sizing:border-box;resize:vertical;
 }
 textarea.ari-in{min-height:52px;line-height:1.4}
+.ari-kinds{display:flex;flex-wrap:wrap;gap:6px}
+.ari-kbtn{
+  padding:7px 11px;border-radius:999px;font-size:12px;font-weight:600;
+  border:1px solid var(--line);background:var(--bg);color:var(--muted);
+}
+.ari-kbtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 .ari-sev{display:flex;gap:6px}
 .ari-sbtn{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
@@ -9596,7 +9602,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.4 · build 13 Okt 2026 · AR Inspection: defect ditanda dalam ruang</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.4 · build 14 Okt 2026 · AR Inspection: kad berwarna, jenis defect</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -18218,6 +18224,7 @@ async function fpStartAr() {
 
 const ARI_STORE = 'pocket_arinsp_v1';
 const ARI_KEY = 'arinsp:';
+const ARI_KIND = ['Concrete', 'Render', 'Damp', 'Electrical', 'Plumbing', 'Finishing', 'Other'];
 const ARI_SEV = [
   { code: 'N1', name: 'Normal',    hue: '#3B82F6' },
   { code: 'R2', name: 'Rutin',     hue: '#F59E0B' },
@@ -18418,6 +18425,11 @@ async function ariZoneScreen() {
             ? 'Padanan terakhir ' + ariMm(z.rms) + ' \u00b7 ' + ariGrade(z.rms) +
               ' \u00b7 ' + ariWhen(z.rmsAt)
             : 'Tanda semula titik ini untuk membuka zon di tempatnya.') + '</span>' +
+         (z.span != null
+            ? '<span>Titik berjauhan ' + ariMm(z.span) + (z.span < 2
+                ? ' \u2014 terlalu rapat. Ralat menanda digandakan; zon baharu lebih baik '
+                  + 'kalau titik diletak pada bucu yang bertentangan.' : '') + '</span>'
+            : '') +
          '<div class="ari-lrow" id="ariLrow"></div></div>';
   }
 
@@ -18521,8 +18533,9 @@ async function ariPaintDefects(isp, z) {
          : '<span class="ari-d-im ari-d-no"></span>') +
       '<span class="ari-d-b">' +
         '<span class="ari-d-t"><b>' + (i + 1) + '. ' +
-          escapeHTML(d.title || s.name) + '</b></span>' +
+          escapeHTML(d.kind || d.title || s.name) + '</b></span>' +
         '<span class="ari-chip" style="background:' + s.hue + '">' + s.code + ' ' + s.name + '</span>' +
+        (d.title && d.kind ? '<span class="ari-d-n">' + escapeHTML(d.title) + '</span>' : '') +
         (d.note ? '<span class="ari-d-n">' + escapeHTML(d.note) + '</span>' : '') +
       '</span></button>';
   }
@@ -18539,7 +18552,13 @@ function ariEditDefect(isp, z, id) {
   const foot = document.getElementById('toolModalFoot');
   foot.innerHTML =
     '<div class="ari-edit">' +
-      '<input class="ari-in" id="ariT" placeholder="Defect apa?" value="' +
+      '<div class="ari-kinds" id="ariKinds">' +
+        ARI_KIND.map(function(k) {
+          return '<button class="ari-kbtn' + (k === d.kind ? ' on' : '') +
+                 '" data-kind="' + k + '">' + k + '</button>';
+        }).join('') +
+      '</div>' +
+      '<input class="ari-in" id="ariT" placeholder="Butiran — contoh: retak rambut 1.2 m" value="' +
         escapeHTML(d.title || '') + '">' +
       '<div class="ari-sev" id="ariSev">' +
         ARI_SEV.map(function(s, i) {
@@ -18556,6 +18575,18 @@ function ariEditDefect(isp, z, id) {
         '<button class="tool-btn tool-btn-primary" id="ariDSave">Simpan</button>' +
       '</div>' +
     '</div>';
+  let kind = d.kind || '';
+  const kb = foot.querySelectorAll('[data-kind]');
+  for (let i = 0; i < kb.length; i++) {
+    kb[i].onclick = function() {
+      const k = this.getAttribute('data-kind');
+      // Ketik semula untuk membatalkan.
+      kind = (kind === k) ? '' : k;
+      for (let j = 0; j < kb.length; j++) {
+        kb[j].classList.toggle('on', kb[j].getAttribute('data-kind') === kind);
+      }
+    };
+  }
   let sev = d.sev | 0;
   const sb = foot.querySelectorAll('[data-sev]');
   for (let i = 0; i < sb.length; i++) {
@@ -18566,6 +18597,7 @@ function ariEditDefect(isp, z, id) {
   }
   document.getElementById('ariDCancel').onclick = ariZoneScreen;
   document.getElementById('ariDSave').onclick = function() {
+    d.kind = kind;
     d.title = document.getElementById('ariT').value.trim();
     d.note = document.getElementById('ariN').value.trim();
     d.sev = sev;
@@ -18635,7 +18667,7 @@ async function ariBundle(z, mode) {
   for (const d of (z.defects || [])) {
     defects.push({
       id: d.id, x: d.x, y: d.y, z: d.z,
-      sev: d.sev | 0, title: d.title || '', note: d.note || '',
+      sev: d.sev | 0, kind: d.kind || '', title: d.title || '', note: d.note || '',
       thumb: await ariSmall(d.shot, 320)
     });
   }
@@ -18716,7 +18748,7 @@ async function ariMerge(p, out) {
     if (fresh) {
       z.defects = (z.defects || []).concat([{
         id: ariId('d'), x: d.x, y: d.y, z: d.z,
-        sev: d.sev | 0, title: d.title || '', note: d.note || '',
+        sev: d.sev | 0, kind: d.kind || '', title: d.title || '', note: d.note || '',
         shot: key, at: Date.now()
       }]);
       added++;
@@ -18724,10 +18756,12 @@ async function ariMerge(p, out) {
       const old = (z.defects || []).filter(function(x) { return x.id === d.id; })[0];
       if (!old) continue;
       old.x = d.x; old.y = d.y; old.z = d.z;
-      old.sev = d.sev | 0; old.title = d.title || ''; old.note = d.note || '';
+      old.sev = d.sev | 0; old.kind = d.kind || '';
+      old.title = d.title || ''; old.note = d.note || '';
       if (key) { if (old.shot) await lbDrop(ARI_KEY + old.shot); old.shot = key; }
     }
   }
+  if (out.placed && typeof out.span === 'number' && out.span > 0) z.span = out.span;
   if (out.placed && typeof out.rms === 'number' && p.mode === 'open') {
     // Kualiti padanan lawatan ini. Tanpa menyimpannya, nombor itu hilang
     // sebaik skrin AR ditutup — dan ia satu-satunya petunjuk sama ada
@@ -18792,9 +18826,9 @@ async function ariExport(isp, z) {
       const data = {
         spaceId: s.id, spaceKey: s.key,
         no: ipFindingsIn(s.id).length + 1 + done,
-        element: '', defectType: d.title || sev.name,
-        desc: (d.note || '') +
-          (d.note ? ' ' : '') + '[Ditanda dalam AR — zon ' + z.name + ']',
+        element: '', defectType: d.kind || d.title || sev.name,
+        desc: [d.title, d.note, '[Ditanda dalam AR — zon ' + z.name + ']']
+          .filter(Boolean).join(' '),
         rate: '', priority: sev.code, cost: '', action: '',
         locationText: z.name,
         planId: '', px: null, py: null,
