@@ -987,6 +987,32 @@ class MainActivity : AppCompatActivity() {
             return out
         }
 
+        /**
+         * Lepaskan kunci potret, atau kunci semula.
+         *
+         * Activity ini dikunci potret dalam manifest kerana setiap alat lain
+         * ialah satu lajur sempit yang direka untuk dipegang tegak. Spirit
+         * level ialah pengecualian: ia dirapatkan pada permukaan dan dibaca
+         * pada apa jua orientasi telefon itu berada, jadi dalam potret yang
+         * terkunci nombornya mengiring kepada pembacanya.
+         *
+         * Dilepaskan semasa alat itu terbuka sahaja, dan dipulangkan bila ia
+         * ditutup — supaya tiada skrin lain tiba-tiba mendapat susun atur
+         * landskap yang ia tidak pernah direka untuknya.
+         */
+        @JavascriptInterface
+        fun allowRotate(on: Boolean): String {
+            runOnUiThread {
+                runCatching {
+                    requestedOrientation = if (on)
+                        android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+                    else
+                        android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            return "ok"
+        }
+
         /** Benar bila telefon ini boleh mendengar langsung. */
         @JavascriptInterface
         fun canListen(): Boolean =
