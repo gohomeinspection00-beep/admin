@@ -38,6 +38,11 @@
             <action android:name="android.intent.action.SEND" />
             <data android:mimeType="*/*" />
         </intent>
+        <!-- Tanpa ini, Android 11+ menyembunyikan app kamera daripada kami,
+             jadi kami tidak boleh menyemak sama ada ada satu sebelum cuba. -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
     </queries>
 
     <application

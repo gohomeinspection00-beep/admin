@@ -200,6 +200,11 @@ class MainActivity : AppCompatActivity() {
     /** Model 3D terakhir yang Pocket PUT ke pelayan tempatan. */
     private val modelDir: File get() = File(cacheDir, "model")
 
+    /** Gambar yang baru diambil dengan kamera, menunggu diserahkan. */
+    private val shotDir: File get() = File(cacheDir, "shot")
+    private var shotFile: File? = null
+    private var shotUri: Uri? = null
+
     /**
      * Pemilih gambar app sendiri.
      *
@@ -231,6 +236,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var filePick: ValueCallback<Array<Uri>>? = null
+
+    /** Kamera untuk <input type=file> dalam halaman. */
+    private val shotForInput = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { res ->
+        val cb = filePick; filePick = null
+        val u = shotUri
+        val ok = shotOk(res)
+        uvc.say("Kamera (input): kod=${res.resultCode} bait=${shotFile?.length() ?: 0}")
+        shotFile = null; shotUri = null
+        cb?.onReceiveValue(if (ok && u != null) arrayOf(u) else null)
+    }
+
+    /** Kamera untuk PocketNative.pickImages. Hasilnya melalui laluan sahkod
+     *  yang sama seperti gambar yang dipilih, supaya halaman menerima bentuk
+     *  yang sama tidak kira dari mana ia datang. */
+    private val shotForPick = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { res ->
+        val u = shotUri
+        val ok = shotOk(res)
+        uvc.say("Kamera (pick): kod=${res.resultCode} bait=${shotFile?.length() ?: 0}")
+        shotFile = null; shotUri = null
+        val list = if (ok && u != null) listOf(u) else emptyList()
+        Thread({ decodePicked(list, list.size) }, "shot-decode")
+            .apply { isDaemon = true }.start()
+    }
 
     private val pickFiles = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -379,24 +411,55 @@ class MainActivity : AppCompatActivity() {
                     // Laluan ini kekal untuk apa-apa <input type=file> lain.
                     filePick?.onReceiveValue(null)
                     filePick = cb
-                    // capture="environment" bermakna ambil gambar BARU.
-                    // Menghalakannya ke pemilih foto membuka galeri dan bukan
-                    // kamera, jadi biarkan intent asal mengendalikan itu.
-                    val wantsCamera = params?.isCaptureEnabled ?: false
-                    val wantsImage = !wantsCamera && (params?.acceptTypes?.any {
-                        it.startsWith("image/") || it == ".jpg" || it == ".png"
-                    } ?: false)
-                    return try {
-                        val it0 = if (wantsImage) imagePickIntent() else params!!.createIntent()
-                        uvc.say("onShowFileChooser: galeri=$wantsImage kamera=$wantsCamera")
-                        pickFiles.launch(it0)
-                        true
-                    } catch (e: Throwable) {
-                        filePick = null
-                        uvc.say("onShowFileChooser gagal: ${e.message}")
-                        toast("Tidak dapat membuka pemilih fail")
-                        false
+
+                    val types = params?.acceptTypes?.filter { it.isNotBlank() } ?: emptyList()
+                    val isImg = { t: String ->
+                        t.startsWith("image/") || t == ".jpg" || t == ".jpeg" || t == ".png"
                     }
+                    val anyImage = types.any(isImg)
+                    val onlyImage = types.isNotEmpty() && types.all(isImg)
+
+                    // Input bukan gambar — dokumen, GLB, PDF sahaja — tiada
+                    // pilihan untuk ditawarkan.
+                    if (!anyImage) {
+                        return try {
+                            pickFiles.launch(params!!.createIntent()); true
+                        } catch (e: Throwable) {
+                            filePick = null
+                            uvc.say("onShowFileChooser gagal: ${e.message}")
+                            toast("Tidak dapat membuka pemilih fail")
+                            false
+                        }
+                    }
+
+                    // Setiap input gambar bertanya, tidak kira sama ada ia
+                    // ditanda capture="environment" atau tidak. Bendera itu
+                    // ialah pilihan penulis HTML; ini pilihan surveyor yang
+                    // sedang berdiri di depan kecacatan itu.
+                    uvc.say("onShowFileChooser: gambar, hanya=$onlyImage " +
+                            "capture=${params?.isCaptureEnabled}")
+                    askSource(
+                        onCamera = {
+                            val i = shotIntent()
+                            if (i == null) { filePick = null; cb?.onReceiveValue(null) }
+                            else try { shotForInput.launch(i) } catch (e: Throwable) {
+                                filePick = null; cb?.onReceiveValue(null)
+                                toast("Tiada app kamera pada telefon ini")
+                            }
+                        },
+                        onFiles = {
+                            try {
+                                // Pemilih foto untuk gambar sahaja: tiada
+                                // kebenaran storan, dan ia lebih pantas.
+                                pickFiles.launch(
+                                    if (onlyImage) imagePickIntent() else params!!.createIntent())
+                            } catch (e: Throwable) {
+                                filePick = null; cb?.onReceiveValue(null)
+                                toast("Tidak dapat membuka pemilih fail")
+                            }
+                        },
+                        onCancel = { filePick = null; cb?.onReceiveValue(null) })
+                    return true
                 }
             }
         }
@@ -464,6 +527,14 @@ class MainActivity : AppCompatActivity() {
         if (missing.isNotEmpty()) askPerms.launch(missing.toTypedArray())
     }
 
+    /** Halaman menunggu satu jawapan selepas pickImages memulangkan "ok".
+     *  Batal ialah jawapan juga, dan tanpa ini butangnya tersekat selamanya. */
+    private fun onPickedNone() {
+        runOnUiThread {
+            runCatching { web.evaluateJavascript("window.enPickDone && enPickDone([],0)", null) }
+        }
+    }
+
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()
 
     /**
@@ -498,6 +569,69 @@ class MainActivity : AppCompatActivity() {
      * Pemilih Foto Android bila ada (API 33+): ia tidak perlukan satu pun
      * kebenaran dan hanya menunjukkan gambar. Di bawah itu, SAF.
      */
+    /**
+     * Niat ambil gambar, dengan failnya sendiri.
+     *
+     * Ini yang hilang sepanjang masa ini. FileChooserParams.createIntent()
+     * memulangkan ACTION_GET_CONTENT dan TIDAK pernah membuka kamera, walau
+     * input itu bertulis capture="environment" — bendera itu didedahkan
+     * kepada app justeru supaya app mengendalikannya sendiri. Jadi setiap
+     * butang "ambil gambar" dalam Pocket membuka pemilih fail dalam APK.
+     *
+     * EXTRA_OUTPUT dan bukan bitmap kecil dalam extras: tanpa ia, app kamera
+     * memulangkan lakaran kecil beberapa ratus piksel, yang tidak berguna
+     * untuk mengukur retak.
+     */
+    private fun shotIntent(): Intent? = try {
+        shotDir.mkdirs()
+        // Satu sahaja disimpan: setiap gambar sudah diserahkan ke halaman.
+        shotDir.listFiles()?.forEach { runCatching { it.delete() } }
+        val f = File(shotDir, "shot-${System.currentTimeMillis()}.jpg")
+        val u = FileProvider.getUriForFile(this, "$packageName.files", f)
+        shotFile = f; shotUri = u
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            .putExtra(MediaStore.EXTRA_OUTPUT, u)
+            .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                      Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    } catch (e: Throwable) {
+        uvc.say("Niat kamera gagal: ${e.message}")
+        shotFile = null; shotUri = null
+        null
+    }
+
+    private fun hasCamPerm(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED
+
+    /** Benar bila gambar itu benar-benar ditulis. */
+    private fun shotOk(res: ActivityResult): Boolean =
+        res.resultCode == RESULT_OK && (shotFile?.length() ?: 0L) > 0L
+
+    /**
+     * Kamera atau fail — ditanya sekali, di satu tempat, untuk setiap input
+     * gambar dalam Pocket.
+     *
+     * Butang yang hanya boleh membuka kamera tidak berguna bila gambar itu
+     * sudah ada dalam telefon, dan butang yang hanya boleh membuka fail
+     * tidak berguna bila kecacatan itu ada di depan mata. Kedua-duanya
+     * berlaku di tapak.
+     */
+    private fun askSource(onCamera: () -> Unit, onFiles: () -> Unit, onCancel: () -> Unit) {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Gambar dari mana?")
+            .setItems(arrayOf("Ambil gambar sekarang", "Pilih dari fail")) { _, w ->
+                if (w == 0) {
+                    if (!hasCamPerm()) {
+                        askPerms.launch(arrayOf(Manifest.permission.CAMERA))
+                        toast("Benarkan kamera, kemudian cuba lagi")
+                        onCancel()
+                    } else onCamera()
+                } else onFiles()
+            }
+            .setOnCancelListener { onCancel() }
+            .show()
+    }
+
     private fun imagePickIntent(): Intent =
         if (Build.VERSION.SDK_INT >= 33) {
             Intent(MediaStore.ACTION_PICK_IMAGES).apply {
@@ -541,6 +675,35 @@ class MainActivity : AppCompatActivity() {
      * sama seperti batal: senyap, iaitu pepijat yang sama yang kita baru
      * hilangkan.
      */
+    /**
+     * Pusingkan mengikut EXIF, kerana piksel itu sendiri tidak dipusingkan.
+     *
+     * Dipakai pada gambar yang dipilih juga dan bukan hanya yang baru
+     * diambil: gambar dalam galeri datang dari kamera yang sama dan membawa
+     * tanda yang sama.
+     */
+    private fun rotateByExif(u: Uri, bmp: Bitmap): Bitmap {
+        val deg = try {
+            contentResolver.openInputStream(u)?.use { ins ->
+                when (android.media.ExifInterface(ins).getAttributeInt(
+                    android.media.ExifInterface.TAG_ORIENTATION,
+                    android.media.ExifInterface.ORIENTATION_NORMAL)) {
+                    android.media.ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+                    android.media.ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+                    android.media.ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+                    else -> 0f
+                }
+            } ?: 0f
+        } catch (e: Throwable) { 0f }
+        if (deg == 0f) return bmp
+        return try {
+            val m = android.graphics.Matrix().apply { postRotate(deg) }
+            val out = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, m, true)
+            if (out !== bmp) bmp.recycle()
+            out
+        } catch (e: Throwable) { bmp }
+    }
+
     private fun decodePicked(uris: List<Uri>, picked: Int) {
         pickDir.mkdirs()
         pickDir.listFiles()?.forEach { runCatching { it.delete() } }
@@ -554,9 +717,14 @@ class MainActivity : AppCompatActivity() {
                 var scale = 1
                 while (maxOf(bounds.outWidth, bounds.outHeight) / scale > 2400) scale *= 2
                 val opts = BitmapFactory.Options().apply { inSampleSize = scale }
-                val bmp = contentResolver.openInputStream(u)?.use {
+                val raw = contentResolver.openInputStream(u)?.use {
                     BitmapFactory.decodeStream(it, null, opts)
                 } ?: throw IllegalStateException("tidak boleh disahkod")
+                // Gambar kamera hampir selalu membawa putaran dalam EXIF dan
+                // bukan dalam piksel — telefon dipegang menegak, sensornya
+                // melintang. BitmapFactory mengabaikannya sepenuhnya, jadi
+                // tanpa ini setiap gambar yang diambil masuk mengiring.
+                val bmp = rotateByExif(u, raw)
                 val f = File(pickDir, "p$i.jpg")
                 FileOutputStream(f).use { out ->
                     bmp.compress(Bitmap.CompressFormat.JPEG, 88, out)
@@ -585,7 +753,23 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun pickImages(): String =
             try {
-                runOnUiThread { pickImg.launch(imagePickIntent()) }
+                runOnUiThread {
+                    askSource(
+                        onCamera = {
+                            val i = shotIntent()
+                            if (i == null) onPickedNone()
+                            else try { shotForPick.launch(i) } catch (e: Throwable) {
+                                toast("Tiada app kamera pada telefon ini"); onPickedNone()
+                            }
+                        },
+                        onFiles = {
+                            try { pickImg.launch(imagePickIntent()) }
+                            catch (e: Throwable) {
+                                toast("Tidak dapat membuka pemilih"); onPickedNone()
+                            }
+                        },
+                        onCancel = { onPickedNone() })
+                }
                 "ok"
             } catch (e: Throwable) {
                 uvc.say("Pemilih gagal dibuka: ${e.message}")

@@ -2,4 +2,6 @@
 <paths>
     <!-- Hanya folder yang app ini tulis sendiri untuk dikongsi. -->
     <cache-path name="share" path="share/" />
+    <!-- Tempat app kamera menulis gambar yang baru diambil. -->
+    <cache-path name="shot" path="shot/" />
 </paths>

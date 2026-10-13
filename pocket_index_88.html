@@ -9200,7 +9200,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   <!-- INSPECTION MODE -->
   <main class="ip-mode" id="ipMode">
     <div id="ipBody"></div>
-    <input type="file" id="ipCam" accept="image/*" capture="environment" multiple hidden>
+    <input type="file" id="ipCam" accept="image/*" multiple hidden>
     <input type="file" id="ipPlanFile" accept="image/*,application/pdf" hidden>
   </main>
 
@@ -9277,7 +9277,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
             </button>
           </div>
           <input type="file" id="lbFileIn" multiple hidden>
-          <input type="file" id="lbCamIn" accept="image/*" capture="environment" hidden>
+          <input type="file" id="lbCamIn" accept="image/*" hidden>
 
           <div class="lb-shelf" id="lbShelfRow"></div>
 
@@ -9434,7 +9434,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">Tentang</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.1 · build 12 Okt 2026 · Skala diukur dari titik, bukan ditanya</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.2 · build 13 Okt 2026 · Kamera atau fail, pada setiap input gambar</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Keluar akaun</button>
@@ -9709,7 +9709,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
   </div>
 
   <!-- Hidden file input for camera -->
-  <input type="file" id="siteCaptureInput" accept="image/*" capture="environment" style="display:none">
+  <input type="file" id="siteCaptureInput" accept="image/*" style="display:none">
 </div>
 
 <!-- Helaian Site Mode: pilih alat, atau bercakap -->
@@ -13741,7 +13741,7 @@ function dsOpenScan() {
   document.getElementById('toolModalBody').innerHTML =
     '<div class="br-field"><label class="br-label">Defect photo <span class="req">*</span></label>' +
       '<div id="dsShotSlot"></div>' +
-      '<input type="file" id="dsFile" accept="image/*" capture="environment" style="display:none"></div>' +
+      '<input type="file" id="dsFile" accept="image/*" style="display:none"></div>' +
     '<div class="br-field"><label class="br-label" for="dsLoc">Description <span style="color:var(--muted);letter-spacing:0;text-transform:none;font-weight:400">(optional)</span></label>' +
       '<textarea class="br-area" id="dsLoc" maxlength="600" style="min-height:64px" placeholder="What you see, which element, where it is."></textarea>' +
       '<div class="ds-note">Passed to the AI as context, and kept with the result.</div></div>' +
@@ -15156,7 +15156,7 @@ function crScreenRef() {
   }
   html += '<div class="cr2-step" style="margin-top:6px">Photo</div>' +
     '<div id="crShotSlot"></div>' +
-    '<input type="file" id="crFile" accept="image/*" capture="environment" style="display:none">';
+    '<input type="file" id="crFile" accept="image/*" style="display:none">';
 
   document.getElementById('toolModalBody').innerHTML = html;
   document.getElementById('toolModalFoot').innerHTML =
@@ -17995,7 +17995,7 @@ function openSketchToReal(retain) {
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
       '<span id="skUploadText">Tap to photo or upload your sketch</span>' +
     '</div>' +
-    '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none">' +
+    '<input type="file" accept="image/*" id="skFile" style="display:none">' +
     '<img id="skPreview" class="fp-preview" style="display:none" alt="">' +
     '<textarea id="skNotes" class="sk-notes" placeholder="Optional notes for the AI (helps a lot) — e.g. left = Bed 1, top-right = Bathroom, bottom-right = Toilet, main door at bottom-left, room ~3m x 4m"></textarea>' +
     '<div id="skStatus" class="ar-status"></div>';
@@ -20072,10 +20072,8 @@ function qsRender() {
     (QS.img ? '' :
       '<div class="qs-empty">' + qsSvg(QS_I.img, 40) +
       '<p>Photograph the bundle end, the rebar mat, or whatever you need to count.</p>' +
-      '<button class="qs-pick" id="qsTake">Take a photo</button>' +
-      '<button class="qs-pick alt" id="qsPickFile">Choose from gallery</button>' +
-      '<input type="file" id="qsFile" accept="image/*" capture="environment" style="display:none">' +
-      '<input type="file" id="qsFile2" accept="image/*" style="display:none"></div>') +
+      '<button class="qs-pick" id="qsTake">Add a photo</button>' +
+      '<input type="file" id="qsFile" accept="image/*" style="display:none"></div>') +
     '<div class="qs-zoom"><button data-qsz="in">+</button><button data-qsz="out">&minus;</button>' +
       '<button data-qsz="fit" style="font-size:11px">fit</button></div>' +
     '<div class="qs-hint" id="qsHint"></div></div>';
@@ -20405,16 +20403,14 @@ function qsWire() {
   const st = document.getElementById('qsStage');
   if (!st) return;
 
+  // Satu butang, bukan dua. Pilihan kamera-atau-fail kini ditanya di satu
+  // tempat untuk setiap input gambar dalam Pocket, jadi dua butang yang
+  // kedua-duanya membawa ke soalan yang sama cuma satu ketikan tambahan.
   const take = document.getElementById('qsTake');
-  const pickF = document.getElementById('qsPickFile');
-  const f1 = document.getElementById('qsFile'), f2 = document.getElementById('qsFile2');
+  const f1 = document.getElementById('qsFile');
   if (take && f1) {
     take.addEventListener('click', function() { f1.click(); });
     f1.addEventListener('change', function() { qsLoadFile(f1.files[0]); });
-  }
-  if (pickF && f2) {
-    pickF.addEventListener('click', function() { f2.click(); });
-    f2.addEventListener('change', function() { qsLoadFile(f2.files[0]); });
   }
 
   document.getElementById('qsBack').addEventListener('click', function() {
