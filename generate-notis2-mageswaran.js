@@ -68,6 +68,7 @@ const data = {
     { tarikh: "3 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/032" },
     { tarikh: "18 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan" },
     { tarikh: "2 Oktober 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) oleh Building Surveyor berdaftar RISM — 8 kecacatan direkodkan: 5 Not Complete, 2 Not Fully Complete dan 1 kecacatan baru" },
+    { tarikh: "13 Oktober 2026", peristiwa: "Sebut harga rasmi pembaikan (Official Repair Quotation) No. GXS-RW-2026-00202606 berjumlah RM4,400.00 diperoleh daripada kontraktor berdaftar CIDB" },
     { tarikh: "14 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/032" },
     { tarikh: "29 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
@@ -291,7 +292,12 @@ numPara(5,
 );
 y += 4;
 
-numPara(6, "Sekiranya pembaikan masih tidak disempurnakan selepas tarikh akhir MUKTAMAD tersebut, saya akan TANPA RUJUKAN LANJUT:");
+numPara(6,
+  `Bagi makluman pihak tuan, saya telah pun memperoleh sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor berdaftar CIDB bagi kerja pembaikan yang masih tertunggak — Go Xpert Solution, No. Sebut Harga GXS-RW-2026-00202606 bertarikh 13 Oktober 2026 — dengan jumlah keseluruhan RM4,400.00 (Ringgit Malaysia: Empat Ribu Empat Ratus Sahaja). Sekiranya pihak tuan masih gagal menyiapkan semua kerja pembaikan dalam tempoh notis ini, jumlah tersebut atau kos sebenar yang ditanggung akan dituntut sepenuhnya daripada pihak tuan, termasuk melalui tolakan daripada Wang Tahanan lima peratus (5%) di bawah Klausa 30(2) Jadual H dan/atau tuntutan di Tribunal Tuntutan Pembeli Rumah (TTPR).`
+);
+y += 4;
+
+numPara(7, "Sekiranya pembaikan masih tidak disempurnakan selepas tarikh akhir MUKTAMAD tersebut, saya akan TANPA RUJUKAN LANJUT:");
 y += 2;
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya;");
 bullet("Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh peguam cara pemaju sebagai pemegang (stakeholder), selaras dengan Klausa 30(2) Jadual H Perjanjian Jual Beli;");
@@ -299,7 +305,7 @@ bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempa
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
-numPara(7,
+numPara(8,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -312,7 +318,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(7,
+numPara(8,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
