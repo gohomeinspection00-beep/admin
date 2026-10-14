@@ -110,11 +110,11 @@ class ArInspectActivity : Activity() {
     private lateinit var readout: TextView
     private lateinit var warn: TextView
     private lateinit var guideIm: ImageView
-    private lateinit var markBtn: ImageButton
-    private lateinit var undoBtn: ImageButton
-    private lateinit var addBtn: ImageButton
-    private lateinit var lockBtn: ImageButton
-    private lateinit var doneBtn: ImageButton
+    private lateinit var markBtn: View
+    private lateinit var undoBtn: View
+    private lateinit var addBtn: View
+    private lateinit var lockBtn: View
+    private lateinit var doneBtn: View
 
     private val bg = ArBackground()
     private val cards = ArCards()
@@ -252,17 +252,33 @@ class ArInspectActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
         }
-        markBtn = iconBtn(R.drawable.ic_pin, "Tanda titik kunci") { wantMark = true }
-        undoBtn = iconBtn(R.drawable.ic_undo, "Buang titik terakhir") { wantUndo = true }
-        addBtn = iconBtn(R.drawable.ic_camera, "Tambah defect") { wantDefect = true }
-        lockBtn = iconBtn(R.drawable.ic_lock, "Tambah titik kunci") { wantLock = true }
-        doneBtn = iconBtn(R.drawable.ic_check, "Siap") { finishUp() }
+        // Berlabel, bukan ikon sahaja. Bar ikon sahaja berfungsi semasa
+        // mengunci kerana hanya ada satu benda untuk ditekan; dalam mod
+        // sedia ia menjadi tiga petak kelabu serupa, dan "tambah defect"
+        // tidak pernah dijumpai. Kamera bersebelahan mangga terbaca
+        // sebagai "tangkap skrin", bukan "defect baharu".
+        markBtn = barBtn(R.drawable.ic_pin, "Tanda", false) { wantMark = true }
+        undoBtn = barBtn(R.drawable.ic_undo, "Buang", false) { wantUndo = true }
+        addBtn = barBtn(R.drawable.ic_camera, "+ Defect", true) { wantDefect = true }
+        lockBtn = barBtn(R.drawable.ic_lock, "Titik", false) { wantLock = true }
+        doneBtn = barBtn(R.drawable.ic_check, "Siap", false) { finishUp() }
         row.addView(markBtn); row.addView(undoBtn)
         row.addView(addBtn); row.addView(lockBtn); row.addView(doneBtn)
         bar.addView(row, LinearLayout.LayoutParams(-1, -2))
         root.addView(bar, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.BOTTOM })
 
-        val close = iconBtn(R.drawable.ic_close, "Tutup") { finishUp() }
+        val close = ImageButton(this).apply {
+            setImageResource(R.drawable.ic_close)
+            setColorFilter(Color.WHITE)
+            contentDescription = "Tutup"
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            background = GradientDrawable().apply {
+                cornerRadius = dp(11).toFloat()
+                setColor(Color.argb(46, 255, 255, 255))
+                setStroke(dp(1), Color.argb(70, 255, 255, 255))
+            }
+            setOnClickListener { finishUp() }
+        }
         root.addView(close, FrameLayout.LayoutParams(dp(44), dp(44)).apply {
             gravity = Gravity.TOP or Gravity.END
             topMargin = dp(10); rightMargin = dp(10)
@@ -442,25 +458,44 @@ class ArInspectActivity : Activity() {
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
-    private fun iconBtn(icon: Int, name: String, onTap: () -> Unit): ImageButton =
-        ImageButton(this).apply {
-            setImageResource(icon)
-            setColorFilter(Color.WHITE)
-            contentDescription = name
-            scaleType = ImageView.ScaleType.CENTER_INSIDE
+    /**
+     * Satu butang bar: ikon dengan NAMANYA di bawah.
+     *
+     * @param primary butang yang paling kerap ditekan dalam mod itu,
+     *                diwarnakan supaya ia tidak hilang antara yang lain.
+     */
+    private fun barBtn(icon: Int, name: String, primary: Boolean, onTap: () -> Unit): View {
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(dp(10), dp(7), dp(10), dp(6))
             background = GradientDrawable().apply {
-                cornerRadius = dp(11).toFloat()
-                setColor(Color.argb(46, 255, 255, 255))
-                setStroke(dp(1), Color.argb(70, 255, 255, 255))
+                cornerRadius = dp(12).toFloat()
+                setColor(if (primary) Color.rgb(27, 79, 216) else Color.argb(46, 255, 255, 255))
+                setStroke(dp(1),
+                    if (primary) Color.rgb(27, 79, 216) else Color.argb(70, 255, 255, 255))
             }
-            val lp = LinearLayout.LayoutParams(dp(54), dp(46))
+            val lp = LinearLayout.LayoutParams(-2, -2)
             lp.marginStart = dp(5); lp.marginEnd = dp(5)
             layoutParams = lp
+            isClickable = true
             setOnClickListener { onTap() }
-            setOnLongClickListener {
-                Toast.makeText(this@ArInspectActivity, name, Toast.LENGTH_SHORT).show(); true
-            }
         }
+        box.addView(ImageView(this).apply {
+            setImageResource(icon)
+            setColorFilter(Color.WHITE)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+        }, LinearLayout.LayoutParams(dp(24), dp(22)))
+        box.addView(TextView(this).apply {
+            text = name
+            setTextColor(Color.WHITE)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+            gravity = Gravity.CENTER
+            setPadding(0, dp(2), 0, 0)
+        })
+        box.contentDescription = name
+        return box
+    }
 
     private fun paintUi() {
         val locking = phase == Phase.LOCK
@@ -480,7 +515,11 @@ class ArInspectActivity : Activity() {
             locking ->
                 "$zoneName · Tanda semula titik ${n + 1} daripada $need" +
                 (ls.getOrNull(n)?.label?.takeIf { it.isNotBlank() }?.let { " — $it" } ?: "")
-            else -> "$zoneName · ${defs.count { !it.removed }} defect"
+            else -> "$zoneName · ${liveDefs().size} defect" +
+                (if (!modeNew && rms > 0f)
+                    " · padanan ${fmtMm(rms)}${quality(rms)}" +
+                    (if (badPoint >= 0) ", titik ${badPoint + 1} paling tersasar" else "")
+                 else "")
         }
 
         // Gambar panduan hanya bermakna semasa menanda semula.
@@ -491,11 +530,11 @@ class ArInspectActivity : Activity() {
         warn.visibility = if (why.isEmpty()) View.GONE else View.VISIBLE
         if (why.isNotEmpty()) warn.text = why
 
+        // Baris ini sentiasa arahan, tidak pernah hanya angka: ia duduk
+        // tepat di atas butang, dan ia satu-satunya tempat yang memberitahu
+        // surveyor apa yang perlu dibuat seterusnya.
         readout.text = when {
-            phase == Phase.READY && !modeNew && rms > 0f ->
-                "Padanan ${fmtMm(rms)}" + quality(rms) +
-                (if (badPoint >= 0) " · titik ${badPoint + 1} paling tersasar" else "")
-            phase == Phase.READY -> "Bidik defect, kemudian tekan kamera"
+            phase == Phase.READY -> "Bidik defect, kemudian tekan + Defect"
             else -> "$n daripada $need ditanda"
         }
     }
@@ -957,8 +996,8 @@ class ArInspectActivity : Activity() {
                             .setMessage("Jaraknya ke titik lain tersasar ${fmtMm(off)} " +
                                 "daripada yang direkod. Biasanya ini bermakna bucu yang salah " +
                                 "ditanda — atau sesuatu di tempat itu sudah berubah.")
-                            .setPositiveButton("Tanda semula") { _, _ -> wantReset = true }
-                            .setNegativeButton("Teruskan juga") { _, _ -> accept(zone, world) }
+                            .setPositiveButton("Teruskan juga") { _, _ -> accept(zone, world) }
+                            .setNegativeButton("Tanda semula") { _, _ -> wantReset = true }
                             .setCancelable(false)
                             .show()
                     }
@@ -997,8 +1036,8 @@ class ArInspectActivity : Activity() {
                         "semasa menanda semula boleh menggerakkan defect di hujung bilik " +
                         "lebih sepuluh sentimeter.\n\nLetak titik pada bucu yang BERJAUHAN " +
                         "— hujung dinding yang bertentangan, bukan tiga jubin bersebelahan.")
-                    .setPositiveButton("Tanda semula") { _, _ -> wantReset = true }
-                    .setNegativeButton("Teruskan", null)
+                    .setPositiveButton("Teruskan", null)
+                    .setNegativeButton("Tanda semula") { _, _ -> wantReset = true }
                     .show()
             }
         }
@@ -1033,8 +1072,8 @@ class ArInspectActivity : Activity() {
                                 "di hujung bilik." else "") +
                             "\n\nTanda semula dengan lebih tepat, atau teruskan kalau " +
                             "anggaran sudah memadai.")
-                        .setPositiveButton("Tanda semula") { _, _ -> wantReset = true }
-                        .setNegativeButton("Teruskan", null)
+                        .setPositiveButton("Teruskan", null)
+                        .setNegativeButton("Tanda semula") { _, _ -> wantReset = true }
                         .show()
                 }
             }
