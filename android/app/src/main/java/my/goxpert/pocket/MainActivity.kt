@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity() {
     private fun recBuild() {
         if (rec != null) return
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            uvc.say("Pengecaman suara: tiada perkhidmatan pada telefon ini")
+            uvc.say("Speech recognition: no service on this phone")
             return
         }
         rec = SpeechRecognizer.createSpeechRecognizer(this).apply {
@@ -229,7 +229,7 @@ class MainActivity : AppCompatActivity() {
             contentResolver.openInputStream(uri)!!.use { input ->
                 pocketFile.outputStream().use { input.copyTo(it) }
             }
-            toast("Pocket dimuat, ${pocketFile.length() / 1024} KB")
+            toast("Pocket loaded, ${pocketFile.length() / 1024} KB")
             web.loadUrl(HOME)
         } catch (e: Throwable) {
             toast("Gagal memuat: ${e.message}")
@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity() {
         val cb = filePick; filePick = null
         val u = shotUri
         val ok = shotOk(res)
-        uvc.say("Kamera (input): kod=${res.resultCode} bait=${shotFile?.length() ?: 0}")
+        uvc.say("Camera (input): code=${res.resultCode} bytes=${shotFile?.length() ?: 0}")
         shotFile = null; shotUri = null
         cb?.onReceiveValue(if (ok && u != null) arrayOf(u) else null)
     }
@@ -258,7 +258,7 @@ class MainActivity : AppCompatActivity() {
     ) { res ->
         val u = shotUri
         val ok = shotOk(res)
-        uvc.say("Kamera (pick): kod=${res.resultCode} bait=${shotFile?.length() ?: 0}")
+        uvc.say("Camera (pick): code=${res.resultCode} bytes=${shotFile?.length() ?: 0}")
         shotFile = null; shotUri = null
         val list = if (ok && u != null) listOf(u) else emptyList()
         Thread({ decodePicked(list, list.size) }, "shot-decode")
@@ -357,7 +357,7 @@ class MainActivity : AppCompatActivity() {
                 // cuba bahasa itu dahulu dan jatuh ke bahasa peranti.
                 if (!useLang("en-GB")) useLang(Locale.getDefault().toLanguageTag())
                 runCatching {
-                    uvc.say("Suara TTS: " + (tts?.voice?.name ?: "(lalai)"))
+                    uvc.say("TTS voice: " + (tts?.voice?.name ?: "(lalai)"))
                 }
             }
             if (ttsOk) runCatching {
@@ -371,16 +371,16 @@ class MainActivity : AppCompatActivity() {
                     override fun onError(id: String?) { sayEvent("end") }
                 })
             }
-            uvc.say("TTS: " + if (ttsOk) "sedia" else "tidak tersedia (kod $st)")
+            uvc.say("TTS: " + if (ttsOk) "sedia" else "not available (code $st)")
         }
 
         try {
             server = LocalServer(uvc, pocketFile, pickDir, modelDir, inspDir, assets)
                 .also { it.start(0, true) }
-            uvc.say("Pelayan hidup pada $HOME")
+            uvc.say("Server up at $HOME")
         } catch (e: Throwable) {
-            uvc.say("Pelayan GAGAL bermula: ${e.message}")
-            toast("Port ${LocalServer.PORT} sedang dipakai. Tutup app ini sepenuhnya dan buka semula.")
+            uvc.say("Server FAILED to start: ${e.message}")
+            toast("Port ${LocalServer.PORT} is in use. Close this app completely and open it again.")
         }
 
         web = WebView(this).apply {
@@ -418,8 +418,8 @@ class MainActivity : AppCompatActivity() {
             setDownloadListener { url, _, _, _, _ ->
                 toast(
                     if (url.startsWith("blob:") || url.startsWith("data:"))
-                        "Guna butang Muat turun dalam Pocket untuk fail ini"
-                    else "Muat turun tidak disokong di sini"
+                        "Use the Download button inside Pocket for this file"
+                    else "Downloads are not supported here"
                 )
             }
             webChromeClient = object : WebChromeClient() {
@@ -460,7 +460,7 @@ class MainActivity : AppCompatActivity() {
                         } catch (e: Throwable) {
                             filePick = null
                             uvc.say("onShowFileChooser gagal: ${e.message}")
-                            toast("Tidak dapat membuka pemilih fail")
+                            toast("Could not open the file picker")
                             false
                         }
                     }
@@ -469,7 +469,7 @@ class MainActivity : AppCompatActivity() {
                     // ditanda capture="environment" atau tidak. Bendera itu
                     // ialah pilihan penulis HTML; ini pilihan surveyor yang
                     // sedang berdiri di depan kecacatan itu.
-                    uvc.say("onShowFileChooser: gambar, hanya=$onlyImage " +
+                    uvc.say("onShowFileChooser: image, only=$onlyImage " +
                             "capture=${params?.isCaptureEnabled}")
                     askSource(
                         onCamera = {
@@ -477,7 +477,7 @@ class MainActivity : AppCompatActivity() {
                             if (i == null) { filePick = null; cb?.onReceiveValue(null) }
                             else try { shotForInput.launch(i) } catch (e: Throwable) {
                                 filePick = null; cb?.onReceiveValue(null)
-                                toast("Tiada app kamera pada telefon ini")
+                                toast("No camera app on this phone")
                             }
                         },
                         onFiles = {
@@ -488,7 +488,7 @@ class MainActivity : AppCompatActivity() {
                                     if (onlyImage) imagePickIntent() else params!!.createIntent())
                             } catch (e: Throwable) {
                                 filePick = null; cb?.onReceiveValue(null)
-                                toast("Tidak dapat membuka pemilih fail")
+                                toast("Could not open the file picker")
                             }
                         },
                         onCancel = { filePick = null; cb?.onReceiveValue(null) })
@@ -528,10 +528,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showMenu() {
         val items = arrayOf(
-            "Muat fail Pocket",
+            "Load Pocket file",
             "Diagnostik endoskop",
-            "Muat semula",
-            "Sambung semula endoskop"
+            "Reload",
+            "Reconnect endoscope"
         )
         AlertDialog.Builder(this)
             .setTitle("GoXpert Pocket")
@@ -593,7 +593,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             true
         } catch (e: Throwable) {
-            toast("Tiada app untuk membuka pautan ini")
+            toast("No app to open this link")
             true
         }
     }
@@ -627,7 +627,7 @@ class MainActivity : AppCompatActivity() {
             .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                       Intent.FLAG_GRANT_READ_URI_PERMISSION)
     } catch (e: Throwable) {
-        uvc.say("Niat kamera gagal: ${e.message}")
+        uvc.say("Camera intent failed: ${e.message}")
         shotFile = null; shotUri = null
         null
     }
@@ -651,12 +651,12 @@ class MainActivity : AppCompatActivity() {
      */
     private fun askSource(onCamera: () -> Unit, onFiles: () -> Unit, onCancel: () -> Unit) {
         android.app.AlertDialog.Builder(this)
-            .setTitle("Gambar dari mana?")
-            .setItems(arrayOf("Ambil gambar sekarang", "Pilih dari fail")) { _, w ->
+            .setTitle("Where from?")
+            .setItems(arrayOf("Take a photo now", "Pick from files")) { _, w ->
                 if (w == 0) {
                     if (!hasCamPerm()) {
                         askPerms.launch(arrayOf(Manifest.permission.CAMERA))
-                        toast("Benarkan kamera, kemudian cuba lagi")
+                        toast("Allow the camera, then try again")
                         onCancel()
                     } else onCamera()
                 } else onFiles()
@@ -692,7 +692,7 @@ class MainActivity : AppCompatActivity() {
             if (uris.isEmpty()) d.data?.let { uris.add(it) }
         }
         val picked = uris.size
-        uvc.say("Pemilih gambar: kod=${res.resultCode}, $picked dipilih")
+        uvc.say("Photo picker: code=${res.resultCode}, $picked chosen")
 
         // Menyahkod dan mengekod semula sehingga 20 gambar mengambil masa
         // beberapa saat. Di atas thread utama itu app yang tergantung, jadi
@@ -752,7 +752,7 @@ class MainActivity : AppCompatActivity() {
                 val opts = BitmapFactory.Options().apply { inSampleSize = scale }
                 val raw = contentResolver.openInputStream(u)?.use {
                     BitmapFactory.decodeStream(it, null, opts)
-                } ?: throw IllegalStateException("tidak boleh disahkod")
+                } ?: throw IllegalStateException("could not be decoded")
                 // Gambar kamera hampir selalu membawa putaran dalam EXIF dan
                 // bukan dalam piksel — telefon dipegang menegak, sensornya
                 // melintang. BitmapFactory mengabaikannya sepenuhnya, jadi
@@ -765,10 +765,10 @@ class MainActivity : AppCompatActivity() {
                 bmp.recycle()
                 if (f.length() > 0) {
                     names.add("/pick/" + f.name)
-                    uvc.say("Gambar $i: ${bounds.outWidth}x${bounds.outHeight} -> ${f.length()} bait")
-                } else uvc.say("Gambar $i: fail kosong")
+                    uvc.say("Photo $i: ${bounds.outWidth}x${bounds.outHeight} -> ${f.length()} bytes")
+                } else uvc.say("Photo $i: empty file")
             } catch (e: Throwable) {
-                uvc.say("Gambar $i gagal: ${e.javaClass.simpleName}: ${e.message}")
+                uvc.say("Photo $i failed: ${e.javaClass.simpleName}: ${e.message}")
             }
         }
 
@@ -792,20 +792,20 @@ class MainActivity : AppCompatActivity() {
                             val i = shotIntent()
                             if (i == null) onPickedNone()
                             else try { shotForPick.launch(i) } catch (e: Throwable) {
-                                toast("Tiada app kamera pada telefon ini"); onPickedNone()
+                                toast("No camera app on this phone"); onPickedNone()
                             }
                         },
                         onFiles = {
                             try { pickImg.launch(imagePickIntent()) }
                             catch (e: Throwable) {
-                                toast("Tidak dapat membuka pemilih"); onPickedNone()
+                                toast("Could not open the picker"); onPickedNone()
                             }
                         },
                         onCancel = { onPickedNone() })
                 }
                 "ok"
             } catch (e: Throwable) {
-                uvc.say("Pemilih gagal dibuka: ${e.message}")
+                uvc.say("Picker could not be opened: ${e.message}")
                 "gagal: ${e.message}"
             }
 
@@ -923,7 +923,7 @@ class MainActivity : AppCompatActivity() {
                         Intent(this@MainActivity, ArMeasureActivity::class.java)
                             .putExtra("kind", kind))
                 } catch (e: Throwable) {
-                    uvc.say("AR gagal dibuka: ${e.message}")
+                    uvc.say("AR could not be opened: ${e.message}")
                     out = "gagal: ${e.message}"
                 }
             }
@@ -973,7 +973,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 out
             } catch (e: Throwable) {
-                uvc.say("Hamparan pelan gagal: ${e.message}")
+                uvc.say("Plan overlay failed: ${e.message}")
                 "gagal: ${e.message}"
             }
         }
@@ -1206,7 +1206,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     val uri = contentResolver.insert(
                         MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv
-                    ) ?: return "Tidak dapat membuat fail"
+                    ) ?: return "Could not create the file"
                     contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
                     cv.clear()
                     cv.put(MediaStore.Downloads.IS_PENDING, 0)
@@ -1218,8 +1218,8 @@ class MainActivity : AppCompatActivity() {
                     dir.mkdirs()
                     FileOutputStream(File(dir, safe)).use { it.write(bytes) }
                 }
-                runOnUiThread { toast("Disimpan ke Muat Turun: $safe") }
-                "Disimpan ke Muat Turun"
+                runOnUiThread { toast("Saved to Downloads: $safe") }
+                "Saved to Downloads"
             } catch (e: Throwable) {
                 val m = "Gagal menyimpan: " + (e.message ?: e.javaClass.simpleName)
                 runOnUiThread { toast(m) }
@@ -1254,7 +1254,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     val uri = contentResolver.insert(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv
-                    ) ?: return "Tidak dapat membuat fail"
+                    ) ?: return "Could not create the file"
                     contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
                     cv.clear()
                     cv.put(MediaStore.Images.Media.IS_PENDING, 0)
@@ -1273,9 +1273,9 @@ class MainActivity : AppCompatActivity() {
                         android.content.Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                         Uri.fromFile(f)))
                 }
-                "Disimpan ke galeri"
+                "Saved to gallery"
             } catch (e: Throwable) {
-                val m = "Gagal menyimpan gambar: " + (e.message ?: e.javaClass.simpleName)
+                val m = "Could not save the photo: " + (e.message ?: e.javaClass.simpleName)
                 runOnUiThread { toast(m) }
                 m
             }

@@ -83,7 +83,7 @@ class LocalServer(
     private fun snapshot(): Response {
         val jpg = uvc.latestJpeg
             ?: return noCache(newFixedLengthResponse(
-                Response.Status.SERVICE_UNAVAILABLE, "text/plain", "tiada bingkai"))
+                Response.Status.SERVICE_UNAVAILABLE, "text/plain", "no frame"))
         return noCache(newFixedLengthResponse(
             Response.Status.OK, "image/jpeg", jpg.inputStream(), jpg.size.toLong()))
     }
@@ -101,7 +101,7 @@ class LocalServer(
         val safe = name.substringAfterLast('/')
         if (!Regex("^p\\d+\\.jpg$").matches(safe)) {
             return noCache(newFixedLengthResponse(
-                Response.Status.FORBIDDEN, "text/plain", "nama tidak sah"))
+                Response.Status.FORBIDDEN, "text/plain", "bad name"))
         }
         val f = File(pickDir, safe)
         if (!f.exists()) {
@@ -129,16 +129,16 @@ class LocalServer(
     private fun model(session: IHTTPSession): Response {
         if (session.method != Method.PUT && session.method != Method.POST) {
             return noCache(newFixedLengthResponse(
-                Response.Status.METHOD_NOT_ALLOWED, "text/plain", "PUT sahaja"))
+                Response.Status.METHOD_NOT_ALLOWED, "text/plain", "PUT only"))
         }
         val len = (session.headers["content-length"] ?: "0").toLongOrNull() ?: 0L
         if (len <= 0L) {
             return noCache(newFixedLengthResponse(
-                Response.Status.BAD_REQUEST, "text/plain", "tiada panjang"))
+                Response.Status.BAD_REQUEST, "text/plain", "no length"))
         }
         if (len > 120L * 1024 * 1024) {
             return noCache(newFixedLengthResponse(
-                Response.Status.BAD_REQUEST, "text/plain", "terlalu besar"))
+                Response.Status.BAD_REQUEST, "text/plain", "too large"))
         }
         return try {
             modelDir.mkdirs()
@@ -161,7 +161,7 @@ class LocalServer(
             if (left > 0L || f.length() != len) {
                 runCatching { f.delete() }
                 return noCache(newFixedLengthResponse(
-                    Response.Status.INTERNAL_ERROR, "text/plain", "terputus"))
+                    Response.Status.INTERNAL_ERROR, "text/plain", "truncated"))
             }
             noCache(newFixedLengthResponse(
                 Response.Status.OK, "application/json", "{\"ok\":true,\"bytes\":${f.length()}}"))
@@ -188,16 +188,16 @@ class LocalServer(
     private fun inspPut(session: IHTTPSession): Response {
         if (session.method != Method.PUT && session.method != Method.POST) {
             return noCache(newFixedLengthResponse(
-                Response.Status.METHOD_NOT_ALLOWED, "text/plain", "PUT sahaja"))
+                Response.Status.METHOD_NOT_ALLOWED, "text/plain", "PUT only"))
         }
         val len = (session.headers["content-length"] ?: "0").toLongOrNull() ?: 0L
         if (len <= 0L) {
             return noCache(newFixedLengthResponse(
-                Response.Status.BAD_REQUEST, "text/plain", "tiada panjang"))
+                Response.Status.BAD_REQUEST, "text/plain", "no length"))
         }
         if (len > 64L * 1024 * 1024) {
             return noCache(newFixedLengthResponse(
-                Response.Status.BAD_REQUEST, "text/plain", "terlalu besar"))
+                Response.Status.BAD_REQUEST, "text/plain", "too large"))
         }
         return try {
             inspDir.mkdirs()
@@ -221,7 +221,7 @@ class LocalServer(
             if (left > 0L || f.length() != len) {
                 runCatching { f.delete() }
                 return noCache(newFixedLengthResponse(
-                    Response.Status.INTERNAL_ERROR, "text/plain", "terputus"))
+                    Response.Status.INTERNAL_ERROR, "text/plain", "truncated"))
             }
             noCache(newFixedLengthResponse(
                 Response.Status.OK, "application/json", "{\"ok\":true}"))
@@ -239,7 +239,7 @@ class LocalServer(
         val json = safe == "out.json"
         if (!json && !Regex("^[dl]\\d+\\.jpg$").matches(safe)) {
             return noCache(newFixedLengthResponse(
-                Response.Status.FORBIDDEN, "text/plain", "nama tidak sah"))
+                Response.Status.FORBIDDEN, "text/plain", "bad name"))
         }
         val f = File(inspDir, safe)
         if (!f.exists()) {
@@ -271,7 +271,7 @@ class LocalServer(
         if (!Regex("^(three\\.min\\.js|fabric\\.min\\.js|loaders/(GLTF|DRACO)Loader\\.js)$")
                 .matches(name)) {
             return noCache(newFixedLengthResponse(
-                Response.Status.FORBIDDEN, "text/plain", "nama tidak sah"))
+                Response.Status.FORBIDDEN, "text/plain", "bad name"))
         }
         return try {
             val ins = assets.open("lib/$name")
@@ -284,11 +284,11 @@ class LocalServer(
 
     private fun debug(): Response {
         val t = buildString {
-            append("PERANTI: ").append(uvc.deviceName.ifEmpty { "(tiada)" }).append('\n')
-            append("DIBUKA : ").append(uvc.opened).append('\n')
-            append("BINGKAI: ").append(uvc.frameCount).append('\n')
-            append("SAIZ   : ").append(uvc.width).append(" x ").append(uvc.height).append('\n')
-            append("POCKET : ").append(if (pocketFile.exists()) "${pocketFile.length()} bait" else "belum dimuat").append('\n')
+            append("DEVICE : ").append(uvc.deviceName.ifEmpty { "(none)" }).append('\n')
+            append("OPENED : ").append(uvc.opened).append('\n')
+            append("FRAMES : ").append(uvc.frameCount).append('\n')
+            append("SIZE   : ").append(uvc.width).append(" x ").append(uvc.height).append('\n')
+            append("POCKET : ").append(if (pocketFile.exists()) "${pocketFile.length()} bait" else "not loaded yet").append('\n')
             append("\n--- log ---\n")
             uvc.logLines().forEach { append(it).append('\n') }
         }
@@ -356,11 +356,11 @@ class LocalServer(
               code{font-family:ui-monospace,monospace;color:#4ea3f0}
             </style>
             <div>
-              <h1>Fail Pocket belum dimuat</h1>
-              <p>Tekan butang menu di penjuru atas, pilih <b>Muat fail Pocket</b>,
-                 dan pilih <code>pocket_index_88.html</code> dari telefon awak.</p>
-              <p>Fail itu disalin ke dalam app, jadi awak boleh menukarnya bila-bila
-                 tanpa memasang semula APK.</p>
+              <h1>No Pocket file loaded yet</h1>
+              <p>Tap the menu button in the top corner, choose <b>Load Pocket file</b>,
+                 and pick <code>pocket_index_88.html</code> from your phone.</p>
+              <p>The file is copied into the app, so you can swap it any time
+                 without reinstalling the APK.</p>
             </div>
         """.trimIndent()
     }

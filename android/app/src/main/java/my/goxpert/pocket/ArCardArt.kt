@@ -38,7 +38,7 @@ object ArCardArt {
 
     /** N1 Normal, R2 Rutin, U3 Mendesak, E4 Kecemasan. */
     val CODES = arrayOf("N1", "R2", "U3", "E4")
-    val NAMES = arrayOf("Normal", "Rutin", "Mendesak", "Kecemasan")
+    val NAMES = arrayOf("Normal", "Routine", "Urgent", "Emergency")
 
     /** Senarai yang sama seperti Site Capture, supaya tiada terjemahan
      *  diperlukan apabila defect ini menjadi satu finding. */
@@ -96,7 +96,7 @@ object ArCardArt {
             p.color = Color.rgb(120, 130, 145)
             p.textSize = 17f
             p.textAlign = Paint.Align.CENTER
-            c.drawText("tiada gambar", W / 2f, PHOTO_H / 2f + 6f, p)
+            c.drawText("no photo", W / 2f, PHOTO_H / 2f + 6f, p)
             p.textAlign = Paint.Align.LEFT
         }
 

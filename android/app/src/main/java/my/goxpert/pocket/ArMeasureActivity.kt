@@ -184,7 +184,7 @@ class ArMeasureActivity : Activity() {
             setBackgroundColor(Color.argb(140, 0, 0, 0))
             setPadding(dp(14), dp(10), dp(14), dp(10))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-            text = "Halakan kamera ke lantai dan gerak perlahan…"
+            text = "Aim the camera at the floor and move slowly…"
         }
         root.addView(hint, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.TOP })
 
@@ -210,14 +210,14 @@ class ArMeasureActivity : Activity() {
         placeBtn = ImageButton(this).apply {
             setImageResource(R.drawable.ic_pin)
             setColorFilter(Color.WHITE)
-            contentDescription = "Letak titik"
+            contentDescription = "Place point"
             scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
             background = GradientDrawable().apply {
                 cornerRadius = dp(14).toFloat()
                 setColor(C_PRIMARY)
             }
             setPadding(dp(12), dp(12), dp(12), dp(12))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Letak titik"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Place point"
             setOnClickListener { place() }
             layoutParams = LinearLayout.LayoutParams(-1, dp(54)).apply { topMargin = dp(8) }
         }
@@ -243,10 +243,10 @@ class ArMeasureActivity : Activity() {
         undoBtn = icon(R.drawable.ic_undo, "Undo", C_PLAIN).apply {
             isEnabled = false; setOnClickListener { undo() }
         }
-        doneBtn = icon(R.drawable.ic_check, "Siap", C_DONE).apply {
+        doneBtn = icon(R.drawable.ic_check, "Done", C_DONE).apply {
             isEnabled = false; setOnClickListener { finishWith() }
         }
-        val closeBtn = icon(R.drawable.ic_close, "Batal", C_CLOSE).apply {
+        val closeBtn = icon(R.drawable.ic_close, "Cancel", C_CLOSE).apply {
             setOnClickListener { askLeave() }
         }
         bar.addView(LinearLayout(this).apply {
@@ -284,7 +284,7 @@ class ArMeasureActivity : Activity() {
                     })
                 }
             } catch (e: Throwable) {
-                bail("AR tidak dapat dimulakan: ${e.javaClass.simpleName}")
+                bail("AR could not start: ${e.javaClass.simpleName}")
                 return
             }
         }
@@ -293,7 +293,7 @@ class ArMeasureActivity : Activity() {
             sessionResumed = true
         } catch (e: CameraNotAvailableException) {
             session = null
-            bail("Kamera tidak tersedia untuk AR")
+            bail("Camera not available for AR")
             return
         }
         gl.onResume()
@@ -325,9 +325,9 @@ class ArMeasureActivity : Activity() {
         val n = doneSegs().size
         if (n == 0) { finish(); return }
         android.app.AlertDialog.Builder(this)
-            .setMessage("$n ukuran belum disimpan. Buang semuanya?")
-            .setPositiveButton("Buang") { _, _ -> finish() }
-            .setNegativeButton("Kembali", null)
+            .setMessage("$n measurements are not saved. Discard them all?")
+            .setPositiveButton("Discard") { _, _ -> finish() }
+            .setNegativeButton("Back", null)
             .show()
     }
 
@@ -344,7 +344,7 @@ class ArMeasureActivity : Activity() {
 
     private fun place() {
         if (aim == null) {
-            Toast.makeText(this, "Belum ada satah di tengah skrin", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No surface at the centre of the screen yet", Toast.LENGTH_SHORT).show()
             return
         }
         wantPlace = true
@@ -411,30 +411,30 @@ class ArMeasureActivity : Activity() {
         for (b2 in listOf(undoBtn, doneBtn)) b2.alpha = if (b2.isEnabled) 1f else 0.35f
 
         readout.text = if (all.isEmpty()) "—" else fmt(shownLen())
-        val tally = if (done == 0) "" else " · $done ukuran siap"
+        val tally = if (done == 0) "" else " · $done measurements done"
         hint.text = when {
             // Sebab sebenar ARCore hilang jejak, dan bukan "cuba lagi": di
             // tapak, "terlalu gelap" dan "gerak terlalu laju" ialah dua
             // masalah berbeza dengan dua penyelesaian berbeza.
             !tracking && why.isNotEmpty() -> why
-            !tracking -> "Gerak telefon perlahan supaya ARCore nampak permukaan…"
+            !tracking -> "Move the phone slowly so ARCore can see the surface…"
             // "Belum jumpa apa-apa" dan "jumpa, tapi awak tidak menghalakannya"
             // ialah dua masalah berbeza, jadi ia dikatakan secara berbeza.
             planeCount == 0 ->
-                "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, " +
-                "halakan ke permukaan bercorak — lantai kosong dan dinding putih sukar."
-            aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru$tally"
+                "No surface yet. Move the phone LEFT and RIGHT slowly, " +
+                "aim at a surface with texture — bare floors and white walls are hard."
+            aim == null -> "$planeCount surfaces found · aim the circle at a blue area$tally"
             kind == "dist" && open.isEmpty() && done == 0 ->
-                "Ketik butang biru pada hujung pertama"
+                "Tap the blue button at the first end"
             // Selepas satu pasangan ditutup, perkara paling penting untuk
             // dikatakan ialah ia SUDAH tutup: titik seterusnya tidak akan
             // menyambung kepadanya.
             kind == "dist" && open.isEmpty() ->
-                "$done ukuran siap · ketik butang biru untuk ukuran baharu, " +
-                "atau bulatan hijau untuk simpan semua"
-            kind == "dist" -> "Jalan ke hujung kedua, ketik butang biru lagi$tally"
-            open.size < 3 -> "Ketik butang biru titik demi titik sepanjang dinding (${open.size})"
-            else -> "${open.size} titik · ketik bulatan hijau"
+                "$done measurements done · tap the blue button for a new one, " +
+                "or the green circle to save them all"
+            kind == "dist" -> "Walk to the other end, tap the blue button again$tally"
+            open.size < 3 -> "Tap the blue button point by point along the wall (${open.size})"
+            else -> "${open.size} points · tap the green circle"
         }
     }
 
@@ -451,7 +451,7 @@ class ArMeasureActivity : Activity() {
             // Satu titik bukan ukuran. Ia dibuang, tetapi tidak secara
             // senyap: data yang hilang tanpa sebab ialah bug.
             Toast.makeText(this,
-                "$dropped titik yang belum lengkap dibuang", Toast.LENGTH_SHORT).show()
+                "$dropped incomplete points dropped", Toast.LENGTH_SHORT).show()
         }
         val sb = StringBuilder("[")
         segs.forEachIndexed { gi, g ->
@@ -674,11 +674,11 @@ class ArMeasureActivity : Activity() {
             val cam = frame.camera
             val ok = cam.trackingState == TrackingState.TRACKING
             val reason = if (ok) "" else when (cam.trackingFailureReason) {
-                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Terlalu gelap — hidupkan lampu"
-                TrackingFailureReason.EXCESSIVE_MOTION -> "Gerak telefon lebih perlahan"
+                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Too dark — turn on a light"
+                TrackingFailureReason.EXCESSIVE_MOTION -> "Move the phone more slowly"
                 TrackingFailureReason.INSUFFICIENT_FEATURES ->
-                    "Permukaan ini terlalu kosong — halakan ke sesuatu yang bercorak"
-                TrackingFailureReason.CAMERA_UNAVAILABLE -> "Kamera diambil oleh app lain"
+                    "This surface is too plain — aim at something with texture"
+                TrackingFailureReason.CAMERA_UNAVAILABLE -> "Another app is using the camera"
                 else -> ""
             }
             if (tracking != ok || why != reason) {

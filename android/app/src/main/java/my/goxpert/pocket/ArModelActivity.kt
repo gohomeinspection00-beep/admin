@@ -192,19 +192,19 @@ class ArModelActivity : Activity() {
                     o.optDouble("z", 0.0).toFloat()))
             }
         }
-        if (marks.size < need) { bail("Tanda $need titik pada model dahulu"); return }
+        if (marks.size < need) { bail("Mark $need points on the model first"); return }
 
         val f = File(path)
-        if (!f.exists() || f.length() <= 0L) { bail("Fail model tidak sampai"); return }
+        if (!f.exists() || f.length() <= 0L) { bail("The model file did not arrive"); return }
 
         // Membaca GLB mengambil masa beberapa detik pada model besar. Pada
         // benang utama itu ialah ANR, jadi ia dibaca di sini dan diambil oleh
         // benang GL bila ia siap.
         Thread {
             try { parsed = Glb.read(f) }
-            catch (e: GlbError) { loadErr = e.message ?: "Model tidak dapat dibaca" }
-            catch (e: OutOfMemoryError) { loadErr = "Model terlalu besar untuk memori telefon ini" }
-            catch (e: Throwable) { loadErr = "Model tidak dapat dibaca: ${e.javaClass.simpleName}" }
+            catch (e: GlbError) { loadErr = e.message ?: "The model could not be read" }
+            catch (e: OutOfMemoryError) { loadErr = "The model is too large for this phone's memory" }
+            catch (e: Throwable) { loadErr = "The model could not be read: ${e.javaClass.simpleName}" }
             runOnUiThread { if (!isFinishing) paintText() }
         }.apply { isDaemon = true }.start()
 
@@ -226,7 +226,7 @@ class ArModelActivity : Activity() {
             setBackgroundColor(Color.argb(140, 0, 0, 0))
             setPadding(dp(14), dp(10), dp(14), dp(10))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-            text = "Membaca model…"
+            text = "Reading the model…"
         }
         root.addView(hint, FrameLayout.LayoutParams(-1, -2).apply { gravity = Gravity.TOP })
 
@@ -266,22 +266,22 @@ class ArModelActivity : Activity() {
 
         // Potong dari ATAS: pada nilai maksimum ia tutup, kerana itulah
         // keadaan di mana tiada apa dibuang.
-        cutHiRow = row("Potong atas", 0, cm, cm, { v ->
-            if (v >= cm) "tutup" else String.format("%.2f m", v / 100f)
+        cutHiRow = row("Cut from top", 0, cm, cm, { v ->
+            if (v >= cm) "off" else String.format("%.2f m", v / 100f)
         }) { v ->
             cutHiOn = v < cm
             cutHi = v / 100f
             paintText()
         }
         // Potong dari BAWAH: pada sifar ia tutup.
-        cutLoRow = row("Potong bawah", 0, cm, 0, { v ->
-            if (v <= 0) "tutup" else String.format("%.2f m", v / 100f)
+        cutLoRow = row("Cut from bottom", 0, cm, 0, { v ->
+            if (v <= 0) "off" else String.format("%.2f m", v / 100f)
         }) { v ->
             cutLoOn = v > 0
             cutLo = v / 100f
             paintText()
         }
-        yawRow = row("Putar", 0, 360, 0, { v -> "$v°" }) { v ->
+        yawRow = row("Rotate", 0, 360, 0, { v -> "$v°" }) { v ->
             if (!locked) { yawDeg = v.toFloat(); rebuild(); paintText() }
         }
         bar.addView(cutHiRow); bar.addView(cutLoRow); bar.addView(yawRow)
@@ -295,13 +295,13 @@ class ArModelActivity : Activity() {
         placeBtn = ImageButton(this).apply {
             setImageResource(R.drawable.ic_pin)
             setColorFilter(Color.WHITE)
-            contentDescription = "Letak titik"
+            contentDescription = "Place point"
             scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
             background = GradientDrawable().apply {
                 cornerRadius = dp(14).toFloat(); setColor(C_PRIMARY)
             }
             setPadding(dp(12), dp(12), dp(12), dp(12))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Letak titik"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Place point"
             setOnClickListener { tagPoint() }
             layoutParams = LinearLayout.LayoutParams(-1, dp(54)).apply { topMargin = dp(8) }
         }
@@ -328,13 +328,13 @@ class ArModelActivity : Activity() {
             isEnabled = false
             setOnClickListener { xray = !xray; paintText() }
         }
-        lockBtn = icon(R.drawable.ic_lock, "Kunci", C_PLAIN).apply {
+        lockBtn = icon(R.drawable.ic_lock, "Lock", C_PLAIN).apply {
             isEnabled = false
             setOnClickListener {
                 locked = !locked
                 paintText()
                 Toast.makeText(this@ArModelActivity,
-                    if (locked) "Model dikunci" else "Model dibuka", Toast.LENGTH_SHORT).show()
+                    if (locked) "Model locked" else "Model open", Toast.LENGTH_SHORT).show()
             }
         }
         shotBtn = icon(R.drawable.ic_camera, "Snap", C_SNAP).apply {
@@ -342,16 +342,16 @@ class ArModelActivity : Activity() {
             setOnClickListener { wantShot = true; isEnabled = false }
         }
         flagBtn = icon(R.drawable.ic_flag,
-            if (hasJob) "Tanda sisihan" else "Tanda sisihan — buka satu inspection dahulu",
+            if (hasJob) "Mark deviation" else "Mark deviation — open an inspection first",
             C_DEV).apply {
             isEnabled = false
             setOnClickListener { wantDev = true }
         }
-        resetBtn = icon(R.drawable.ic_reset, "Jajar semula", C_PLAIN).apply {
+        resetBtn = icon(R.drawable.ic_reset, "Align again", C_PLAIN).apply {
             isEnabled = false
             setOnClickListener { wantReset = true }
         }
-        val closeBtn = icon(R.drawable.ic_close, "Keluar", C_CLOSE).apply {
+        val closeBtn = icon(R.drawable.ic_close, "Exit", C_CLOSE).apply {
             setOnClickListener { askLeave() }
         }
         bar.addView(LinearLayout(this).apply {
@@ -417,7 +417,7 @@ class ArModelActivity : Activity() {
 
     private fun tagPoint() {
         if (aim == null) {
-            Toast.makeText(this, "Belum ada satah di tengah skrin", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No surface at the centre of the screen yet", Toast.LENGTH_SHORT).show()
             return
         }
         wantPlace = true
@@ -430,12 +430,12 @@ class ArModelActivity : Activity() {
     private fun askLeave() {
         if (devs.isEmpty()) { finishWith(); return }
         android.app.AlertDialog.Builder(this)
-            .setMessage("${devs.size} sisihan ditanda. Simpan sebagai penemuan?")
-            .setPositiveButton("Simpan") { _, _ -> finishWith() }
-            .setNegativeButton("Buang") { _, _ ->
+            .setMessage("${devs.size} deviations marked. Save them as findings?")
+            .setPositiveButton("Save") { _, _ -> finishWith() }
+            .setNegativeButton("Discard") { _, _ ->
                 devs = emptyList(); finishWith()
             }
-            .setNeutralButton("Kembali", null)
+            .setNeutralButton("Back", null)
             .show()
     }
 
@@ -485,12 +485,12 @@ class ArModelActivity : Activity() {
                     })
                 }
             } catch (e: Throwable) {
-                bail("AR tidak dapat dimulakan: ${e.javaClass.simpleName}"); return
+                bail("AR could not start: ${e.javaClass.simpleName}"); return
             }
         }
         try { session?.resume(); resumed = true }
         catch (e: CameraNotAvailableException) {
-            session = null; bail("Kamera tidak tersedia untuk AR"); return
+            session = null; bail("Camera not available for AR"); return
         }
         gl.onResume()
     }
@@ -658,7 +658,7 @@ class ArModelActivity : Activity() {
         }
         lockBtn.setImageResource(if (locked) R.drawable.ic_unlock else R.drawable.ic_lock)
         lockBtn.setColorFilter(if (locked) C_LOCKED else C_PLAIN)
-        lockBtn.contentDescription = if (locked) "Buka kunci" else "Kunci"
+        lockBtn.contentDescription = if (locked) "Unlock" else "Lock"
         xrayBtn.setColorFilter(if (xray) C_XRAY else C_PLAIN)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             lockBtn.tooltipText = lockBtn.contentDescription
@@ -670,32 +670,32 @@ class ArModelActivity : Activity() {
         yawRow.visibility = if (placed && need == 1) View.VISIBLE else View.GONE
 
         readout.text = when {
-            !ready -> "Membaca model…"
+            !ready -> "Reading the model…"
             !placed -> modelName.ifBlank { "Model 3D" } +
-                " · ${tagged.size}/$need titik di tapak"
-            need >= 2 -> "Ralat padanan ${fmtMm(rms)} · $need titik · model diskala " +
+                " · ${tagged.size}/$need points on site"
+            need >= 2 -> "Match error ${fmtMm(rms)} · $need points · model scaled " +
                 (if (measured >= 1f) String.format("%.2f×", measured)
                  else String.format("1/%.1f", 1f / measured))
-            else -> "Satu titik · putar ${Math.round(yawDeg)}°"
+            else -> "One point · rotate ${Math.round(yawDeg)}°"
         }
 
         hint.text = when {
-            !ready -> "Membaca model… fail besar mengambil beberapa detik."
+            !ready -> "Reading the model… a large file takes a few seconds."
             !tracking && why.isNotEmpty() -> why
-            !tracking -> "Gerak telefon perlahan supaya ARCore nampak permukaan…"
-            locked -> "Model dikunci. Ketik mangga kuning untuk melaras semula."
+            !tracking -> "Move the phone slowly so ARCore can see the surface…"
+            locked -> "Model locked. Tap the yellow padlock to adjust it again."
             placed && !hasJob ->
-                "Model diletak. Tanda sisihan mati — buka satu inspection dahulu."
-            placed && need >= 2 -> "Model diletak. Potong pada paras mata untuk masuk ke dalamnya."
-            placed -> "Model diletak. Putar sehingga ia padan dengan bangunan."
+                "Model placed. Marking deviations is off — open an inspection first."
+            placed && need >= 2 -> "Model placed. Cut at eye level to step inside it."
+            placed -> "Model placed. Rotate it until it lines up with the building."
             planeCount == 0 ->
-                "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, " +
-                "halakan ke lantai bercorak."
-            aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
+                "No surface yet. Move the phone LEFT and RIGHT slowly, " +
+                "aim at a floor with texture."
+            aim == null -> "$planeCount surfaces found · aim the circle at a blue area"
             tagged.isEmpty() ->
-                "Berdiri di sudut yang awak tanda sebagai titik 1 daripada $need, " +
-                "halakan ke situ, ketik butang biru"
-            else -> "Sekarang sudut titik ${tagged.size + 1} daripada $need · ketik butang biru"
+                "Stand at the corner you marked as point 1 of $need, " +
+                "aim at it, tap the blue button"
+            else -> "Now the corner for point ${tagged.size + 1} of $need · tap the blue button"
         }
 
         // Dua potongan yang bertindih bukan ralat, tetapi ia bermakna skrin
@@ -704,11 +704,11 @@ class ArModelActivity : Activity() {
         val bad = placed && need >= 2 && rms > 0.12f
         warn.visibility = if (clash || bad) View.VISIBLE else View.GONE
         warn.text = when {
-            clash -> "Potong bawah lebih tinggi daripada potong atas — tiada apa " +
-                "untuk dilihat. Turunkan potong bawah."
-            else -> "Ralat padanan ${fmtMm(rms)} — satu sudut mungkin tersalah pilih. " +
-                "Ketik ↻ dan cuba sudut yang lebih jauh" +
-                (if (need < 3) ", atau guna tiga titik supaya yang tersilap menonjol." else ".")
+            clash -> "The bottom cut is above the top cut — nothing is " +
+                "left to see. Lower the bottom cut."
+            else -> "Match error ${fmtMm(rms)} — one corner may be the wrong one. " +
+                "Tap ↻ and try corners further apart" +
+                (if (need < 3) ", or use three points so the wrong one stands out." else ".")
         }
         overlay.postInvalidate()
     }
@@ -822,7 +822,7 @@ class ArModelActivity : Activity() {
                 val sp = toScreen(list[i]) ?: continue
                 c.drawCircle(sp[0], sp[1], dp(7).toFloat(), dot)
                 if (!placed || i >= marks.size) {
-                    tag(c, sp[0], sp[1] - dp(20), "Titik ${i + 1}")
+                    tag(c, sp[0], sp[1] - dp(20), "Point ${i + 1}")
                     continue
                 }
                 val mw = placedMark(i)
@@ -833,7 +833,7 @@ class ArModelActivity : Activity() {
                     c.drawCircle(mp[0], mp[1], dp(5).toFloat(), fitDot)
                 }
                 tag(c, sp[0], sp[1] - dp(20),
-                    "Titik ${i + 1} · " + if (gap < 1f) "${Math.round(gap * 1000)} mm"
+                    "Point ${i + 1} · " + if (gap < 1f) "${Math.round(gap * 1000)} mm"
                                           else String.format("%.2f m", gap))
             }
 
@@ -885,7 +885,7 @@ class ArModelActivity : Activity() {
                 parsed?.let { m ->
                     runCatching { mesh.create(m) }
                         .onSuccess { uploaded = true; parsed = null }
-                        .onFailure { loadErr = "Model tidak dapat dimuat ke GPU" }
+                        .onFailure { loadErr = "The model could not be loaded onto the GPU" }
                     runOnUiThread { paintText() }
                 }
             }
@@ -893,11 +893,11 @@ class ArModelActivity : Activity() {
             val cam = frame.camera
             val ok = cam.trackingState == TrackingState.TRACKING
             val reason = if (ok) "" else when (cam.trackingFailureReason) {
-                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Terlalu gelap — hidupkan lampu"
-                TrackingFailureReason.EXCESSIVE_MOTION -> "Gerak telefon lebih perlahan"
+                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Too dark — turn on a light"
+                TrackingFailureReason.EXCESSIVE_MOTION -> "Move the phone more slowly"
                 TrackingFailureReason.INSUFFICIENT_FEATURES ->
-                    "Permukaan ini terlalu kosong — halakan ke sesuatu yang bercorak"
-                TrackingFailureReason.CAMERA_UNAVAILABLE -> "Kamera diambil oleh app lain"
+                    "This surface is too plain — aim at something with texture"
+                TrackingFailureReason.CAMERA_UNAVAILABLE -> "Another app is using the camera"
                 else -> ""
             }
             if (tracking != ok || why != reason) {
@@ -997,12 +997,12 @@ class ArModelActivity : Activity() {
                     changed = true
                     runOnUiThread {
                         Toast.makeText(this@ArModelActivity,
-                            "Sisihan S${devs.size} ditanda", Toast.LENGTH_SHORT).show()
+                            "Deviation S${devs.size} marked", Toast.LENGTH_SHORT).show()
                     }
                 } else if (w == null) {
                     runOnUiThread {
                         Toast.makeText(this@ArModelActivity,
-                            "Cari permukaan dahulu", Toast.LENGTH_SHORT).show()
+                            "Find a surface first", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -1038,8 +1038,8 @@ class ArModelActivity : Activity() {
                         changed = true
                         runOnUiThread {
                             Toast.makeText(this@ArModelActivity,
-                                "Titik itu terlalu rapat untuk mengukur skala — " +
-                                "cuba sudut yang berjauhan",
+                                "Those points are too close together to measure scale — " +
+                                "try corners further apart",
                                 Toast.LENGTH_LONG).show()
                         }
                     }
@@ -1093,7 +1093,7 @@ class ArModelActivity : Activity() {
                 bmp?.recycle()
                 runOnUiThread {
                     Toast.makeText(this@ArModelActivity,
-                        if (okSave) "Disimpan ke galeri" else "Tidak dapat menyimpan gambar",
+                        if (okSave) "Saved to gallery" else "Could not save the photo",
                         Toast.LENGTH_SHORT).show()
                     shotBtn.isEnabled = placed
                     paintText()

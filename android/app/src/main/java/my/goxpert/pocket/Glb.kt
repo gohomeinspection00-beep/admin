@@ -67,10 +67,10 @@ object Glb {
 
     fun read(file: File): Model {
         val all = file.readBytes()
-        if (all.size < 20) throw GlbError("Fail terlalu kecil untuk menjadi GLB")
+        if (all.size < 20) throw GlbError("File too small to be a GLB")
         val bb = ByteBuffer.wrap(all).order(ByteOrder.LITTLE_ENDIAN)
         if (bb.int != 0x46546C67) {
-            throw GlbError("Ini bukan fail GLB. Fail .gltf teks perlu ditukar ke .glb dahulu.")
+            throw GlbError("This is not a GLB file. A text .gltf must be converted to .glb first.")
         }
         bb.int                                  // versi
         bb.int                                  // panjang yang diisytiharkan
@@ -91,9 +91,9 @@ object Glb {
             if (next > all.size) break
             bb.position(next)
         }
-        val j = JSONObject(json ?: throw GlbError("GLB tiada bongkah JSON"))
+        val j = JSONObject(json ?: throw GlbError("GLB has no JSON chunk"))
         blockUnsupported(j)
-        return build(j, bin ?: throw GlbError("GLB tiada bongkah data"))
+        return build(j, bin ?: throw GlbError("GLB has no data chunk"))
     }
 
     /**
@@ -110,8 +110,8 @@ object Glb {
         for (k in 0 until req.length()) {
             known[req.optString(k)]?.let {
                 throw GlbError(
-                    "Model ini termampat ($it). Eksport semula tanpa mampatan " +
-                    "— dalam Blender, buang tanda Compression semasa eksport GLB."
+                    "This model is compressed ($it). Export it again without compression " +
+                    "— in Blender, untick Compression when exporting the GLB."
                 )
             }
         }
@@ -148,32 +148,32 @@ object Glb {
 
         private fun comps(type: String): Int = when (type) {
             "SCALAR" -> 1; "VEC2" -> 2; "VEC3" -> 3; "VEC4" -> 4
-            else -> throw GlbError("Jenis pengakses $type tidak disokong")
+            else -> throw GlbError("Accessor type $type not supported")
         }
 
         private fun size(ct: Int): Int = when (ct) {
             5120, 5121 -> 1
             5122, 5123 -> 2
             5125, 5126 -> 4
-            else -> throw GlbError("Jenis komponen $ct tidak dikenali")
+            else -> throw GlbError("Component type $ct not recognised")
         }
 
         /** Satu pengakses sebagai apungan, dengan byteStride dihormati. */
         fun vec(i: Int): FloatArray = cacheV.getOrPut(i) {
-            val a = accessors?.optJSONObject(i) ?: throw GlbError("Pengakses $i tiada")
+            val a = accessors?.optJSONObject(i) ?: throw GlbError("Accessor $i missing")
             val n = a.optInt("count")
             val c = comps(a.optString("type", "VEC3"))
             val ct = a.optInt("componentType", 5126)
             val out = FloatArray(n * c)
             val vi = if (a.has("bufferView")) a.optInt("bufferView") else -1
             if (vi < 0) return@getOrPut out        // dibenarkan oleh spek: semua sifar
-            val v = views?.optJSONObject(vi) ?: throw GlbError("bufferView $vi tiada")
+            val v = views?.optJSONObject(vi) ?: throw GlbError("bufferView $vi missing")
             val base = v.optInt("byteOffset", 0) + a.optInt("byteOffset", 0)
             val es = size(ct)
             val stride = v.optInt("byteStride", 0).let { if (it > 0) it else c * es }
             val norm = a.optBoolean("normalized", false)
             if (n > 0 && base + (n - 1) * stride + c * es > bin.limit()) {
-                throw GlbError("Pengakses $i menunjuk ke luar data model")
+                throw GlbError("Accessor $i points outside the model data")
             }
             for (k in 0 until n) {
                 var p = base + k * stride
@@ -195,18 +195,18 @@ object Glb {
         }
 
         fun idx(i: Int): IntArray = cacheI.getOrPut(i) {
-            val a = accessors?.optJSONObject(i) ?: throw GlbError("Pengakses indeks $i tiada")
+            val a = accessors?.optJSONObject(i) ?: throw GlbError("Index accessor $i missing")
             val n = a.optInt("count")
             val ct = a.optInt("componentType", 5123)
             val out = IntArray(n)
             val vi = if (a.has("bufferView")) a.optInt("bufferView") else -1
             if (vi < 0) return@getOrPut out
-            val v = views?.optJSONObject(vi) ?: throw GlbError("bufferView $vi tiada")
+            val v = views?.optJSONObject(vi) ?: throw GlbError("bufferView $vi missing")
             val base = v.optInt("byteOffset", 0) + a.optInt("byteOffset", 0)
             val es = size(ct)
             val stride = v.optInt("byteStride", 0).let { if (it > 0) it else es }
             if (n > 0 && base + (n - 1) * stride + es > bin.limit()) {
-                throw GlbError("Pengakses indeks $i menunjuk ke luar data model")
+                throw GlbError("Index accessor $i points outside the model data")
             }
             for (k in 0 until n) {
                 val p = base + k * stride
@@ -294,7 +294,7 @@ object Glb {
 
     private fun build(j: JSONObject, bin: ByteBuffer): Model {
         val nodes = j.optJSONArray("nodes")
-        val meshes = j.optJSONArray("meshes") ?: throw GlbError("Model ini tiada mesh")
+        val meshes = j.optJSONArray("meshes") ?: throw GlbError("This model has no mesh")
         val mats = j.optJSONArray("materials")
 
         // Punca pokok. scenes ialah jawapan yang betul; tanpanya, node yang
@@ -341,7 +341,7 @@ object Glb {
             }
         }
         for (r in roots) walk(r, ident(), emptyList(), 0)
-        if (inst.isEmpty()) throw GlbError("Tiada geometri segi tiga dalam model ini")
+        if (inst.isEmpty()) throw GlbError("No triangle geometry in this model")
 
         val rd = Reader(j, bin)
 
@@ -358,8 +358,8 @@ object Glb {
             tris += nIdx / 3
         }
         if (tris > MAX_TRIS) throw GlbError(
-            "${tris / 1000}k segi tiga — terlalu berat untuk AR. " +
-            "Eksport satu tingkat sahaja, bukan bangunan penuh.")
+            "${tris / 1000}k triangles — too heavy for AR. " +
+            "Export one floor only, not the whole building.")
 
         // Kunci kelompok: kumpulan dahulu, kemudian bahan. Kumpulan dahulu
         // supaya menyembunyikan satu kumpulan ialah melangkau lukisan dan
@@ -460,7 +460,7 @@ object Glb {
         }
 
         rd.clear()
-        if (out.isEmpty()) throw GlbError("Tiada geometri yang boleh dibaca")
+        if (out.isEmpty()) throw GlbError("No readable geometry")
         if (lo[0] > hi[0]) { lo.fill(0f); hi.fill(0f) }
         return Model(out, tris, lo, hi, groups.toList())
     }

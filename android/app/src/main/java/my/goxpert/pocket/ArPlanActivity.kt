@@ -126,7 +126,7 @@ class ArPlanActivity : Activity() {
 
         val path = intent.getStringExtra("plan").orEmpty()
         plan = runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
-        if (plan == null) { bail("Pelan tidak dapat dibaca"); return }
+        if (plan == null) { bail("The plan could not be read"); return }
 
         runCatching {
             val j = JSONObject(intent.getStringExtra("spec") ?: "{}")
@@ -139,7 +139,7 @@ class ArPlanActivity : Activity() {
             bu = (j.optDouble("bu", 50.0) / 100.0).toFloat() * planW
             bv = (j.optDouble("bv", 50.0) / 100.0).toFloat() * planH
         }
-        if (planW <= 0f || planH <= 0f) { bail("Saiz pelan tidak sah"); return }
+        if (planW <= 0f || planH <= 0f) { bail("The plan size is not valid"); return }
         // Lebar 10 m ialah teka-teka pertama yang munasabah untuk satu bilik;
         // mod satu pin membiarkan ia dilaras.
         mPerPx = 10f / planW
@@ -192,23 +192,23 @@ class ArPlanActivity : Activity() {
 
         // Lut sinar: pelan mesti boleh dilihat menembusi untuk dibandingkan
         // dengan apa yang sebenarnya ada di sana.
-        bar.addView(row("Lut sinar", 20, 95, 65, { v -> "$v%" }) { v ->
+        bar.addView(row("Opacity", 20, 95, 65, { v -> "$v%" }) { v ->
             opacity = v / 100f; paintText(); overlay.postInvalidate()
         })
-        bar.addView(row(if (mode == "wall") "Dalam" else "Tinggi", 0, 100, 50,
+        bar.addView(row(if (mode == "wall") "Depth" else "Height", 0, 100, 50,
             { v -> String.format("%+.2f m", (v - 50) / 100f * 2f) }) { v ->
             if (locked) return@row
             lift = (v - 50) / 100f * 2f      // -1 m .. +1 m
             rebuild(); paintText()
         })
         if (!twoPin) {
-            bar.addView(row("Putar", 0, 360, 0, { v -> "$v\u00b0" }) { v ->
+            bar.addView(row("Rotate", 0, 360, 0, { v -> "$v\u00b0" }) { v ->
                 if (!locked) { theta = v.toFloat(); rebuild(); paintText() }
             })
             // Turun ke 10 cm: pelan satu bilik kecil, keratan rentas, atau
             // lakaran kecacatan semuanya jauh lebih kecil daripada satu meter,
             // dan had lama pada 1 m menjadikannya tidak boleh dijajarkan.
-            bar.addView(row("Skala", 1, 400, 100,
+            bar.addView(row("Scale", 1, 400, 100,
                 { v -> val m = 10f * (v / 100f)
                        if (m < 1f) String.format("%.0f cm", m * 100) else String.format("%.1f m", m) }) { v ->
                 if (!locked) { mPerPx = (10f * (v / 100f)) / planW; rebuild(); paintText() }
@@ -245,14 +245,14 @@ class ArPlanActivity : Activity() {
         placeBtn = ImageButton(this).apply {
             setImageResource(R.drawable.ic_pin)
             setColorFilter(Color.WHITE)
-            contentDescription = "Letak titik"
+            contentDescription = "Place point"
             scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
             background = GradientDrawable().apply {
                 cornerRadius = dp(14).toFloat()
                 setColor(C_PRIMARY)
             }
             setPadding(dp(12), dp(12), dp(12), dp(12))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Letak titik"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) tooltipText = "Place point"
             setOnClickListener { wantPlace = true }
             layoutParams = LinearLayout.LayoutParams(-1, dp(54)).apply { topMargin = dp(8) }
         }
@@ -262,32 +262,32 @@ class ArPlanActivity : Activity() {
         // kerap: jajaran dua titik menetapkan satu garis, bukan sisi mana
         // menghadap ke atas, jadi pelan boleh mendarat bercermin dan satu
         // ketikan membetulkannya.
-        flipBtn = icon(R.drawable.ic_flip, "Cermin", C_FLIP).apply {
+        flipBtn = icon(R.drawable.ic_flip, "Mirror", C_FLIP).apply {
             setOnClickListener {
                 if (locked) {
-                    Toast.makeText(this@ArPlanActivity, "Buka kunci dahulu", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ArPlanActivity, "Unlock first", Toast.LENGTH_SHORT).show()
                 } else { flip = !flip; rebuild(); paintText() }
             }
         }
-        lockBtn = icon(R.drawable.ic_lock, "Kunci", C_PLAIN).apply {
+        lockBtn = icon(R.drawable.ic_lock, "Lock", C_PLAIN).apply {
             isEnabled = false
             setOnClickListener {
                 locked = !locked
                 if (!locked) rebuild()
                 paintText()
                 Toast.makeText(this@ArPlanActivity,
-                    if (locked) "Pelan dikunci" else "Pelan dibuka", Toast.LENGTH_SHORT).show()
+                    if (locked) "Plan locked" else "Plan open", Toast.LENGTH_SHORT).show()
             }
         }
         shotBtn = icon(R.drawable.ic_camera, "Snap", C_SNAP).apply {
             isEnabled = false
             setOnClickListener { wantShot = true; isEnabled = false }
         }
-        resetBtn = icon(R.drawable.ic_reset, "Mula semula", C_PLAIN).apply {
+        resetBtn = icon(R.drawable.ic_reset, "Start over", C_PLAIN).apply {
             isEnabled = false
             setOnClickListener { locked = false; wantReset = true }
         }
-        val doneBtn = icon(R.drawable.ic_close, "Tutup", C_CLOSE).apply {
+        val doneBtn = icon(R.drawable.ic_close, "Close", C_CLOSE).apply {
             setOnClickListener { finish() }
         }
         bar.addView(LinearLayout(this).apply {
@@ -374,10 +374,10 @@ class ArPlanActivity : Activity() {
                         cloudAnchorMode = Config.CloudAnchorMode.DISABLED
                     })
                 }
-            } catch (e: Throwable) { bail("AR tidak dapat dimulakan"); return }
+            } catch (e: Throwable) { bail("AR could not start"); return }
         }
         try { session?.resume(); resumed = true }
-        catch (e: CameraNotAvailableException) { session = null; bail("Kamera tidak tersedia"); return }
+        catch (e: CameraNotAvailableException) { session = null; bail("Camera not available"); return }
         gl.onResume()
     }
 
@@ -484,7 +484,7 @@ class ArPlanActivity : Activity() {
         if (n == 0) { state = null; quad = FloatArray(0); return }
         val a0 = anchors[0].pose
         val up = if (mode == "wall") {
-            // "Dalam" menolak pelan menjauhi dinding, pada normalnya.
+            // "Depth" menolak pelan menjauhi dinding, pada normalnya.
             val st0 = state
             val e = st0?.eu ?: floatArrayOf(1f, 0f, 0f)
             val p = perp(e, false)
@@ -530,7 +530,7 @@ class ArPlanActivity : Activity() {
         placeBtn.isEnabled = n < need && !locked
         placeBtn.alpha = if (placeBtn.isEnabled) 1f else 0.3f
         placeBtn.contentDescription =
-            if (n < need) "Letak titik ${n + 1}" else "Pelan sudah diletak"
+            if (n < need) "Place point ${n + 1}" else "The plan is already placed"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             placeBtn.tooltipText = placeBtn.contentDescription
         // Ikon mangga bertukar bersama keadaannya, dan warnanya juga: kuning
@@ -539,7 +539,7 @@ class ArPlanActivity : Activity() {
         lockBtn.setColorFilter(if (locked) C_LOCKED else C_PLAIN)
         for (b2 in listOf(flipBtn, lockBtn, shotBtn, resetBtn)) b2.alpha = if (b2.isEnabled) 1f else 0.35f
         lockBtn.isEnabled = state != null
-        lockBtn.contentDescription = if (locked) "Buka kunci" else "Kunci"
+        lockBtn.contentDescription = if (locked) "Unlock" else "Lock"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             lockBtn.tooltipText = lockBtn.contentDescription
         flipBtn.isEnabled = state != null && !locked
@@ -548,16 +548,16 @@ class ArPlanActivity : Activity() {
 
         hint.text = when {
             !tracking && why.isNotEmpty() -> why
-            !tracking -> "Gerak telefon perlahan supaya ARCore nampak lantai…"
+            !tracking -> "Move the phone slowly so ARCore can see the floor…"
             planeCount == 0 ->
-                "Belum ada satah. Gerak telefon ke KIRI dan KANAN perlahan, halakan ke lantai bercorak."
-            locked -> "Pelan dikunci. Ketik mangga kuning untuk melaras semula."
+                "No surface yet. Move the phone LEFT and RIGHT slowly, aim at a floor with texture."
+            locked -> "Plan locked. Tap the yellow padlock to adjust it again."
             // Ketaksaan yang paling kerap mengelirukan, dinamakan sebaik
             // pelan muncul dan bukan dibiarkan untuk ditemui sendiri.
-            n >= need -> "Pelan diletak. Teks terbalik? Ketik ikon sian. Laras tinggi dengan slider."
-            aim == null -> "$planeCount satah dikesan · halakan bulatan ke kawasan biru"
-            n == 0 -> "Halakan ke tempat sebenar titik ${if (twoPin) "1" else "jangkar"} pada pelan, kemudian ketik butang biru"
-            else -> "Halakan ke tempat sebenar titik 2, kemudian ketik butang biru"
+            n >= need -> "Plan placed. Text mirrored? Tap the cyan icon. Adjust height with the slider."
+            aim == null -> "$planeCount surfaces found · aim the circle at a blue area"
+            n == 0 -> "Aim at the real position of point ${if (twoPin) "1" else "jangkar"} on the plan, then tap the blue button"
+            else -> "Aim at the real position of point 2, then tap the blue button"
         }
 
         val st = state
@@ -569,18 +569,18 @@ class ArPlanActivity : Activity() {
             View.VISIBLE else View.GONE
         if (warn.visibility == View.VISIBLE) {
             warn.text = String.format(
-                "Pelan keluar %.2f m lebar — dua titik di tapak terlalu %s. " +
-                "Ketik ikon pusing dan letak semula lebih %s.",
-                wideM, if (wideM < 0.8f) "rapat" else "jauh",
-                if (wideM < 0.8f) "jauh" else "rapat")
+                "The plan comes out %.2f m wide — the two points on site are too %s. " +
+                "Tap the rotate icon and place them %s.",
+                wideM, if (wideM < 0.8f) "close together" else "far apart",
+                if (wideM < 0.8f) "further apart" else "closer together")
         }
         readout.text = if (st == null) "—" else {
             val wide = planW * st.s
             val gap = if (mode == "wall") ""
-                else if (abs(lift) < 0.015f) " · pada satah"
-                else String.format(" · %.0f cm %s satah", abs(lift) * 100,
-                    if (lift > 0) "atas" else "bawah")
-            String.format("%.2f m lebar%s · %d%%", wide, gap, (opacity * 100).toInt())
+                else if (abs(lift) < 0.015f) " · on the plane"
+                else String.format(" · %.0f cm %s the plane", abs(lift) * 100,
+                    if (lift > 0) "above" else "below")
+            String.format("%.2f m wide%s · %d%%", wide, gap, (opacity * 100).toInt())
         }
     }
 
@@ -597,12 +597,12 @@ class ArPlanActivity : Activity() {
     private fun grab() {
         val bmp = ArShot.capture(gl.width, gl.height)
         if (bmp == null) { runOnUiThread { paintText() }; return }
-        val name = "goxpert-pelan-" + System.currentTimeMillis() + ".jpg"
+        val name = "goxpert-plan-" + System.currentTimeMillis() + ".jpg"
         val okSave = runCatching { ArShot.save(this, bmp, name) }.getOrDefault(false)
         bmp.recycle()
         runOnUiThread {
             Toast.makeText(this,
-                if (okSave) "Disimpan ke galeri" else "Tidak dapat menyimpan gambar",
+                if (okSave) "Saved to gallery" else "Could not save the photo",
                 Toast.LENGTH_SHORT).show()
             paintText()
         }
@@ -705,10 +705,10 @@ class ArPlanActivity : Activity() {
             val cam = frame.camera
             val ok = cam.trackingState == TrackingState.TRACKING
             val reason = if (ok) "" else when (cam.trackingFailureReason) {
-                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Terlalu gelap — hidupkan lampu"
-                TrackingFailureReason.EXCESSIVE_MOTION -> "Gerak telefon lebih perlahan"
+                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Too dark — turn on a light"
+                TrackingFailureReason.EXCESSIVE_MOTION -> "Move the phone more slowly"
                 TrackingFailureReason.INSUFFICIENT_FEATURES ->
-                    "Permukaan ini terlalu kosong — halakan ke sesuatu yang bercorak"
+                    "This surface is too plain — aim at something with texture"
                 else -> ""
             }
             if (tracking != ok || why != reason) {

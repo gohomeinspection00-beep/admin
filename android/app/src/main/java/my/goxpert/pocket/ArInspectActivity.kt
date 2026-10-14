@@ -176,15 +176,15 @@ class ArInspectActivity : Activity() {
     override fun onCreate(st: Bundle?) {
         super.onCreate(st)
         val path = intent.getStringExtra("bundle")
-        if (path.isNullOrEmpty()) { bail("Zon tidak sampai"); return }
+        if (path.isNullOrEmpty()) { bail("Zone did not arrive"); return }
         val f = File(path)
         outDir = f.parentFile ?: cacheDir
-        if (!f.exists()) { bail("Zon tidak sampai"); return }
+        if (!f.exists()) { bail("Zone did not arrive"); return }
 
         try { readBundle(f) } catch (e: Throwable) {
-            bail("Zon tidak dapat dibaca: ${e.javaClass.simpleName}"); return
+            bail("Zone could not be read: ${e.javaClass.simpleName}"); return
         }
-        if (!modeNew && locks.size < 2) { bail("Zon ini belum ada titik kunci"); return }
+        if (!modeNew && locks.size < 2) { bail("This zone has no reference points yet"); return }
         if (!modeNew) need = locks.size
 
         gl = GLSurfaceView(this).apply {
@@ -257,11 +257,11 @@ class ArInspectActivity : Activity() {
         // sedia ia menjadi tiga petak kelabu serupa, dan "tambah defect"
         // tidak pernah dijumpai. Kamera bersebelahan mangga terbaca
         // sebagai "tangkap skrin", bukan "defect baharu".
-        markBtn = barBtn(R.drawable.ic_pin, "Tanda", false) { wantMark = true }
-        undoBtn = barBtn(R.drawable.ic_undo, "Buang", false) { wantUndo = true }
+        markBtn = barBtn(R.drawable.ic_pin, "Mark", false) { wantMark = true }
+        undoBtn = barBtn(R.drawable.ic_undo, "Undo", false) { wantUndo = true }
         addBtn = barBtn(R.drawable.ic_camera, "+ Defect", true) { wantDefect = true }
-        lockBtn = barBtn(R.drawable.ic_lock, "Titik", false) { wantLock = true }
-        doneBtn = barBtn(R.drawable.ic_check, "Siap", false) { finishUp() }
+        lockBtn = barBtn(R.drawable.ic_lock, "Ref pt", false) { wantLock = true }
+        doneBtn = barBtn(R.drawable.ic_check, "Done", false) { finishUp() }
         row.addView(markBtn); row.addView(undoBtn)
         row.addView(addBtn); row.addView(lockBtn); row.addView(doneBtn)
         bar.addView(row, LinearLayout.LayoutParams(-1, -2))
@@ -270,7 +270,7 @@ class ArInspectActivity : Activity() {
         val close = ImageButton(this).apply {
             setImageResource(R.drawable.ic_close)
             setColorFilter(Color.WHITE)
-            contentDescription = "Tutup"
+            contentDescription = "Close"
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             background = GradientDrawable().apply {
                 cornerRadius = dp(11).toFloat()
@@ -297,7 +297,7 @@ class ArInspectActivity : Activity() {
 
     private fun readBundle(f: File) {
         val j = JSONObject(f.readText())
-        zoneName = j.optString("zone", "Zon")
+        zoneName = j.optString("zone", "Zone")
         modeNew = j.optString("mode", "new") != "open"
         need = j.optInt("need", 3).coerceIn(2, 8)
         j.optJSONArray("locks")?.let { a ->
@@ -406,7 +406,7 @@ class ArInspectActivity : Activity() {
         }.getOrElse { false }
 
         if (ok) setResult(RESULT_OK, Intent())
-        else setResult(RESULT_CANCELED, Intent().putExtra("error", "Tidak dapat menyimpan hasil"))
+        else setResult(RESULT_CANCELED, Intent().putExtra("error", "Could not save the result"))
         finish()
     }
 
@@ -427,11 +427,11 @@ class ArInspectActivity : Activity() {
                 })
                 session = s
             } catch (e: Throwable) {
-                bail("AR tidak dapat dimulakan: ${e.message}"); return
+                bail("AR could not start: ${e.message}"); return
             }
         }
         try { session?.resume() } catch (e: CameraNotAvailableException) {
-            bail("Kamera tidak tersedia"); return
+            bail("Camera not available"); return
         }
         gl.onResume()
         paused = false
@@ -508,17 +508,17 @@ class ArInspectActivity : Activity() {
         val n = pins.size
         val ls = lockList()
         hint.text = when {
-            !tracking -> "Gerakkan telefon perlahan untuk mengesan ruang"
+            !tracking -> "Move the phone slowly to map the space"
             locking && modeNew ->
-                "$zoneName · Tanda titik kunci ${n + 1} daripada $need — " +
-                "pilih ciri yang tidak akan bergerak: bucu dinding, bucu kusen pintu, penjuru tiang."
+                "$zoneName · Mark reference point ${n + 1} of $need — " +
+                "pick features that will not move: wall corners, door frames, column edges."
             locking ->
-                "$zoneName · Tanda semula titik ${n + 1} daripada $need" +
+                "$zoneName · Mark point ${n + 1} of $need again" +
                 (ls.getOrNull(n)?.label?.takeIf { it.isNotBlank() }?.let { " — $it" } ?: "")
-            else -> "$zoneName · ${liveDefs().size} defect" +
+            else -> "$zoneName · ${liveDefs().size} defects" +
                 (if (!modeNew && rms > 0f)
-                    " · padanan ${fmtMm(rms)}${quality(rms)}" +
-                    (if (badPoint >= 0) ", titik ${badPoint + 1} paling tersasar" else "")
+                    " · match ${fmtMm(rms)}${quality(rms)}" +
+                    (if (badPoint >= 0) ", point ${badPoint + 1} is furthest off" else "")
                  else "")
         }
 
@@ -534,15 +534,15 @@ class ArInspectActivity : Activity() {
         // tepat di atas butang, dan ia satu-satunya tempat yang memberitahu
         // surveyor apa yang perlu dibuat seterusnya.
         readout.text = when {
-            phase == Phase.READY -> "Bidik defect, kemudian tekan + Defect"
-            else -> "$n daripada $need ditanda"
+            phase == Phase.READY -> "Aim at a defect, then press + Defect"
+            else -> "$n of $need marked"
         }
     }
 
     private fun quality(e: Float) = when {
-        e < 0.05f -> " · bagus"
-        e < 0.15f -> " · boleh pakai"
-        else -> " · lemah"
+        e < 0.05f -> " · good"
+        e < 0.15f -> " · usable"
+        else -> " · weak"
     }
 
     private fun fmtMm(m: Float): String {
@@ -573,7 +573,7 @@ class ArInspectActivity : Activity() {
         // defectType dalam laporan. Menaip sambil berdiri di depan
         // kecacatan, dengan satu tangan memegang telefon, ialah bahagian
         // paling perlahan dalam seluruh aliran ini.
-        box.addView(label("Jenis"))
+        box.addView(label("Type"))
         var kind = d.kind
         val chips = ArrayList<TextView>()
         val kindBox = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
@@ -617,7 +617,7 @@ class ArInspectActivity : Activity() {
         paintKind()
         box.addView(kindBox)
 
-        box.addView(label("Keutamaan"))
+        box.addView(label("Priority"))
         var sev = d.sev
         val sevRow = newRow()
         val btns = ArrayList<TextView>()
@@ -648,15 +648,15 @@ class ArInspectActivity : Activity() {
         paintSev()
         box.addView(sevRow)
 
-        box.addView(label("Butiran"))
+        box.addView(label("Details"))
         val title = EditText(this).apply {
-            hint = "Contoh: retak rambut 1.2 m dari bucu siling"
+            hint = "e.g. hairline crack 1.2 m from the ceiling corner"
             setText(d.title)
             setSingleLine()
         }
         box.addView(title)
         val note = EditText(this).apply {
-            hint = "Nota lanjut (pilihan)"
+            hint = "More notes (optional)"
             setText(d.note)
             minLines = 2
         }
@@ -668,9 +668,9 @@ class ArInspectActivity : Activity() {
         val scroll = android.widget.ScrollView(this).apply { addView(box) }
 
         val b = AlertDialog.Builder(this)
-            .setTitle(if (isNew) "Defect baharu" else "Defect ${liveDefs().indexOf(d) + 1}")
+            .setTitle(if (isNew) "New defect" else "Defect ${liveDefs().indexOf(d) + 1}")
             .setView(scroll)
-            .setPositiveButton("Simpan") { _, _ ->
+            .setPositiveButton("Save") { _, _ ->
                 d.kind = kind
                 d.title = title.text.toString().trim()
                 d.sev = sev
@@ -683,16 +683,16 @@ class ArInspectActivity : Activity() {
         if (isNew) {
             // Batal bermakna gambar itu dibuang, bukan defect tanpa nama
             // tertinggal dalam zon.
-            b.setNegativeButton("Buang") { _, _ -> paintUi() }
+            b.setNegativeButton("Discard") { _, _ -> paintUi() }
         } else {
-            b.setNegativeButton("Buang defect") { _, _ ->
+            b.setNegativeButton("Delete defect") { _, _ ->
                 synchronized(bank) {
                     d.removed = true
                     if (!d.fresh && d.id.isNotEmpty()) removed.add(d.id)
                 }
                 paintUi()
             }
-            b.setNeutralButton("Tutup", null)
+            b.setNeutralButton("Close", null)
         }
         b.setCancelable(false)
         b.show()
@@ -784,12 +784,12 @@ class ArInspectActivity : Activity() {
             val cam = frame.camera
             val ok = cam.trackingState == TrackingState.TRACKING
             val reason = when (cam.trackingFailureReason) {
-                TrackingFailureReason.BAD_STATE -> "AR hilang jejak — gerak perlahan"
-                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Terlalu gelap untuk menjejak"
-                TrackingFailureReason.EXCESSIVE_MOTION -> "Terlalu laju — gerak perlahan"
+                TrackingFailureReason.BAD_STATE -> "AR lost tracking — move slowly"
+                TrackingFailureReason.INSUFFICIENT_LIGHT -> "Too dark to track"
+                TrackingFailureReason.EXCESSIVE_MOTION -> "Too fast — move slowly"
                 TrackingFailureReason.INSUFFICIENT_FEATURES ->
-                    "Dinding terlalu kosong untuk dijejak — masukkan sedikit perabot atau bucu dalam pandangan"
-                TrackingFailureReason.CAMERA_UNAVAILABLE -> "Kamera diambil oleh app lain"
+                    "The wall is too plain to track — bring some furniture or a corner into view"
+                TrackingFailureReason.CAMERA_UNAVAILABLE -> "Another app is using the camera"
                 else -> ""
             }
             if (tracking != ok || why != reason) {
@@ -850,10 +850,10 @@ class ArInspectActivity : Activity() {
             if (wantDefect) {
                 wantDefect = false
                 val p = smooth
-                if (p == null) toast("Cari permukaan dahulu")
+                if (p == null) toast("Find a surface first")
                 else {
                     val f0 = fit
-                    if (f0 == null) toast("Zon belum berada")
+                    if (f0 == null) toast("The zone is not placed yet")
                     else {
                         val z = ArFit.invert(p, f0)
                         shotFor = Def("", z[0], z[1], z[2], 1, "", "", "", true)
@@ -924,13 +924,13 @@ class ArInspectActivity : Activity() {
 
         private fun doMark(hit: HitResult?) {
             if (phase != Phase.LOCK) return
-            if (hit == null) { toast("Cari permukaan dahulu"); return }
+            if (hit == null) { toast("Find a surface first"); return }
             val an = runCatching { hit.trackable.createAnchor(hit.hitPose) }.getOrNull()
-            if (an == null) { toast("Tidak dapat menanda di sini"); return }
+            if (an == null) { toast("Cannot mark here"); return }
             // Gambar panduan untuk titik ini, hanya bila ia titik BAHARU.
             if (modeNew) {
                 val shot = ArShot.capture(w, h)
-                val l = Lock(0f, 0f, 0f, "Titik ${pins.size + 1}",
+                val l = Lock(0f, 0f, 0f, "Point ${pins.size + 1}",
                     guide = shot?.let { ArCardArt.aimed(scale(it, 420)) })
                 synchronized(bank) { locks.add(l) }
             }
@@ -950,16 +950,16 @@ class ArInspectActivity : Activity() {
          *  daripada yang lama musnah. */
         private fun doAddLock(hit: HitResult?) {
             val f0 = fit ?: return
-            if (hit == null) { toast("Cari permukaan dahulu"); return }
+            if (hit == null) { toast("Find a surface first"); return }
             val p = floatArrayOf(hit.hitPose.tx(), hit.hitPose.ty(), hit.hitPose.tz())
             val z = ArFit.invert(p, f0)
             val shot = ArShot.capture(w, h)
             val n = synchronized(bank) {
-                locks.add(Lock(z[0], z[1], z[2], "Titik ${locks.size + 1}",
+                locks.add(Lock(z[0], z[1], z[2], "Point ${locks.size + 1}",
                     guide = shot?.let { ArCardArt.aimed(scale(it, 420)) }))
                 locks.size
             }
-            toast("Titik kunci $n ditambah")
+            toast("Reference point $n added")
             runOnUiThread { if (!isFinishing) paintUi() }
         }
 
@@ -971,7 +971,7 @@ class ArInspectActivity : Activity() {
             if (modeNew) {
                 val f0 = ArFit.frame(world)
                 if (f0 == null) {
-                    toast("Titik terlalu rapat atau sebaris — pilih bucu yang lebih berjauhan")
+                    toast("Points too close or in a line — pick corners further apart")
                     doUndo(); return
                 }
                 synchronized(bank) {
@@ -992,12 +992,12 @@ class ArInspectActivity : Activity() {
                     runOnUiThread {
                         if (isFinishing) return@runOnUiThread
                         AlertDialog.Builder(this@ArInspectActivity)
-                            .setTitle("Titik ${who + 1} tidak padan")
-                            .setMessage("Jaraknya ke titik lain tersasar ${fmtMm(off)} " +
-                                "daripada yang direkod. Biasanya ini bermakna bucu yang salah " +
-                                "ditanda — atau sesuatu di tempat itu sudah berubah.")
-                            .setPositiveButton("Teruskan juga") { _, _ -> accept(zone, world) }
-                            .setNegativeButton("Tanda semula") { _, _ -> wantReset = true }
+                            .setTitle("Point ${who + 1} does not match")
+                            .setMessage("Its distance to the other points is off by ${fmtMm(off)} " +
+                                "from what was recorded. That usually means the wrong corner was " +
+                                "marked — or something there has changed.")
+                            .setPositiveButton("Continue anyway") { _, _ -> accept(zone, world) }
+                            .setNegativeButton("Mark again") { _, _ -> wantReset = true }
                             .setCancelable(false)
                             .show()
                     }
@@ -1030,14 +1030,14 @@ class ArInspectActivity : Activity() {
             runOnUiThread {
                 if (isFinishing) return@runOnUiThread
                 AlertDialog.Builder(this@ArInspectActivity)
-                    .setTitle("Titik kunci terlalu rapat: ${fmtMm(sp)}")
-                    .setMessage("Yaw dikira daripada arah antara titik, jadi ralat menanda " +
-                        "dibahagi dengan jarak antaranya. Pada ${fmtMm(sp)}, tersilap 2 cm " +
-                        "semasa menanda semula boleh menggerakkan defect di hujung bilik " +
-                        "lebih sepuluh sentimeter.\n\nLetak titik pada bucu yang BERJAUHAN " +
-                        "— hujung dinding yang bertentangan, bukan tiga jubin bersebelahan.")
-                    .setPositiveButton("Teruskan", null)
-                    .setNegativeButton("Tanda semula") { _, _ -> wantReset = true }
+                    .setTitle("Reference points too close: ${fmtMm(sp)}")
+                    .setMessage("Yaw is solved from the direction between the points, so marking error " +
+                        "is divided by the distance between them. At ${fmtMm(sp)}, being 2 cm out " +
+                        "when marking again can move a defect at the far end of the room by " +
+                        "more than ten centimetres.\n\nPut the points on corners FAR APART " +
+                        "— opposite ends of the room, not three tiles side by side.")
+                    .setPositiveButton("Continue", null)
+                    .setNegativeButton("Mark again") { _, _ -> wantReset = true }
                     .show()
             }
         }
@@ -1045,7 +1045,7 @@ class ArInspectActivity : Activity() {
         private fun accept(zone: List<FloatArray>, world: List<FloatArray>) {
             val f0 = ArFit.solve(zone, world)
             if (f0 == null) {
-                toast("Titik terlalu rapat atau sebaris — tanda semula")
+                toast("Points too close or in a line — mark again")
                 wantReset = true
                 return
             }
@@ -1058,22 +1058,22 @@ class ArInspectActivity : Activity() {
                 if (f0.rms <= 0.15f) { warnSpan(); return@runOnUiThread }
                 if (f0.rms > 0.15f) {
                     AlertDialog.Builder(this@ArInspectActivity)
-                        .setTitle("Padanan lemah: ${fmtMm(f0.rms)}")
-                        .setMessage("Defect akan muncul lebih kurang sejauh itu daripada " +
-                            "tempat sebenarnya." +
+                        .setTitle("Weak match: ${fmtMm(f0.rms)}")
+                        .setMessage("Defects will appear about that far from " +
+                            "where they really are." +
                             (if (f0.worst >= 0)
-                                " Titik ${f0.worst + 1} paling tidak sepadan, tersasar " +
-                                "${fmtMm(f0.worstErr)} daripada tempat yang direkod." else "") +
+                                " Point ${f0.worst + 1} fits worst, off by " +
+                                "${fmtMm(f0.worstErr)} from where it was recorded." else "") +
                             // Punca yang paling lazim, dan yang paling mudah dibetulkan.
                             (if (span < 2f)
-                                "\n\nTitik kunci zon ini hanya ${fmtMm(span)} berjauhan. " +
-                                "Yaw dikira daripada arah antara titik, jadi pada jarak itu " +
-                                "tersilap sedikit semasa menanda semula menjadi ralat besar " +
-                                "di hujung bilik." else "") +
-                            "\n\nTanda semula dengan lebih tepat, atau teruskan kalau " +
-                            "anggaran sudah memadai.")
-                        .setPositiveButton("Teruskan", null)
-                        .setNegativeButton("Tanda semula") { _, _ -> wantReset = true }
+                                "\n\nThis zone's reference points are only ${fmtMm(span)} apart. " +
+                                "Yaw is solved from the direction between the points, so at that spacing " +
+                                "a small slip when marking again becomes a large error " +
+                                "at the far end of the room." else "") +
+                            "\n\nMark again more carefully, or continue if " +
+                            "an estimate is good enough.")
+                        .setPositiveButton("Continue", null)
+                        .setNegativeButton("Mark again") { _, _ -> wantReset = true }
                         .show()
                 }
             }

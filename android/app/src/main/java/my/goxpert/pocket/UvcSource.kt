@@ -68,7 +68,7 @@ class UvcSource(private val ctx: Context) {
             val h = CameraHelper()
             h.setStateCallback(state)
             helper = h
-            say("CameraHelper dicipta, menunggu peranti")
+            say("CameraHelper created, waiting for a device")
         } catch (e: Throwable) {
             say("GAGAL mencipta CameraHelper: ${e.javaClass.simpleName}: ${e.message}")
         }
@@ -78,7 +78,7 @@ class UvcSource(private val ctx: Context) {
         try {
             helper?.releaseAll()
         } catch (e: Throwable) {
-            say("Ralat semasa melepaskan: ${e.message}")
+            say("Error while releasing: ${e.message}")
         }
         helper = null
         opened = false
@@ -99,7 +99,7 @@ class UvcSource(private val ctx: Context) {
         }
 
         override fun onDeviceOpen(device: UsbDevice?, isFirstOpen: Boolean) {
-            say("Peranti dibuka (pertama=$isFirstOpen)")
+            say("Device opened (first=$isFirstOpen)")
             try {
                 helper?.openCamera()
             } catch (e: Throwable) {
@@ -109,13 +109,13 @@ class UvcSource(private val ctx: Context) {
 
         override fun onCameraOpen(device: UsbDevice?) {
             deviceName = device?.let { desc(it) } ?: "UVC"
-            say("Kamera dibuka")
+            say("Camera opened")
             try {
                 val h = helper ?: return
                 h.previewSize?.let {
                     width = it.width
                     height = it.height
-                    say("Saiz pratonton ${it.width} x ${it.height}")
+                    say("Preview size ${it.width} x ${it.height}")
                 }
                 // Pustaka ini mengharapkan satu permukaan sebelum pratonton
                 // bermula. Tiada apa akan melihatnya: bingkai sampai kepada
@@ -137,11 +137,11 @@ class UvcSource(private val ctx: Context) {
 
         override fun onCameraClose(device: UsbDevice?) {
             opened = false
-            say("Kamera ditutup")
+            say("Camera closed")
             try { helper?.stopPreview() } catch (_: Throwable) {}
         }
 
-        override fun onDeviceClose(device: UsbDevice?) { say("Peranti ditutup") }
+        override fun onDeviceClose(device: UsbDevice?) { say("Device closed") }
 
         override fun onDetach(device: UsbDevice?) {
             opened = false
@@ -171,9 +171,9 @@ class UvcSource(private val ctx: Context) {
             latestJpeg = out.toByteArray()
 
             frameCount++
-            if (frameCount == 1L) say("Bingkai pertama diterima, ${latestJpeg?.size} bait JPEG")
+            if (frameCount == 1L) say("First frame received, ${latestJpeg?.size} JPEG bytes")
         } catch (e: Throwable) {
-            if (frameCount == 0L) say("Penukaran bingkai gagal: ${e.javaClass.simpleName}: ${e.message}")
+            if (frameCount == 0L) say("Frame conversion failed: ${e.javaClass.simpleName}: ${e.message}")
         }
     }
 
