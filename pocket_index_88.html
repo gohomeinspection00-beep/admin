@@ -6725,6 +6725,44 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 
 /* ---------- quick tiles ---------- */
 .nh-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:20px}
+/* ---------- Kad keselamatan di Home ----------
+   Tiga keadaan, dan warnanya yang membezakan: pengawas hidup (tenang),
+   check-in menunggu jawapan (merah), dan amaran orang lain (merah).
+   Butang "I am OK" ada di sini supaya check-in tidak memerlukan satu
+   lagi skrin dibuka. */
+.nh-safe{
+  border-radius:18px;padding:14px;margin-bottom:14px;
+  border:1px solid var(--line);background:var(--bg-2);
+}
+.nh-safe.on{border-color:var(--success);background:var(--success-soft)}
+.nh-safe.due,.nh-safe.alert{border-color:var(--critical);background:var(--critical-soft)}
+.nh-safe-top{display:flex;align-items:flex-start;gap:11px}
+.nh-safe-ico{
+  flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+  background:var(--success);color:#fff;
+}
+.nh-safe.due .nh-safe-ico,.nh-safe.alert .nh-safe-ico{background:var(--critical)}
+.nh-safe.off .nh-safe-ico{background:var(--surface-2);color:var(--muted)}
+.nh-safe-txt{min-width:0;flex:1}
+.nh-safe-txt b{display:block;font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--fg)}
+.nh-safe.on .nh-safe-txt b{color:var(--success)}
+.nh-safe.due .nh-safe-txt b,.nh-safe.alert .nh-safe-txt b{color:var(--critical)}
+.nh-safe-txt span{
+  display:block;font-size:11.5px;color:var(--fg-dim);line-height:1.45;margin-top:2px;
+}
+.nh-safe-txt em{font-style:normal;font-family:var(--font-mono);font-weight:700;letter-spacing:-.03em}
+.nh-safe-acts{display:flex;gap:8px;margin-top:12px}
+.nh-safe-ok{
+  flex:1;padding:13px;border-radius:13px;border:none;background:var(--success);color:#fff;
+  font-size:14px;font-weight:800;letter-spacing:-.02em;
+}
+.nh-safe.due .nh-safe-ok,.nh-safe.alert .nh-safe-ok{background:var(--critical)}
+.nh-safe-go{
+  flex:none;padding:13px 16px;border-radius:13px;background:var(--bg);
+  border:1px solid var(--line-2);font-size:13px;font-weight:700;color:var(--fg-2);
+}
+@keyframes nhSafePulse{0%,100%{opacity:1}50%{opacity:.55}}
+.nh-safe.due .nh-safe-ico,.nh-safe.alert .nh-safe-ico{animation:nhSafePulse 1.2s infinite}
 .nh-qa{
   display:flex;flex-direction:column;align-items:center;gap:7px;
   padding:6px 2px;border-radius:14px;min-width:0;color:var(--fg);
@@ -9323,6 +9361,11 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           <button class="nh-mode" id="nhMode"><i></i><span id="nhModeTxt">Normal</span></button>
         </div>
 
+        <!-- Keselamatan di Home. Jalur nipis di atas skrin terlalu mudah
+             terlepas pandang, dan check-in yang terlepas pandang ialah
+             amaran yang keluar tanpa sebab. -->
+        <div class="nh-safe" id="nhSafety" style="display:none"></div>
+
         <!-- Kad utama: sambung kerja, atau mula baharu -->
         <button class="nh-hero" id="nhHero">
           <svg class="nh-hero-ghost" viewBox="0 0 140 120" fill="none" aria-hidden="true">
@@ -9675,7 +9718,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.9 · build 15 Oct 2026 · SOS reaches up to three people — re-deploy firestore.rules</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.0 · build 15 Oct 2026 · safety card on Home, check in without opening another screen</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -30151,6 +30194,8 @@ function sosDisarm(quiet) {
   if (_sosTimer) clearInterval(_sosTimer);
   _sosTimer = null;
   sosStopGeo(); sosWakeOff(); sosClear(); sosNoteClear();
+  // Senarai pemerhati DIKEKALKAN: berhenti waktu makan tengah hari dan
+  // memasang semula tidak sepatutnya bermakna menaip tiga kod lagi.
   document.getElementById('swDue').classList.remove('show');
   sosPushOff();
   sosPaintStrip();
@@ -30416,6 +30461,7 @@ function sosListen() {
   }
 }
 function sosPaintInbound() {
+  sosPaintHome();
   const bar = document.getElementById('swInbound');
   if (!bar) return;
   const onWatchPane = document.getElementById('swScreen').classList.contains('show') && SOS.tab === 'watch';
@@ -30497,7 +30543,77 @@ function sosView(v) {
       '. ' + escapeHTML(sosWhoName()) + ' notified.';
   }
 }
+/**
+ * Kad keselamatan di Home.
+ *
+ * Jalur nipis di atas skrin memang ada, tetapi ia nipis: satu
+ * check-in yang terlepas pandang menjadi amaran yang keluar tanpa
+ * sebab, dan itu mengajar orang mematikan ciri ini. Kad ini membawa
+ * butang "I am OK" terus ke skrin yang paling kerap dipandang.
+ *
+ * Strukturnya dilukis semula hanya bila KEADAAN bertukar, bukan pada
+ * setiap tik 250 ms — kalau tidak, ketikan jari mendarat pada butang
+ * yang baru sahaja diganti.
+ */
+let _sosHomeKey = '';
+function sosPaintHome() {
+  const box = document.getElementById('nhSafety');
+  if (!box) return;
+  const alert = (SOS.alerts && SOS.alerts[0]) || null;
+  const mode = alert ? 'alert'
+    : (!SOS.on ? 'off' : (SOS.phase === 'due' ? 'due' : 'on'));
+
+  if (mode === 'off') {
+    box.style.display = 'none';
+    box.innerHTML = '';
+    _sosHomeKey = '';
+    return;
+  }
+  box.style.display = '';
+
+  const key = [mode, alert ? alert.id : '', SOS.check ? 1 : 0, sosWhoName()].join('|');
+  if (key !== _sosHomeKey) {
+    _sosHomeKey = key;
+    box.className = 'nh-safe ' + mode;
+    const ico = mode === 'alert'
+      ? '<path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/>'
+      : '<path d="M12 2.5 21 7v5c0 5-3.9 8.7-9 10-5.1-1.3-9-5-9-10V7z"/>';
+    let title, sub, acts;
+    if (mode === 'alert') {
+      title = escapeHTML(alert.fromName || 'Someone') + ' needs help';
+      sub = escapeHTML(alert.siteName || 'Location not set') + ' \u00b7 ' + escapeHTML(alert.reason || 'SOS');
+      acts = '<button class="nh-safe-ok" data-sosho="see">See where they are</button>';
+    } else if (mode === 'due') {
+      title = 'Answer now';
+      sub = 'The SOS goes out in <em id="nhSafeT">--:--</em>';
+      acts = '<button class="nh-safe-ok" data-sosho="ok">Yes \u2014 I am OK</button>' +
+             '<button class="nh-safe-go" data-sosho="open">Open</button>';
+    } else {
+      title = 'Site safety is watching you';
+      sub = (SOS.check
+        ? 'Next check-in in <em id="nhSafeT">--:--</em> \u00b7 '
+        : 'Panic button ready \u00b7 ') + escapeHTML(sosWhoName());
+      acts = (SOS.check ? '<button class="nh-safe-ok" data-sosho="ok">I am OK</button>' : '') +
+             '<button class="nh-safe-go" data-sosho="open">Open</button>';
+    }
+    box.innerHTML =
+      '<div class="nh-safe-top"><span class="nh-safe-ico">' +
+        '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ico + '</svg>' +
+      '</span><span class="nh-safe-txt"><b>' + title + '</b><span>' + sub + '</span></span></div>' +
+      '<div class="nh-safe-acts">' + acts + '</div>';
+  }
+
+  // Hanya nombor yang bertukar setiap tik.
+  const t = document.getElementById('nhSafeT');
+  if (t) {
+    t.textContent = mode === 'due'
+      ? sosFmt(SOS.escAt - Date.now())
+      : sosFmt(SOS.dueAt - Date.now());
+  }
+}
+
 function sosPaintStrip() {
+  sosPaintHome();
   const s = document.getElementById('swStrip');
   if (!s) return;
   if (!SOS.on) { s.classList.remove('show', 'hot'); return; }
@@ -30596,6 +30712,18 @@ function sosWire() {
   if (wl) wl.addEventListener('click', function(e) {
     const b = e.target.closest('[data-swdrop]');
     if (b) sosDropWatcher(b.dataset.swdrop);
+  });
+
+  // Kad keselamatan di Home. Dikendalikan di sini dan bukan pada
+  // setiap butang, kerana kad itu dilukis semula bila keadaan bertukar.
+  const hs = document.getElementById('nhSafety');
+  if (hs) hs.addEventListener('click', function(e) {
+    const b = e.target.closest('[data-sosho]');
+    if (!b) return;
+    const a = b.dataset.sosho;
+    if (a === 'ok') { sosOk(); return; }
+    if (a === 'see') { SOS.tab = 'watch'; sosSetTab('watch'); sosOpen(); return; }
+    sosOpen();
   });
   const iv = document.getElementById('swIvl');
   if (iv) iv.addEventListener('click', function(e) {
