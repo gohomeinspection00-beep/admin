@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity() {
             toast("Pocket loaded, ${pocketFile.length() / 1024} KB")
             web.loadUrl(HOME)
         } catch (e: Throwable) {
-            toast("Gagal memuat: ${e.message}")
+            toast("Could not load: ${e.message}")
         }
     }
 
@@ -357,7 +357,7 @@ class MainActivity : AppCompatActivity() {
                 // cuba bahasa itu dahulu dan jatuh ke bahasa peranti.
                 if (!useLang("en-GB")) useLang(Locale.getDefault().toLanguageTag())
                 runCatching {
-                    uvc.say("TTS voice: " + (tts?.voice?.name ?: "(lalai)"))
+                    uvc.say("TTS voice: " + (tts?.voice?.name ?: "(default)"))
                 }
             }
             if (ttsOk) runCatching {
@@ -367,11 +367,11 @@ class MainActivity : AppCompatActivity() {
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(id: String?) { sayEvent("start") }
                     override fun onDone(id: String?) { sayEvent("end") }
-                    @Deprecated("Diperlukan oleh kelas asas")
+                    @Deprecated("Required by the base class")
                     override fun onError(id: String?) { sayEvent("end") }
                 })
             }
-            uvc.say("TTS: " + if (ttsOk) "sedia" else "not available (code $st)")
+            uvc.say("TTS: " + if (ttsOk) "ready" else "not available (code $st)")
         }
 
         try {
@@ -459,7 +459,7 @@ class MainActivity : AppCompatActivity() {
                             pickFiles.launch(params!!.createIntent()); true
                         } catch (e: Throwable) {
                             filePick = null
-                            uvc.say("onShowFileChooser gagal: ${e.message}")
+                            uvc.say("onShowFileChooser failed: ${e.message}")
                             toast("Could not open the file picker")
                             false
                         }
@@ -806,7 +806,7 @@ class MainActivity : AppCompatActivity() {
                 "ok"
             } catch (e: Throwable) {
                 uvc.say("Picker could not be opened: ${e.message}")
-                "gagal: ${e.message}"
+                "failed: ${e.message}"
             }
 
         /** Baca satu baris. QUEUE_FLUSH: kiraan laju tidak menimbun baris
@@ -820,7 +820,7 @@ class MainActivity : AppCompatActivity() {
                 t.speak(text, TextToSpeech.QUEUE_FLUSH, null, "pocket")
                 "ok"
             } catch (e: Throwable) {
-                "gagal: ${e.message}"
+                "failed: ${e.message}"
             }
         }
 
@@ -837,7 +837,7 @@ class MainActivity : AppCompatActivity() {
                 t.speak(text, TextToSpeech.QUEUE_FLUSH, null, "pocket")
                 "ok"
             } catch (e: Throwable) {
-                "gagal: ${e.message}"
+                "failed: ${e.message}"
             }
         }
 
@@ -870,7 +870,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 "ok"
             } catch (e: Throwable) {
-                "gagal: ${e.message}"
+                "failed: ${e.message}"
             }
 
         /** Buka pautan di luar app. */
@@ -924,7 +924,7 @@ class MainActivity : AppCompatActivity() {
                             .putExtra("kind", kind))
                 } catch (e: Throwable) {
                     uvc.say("AR could not be opened: ${e.message}")
-                    out = "gagal: ${e.message}"
+                    out = "failed: ${e.message}"
                 }
             }
             return out
@@ -944,7 +944,7 @@ class MainActivity : AppCompatActivity() {
                 dir.listFiles()?.forEach { runCatching { it.delete() } }
                 val f = File(dir, "plan.jpg")
                 FileOutputStream(f).use { it.write(Base64.decode(b64, Base64.DEFAULT)) }
-                if (f.length() <= 0L) return "gagal: pelan kosong"
+                if (f.length() <= 0L) return "failed: empty plan"
                 var out = "ok"
                 runOnUiThread {
                     val av = runCatching {
@@ -969,12 +969,12 @@ class MainActivity : AppCompatActivity() {
                         startActivity(Intent(this@MainActivity, ArPlanActivity::class.java)
                             .putExtra("plan", f.absolutePath)
                             .putExtra("spec", spec))
-                    }.onFailure { out = "gagal: ${it.message}" }
+                    }.onFailure { out = "failed: ${it.message}" }
                 }
                 out
             } catch (e: Throwable) {
                 uvc.say("Plan overlay failed: ${e.message}")
-                "gagal: ${e.message}"
+                "failed: ${e.message}"
             }
         }
 
@@ -998,7 +998,7 @@ class MainActivity : AppCompatActivity() {
                     arInspectResult.launch(
                         Intent(this@MainActivity, ArInspectActivity::class.java)
                             .putExtra("bundle", f.absolutePath))
-                }.onFailure { out = "gagal: ${it.message}" }
+                }.onFailure { out = "failed: ${it.message}" }
             }
             return out
         }
@@ -1039,7 +1039,7 @@ class MainActivity : AppCompatActivity() {
                             .putExtra("model", f.absolutePath)
                             .putExtra("spec", spec))
                 } catch (e: Throwable) {
-                    out = "gagal: ${e.message}"
+                    out = "failed: ${e.message}"
                 }
             }
             return out
@@ -1102,7 +1102,7 @@ class MainActivity : AppCompatActivity() {
                     r.startListening(i)
                 }.onFailure {
                     recOn = false
-                    out = "gagal: ${it.message}"
+                    out = "failed: ${it.message}"
                     recEvent("error", "aborted"); recEvent("end")
                 }
             }
@@ -1128,7 +1128,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 runOnUiThread { leaveApp(url) }
                 "ok"
-            } catch (e: Throwable) { "gagal: ${e.message}" }
+            } catch (e: Throwable) { "failed: ${e.message}" }
 
         /**
          * API Web Share tidak wujud dalam WebView, jadi navigator.share
@@ -1159,12 +1159,12 @@ class MainActivity : AppCompatActivity() {
                     i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
                 runOnUiThread {
-                    runCatching { startActivity(Intent.createChooser(i, "Kongsi")) }
+                    runCatching { startActivity(Intent.createChooser(i, "Share")) }
                 }
                 "ok"
             } catch (e: Throwable) {
-                uvc.say("Kongsi gagal: ${e.message}")
-                "gagal: ${e.message}"
+                uvc.say("Share failed: ${e.message}")
+                "failed: ${e.message}"
             }
         }
 
@@ -1221,7 +1221,7 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread { toast("Saved to Downloads: $safe") }
                 "Saved to Downloads"
             } catch (e: Throwable) {
-                val m = "Gagal menyimpan: " + (e.message ?: e.javaClass.simpleName)
+                val m = "Could not save: " + (e.message ?: e.javaClass.simpleName)
                 runOnUiThread { toast(m) }
                 m
             }

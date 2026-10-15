@@ -106,7 +106,7 @@ class LocalServer(
         val f = File(pickDir, safe)
         if (!f.exists()) {
             return noCache(newFixedLengthResponse(
-                Response.Status.NOT_FOUND, "text/plain", "tiada"))
+                Response.Status.NOT_FOUND, "text/plain", "not found"))
         }
         return noCache(newFixedLengthResponse(
             Response.Status.OK, "image/jpeg", f.inputStream(), f.length()))
@@ -244,7 +244,7 @@ class LocalServer(
         val f = File(inspDir, safe)
         if (!f.exists()) {
             return noCache(newFixedLengthResponse(
-                Response.Status.NOT_FOUND, "text/plain", "tiada"))
+                Response.Status.NOT_FOUND, "text/plain", "not found"))
         }
         return noCache(newFixedLengthResponse(
             Response.Status.OK, if (json) "application/json" else "image/jpeg",
@@ -278,7 +278,7 @@ class LocalServer(
             newChunkedResponse(Response.Status.OK, "application/javascript", ins)
                 .also { it.addHeader("Cache-Control", "max-age=86400") }
         } catch (e: Throwable) {
-            noCache(newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "tiada"))
+            noCache(newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "not found"))
         }
     }
 
@@ -288,7 +288,7 @@ class LocalServer(
             append("OPENED : ").append(uvc.opened).append('\n')
             append("FRAMES : ").append(uvc.frameCount).append('\n')
             append("SIZE   : ").append(uvc.width).append(" x ").append(uvc.height).append('\n')
-            append("POCKET : ").append(if (pocketFile.exists()) "${pocketFile.length()} bait" else "not loaded yet").append('\n')
+            append("POCKET : ").append(if (pocketFile.exists()) "${pocketFile.length()} bytes" else "not loaded yet").append('\n')
             append("\n--- log ---\n")
             uvc.logLines().forEach { append(it).append('\n') }
         }

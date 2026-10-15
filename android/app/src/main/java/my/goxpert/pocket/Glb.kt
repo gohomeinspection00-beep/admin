@@ -285,7 +285,7 @@ object Glb {
             IFC.find(names[i])?.let { return it.groupValues[1] }
         }
         val head = names.lastOrNull().orEmpty().split('_', '.', ':').firstOrNull().orEmpty()
-        return if (head.isBlank()) "Lain" else head
+        return if (head.isBlank()) "Other" else head
     }
 
     // ---------- 6. MEMBAKAR ----------

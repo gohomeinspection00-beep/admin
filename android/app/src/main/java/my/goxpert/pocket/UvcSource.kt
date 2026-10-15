@@ -70,7 +70,7 @@ class UvcSource(private val ctx: Context) {
             helper = h
             say("CameraHelper created, waiting for a device")
         } catch (e: Throwable) {
-            say("GAGAL mencipta CameraHelper: ${e.javaClass.simpleName}: ${e.message}")
+            say("FAILED to create CameraHelper: ${e.javaClass.simpleName}: ${e.message}")
         }
     }
 
@@ -84,17 +84,17 @@ class UvcSource(private val ctx: Context) {
         opened = false
         dummySurface?.release(); dummySurface = null
         dummyTexture?.release(); dummyTexture = null
-        say("Dihentikan")
+        say("Stopped")
     }
 
     private val state = object : ICameraHelper.StateCallback {
         override fun onAttach(device: UsbDevice?) {
             device ?: return
-            say("Dicolok: ${desc(device)}")
+            say("Plugged in: ${desc(device)}")
             try {
                 helper?.selectDevice(device)
             } catch (e: Throwable) {
-                say("selectDevice gagal: ${e.message}")
+                say("selectDevice failed: ${e.message}")
             }
         }
 
@@ -103,7 +103,7 @@ class UvcSource(private val ctx: Context) {
             try {
                 helper?.openCamera()
             } catch (e: Throwable) {
-                say("openCamera gagal: ${e.message}")
+                say("openCamera failed: ${e.message}")
             }
         }
 
@@ -124,14 +124,14 @@ class UvcSource(private val ctx: Context) {
                     val tex = SurfaceTexture(0).also { dummyTexture = it }
                     if (width > 0 && height > 0) tex.setDefaultBufferSize(width, height)
                     dummySurface = Surface(tex).also { h.addSurface(it, false) }
-                    say("Permukaan tersembunyi dipasang")
+                    say("Hidden surface attached")
                 }
                 h.setFrameCallback(frameCb, UVCCamera.PIXEL_FORMAT_NV21)
                 h.startPreview()
                 opened = true
-                say("Pratonton bermula")
+                say("Preview started")
             } catch (e: Throwable) {
-                say("Gagal memulakan pratonton: ${e.javaClass.simpleName}: ${e.message}")
+                say("Could not start the preview: ${e.javaClass.simpleName}: ${e.message}")
             }
         }
 
@@ -146,11 +146,11 @@ class UvcSource(private val ctx: Context) {
         override fun onDetach(device: UsbDevice?) {
             opened = false
             latestJpeg = null
-            say("Dicabut")
+            say("Unplugged")
         }
 
         override fun onCancel(device: UsbDevice?) {
-            say("Kebenaran USB ditolak oleh pengguna")
+            say("USB permission refused by the user")
         }
     }
 
