@@ -7585,6 +7585,47 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .ip-rates button.on[data-r="good"]{background:var(--success-soft);border-color:var(--success);color:var(--success)}
 .ip-rates button.on[data-r="fair"]{background:var(--warning-soft);border-color:var(--warning);color:var(--warning)}
 .ip-rates button.on[data-r="dilapidated"]{background:var(--critical-soft);border-color:var(--critical);color:var(--critical)}
+
+/* ---------- BARIS pada borang penemuan ----------
+   Keadaan 1-5 KALI keutamaan N1-E4. Nombornya besar kerana itulah yang
+   ibu jari tekan di tapak, dan skor dikira semula serta-merta: satu
+   penarafan yang tidak boleh dilihat kesannya sebelum disimpan ialah
+   penarafan yang diteka. */
+.ip-bnum{display:grid;gap:6px}
+.ip-bnum.c5{grid-template-columns:repeat(5,1fr)}
+.ip-bnum.c4{grid-template-columns:repeat(4,1fr)}
+.ip-bnum button{
+  padding:9px 2px;border:1px solid var(--line);border-radius:11px;background:var(--bg-2);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.ip-bnum button b{
+  font-family:var(--font-mono);font-size:17px;font-weight:700;letter-spacing:-.04em;
+  color:var(--fg-dim);line-height:1;
+}
+.ip-bnum button small{font-size:8.5px;font-weight:600;color:var(--muted);line-height:1.2;text-align:center}
+.ip-bnum button.on{background:var(--tb);border-color:var(--tc)}
+.ip-bnum button.on b,.ip-bnum button.on small{color:var(--tc)}
+.ip-bres{
+  display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;
+  border:1px solid var(--line);background:var(--bg-2);margin-bottom:13px;
+}
+.ip-bres-n{
+  flex:none;min-width:46px;height:46px;border-radius:12px;display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:19px;font-weight:700;letter-spacing:-.04em;
+  background:var(--surface-2);color:var(--muted);
+}
+.ip-bres-t{min-width:0;flex:1}
+.ip-bres-t b{display:block;font-size:13px;font-weight:700;color:var(--fg);letter-spacing:-.015em}
+.ip-bres-t span{display:block;font-size:11px;color:var(--muted);line-height:1.45;margin-top:2px}
+.ip-bres.good{border-color:var(--success);background:var(--success-soft)}
+.ip-bres.good .ip-bres-n{background:var(--success);color:#fff}
+.ip-bres.good .ip-bres-t b{color:var(--success)}
+.ip-bres.fair{border-color:var(--warning);background:var(--warning-soft)}
+.ip-bres.fair .ip-bres-n{background:var(--warning);color:#fff}
+.ip-bres.fair .ip-bres-t b{color:var(--warning)}
+.ip-bres.dilapidated{border-color:var(--critical);background:var(--critical-soft)}
+.ip-bres.dilapidated .ip-bres-n{background:var(--critical);color:#fff}
+.ip-bres.dilapidated .ip-bres-t b{color:var(--critical)}
 .ip-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:13px}
 .ip-tool{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);font-size:10.5px;font-weight:600;color:var(--fg-2);text-align:center;line-height:1.25}
 .ip-tool svg{color:var(--tc)}
@@ -9612,7 +9653,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.6 · build 15 Oct 2026 · tall floor plans fit, and the controls under them are reachable</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.7 · build 15 Oct 2026 · BARIS condition × priority on every BCA finding, and in the report</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -11500,19 +11541,9 @@ function appendMessage(msg, animate = true) {
 // Score = Condition (1-5) × Priority (1-4)
 // 1-4 = Good (green), 5-12 = Fair (yellow), 13-20 = Dilapidated (red)
 // =======================================================
-const BARIS_CONDITIONS = [
-  { value: 1, label: 'New/As New', desc: 'Minor Servicing' },
-  { value: 2, label: 'Fair', desc: 'Minor Repair' },
-  { value: 3, label: 'Poor', desc: 'Major Repair/Replacement' },
-  { value: 4, label: 'Very Poor', desc: 'Malfunction' },
-  { value: 5, label: 'Dilapidated', desc: 'Damage/Missing' }
-];
-const BARIS_PRIORITIES = [
-  { value: 1, label: 'N1', name: 'Normal', desc: 'Functional, cosmetic only' },
-  { value: 2, label: 'R2', name: 'Routine', desc: 'Minor defect, may worsen if unattended' },
-  { value: 3, label: 'U3', name: 'Urgent', desc: 'Serious defect, cannot function properly' },
-  { value: 4, label: 'E4', name: 'Emergency', desc: 'Element non-functional; fatality/injury risk' }
-];
+// Skala itu hidup di SATU tempat sahaja: BR_COND dan BR_PRIO, lebih ke
+// bawah. Satu salinan kedua di sini pernah wujud dan ia memang mula
+// menyimpang — jadi ia dibuang dan bukan disegerakkan.
 
 function calcBarisScore(condition, priority) {
   if (!condition || !priority) return null;
@@ -18850,14 +18881,19 @@ async function ariExport(isp, z) {
   try {
     for (let i = 0; i < z.defects.length; i++) {
       const d = z.defects[i];
-      const sev = ARI_SEV[Math.min(3, Math.max(0, d.sev | 0))];
+      const sevIx = Math.min(3, Math.max(0, d.sev | 0));
+      const sev = ARI_SEV[sevIx];
       const data = {
         spaceId: s.id, spaceKey: s.key,
         no: ipFindingsIn(s.id).length + 1 + done,
         element: '', defectType: d.kind || d.title || sev.name,
         desc: [d.title, d.note, '[Marked in AR — zone ' + z.name + ']']
           .filter(Boolean).join(' '),
-        rate: '', priority: sev.code, cost: '', action: '',
+        // N1/R2/U3/E4 dalam AR IALAH keutamaan BARIS. Menyimpannya
+        // sebagai nombor bermakna penemuan itu dibuka dengan separuh
+        // penarafan sudah ditekan; tinggal keadaan elemen sahaja.
+        prio: sevIx + 1, cond: 0, baris: null,
+        rate: '', priority: sev.name, cost: '', action: '',
         locationText: z.name,
         planId: '', px: null, py: null,
         photoN: 0,
@@ -30806,6 +30842,34 @@ function ipFindingsIn(spaceId) { return IP.findings.filter(function(f) { return 
  * pemeriksaan lain membuat Hub berkata 100% sedangkan baris yang sama
  * berkata TO DO. Penarafan hanya dikira pada jenis yang menggunakannya.
  */
+/**
+ * BARIS pada satu penemuan: keadaan (1-5) KALI keutamaan (N1..E4).
+ *
+ * Keutamaan ada EMPAT tahap, bukan lima — itu skala BARIS sebenar
+ * (N1 Normal, R2 Routine, U3 Urgent, E4 Emergency), dan jalur skornya
+ * 1-4 / 5-12 / 13-20 bergantung padanya. Menambah tahap kelima akan
+ * menjadikan setiap skor dalam laporan tidak sepadan dengan skala yang
+ * dirujuk di sebelahnya.
+ *
+ * Memulangkan null untuk penemuan lama yang hanya membawa f.rate:
+ * laporan jatuh kembali kepada jalur itu dan tiada apa yang hilang.
+ */
+function ipBaris(f) {
+  if (!f || !f.cond || !f.prio) return null;
+  const c = BR_COND.filter(function(x) { return x.v === f.cond; })[0];
+  const p = BR_PRIO.filter(function(x) { return x.v === f.prio; })[0];
+  if (!c || !p) return null;
+  const score = c.v * p.v;
+  const band = getBarisRating(score);
+  return { c: c, p: p, score: score, band: band,
+           label: getBarisRatingLabel(band), action: getBarisRatingFull(band) };
+}
+
+/** Satu penemuan yang perlu dilihat sekarang, dalam mana-mana skala. */
+function ipUrgent(f) {
+  return (f.prio >= 3) || f.priority === 'Urgent' || f.priority === 'Emergency';
+}
+
 function ipSpaceDone(s) {
   return !!(ipFindingsIn(s.id).length || (ipT().rate && s.rate) || s.noDefect);
 }
@@ -31024,7 +31088,7 @@ function ipViewCover() {
 function ipViewHub() {
   const t = ipT(), p = ipPct(), C = 2 * Math.PI * 22;
   const c = (IP.insp && IP.insp.cover) || {};
-  const urgent = IP.findings.filter(function(f) { return f.priority === 'Urgent'; }).length;
+  const urgent = IP.findings.filter(ipUrgent).length;
   let html = '<div class="ip-hub ' + t.cls + '">' +
     '<span class="ip-badge">' + ipEsc(t.n) + '</span>' +
     '<h2>' + ipEsc(c.title || IP.insp.title || 'Untitled') + '</h2>' +
@@ -31120,8 +31184,20 @@ function ipViewSpace() {
   let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="hub"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><h2><em>' + ipEsc(s.key) + '</em> ' + ipEsc(s.name) + '</h2></div>' +
     '<div class="ip-fld"><label>' + t.unit + ' name</label><input id="ipSpName" value="' + ipEsc(s.name).replace(/"/g, '&quot;') + '"></div>';
   if (t.rate) {
+    // Penarafan ruang ialah satu ringkasan, bukan satu BARIS keempat.
+    // Menunjukkan penemuan terburuk di sini menghentikan ruang yang
+    // ditandakan Good sedangkan ia memegang satu defect berskor 20.
+    let worst = null;
+    list.forEach(function(f) {
+      const b = ipBaris(f);
+      if (b && (!worst || b.score > worst.score)) worst = b;
+    });
     html += '<div class="ip-fld"><label>Condition of this ' + t.unit.toLowerCase() + '</label><div class="ip-rates" id="ipSpRate">' +
-      IP_RATES.map(function(r) { return '<button data-r="' + r[0] + '" class="' + (s.rate === r[0] ? 'on' : '') + '">' + r[1] + '<small>' + r[2] + '</small></button>'; }).join('') + '</div></div>';
+      IP_RATES.map(function(r) { return '<button data-r="' + r[0] + '" class="' + (s.rate === r[0] ? 'on' : '') + '">' + r[1] + '<small>' + r[2] + '</small></button>'; }).join('') + '</div>' +
+      '<p class="ip-hint">' + (worst
+        ? 'Worst finding here is BARIS ' + worst.score + ' \u00b7 ' + ipEsc(worst.label) + '.'
+        : 'The band for the ' + t.unit.toLowerCase() + ' as a whole. Each finding carries its own BARIS score.') +
+      '</p></div>';
   }
   html += '<div class="ip-sec"><b>Findings</b><i></i><span>' + list.length + '</span></div>';
   if (!list.length) {
@@ -31135,7 +31211,8 @@ function ipViewSpace() {
           '<b>' + ipEsc(f.defectType || 'Untyped') + (f.element ? ' — ' + ipEsc(f.element) : '') + '</b>' +
           (f.desc ? '<p>' + ipEsc(f.desc) + '</p>' : '') +
           '<span class="ip-dmeta">' +
-            (t.rate && f.rate ? '<span class="ip-rate ip-r-' + f.rate + '">' + f.rate.slice(0, 5).toUpperCase() + '</span>' : '') +
+            (t.rate && f.rate ? '<span class="ip-rate ip-r-' + f.rate + '">' +
+              (ipBaris(f) ? 'B' + ipBaris(f).score : f.rate.slice(0, 5).toUpperCase()) + '</span>' : '') +
             (f.priority ? '<span class="ip-chip">' + ipEsc(f.priority) + '</span>' : '') +
             (t.cost && f.cost ? '<span class="ip-chip">RM ' + ipEsc(f.cost) + '</span>' : '') +
             (f.px != null ? '<span class="ip-pinflag"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/></svg>on plan</span>' : '') +
@@ -31175,13 +31252,8 @@ function ipViewFinding() {
       '<p class="ip-hint">From a list, not free text — the same wall is called the same thing in every report you write.</p></div>' +
     '<div class="ip-fld"><label>Defect type</label><select id="ipfDt">' + opt(IP_DEFTYPES, d.defectType) + '</select></div>' +
     '<div class="ip-fld"><label>Description</label><textarea id="ipfDesc" placeholder="What you see, where exactly, how big.">' + ipEsc(d.desc) + '</textarea></div>';
-  if (t.rate) {
-    html += '<div class="ip-fld"><label>BARIS rating</label><div class="ip-rates" id="ipfRate">' +
-      [['good','Good','B1'],['fair','Fair','B2'],['dilapidated','Dilapidated','B3–B4']].map(function(r) {
-        return '<button data-r="' + r[0] + '" class="' + (d.rate === r[0] ? 'on' : '') + '">' + r[1] + '<small>' + r[2] + '</small></button>';
-      }).join('') + '</div></div>';
-  }
-  if (t.rate || t.gps) html += '<div class="ip-fld"><label>Priority</label><select id="ipfPri">' + opt(IP_PRI, d.priority) + '</select></div>';
+  if (t.rate) html += ipBarisPicker(d);
+  if (t.gps) html += '<div class="ip-fld"><label>Priority</label><select id="ipfPri">' + opt(IP_PRI, d.priority) + '</select></div>';
   if (t.rate) {
     html += '<div class="ip-fld"><label>Recommended action</label><textarea id="ipfAct" placeholder="What should be done, and by whom.">' + ipEsc(d.action) + '</textarea></div>' +
       '<div class="ip-fld"><label>Estimated cost (RM)</label><input id="ipfCost" inputmode="decimal" value="' + ipEsc(d.cost).replace(/"/g, '&quot;') + '"></div>';
@@ -31193,6 +31265,58 @@ function ipViewFinding() {
   html += '<button class="ip-go" id="ipSaveFind">' + (f ? 'Save changes' : 'Save finding') + '</button>';
   if (f) html += '<button class="ip-ghost bad" id="ipDelFind">Delete this finding</button>';
   return ipShell(html);
+}
+
+/**
+ * Dua baris nombor: keadaan 1-5, keutamaan 1-4. Tekan satu daripada
+ * setiap baris dan skor muncul di bawahnya.
+ *
+ * Sebelum ini borang ini menawarkan tiga butang — Good / Fair /
+ * Dilapidated — iaitu JALUR KEPUTUSAN BARIS, bukan BARIS itu sendiri.
+ * Surveyor terpaksa mengira 3 x 4 = 12 dalam kepala, memetakannya ke
+ * jalur, dan menekan jalur itu; skor sebenar tidak pernah masuk ke
+ * dalam laporan walaupun itulah nombor yang klien pertikaikan.
+ */
+function ipBarisPicker(d) {
+  const cond = d.cond || 0, prio = d.prio || 0;
+  return '<div class="ip-fld"><label>BARIS \u00b7 condition</label>' +
+    '<div class="ip-bnum c5" id="ipfCond">' +
+      BR_COND.map(function(c) {
+        return '<button type="button" data-ipcond="' + c.v + '" class="' + (cond === c.v ? 'on' : '') + '" ' +
+          'aria-pressed="' + (cond === c.v) + '" aria-label="Condition ' + c.v + ', ' + c.label + '">' +
+          '<b>' + c.v + '</b><small>' + ipEsc(c.short) + '</small></button>';
+      }).join('') +
+    '</div>' +
+    '<p class="ip-hint">What state the element is in.</p></div>' +
+    '<div class="ip-fld"><label>BARIS \u00b7 priority</label>' +
+    '<div class="ip-bnum c4" id="ipfPrio">' +
+      BR_PRIO.map(function(p) {
+        return '<button type="button" data-ipprio="' + p.v + '" class="' + (prio === p.v ? 'on' : '') + '" ' +
+          'aria-pressed="' + (prio === p.v) + '" aria-label="Priority ' + p.code + ', ' + p.name + '">' +
+          '<b>' + p.v + '</b><small>' + ipEsc(p.code) + ' ' + ipEsc(p.tiny) + '</small></button>';
+      }).join('') +
+    '</div>' +
+    '<p class="ip-hint">How soon it has to be dealt with.</p></div>' +
+    ipBarisRes(cond, prio, d.rate);
+}
+
+/** Jalur skor di bawah dua baris itu. Dilukis semula pada setiap ketikan. */
+function ipBarisRes(cond, prio, oldRate) {
+  const b = ipBaris({ cond: cond, prio: prio });
+  if (!b) {
+    // Penemuan lama membawa jalur sahaja. Tunjukkan apa yang ada, dan
+    // katakan apa yang hilang, bukan kosong tanpa sebab.
+    const was = oldRate ? getBarisRatingLabel(oldRate) : '';
+    return '<div class="ip-bres" id="ipfBres"><span class="ip-bres-n">\u2013</span>' +
+      '<span class="ip-bres-t"><b>' + (was ? 'Saved as ' + ipEsc(was) : 'Not rated yet') + '</b>' +
+      '<span>Pick a condition and a priority. The score, the band and the action it calls for go into the report.</span>' +
+      '</span></div>';
+  }
+  return '<div class="ip-bres ' + b.band + '" id="ipfBres">' +
+    '<span class="ip-bres-n">' + b.score + '</span>' +
+    '<span class="ip-bres-t"><b>' + ipEsc(b.label) + ' \u00b7 ' + ipEsc(b.action) + '</b>' +
+    '<span>' + b.c.v + ' ' + ipEsc(b.c.label) + ' \u00d7 ' + ipEsc(b.p.code) + ' ' + ipEsc(b.p.name) +
+    ' \u2014 ' + ipEsc(b.p.desc.toLowerCase()) + '</span></span></div>';
 }
 
 // Pelan kecil dalam borang. Ia menulis ke IP.draftPin dan hanya
@@ -31232,6 +31356,7 @@ function ipViewExport() {
   const t = ipT();
   const noDesc = IP.findings.filter(function(f) { return !f.desc; }).length;
   const noPhoto = IP.findings.filter(function(f) { return !(f.photoN > 0); }).length;
+  const noBaris = t.rate ? IP.findings.filter(function(f) { return !ipBaris(f); }).length : 0;
   const blank = IP.spaces.filter(function(s) { return !ipSpaceDone(s); });
   const c = (IP.insp && IP.insp.cover) || {};
   const coverOk = !!(c.title && c.addr && c.client);
@@ -31248,6 +31373,9 @@ function ipViewExport() {
         blank.length ? blank.map(function(s) { return s.key + ' ' + s.name; }).join(', ') : 'Nothing left blank.') +
     row(noDesc === 0, noDesc ? pkPl(noDesc, 'finding') + ' ' + pkHas(noDesc) + ' no description' : 'Every finding described', 'A photo without words is not a report.') +
     row(noPhoto === 0, noPhoto ? pkPl(noPhoto, 'finding') + ' ' + pkHas(noPhoto) + ' no photo' : 'Every finding photographed', 'Photos are what the client argues with, not your prose.') +
+    (t.rate ? row(noBaris === 0,
+      noBaris ? pkPl(noBaris, 'finding') + ' ' + pkHas(noBaris) + ' no BARIS score' : 'Every finding scored',
+      'Condition × priority. The score and the band it falls in both go in the report.') : '') +
     '<div class="ip-sec" style="margin-top:16px"><b>The report will contain</b><i></i></div>' +
     ['Cover page with the property, client and date',
      'Summary — findings by ' + (t.rate ? 'rating and ' : '') + 'priority',
@@ -31255,6 +31383,7 @@ function ipViewExport() {
      'One table per ' + t.unit.toLowerCase() + ', findings numbered ' + (IP.spaces[0] ? IP.spaces[0].key : 'A') + '01, ' + (IP.spaces[0] ? IP.spaces[0].key : 'A') + '02 …',
      'A photo with each finding, captioned with its number',
      t.cost ? 'Cost summary, totalled' : '',
+     t.rate ? 'The BARIS scale itself, so the client can check every score' : '',
      'Limitations and signature block'].filter(Boolean).map(function(x) {
       return '<div class="ip-check ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg><div><b>' + ipEsc(x) + '</b></div></div>';
     }).join('') +
@@ -31508,13 +31637,23 @@ async function ipSaveFinding() {
   const g = function(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
   const t = ipT();
   const existing = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
-  const rateBtn = document.querySelector('#ipfRate button.on');
+  // BARIS: dua nombor disimpan, dan jalur serta skor DITERBITKAN
+  // daripadanya. Menyimpan ketiga-tiganya secara berasingan bermakna
+  // ia boleh bercanggah, dan jalur itulah yang mewarnakan pin pelan.
+  const cBtn = document.querySelector('#ipfCond button.on');
+  const pBtn = document.querySelector('#ipfPrio button.on');
+  const cond = t.rate ? (cBtn ? +cBtn.dataset.ipcond : 0) : 0;
+  const prio = t.rate ? (pBtn ? +pBtn.dataset.ipprio : 0) : 0;
+  const bar = ipBaris({ cond: cond, prio: prio });
   const data = {
     spaceId: s.id, spaceKey: s.key,
     no: existing ? existing.no : ipFindingsIn(s.id).length + 1,
     element: g('ipfEl'), defectType: g('ipfDt'), desc: g('ipfDesc'),
-    rate: t.rate ? (rateBtn ? rateBtn.dataset.r : (existing ? existing.rate : '')) : '',
-    priority: g('ipfPri'), cost: g('ipfCost'), action: g('ipfAct'), locationText: g('ipfLoc'),
+    cond: cond, prio: prio,
+    baris: bar ? bar.score : null,
+    rate: bar ? bar.band : (t.rate && existing ? (existing.rate || '') : ''),
+    priority: t.gps ? g('ipfPri') : (bar ? bar.p.name : (existing ? (existing.priority || '') : '')),
+    cost: g('ipfCost'), action: g('ipfAct'), locationText: g('ipfLoc'),
     planId: IP.draftPin ? IP.draftPin.planId : '',
     px: (IP.draftPin && IP.draftPin.px != null) ? IP.draftPin.px : null,
     py: (IP.draftPin && IP.draftPin.py != null) ? IP.draftPin.py : null,
@@ -31774,22 +31913,32 @@ async function ipBuildPdf() {
     const cnt = { good: 0, fair: 0, dilapidated: 0 };
     IP.findings.forEach(function(f) { if (cnt[f.rate] != null) cnt[f.rate]++; });
     let bx = M;
-    [['good', 'Good'], ['fair', 'Fair'], ['dilapidated', 'Dilapidated']].forEach(function(r) {
+    [['good', 'Good', '1–4'], ['fair', 'Fair', '5–12'], ['dilapidated', 'Dilapidated', '13–20']].forEach(function(r) {
       const w = (W - M * 2 - 8) / 3;
       doc.setFillColor(248, 248, 248); doc.roundedRect(bx, y, w, 20, 2, 2, 'F');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
       doc.setTextColor(RGB[r[0]][0], RGB[r[0]][1], RGB[r[0]][2]);
       doc.text(String(cnt[r[0]]), bx + 5, y + 10);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(120, 120, 120);
-      doc.text(r[1], bx + 5, y + 16);
+      // Jalur tanpa julatnya ialah satu perkataan; dengan julatnya ia
+      // satu nombor yang klien boleh semak sendiri.
+      doc.text(r[1] + '   ' + r[2], bx + 5, y + 16);
       bx += w + 4;
     });
     y += 27;
   }
-  const pri = {};
-  IP.findings.forEach(function(f) { if (f.priority) pri[f.priority] = (pri[f.priority] || 0) + 1; });
-  if (Object.keys(pri).length) {
-    y = ipPdfText(doc, 'By priority: ' + IP_PRI.filter(function(p) { return pri[p]; }).map(function(p) { return p + ' ' + pri[p]; }).join('   ·   '), M, y, W - M * 2, 10) + 8;
+  if (t.rate) {
+    const pc = {};
+    IP.findings.forEach(function(f) { if (f.prio) pc[f.prio] = (pc[f.prio] || 0) + 1; });
+    const parts = BR_PRIO.filter(function(p) { return pc[p.v]; })
+      .map(function(p) { return p.code + ' ' + p.name + ' ' + pc[p.v]; });
+    if (parts.length) y = ipPdfText(doc, 'By priority: ' + parts.join('   ·   '), M, y, W - M * 2, 10) + 8;
+  } else {
+    const pri = {};
+    IP.findings.forEach(function(f) { if (f.priority) pri[f.priority] = (pri[f.priority] || 0) + 1; });
+    if (Object.keys(pri).length) {
+      y = ipPdfText(doc, 'By priority: ' + IP_PRI.filter(function(p) { return pri[p]; }).map(function(p) { return p + ' ' + pri[p]; }).join('   ·   '), M, y, W - M * 2, 10) + 8;
+    }
   }
   y = ipPdfText(doc, t.units, M, y, W - M * 2, 12, 'bold') + 5;
   doc.setFontSize(9);
@@ -31881,8 +32030,13 @@ async function ipBuildPdf() {
       ty += 1.5;
       if (f.desc) ty = ipPdfText(doc, f.desc, tx, ty, tw, 8.5, 'normal', [70, 70, 70]) + 1.5;
       const tags = [];
-      if (t.rate && f.rate) tags.push(f.rate.toUpperCase());
-      if (f.priority) tags.push('Priority: ' + f.priority);
+      const fb = ipBaris(f);
+      // Skor itulah nombor yang klien pertikaikan, jadi ia muncul penuh
+      // dengan dua angka yang menghasilkannya — bukan jalur sahaja.
+      if (fb) tags.push('BARIS ' + fb.score + ' · ' + fb.label +
+        '  (C' + fb.c.v + ' ' + fb.c.label + ' × ' + fb.p.code + ' ' + fb.p.name + ')');
+      else if (t.rate && f.rate) tags.push(f.rate.toUpperCase());
+      if (f.priority && !fb) tags.push('Priority: ' + f.priority);
       if (t.cost && f.cost) tags.push('RM ' + f.cost);
       if (f.locationText) tags.push(f.locationText);
       if (f.gps) tags.push('GPS ' + f.gps);
@@ -31891,6 +32045,45 @@ async function ipBuildPdf() {
       y = Math.max(top + ih, ty) + 9;
       doc.setDrawColor(235, 235, 235); doc.line(M, y - 5, W - M, y - 5);
     }
+  }
+
+  // --- Skala BARIS ---
+  // Setiap penemuan membawa satu nombor. Satu laporan yang menyebut
+  // "BARIS 12" tanpa memberitahu dari mana 12 itu datang memaksa klien
+  // mempercayai surveyor; dengan skala ini di dalamnya, klien boleh
+  // menyemak sendiri, dan itulah maksud penarafan berpiawai.
+  if (t.rate) {
+    nextPage(); y = M + 8;
+    y = ipPdfText(doc, 'The BARIS scale', M, y, W - M * 2, 15, 'bold') + 4;
+    y = ipPdfText(doc, 'Every finding in this report carries a BARIS score: the condition of the element ' +
+      'multiplied by the priority of the action it calls for. The score decides the band, and the band ' +
+      'decides what happens next.', M, y, W - M * 2, 9.5, 'normal', [80, 80, 80]) + 7;
+
+    const scaleRow = function(code, label, desc, col) {
+      if (y > H - 26) { nextPage(); y = M + 8; }
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+      doc.setTextColor(col ? col[0] : 30, col ? col[1] : 30, col ? col[2] : 30);
+      doc.text(String(code), M, y);
+      doc.setTextColor(30, 30, 30);
+      doc.text(label, M + 17, y);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
+      doc.text(desc, M + 62, y);
+      y += 6;
+    };
+
+    y = ipPdfText(doc, 'Condition of the element', M, y, W - M * 2, 10.5, 'bold') + 4;
+    BR_COND.forEach(function(c) { scaleRow(c.v, c.label, c.desc); });
+    y += 3;
+    y = ipPdfText(doc, 'Priority of the action', M, y, W - M * 2, 10.5, 'bold') + 4;
+    BR_PRIO.forEach(function(p) { scaleRow(p.code, p.name, p.desc); });
+    y += 3;
+    y = ipPdfText(doc, 'Score bands', M, y, W - M * 2, 10.5, 'bold') + 4;
+    scaleRow('1–4', 'Good', 'Plan maintenance ' + '·' + ' acceptable condition', RGB.good);
+    scaleRow('5–12', 'Fair', 'Condition monitoring ' + '·' + ' rectify within six months', RGB.fair);
+    scaleRow('13–20', 'Dilapidated', 'Serious attention ' + '·' + ' formal notice, rectify within the DLP', RGB.dilapidated);
+    y += 2;
+    y = ipPdfText(doc, 'Condition runs 1 to 5 and priority 1 to 4, so the highest possible score is 20.',
+      M, y, W - M * 2, 8.5, 'normal', [120, 120, 120]) + 4;
   }
 
   // --- Limitations ---
@@ -32026,11 +32219,24 @@ function ipWire() {
       ipRender();
       return;
     }
-    const fr = e.target.closest('#ipfRate button');
-    if (fr) {
-      const was = fr.classList.contains('on');
-      document.querySelectorAll('#ipfRate button').forEach(function(b) { b.classList.remove('on'); });
-      if (!was) fr.classList.add('on');
+    // Dua baris nombor BARIS. Borang ini TIDAK dilukis semula pada
+    // setiap ketikan — ipRender() akan membuang setiap medan yang
+    // belum disimpan, termasuk gambar yang baru diambil.
+    const bn = e.target.closest('#ipfCond button, #ipfPrio button');
+    if (bn) {
+      const row = bn.parentElement;
+      const was = bn.classList.contains('on');
+      row.querySelectorAll('button').forEach(function(b) {
+        b.classList.remove('on'); b.setAttribute('aria-pressed', 'false');
+      });
+      if (!was) { bn.classList.add('on'); bn.setAttribute('aria-pressed', 'true'); }
+      const c = document.querySelector('#ipfCond button.on');
+      const p = document.querySelector('#ipfPrio button.on');
+      const old = document.getElementById('ipfBres');
+      if (old) {
+        const f = IP.findId ? IP.findings.filter(function(x) { return x.id === IP.findId; })[0] : null;
+        old.outerHTML = ipBarisRes(c ? +c.dataset.ipcond : 0, p ? +p.dataset.ipprio : 0, f ? f.rate : '');
+      }
       return;
     }
     if (e.target.closest('#ipMake')) {
@@ -32701,11 +32907,18 @@ async function smImportLegacy() {
       const pd = snap.docs[i];
       if (done.has(pd.id)) continue;
       const d = pd.data();
-      const rate = d.baris ? smBarisToRate(d) : '';
+      // Tangkapan lama sudah membawa keadaan dan keutamaan BARIS.
+      // Menjatuhkannya di sini bermakna skor itu mati pada import, dan
+      // laporan kehilangan nombor yang klien pertikaikan.
+      const iCond = (typeof d.condition === 'number') ? d.condition : 0;
+      const iPrio = (typeof d.priority === 'number') ? d.priority : 0;
+      const iBar = ipBaris({ cond: iCond, prio: iPrio });
+      const rate = iBar ? iBar.band : (d.baris ? smBarisToRate(d) : '');
       const f = {
         spaceId: bucket.id, spaceKey: bucket.key, no: base + added + 1,
         element: '', defectType: d.defectType || '', desc: d.remarks || '',
-        rate: rate, priority: smPrioName(d.priority), cost: '', action: '',
+        cond: iCond, prio: iPrio, baris: iBar ? iBar.score : (d.baris || null),
+        rate: rate, priority: iBar ? iBar.p.name : smPrioName(d.priority), cost: '', action: '',
         locationText: d.location || '',
         planId: '', px: null, py: null, photoN: 0,
         fromPhoto: pd.id, source: 'site-import',
@@ -32743,16 +32956,15 @@ function smBarisToRate(d) {
   if (typeof d.baris === 'number') score = d.baris;
   else if (typeof d.condition === 'number' && typeof d.priority === 'number' && typeof calcBarisScore === 'function') score = calcBarisScore(d.condition, d.priority);
   if (score == null) return '';
-  if (score <= 6) return 'good';
-  if (score <= 12) return 'fair';
-  return 'dilapidated';
+  // Dulu baris ini memotong pada 6, sedangkan BARIS Rater dan skrin
+  // Defect memotong pada 4: skor 5 dan 6 membaca "Good" di satu tempat
+  // dan "Fair" di tempat lain, untuk defect yang sama.
+  return getBarisRating(score) || '';
 }
+/** Nama keutamaan BARIS, bukan perbendaharaan kedua yang selari. */
 function smPrioName(p) {
-  if (p === 1) return 'Low';
-  if (p === 2) return 'Medium';
-  if (p === 3) return 'High';
-  if (p === 4) return 'Urgent';
-  return '';
+  const row = BR_PRIO.filter(function(x) { return x.v === p; })[0];
+  return row ? row.name : '';
 }
 
 // ---------- 5. LETAK TEPI / SAMBUNG SEMULA ----------
@@ -33025,7 +33237,7 @@ function smRecog() {
       ? 'No signal. Speech recognition on a phone sends audio to a server, so it cannot turn speech into text here. Press “Record voice only” — your voice is kept on the phone and can be transcribed when there is signal.'
       : (e.error === 'not-allowed'
         ? 'The microphone is not allowed. Open the browser settings and allow the microphone for this site.'
-        : 'Mikrofon: ' + e.error), true, net);
+        : 'Microphone: ' + e.error), true, net);
   };
   r.onend = function() {
     _smHolding = false;
