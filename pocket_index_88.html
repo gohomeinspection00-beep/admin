@@ -7529,7 +7529,17 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
    bilik kecil di telefon hampir mustahil. Pin dikecilkan songsang
    mengikut zum supaya ia kekal sebesar jari, bukan membesar sampai
    menutup pelan. */
-.ip-plan, .ip-mini{touch-action:none;overscroll-behavior:contain}
+/* Jari milik HALAMAN semasa pelan muat penuh, dan milik pelan sebaik
+   dizum. touch-action:none tetap bermakna pelayar tidak pernah menatal
+   bila jari bermula di atas pelan — dan pada pelan potret, jari sentiasa
+   bermula di atas pelan, kerana pelan itu seluruh skrin. Nilai ini
+   ditukar semula kepada none oleh ipZApply() sebaik skala melebihi muat. */
+.ip-plan, .ip-mini{touch-action:pan-y;overscroll-behavior:contain}
+/* Dan hadkan tingginya. Satu pelan potret pada lebar penuh lebih tinggi
+   daripada telefon, jadi tanpa had ini setiap kawalan di bawahnya —
+   termasuk "Delete this plan" — ditolak keluar skrin. */
+#ipPlanBox{max-height:62vh}
+.ip-mini{max-height:46vh}
 .ip-stage{position:relative;width:100%;transform-origin:0 0;will-change:transform}
 .ip-pin,.ip-fpin,.ip-mini .ip-my-pin,.ip-mini .ip-ghost-pin,.ip-mini .ip-ghost-key{transition:none}
 .ip-pin{transform:translate(-50%,-100%) scale(var(--ipz,1));transform-origin:center bottom}
@@ -9602,7 +9612,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.5 · build 15 Oct 2026 · Continue card opens the inspection · English everywhere, app included</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.6 · build 15 Oct 2026 · tall floor plans fit, and the controls under them are reachable</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -11570,6 +11580,19 @@ function normalizeBarisCounts(raw) {
 function escapeHTML(s) {
   return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+
+/**
+ * "1 finding", "2 findings".
+ *
+ * Satu laporan yang berkata "1 findings have no description" kelihatan
+ * seperti laporan yang tidak pernah disemak sesiapa, dan itu tepat
+ * sebaliknya daripada apa yang alat ini jual kepada klien surveyor.
+ */
+function pkPl(n, one, many) {
+  return n + ' ' + (n === 1 ? one : (many || one + 's'));
+}
+/** "has" / "have", supaya ayat kiraan itu kekal gramatis. */
+function pkHas(n) { return n === 1 ? 'has' : 'have'; }
 
 function formatPlainContent(text) {
   if (!text) return '';
@@ -15823,7 +15846,7 @@ function crUpdateHint() {
     } else {
       badge.textContent = 'LENGTH  ' + n + ' pts';
       hint.innerHTML = n < 2 ? 'Tap <b>along the crack</b>. Add as many points as it bends.'
-                             : 'So far: <b>' + crFmt(mm) + '</b> over ' + n + ' points. Keep tapping, drag to adjust, or Done.';
+                             : 'So far: <b>' + crFmt(mm) + '</b> over ' + pkPl(n, 'point') + '. Keep tapping, drag to adjust, or Done.';
     }
   }
 }
@@ -15953,7 +15976,7 @@ function crResultHtml(showAdjust) {
       (l.photo ? '<img class="cr2-res-img" src="' + l.photo + '" alt="">' : '') +
       '<div class="cr2-res-top"><span class="cr2-res-n">' + crFmt(l.mm) + '</span>' +
       '<span class="cr2-res-t"><i>Crack length</i><b>Measured along the crack</b>' +
-      '<span>' + l.pts + ' points followed the crack path, so bends are counted.</span></span></div>' +
+      '<span>' + pkPl(l.pts, 'point') + ' followed the crack path, so bends are counted.</span></span></div>' +
       '<div class="cr2-res-b">' + l.ref + ' &middot; ' + l.refMm + ' mm &middot; ' + l.pxPerMm.toFixed(2) + ' px/mm</div>' +
       adj('length') + '</div>';
   }
@@ -16599,7 +16622,7 @@ function armDrop(id) {
 function armClear() { ARM.items = []; ARM.seq = 0; armSave(); }
 function armSummary(it) {
   if (it.kind === 'area') return armFmtArea(it.area) + ' · keliling ' + armFmt(it.m);
-  if (it.kind === 'path') return armFmt(it.m) + ' · ' + it.pts.length + ' points';
+  if (it.kind === 'path') return armFmt(it.m) + ' · ' + pkPl(it.pts.length, 'point');
   return armFmt(it.m);
 }
 // Teks yang masuk ke laporan atau chat. Ayat yang surveyor akan tulis
@@ -16988,7 +17011,7 @@ async function armStart(statusEl, startBtn) {
       if (n === 1) hintEl.textContent += ' · ' + armFmt(armDist(ARM.pts[0], armReticlePt()));
     } else {
       hintEl.textContent = n === 0 ? 'Tap point by point along the wall'
-        : armFmt(armLen(ARM.pts.concat([armReticlePt()]))) + ' so far · ' + n + ' points';
+        : armFmt(armLen(ARM.pts.concat([armReticlePt()]))) + ' so far · ' + pkPl(n, 'point');
     }
   }
   function armReticlePt() {
@@ -18001,7 +18024,7 @@ async function fpStartAr() {
       labelBox.appendChild(el);
       labels.push({ el: el, pt: { x: w.x, y: w.y + lift + 0.12, z: w.z } });
     });
-    if (list.length) showToast(list.length + ' findings shown in place');
+    if (list.length) showToast(pkPl(list.length, 'finding') + ' shown in place');
   }
   function buildMesh() {
     if (mesh) { scene.remove(mesh); if (mesh.geometry) mesh.geometry.dispose(); mesh = null; }
@@ -18333,7 +18356,7 @@ function ariHome() {
       const nd = (x.zones || []).reduce(function(a, z) { return a + ariCount(z); }, 0);
       h += '<button class="ari-row" data-isp="' + escapeHTML(x.id) + '">' +
         '<span class="ari-row-b"><b>' + escapeHTML(x.name || 'Inspection') + '</b>' +
-        '<span>' + nz + ' zones · ' + nd + ' defects · ' + ariWhen(x.at) + '</span></span>' +
+        '<span>' + pkPl(nz, 'zone') + ' · ' + pkPl(nd, 'defect') + ' · ' + ariWhen(x.at) + '</span></span>' +
         '<span class="ari-go">›</span></button>';
     }
   }
@@ -18494,7 +18517,7 @@ function ariZoneMenu(isp, z) {
     ariSave(isp); ariZoneScreen();
   };
   document.getElementById('ariDelZone').onclick = async function() {
-    if (!confirm('Delete the zone "' + z.name + '" and its ' + ariCount(z) + ' defects?')) return;
+    if (!confirm('Delete the zone "' + z.name + '" and its ' + pkPl(ariCount(z), 'defect') + '?')) return;
     await ariDropPhotos(z);
     isp.zones = (isp.zones || []).filter(function(x) { return x.id !== z.id; });
     ariSave(isp); ariInspScreen();
@@ -18814,7 +18837,7 @@ async function ariExport(isp, z) {
   const names = spaces.map(function(s, i) {
     return (i + 1) + '. ' + (s.name || s.key || 'Space');
   }).join('\n');
-  const pick = prompt('Send ' + ariCount(z) + ' defects from "' + z.name + '" to which space?\n\n' +
+  const pick = prompt('Send ' + pkPl(ariCount(z), 'defect') + ' from "' + z.name + '" to which space?\n\n' +
                       names + '\n\nType a number:', '1');
   if (pick === null) return;
   const n = parseInt(pick, 10);
@@ -18855,7 +18878,7 @@ async function ariExport(isp, z) {
       IP.findings.push(Object.assign({ id: fid }, data));
       done++;
     }
-    showToast(done + ' defects added to ' + (s.name || s.key));
+    showToast(pkPl(done, 'defect') + ' added to ' + (s.name || s.key));
   } catch (e) {
     showToast('Sending failed after ' + done + ': ' + e.message);
   }
@@ -21307,7 +21330,7 @@ function qsWire() {
   document.getElementById('qsSaveBtn').addEventListener('click', qsOpenSave);
   document.getElementById('qsUndo').addEventListener('click', function() { QS.pins.pop(); qsRender(); });
   document.getElementById('qsClear').addEventListener('click', function() {
-    if (!confirm('Remove all ' + QS.pins.length + ' pins?')) return;
+    if (!confirm('Remove all ' + pkPl(QS.pins.length, 'pin') + '?')) return;
     QS.pins = []; qsRender();
   });
   document.getElementById('qsScaleBtn').addEventListener('click', function() {
@@ -24493,14 +24516,14 @@ function enLive(ov) {
   }
 
   ov.innerHTML =
-    enHead(EN.sess.name, n + ' photos in this session',
+    enHead(EN.sess.name, pkPl(n, 'photo') + ' in this session',
       '<button class="en-ic" id="enMenu" aria-label="Session">' +
       '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>') +
     body +
     '<div class="en-stat" id="enStat">' + escapeHTML(enLine(st)) + '</div>' +
     '<div class="en-bar">' +
       '<button class="en-btn" id="enAdd">Add</button>' +
-      '<button class="en-btn" id="enGal">' + (n ? n + ' photos' : 'Gallery') + '</button>' +
+      '<button class="en-btn" id="enGal">' + (n ? pkPl(n, 'photo') : 'Gallery') + '</button>' +
       '<button class="en-shut" id="enShot"' + (st && st.opened ? '' : ' disabled') + ' aria-label="Tangkap"></button>' +
       '<button class="en-btn" id="enRep"' + (n ? '' : ' disabled') + '>Report</button>' +
     '</div>';
@@ -24530,9 +24553,9 @@ async function enSnap() {
     await enSaveSess(EN.sess);
 
     if (typeof tcBuzz === 'function') tcBuzz(14);
-    if (stat) stat.textContent = EN.sess.shots.length + ' photos saved';
+    if (stat) stat.textContent = pkPl(EN.sess.shots.length, 'photo') + ' saved';
     var g = document.getElementById('enGal');
-    if (g) g.textContent = EN.sess.shots.length + ' photos';
+    if (g) g.textContent = pkPl(EN.sess.shots.length, 'photo');
     var rp = document.getElementById('enRep');
     if (rp) rp.disabled = false;
   } catch (e) {
@@ -24563,7 +24586,7 @@ async function enPickSess() {
   var idx = await enLoadIndex();
   if (!idx.length) { showToast('No saved sessions'); return; }
   enAsk('Saved sessions', idx.slice(0, 12).map(function(r) {
-    return [r.name + '  ·  ' + r.n + ' photos  ·  ' + enStamp(r.createdAt).slice(0, 10),
+    return [r.name + '  ·  ' + pkPl(r.n, 'photo') + '  ·  ' + enStamp(r.createdAt).slice(0, 10),
       async function() {
         var s = await enLoadSess(r.id);
         if (s) { EN.sess = s; EN.view = 'gallery'; enRender(); }
@@ -24576,7 +24599,7 @@ async function enPickSess() {
 async function enGallery(ov) {
   var shots = EN.sess.shots;
   ov.innerHTML =
-    enHead(EN.sess.name, (EN.sess.site ? EN.sess.site + ' · ' : '') + shots.length + ' photos',
+    enHead(EN.sess.name, (EN.sess.site ? EN.sess.site + ' · ' : '') + pkPl(shots.length, 'photo'),
       '<button class="en-ic" id="enMenu" aria-label="Session">' +
       '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>') +
     (shots.length
@@ -25072,7 +25095,7 @@ window.enPickDone = async function(urls, dipilih) {
     } catch (e) {}
   }
   cb(out, (want && !out.length)
-    ? (want + ' photos chosen but none could be read')
+    ? (pkPl(want, 'photo') + ' chosen but none could be read')
     : null);
 };
 
@@ -25135,7 +25158,7 @@ function enImport() {
   pkPickImages(async function(files, err) {
     if (err) return showToast('Photo picker: ' + err, 'error');
     if (!files.length) return;
-    showToast('Adding ' + files.length + ' photos…');
+    showToast('Adding ' + pkPl(files.length, 'photo') + '…');
     var n = 0, bad = [];
     for (var i = 0; i < files.length; i++) {
       try { await enAddShot(files[i], 'import'); n++; }
@@ -25145,7 +25168,7 @@ function enImport() {
     EN.view = 'gallery';
     enRender();
     if (bad.length) showToast(n + ' added, ' + bad.length + ' failed: ' + bad[0], 'error');
-    else showToast(n + ' photos brought in');
+    else showToast(pkPl(n, 'photo') + ' brought in');
   });
 }
 
@@ -25188,13 +25211,13 @@ async function enSaveImg(s, i, quiet) {
 async function enSaveSelected() {
   var list = enPickList();
   if (!list.length) { showToast('No photos chosen'); return; }
-  showToast('Saving ' + list.length + ' photos…');
+  showToast('Saving ' + pkPl(list.length, 'photo') + '…');
   var done = 0;
   for (var i = 0; i < list.length; i++) {
     var at = EN.sess.shots.indexOf(list[i]);
     if (await enSaveImg(list[i], at, true)) done++;
   }
-  showToast(done + ' photos saved to the phone gallery');
+  showToast(pkPl(done, 'photo') + ' saved to the phone gallery');
 }
 
 /** Gambar lama tiada medan pick, jadi anggap ia dipilih. */
@@ -25230,7 +25253,7 @@ function enReport(ov) {
       '</div>' +
       '<button class="en-btn" id="enChoose" style="margin-top:11px;width:100%">Choose which photos go in</button>' +
       (picked.length && withNote < picked.length
-        ? '<div class="en-msg warn" style="margin-top:11px"><b>' + (picked.length - withNote) + ' photos have no title or description</b>' +
+        ? '<div class="en-msg warn" style="margin-top:11px"><b>' + pkPl(picked.length - withNote, 'photo') + ' ' + pkHas(picked.length - withNote) + ' no title or description</b>' +
           '<span>They still go in, but a photo with no words rarely helps the reader.</span></div>'
         : '') +
       (picked.length ? '' :
@@ -25429,7 +25452,7 @@ async function enPreview() {
 async function enPreviewView(ov) {
   var kb = EN.pdfBlob ? Math.round(EN.pdfBlob.size / 1024) : 0;
   ov.innerHTML =
-    enHead('Preview', enPickList().length + ' photos · ' + kb + ' KB') +
+    enHead('Preview', pkPl(enPickList().length, 'photo') + ' · ' + kb + ' KB') +
     '<div class="en-scroll"><div class="en-pages" id="enPages">' +
       '<div class="en-empty">Rendering pages…</div></div></div>' +
     '<div class="en-bar">' +
@@ -28055,7 +28078,7 @@ async function generatePDF() {
     doc.save(filename);
     
     overlay.classList.remove('show');
-    showToast('PDF saved · ' + selectedPhotos.length + ' findings');
+    showToast('PDF saved · ' + pkPl(selectedPhotos.length, 'finding'));
     
     // Exit selection mode
     exitPdfSelectionMode();
@@ -30773,7 +30796,20 @@ async function ipLoadOne(id) {
   } catch (e) { console.warn('[Inspection load]', e.message); }
 }
 function ipFindingsIn(spaceId) { return IP.findings.filter(function(f) { return f.spaceId === spaceId; }); }
-function ipCovered() { return IP.spaces.filter(function(s) { return ipFindingsIn(s.id).length || s.rate || s.noDefect; }).length; }
+/**
+ * Satu ruang dikira siap bila ia membawa sesuatu ke dalam laporan.
+ *
+ * Satu takrif sahaja, kerana tiga tempat bergantung padanya: cincin
+ * peratus di Hub, lencana TO DO pada setiap baris ruang, dan semakan
+ * "Every space covered" pada skrin eksport. Dulu ketiga-tiganya menulis
+ * syarat sendiri, dan satu penarafan yang tertinggal daripada jenis
+ * pemeriksaan lain membuat Hub berkata 100% sedangkan baris yang sama
+ * berkata TO DO. Penarafan hanya dikira pada jenis yang menggunakannya.
+ */
+function ipSpaceDone(s) {
+  return !!(ipFindingsIn(s.id).length || (ipT().rate && s.rate) || s.noDefect);
+}
+function ipCovered() { return IP.spaces.filter(ipSpaceDone).length; }
 function ipPct() { return IP.spaces.length ? Math.round(ipCovered() / IP.spaces.length * 100) : 0; }
 
 // ---------- 2. GAMBAR ----------
@@ -31000,7 +31036,9 @@ function ipViewHub() {
 
   let body = '<button class="ip-back" data-ipgo="list" style="margin-bottom:13px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>' +
     '<button class="ip-tile" data-ipgo="cover"><span class="ip-tile-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>' +
-      '<span class="ip-ttxt"><b>Cover and client</b><span>' + ipEsc(c.client || 'not filled in') + ' · ' + ipEsc(c.ref || '') + '</span></span>' +
+      '<span class="ip-ttxt"><b>Cover and client</b><span>' +
+        [c.client || 'not filled in', c.ref || ''].filter(Boolean).map(ipEsc).join(' · ') +
+        '</span></span>' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>' +
     '<button class="ip-tile" data-ipgo="plan"><span class="ip-tile-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 10h9M12 3v18"/></svg></span>' +
       '<span class="ip-ttxt"><b>Floor plans</b><span>' + (IP.plans.length ? IP.plans.length + ' plan' + (IP.plans.length === 1 ? '' : 's') + ' · ' + IP.spaces.filter(function(s) { return s.planId; }).length + ' tagged' : 'none uploaded yet') + '</span></span>' +
@@ -31011,11 +31049,12 @@ function ipViewHub() {
   } else {
     IP.spaces.forEach(function(s) {
       const n = ipFindingsIn(s.id).length;
-      const tag = s.rate ? '<span class="ip-rate ip-r-' + s.rate + '">' + s.rate.slice(0, 5).toUpperCase() + '</span>'
-        : (n || s.noDefect ? '' : '<span class="ip-rate ip-r-todo">TO DO</span>');
+      const tag = (t.rate && s.rate)
+        ? '<span class="ip-rate ip-r-' + s.rate + '">' + s.rate.slice(0, 5).toUpperCase() + '</span>'
+        : (ipSpaceDone(s) ? '' : '<span class="ip-rate ip-r-todo">TO DO</span>');
       body += '<button class="ip-srow" data-ipspace="' + s.id + '"><span class="ip-key">' + ipEsc(s.key) + '</span>' +
         '<span class="ip-stxt"><b>' + ipEsc(s.name) + '</b><span>' + (n ? n + ' finding' + (n === 1 ? '' : 's') : (s.noDefect ? 'no defect found' : 'nothing recorded yet')) + '</span></span>' +
-        (t.rate ? tag : (n || s.noDefect ? '' : '<span class="ip-rate ip-r-todo">TO DO</span>')) + '</button>';
+        tag + '</button>';
     });
   }
   body += '<div class="ip-sec" style="margin-top:15px"><b>Finish</b><i></i></div>' +
@@ -31041,7 +31080,7 @@ function ipViewPlan() {
   }
   if (!plan) {
     html += '<div class="ip-empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 10h9M12 3v18"/></svg>' +
-      '<h4>No plan yet</h4><p>Upload a photo or screenshot of the drawing. A PDF plan needs a screenshot first — Pocket reads images, not PDFs.</p></div>' +
+      '<h4>No plan yet</h4><p>Upload a photo, a screenshot, or the PDF itself — every page comes in as its own plan.</p></div>' +
       '<button class="ip-add" id="ipPlanUp2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-5 5 5M12 4v12"/></svg>Upload a plan</button>';
     return ipShell(html);
   }
@@ -31193,7 +31232,7 @@ function ipViewExport() {
   const t = ipT();
   const noDesc = IP.findings.filter(function(f) { return !f.desc; }).length;
   const noPhoto = IP.findings.filter(function(f) { return !(f.photoN > 0); }).length;
-  const blank = IP.spaces.filter(function(s) { return !ipFindingsIn(s.id).length && !s.rate && !s.noDefect; });
+  const blank = IP.spaces.filter(function(s) { return !ipSpaceDone(s); });
   const c = (IP.insp && IP.insp.cover) || {};
   const coverOk = !!(c.title && c.addr && c.client);
   const row = function(ok, b, sub) {
@@ -31205,10 +31244,10 @@ function ipViewExport() {
   let html = '<div class="ip-hd"><button class="ip-back" data-ipgo="hub"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><h2>Before you <em>send</em></h2></div>' +
     '<div class="ip-sec"><b>Checks</b><i></i></div>' +
     row(coverOk, coverOk ? 'Cover complete' : 'Cover is missing something', coverOk ? 'Property, address and client all filled.' : 'Property name, address and client all show on page one.') +
-    row(blank.length === 0, blank.length ? blank.length + ' ' + t.units.toLowerCase() + ' still empty' : 'Every ' + t.unit.toLowerCase() + ' covered',
+    row(blank.length === 0, blank.length ? pkPl(blank.length, t.unit.toLowerCase(), t.units.toLowerCase()) + ' still empty' : 'Every ' + t.unit.toLowerCase() + ' covered',
         blank.length ? blank.map(function(s) { return s.key + ' ' + s.name; }).join(', ') : 'Nothing left blank.') +
-    row(noDesc === 0, noDesc ? noDesc + ' findings have no description' : 'Every finding described', 'A photo without words is not a report.') +
-    row(noPhoto === 0, noPhoto ? noPhoto + ' findings have no photo' : 'Every finding photographed', 'Photos are what the client argues with, not your prose.') +
+    row(noDesc === 0, noDesc ? pkPl(noDesc, 'finding') + ' ' + pkHas(noDesc) + ' no description' : 'Every finding described', 'A photo without words is not a report.') +
+    row(noPhoto === 0, noPhoto ? pkPl(noPhoto, 'finding') + ' ' + pkHas(noPhoto) + ' no photo' : 'Every finding photographed', 'Photos are what the client argues with, not your prose.') +
     '<div class="ip-sec" style="margin-top:16px"><b>The report will contain</b><i></i></div>' +
     ['Cover page with the property, client and date',
      'Summary — findings by ' + (t.rate ? 'rating and ' : '') + 'priority',
@@ -31274,7 +31313,7 @@ async function ipPaintShots() {
 // ketik untuk meletak pin. Ketikan dibezakan daripada seretan dengan
 // ambang jarak — kalau tidak, setiap kali menggeser akan menjatuhkan pin.
 const IP_ZMAX = 6, IP_ZTAPPX = 9;
-let IP_Z = {};   // id -> {s, tx, ty, key}
+let IP_Z = {};   // id -> {s, tx, ty, key, fit, fresh}
 
 function ipZoomBar() {
   return '<div class="ip-zoomlvl" data-zlvl="1">1.0x</div>' +
@@ -31285,30 +31324,54 @@ function ipZoomBar() {
     '</div>';
 }
 function ipZState(id, key) {
-  if (!IP_Z[id] || IP_Z[id].key !== key) IP_Z[id] = { s: 1, tx: 0, ty: 0, key: key };
+  if (!IP_Z[id] || IP_Z[id].key !== key) {
+    IP_Z[id] = { s: 1, tx: 0, ty: 0, key: key, fit: 1, fresh: true };
+  }
   return IP_Z[id];
 }
+/**
+ * Skala yang memuatkan seluruh pelan di dalam kotaknya.
+ *
+ * Kotak itu berhad tinggi, jadi pelan potret pada 1.0x tergantung di
+ * luar bawahnya. Geseran pula hanya hidup selepas dizum, jadi 1.0x di
+ * sana bermakna separuh bawah pelan tidak boleh dilihat LANGSUNG.
+ * Membenarkan skala turun di bawah 1 menjadikan FIT benar-benar muat.
+ */
 function ipZApply(wrap, stage, st) {
   const w = wrap.clientWidth, h = wrap.clientHeight;
-  const natW = w, natH = stage.offsetHeight || h;
+  const natH = stage.offsetHeight;
+  // Sebelum imej bersaiz, tinggi stage belum bermakna. Mengunci skala
+  // muat pada angka itu akan mengunci pelan pada saiz yang salah.
+  const img = stage.querySelector('img');
+  const ready = (!img || (img.complete && img.naturalHeight > 0)) && h > 0 && natH > 0;
+  if (ready) {
+    st.fit = Math.min(1, h / natH);
+    if (st.fresh) { st.s = st.fit; st.fresh = false; }
+    st.s = Math.max(st.fit, Math.min(IP_ZMAX, st.s));
+  }
+  const fit = st.fit || 1;
+  const natW = w, nh = natH || h;
   // Hadkan geseran supaya pelan tidak boleh diseret keluar sepenuhnya.
-  const spanX = natW * st.s - w, spanY = natH * st.s - h;
+  const spanX = natW * st.s - w, spanY = nh * st.s - h;
   st.tx = spanX <= 0 ? (w - natW * st.s) / 2 : Math.min(0, Math.max(-spanX, st.tx));
   st.ty = spanY <= 0 ? 0 : Math.min(0, Math.max(-spanY, st.ty));
   stage.style.transform = 'translate(' + st.tx + 'px,' + st.ty + 'px) scale(' + st.s + ')';
   stage.style.setProperty('--ipz', String(1 / st.s));
+  // Jari milik halaman semasa muat penuh: itu satu-satunya cara untuk
+  // sampai ke kawalan di bawah pelan. Sebaik dizum ia milik pelan.
+  wrap.style.touchAction = st.s > fit + 0.01 ? 'none' : 'pan-y';
   const lvl = wrap.querySelector('[data-zlvl]');
   if (lvl) {
     lvl.textContent = st.s.toFixed(1) + 'x';
-    lvl.classList.toggle('on', st.s > 1.02);
+    lvl.classList.toggle('on', st.s > fit * 1.02);
   }
   const out = wrap.querySelector('[data-zoom="out"]');
-  if (out) out.disabled = st.s <= 1.01;
+  if (out) out.disabled = st.s <= fit + 0.01;
   const zin = wrap.querySelector('[data-zoom="in"]');
   if (zin) zin.disabled = st.s >= IP_ZMAX - 0.01;
 }
 function ipZAt(wrap, st, ns, cx, cy) {
-  ns = Math.max(1, Math.min(IP_ZMAX, ns));
+  ns = Math.max(st.fit || 1, Math.min(IP_ZMAX, ns));
   const k = ns / st.s;
   // Titik di bawah jari mesti kekal di bawah jari.
   st.tx = cx - (cx - st.tx) * k;
@@ -31337,6 +31400,9 @@ function ipZBind(wrapId, stageId, key, onTap) {
     pts.set(e.pointerId, local(e));
     if (pts.size === 1) { start = Object.assign({ t: Date.now() }, local(e)); moved = 0; }
     if (pts.size === 2) {
+      // Dua jari ialah cubitan, bukan tatalan. Rampas ia sebelum pelayar
+      // memulakan tatalan menegak dan membatalkan pointer kita.
+      wrap.style.touchAction = 'none';
       const a = Array.from(pts.values());
       pinchD = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y);
       pinchC = { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2 };
@@ -31362,7 +31428,7 @@ function ipZBind(wrapId, stageId, key, onTap) {
       return;
     }
     moved += Math.abs(now.x - prev.x) + Math.abs(now.y - prev.y);
-    if (st.s > 1.01 && moved > 4) {
+    if (st.s > (st.fit || 1) + 0.01 && moved > 4) {
       st.tx += now.x - prev.x; st.ty += now.y - prev.y;
       draw();
       e.preventDefault();
@@ -31384,6 +31450,7 @@ function ipZBind(wrapId, stageId, key, onTap) {
       if (px >= 0 && px <= 100 && py >= 0 && py <= 100) onTap(px, py);
     }
     start = null; moved = 0; pinchD = 0;
+    draw();   // pulangkan touch-action mengikut skala semasa
   };
   wrap.addEventListener('pointerup', end);
   wrap.addEventListener('pointercancel', end);
@@ -31400,7 +31467,7 @@ function ipZBind(wrapId, stageId, key, onTap) {
     const c = { x: wrap.clientWidth / 2, y: wrap.clientHeight / 2 };
     if (z.dataset.zoom === 'in') ipZAt(wrap, st, st.s * 1.6, c.x, c.y);
     else if (z.dataset.zoom === 'out') ipZAt(wrap, st, st.s / 1.6, c.x, c.y);
-    else { st.s = 1; st.tx = 0; st.ty = 0; }
+    else { st.s = st.fit || 1; st.tx = 0; st.ty = 0; }
     draw();
   });
 }
@@ -32149,7 +32216,7 @@ function ipWire() {
       try { await ipAddPlanBlob(pages[i], (f.name || 'Plan').replace(/\.pdf$/i, '') + (pages.length > 1 ? ' — p' + (i + 1) : '')); ok++; }
       catch (err) { console.warn('[Plan page]', err.message); }
     }
-    showToast(ok === 1 ? 'Plan added — tap Place to tag it' : ok + ' pages brought in as plans');
+    showToast(ok === 1 ? 'Plan added — tap Place to tag it' : pkPl(ok, 'page') + ' brought in as plans');
   });
 }
 
@@ -33059,7 +33126,7 @@ function smCtxLine() {
     c += ' Job: "' + (insp.title || 'Untitled') + '"' + (t ? ', a ' + t.n : '') + '.';
   }
   if (s) c += ' Currently in: ' + s.key + ' — ' + (s.name || '') + '.';
-  if (IP.findings.length) c += ' ' + IP.findings.length + ' findings recorded so far.';
+  if (IP.findings.length) c += ' ' + pkPl(IP.findings.length, 'finding') + ' recorded so far.';
   return c;
 }
 async function smAskAI(q) {
@@ -33906,7 +33973,7 @@ function msFindingCard(f, s, insp) {
   const tags = [];
   if (t.rate && f.rate) tags.push(f.rate.charAt(0).toUpperCase() + f.rate.slice(1));
   if (f.priority) tags.push('Priority: ' + f.priority);
-  if (f.photoN) tags.push(f.photoN + ' photos');
+  if (f.photoN) tags.push(pkPl(f.photoN, 'photo'));
   return {
     tag: (s ? s.key : '?') + ipNo(f.no),
     title: (f.defectType || 'Finding') + (f.element ? ' — ' + f.element : ''),
@@ -34956,7 +35023,7 @@ function mdViewer() {
       // unit, dan snapVertex memulangkan koordinat DUNIA. Mendarabkannya
       // dengan faktor itu lagi sekali — yang pernah dibuat di sini — ialah
       // pendaraban dua kali, dan model milimeter mendarat seribu kali jauh.
-      hint.innerHTML = MD.marks.length + ' points chosen' +
+      hint.innerHTML = pkPl(MD.marks.length, 'point') + ' chosen' +
         (MD.marks.length >= 2
           ? ' · point 1→2 is ' + MD.marks[0].distanceTo(MD.marks[1]).toFixed(2) + ' m' : '') +
         ' — press <b>AR</b>';
