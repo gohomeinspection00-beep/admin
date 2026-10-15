@@ -40,8 +40,8 @@ const data = {
   kaedahSerahanLaporan: "aplikasi IJM CONNEX pihak pemaju",
   tarikhTamat30: "21 September 2026",
 
-  tarikhNotis: "15 Oktober 2026",
-  tarikhDeadline: "30 Oktober 2026",
+  tarikhNotis: "16 Oktober 2026",
+  tarikhDeadline: "31 Oktober 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -64,8 +64,8 @@ const data = {
     { tarikh: "18 Ogos 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "22 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi melalui aplikasi IJM CONNEX pihak pemaju (Ticket ID: 6DP1383 - 6DP1387) dan diakui terima (acknowledged) oleh pihak pemaju pada hari yang sama — merupakan notis bertulis di bawah Klausa 27(1)" },
     { tarikh: "21 September 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan; kesemua tiket masih kekal berstatus New (tiada kemajuan kerja) di dalam sistem IJM CONNEX" },
-    { tarikh: "15 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "30 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "16 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "31 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
