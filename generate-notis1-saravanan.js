@@ -46,6 +46,11 @@ const data = {
   tempohNotis2: "15",
 
   kecacatan: [
+    { tag: "26", lokasi: "Living And Dining — Dinding", kecacatan: "Bunyi berongga pada permukaan dinding (Hollow sound on wall surface — Hollowness Issue)", status: "Belum Dibaiki" },
+    { tag: "88", lokasi: "Staircase — Dinding", kecacatan: "Bunyi berongga pada dinding bercat (Hollow sound on painted wall — Hollowness Issue)", status: "Belum Dibaiki" },
+    { tag: "152", lokasi: "Bathroom 2 — Lantai", kecacatan: "Air bertakung pada jubin lantai (Water stagnant on floor tiles — Alignment Issue)", status: "Belum Dibaiki" },
+    { tag: "183", lokasi: "Flat Roof — Lantai", kecacatan: "Kesan air bertakung pada permukaan papak (Sign of water stagnant on slab surface — Alignment Issue)", status: "Belum Dibaiki" },
+    { tag: "186", lokasi: "Flat Roof — Lantai", kecacatan: "Bunyi berongga pada permukaan papak (Hollow sound on slab surface — Hollowness Issue)", status: "Belum Dibaiki" },
     { tag: "189", lokasi: "Flat Roof — Dinding", kecacatan: "Bunyi berongga pada dinding bercat (Hollow sound on painted wall — Hollowness Issue)", status: "Belum Dibaiki" },
     { tag: "191", lokasi: "Top Roof", kecacatan: "Sisa binaan ditinggalkan di atas bumbung (Construction leftover on roof — Finishing Issue)", status: "Belum Dibaiki" },
     { tag: "192", lokasi: "Top Roof", kecacatan: "Keretakan, serpihan dan genting bumbung pecah (Crack, chipping and broken roof tiles — Major Defect)", status: "Belum Dibaiki" },
@@ -57,8 +62,8 @@ const data = {
   kronologi: [
     { tarikh: "26 Ogos 2024", peristiwa: "Perjanjian Jual Beli (Sale and Purchase Agreement) ditandatangani — Desa Palma Fasa 6 (Ruj: 10241-7/eSPA/260824/PTD142908/01)" },
     { tarikh: "18 Ogos 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
-    { tarikh: "22 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi melalui aplikasi IJM CONNEX pihak pemaju — merupakan notis bertulis di bawah Klausa 27(1)" },
-    { tarikh: "21 September 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan" },
+    { tarikh: "22 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi melalui aplikasi IJM CONNEX pihak pemaju (Ticket ID: 6DP1383 - 6DP1387) — merupakan notis bertulis di bawah Klausa 27(1)" },
+    { tarikh: "21 September 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan; kesemua tiket masih berstatus Pending Approval di dalam sistem IJM CONNEX" },
     { tarikh: "15 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "30 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
@@ -238,7 +243,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan. Malah, rekod sistem IJM CONNEX pihak tuan sendiri mengesahkan bahawa kesemua tiket kecacatan yang dikemukakan pada 22 Ogos 2026 (Ticket ID: 6DP1383, 6DP1384, 6DP1385, 6DP1386 dan 6DP1387) masih berstatus "Pending Approval" sehingga kini — iaitu hampir DUA (2) BULAN tanpa sebarang tindakan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
@@ -267,21 +272,26 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Perhatian turut diberikan kepada item No. 195 — air bertakung (water ponding) pada talang belakang (rear gutter). Takungan air yang berterusan menunjukkan kecerunan (falls) dan laluan saliran talang yang tidak sempurna; ia akan mempercepatkan kakisan talang, mengundang limpahan dan kebocoran, serta menjadi tempat pembiakan nyamuk Aedes. Pihak tuan dituntut membetulkan PUNCA — iaitu kecerunan dan laluan saliran talang — dan bukan sekadar mengeringkan takungan. Item No. 191 — sisa binaan yang ditinggalkan di atas bumbung — WAJIB dikeluarkan sepenuhnya kerana ia boleh menyumbat talang dan merosakkan genting; dan item No. 189 — bunyi berongga pada dinding bercat di Flat Roof — hendaklah dibaiki mengikut amalan pembinaan yang baik (hack dan lepa semula) dan bukan sekadar tampalan kosmetik. Memandangkan kesemua lokasi kerja (Top Roof dan Flat Roof) adalah kawasan yang sukar diakses oleh pemilik, pihak tuan dituntut mengemukakan gambar selepas pembaikan (after-repair photos) kepada pemilik melalui e-mel (${data.emailPembeli}) atau WhatsApp (${data.telefonPembeli}) sebagai bukti penyiapan.`
+  `Perhatian turut diberikan kepada kluster air bertakung (water ponding) — item No. 195 (talang belakang / rear gutter), item No. 183 (permukaan papak Flat Roof) dan item No. 152 (jubin lantai Bathroom 2). Takungan air yang berterusan menunjukkan kecerunan (falls) dan laluan saliran yang tidak sempurna; ia akan mempercepatkan kemerosotan lapisan kalis air dan kakisan talang, mengundang limpahan dan kebocoran ke ruang di bawahnya, serta menjadi tempat pembiakan nyamuk Aedes. Bagi Bathroom 2, kecerunan lantai hendaklah mengalirkan air sepenuhnya ke arah floor trap. Pihak tuan dituntut membetulkan PUNCA — iaitu kecerunan permukaan dan laluan saliran — dan bukan sekadar mengeringkan takungan.`
 );
 y += 4;
 
 numPara(5,
-  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+  `Selain itu, kluster bunyi berongga (hollowness) — item No. 26 (dinding Living And Dining), No. 88 (dinding bercat Staircase), No. 186 (permukaan papak Flat Roof) dan No. 189 (dinding bercat Flat Roof) — menunjukkan lekatan lepaan/skrid yang tidak sempurna yang berisiko retak dan tertanggal; ia hendaklah dibaiki mengikut amalan pembinaan yang baik (hack dan lepa/skrid semula) dan bukan sekadar tampalan kosmetik. Item No. 191 — sisa binaan yang ditinggalkan di atas bumbung — WAJIB dikeluarkan sepenuhnya kerana ia boleh menyumbat talang dan merosakkan genting. Memandangkan sebahagian besar lokasi kerja (Top Roof dan Flat Roof) adalah kawasan yang sukar diakses oleh pemilik, pihak tuan dituntut mengemukakan gambar selepas pembaikan (after-repair photos) kepada pemilik melalui e-mel (${data.emailPembeli}) atau WhatsApp (${data.telefonPembeli}) sebagai bukti penyiapan.`
 );
 y += 4;
 
 numPara(6,
+  `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
+);
+y += 4;
+
+numPara(7,
   `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan kepada pihak tuan untuk menyelesaikan semua kerja pembaikan.`
 );
 y += 4;
 
-numPara(7, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+numPara(8, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
@@ -289,7 +299,7 @@ bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak t
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
-numPara(8,
+numPara(9,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -302,7 +312,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(9,
+numPara(10,
   `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
