@@ -2,6 +2,9 @@ package my.goxpert.pocket
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
@@ -41,6 +44,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import java.io.File
 import java.io.FileOutputStream
@@ -554,6 +559,11 @@ class MainActivity : AppCompatActivity() {
             want += Manifest.permission.BLUETOOTH_SCAN
             want += Manifest.permission.BLUETOOTH_CONNECT
         }
+        // Penggera check-in SOS perlu sampai walaupun surveyor sudah
+        // bertukar ke app lain, dan sejak Android 13 itu memerlukan
+        // kebenaran masa jalan.
+        if (Build.VERSION.SDK_INT >= 33) want += "android.permission.POST_NOTIFICATIONS"
+
         val missing = want.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
@@ -569,6 +579,60 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()
+
+    // ---------- Penggera SOS ----------
+    // Satu saluran, dibuat sekali, pada kepentingan TINGGI: penggera
+    // keselamatan yang didiamkan oleh sistem bukan penggera.
+    private fun sosChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val mgr = getSystemService(NotificationManager::class.java) ?: return
+        if (mgr.getNotificationChannel(SOS_CHANNEL) != null) return
+        val ch = NotificationChannel(SOS_CHANNEL, "Site safety",
+            NotificationManager.IMPORTANCE_HIGH)
+        ch.description = "Check-in alarms and SOS"
+        ch.enableVibration(true)
+        ch.setShowBadge(true)
+        mgr.createNotificationChannel(ch)
+    }
+
+    private fun postAlarmNote(title: String, body: String) {
+        sosChannel()
+        val open = Intent(this, MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or
+            (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
+        val pi = PendingIntent.getActivity(this, 0, open, flags)
+        val n = NotificationCompat.Builder(this, SOS_CHANNEL)
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setVibrate(longArrayOf(0, 400, 150, 400, 150, 400))
+            .setAutoCancel(true)
+            .setOngoing(false)
+            .setContentIntent(pi)
+            .build()
+        runCatching { NotificationManagerCompat.from(this).notify(SOS_NOTE_ID, n) }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun buzzFor(ms: Long) {
+        runCatching {
+            val v = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                (getSystemService(android.os.VibratorManager::class.java))?.defaultVibrator
+            } else {
+                getSystemService(VIBRATOR_SERVICE) as? android.os.Vibrator
+            } ?: return
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(android.os.VibrationEffect.createOneShot(
+                    ms, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                v.vibrate(ms)
+            }
+        }
+    }
 
     /**
      * Dalam WebView, doc.save() daripada jsPDF tidak melakukan apa-apa: ia
@@ -1183,6 +1247,38 @@ class MainActivity : AppCompatActivity() {
             return "ok"
         }
 
+        /**
+         * Notification API tidak wujud dalam WebView Android.
+         *
+         * Penggera check-in SOS berbunyi dan menggetar, tetapi kedua-duanya
+         * hilang sebaik surveyor bertukar ke kamera atau peta. Satu
+         * pemberitahuan kekal di bar status sehingga ia dijawab, dan
+         * mengetiknya membawa Pocket ke hadapan.
+         */
+        @JavascriptInterface
+        fun notify(title: String, body: String): String {
+            return try {
+                runOnUiThread { postAlarmNote(title, body) }
+                "ok"
+            } catch (e: Throwable) { "failed: ${e.message}" }
+        }
+
+        /** Buang pemberitahuan itu sebaik sahaja ia dijawab. */
+        @JavascriptInterface
+        fun notifyClear(): String {
+            runCatching { NotificationManagerCompat.from(this@MainActivity).cancel(SOS_NOTE_ID) }
+            return "ok"
+        }
+
+        /** Getaran melalui Android, bukan melalui WebView. */
+        @JavascriptInterface
+        fun buzz(ms: Int): String {
+            return try {
+                runOnUiThread { buzzFor(ms.toLong().coerceIn(50L, 4000L)) }
+                "ok"
+            } catch (e: Throwable) { "failed: ${e.message}" }
+        }
+
         @JavascriptInterface
         fun sayStop(): String {
             runCatching { tts?.stop() }
@@ -1300,6 +1396,9 @@ class MainActivity : AppCompatActivity() {
          * mati senyap. Fail hosts Android memetakan localhost ke 127.0.0.1,
          * iaitu alamat yang pelayan terikat padanya.
          */
+        private const val SOS_CHANNEL = "pocket_sos"
+        private const val SOS_NOTE_ID = 4201
+
         private const val HOME = "http://localhost:${LocalServer.PORT}"
     }
 }

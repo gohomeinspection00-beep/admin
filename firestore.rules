@@ -77,12 +77,21 @@ service cloud.firestore {
         && (myEmail() in resource.data.sharedWith);
     }
 
-    // ---- users/{email} : own profile/quota + AI chat subcollections ----
-    match /users/{email} {
-      allow read, write: if (isSignedIn() && email == myEmail()) || isAdmin();
+    // ---- users/{id} : own profile/quota + AI chat subcollections ----
+    // GoInspect keys this collection by EMAIL. Pocket keys the same
+    // collection by UID (users/{uid}.pocketId, .name), so an email-only
+    // rule denied every Pocket profile write — including the one that
+    // mints a Pocket ID, which the whole SOS watcher feature hangs on.
+    // Both keys are the signed-in user's own document; neither widens
+    // access to anybody else's.
+    function ownsUserDoc(id) {
+      return isSignedIn() && (id == myEmail() || id == request.auth.uid);
+    }
+    match /users/{id} {
+      allow read, write: if ownsUserDoc(id) || isAdmin();
       // ayieChats / ayieFloatChats and any other per-user subcollection.
       match /{sub=**} {
-        allow read, write: if (isSignedIn() && email == myEmail()) || isAdmin();
+        allow read, write: if ownsUserDoc(id) || isAdmin();
       }
     }
 
@@ -211,6 +220,73 @@ service cloud.firestore {
     match /ssPropertyProfile/{p=**}  { allow read, write: if true; }
     match /ssRenovation/{p=**}       { allow read, write: if true; }
     match /ssSchedule/{p=**}         { allow read, write: if true; }
+
+    // ===========================================================================
+    // POCKET — SOS lone-worker watch, Pocket ID directory, Pocket admins.
+    //
+    // Without these blocks the default-deny below rejected every write the
+    // SOS feature makes. A rejected write does not queue and retry: it is
+    // refused for good. So the alarm never reached anybody, the watcher
+    // never saw the watch, and the app showed "Alarm queued" while nothing
+    // had been sent. Safety features fail silently or not at all.
+    // ===========================================================================
+
+    // Pocket's own admin list is keyed by UID (the app reads its OWN doc to
+    // learn whether it should show the watch pane).
+    function isPocketAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/pocketAdmins/$(request.auth.uid));
+    }
+
+    match /pocketAdmins/{uid} {
+      allow get:   if isSignedIn() && uid == request.auth.uid;
+      allow list:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ---- pocketIds/{CODE} : the six-character directory ----
+    // A code is meant to be handed to a colleague, so any signed-in user may
+    // look ONE up by its exact code. Listing is denied: the directory is not
+    // a phone book to be harvested. A row may only be claimed for, or
+    // released by, its own owner.
+    match /pocketIds/{code} {
+      allow get:    if isSignedIn();
+      allow list:   if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.uid == request.auth.uid
+                       && request.resource.data.uid == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // ---- sosWatch/{uid} : live status of one person being watched ----
+    // Only the person writes their own row. The person they NAMED as their
+    // watcher may read it, and so may an admin — that is the whole point of
+    // the feature. The app's queries are:
+    //   watcher : where('watcherUid','==',me).where('active','==',true)
+    //   admin   : where('active','==',true)
+    match /sosWatch/{uid} {
+      allow read, write: if isSignedIn() && uid == request.auth.uid;
+      allow get:  if isSignedIn() && resource.data.watcherUid == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.watcherUid == request.auth.uid;
+      allow read: if isPocketAdmin() || isAdmin();
+    }
+
+    // ---- sosAlerts/{id} : an alarm that has gone out ----
+    // The sender may create it and mark it a false alarm afterwards. The
+    // named watcher and admins may read it and mark it handled. Queries:
+    //   watcher : where('toUid','==',me).where('resolved','==',false)
+    //   admin   : where('toAdmin','==',true).where('resolved','==',false)
+    match /sosAlerts/{id} {
+      allow create: if isSignedIn() && request.resource.data.fromUid == request.auth.uid;
+      allow get, list: if isSignedIn() && resource.data.fromUid == request.auth.uid;
+      allow get, list: if isSignedIn() && resource.data.toUid == request.auth.uid;
+      allow get, list: if (isPocketAdmin() || isAdmin()) && resource.data.toAdmin == true;
+      allow update: if isSignedIn() && (
+                         resource.data.fromUid == request.auth.uid
+                      || resource.data.toUid == request.auth.uid
+                      || isPocketAdmin() || isAdmin());
+      allow delete: if isAdmin();
+    }
 
     // ---- default deny everything else ----
     match /{document=**} {
