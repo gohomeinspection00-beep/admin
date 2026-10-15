@@ -262,12 +262,18 @@ service cloud.firestore {
     // Only the person writes their own row. The person they NAMED as their
     // watcher may read it, and so may an admin — that is the whole point of
     // the feature. The app's queries are:
+    // Up to three people may be named. watcherUid is the first of them and
+    // stays for older clients and the admin panel; watcherUids is the list
+    // every watcher's own query matches on.
     //   watcher : where('watcherUid','==',me).where('active','==',true)
+    //             where('watcherUids','array-contains',me).where('active','==',true)
     //   admin   : where('active','==',true)
     match /sosWatch/{uid} {
       allow read, write: if isSignedIn() && uid == request.auth.uid;
       allow get:  if isSignedIn() && resource.data.watcherUid == request.auth.uid;
       allow list: if isSignedIn() && resource.data.watcherUid == request.auth.uid;
+      allow get:  if isSignedIn() && request.auth.uid in resource.data.watcherUids;
+      allow list: if isSignedIn() && request.auth.uid in resource.data.watcherUids;
       allow read: if isPocketAdmin() || isAdmin();
     }
 
@@ -275,15 +281,18 @@ service cloud.firestore {
     // The sender may create it and mark it a false alarm afterwards. The
     // named watcher and admins may read it and mark it handled. Queries:
     //   watcher : where('toUid','==',me).where('resolved','==',false)
+    //             where('toUids','array-contains',me).where('resolved','==',false)
     //   admin   : where('toAdmin','==',true).where('resolved','==',false)
     match /sosAlerts/{id} {
       allow create: if isSignedIn() && request.resource.data.fromUid == request.auth.uid;
       allow get, list: if isSignedIn() && resource.data.fromUid == request.auth.uid;
       allow get, list: if isSignedIn() && resource.data.toUid == request.auth.uid;
+      allow get, list: if isSignedIn() && request.auth.uid in resource.data.toUids;
       allow get, list: if (isPocketAdmin() || isAdmin()) && resource.data.toAdmin == true;
       allow update: if isSignedIn() && (
                          resource.data.fromUid == request.auth.uid
                       || resource.data.toUid == request.auth.uid
+                      || request.auth.uid in resource.data.toUids
                       || isPocketAdmin() || isAdmin());
       allow delete: if isAdmin();
     }

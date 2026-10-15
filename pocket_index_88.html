@@ -7215,6 +7215,28 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .sw-sw.on{background:var(--success)}
 .sw-sw.on i{transform:translateX(18px)}
 
+/* Senarai pemerhati. Satu orang boleh terlepas telefon; dua jarang
+   sekali, dan itu memang yang skrin ini sudah lama janjikan. */
+.sw-wlist{display:grid;gap:6px;margin-top:8px}
+.sw-wpick{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;
+  border:1px solid var(--accent-line);background:var(--accent-soft);
+}
+.sw-wpick b{
+  flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--accent);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sw-wpick em{font-style:normal;font-family:var(--font-mono);font-size:10.5px;color:var(--accent);opacity:.7}
+.sw-wpick button{
+  flex:none;width:22px;height:22px;border-radius:50%;border:none;
+  background:rgba(0,0,0,.09);color:var(--accent);display:grid;place-items:center;
+}
+.sw-addbtn{
+  width:100%;margin-top:8px;padding:11px;border-radius:11px;
+  border:1px dashed var(--line-2);background:var(--bg-2);
+  font-size:12.5px;font-weight:700;color:var(--fg-dim);
+}
+.sw-addbtn:disabled{opacity:.45}
 .sw-go{width:100%;padding:16px;border-radius:15px;background:var(--critical);color:#fff;font-size:16px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:4px}
 .sw-go:disabled{opacity:.45}
 
@@ -9653,7 +9675,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.8 · build 15 Oct 2026 · SOS repaired — deploy firestore.rules or no alarm reaches anybody</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v5.9 · build 15 Oct 2026 · SOS reaches up to three people — re-deploy firestore.rules</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -10512,12 +10534,14 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16"/><path d="M7 12h10"/></svg>
           Scan their QR instead
         </button>
-        <p class="sw-hint" id="swPidHint">Every Pocket user has one, shown in their Profile. They must have Pocket installed and signed in — the alarm arrives inside the app.</p>
+        <p class="sw-hint" id="swPidHint">Every Pocket user has one, shown in their Profile. They must have Pocket installed and signed in, with the app open — the alarm arrives inside it.</p>
+        <button class="sw-addbtn" id="swPidAdd" type="button">Add this person</button>
+        <div class="sw-wlist" id="swWList"></div>
       </div>
       <div class="sw-fld">
         <label>Also notify</label>
         <input type="text" value="Admin — always included" disabled>
-        <p class="sw-hint">Admin is copied even when you name someone else. One person can miss a phone; two rarely do.</p>
+        <p class="sw-hint">Admin is copied even when you name someone else. Name up to three people — one person can miss a phone; three rarely do.</p>
       </div>
 
       <div id="swSoloOnly">
@@ -29770,8 +29794,14 @@ async function pidLookup(raw) {
 // =======================================================
 const SOS_KEY = 'pocket_sos_v1';
 
+const SOS_MAX_WATCHERS = 3;
+
 let SOS = {
-  on: false, mode: 'solo', who: 'admin', watcherUid: '', watcherId: '', watcherName: '',
+  on: false, mode: 'solo', who: 'admin',
+  // watchers ialah senarai sebenar. Ketiga-tiga medan tunggal di bawah
+  // mencerminkan yang pertama, supaya apa-apa yang sudah membaca
+  // watcherUid — panel admin, dokumen lama — tidak patah.
+  watchers: [], watcherUid: '', watcherId: '', watcherName: '',
   check: true, auto: true, ivl: 60, grc: 5, endAt: '',
   dueAt: 0, escAt: 0, phase: 'idle', armedAt: 0, lastOk: 0,
   endAsked: false, dueWhy: '', lastAlarmAt: 0, lastAlertId: '',
@@ -29780,7 +29810,7 @@ let SOS = {
   isAdmin: false, watchList: [], alerts: []
 };
 let _sosTimer = null, _sosGeo = null, _sosWake = null, _sosAudio = null;
-let _sosLastWrite = 0, _sosUnsubA = null, _sosUnsubW = null;
+let _sosLastWrite = 0, _sosUnsubs = [];
 
 function sosSave() {
   try {
@@ -29792,7 +29822,8 @@ function sosSave() {
       // Tanpa ketiga-tiga ini, satu app yang dimulakan semula lupa
       // mengapa ia menggera, dan "False alarm \u2014 I am fine" kehilangan
       // amaran yang sepatutnya ditariknya balik.
-      endAsked: SOS.endAsked, dueWhy: SOS.dueWhy, lastAlertId: SOS.lastAlertId
+      endAsked: SOS.endAsked, dueWhy: SOS.dueWhy, lastAlertId: SOS.lastAlertId,
+      watchers: SOS.watchers
     }));
   } catch (e) {}
 }
@@ -29810,8 +29841,87 @@ function sosFmt(ms) {
   return m + ':' + String(s).padStart(2, '0');
 }
 function sosWhoName() {
-  if (SOS.who === 'admin') return 'GoXpert admin';
-  return (SOS.watcherName || pidPretty(SOS.watcherId) || 'your contact') + ' + admin';
+  if (SOS.who === 'admin' || !SOS.watchers.length) return 'GoXpert admin';
+  const names = SOS.watchers.map(function(w) {
+    return w.name || pidPretty(w.id) || 'your contact';
+  });
+  return names.join(', ') + ' + admin';
+}
+
+/** Senarai ialah kebenaran; medan tunggal itu cerminannya. */
+function sosSyncWatcher() {
+  const w = SOS.watchers[0] || null;
+  SOS.watcherUid = w ? w.uid : '';
+  SOS.watcherId = w ? w.id : '';
+  SOS.watcherName = w ? w.name : '';
+}
+function sosWatcherUids() {
+  return SOS.watchers.map(function(w) { return w.uid; }).filter(Boolean);
+}
+
+/**
+ * Tambah satu Pocket ID ke senarai pemerhati.
+ *
+ * Setiap penolakan dikatakan di tempat yang sama, kerana satu kod yang
+ * tidak diterima tanpa sebab bermakna surveyor itu keluar ke tapak
+ * dengan senarai kosong tanpa menyedarinya.
+ */
+async function sosAddWatcher(raw, quiet) {
+  const hint = document.getElementById('swPidHint');
+  const say = function(msg, bad) {
+    if (!hint) return;
+    hint.textContent = msg;
+    hint.classList.toggle('bad', !!bad);
+  };
+  const id = pidNormal(raw);
+  if (id.length !== 6) { if (!quiet) say('A Pocket ID is six characters.', true); return false; }
+  if (SOS.watchers.length >= SOS_MAX_WATCHERS) {
+    say('Three is the most. Remove one first.', true);
+    return false;
+  }
+  if (SOS.watchers.some(function(w) { return w.id === id; })) {
+    say('That person is already on the list.', true);
+    return false;
+  }
+  say('Checking\u2026');
+  const found = await pidLookup(id);
+  if (!found) { say('No Pocket user has that ID. Check it with them \u2014 it is in their Profile.', true); return false; }
+  if (currentUser && found.uid === currentUser.uid) {
+    say('That is your own ID. Name someone who is not on site with you.', true);
+    return false;
+  }
+  SOS.watchers.push({ uid: found.uid, id: id, name: found.name || '' });
+  sosSyncWatcher();
+  const f = document.getElementById('swPid');
+  if (f) f.value = '';
+  say(SOS.watchers.length >= SOS_MAX_WATCHERS
+    ? 'Three people will get your alarm, and admin as well.'
+    : 'Added. You can name ' + (SOS_MAX_WATCHERS - SOS.watchers.length) + ' more.');
+  sosPaintWatchers();
+  return true;
+}
+
+function sosDropWatcher(id) {
+  SOS.watchers = SOS.watchers.filter(function(w) { return w.id !== id; });
+  sosSyncWatcher();
+  sosPaintWatchers();
+}
+
+function sosPaintWatchers() {
+  const box = document.getElementById('swWList');
+  if (!box) return;
+  box.innerHTML = SOS.watchers.map(function(w) {
+    return '<div class="sw-wpick"><b>' + escapeHTML(w.name || 'Pocket user') + '</b>' +
+      '<em>' + escapeHTML(pidPretty(w.id)) + '</em>' +
+      '<button type="button" data-swdrop="' + escapeHTML(w.id) + '" aria-label="Remove">' +
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+      '</button></div>';
+  }).join('');
+  const add = document.getElementById('swPidAdd');
+  if (add) {
+    add.disabled = SOS.watchers.length >= SOS_MAX_WATCHERS;
+    add.textContent = SOS.watchers.length ? 'Add another person' : 'Add this person';
+  }
 }
 /**
  * "I expect to finish by 17:30" sebagai cap masa sebenar.
@@ -29968,8 +30078,12 @@ async function sosPush() {
       lastCheckIn: SOS.lastOk || 0,
       lat: SOS.lat, lng: SOS.lng, acc: SOS.acc,
       battery: SOS.battery,
+      // Medan tunggal untuk pembaca lama; senarai untuk pertanyaan
+      // array-contains yang setiap pemerhati gunakan.
       watcherUid: SOS.watcherUid || '',
       watcherPocketId: SOS.watcherId || '',
+      watcherUids: sosWatcherUids(),
+      watcherNames: SOS.watchers.map(function(w) { return w.name || ''; }),
       notifyAdmin: true,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
@@ -29989,25 +30103,24 @@ async function sosArm() {
   btn.disabled = true;
 
   if (SOS.who === 'id') {
-    const found = await pidLookup(document.getElementById('swPid').value);
-    const hint = document.getElementById('swPidHint');
-    if (!found) {
-      hint.textContent = 'No Pocket user has that ID. Check it with them — it is in their Profile.';
-      hint.classList.add('bad');
+    // Satu kod yang sudah ditaip tetapi belum ditambah tetap dikira:
+    // terlupa menekan "Add" tidak sepatutnya menghantar sesiapa ke
+    // tapak dengan senarai pemerhati yang kosong.
+    const typed = (document.getElementById('swPid').value || '').trim();
+    if (typed) await sosAddWatcher(typed);
+    if (!SOS.watchers.length) {
+      const hint = document.getElementById('swPidHint');
+      if (hint && !hint.classList.contains('bad')) {
+        hint.textContent = 'Name at least one person, or pick GoXpert admin instead.';
+        hint.classList.add('bad');
+      }
       btn.disabled = false;
       return;
     }
-    if (found.uid === currentUser.uid) {
-      hint.textContent = 'That is your own ID. Name someone who is not on site with you.';
-      hint.classList.add('bad');
-      btn.disabled = false;
-      return;
-    }
-    hint.classList.remove('bad');
-    SOS.watcherUid = found.uid; SOS.watcherId = found.id; SOS.watcherName = found.name;
   } else {
-    SOS.watcherUid = ''; SOS.watcherId = ''; SOS.watcherName = '';
+    SOS.watchers = [];
   }
+  sosSyncWatcher();
 
   sosPrime();
   SOS.on = true;
@@ -30151,6 +30264,7 @@ async function sosFire(why) {
     fromName: currentUser ? (currentUser.displayName || currentUser.email || 'Surveyor') : '',
     fromPocketId: myPocketId || '',
     toUid: SOS.watcherUid || '',
+    toUids: sosWatcherUids(),
     toAdmin: true,
     reason: why,
     siteName: SOS.siteName || '',
@@ -30196,10 +30310,12 @@ async function sosFire(why) {
     // Amaran juga mendarat dalam perbualan dengan pemerhati itu. Peti
     // masuk SOS yang berasingan terlalu mudah terlepas pandang; satu
     // tempat sahaja untuk dipandang lebih selamat daripada dua.
-    if (SOS.watcherUid && typeof msPostSos === 'function') {
-      msPostSos(SOS.watcherUid, why,
-        SOS.lat != null ? (SOS.lat.toFixed(6) + ', ' + SOS.lng.toFixed(6) + ' (±' + SOS.acc + ' m)') : '')
-        .catch(function(e) { console.warn('[SOS chat]', e.message); });
+    if (typeof msPostSos === 'function') {
+      const where = SOS.lat != null
+        ? (SOS.lat.toFixed(6) + ', ' + SOS.lng.toFixed(6) + ' (±' + SOS.acc + ' m)') : '';
+      sosWatcherUids().forEach(function(uid) {
+        msPostSos(uid, why, where).catch(function(e) { console.warn('[SOS chat]', e.message); });
+      });
     }
   } catch (e) {
     console.warn('[SOS fire]', e.message);
@@ -30236,36 +30352,68 @@ async function sosCheckAdmin() {
   } catch (e) { SOS.isAdmin = false; }
   return SOS.isAdmin;
 }
+/**
+ * Mendengar amaran yang ditujukan kepada saya.
+ *
+ * DUA pertanyaan setiap koleksi, bukan satu. Satu telefon yang masih
+ * membawa HTML lama menulis watcherUid/toUid sahaja; satu yang baharu
+ * menulis senarai. Seorang pemerhati yang hanya bertanya pada senarai
+ * tidak akan melihat amaran daripada telefon lama LANGSUNG — dan dalam
+ * ciri ini, "tidak melihat" bermakna tiada siapa datang.
+ */
 function sosListen() {
   if (!currentUser) return;
-  if (_sosUnsubA) { _sosUnsubA(); _sosUnsubA = null; }
-  if (_sosUnsubW) { _sosUnsubW(); _sosUnsubW = null; }
-  const alerts = SOS.isAdmin
-    ? db.collection('sosAlerts').where('toAdmin', '==', true).where('resolved', '==', false)
-    : db.collection('sosAlerts').where('toUid', '==', currentUser.uid).where('resolved', '==', false);
-  _sosUnsubA = alerts.onSnapshot(function(snap) {
-    SOS.alerts = [];
-    snap.forEach(function(d) {
-      const x = d.data();
-      if (x.fromUid === currentUser.uid) return;      // amaran sendiri bukan untuk sendiri
-      SOS.alerts.push(Object.assign({ id: d.id }, x));
-    });
-    SOS.alerts.sort(function(a, b) { return (b.createdAt && b.createdAt.seconds || 0) - (a.createdAt && a.createdAt.seconds || 0); });
-    sosPaintWatch();
-    sosPaintInbound();
-  }, function(e) { console.warn('[SOS alerts]', e.message); });
+  _sosUnsubs.forEach(function(f) { try { f(); } catch (e) {} });
+  _sosUnsubs = [];
 
-  const watch = SOS.isAdmin
-    ? db.collection('sosWatch').where('active', '==', true)
-    : db.collection('sosWatch').where('watcherUid', '==', currentUser.uid).where('active', '==', true);
-  _sosUnsubW = watch.onSnapshot(function(snap) {
-    SOS.watchList = [];
-    snap.forEach(function(d) {
-      if (d.id === currentUser.uid) return;
-      SOS.watchList.push(Object.assign({ id: d.id }, d.data()));
+  const seenA = {}, seenW = {};
+  const flat = function(store) {
+    const by = {};
+    Object.keys(store).forEach(function(k) {
+      store[k].forEach(function(x) { by[x.id] = x; });
     });
-    sosPaintWatch();
-  }, function(e) { console.warn('[SOS watch]', e.message); });
+    return Object.keys(by).map(function(k) { return by[k]; });
+  };
+
+  const alertQ = function(key, q) {
+    _sosUnsubs.push(q.onSnapshot(function(snap) {
+      seenA[key] = [];
+      snap.forEach(function(d) {
+        const x = d.data();
+        if (x.fromUid === currentUser.uid) return;    // amaran sendiri bukan untuk sendiri
+        seenA[key].push(Object.assign({ id: d.id }, x));
+      });
+      SOS.alerts = flat(seenA);
+      SOS.alerts.sort(function(a, b) {
+        return (b.createdAt && b.createdAt.seconds || 0) - (a.createdAt && a.createdAt.seconds || 0);
+      });
+      sosPaintWatch();
+      sosPaintInbound();
+    }, function(e) { console.warn('[SOS alerts]', e.message); }));
+  };
+
+  const watchQ = function(key, q) {
+    _sosUnsubs.push(q.onSnapshot(function(snap) {
+      seenW[key] = [];
+      snap.forEach(function(d) {
+        if (d.id === currentUser.uid) return;
+        seenW[key].push(Object.assign({ id: d.id }, d.data()));
+      });
+      SOS.watchList = flat(seenW);
+      sosPaintWatch();
+    }, function(e) { console.warn('[SOS watch]', e.message); }));
+  };
+
+  const AC = db.collection('sosAlerts'), WC = db.collection('sosWatch');
+  if (SOS.isAdmin) {
+    alertQ('admin', AC.where('toAdmin', '==', true).where('resolved', '==', false));
+    watchQ('admin', WC.where('active', '==', true));
+  } else {
+    alertQ('one', AC.where('toUid', '==', currentUser.uid).where('resolved', '==', false));
+    alertQ('many', AC.where('toUids', 'array-contains', currentUser.uid).where('resolved', '==', false));
+    watchQ('one', WC.where('watcherUid', '==', currentUser.uid).where('active', '==', true));
+    watchQ('many', WC.where('watcherUids', 'array-contains', currentUser.uid).where('active', '==', true));
+  }
 }
 function sosPaintInbound() {
   const bar = document.getElementById('swInbound');
@@ -30370,6 +30518,7 @@ function sosPaintStrip() {
 }
 function sosOpen() {
   document.getElementById('swScreen').classList.add('show');
+  sosPaintWatchers();
   sosView(SOS.on ? 'armed' : (SOS.view === 'sent' ? 'sent' : 'setup'));
   sosPaintWatch();
   sosPaintInbound();
@@ -30382,6 +30531,13 @@ function sosClose() { document.getElementById('swScreen').classList.remove('show
 // telefon. Ia minta jawapan sekarang, dengan kiraan bermula semula.
 function sosResume() {
   sosLoad();
+  if (!Array.isArray(SOS.watchers)) SOS.watchers = [];
+  // Satu simpanan daripada versi lama hanya membawa satu pemerhati.
+  if (!SOS.watchers.length && SOS.watcherUid) {
+    SOS.watchers = [{ uid: SOS.watcherUid, id: SOS.watcherId || '', name: SOS.watcherName || '' }];
+  }
+  sosSyncWatcher();
+  sosPaintWatchers();
   if (!SOS.on) { sosPaintStrip(); return; }
   sosStartGeo(); sosBattery(); sosWakeOn();
   if (SOS.check) {
@@ -30422,6 +30578,24 @@ function sosWire() {
     SOS.who = b.dataset.who;
     who.querySelectorAll('.sw-wb').forEach(function(x) { x.classList.toggle('on', x === b); });
     document.getElementById('swIdFld').style.display = SOS.who === 'id' ? '' : 'none';
+    if (SOS.who === 'id') sosPaintWatchers();
+  });
+
+  on('swPidAdd', function() {
+    const f = document.getElementById('swPid');
+    sosAddWatcher(f ? f.value : '');
+  });
+  // Enter dalam medan itu bermakna "tambah", bukan hantar borang.
+  const pidIn = document.getElementById('swPid');
+  if (pidIn) pidIn.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    sosAddWatcher(pidIn.value);
+  });
+  const wl = document.getElementById('swWList');
+  if (wl) wl.addEventListener('click', function(e) {
+    const b = e.target.closest('[data-swdrop]');
+    if (b) sosDropWatcher(b.dataset.swdrop);
   });
   const iv = document.getElementById('swIvl');
   if (iv) iv.addEventListener('click', function(e) {
@@ -30832,17 +31006,10 @@ function qrWire() {
   if (sh) sh.addEventListener('click', function(e) { if (e.target.closest('[data-qrx]')) qrCloseCard(); });
 
   on('swScanBtn', function() {
-    qrOpenScanner(async function(id) {
-      const f = document.getElementById('swPid');
-      f.value = pidPretty(id);
-      const hint = document.getElementById('swPidHint');
-      hint.classList.remove('bad');
-      hint.textContent = 'Checking…';
-      const found = await pidLookup(id);
-      if (!found) { hint.textContent = 'Scanned, but no Pocket user has that ID.'; hint.classList.add('bad'); return; }
-      if (found.uid === currentUser.uid) { hint.textContent = 'That is your own code.'; hint.classList.add('bad'); return; }
-      hint.textContent = 'Found ' + (found.name || 'that user') + '. They will get your alarm.';
-    });
+    // Mengimbas ialah niat yang jelas, jadi ia terus menambah. Satu
+    // langkah "Add" selepas mengimbas ialah satu lagi langkah yang
+    // boleh terlupa, dan terlupa di sini bermakna senarai kosong.
+    qrOpenScanner(function(id) { sosAddWatcher(id); });
   });
 }
 
