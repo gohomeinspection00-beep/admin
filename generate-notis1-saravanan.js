@@ -62,8 +62,8 @@ const data = {
   kronologi: [
     { tarikh: "26 Ogos 2024", peristiwa: "Perjanjian Jual Beli (Sale and Purchase Agreement) ditandatangani — Desa Palma Fasa 6 (Ruj: 10241-7/eSPA/260824/PTD142908/01)" },
     { tarikh: "18 Ogos 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
-    { tarikh: "22 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi melalui aplikasi IJM CONNEX pihak pemaju (Ticket ID: 6DP1383 - 6DP1387) — merupakan notis bertulis di bawah Klausa 27(1)" },
-    { tarikh: "21 September 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan; kesemua tiket masih berstatus Pending Approval di dalam sistem IJM CONNEX" },
+    { tarikh: "22 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi melalui aplikasi IJM CONNEX pihak pemaju (Ticket ID: 6DP1383 - 6DP1387) dan diakui terima (acknowledged) oleh pihak pemaju pada hari yang sama — merupakan notis bertulis di bawah Klausa 27(1)" },
+    { tarikh: "21 September 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan; kesemua tiket masih kekal berstatus New (tiada kemajuan kerja) di dalam sistem IJM CONNEX" },
     { tarikh: "15 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "30 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
@@ -243,7 +243,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan. Malah, rekod sistem IJM CONNEX pihak tuan sendiri mengesahkan bahawa kesemua tiket kecacatan yang dikemukakan pada 22 Ogos 2026 (Ticket ID: 6DP1383, 6DP1384, 6DP1385, 6DP1386 dan 6DP1387) masih berstatus "Pending Approval" sehingga kini — iaitu hampir DUA (2) BULAN tanpa sebarang tindakan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan. Malah, rekod sistem IJM CONNEX pihak tuan sendiri mengesahkan bahawa kesemua tiket kecacatan yang dikemukakan pada 22 Ogos 2026 (Ticket ID: 6DP1383, 6DP1384, 6DP1385, 6DP1386 dan 6DP1387) telah diterima dan diakui (acknowledged) oleh pihak tuan pada hari yang sama (Last Update: 22 Ogos 2026), namun sehingga kini kesemuanya masih kekal berstatus "New" tanpa sebarang kemajuan kerja pembaikan — iaitu hampir DUA (2) BULAN sejak serahan laporan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
