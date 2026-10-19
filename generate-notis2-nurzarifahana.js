@@ -304,11 +304,16 @@ numPara(6,
 y += 4;
 
 numPara(7,
+  `Berikutan kegagalan berterusan pihak tuan/puan, saya telah mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah bagi kerja-kerja membaiki kecacatan yang masih tertunggak — merangkumi pembaikan dinding senget dan tidak selari (lebih kurang 25 meter persegi), pemecahan dan lepaan semula dinding berongga, pembaikan permukaan lantai slab yang berongga (lebih kurang 10 meter persegi), pengecatan semula bahagian bawah pintu serta kerja pembersihan — dengan JUMLAH BESAR sebanyak RM15,750.00 (Ringgit Malaysia: Lima Belas Ribu Tujuh Ratus Lima Puluh Sahaja). Salinan jadual kerja dan harga dilampirkan sebagai LAMPIRAN C. Sekiranya pembaikan tidak disempurnakan menjelang TARIKH MUKTAMAD di bawah, keseluruhan kos ini akan dituntut sepenuhnya daripada pihak yang bertanggungjawab.`
+);
+y += 4;
+
+numPara(8,
   `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan/puan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan SEPENUHNYA dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline} (TARIKH MUKTAMAD). Tiada sebarang lanjutan masa akan diberikan selepas tarikh tersebut.`
 );
 y += 4;
 
-numPara(8, "Sekiranya pembaikan masih tidak disempurnakan sepenuhnya selepas TARIKH MUKTAMAD tersebut, saya akan, tanpa notis lanjut:");
+numPara(9, "Sekiranya pembaikan masih tidak disempurnakan sepenuhnya selepas TARIKH MUKTAMAD tersebut, saya akan, tanpa notis lanjut:");
 y += 2;
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah (TTPR) di bawah Akta 118 dan Peraturan-peraturan TTPR 2002;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah dan menuntut sepenuhnya kos tersebut daripada pihak yang bertanggungjawab, termasuk melalui notis kepada peguam pemegang amanah (stakeholder) supaya MENAHAN wang tahanan lima peratus (5%) di bawah Klausa 30(2) Jadual H;");
@@ -316,7 +321,7 @@ bullet("Mengemukakan aduan rasmi kepada Pejabat Pengawal Perumahan, Kementerian 
 bullet("Mengambil apa-apa tindakan undang-undang lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
-numPara(9,
+numPara(10,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -329,7 +334,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(10,
+numPara(11,
   `Adalah ditegaskan bahawa ini merupakan NOTIS TERAKHIR yang akan dikeluarkan sebelum tindakan undang-undang diambil. Kegagalan pihak tuan/puan mematuhi notis ini sepenuhnya sebelum atau pada ${data.tarikhDeadline} akan mengakibatkan tuntutan difailkan ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) dan/atau apa-apa remedi lain di bawah Akta 118, tanpa sebarang rujukan lanjut kepada pihak tuan/puan.`
 );
 y += 4;
@@ -485,6 +490,31 @@ for (const it of waItems) {
   const cl = doc.splitTextToSize(it.cap, cW - 20);
   for (const c of cl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 }
+
+// ============================================================
+// LAMPIRAN C — SEBUT HARGA PEMBAIKAN
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const cT = "LAMPIRAN C";
+doc.text(cT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(cT) / 2, y + 1, pageW / 2 + doc.getTextWidth(cT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Sebut Harga Rasmi Pembaikan (Official Repair Quotation) — RM15,750.00", pageW / 2, y, { align: "center" });
+y += 8;
+const quotImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/zarifahana-quot.jpg").toString("base64");
+const qW = 150; const qH = qW * 565 / 881;
+const qX = (pageW - qW) / 2;
+doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+doc.rect(qX - 1, y - 1, qW + 2, qH + 2);
+doc.addImage(quotImg, "JPEG", qX, y, qW, qH);
+y += qH + 6;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const qcl = doc.splitTextToSize("Jadual kerja dan harga daripada kontraktor bertauliah bagi kerja pembaikan kecacatan yang masih tertunggak — Jumlah Besar RM15,750.00 (tidak termasuk SST, jika berkenaan).", cW - 20);
+for (const c of qcl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // FOOTER
