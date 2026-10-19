@@ -15,15 +15,20 @@ const data = {
   telefonPembeli: "013-216 8801",
   emailPembeli: "nurzarifahana@gmail.com",
 
-  namaPemaju: "PERBADANAN PENGURUSAN PANGSAPURI LAMAN INDAH",
-  noSyarikat: "(PTG01817)",
-  alamatPenerima: [
+  namaPemaju: (process.argv[2] === "PEMAJU") ? "ECO BOTANIC SDN. BHD." : "PERBADANAN PENGURUSAN PANGSAPURI LAMAN INDAH",
+  noSyarikat: (process.argv[2] === "PEMAJU") ? "(201301037050 / 1066879-M)" : "(PTG01817)",
+  alamatPenerima: (process.argv[2] === "PEMAJU") ? [
+    "No. 9, 11, 15 & 17, Jalan Ekoperniagaan 1/6,",
+    "Taman Ekoperniagaan,",
+    "81100 Johor Bahru,",
+    "Johor.",
+  ] : [
     "A-01-04 (Pejabat Pengurusan),",
     "Pangsapuri Laman Indah, Taman Laman Indah,",
     "81110 Johor Bahru,",
     "Johor.",
   ],
-  kontakPenerima: "Tel: +6011 6566 8992   E-mel: pkjb.management@gmail.com",
+  kontakPenerima: (process.argv[2] === "PEMAJU") ? "" : "Tel: +6011 6566 8992   E-mel: pkjb.management@gmail.com",
 
   alamatHartanah: "A-05-02, Pangsapuri Laman Indah, Blok A, Laman Indah, Taman Laman Indah, 81110 Johor Bahru, Johor (Lot 172257, GM 2876, Mukim Pulai)",
   jenisHartanah: "Unit Pangsapuri (Apartment) — Unit 05-02",
@@ -223,8 +228,10 @@ for (const line of data.alamatPenerima) { doc.text(line, mL, y); y += LH_S; }
 
 doc.text(data.tarikhNotis, pageW - mR, y - LH_S, { align: "right" });
 
-doc.setFontSize(SZ.SMALL);
-doc.text(data.kontakPenerima, mL, y); y += LH_S;
+if (data.kontakPenerima) {
+  doc.setFontSize(SZ.SMALL);
+  doc.text(data.kontakPenerima, mL, y); y += LH_S;
+}
 
 y += 3;
 
@@ -530,6 +537,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_2_NURZARIFAHANA.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_2_NURZARIFAHANA.pdf");
+const outName = (process.argv[2] === "PEMAJU") ? "NOTIS_2_NURZARIFAHANA_PEMAJU.pdf" : "NOTIS_2_NURZARIFAHANA.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
