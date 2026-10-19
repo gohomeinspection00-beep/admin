@@ -37,8 +37,8 @@ const data = {
   klausaSerahan: "32(1)",
   tempohDLP: "24",
 
-  tarikhNotis: "19 Oktober 2026",
-  tarikhDeadline: "3 November 2026",
+  tarikhNotis: "20 Oktober 2026",
+  tarikhDeadline: "4 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -78,8 +78,8 @@ const data = {
     { tarikh: "30 Julai 2026", peristiwa: "Pengakuan pihak pengurusan melalui WhatsApp bahawa kerja pembaikan masih berjalan (\"site team tengah buat floor hollow, target siap next week\")" },
     { tarikh: "21 Ogos 2026", peristiwa: "Pemilik bertanya status terkini dan lokasi kunci melalui WhatsApp — tiada penyelesaian" },
     { tarikh: "5 Oktober 2026", peristiwa: "Pemeriksaan Kali Keempat (Fourth Inspection) dijalankan — SEMUA 17 kecacatan direkodkan masih belum diselesaikan (100% Not Complete)" },
-    { tarikh: "19 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
-    { tarikh: "3 November 2026", peristiwa: "TARIKH MUKTAMAD pembaikan (15 hari dari Notis Akhir)" },
+    { tarikh: "20 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
+    { tarikh: "4 November 2026", peristiwa: "TARIKH MUKTAMAD pembaikan (15 hari dari Notis Akhir)" },
   ],
 
   salinanKepada: [],
