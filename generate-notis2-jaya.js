@@ -278,11 +278,16 @@ numPara(3,
 y += 4;
 
 numPara(4,
+  `Berikutan kegagalan berterusan pihak tuan, saya telah mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah bagi kerja-kerja membaiki kecacatan yang masih tertunggak — merangkumi pembaikan keretakan slab kawasan luar (sehingga 15 meter), pembaikan keretakan slab kawasan metal deck (sehingga 20 meter), kerja levelling dan lapisan semula waterproofing lantai metal deck (lebih kurang 20 meter persegi), penyucian tangki air serta kerja pembersihan — dengan JUMLAH BESAR sebanyak RM6,650.00 (Ringgit Malaysia: Enam Ribu Enam Ratus Lima Puluh Sahaja). Salinan jadual kerja dan harga dilampirkan sebagai LAMPIRAN A. Sekiranya pembaikan tidak disempurnakan menjelang TARIKH MUKTAMAD di bawah, keseluruhan kos ini akan dituntut sepenuhnya daripada pihak tuan, termasuk melalui Wang Tahanan 5% dan tuntutan TTPR.`
+);
+y += 4;
+
+numPara(5,
   `Dengan ini, saya mengeluarkan NOTIS KEDUA iaitu NOTIS AKHIR (FINAL NOTICE) kepada pihak tuan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan tiada sebarang lanjutan masa akan diberikan selepasnya.`
 );
 y += 4;
 
-numPara(5, "Sekiranya pembaikan masih tidak disempurnakan selepas tarikh akhir MUKTAMAD tersebut, saya akan TANPA RUJUKAN LANJUT:");
+numPara(6, "Sekiranya pembaikan masih tidak disempurnakan selepas tarikh akhir MUKTAMAD tersebut, saya akan TANPA RUJUKAN LANJUT:");
 y += 2;
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya;");
 bullet("Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh peguam cara pemaju sebagai pemegang (stakeholder), selaras dengan Klausa 27(2) Jadual G Perjanjian Jual Beli;");
@@ -290,12 +295,12 @@ bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempa
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
-numPara(6,
+numPara(7,
   `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa apa-apa kecacatan, pengecutan atau kerosakan lain yang menjadi ketara dalam tempoh ${data.tempohDLP} bulan selepas pembeli mengambil milikan kosong, yang disebabkan oleh mutu kerja atau bahan yang cacat, hendaklah dibaiki oleh pemaju atas kos dan belanjanya sendiri dalam masa tiga puluh (30) hari selepas menerima notis bertulis daripada pembeli.`
 );
 y += 4;
 
-numPara(7,
+numPara(8,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -308,7 +313,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(8,
+numPara(9,
   `Ini merupakan NOTIS TERAKHIR sebelum tindakan undang-undang dimulakan. Sebarang kegagalan pihak tuan mematuhi notis ini akan dijadikan bukti kegagalan dan keengganan pihak tuan di hadapan Tribunal Tuntutan Pembeli Rumah dan/atau mahkamah yang berbidang kuasa, dan segala kos yang ditanggung akibat kegagalan tersebut akan dituntut sepenuhnya daripada pihak tuan`
 );
 y += 4;
@@ -403,6 +408,31 @@ function drawAkuanTerima(copyLabel) {
 
 drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
+
+// ============================================================
+// LAMPIRAN A — SEBUT HARGA PEMBAIKAN
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN A";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Sebut Harga Rasmi Pembaikan (Official Repair Quotation) — RM6,650.00", pageW / 2, y, { align: "center" });
+y += 8;
+const quotImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/jaya-quot.jpg").toString("base64");
+const qW = 150; const qH = qW * 579 / 852;
+const qX = (pageW - qW) / 2;
+doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+doc.rect(qX - 1, y - 1, qW + 2, qH + 2);
+doc.addImage(quotImg, "JPEG", qX, y, qW, qH);
+y += qH + 6;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const qcl = doc.splitTextToSize("Jadual kerja dan harga daripada kontraktor bertauliah bagi kerja pembaikan kecacatan yang masih tertunggak — Jumlah Besar RM6,650.00 (tidak termasuk SST, jika berkenaan).", cW - 20);
+for (const c of qcl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // FOOTER
