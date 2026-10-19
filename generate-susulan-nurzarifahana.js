@@ -15,20 +15,15 @@ const data = {
   telefonPembeli: "013-216 8801",
   emailPembeli: "nurzarifahana@gmail.com",
 
-  namaPemaju: (process.argv[2] === "PEMAJU") ? "ECO BOTANIC SDN. BHD." : "PERBADANAN PENGURUSAN PANGSAPURI LAMAN INDAH",
-  noSyarikat: (process.argv[2] === "PEMAJU") ? "(201301037050 / 1066879-M)" : "(PTG01817)",
-  alamatPenerima: (process.argv[2] === "PEMAJU") ? [
+  namaPemaju: "ECO BOTANIC SDN. BHD.",
+  noSyarikat: "(201301037050 / 1066879-M)",
+  alamatPenerima: [
     "No. 9, 11, 15 & 17, Jalan Ekoperniagaan 1/6,",
     "Taman Ekoperniagaan,",
     "81100 Johor Bahru,",
     "Johor.",
-  ] : [
-    "A-01-04 (Pejabat Pengurusan),",
-    "Pangsapuri Laman Indah, Taman Laman Indah,",
-    "81110 Johor Bahru,",
-    "Johor.",
   ],
-  kontakPenerima: (process.argv[2] === "PEMAJU") ? "" : "Tel: +6011 6566 8992   E-mel: pkjb.management@gmail.com",
+  kontakPenerima: "",
 
   alamatHartanah: "A-05-02, Pangsapuri Laman Indah, Blok A, Laman Indah, Taman Laman Indah, 81110 Johor Bahru, Johor (Lot 172257, GM 2876, Mukim Pulai)",
   jenisHartanah: "Unit Pangsapuri (Apartment) — Unit 05-02",
@@ -262,7 +257,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik berdaftar unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli (${data.jenisSPA}, Akta Pemajuan Perumahan 1966) bertarikh ${data.tarikhSPA} dengan pemaju ${data.namaPemajuSPA} (Ruj. fail: ${data.noSPA}), merujuk kepada Notis Pertama — surat rasmi tuntutan pembaikan kecacatan bertarikh 20 Mei 2026 beserta Laporan Pemeriksaan Kecacatan yang telah diserahkan secara serahan tangan dan DITERIMA serta diakui terima oleh pihak tuan/puan pada 21 Mei 2026 (ditandatangani oleh Encik Abdullah Hakim b. Wahid dengan cop rasmi ECO BOTANIC SDN. BHD. / Pangsapuri Laman Indah — salinan Akuan Terima dilampirkan sebagai LAMPIRAN A). Notis Pertama tersebut merupakan notis bertulis di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA} yang mewajibkan semua kecacatan dibaiki dalam tempoh tiga puluh (30) hari.${(process.argv[2] === "PEMAJU") ? ' DITEGASKAN bahawa Notis Pertama tersebut telah pun dihantar dan DITERIMA di Pejabat Pengurusan Laman Indah, yang diakui terima dengan cop rasmi pihak tuan sendiri (ECO BOTANIC SDN. BHD. / Pangsapuri Laman Indah). Memandangkan tiada penyelesaian sehingga kini, notis susulan rasmi ini dikemukakan TERUS kepada pihak pemaju ECO BOTANIC SDN. BHD.' : ''}`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik berdaftar unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli (${data.jenisSPA}, Akta Pemajuan Perumahan 1966) bertarikh ${data.tarikhSPA} dengan pemaju ${data.namaPemajuSPA} (Ruj. fail: ${data.noSPA}), merujuk kepada Notis Pertama — surat rasmi tuntutan pembaikan kecacatan bertarikh 20 Mei 2026 beserta Laporan Pemeriksaan Kecacatan yang telah diserahkan secara serahan tangan dan DITERIMA serta diakui terima oleh pihak tuan/puan pada 21 Mei 2026 (ditandatangani oleh Encik Abdullah Hakim b. Wahid dengan cop rasmi ECO BOTANIC SDN. BHD. / Pangsapuri Laman Indah — salinan Akuan Terima dilampirkan sebagai LAMPIRAN A). Notis Pertama tersebut merupakan notis bertulis di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA} yang mewajibkan semua kecacatan dibaiki dalam tempoh tiga puluh (30) hari.${true ? ' DITEGASKAN bahawa Notis Pertama tersebut telah pun dihantar dan DITERIMA di Pejabat Pengurusan Laman Indah, yang diakui terima dengan cop rasmi pihak tuan sendiri (ECO BOTANIC SDN. BHD. / Pangsapuri Laman Indah). Memandangkan tiada penyelesaian sehingga kini, notis susulan rasmi ini dikemukakan TERUS kepada pihak pemaju ECO BOTANIC SDN. BHD.' : ''}`
 );
 y += 4;
 
@@ -538,7 +533,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-const outName = (process.argv[2] === "PEMAJU") ? "NOTIS_SUSULAN_NURZARIFAHANA_PEMAJU.pdf" : "NOTIS_SUSULAN_NURZARIFAHANA.pdf";
+const outName = "NOTIS_SUSULAN_NURZARIFAHANA.pdf";
 fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
 console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
