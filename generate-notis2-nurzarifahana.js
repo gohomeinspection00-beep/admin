@@ -70,9 +70,13 @@ const data = {
     { tarikh: "9 Mei 2026", peristiwa: "Pemeriksaan Kali Kedua (Second Inspection) — kecacatan didapati BERULANG di lokasi yang sama selepas lebih kurang 13 bulan, dan sebahagiannya semakin bertambah" },
     { tarikh: "21 Mei 2026", peristiwa: "Surat rasmi beserta Laporan Pemeriksaan Kedua diserahkan secara serahan tangan ke Pejabat Pengurusan Laman Indah — merupakan Notis Pertama / notis bertulis di bawah Klausa 30(1) Jadual H (tempoh pembaikan 30 hari); DITERIMA dan diakui terima pada 21 Mei 2026 oleh Encik Abdullah Hakim b. Wahid dengan cop rasmi Eco Botanic Sdn. Bhd. / Pangsapuri Laman Indah (rujuk Lampiran A)" },
     { tarikh: "20 Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan — pembaikan masih belum diselesaikan" },
+    { tarikh: "2 Julai 2026", peristiwa: "Pihak pengurusan memaklumkan melalui WhatsApp bahawa unit \"dah completed\" dan kunci boleh diambil — kemudiannya didapati tidak benar (rujuk Lampiran B)" },
     { tarikh: "7 Julai 2026", peristiwa: "Semakan oleh pemilik — kebanyakan kecacatan masih belum disiapkan" },
+    { tarikh: "10 Julai 2026", peristiwa: "Pemilik menghantar gambar-gambar kecacatan yang masih wujud melalui WhatsApp kepada pihak pengurusan" },
     { tarikh: "11 Julai 2026", peristiwa: "Pemeriksaan Kali Ketiga (Third Inspection / Re-Inspection) dijalankan" },
-    { tarikh: "17 Julai 2026", peristiwa: "Laporan Pemeriksaan Ketiga diserahkan kepada pihak pengurusan" },
+    { tarikh: "17 Julai 2026", peristiwa: "Laporan Pemeriksaan Ketiga (softcopy) diserahkan kepada pihak pengurusan melalui WhatsApp (rujuk Lampiran B)" },
+    { tarikh: "30 Julai 2026", peristiwa: "Pengakuan pihak pengurusan melalui WhatsApp bahawa kerja pembaikan masih berjalan (\"site team tengah buat floor hollow, target siap next week\")" },
+    { tarikh: "21 Ogos 2026", peristiwa: "Pemilik bertanya status terkini dan lokasi kunci melalui WhatsApp — tiada penyelesaian" },
     { tarikh: "5 Oktober 2026", peristiwa: "Pemeriksaan Kali Keempat (Fourth Inspection) dijalankan — SEMUA 17 kecacatan direkodkan masih belum diselesaikan (100% Not Complete)" },
     { tarikh: "19 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
     { tarikh: "3 November 2026", peristiwa: "TARIKH MUKTAMAD pembaikan (15 hari dari Notis Akhir)" },
@@ -256,7 +260,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tempoh tiga puluh (30) hari tersebut telah TAMAT pada 20 Jun 2026 tanpa pembaikan disempurnakan. Semakan oleh pemilik pada 7 Julai 2026, Pemeriksaan Kali Ketiga pada 11 Julai 2026 (laporan diserahkan 17 Julai 2026) dan seterusnya Pemeriksaan Kali Keempat pada 5 Oktober 2026 MENGESAHKAN bahawa KESEMUA TUJUH BELAS (17) kecacatan yang direkodkan masih belum diselesaikan — 100% berstatus "Not Complete". Perlu ditegaskan bahawa kecacatan-kecacatan ini telah direkodkan seawal Laporan Pertama 12 April 2025 dan BERULANG walaupun pihak tuan/puan memaklumkan pembaikan selesai pada 4 Julai 2025. Senarai kecacatan tersebut adalah seperti berikut:`
+  `Namun, tempoh tiga puluh (30) hari tersebut telah TAMAT pada 20 Jun 2026 tanpa pembaikan disempurnakan. Semakan oleh pemilik pada 7 Julai 2026, Pemeriksaan Kali Ketiga pada 11 Julai 2026 (laporan diserahkan 17 Julai 2026) dan seterusnya Pemeriksaan Kali Keempat pada 5 Oktober 2026 MENGESAHKAN bahawa KESEMUA TUJUH BELAS (17) kecacatan yang direkodkan masih belum diselesaikan — 100% berstatus "Not Complete". Perlu ditegaskan bahawa kecacatan-kecacatan ini telah direkodkan seawal Laporan Pertama 12 April 2025 dan BERULANG walaupun pihak tuan/puan memaklumkan pembaikan selesai pada 4 Julai 2025. Malah, pada 2 Julai 2026 pihak tuan/puan telah memaklumkan melalui WhatsApp bahawa unit saya "dah completed" dan kunci boleh diambil — namun gambar-gambar kecacatan yang saya hantar pada 10 Julai 2026 serta pengakuan pihak tuan/puan sendiri pada 30 Julai 2026 bahawa "site team tengah buat floor hollow... target siap next week" mengesahkan bahawa makluman tersebut merupakan SALAH NYATA STATUS PEMBAIKAN (rujuk Lampiran B). Senarai kecacatan tersebut adalah seperti berikut:`
 );
 y += 5;
 
@@ -447,6 +451,40 @@ y += imH + 6;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const capL = doc.splitTextToSize("Notis Pertama bertarikh 20 Mei 2026 diserahkan secara serahan tangan dan diakui terima pada 21 Mei 2026 — ditandatangani oleh Encik Abdullah Hakim b. Wahid dengan cop rasmi ECO BOTANIC SDN. BHD. / Pangsapuri Laman Indah (RECEIVED).", cW - 20);
 for (const c of capL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN B — BUKTI SERAHAN & KOMUNIKASI WHATSAPP
+// ============================================================
+const waItems = [
+  { file: "zarifahana-wa-1.jpg", w: 540, h: 1122, cap: "Lampiran B-1: Serahan laporan pemeriksaan pertama (softcopy) kepada pihak pengurusan (Cik Syafiqah, EcoWorld) pada 26 Mei 2025 — disahkan terima; dan makluman pihak pengurusan pada 4 Julai 2025 bahawa kerja pembaikan telah siap." },
+  { file: "zarifahana-wa-2.jpg", w: 990, h: 1280, cap: "Lampiran B-2: Serahan laporan pemeriksaan kedua (softcopy) kepada Cik Syafiqah pada 21 Mei 2026 — hardcopy telah diserahkan dan diakui terima pada hari yang sama." },
+  { file: "zarifahana-wa-3.jpg", w: 868, h: 1280, cap: "Lampiran B-3: Serahan laporan pemeriksaan kedua (softcopy) kepada En. Hakim (Pejabat Pengurusan Laman Indah) pada 21 Mei 2026 — diakui terima untuk diserahkan kepada PIC." },
+  { file: "zarifahana-wa-4.jpg", w: 1080, h: 1055, cap: "Lampiran B-4: Serahan Laporan Pemeriksaan Semula / Ketiga (softcopy, 43 muka) kepada En. Hakim pada 17 Julai 2026." },
+];
+for (const it of waItems) {
+  newPage();
+  y = 25;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  const bT = "LAMPIRAN B";
+  doc.text(bT, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(bT) / 2, y + 1, pageW / 2 + doc.getTextWidth(bT) / 2, y + 1);
+  y += 6;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+  doc.text("Bukti Serahan Laporan & Komunikasi WhatsApp dengan Pihak Pengurusan", pageW / 2, y, { align: "center" });
+  y += 8;
+  const img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/" + it.file).toString("base64");
+  let iw = 100; let ih = iw * it.h / it.w;
+  if (ih > 195) { ih = 195; iw = ih * it.w / it.h; }
+  const ix = (pageW - iw) / 2;
+  doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+  doc.rect(ix - 1, y - 1, iw + 2, ih + 2);
+  doc.addImage(img, "JPEG", ix, y, iw, ih);
+  y += ih + 6;
+  doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+  const cl = doc.splitTextToSize(it.cap, cW - 20);
+  for (const c of cl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
+}
 
 // ============================================================
 // FOOTER
