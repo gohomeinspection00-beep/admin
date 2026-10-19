@@ -294,7 +294,7 @@ numPara(4,
 y += 4;
 
 numPara(5,
-  `Bagi item No. 5 (isu pemasangan pada titik lampu Kitchen): sekiranya pihak tuan/puan mendakwa keadaan tersebut adalah mengikut reka bentuk asal atau di dalam had toleransi, pihak tuan/puan dituntut mengemukakan dokumen rasmi (official documentation) — lukisan reka bentuk yang diluluskan atau spesifikasi — sebagai bukti; jika tidak, ia hendaklah dibetulkan supaya tidak menyukarkan pemasangan lampu oleh pemilik. Item No. 8 (karat pada rangka siling Master Bathroom) hendaklah dirawat atau diganti bagi mengelakkan merebak; dan item No. 16 (penyendal/seal basin yang tiada di Bathroom 2) hendaklah dipasang bagi mengelakkan resapan air ke dalam struktur.`
+  `Bagi item No. 5 (isu pemasangan pada titik lampu Kitchen): sekiranya pihak tuan/puan mendakwa keadaan tersebut adalah mengikut reka bentuk asal atau di dalam had toleransi, pihak tuan/puan dituntut mengemukakan dokumen rasmi (official documentation) — lukisan reka bentuk yang diluluskan atau spesifikasi — sebagai bukti; jika tidak, ia hendaklah dibetulkan supaya tidak menyukarkan pemasangan lampu oleh pemilik. Item No. 8 (karat pada rangka siling Master Bathroom) hendaklah dirawat atau diganti bagi mengelakkan merebak.`
 );
 y += 4;
 
