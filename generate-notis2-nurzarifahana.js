@@ -2,7 +2,7 @@ const { jsPDF } = require("jspdf");
 const fs = require("fs");
 
 const data = {
-  noRujukan: "NOTIS-1/2026/058",
+  noRujukan: "NOTIS-2/2026/058",
 
   namaPembeli: "NUR ZARIFAHANA BINTI ISA",
   alamatPengirim: [
@@ -68,14 +68,14 @@ const data = {
     { tarikh: "25 Mei 2025", peristiwa: "Laporan Pemeriksaan Kecacatan Pertama diserahkan kepada pihak pengurusan" },
     { tarikh: "4 Julai 2025", peristiwa: "Pihak pengurusan/pemaju memaklumkan kerja pembaikan telah selesai" },
     { tarikh: "9 Mei 2026", peristiwa: "Pemeriksaan Kali Kedua (Second Inspection) — kecacatan didapati BERULANG di lokasi yang sama selepas lebih kurang 13 bulan, dan sebahagiannya semakin bertambah" },
-    { tarikh: "21 Mei 2026", peristiwa: "Surat rasmi beserta Laporan Pemeriksaan Kedua diserahkan secara serahan tangan ke Pejabat Pengurusan Laman Indah — merupakan notis bertulis di bawah Klausa 30(1) Jadual H (tempoh pembaikan 30 hari)" },
+    { tarikh: "21 Mei 2026", peristiwa: "Surat rasmi beserta Laporan Pemeriksaan Kedua diserahkan secara serahan tangan ke Pejabat Pengurusan Laman Indah — merupakan Notis Pertama / notis bertulis di bawah Klausa 30(1) Jadual H (tempoh pembaikan 30 hari); DITERIMA dan diakui terima pada 21 Mei 2026 oleh Encik Abdullah Hakim b. Wahid dengan cop rasmi Eco Botanic Sdn. Bhd. / Pangsapuri Laman Indah (rujuk Lampiran A)" },
     { tarikh: "20 Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan — pembaikan masih belum diselesaikan" },
     { tarikh: "7 Julai 2026", peristiwa: "Semakan oleh pemilik — kebanyakan kecacatan masih belum disiapkan" },
     { tarikh: "11 Julai 2026", peristiwa: "Pemeriksaan Kali Ketiga (Third Inspection / Re-Inspection) dijalankan" },
     { tarikh: "17 Julai 2026", peristiwa: "Laporan Pemeriksaan Ketiga diserahkan kepada pihak pengurusan" },
     { tarikh: "5 Oktober 2026", peristiwa: "Pemeriksaan Kali Keempat (Fourth Inspection) dijalankan — SEMUA 17 kecacatan direkodkan masih belum diselesaikan (100% Not Complete)" },
-    { tarikh: "19 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "3 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "19 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan" },
+    { tarikh: "3 November 2026", peristiwa: "TARIKH MUKTAMAD pembaikan (15 hari dari Notis Akhir)" },
   ],
 
   salinanKepada: [],
@@ -235,7 +235,7 @@ y += 8;
 doc.setFont("helvetica", "bold");
 doc.setFontSize(SZ.TITLE);
 bk();
-const perkara1 = "Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim)";
+const perkara1 = "Notis Kedua / Notis Akhir — Tuntutan Pembetulan Kecacatan (Final Notice — Defect Rectification Claim)";
 const perkara2 = `Hartanah: ${data.jenisHartanah}`;
 const perkara3 = `di ${data.alamatHartanah}`;
 for (const pk of [perkara1, perkara2, perkara3]) {
@@ -251,12 +251,12 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik berdaftar unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli (${data.jenisSPA}, Akta Pemajuan Perumahan 1966) bertarikh ${data.tarikhSPA} dengan pemaju ${data.namaPemajuSPA} (Ruj. fail: ${data.noSPA}). Unit saya masih berada di dalam tempoh Defect Liability Period (DLP) selama ${data.tempohDLP} bulan di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA}. Pemeriksaan Kecacatan Kali Pertama telah dijalankan oleh Surveyor Bangunan Berdaftar (RISM) pada 12 April 2025 dan laporannya diserahkan kepada pihak tuan/puan pada 25 Mei 2025; pihak tuan/puan telah memaklumkan kerja pembaikan selesai pada 4 Julai 2025.`
+  `Saya, ${data.namaPembeli} (No. K/P: ${data.noKP}), pemilik berdaftar unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli (${data.jenisSPA}, Akta Pemajuan Perumahan 1966) bertarikh ${data.tarikhSPA} dengan pemaju ${data.namaPemajuSPA} (Ruj. fail: ${data.noSPA}), merujuk kepada Notis Pertama — surat rasmi tuntutan pembaikan kecacatan bertarikh 20 Mei 2026 beserta Laporan Pemeriksaan Kecacatan yang telah diserahkan secara serahan tangan dan DITERIMA serta diakui terima oleh pihak tuan/puan pada 21 Mei 2026 (ditandatangani oleh Encik Abdullah Hakim b. Wahid dengan cop rasmi ECO BOTANIC SDN. BHD. / Pangsapuri Laman Indah — salinan Akuan Terima dilampirkan sebagai LAMPIRAN A). Notis Pertama tersebut merupakan notis bertulis di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA} yang mewajibkan semua kecacatan dibaiki dalam tempoh tiga puluh (30) hari.`
 );
 y += 4;
 
 numPara(2,
-  `Namun, Pemeriksaan Kali Kedua pada 9 Mei 2026 mendapati kecacatan BERULANG di lokasi yang sama selepas lebih kurang tiga belas (13) bulan, dan sebahagiannya semakin bertambah teruk. Surat rasmi beserta Laporan Pemeriksaan Kedua telah diserahkan secara serahan tangan ke Pejabat Pengurusan pada 21 Mei 2026 — merupakan notis bertulis di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA} dengan tempoh pembaikan tiga puluh (30) hari yang telah tamat pada 20 Jun 2026. Pemeriksaan Kali Ketiga (11 Julai 2026, laporan diserahkan 17 Julai 2026) dan seterusnya Pemeriksaan Kali Keempat pada 5 Oktober 2026 mengesahkan bahawa KESEMUA TUJUH BELAS (17) kecacatan yang direkodkan masih belum diselesaikan — 100% berstatus "Not Complete". Senarai kecacatan tersebut adalah seperti berikut:`
+  `Namun, tempoh tiga puluh (30) hari tersebut telah TAMAT pada 20 Jun 2026 tanpa pembaikan disempurnakan. Semakan oleh pemilik pada 7 Julai 2026, Pemeriksaan Kali Ketiga pada 11 Julai 2026 (laporan diserahkan 17 Julai 2026) dan seterusnya Pemeriksaan Kali Keempat pada 5 Oktober 2026 MENGESAHKAN bahawa KESEMUA TUJUH BELAS (17) kecacatan yang direkodkan masih belum diselesaikan — 100% berstatus "Not Complete". Perlu ditegaskan bahawa kecacatan-kecacatan ini telah direkodkan seawal Laporan Pertama 12 April 2025 dan BERULANG walaupun pihak tuan/puan memaklumkan pembaikan selesai pada 4 Julai 2025. Senarai kecacatan tersebut adalah seperti berikut:`
 );
 y += 5;
 
@@ -300,16 +300,16 @@ numPara(6,
 y += 4;
 
 numPara(7,
-  `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan/puan bagi menuntut agar semua kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, menjadikan keseluruhan tempoh tiga puluh (30) hari diperuntukkan untuk menyelesaikan semua kerja pembaikan.`
+  `Dengan ini, saya mengeluarkan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan/puan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan SEPENUHNYA dalam tempoh ${data.tempohNotis1} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline} (TARIKH MUKTAMAD). Tiada sebarang lanjutan masa akan diberikan selepas tarikh tersebut.`
 );
 y += 4;
 
-numPara(8, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+numPara(8, "Sekiranya pembaikan masih tidak disempurnakan sepenuhnya selepas TARIKH MUKTAMAD tersebut, saya akan, tanpa notis lanjut:");
 y += 2;
-bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
-bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
-bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan/puan, pemaju dan pihak berkepentingan (stakeholders);");
-bullet("Memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) dan/atau mengeskalasikan perkara ini kepada Pejabat Pengawal Perumahan, KPKT, atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
+bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah (TTPR) di bawah Akta 118 dan Peraturan-peraturan TTPR 2002;");
+bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah dan menuntut sepenuhnya kos tersebut daripada pihak yang bertanggungjawab, termasuk melalui notis kepada peguam pemegang amanah (stakeholder) supaya MENAHAN wang tahanan lima peratus (5%) di bawah Klausa 30(2) Jadual H;");
+bullet("Mengemukakan aduan rasmi kepada Pejabat Pengawal Perumahan, Kementerian Perumahan dan Kerajaan Tempatan (KPKT) untuk siasatan lanjut; dan");
+bullet("Mengambil apa-apa tindakan undang-undang lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
 numPara(9,
@@ -326,11 +326,11 @@ doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
 numPara(10,
-  `Sekiranya pihak tuan/puan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
+  `Adalah ditegaskan bahawa ini merupakan NOTIS TERAKHIR yang akan dikeluarkan sebelum tindakan undang-undang diambil. Kegagalan pihak tuan/puan mematuhi notis ini sepenuhnya sebelum atau pada ${data.tarikhDeadline} akan mengakibatkan tuntutan difailkan ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) dan/atau apa-apa remedi lain di bawah Akta 118, tanpa sebarang rujukan lanjut kepada pihak tuan/puan.`
 );
 y += 4;
 
-para("Saya berharap pihak tuan/puan mengambil tindakan segera terhadap Notis Pertama ini. Atas kerjasama dan perhatian diucapkan ribuan terima kasih.");
+para("Saya berharap pihak tuan/puan mengambil tindakan segera terhadap Notis Akhir ini. Atas kerjasama dan perhatian diucapkan ribuan terima kasih.");
 y += 4;
 para("Sekian.");
 y += 4;
@@ -395,7 +395,7 @@ function drawAkuanTerima(copyLabel) {
   y += 12;
 
   doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
-  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
+  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Kedua / Notis Akhir — Tuntutan Pembetulan Kecacatan (Final Notice — Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
   const ls = doc.splitTextToSize(akText, cW);
   for (const l of ls) { doc.text(l, mL, y); y += LH; }
 
@@ -423,6 +423,32 @@ drawAkuanTerima("Salinan Pejabat Pengurusan (Management's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
 
 // ============================================================
+// LAMPIRAN A — AKUAN TERIMA NOTIS PERTAMA
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN A";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Akuan Terima Notis Pertama (Proof of Service of First Notice)", pageW / 2, y, { align: "center" });
+y += 8;
+
+const akuanImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/zarifahana-akuan.jpg").toString("base64");
+const imW = 110; const imH = imW * 1280 / 903;
+const imX = (pageW - imW) / 2;
+doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+doc.rect(imX - 1, y - 1, imW + 2, imH + 2);
+doc.addImage(akuanImg, "JPEG", imX, y, imW, imH);
+y += imH + 6;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const capL = doc.splitTextToSize("Notis Pertama bertarikh 20 Mei 2026 diserahkan secara serahan tangan dan diakui terima pada 21 Mei 2026 — ditandatangani oleh Encik Abdullah Hakim b. Wahid dengan cop rasmi ECO BOTANIC SDN. BHD. / Pangsapuri Laman Indah (RECEIVED).", cW - 20);
+for (const c of capL) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
 // FOOTER
 // ============================================================
 const totalPages = pageNum;
@@ -436,6 +462,6 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_NURZARIFAHANA.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_NURZARIFAHANA.pdf");
+fs.writeFileSync("/home/user/admin/NOTIS_2_NURZARIFAHANA.pdf", Buffer.from(out));
+console.log("PDF generated: NOTIS_2_NURZARIFAHANA.pdf");
 console.log(`Total pages: ${totalPages}`);
