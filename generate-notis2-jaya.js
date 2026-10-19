@@ -66,6 +66,7 @@ const data = {
     { tarikh: "10 Julai 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/014, dihantar secara serahan tangan" },
     { tarikh: "25 Julai 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan" },
     { tarikh: "19 Ogos 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) dijalankan — kecacatan masih belum diselesaikan" },
+    { tarikh: "7 Oktober 2026", peristiwa: "Pemeriksaan Semula Keempat (4th Re-Inspection) dijalankan — 6 kecacatan masih belum diselesaikan" },
     { tarikh: "11 Oktober 2026", peristiwa: "Laporan Pemeriksaan Semula Keempat (4th Re-Inspection) disiapkan oleh Building Surveyor berdaftar RISM — 6 kecacatan, KESEMUANYA (100%) berstatus Not Complete" },
     { tarikh: "14 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/014" },
     { tarikh: "29 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
@@ -247,7 +248,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 25 Julai 2026 — hampir TIGA (3) BULAN yang lalu — tanpa semua pembaikan disempurnakan. Pemeriksaan Ketiga pada 19 Ogos 2026 dan seterusnya Pemeriksaan Semula Keempat (4th Re-Inspection) oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM) mengesahkan bahawa KESEMUA ENAM (6) kecacatan yang tinggal masih berstatus Not Complete (100%). Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama. Laporan Pemeriksaan Semula Keempat disertakan bersama-sama notis ini sebagai serahan rasmi. Senarai kecacatan tersebut adalah seperti berikut:`
+  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 25 Julai 2026 — hampir TIGA (3) BULAN yang lalu — tanpa semua pembaikan disempurnakan. Pemeriksaan Ketiga pada 19 Ogos 2026 dan seterusnya Pemeriksaan Semula Keempat (4th Re-Inspection) pada 7 Oktober 2026 oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM) mengesahkan bahawa KESEMUA ENAM (6) kecacatan yang tinggal masih berstatus Not Complete (100%). Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama. Laporan Pemeriksaan Semula Keempat disertakan bersama-sama notis ini sebagai serahan rasmi. Senarai kecacatan tersebut adalah seperti berikut:`
 );
 y += 5;
 
