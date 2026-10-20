@@ -118,6 +118,37 @@ function numPara(num, text) {
   }
 }
 
+function richNumPara(num, segments) {
+  // segments: [{t: "text", b: true/false}] — lays out word by word with mixed bold
+  const ni = 10;
+  doc.setFontSize(SZ.BODY);
+  bk();
+  checkBreak(LH + 1);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${num}.`, mL, y);
+  const words = [];
+  for (const seg of segments) {
+    for (const w of seg.t.split(/\s+/)) {
+      if (w) words.push({ w, b: seg.b });
+    }
+  }
+  let x = mL + ni;
+  const maxX = mL + cW;
+  doc.setFontSize(SZ.BODY);
+  for (const { w, b } of words) {
+    doc.setFont("helvetica", b ? "bold" : "normal");
+    const ww = doc.getTextWidth(w + " ");
+    if (x + ww > maxX) {
+      y += LH;
+      checkBreak(LH + 1);
+      x = mL + ni;
+    }
+    doc.text(w, x, y);
+    x += ww;
+  }
+  y += LH;
+}
+
 function bullet(text) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(SZ.BODY);
@@ -283,17 +314,34 @@ numPara(5,
 );
 y += 4;
 
-numPara(6,
+richNumPara(6, [
+  { t: "Berikutan kegagalan berterusan pihak tuan, saya telah mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah bagi kerja-kerja pembaikan arkitektural dan paip (plumbing) dengan", b: false },
+  { t: "JUMLAH BESAR sebanyak RM17,350.00 (Ringgit Malaysia: Tujuh Belas Ribu Tiga Ratus Lima Puluh Sahaja).", b: true },
+  { t: "Untuk makluman, skop sebut harga tersebut", b: false },
+  { t: "TIDAK TERMASUK kerja elektrikal:", b: true },
+  { t: "beberapa kecacatan berkaitan sistem elektrik yang diperhatikan di dalam unit", b: false },
+  { t: "dirujuk kepada pihak tuan selaku pemaju untuk dibaiki terlebih dahulu,", b: true },
+  { t: "memandangkan unit masih berada di dalam Tempoh Liabiliti Kecacatan (DLP) dan", b: false },
+  { t: "pembaikan tersebut adalah tanggungjawab pihak tuan tanpa sebarang kos kepada pemilik,", b: true },
+  { t: "manakala pembaikan oleh pihak ketiga boleh menjejaskan tuntutan waranti.", b: false },
+  { t: "Sekiranya pihak tuan enggan atau gagal membaiki kecacatan elektrik tersebut,", b: true },
+  { t: "kerja elektrik akan disebut harga secara berasingan dan dilaksanakan oleh pendawai berdaftar Suruhanjaya Tenaga, dan", b: false },
+  { t: "keseluruhan kos tersebut, bersama kos sebut harga di atas, akan dituntut sepenuhnya daripada pihak tuan", b: true },
+  { t: "termasuk melalui Wang Tahanan 5% di bawah Klausa 30(2) Jadual H dan tuntutan ke TTPR.", b: false },
+]);
+y += 4;
+
+numPara(7,
   `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
 );
 y += 4;
 
-numPara(7,
+numPara(8,
   `Dengan ini, saya mengeluarkan NOTIS KEDUA iaitu NOTIS AKHIR (FINAL NOTICE) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan tiada sebarang lanjutan masa akan diberikan selepasnya.`
 );
 y += 4;
 
-numPara(8, "Sekiranya pembaikan masih tidak disempurnakan selepas TARIKH MUKTAMAD tersebut, saya akan, tanpa notis lanjut:");
+numPara(9, "Sekiranya pembaikan masih tidak disempurnakan selepas TARIKH MUKTAMAD tersebut, saya akan, tanpa notis lanjut:");
 y += 2;
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah dan menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh pemegang amanah (stakeholder), selaras dengan Klausa 30(2) Jadual H Perjanjian Jual Beli;");
@@ -301,7 +349,7 @@ bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempa
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
-numPara(9,
+numPara(10,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -314,7 +362,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(10,
+numPara(11,
   `Adalah ditegaskan bahawa ini merupakan NOTIS TERAKHIR yang akan dikeluarkan sebelum tindakan undang-undang diambil. Kegagalan pihak tuan mematuhi notis ini sepenuhnya sebelum atau pada ${data.tarikhDeadline} akan mengakibatkan tuntutan difailkan ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) dan/atau apa-apa remedi lain di bawah Akta 118, tanpa sebarang rujukan lanjut kepada pihak tuan.`
 );
 y += 4;
