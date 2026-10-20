@@ -41,8 +41,8 @@ const data = {
   tarikhSerahanLaporan: "9 April 2026",
   kaedahSerahanLaporan: "aplikasi IOI",
 
-  tarikhNotis: "14 Oktober 2026",
-  tarikhDeadline: "29 Oktober 2026",
+  tarikhNotis: "20 Oktober 2026",
+  tarikhDeadline: "4 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -68,8 +68,8 @@ const data = {
     { tarikh: "19 Ogos 2026", peristiwa: "Pemeriksaan Ketiga (Third Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "7 Oktober 2026", peristiwa: "Pemeriksaan Semula Keempat (4th Re-Inspection) dijalankan — 6 kecacatan masih belum diselesaikan; dikemukakan melalui aplikasi pihak pemaju sebagai Case Ticket C97696" },
     { tarikh: "11 Oktober 2026", peristiwa: "Laporan Pemeriksaan Semula Keempat (4th Re-Inspection) disiapkan oleh Building Surveyor berdaftar RISM — 6 kecacatan, KESEMUANYA (100%) berstatus Not Complete" },
-    { tarikh: "14 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/014" },
-    { tarikh: "29 Oktober 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "20 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/014" },
+    { tarikh: "4 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
