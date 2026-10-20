@@ -300,21 +300,11 @@ for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus diberikan kepada kluster BUNYI BERONGGA (hollowness) — item No. 15 (dinding Master Bedroom), No. 24 (dinding Bedroom 2), No. 40 (papak lantai Balcony) dan No. 44 (dinding Balcony) — yang masih wujud walaupun telah melalui dua pusingan "pembaikan". Lekatan lepaan/skrid yang tidak sempurna berisiko retak dan tertanggal, dan hendaklah dibaiki dengan kaedah hack dan lepa/skrid semula mengikut amalan pembinaan yang baik, bukan tampalan kosmetik. Item No. 12 — ketidakjajaran ketara pada dinding Master Bedroom — turut masih ada dan hendaklah diperbetulkan mengikut piawaian kerja yang sepatutnya.`
-);
-y += 4;
-
-numPara(4,
-  `Perhatian turut diberikan kepada item No. 17 — air bertakung pada jubin lantai Master Bathroom yang masih ada: kecerunan (falls) lantai hendaklah dibetulkan supaya air mengalir sepenuhnya ke arah floor trap, dan bukan sekadar dikeringkan. Item No. 20 — keretakan pada dinding luar Master Bathroom — hendaklah dibaiki dengan sempurna; manakala item No. 27 (lantai kayu tenggelam/mendap di Bedroom 2) dan No. 34 (skirting tidak sejajar di Bedroom 3) memerlukan pembaikan pada ASAS/substrat lantai dan pemasangan semula yang betul, bukan sekadar penggantian permukaan.`
-);
-y += 4;
-
-numPara(5,
   `Pihak tuan turut diingatkan bahawa Laporan Pemeriksaan Elektrikal (Electrical Inspection Report) bagi unit ini — mengandungi dua belas (12) penemuan serius yang melibatkan KESELAMATAN penghuni — telah dikemukakan secara serahan tangan (hardcopy) pada akhir Ogos 2026, dan kesemua penemuan tersebut hendaklah diselesaikan oleh orang kompeten (competent person) tanpa kelewatan lanjut.`
 );
 y += 4;
 
-richNumPara(6, [
+richNumPara(4, [
   { t: "Berikutan kegagalan berterusan pihak tuan, saya telah mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah bagi kerja-kerja pembaikan arkitektural dan paip (plumbing) dengan", b: false },
   { t: "JUMLAH BESAR sebanyak RM17,350.00 (Ringgit Malaysia: Tujuh Belas Ribu Tiga Ratus Lima Puluh Sahaja).", b: true },
   { t: "Untuk makluman, skop sebut harga tersebut", b: false },
@@ -331,17 +321,17 @@ richNumPara(6, [
 ]);
 y += 4;
 
-numPara(7,
+numPara(5,
   `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
 );
 y += 4;
 
-numPara(8,
+numPara(6,
   `Dengan ini, saya mengeluarkan NOTIS KEDUA iaitu NOTIS AKHIR (FINAL NOTICE) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan tiada sebarang lanjutan masa akan diberikan selepasnya.`
 );
 y += 4;
 
-numPara(9, "Sekiranya pembaikan masih tidak disempurnakan selepas TARIKH MUKTAMAD tersebut, saya akan, tanpa notis lanjut:");
+numPara(7, "Sekiranya pembaikan masih tidak disempurnakan selepas TARIKH MUKTAMAD tersebut, saya akan, tanpa notis lanjut:");
 y += 2;
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah dan menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh pemegang amanah (stakeholder), selaras dengan Klausa 30(2) Jadual H Perjanjian Jual Beli;");
@@ -349,7 +339,7 @@ bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempa
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
 
-numPara(10,
+numPara(8,
   `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -362,7 +352,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(11,
+numPara(9,
   `Adalah ditegaskan bahawa ini merupakan NOTIS TERAKHIR yang akan dikeluarkan sebelum tindakan undang-undang diambil. Kegagalan pihak tuan mematuhi notis ini sepenuhnya sebelum atau pada ${data.tarikhDeadline} akan mengakibatkan tuntutan difailkan ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) dan/atau apa-apa remedi lain di bawah Akta 118, tanpa sebarang rujukan lanjut kepada pihak tuan.`
 );
 y += 4;
