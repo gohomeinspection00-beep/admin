@@ -248,7 +248,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 25 Julai 2026 — hampir TIGA (3) BULAN yang lalu — tanpa semua pembaikan disempurnakan. Pemeriksaan Ketiga pada 19 Ogos 2026 dan seterusnya Pemeriksaan Semula Keempat (4th Re-Inspection) pada 7 Oktober 2026 oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM) mengesahkan bahawa KESEMUA ENAM (6) kecacatan yang tinggal masih berstatus Not Complete (100%). Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama. Laporan Pemeriksaan Semula Keempat disertakan bersama-sama notis ini sebagai serahan rasmi, dan kecacatan pemeriksaan keempat ini turut telah dikemukakan melalui aplikasi pihak tuan sendiri sebagai Case Ticket C97696 (tiket-tiket terdahulu: C90830, C90913 dan C90923). Senarai kecacatan tersebut adalah seperti berikut:`
+  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 25 Julai 2026 — hampir TIGA (3) BULAN yang lalu — tanpa semua pembaikan disempurnakan. Pemeriksaan Ketiga pada 19 Ogos 2026 dan seterusnya Pemeriksaan Semula Keempat (4th Re-Inspection) pada 7 Oktober 2026 oleh Building Surveyor berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM) mengesahkan bahawa KESEMUA ENAM (6) kecacatan yang tinggal masih berstatus Not Complete (100%). Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama. Laporan Pemeriksaan Semula Keempat disertakan bersama-sama notis ini sebagai serahan rasmi, dan kecacatan pemeriksaan keempat ini turut telah dikemukakan melalui aplikasi pihak tuan sendiri sebagai Case Ticket C97696 (tiket-tiket terdahulu: C90830, C90913 dan C90923) — rujuk LAMPIRAN B. Senarai kecacatan tersebut adalah seperti berikut:`
 );
 y += 5;
 
@@ -433,6 +433,31 @@ y += qH + 6;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const qcl = doc.splitTextToSize("Jadual kerja dan harga daripada kontraktor bertauliah bagi kerja pembaikan kecacatan yang masih tertunggak — Jumlah Besar RM6,650.00 (tidak termasuk SST, jika berkenaan).", cW - 20);
 for (const c of qcl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN B — TIKET APLIKASI IOI
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampBT = "LAMPIRAN B";
+doc.text(lampBT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampBT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampBT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Rekod Case Tickets di dalam Aplikasi Pihak Pemaju (IOI)", pageW / 2, y, { align: "center" });
+y += 8;
+const ioiImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/jaya-ioi-tickets.jpg").toString("base64");
+const bW = 85; const bH = bW * 1280 / 591;
+const bX = (pageW - bW) / 2;
+doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+doc.rect(bX - 1, y - 1, bW + 2, bH + 2);
+doc.addImage(ioiImg, "JPEG", bX, y, bW, bH);
+y += bH + 6;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const bcl = doc.splitTextToSize("Rekod Case Tickets di dalam aplikasi pihak pemaju — Case Ticket C97696 (kecacatan Pemeriksaan Semula Keempat) serta tiket-tiket terdahulu C90830, C90913 dan C90923 (Bandar Putra Kulai, 1B01-Piccolo 3, 110150).", cW - 20);
+for (const c of bcl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.5; }
 
 // ============================================================
 // FOOTER
