@@ -15,6 +15,11 @@ const sets = [
     pengirim: saraPengirim,
     penerima: ["NASA LAND SDN. BHD. (457736-W)", "No. 1, Jalan Palma Puteri 4,", "Desa Palma,", "81100 Johor Bahru, Johor."],
   },
+  {
+    label: "JAYA CHANDRAN (NOTIS 2) — ke NICE FRONTIER SDN. BHD., IOI Galleria  [Ruj: NOTIS-2/2026/014]",
+    pengirim: ["JAYA CHANDRAN", "No 13438, Jalan Rajawali 9,", "Bandar Putra,", "81000 Kulai, Johor.", "Tel: 016-722 9052"],
+    penerima: ["NICE FRONTIER SDN. BHD. (199401014059 / 299739-U)", "IOI Galleria @ Bandar Putra Kulai,", "Jalan Putra 4,", "Bandar Putra Kulai,", "81000 Kulai, Johor."],
+  },
 ];
 
 const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -71,5 +76,5 @@ for (const s of sets) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/SAMPUL_LOO_SARAVANAN.pdf", Buffer.from(out));
-console.log("PDF generated: SAMPUL_LOO_SARAVANAN.pdf");
+fs.writeFileSync("/home/user/admin/SAMPUL_LOO_SARAVANAN_JAYA.pdf", Buffer.from(out));
+console.log("PDF generated: SAMPUL_LOO_SARAVANAN_JAYA.pdf");
