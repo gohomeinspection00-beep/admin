@@ -382,14 +382,14 @@ y += 5;
 doc.text("(Proof of Developer's Acknowledgement of Receipt — First Notice)", pageW / 2, y, { align: "center" });
 y += 8;
 
-const akuanImg = fs.readFileSync("/home/user/admin/pupalan-bukti-akuan.jpg");
+const akuanImg = fs.readFileSync("/home/user/admin/pupalan-akuan-notis1-layangkasa.jpg");
 const akuanB64 = "data:image/jpeg;base64," + akuanImg.toString("base64");
 const imgW = 120; const imgH = 160;
 doc.addImage(akuanB64, "JPEG", (pageW - imgW) / 2, y, imgW, imgH);
 y += imgH + 6;
 
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const capText = "Akuan Terima Notis Pertama (Ruj: NOTIS-1/2026/016) bertarikh 5 Ogos 2026 — diterima dan ditandatangani oleh Cik Laynia Nabila binti Salikim (Customer Care) dengan cop 'RECEIVED' 05 AUG 2026 serta cop rasmi PARKLAND CITY SDN BHD.";
+const capText = "Akuan Terima Notis Pertama (Ruj: NOTIS-1/2026/016) bertarikh 5 Ogos 2026 — diserahkan ke pejabat pihak pemaju di Bandar Layangkasa dan diterima serta ditandatangani oleh Cik Laynia Nabila binti Salikim (Customer Care) dengan cop 'RECEIVED' 05 AUG 2026 serta cop rasmi PARKLAND CITY SDN BHD.";
 const capLines = doc.splitTextToSize(capText, cW - 20);
 for (const cl of capLines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
 
