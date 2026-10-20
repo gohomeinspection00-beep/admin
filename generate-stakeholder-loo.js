@@ -49,7 +49,7 @@ doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
 doc.text("M/s K.H. KOH, AZHAR & KOH", mL, y); y += LH_S;
 doc.setFont("helvetica", "normal");
 for (const l of ["Advocates & Solicitors", "Suite 25-03, Level 25, Menara Landmark,", "No. 12, Jalan Ngee Heng,", "80000 Johor Bahru, Johor."]) { doc.text(l, mL, y); y += LH_S; }
-doc.text("14 October 2026", pageW - mR, y - LH_S, { align: "right" });
+doc.text("20 October 2026", pageW - mR, y - LH_S, { align: "right" });
 y += 1;
 doc.setFontSize(SZ.SMALL);
 doc.text("E-mail: khkohjoetan@yahoo.com; khkjoetan@gmail.com", mL, y); y += LH_S;
@@ -103,7 +103,7 @@ para("We refer to the above matter.");
 y += 4;
 
 para(
-  "Pursuant to the Sale and Purchase Agreement, I have given the requisite written notices to the Developer to remedy the defects within the Defect Liability Period under Clause 30(1) of Schedule H, namely: (i) the Defect Inspection Report submitted through the Developer's CVConnect application on 22 July 2026, comprising 342 defects; (ii) the First Notice (Ref: NOTIS-1/2026/037) dated 3 September 2026, delivered by AR Registered Post No. RW193876515MY and RECEIVED by the Developer on 23 September 2026; and (iii) the Second and Final Notice (Ref: NOTIS-2/2026/037) dated 14 October 2026, with a final deadline of 29 October 2026."
+  "Pursuant to the Sale and Purchase Agreement, I have given the requisite written notices to the Developer to remedy the defects within the Defect Liability Period under Clause 30(1) of Schedule H, namely: (i) the Defect Inspection Report submitted through the Developer's CVConnect application on 22 July 2026, comprising 342 defects; (ii) the First Notice (Ref: NOTIS-1/2026/037) dated 3 September 2026, delivered by AR Registered Post No. RW193876515MY and RECEIVED by the Developer on 23 September 2026; and (iii) the Second and Final Notice (Ref: NOTIS-2/2026/037) dated 14 October 2026, delivered to the Developer's registered office by AR Registered Post No. RW214685986MY, with a final deadline of 29 October 2026."
 );
 y += 4;
 
@@ -147,7 +147,8 @@ doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL); bk();
 doc.text("To follow by e-mail:", mL, y); y += 5;
 doc.setFont("helvetica", "normal");
 doc.text("1. List of outstanding defects (as per Second and Final Notice Ref: NOTIS-2/2026/037)", mL + 5, y); y += 4.5;
-doc.text("2. Copy of AR card No. RW193876515MY and the Developer's written admission dated 24 September 2026", mL + 5, y); y += 4.5;
+doc.text("2. Copies of AR cards No. RW193876515MY (First Notice) and No. RW214685986MY (Second and Final Notice),", mL + 5, y); y += 4.5;
+doc.text("    and the Developer's written admission dated 24 September 2026", mL + 5, y); y += 4.5;
 
 // ===== Footer =====
 const totalPages = doc.internal.getNumberOfPages();
