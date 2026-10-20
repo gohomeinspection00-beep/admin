@@ -65,7 +65,7 @@ const data = {
     { tarikh: "18 September 2026", peristiwa: "Notis Pertama (NOTIS-1/2026/045) dikeluarkan dan diserahkan — DITERIMA dan diakui terima pada hari yang sama oleh Puan Nurdayanee Abdul Hadi (Management) dan En. Azwan bin Azhar, dengan cop rasmi RECEIVED 18 SEP 2026 (rujuk Lampiran A dan B)" },
     { tarikh: "3 Oktober 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan" },
     { tarikh: "12 Oktober 2026", peristiwa: "Pihak pemaju memaklumkan kerja pembaikan telah siap" },
-    { tarikh: "14 Oktober 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — SEMBILAN (9) kecacatan masih belum diselesaikan" },
+    { tarikh: "14 Oktober 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — LIMA PULUH DUA (52) kecacatan masih belum diselesaikan" },
     { tarikh: "21 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/045" },
     { tarikh: "5 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
@@ -276,7 +276,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 3 Oktober 2026 tanpa semua pembaikan disempurnakan. Walaupun pihak tuan memaklumkan pada 12 Oktober 2026 bahawa kerja pembaikan telah siap, Pemeriksaan Semula (Re-Inspection) yang dijalankan pada 14 Oktober 2026 MENGESAHKAN bahawa SEMBILAN (9) kecacatan masih belum diselesaikan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama. Senarai kecacatan tersebut adalah seperti berikut:`
+  `Namun, tempoh Notis Pertama tersebut telah TAMAT pada 3 Oktober 2026 tanpa semua pembaikan disempurnakan. Walaupun pihak tuan memaklumkan pada 12 Oktober 2026 bahawa kerja pembaikan telah siap, Pemeriksaan Semula (Re-Inspection) yang dijalankan pada 14 Oktober 2026 MENGESAHKAN bahawa LIMA PULUH DUA (52) kecacatan masih belum diselesaikan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama. Antara kecacatan yang masih wujud adalah seperti berikut:`
 );
 y += 5;
 
@@ -294,7 +294,7 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai di atas merujuk kepada penemuan Pemeriksaan Semula (Re-Inspection) pada 14 Oktober 2026. Senarai lengkap kecacatan asal terkandung di dalam Laporan Pemeriksaan Kecacatan yang diserahkan pada ${data.tarikhSerahanLaporan} serta Notis Pertama, dan kesemuanya hendaklah dibaiki sepenuhnya.`;
+const fn = `*Senarai di atas bukanlah senarai penuh — kesemua LIMA PULUH DUA (52) kecacatan yang masih belum diselesaikan adalah sebagaimana direkodkan di dalam Laporan Pemeriksaan Semula (Re-Inspection Report) bertarikh 14 Oktober 2026. Senarai lengkap kecacatan asal terkandung di dalam Laporan Pemeriksaan Kecacatan yang diserahkan pada ${data.tarikhSerahanLaporan} serta Notis Pertama, dan kesemuanya hendaklah dibaiki sepenuhnya.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
