@@ -300,7 +300,7 @@ for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Pihak tuan turut diingatkan bahawa Laporan Pemeriksaan Elektrikal (Electrical Inspection Report) bagi unit ini — mengandungi dua belas (12) penemuan serius yang melibatkan KESELAMATAN penghuni — telah dikemukakan secara serahan tangan (hardcopy) pada akhir Ogos 2026, dan kesemua penemuan tersebut hendaklah diselesaikan oleh orang kompeten (competent person) tanpa kelewatan lanjut.`
+  `Pihak tuan turut diingatkan bahawa Laporan Pemeriksaan Elektrikal (Electrical Inspection Report) bagi unit ini — mengandungi dua belas (12) penemuan serius yang melibatkan KESELAMATAN penghuni — telah dikemukakan secara serahan tangan (hardcopy) pada akhir Ogos 2026. Semasa Pemeriksaan Semula pada 14 Oktober 2026, TIGA (3) daripada penemuan elektrikal tersebut masih belum diselesaikan, dan hendaklah disiapkan oleh orang kompeten (competent person) tanpa kelewatan lanjut.`
 );
 y += 4;
 
