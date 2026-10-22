@@ -39,7 +39,7 @@ const data = {
   jenisSPA: "Jadual G",
   klausaPembaikan: "27(1)",
 
-  tarikhNotis: "22 Oktober 2026",
+  tarikhNotis: "21 Oktober 2026",
 };
 
 const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
