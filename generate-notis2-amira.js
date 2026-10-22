@@ -69,7 +69,7 @@ const data = {
     { tarikh: "24 Julai 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-001-H" },
     { tarikh: "7 Ogos 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-002-H" },
     { tarikh: "23 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 001-H — pembaikan masih belum disempurnakan" },
-    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/030" },
+    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (NOTIS-1/2026/030) dikeluarkan dan diserahkan — DITERIMA dan diakui terima pada hari yang sama dengan cop rasmi di Sales Gallery Meridin East, Taman Bistari Perdana DAN pejabat Mah Sing Properties, Austin V Square (rujuk Lampiran A dan B)" },
     { tarikh: "6 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 002-H serta tarikh akhir Notis Pertama — pembaikan masih tidak disempurnakan" },
     { tarikh: "14 Oktober 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
     { tarikh: "22 Oktober 2026", peristiwa: "Kes baharu dikemukakan melalui aplikasi pemaju — No. Kes ME4A1-H-142447141433-004-H (23 kecacatan terbuka, berstatus New)" },
@@ -250,7 +250,7 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Kami, ${data.namaPembeli} (No. K/P: ${data.noKP}) dan ${data.namaPembeli2} (No. K/P: ${data.noKP2}), pemilik bersama unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli bertarikh ${data.tarikhSPA} mengikut ${data.jenisSPA}, merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026, susulan laporan kecacatan yang dikemukakan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} (No. Kes: ${data.noKes1} dan ${data.noKes2}) selaras dengan Klausa ${data.klausaPembaikan} ${data.jenisSPA}. Notis Pertama tersebut menuntut agar semua kerja pembaikan disiapkan selewat-lewatnya pada 6 September 2026.`
+  `Kami, ${data.namaPembeli} (No. K/P: ${data.noKP}) dan ${data.namaPembeli2} (No. K/P: ${data.noKP2}), pemilik bersama unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli bertarikh ${data.tarikhSPA} mengikut ${data.jenisSPA}, merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026, susulan laporan kecacatan yang dikemukakan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} (No. Kes: ${data.noKes1} dan ${data.noKes2}) selaras dengan Klausa ${data.klausaPembaikan} ${data.jenisSPA}. Notis Pertama tersebut telah DITERIMA dan diakui terima oleh pihak tuan pada hari yang sama, 2 September 2026 — di Sales Gallery/Customer Services Taman Bistari Perdana (cop rasmi MERIDIN EAST SDN. BHD. "RECEIVED 02 SEP 2026") dan di pejabat Austin V Square (cop rasmi MAH SING PROPERTIES SDN BHD "RECEIVED 02 SEP 2026") — salinan dilampirkan sebagai LAMPIRAN A dan LAMPIRAN B. Notis Pertama tersebut menuntut agar semua kerja pembaikan disiapkan selewat-lewatnya pada 6 September 2026.`
 );
 y += 4;
 
@@ -417,6 +417,36 @@ function drawAkuanTerima(copyLabel) {
 
 drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
+
+// ============================================================
+// LAMPIRAN A & B — BUKTI SERAHAN NOTIS PERTAMA
+// ============================================================
+const akuanItems = [
+  { file: "amira-akuan-meridin.jpg", t: "LAMPIRAN A", cap: "Notis Pertama (NOTIS-1/2026/030) bertarikh 2 September 2026 — diterima dan diakui terima pada 2 September 2026 di Sales Gallery / Customer Services, Taman Bistari Perdana, dengan cop rasmi MERIDIN EAST SDN. BHD. (RECEIVED 02 SEP 2026)." },
+  { file: "amira-akuan-mahsing.jpg", t: "LAMPIRAN B", cap: "Notis Pertama (NOTIS-1/2026/030) bertarikh 2 September 2026 — diterima dan diakui terima pada 2 September 2026 di pejabat Austin V Square, Taman Austin Perdana, dengan cop rasmi MAH SING PROPERTIES SDN BHD (RECEIVED 02 SEP 2026)." },
+];
+for (const it of akuanItems) {
+  newPage();
+  y = 25;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  doc.text(it.t, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(it.t) / 2, y + 1, pageW / 2 + doc.getTextWidth(it.t) / 2, y + 1);
+  y += 6;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+  doc.text("Bukti Serahan Notis Pertama (Proof of Service of First Notice)", pageW / 2, y, { align: "center" });
+  y += 8;
+  const img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/" + it.file).toString("base64");
+  const iw = 105; const ih = iw * 1280 / 720;
+  const ix = (pageW - iw) / 2;
+  doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+  doc.rect(ix - 1, y - 1, iw + 2, ih + 2);
+  doc.addImage(img, "JPEG", ix, y, iw, ih);
+  y += ih + 5;
+  doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+  const cl = doc.splitTextToSize(it.cap, cW - 10);
+  for (const c of cl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
+}
 
 // ============================================================
 // FOOTER
