@@ -53,7 +53,11 @@ const data = {
     { tag: "4", lokasi: "Bathroom 2 — Plumbing & Sanitary", kecacatan: "Air masih keluar walaupun tidak flush (Water still come out even not flush — Functionality issue)", status: "Masih Belum Diselesaikan" },
     { tag: "5", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Kotoran dan kesan di dalam tangki air (Dirty/stains inside water tank)", status: "Masih Belum Diselesaikan" },
     { tag: "17", lokasi: "Car Porch — Plumbing & Sanitary", kecacatan: "Sistem saliran tidak sempurna (Poor Drainage System) — sisa binaan di dalam floor trap (Construction leftover inside floor trap)", status: "Masih Belum Diselesaikan" },
+    { tag: "44", lokasi: "Living & Dining Area — Dinding", kecacatan: "Bunyi berongga pada rasuk (Hollowness on beam, still observed)", status: "Masih Belum Diselesaikan" },
     { tag: "53", lokasi: "Living & Dining Area — M&E", kecacatan: "Isu pemasangan — wayar Live dan Neutral terbalik pada Distribution Box masuk; litar Neutral mempunyai voltan manakala litar Live tiada voltan; semua soket dan litar lampu terjejas (Installation issue — safety hazard)", status: "Masih Belum Diselesaikan" },
+    { tag: "97", lokasi: "Backyard — Dinding", kecacatan: "Kesan kotoran, permukaan kasar dan cat tidak sekata pada dinding (Stain, rough surface and uneven painting on wall surface — different tonality still observed)", status: "Masih Belum Diselesaikan" },
+    { tag: "98", lokasi: "Backyard — Dinding", kecacatan: "Keretakan dan cat mengelupas pada permukaan dinding (Crack and peeling paint on wall surface — crack still observed)", status: "Masih Belum Diselesaikan" },
+    { tag: "99", lokasi: "Backyard — Dinding", kecacatan: "Keretakan pada wall copping (Crack on wall copping, still observed)", status: "Masih Belum Diselesaikan" },
     { tag: "230", lokasi: "Ceiling Area (Bedroom 2 & 3) — Wall", kecacatan: "Kecacatan honeycomb pada tiang (Honeycomb defect on column)", status: "Masih Belum Diselesaikan" },
     { tag: "236", lokasi: "Top Roof (First Floor) — Roof", kecacatan: "Genting bumbung rosak (Damaged on roof tiles — Major defects)", status: "Masih Belum Diselesaikan" },
     { tag: "239", lokasi: "Top Roof — Roof", kecacatan: "Kerosakan pada bumbung (Damaged on roof — Minor defects)", status: "Masih Belum Diselesaikan" },
@@ -67,6 +71,7 @@ const data = {
     { tarikh: "23 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 001-H — pembaikan masih belum disempurnakan" },
     { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/030" },
     { tarikh: "6 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 002-H serta tarikh akhir Notis Pertama — pembaikan masih tidak disempurnakan" },
+    { tarikh: "14 Oktober 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
     { tarikh: "22 Oktober 2026", peristiwa: "Kes baharu dikemukakan melalui aplikasi pemaju — No. Kes ME4A1-H-142447141433-004-H (23 kecacatan terbuka, berstatus New)" },
     { tarikh: "22 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/030" },
     { tarikh: "6 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
@@ -250,7 +255,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tarikh akhir Notis Pertama tersebut telah TAMAT pada 6 September 2026 — lebih ENAM (6) MINGGU yang lalu — dan sehingga tarikh notis ini dikeluarkan, kerja pembaikan masih belum disempurnakan oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Klausa ${data.klausaPembaikan} ${data.jenisSPA} serta Notis Pertama yang telah dikeluarkan. Malah, satu kes baharu — No. Kes ME4A1-H-142447141433-004-H dengan DUA PULUH TIGA (23) kecacatan terbuka (open defects) — telah pun dikemukakan melalui aplikasi pihak tuan dan sehingga kini masih berstatus "New". Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
+  `Namun, tarikh akhir Notis Pertama tersebut telah TAMAT pada 6 September 2026 — lebih ENAM (6) MINGGU yang lalu — dan Pemeriksaan Semula (Re-Inspection) yang dijalankan pada 14 Oktober 2026 MENGESAHKAN bahawa kerja pembaikan masih belum disempurnakan oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Klausa ${data.klausaPembaikan} ${data.jenisSPA} serta Notis Pertama yang telah dikeluarkan. Malah, satu kes baharu — No. Kes ME4A1-H-142447141433-004-H dengan DUA PULUH TIGA (23) kecacatan terbuka (open defects) — telah pun dikemukakan melalui aplikasi pihak tuan dan sehingga kini masih berstatus "New". Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -268,7 +273,7 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai di atas bukanlah senarai penuh. Kecacatan lain adalah sebagaimana terkandung dalam laporan kecacatan yang telah diserahkan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} (No. Kes: ${data.noKes1} & ${data.noKes2}) serta kes baharu ME4A1-H-142447141433-004-H.`;
+const fn = `*Senarai di atas bukanlah senarai penuh. Kecacatan lain adalah sebagaimana terkandung dalam laporan kecacatan yang telah diserahkan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} (No. Kes: ${data.noKes1} & ${data.noKes2}) serta kes baharu ME4A1-H-142447141433-004-H, dan status terkini adalah sebagaimana Laporan Pemeriksaan Semula (Re-Inspection Report) bertarikh 14 Oktober 2026.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { checkBreak(6); doc.text(f, mL, y); y += 4.5; }
 y += 5;
