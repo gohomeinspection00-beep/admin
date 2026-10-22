@@ -20,7 +20,13 @@ const data = {
 
   namaPemaju: "MERIDIN EAST SDN BHD",
   noSyarikat: "(201301025170 / 1054999-D)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "AUSTIN") ? [
+    "(Sales Gallery)",
+    "No. 17 - 21, Block A, Austin V Square,",
+    "Jalan Austin Perdana 2, Taman Austin Perdana,",
+    "81100 Johor Bahru, Johor.",
+    "Tel: 07-355 4888 / 019-422 2624",
+  ] : [
     "(Sales Gallery / Customer Services)",
     "Utama 6, Jalan Bestari Perdana, Jalan Kong Kong,",
     "Taman Bistari Perdana,",
@@ -462,6 +468,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_2_AMIRA.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_2_AMIRA.pdf");
+const outName = (process.argv[2] === "AUSTIN") ? "NOTIS_2_AMIRA_AUSTIN.pdf" : "NOTIS_2_AMIRA.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + ((process.argv[2] === "AUSTIN") ? "NOTIS_2_AMIRA_AUSTIN.pdf" : "NOTIS_2_AMIRA.pdf"));
 console.log(`Total pages: ${totalPages}`);
