@@ -78,7 +78,8 @@ const data = {
     { tarikh: "2 September 2026", peristiwa: "Notis Pertama (NOTIS-1/2026/030) dikeluarkan dan diserahkan — DITERIMA dan diakui terima pada hari yang sama dengan cop rasmi di Sales Gallery Meridin East, Taman Bistari Perdana DAN pejabat Mah Sing Properties, Austin V Square (rujuk Lampiran A dan B)" },
     { tarikh: "6 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 002-H serta tarikh akhir Notis Pertama — pembaikan masih tidak disempurnakan" },
     { tarikh: "14 Oktober 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
-    { tarikh: "22 Oktober 2026", peristiwa: "Kes baharu dikemukakan melalui aplikasi pemaju — No. Kes ME4A1-H-142447141433-004-H (23 kecacatan terbuka, berstatus New)" },
+    { tarikh: "21 Oktober 2026", peristiwa: "Laporan Pemeriksaan Semula dikemukakan kepada pihak pemaju — submission kali kedua selepas Re-Inspection; surat makluman kecacatan tambahan (kebocoran siling Family Area) turut dikemukakan" },
+    { tarikh: "22 Oktober 2026", peristiwa: "Kes baharu dikemukakan oleh pemilik melalui aplikasi Novade pihak pemaju — No. Kes ME4A1-H-142447141433-004-H (23 kecacatan terbuka, berstatus New)" },
     { tarikh: "22 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/030" },
     { tarikh: "6 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
@@ -261,7 +262,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tarikh akhir Notis Pertama tersebut telah TAMAT pada 6 September 2026 — lebih ENAM (6) MINGGU yang lalu — dan Pemeriksaan Semula (Re-Inspection) yang dijalankan pada 14 Oktober 2026 MENGESAHKAN bahawa kerja pembaikan masih belum disempurnakan oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Klausa ${data.klausaPembaikan} ${data.jenisSPA} serta Notis Pertama yang telah dikeluarkan. Malah, satu kes baharu — No. Kes ME4A1-H-142447141433-004-H dengan DUA PULUH TIGA (23) kecacatan terbuka (open defects) — telah pun dikemukakan melalui aplikasi pihak tuan dan sehingga kini masih berstatus "New". Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
+  `Namun, tarikh akhir Notis Pertama tersebut telah TAMAT pada 6 September 2026 — lebih ENAM (6) MINGGU yang lalu — dan Pemeriksaan Semula (Re-Inspection) yang dijalankan pada 14 Oktober 2026 MENGESAHKAN bahawa kerja pembaikan masih belum disempurnakan oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Klausa ${data.klausaPembaikan} ${data.jenisSPA} serta Notis Pertama yang telah dikeluarkan. Malah, satu kes baharu — No. Kes ME4A1-H-142447141433-004-H dengan DUA PULUH TIGA (23) kecacatan terbuka (open defects) — telah dikemukakan oleh pemilik melalui aplikasi Novade pihak tuan pada 22 Oktober 2026 dan sehingga kini masih berstatus "New". Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
