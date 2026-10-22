@@ -1,0 +1,431 @@
+const { jsPDF } = require("jspdf");
+const fs = require("fs");
+
+const data = {
+  noRujukan: "NOTIS-2/2026/030",
+  noRujukanNotis1: "NOTIS-1/2026/030",
+
+  namaPembeli: "NOR AMIRA BINTI ABU ZARIN",
+  noKP: "960408-01-6216",
+  namaPembeli2: "MUHAMMAD AMIRUL ZARIQ BIN MOHAMAD HALID",
+  noKP2: "920721-01-6451",
+  alamatPengirim: [
+    "No. 55, Jalan Alamanda 4,",
+    "Taman Bistari Perdana,",
+    "81700 Pasir Gudang,",
+    "Johor.",
+  ],
+  telefonPembeli: "011-3788 1033",
+  emailPembeli: "noramira390@gmail.com",
+
+  namaPemaju: "MERIDIN EAST SDN BHD",
+  noSyarikat: "(201301025170 / 1054999-D)",
+  alamatPenerima: [
+    "(Sales Gallery / Customer Services)",
+    "Utama 6, Jalan Bestari Perdana, Jalan Kong Kong,",
+    "Taman Bistari Perdana,",
+    "81700 Pasir Gudang, Johor.",
+  ],
+
+  alamatHartanah: "No. 55, Jalan Alamanda 4, Taman Bistari Perdana, 81700 Pasir Gudang, Johor",
+  jenisHartanah: "Rumah Teres 2 Tingkat (18' x 65', Intermediate, Unit PTD 244714)",
+  namaProyek: "Allamanda, Bandar Meridin East",
+
+  tarikhSPA: "9 Januari 2024",
+  jenisSPA: "Jadual G",
+  klausaPembaikan: "27(1)",
+  klausaSerahan: "29(1)",
+  tempohDLP: "24",
+
+  tarikhPemeriksaan1: "20 Julai 2026",
+  tarikhSerahanLaporan: "24 Julai dan 7 Ogos 2026",
+  kaedahSerahanLaporan: "aplikasi pemaju (Mah Sing)",
+  noKes1: "ME4A1-H-142447141433-001-H",
+  noKes2: "ME4A1-H-142447141433-002-H",
+  tarikhTamat30Hari: "23 Ogos 2026 (Kes 001-H) dan 6 September 2026 (Kes 002-H)",
+
+  tarikhNotis: "22 Oktober 2026",
+  tarikhDeadline: "6 November 2026",
+  tempohNotis2: "15",
+
+  kecacatan: [
+    { tag: "2", lokasi: "Carporch — Ceiling", kecacatan: "Kebocoran — kelembapan tinggi dan kebocoran dikesan pada permukaan siling (High moisture and leaking detected on ceiling surface — bukti kamera termal)", status: "Masih Belum Diselesaikan" },
+    { tag: "4", lokasi: "Bathroom 2 — Plumbing & Sanitary", kecacatan: "Air masih keluar walaupun tidak flush (Water still come out even not flush — Functionality issue)", status: "Masih Belum Diselesaikan" },
+    { tag: "5", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Kotoran dan kesan di dalam tangki air (Dirty/stains inside water tank)", status: "Masih Belum Diselesaikan" },
+    { tag: "17", lokasi: "Car Porch — Plumbing & Sanitary", kecacatan: "Sistem saliran tidak sempurna (Poor Drainage System) — sisa binaan di dalam floor trap (Construction leftover inside floor trap)", status: "Masih Belum Diselesaikan" },
+    { tag: "53", lokasi: "Living & Dining Area — M&E", kecacatan: "Isu pemasangan — wayar Live dan Neutral terbalik pada Distribution Box masuk; litar Neutral mempunyai voltan manakala litar Live tiada voltan; semua soket dan litar lampu terjejas (Installation issue — safety hazard)", status: "Masih Belum Diselesaikan" },
+    { tag: "230", lokasi: "Ceiling Area (Bedroom 2 & 3) — Wall", kecacatan: "Kecacatan honeycomb pada tiang (Honeycomb defect on column)", status: "Masih Belum Diselesaikan" },
+    { tag: "236", lokasi: "Top Roof (First Floor) — Roof", kecacatan: "Genting bumbung rosak (Damaged on roof tiles — Major defects)", status: "Masih Belum Diselesaikan" },
+    { tag: "239", lokasi: "Top Roof — Roof", kecacatan: "Kerosakan pada bumbung (Damaged on roof — Minor defects)", status: "Masih Belum Diselesaikan" },
+  ],
+
+  kronologi: [
+    { tarikh: "9 Januari 2024", peristiwa: "Perjanjian Jual Beli (SPA) ditandatangani — Jadual G" },
+    { tarikh: "20 Julai 2026", peristiwa: "Pemeriksaan Kecacatan (Defect Inspection) dijalankan ke atas hartanah" },
+    { tarikh: "24 Julai 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-001-H" },
+    { tarikh: "7 Ogos 2026", peristiwa: "Laporan kecacatan diserahkan melalui aplikasi pemaju — Kes ME4A1-H-142447141433-002-H" },
+    { tarikh: "23 Ogos 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 001-H — pembaikan masih belum disempurnakan" },
+    { tarikh: "2 September 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — Ruj. NOTIS-1/2026/030" },
+    { tarikh: "6 September 2026", peristiwa: "Tamat tempoh 30 hari pembaikan bagi Kes 002-H serta tarikh akhir Notis Pertama — pembaikan masih tidak disempurnakan" },
+    { tarikh: "22 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/030" },
+    { tarikh: "6 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+  ],
+
+  salinanKepada: [
+    { nama: "Meridin East Customer Services", alamat: ["melalui e-mel: cspm.me@mahsing.com.my", "Tel: 07-291 3216"] },
+  ],
+};
+
+const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+const pageW = 210;
+const pageH = 297;
+const mL = 25;
+const mR = 25;
+const cW = pageW - mL - mR;
+let y = 0;
+let pageNum = 1;
+
+const SZ = { BODY: 12, SMALL: 10, TABLE: 10, FOOTNOTE: 9, FOOTER: 8, TITLE: 12 };
+const LH = 6;
+const LH_S = 5;
+
+function bk() { doc.setTextColor(0, 0, 0); doc.setDrawColor(0, 0, 0); }
+function newPage() { doc.addPage(); pageNum++; y = 25; }
+function checkBreak(n = 15) { if (y + n > pageH - 22) { newPage(); return true; } return false; }
+
+function para(text, opts = {}) {
+  const { indent = 0, style = "normal", size = SZ.BODY } = opts;
+  doc.setFont("helvetica", style);
+  doc.setFontSize(size);
+  bk();
+  const lines = doc.splitTextToSize(text, cW - indent);
+  for (const line of lines) {
+    checkBreak(LH + 1);
+    doc.text(line, mL + indent, y);
+    y += LH;
+  }
+}
+
+function numPara(num, text) {
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(SZ.BODY);
+  bk();
+  const ni = 10;
+  checkBreak(LH + 1);
+  doc.text(`${num}.`, mL, y);
+  const lines = doc.splitTextToSize(text, cW - ni);
+  for (const line of lines) {
+    checkBreak(LH + 1);
+    doc.text(line, mL + ni, y);
+    y += LH;
+  }
+}
+
+function bullet(text) {
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(SZ.BODY);
+  bk();
+  const bi = 14; const ti = bi + 5;
+  checkBreak(LH + 1);
+  doc.text("•", mL + bi, y);
+  const lines = doc.splitTextToSize(text, cW - ti);
+  for (const line of lines) { checkBreak(LH + 1); doc.text(line, mL + ti, y); y += LH; }
+}
+
+function drawTable(headers, rows, colWidths) {
+  const pad = 2.5;
+  const rlh = 5;
+  const fsz = SZ.TABLE;
+  doc.setFontSize(fsz);
+
+  function rowH(cells) {
+    let mx = rlh + pad * 2;
+    for (let c = 0; c < cells.length; c++) {
+      doc.setFont("helvetica", "normal"); doc.setFontSize(fsz);
+      const ls = doc.splitTextToSize(String(cells[c]), colWidths[c] - pad * 2);
+      const h = ls.length * rlh + pad * 2;
+      if (h > mx) mx = h;
+    }
+    return mx;
+  }
+
+  function drawRow(cells, ry, rh, isH) {
+    doc.setFont("helvetica", isH ? "bold" : "normal"); doc.setFontSize(fsz); bk();
+    let cx = mL;
+    for (let c = 0; c < cells.length; c++) {
+      doc.setLineWidth(0.3);
+      doc.rect(cx, ry, colWidths[c], rh);
+      const w = colWidths[c] - pad * 2;
+      doc.setFont("helvetica", isH ? "bold" : "normal"); doc.setFontSize(fsz); bk();
+      const ls = doc.splitTextToSize(String(cells[c]), w);
+      const ty = ry + pad + rlh - 1;
+      for (let l = 0; l < ls.length; l++) doc.text(ls[l], cx + pad, ty + l * rlh);
+      cx += colWidths[c];
+    }
+  }
+
+  const hh = rowH(headers);
+  checkBreak(hh + 5);
+  drawRow(headers, y, hh, true);
+  y += hh;
+
+  for (const row of rows) {
+    const rh2 = rowH(row);
+    checkBreak(rh2 + 2);
+    drawRow(row, y, rh2, false);
+    y += rh2;
+  }
+}
+
+// ============================================================
+// PAGE 1 — SURAT UTAMA
+// ============================================================
+y = 25;
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(SZ.BODY);
+bk();
+doc.text(`${data.namaPembeli} &`, mL, y); y += LH_S;
+doc.text(data.namaPembeli2, mL, y); y += LH;
+
+doc.setFont("helvetica", "normal");
+for (const line of data.alamatPengirim) { doc.text(line, mL, y); y += LH_S; }
+y += 1;
+doc.setFontSize(SZ.SMALL);
+doc.text(`No. K/P: ${data.noKP} (${data.namaPembeli.split(" ")[0]} ${data.namaPembeli.split(" ")[1]})`, mL, y); y += LH_S;
+doc.text(`No. K/P: ${data.noKP2}`, mL, y); y += LH_S;
+doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
+doc.text(`Tel: ${data.telefonPembeli}`, mL, y); y += LH_S;
+
+y += 3;
+
+doc.setLineWidth(0.5);
+doc.line(mL, y, pageW - mR, y);
+y += 6;
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(SZ.BODY);
+bk();
+doc.text(`${data.namaPemaju} ${data.noSyarikat}`, mL, y);
+y += LH_S;
+
+doc.setFont("helvetica", "normal");
+doc.setFontSize(SZ.BODY);
+for (const line of data.alamatPenerima) { doc.text(line, mL, y); y += LH_S; }
+
+doc.text(data.tarikhNotis, pageW - mR, y - LH_S, { align: "right" });
+
+y += 3;
+
+doc.setFontSize(SZ.SMALL);
+doc.text(`Ruj. Kami: ${data.noRujukan}   Ruj. Notis Pertama: ${data.noRujukanNotis1}`, mL, y);
+y += 8;
+
+doc.setFontSize(SZ.BODY);
+doc.text("Tuan,", mL, y);
+y += 8;
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(SZ.TITLE);
+bk();
+const perkara1 = "Notis Kedua / Notis Akhir — Tuntutan Pembetulan Kecacatan (Final Notice — Defect Rectification Claim)";
+const perkara2 = `Hartanah: ${data.jenisHartanah}`;
+const perkara3 = `di ${data.alamatHartanah}`;
+for (const pk of [perkara1, perkara2, perkara3]) {
+  const ls = doc.splitTextToSize(pk, cW);
+  for (const l of ls) {
+    doc.text(l, mL, y);
+    doc.setLineWidth(0.3);
+    doc.line(mL, y + 1, mL + doc.getTextWidth(l), y + 1);
+    y += LH;
+  }
+}
+y += 6;
+
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
+para(
+  `Kami, ${data.namaPembeli} (No. K/P: ${data.noKP}) dan ${data.namaPembeli2} (No. K/P: ${data.noKP2}), pemilik bersama unit hartanah di alamat di atas (Projek: ${data.namaProyek}), sebagaimana termaktub di dalam Perjanjian Jual Beli bertarikh ${data.tarikhSPA} mengikut ${data.jenisSPA}, merujuk kepada Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice) dengan rujukan ${data.noRujukanNotis1} bertarikh 2 September 2026, susulan laporan kecacatan yang dikemukakan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} (No. Kes: ${data.noKes1} dan ${data.noKes2}) selaras dengan Klausa ${data.klausaPembaikan} ${data.jenisSPA}. Notis Pertama tersebut menuntut agar semua kerja pembaikan disiapkan selewat-lewatnya pada 6 September 2026.`
+);
+y += 4;
+
+numPara(2,
+  `Namun, tarikh akhir Notis Pertama tersebut telah TAMAT pada 6 September 2026 — lebih ENAM (6) MINGGU yang lalu — dan sehingga tarikh notis ini dikeluarkan, kerja pembaikan masih belum disempurnakan oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Klausa ${data.klausaPembaikan} ${data.jenisSPA} serta Notis Pertama yang telah dikeluarkan. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
+);
+y += 5;
+
+checkBreak(45);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+doc.text("Senarai Kecacatan yang Masih Belum Diselesaikan:", mL, y);
+y += 6;
+
+const colW = [15, 40, 70, cW - 15 - 40 - 70];
+drawTable(
+  ["No.", "Lokasi", "Kecacatan (Defect)", "Status"],
+  data.kecacatan.map(i => [i.tag, i.lokasi, i.kecacatan, i.status]),
+  colW
+);
+
+y += 5;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const fn = `*Senarai di atas bukanlah senarai penuh. Kecacatan lain adalah sebagaimana terkandung dalam laporan kecacatan yang telah diserahkan melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan} (No. Kes: ${data.noKes1} & ${data.noKes2}).`;
+const fnL = doc.splitTextToSize(fn, cW);
+for (const f of fnL) { checkBreak(6); doc.text(f, mL, y); y += 4.5; }
+y += 5;
+
+numPara(4,
+  `Dengan ini, kami mengeluarkan NOTIS KEDUA iaitu NOTIS AKHIR (FINAL NOTICE) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis2} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan tiada sebarang lanjutan masa akan diberikan selepasnya.`
+);
+y += 4;
+
+numPara(5, "Sekiranya pembaikan masih tidak disempurnakan selepas TARIKH MUKTAMAD tersebut, kami akan, tanpa notis lanjut:");
+y += 2;
+bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan, kos pembaikan atau pampasan yang sewajarnya;");
+bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah dan menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan lima peratus (5%) (Retention Sum) yang dipegang oleh pemegang amanah (stakeholder), selaras dengan Klausa 27(2) Jadual G Perjanjian Jual Beli;");
+bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempatan (KPKT) serta pihak berkuasa berkaitan; dan/atau");
+bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
+y += 4;
+
+numPara(6,
+  `Merujuk kepada klausa Service of Documents (Klausa ${data.klausaSerahan} ${data.jenisSPA}) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
+);
+y += 4;
+
+checkBreak(30);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+const lT = "Peringatan Tindakan Undang-undang (Legal Action Notice)";
+doc.text(lT, mL, y);
+doc.setLineWidth(0.3);
+doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
+y += 8;
+
+numPara(7,
+  `Adalah ditegaskan bahawa ini merupakan NOTIS TERAKHIR yang akan dikeluarkan sebelum tindakan undang-undang diambil. Kegagalan pihak tuan mematuhi notis ini sepenuhnya sebelum atau pada ${data.tarikhDeadline} akan mengakibatkan tuntutan difailkan ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) dan/atau apa-apa remedi lain di bawah Akta 118, tanpa sebarang rujukan lanjut kepada pihak tuan.`
+);
+y += 4;
+
+para("Kami berharap pihak tuan mengambil tindakan segera terhadap Notis Akhir ini. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.");
+y += 4;
+para("Sekian.");
+y += 4;
+
+checkBreak(60);
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
+doc.text("Yang benar,", mL, y);
+y += 12;
+const sigCol2 = mL + 85;
+doc.setLineWidth(0.3);
+doc.line(mL, y, mL + 60, y);
+doc.line(sigCol2, y, sigCol2 + 60, y);
+y += 5;
+doc.setFont("helvetica", "bold");
+doc.setFontSize(SZ.SMALL);
+doc.text(`(${data.namaPembeli})`, mL, y);
+doc.text(`(${data.namaPembeli2})`, sigCol2, y);
+y += 5;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text(`No. K/P: ${data.noKP}`, mL, y);
+doc.text(`No. K/P: ${data.noKP2}`, sigCol2, y);
+y += 4;
+doc.text(`E-mel: ${data.emailPembeli}`, mL, y); y += LH_S;
+doc.text(`Telefon: ${data.telefonPembeli}`, mL, y); y += 7;
+
+// s.k. (CC)
+checkBreak(14);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL); bk();
+doc.text("s.k. (CC):", mL, y); y += 5;
+doc.setFont("helvetica", "normal");
+for (const cc of data.salinanKepada) {
+  const ccText = `${cc.nama} — ${cc.alamat.join(" ")}`;
+  const ccLines = doc.splitTextToSize(ccText, cW - 5);
+  for (const l of ccLines) { checkBreak(5); doc.text(l, mL + 5, y); y += 4.5; }
+}
+
+// ============================================================
+// KRONOLOGI
+// ============================================================
+newPage();
+y = 30;
+
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const krT = "KRONOLOGI TINDAKAN";
+doc.text(krT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(krT) / 2, y + 1, pageW / 2 + doc.getTextWidth(krT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("(Chronology of Actions)", pageW / 2, y, { align: "center" });
+y += 10;
+
+const krColW = [40, cW - 40];
+drawTable(
+  ["Tarikh (Date)", "Peristiwa (Event)"],
+  data.kronologi.map(k => [k.tarikh, k.peristiwa]),
+  krColW
+);
+
+// ============================================================
+// AKUAN TERIMA x 2
+// ============================================================
+function drawAkuanTerima(copyLabel) {
+  newPage();
+  y = 25;
+
+  doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.SMALL); bk();
+  doc.text(copyLabel, pageW - mR, y, { align: "right" });
+  y += 8;
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  const t = "AKUAN TERIMA OLEH PEMAJU";
+  doc.text(t, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(t) / 2, y + 1, pageW / 2 + doc.getTextWidth(t) / 2, y + 1);
+  y += 6;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+  doc.text("(Developer's Acknowledgement of Receipt)", pageW / 2, y, { align: "center" });
+  y += 12;
+
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
+  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Kedua / Notis Akhir — Tuntutan Pembetulan Kecacatan (Final Notice — Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} dan ${data.namaPembeli2} berhubung hartanah di ${data.alamatHartanah}.`;
+  const ls = doc.splitTextToSize(akText, cW);
+  for (const l of ls) { doc.text(l, mL, y); y += LH; }
+
+  y += 18;
+  doc.setFont("helvetica", "bold");
+  doc.text("Diterima oleh:", mL, y);
+  y += 14;
+
+  const fs2 = mL + 30; const fe = mL + 120;
+  for (const f of ["Nama", "Jawatan", "Tarikh"]) {
+    doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
+    doc.text(f, mL, y); doc.text(":", mL + 25, y);
+    doc.setLineWidth(0.3); doc.line(fs2, y + 1, fe, y + 1);
+    y += 14;
+  }
+
+  y += 8;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.SMALL);
+  doc.text("Cop Syarikat (Company Stamp):", mL, y);
+  y += 5;
+  doc.setLineWidth(0.3); doc.rect(mL, y, 60, 35);
+}
+
+drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
+drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
+
+// ============================================================
+// FOOTER
+// ============================================================
+const totalPages = pageNum;
+for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
+  doc.setPage(p);
+  doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.2);
+  doc.line(mL, pageH - 18, pageW - mR, pageH - 18);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.FOOTER); doc.setTextColor(0, 0, 0);
+  doc.text(`Ruj: ${data.noRujukan}`, mL, pageH - 13);
+  doc.text(`Muka ${p} daripada ${totalPages}`, pageW - mR, pageH - 13, { align: "right" });
+}
+
+const out = doc.output("arraybuffer");
+fs.writeFileSync("/home/user/admin/NOTIS_2_AMIRA.pdf", Buffer.from(out));
+console.log("PDF generated: NOTIS_2_AMIRA.pdf");
+console.log(`Total pages: ${totalPages}`);
