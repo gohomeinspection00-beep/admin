@@ -262,7 +262,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tarikh akhir Notis Pertama tersebut telah TAMAT pada 6 September 2026 — lebih ENAM (6) MINGGU yang lalu — dan Pemeriksaan Semula (Re-Inspection) yang dijalankan pada 14 Oktober 2026 MENGESAHKAN bahawa kerja pembaikan masih belum disempurnakan oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Klausa ${data.klausaPembaikan} ${data.jenisSPA} serta Notis Pertama yang telah dikeluarkan. Malah, satu kes baharu — No. Kes ME4A1-H-142447141433-004-H dengan DUA PULUH TIGA (23) kecacatan terbuka (open defects) — telah dikemukakan oleh pemilik pada 21 Oktober 2026 (submission kali kedua selepas Pemeriksaan Semula) dan sehingga kini berstatus "Work In Progress". Selain itu, satu kecacatan tambahan — KESAN KEBOCORAN pada siling Family Area — turut telah dikemukakan oleh pemilik melalui aplikasi Novade pihak tuan pada 22 Oktober 2026. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
+  `Namun, tarikh akhir Notis Pertama tersebut telah TAMAT pada 6 September 2026 — lebih ENAM (6) MINGGU yang lalu — dan Pemeriksaan Semula (Re-Inspection) yang dijalankan pada 14 Oktober 2026 MENGESAHKAN bahawa kerja pembaikan masih belum disempurnakan oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Klausa ${data.klausaPembaikan} ${data.jenisSPA} serta Notis Pertama yang telah dikeluarkan. Malah, satu kes baharu — No. Kes ME4A1-H-142447141433-004-H dengan DUA PULUH TIGA (23) kecacatan terbuka (open defects) — telah dikemukakan oleh pemilik pada 21 Oktober 2026 (submission kali kedua selepas Pemeriksaan Semula) dan sehingga kini berstatus "Work In Progress". Selain itu, satu kecacatan tambahan — KESAN KEBOCORAN pada siling Family Area — turut telah dikemukakan oleh pemilik melalui aplikasi Novade pihak tuan pada 22 Oktober 2026 (gambar dilampirkan sebagai LAMPIRAN C). Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -431,6 +431,7 @@ drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
 const akuanItems = [
   { file: "amira-akuan-meridin.jpg", t: "LAMPIRAN A", cap: "Notis Pertama (NOTIS-1/2026/030) bertarikh 2 September 2026 — diterima dan diakui terima pada 2 September 2026 di Sales Gallery / Customer Services, Taman Bistari Perdana, dengan cop rasmi MERIDIN EAST SDN. BHD. (RECEIVED 02 SEP 2026)." },
   { file: "amira-akuan-mahsing.jpg", t: "LAMPIRAN B", cap: "Notis Pertama (NOTIS-1/2026/030) bertarikh 2 September 2026 — diterima dan diakui terima pada 2 September 2026 di pejabat Austin V Square, Taman Austin Perdana, dengan cop rasmi MAH SING PROPERTIES SDN BHD (RECEIVED 02 SEP 2026)." },
+  { file: "amira-leaking-family.jpg", t: "LAMPIRAN C", cap: "Kecacatan tambahan — kesan kebocoran / tompok air (water stain / sign of leaking) pada permukaan siling Family Area, pemerhatian pemilik; dikemukakan melalui aplikasi Novade pada 22 Oktober 2026." },
 ];
 for (const it of akuanItems) {
   newPage();
@@ -441,7 +442,7 @@ for (const it of akuanItems) {
   doc.line(pageW / 2 - doc.getTextWidth(it.t) / 2, y + 1, pageW / 2 + doc.getTextWidth(it.t) / 2, y + 1);
   y += 6;
   doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-  doc.text("Bukti Serahan Notis Pertama (Proof of Service of First Notice)", pageW / 2, y, { align: "center" });
+  doc.text(it.t === "LAMPIRAN C" ? "Gambar Kecacatan Tambahan (Additional Defect — Owner's Observation)" : "Bukti Serahan Notis Pertama (Proof of Service of First Notice)", pageW / 2, y, { align: "center" });
   y += 8;
   const img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/" + it.file).toString("base64");
   const iw = 105; const ih = iw * 1280 / 720;
