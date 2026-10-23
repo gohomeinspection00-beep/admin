@@ -41,8 +41,8 @@ const data = {
   tarikhTamat30: "21 Jun 2026",
   tarikhReInspection: "3 Oktober 2026",
 
-  tarikhNotis: "16 Oktober 2026",
-  tarikhDeadline: "31 Oktober 2026",
+  tarikhNotis: "23 Oktober 2026",
+  tarikhDeadline: "7 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -64,8 +64,8 @@ const data = {
     { tarikh: "22 Mei 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara rasmi melalui serahan tangan (hardcopy) di pejabat pengurusan pihak pemaju — merupakan notis bertulis di bawah Klausa 27(1)" },
     { tarikh: "21 Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan" },
     { tarikh: "3 Oktober 2026", peristiwa: "Pemeriksaan Semula (Second Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
-    { tarikh: "16 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "31 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "23 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "7 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -325,10 +325,9 @@ y += 4;
 checkBreak(46);
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Yang benar,", mL, y);
-y += 12;
-doc.setLineWidth(0.3);
-doc.line(mL, y, mL + 60, y);
-y += 5;
+const signImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/vishuan-sign.jpg").toString("base64");
+doc.addImage(signImg, "JPEG", mL + 8, y + 1, 32, 32 * 151 / 480);
+y += 18;
 doc.setFont("helvetica", "bold");
 doc.text(`(${data.namaPembeli})`, mL, y);
 y += 5;
