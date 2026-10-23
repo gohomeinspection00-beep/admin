@@ -50,8 +50,8 @@ const data = {
   noKes2: "ME4A1-H-142447141433-002-H",
   tarikhTamat30Hari: "23 Ogos 2026 (Kes 001-H) dan 6 September 2026 (Kes 002-H)",
 
-  tarikhNotis: "22 Oktober 2026",
-  tarikhDeadline: "6 November 2026",
+  tarikhNotis: (process.argv[2] === "AUSTIN") ? "24 Oktober 2026" : "22 Oktober 2026",
+  tarikhDeadline: (process.argv[2] === "AUSTIN") ? "8 November 2026" : "6 November 2026",
   tempohNotis2: "15",
 
   kecacatan: [
@@ -80,8 +80,8 @@ const data = {
     { tarikh: "14 Oktober 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
     { tarikh: "21 Oktober 2026", peristiwa: "Kes baharu dikemukakan oleh pemilik — No. Kes ME4A1-H-142447141433-004-H (23 kecacatan terbuka, berstatus Work In Progress) — submission kali kedua selepas Re-Inspection; surat makluman kecacatan tambahan turut dikemukakan" },
     { tarikh: "22 Oktober 2026", peristiwa: "Kecacatan tambahan — kesan kebocoran pada siling Family Area — dikemukakan oleh pemilik melalui aplikasi Novade pihak pemaju" },
-    { tarikh: "22 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/030" },
-    { tarikh: "6 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: (process.argv[2] === "AUSTIN") ? "24 Oktober 2026" : "22 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/030" },
+    { tarikh: (process.argv[2] === "AUSTIN") ? "8 November 2026" : "6 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [
