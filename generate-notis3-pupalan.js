@@ -51,8 +51,8 @@ const data = {
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "serahan tangan",
 
-  tarikhNotis3: "23 Oktober 2026",
-  tarikhDeadlineNotis3: "7 November 2026",
+  tarikhNotis3: "24 Oktober 2026",
+  tarikhDeadlineNotis3: "8 November 2026",
   tempohNotis3: "15",
 
   kecacatan: [
@@ -82,8 +82,8 @@ const data = {
     { tarikh: "15 Oktober 2026", peristiwa: "Pemeriksaan Ketiga (3rd Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
     { tarikh: "20 Oktober 2026", peristiwa: "Susulan oleh pemilik melalui WhatsApp kepada wakil Customer Care pihak pemaju — respons: akan semak dengan team" },
     { tarikh: "23 Oktober 2026", peristiwa: "Susulan kedua melalui WhatsApp — wakil pemaju memaklumkan masih menunggu jawapan team; tiada tindakan pembaikan (rujuk Lampiran D)" },
-    { tarikh: "23 Oktober 2026", peristiwa: "Notis Ketiga / Peringatan Terakhir (Third Notice — Final Reminder) dikeluarkan — Ruj. NOTIS-3/2026/016 — diserahkan ke pejabat pihak pemaju di Bandar Layangkasa" },
-    { tarikh: "7 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Ketiga (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "24 Oktober 2026", peristiwa: "Notis Ketiga / Peringatan Terakhir (Third Notice — Final Reminder) dikeluarkan — Ruj. NOTIS-3/2026/016 — diserahkan ke pejabat pihak pemaju di Bandar Layangkasa" },
+    { tarikh: "8 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Ketiga (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
