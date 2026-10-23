@@ -268,14 +268,9 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, tempoh pembaikan Notis Kedua tersebut telah TAMAT pada ${data.tarikhDeadlineNotis2}, dan Pemeriksaan Ketiga (3rd Inspection) yang dijalankan pada 15 Oktober 2026 MENGESAHKAN bahawa kecacatan yang dilaporkan masih belum diselesaikan. Sehingga tarikh notis ini dikeluarkan — lebih TIGA (3) minggu selepas tarikh muktamad tersebut — kecacatan yang dilaporkan MASIH BELUM DISELESAIKAN oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama dan Notis Kedua yang kedua-duanya telah diakui terima oleh wakil pihak tuan sendiri. Susulan turut dibuat oleh pemilik melalui WhatsApp kepada wakil Customer Care pihak tuan (Cik Laynia Nabila) pada 20 Oktober 2026 dan sekali lagi pada 23 Oktober 2026 — namun respons yang diterima hanyalah "sebentar saya tanya team dulu" dan "sorry saya masih tunggu jawapan team", tanpa sebarang tindakan pembaikan (rujuk Lampiran D).`
+  `Namun, tempoh pembaikan Notis Kedua tersebut telah TAMAT pada ${data.tarikhDeadlineNotis2}, dan Pemeriksaan Ketiga (3rd Inspection) yang dijalankan pada 15 Oktober 2026 MENGESAHKAN bahawa kecacatan yang dilaporkan masih belum diselesaikan. Sehingga tarikh notis ini dikeluarkan — lebih TIGA (3) minggu selepas tarikh muktamad tersebut — kecacatan yang dilaporkan MASIH BELUM DISELESAIKAN oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama dan Notis Kedua yang kedua-duanya telah diakui terima oleh wakil pihak tuan sendiri. Susulan turut dibuat oleh pemilik melalui WhatsApp kepada pihak Customer Care pihak tuan pada 20 Oktober 2026 dan sekali lagi pada 23 Oktober 2026 — namun respons yang diterima hanyalah "sebentar saya tanya team dulu" dan "sorry saya masih tunggu jawapan team", tanpa sebarang tindakan pembaikan (rujuk Lampiran D).`
 );
 y += 4;
-
-numPara(3,
-  `Lebih membimbangkan, pemeriksaan semula tersebut turut mengesan KECACATAN BARU yang berlaku akibat kerja pembaikan pihak tuan sendiri (New Defect from Rectification Work), iaitu paip saliran papak di Water Tank Area yang tersumbat (clogged slab discharge pipe — item 81). Kecacatan baru ini boleh menyebabkan air bertakung dan kebocoran ke dalam unit, dan dengan itu dituntut supaya ia dibaiki dengan SEGERA bersama-sama kecacatan lain dalam tempoh notis ini.`
-);
-y += 5;
 
 doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
 doc.text("Senarai Kecacatan yang Masih Belum Diselesaikan:", mL, y);
@@ -298,12 +293,12 @@ const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
-numPara(4,
+numPara(3,
   `Dengan ini, saya mengeluarkan NOTIS KETIGA sebagai PERINGATAN TERAKHIR (Final Reminder) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis3} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis3}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan TIADA sebarang notis atau lanjutan masa lagi akan diberikan selepas ini.`
 );
 y += 4;
 
-numPara(5,
+numPara(4,
   `Merujuk kepada Klausa Penyampaian Dokumen ${data.klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -316,13 +311,13 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(6,
+numPara(5,
   `Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Ketiga ini tamat tempohnya pada ${data.tarikhDeadlineNotis3}, saya akan TANPA NOTIS LANJUT mengambil tindakan berikut:`
 );
 y += 2;
 
 bullet("Memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya;");
-bullet("Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan 5% (Retention Sum 5%) yang sedang dipegang sebagaimana diperuntukkan di bawah Klausa 27(2) Perjanjian Jual Beli (Jadual G);");
+bullet("Menuntut supaya kos pembaikan ditolak/ditahan daripada Wang Tahanan 5% (Retention Sum 5%) yang sedang dipegang sebagaimana diperuntukkan di bawah Klausa 27(2) Perjanjian Jual Beli (Jadual G) — untuk makluman pihak tuan, surat arahan kepada peguam pemegang amanah (stakeholder lawyers) supaya MENAHAN Wang Tahanan 5% tersebut TELAH PUN dihantar;");
 bullet("Mengemukakan aduan rasmi kepada Kementerian Perumahan dan Kerajaan Tempatan (KPKT) serta pihak berkuasa berkaitan; dan/atau");
 bullet("Mengambil apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118).");
 y += 4;
@@ -454,7 +449,7 @@ for (const c of arCap) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.
 // LAMPIRAN D — SUSULAN WHATSAPP
 // ============================================================
 const waItems = [
-  { file: "pupalan-wa-1.jpg", cap: "Lampiran D-1: Susulan pemilik melalui WhatsApp kepada wakil Customer Care pihak pemaju (Cik Laynia Nabila) pada 20 Oktober 2026 — bertanya status pembaikan unit No. 6, Jalan Wau Barat 9 (Phase 5) beserta salinan akuan terima Notis 2; respons: akan semak dengan team." },
+  { file: "pupalan-wa-1.jpg", cap: "Lampiran D-1: Susulan pemilik melalui WhatsApp kepada pihak Customer Care pihak pemaju pada 20 Oktober 2026 — bertanya status pembaikan unit No. 6, Jalan Wau Barat 9 (Phase 5) beserta salinan akuan terima Notis 2; respons: akan semak dengan team." },
   { file: "pupalan-wa-2.jpg", cap: "Lampiran D-2: Susulan kedua pada 23 Oktober 2026 — wakil pemaju memaklumkan masih menunggu jawapan team; tiada sebarang tindakan pembaikan diambil." },
 ];
 for (const it of waItems) {
