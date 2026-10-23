@@ -56,21 +56,13 @@ const data = {
   tempohNotis3: "15",
 
   kecacatan: [
-    { tag: "11", lokasi: "Carporch — Mailbox", kecacatan: "Celahan ketara dan penyendalan tidak sempurna di sekeliling bingkai peti surat (Visible gaps and improper seal around mailbox frame)", status: "Belum Dibaiki" },
-    { tag: "12", lokasi: "Carporch — Mailbox", kecacatan: "Bukaan peti surat tertanggal (Detached mailbox opening)", status: "Belum Dibaiki" },
-    { tag: "13", lokasi: "Foyer — Floor", kecacatan: "Kesan kotoran pada jubin lantai (Stains on floor tile)", status: "Belum Dibaiki" },
-    { tag: "37", lokasi: "Yard — Plumbing & Sanitary Fitting", kecacatan: "Batu di dalam manhole — sistem saliran tidak sempurna (Stones inside manhole — poor drainage system)", status: "Belum Dibaiki" },
-    { tag: "47", lokasi: "Staircase — Wall", kecacatan: "Keretakan pada dinding bercat (Crack on painted wall)", status: "Belum Dibaiki" },
-    { tag: "50", lokasi: "Family Area — Wall", kecacatan: "Keretakan pada dinding bercat (Crack on painted wall)", status: "Belum Dibaiki" },
-    { tag: "55", lokasi: "Master Bedroom — Wall", kecacatan: "Ketidakjajaran ketara pada dinding (Visible misalignment on wall)", status: "Belum Dibaiki" },
-    { tag: "78", lokasi: "Water Tank Area — Floor", kecacatan: "Keretakan pada papak lantai (semua kawasan lantai) — masih retak selepas kerja pembaikan (Crack on floor slab, all floor area — still cracked after rectification work)", status: "Belum Dibaiki Sepenuhnya" },
-    { tag: "80", lokasi: "Water Tank Area — Plumbing & Sanitary Fitting", kecacatan: "Tiada sokongan yang sempurna pada distribution pipe dan incoming pipe ke tangki air (Missing proper support on distribution pipe and incoming pipe connected to water tank)", status: "Belum Dibaiki" },
-    { tag: "81", lokasi: "Water Tank Area — Plumbing & Sanitary Fitting", kecacatan: "Paip saliran papak tersumbat (Clogged slab discharge pipe) — KECACATAN BARU yang berlaku akibat kerja pembaikan (New Defect from Rectification Work)", status: "Kecacatan Baru — Belum Dibaiki" },
-    { tag: "82", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air kotor dan perlu dibersihkan (Water tank dirty and needs to be cleaned)", status: "Belum Dibaiki" },
-    { tag: "85", lokasi: "RC Flat Roof — Floor", kecacatan: "Air bertakung pada papak lantai (Stagnant water on floor slab)", status: "Belum Dibaiki" },
-    { tag: "86", lokasi: "RC Flat Roof — Floor", kecacatan: "Lubang, keretakan dan mengelupas pada papak lantai (Holes, crack and peel off on floor slab)", status: "Belum Dibaiki Sepenuhnya" },
-    { tag: "88", lokasi: "RC Flat Roof — Wall", kecacatan: "Keretakan dan kemek pada dinding bercat (Crack and dented on painted wall)", status: "Belum Dibaiki Sepenuhnya" },
-    { tag: "89", lokasi: "Top Roof — Roof", kecacatan: "Keretakan/kerosakan pada genting bumbung (Crack/damaged on roof tiles)", status: "Belum Dibaiki" },
+    { tag: "1", lokasi: "Carporch — M&E", kecacatan: "Rintangan elektrod pembumian (earth electrode resistance) diukur 61 ohm dan masih 47.9 ohm semasa pemeriksaan terkini — melebihi had di bawah Klausa 10.8(b) ST Domestic Electrical Installation Guidelines (Second Edition 2024) yang mewajibkan rintangan bawah 10 ohm bagi pemasangan dengan SPD — tidak patuh (Standard & Regulation, non-compliant)", status: "Belum Dibaiki" },
+    { tag: "2", lokasi: "Bathroom 3 — Pintu", kecacatan: "Selak pintu tersekat dan pintu tidak dapat ditutup dengan sempurna — pintu ke dapur (Door latch still stuck and door cannot close properly)", status: "Belum Dibaiki" },
+    { tag: "3", lokasi: "Backyard — Dinding", kecacatan: "Cat tidak sekata dan permukaan tidak rata yang ketara SELEPAS kerja pembaikan (Uneven painting and visible uneven surface after rectification work — New Defect from Rectification Work)", status: "Kecacatan Baru — Belum Dibaiki Sepenuhnya" },
+    { tag: "4", lokasi: "Backyard — Pintu", kecacatan: "Karat pada skru pemegang pintu masih ada (Rusty on screw door handle, still observed)", status: "Belum Dibaiki" },
+    { tag: "5", lokasi: "Master Bathroom — Plumbing & Sanitary", kecacatan: "Bocor apabila tandas dipam SELEPAS kerja pembaikan (Leaking when flush the toilet — New Defect from Rectification Work)", status: "Kecacatan Baru — Belum Dibaiki" },
+    { tag: "7", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Tiada sokongan yang sempurna pada distribution pipe dan incoming pipe ke tangki air — bertentangan dengan garis panduan pemasangan pengilang yang mewajibkan sokongan dipasang (Missing proper support for distribution pipe and incoming pipe — contrary to manufacturer installation guideline)", status: "Belum Dibaiki Sepenuhnya" },
+    { tag: "8", lokasi: "RC Flat Roof — Lantai", kecacatan: "Air bertakung pada papak lantai masih ada (Still have stagnant water on floor slab — Alignment issue)", status: "Belum Dibaiki" },
   ],
 
   kronologi: [
@@ -288,17 +280,27 @@ drawTable(
 
 y += 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
-const fn = `*Senarai lengkap kecacatan adalah sebagaimana dinyatakan di dalam Laporan Pemeriksaan Kecacatan Kali Pertama yang telah dihantar melalui ${data.kaedahSerahanLaporan} pada ${data.tarikhSerahanLaporan}, dan Laporan Pemeriksaan Semula Kali Kedua (Re-Inspection Report) bertarikh ${data.tarikhReInspection} yang disertakan bersama-sama notis ini.`;
+const fn = `*Senarai di atas adalah berdasarkan Laporan Pemeriksaan Ketiga (3rd Inspection Report) bertarikh 15 Oktober 2026 yang disertakan bersama-sama notis ini. Senarai lengkap kecacatan asal adalah sebagaimana Laporan Pemeriksaan Kecacatan yang diserahkan pada ${data.tarikhSerahanLaporan} serta laporan-laporan pemeriksaan berikutnya.`;
 const fnL = doc.splitTextToSize(fn, cW);
 for (const f of fnL) { doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Dengan ini, saya mengeluarkan NOTIS KETIGA sebagai PERINGATAN TERAKHIR (Final Reminder) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis3} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis3}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan TIADA sebarang notis atau lanjutan masa lagi akan diberikan selepas ini.`
+  `Perhatian khusus dan SEGERA diberikan kepada item No. 1 — rintangan elektrod pembumian yang masih melebihi had 10 ohm yang ditetapkan di bawah Klausa 10.8(b) ST Domestic Electrical Installation Guidelines (Second Edition 2024) bagi pemasangan yang mempunyai SPD (Surge Protection Device). Ketidakpatuhan ini menjejaskan keberkesanan SPD dan melibatkan KESELAMATAN elektrik penghuni; pembaikan hendaklah dilaksanakan oleh orang kompeten (competent person) yang berdaftar dengan Suruhanjaya Tenaga, dan bukti penyiapan dikemukakan kepada pemilik.`
 );
 y += 4;
 
 numPara(4,
+  `Lebih membimbangkan, item No. 3 (cat tidak sekata dan permukaan tidak rata pada dinding Backyard) dan item No. 5 (kebocoran apabila tandas dipam di Master Bathroom) adalah KECACATAN BARU yang berlaku AKIBAT kerja pembaikan pihak tuan sendiri (New Defects from Rectification Work) — bukti kualiti kerja pembaikan yang tidak memuaskan. Manakala item No. 7 — ketiadaan sokongan pada distribution pipe dan incoming pipe ke tangki air — adalah bertentangan dengan garis panduan pemasangan pengilang (manufacturer installation guideline) yang jelas mewajibkan sokongan dipasang, dan hendaklah dibetulkan mengikut spesifikasi tersebut.`
+);
+y += 4;
+
+numPara(5,
+  `Dengan ini, saya mengeluarkan NOTIS KETIGA sebagai PERINGATAN TERAKHIR (Final Reminder) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh ${data.tempohNotis3} hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadlineNotis3}. Tarikh tersebut merupakan TARIKH MUKTAMAD, dan TIADA sebarang notis atau lanjutan masa lagi akan diberikan selepas ini.`
+);
+y += 4;
+
+numPara(6,
   `Merujuk kepada Klausa Penyampaian Dokumen ${data.klausaSerahan} (Service of Documents) di dalam Perjanjian Jual Beli, sebarang dokumen yang dihantar kepada pihak tuan melalui serahan tangan atau pos berdaftar adalah dianggap sah dan diterima pakai sebagai dokumen rasmi.`
 );
 y += 4;
@@ -311,7 +313,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(5,
+numPara(7,
   `Sekiranya pihak tuan masih gagal mengambil tindakan pembaikan selepas Notis Ketiga ini tamat tempohnya pada ${data.tarikhDeadlineNotis3}, saya akan TANPA NOTIS LANJUT mengambil tindakan berikut:`
 );
 y += 2;
