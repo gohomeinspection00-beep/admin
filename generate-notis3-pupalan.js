@@ -51,8 +51,8 @@ const data = {
   tempohNotis2: "15",
   kaedahPenghantaranNotis2: "serahan tangan",
 
-  tarikhNotis3: "20 Oktober 2026",
-  tarikhDeadlineNotis3: "4 November 2026",
+  tarikhNotis3: "23 Oktober 2026",
+  tarikhDeadlineNotis3: "7 November 2026",
   tempohNotis3: "15",
 
   kecacatan: [
@@ -85,9 +85,12 @@ const data = {
     { tarikh: "4 September 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — 15 kecacatan masih belum dibaiki / kecacatan baru dikesan / belum disiapkan sepenuhnya" },
     { tarikh: "10 September 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) diserahkan secara serahan tangan kepada pejabat pengurusan pihak pemaju di Bandar Layangkasa — diakui terima oleh Cik Syafiqa (Customer Care) dengan cop syarikat" },
     { tarikh: "11 September 2026", peristiwa: "Notis Kedua / Notis Akhir dihantar kepada Ibu Pejabat (Parkland Headquarters Office), Jalan Tun Perak, Melaka" },
+    { tarikh: "23 September 2026", peristiwa: "Notis Kedua diterima di Ibu Pejabat pihak pemaju, Melaka — Pos Daftar AR No. RW193876461MY (cop Pos Malaysia, Pusat Mel Melaka; rujuk Lampiran C)" },
     { tarikh: "26 September 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Kedua (15 hari) — kecacatan masih belum diselesaikan" },
-    { tarikh: "20 Oktober 2026", peristiwa: "Notis Ketiga / Peringatan Terakhir (Third Notice — Final Reminder) dikeluarkan — Ruj. NOTIS-3/2026/016 — diserahkan ke pejabat pihak pemaju di Bandar Layangkasa" },
-    { tarikh: "4 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Ketiga (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "20 Oktober 2026", peristiwa: "Susulan oleh pemilik melalui WhatsApp kepada wakil Customer Care pihak pemaju — respons: akan semak dengan team" },
+    { tarikh: "23 Oktober 2026", peristiwa: "Susulan kedua melalui WhatsApp — wakil pemaju memaklumkan masih menunggu jawapan team; tiada tindakan pembaikan (rujuk Lampiran D)" },
+    { tarikh: "23 Oktober 2026", peristiwa: "Notis Ketiga / Peringatan Terakhir (Third Notice — Final Reminder) dikeluarkan — Ruj. NOTIS-3/2026/016 — diserahkan ke pejabat pihak pemaju di Bandar Layangkasa" },
+    { tarikh: "7 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Ketiga (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
@@ -259,12 +262,12 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} (Ruj: ${data.noRujukanNotis1}) yang telah diakui terima oleh wakil pihak tuan, Cik Laynia Nabila binti Salikim (Customer Care), dengan cop rasmi "RECEIVED" bertarikh 5 Ogos 2026 (Lampiran A), dan seterusnya Notis Kedua / Notis Akhir (Final Notice) bertarikh ${data.tarikhNotis2} (Ruj: ${data.noRujukanNotis2}) yang telah diserahkan secara serahan tangan ke pejabat pihak tuan di Bandar Layangkasa dan diakui terima oleh Cik Syafiqa (Customer Care) dengan cop syarikat pada 10 September 2026 (Lampiran B), serta turut dihantar kepada Ibu Pejabat pihak tuan di Jalan Tun Perak, Melaka pada 11 September 2026. Kedua-dua notis tersebut dikeluarkan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
+  `Merujuk kepada Notis Pertama (First Notice) bertarikh ${data.tarikhNotis1} (Ruj: ${data.noRujukanNotis1}) yang telah diakui terima oleh wakil pihak tuan, Cik Laynia Nabila binti Salikim (Customer Care), dengan cop rasmi "RECEIVED" bertarikh 5 Ogos 2026 (Lampiran A), dan seterusnya Notis Kedua / Notis Akhir (Final Notice) bertarikh ${data.tarikhNotis2} (Ruj: ${data.noRujukanNotis2}) yang telah diserahkan secara serahan tangan ke pejabat pihak tuan di Bandar Layangkasa dan diakui terima oleh Cik Syafiqa (Customer Care) dengan cop syarikat pada 10 September 2026 (Lampiran B), serta turut dihantar kepada Ibu Pejabat pihak tuan di Jalan Tun Perak, Melaka melalui Pos Daftar AR No. RW193876461MY dan DITERIMA pada 23 September 2026 (cop Pos Malaysia, Pusat Mel Melaka — Lampiran C). Kedua-dua notis tersebut dikeluarkan selaras dengan Klausa ${data.klausaSPA} Perjanjian Jual Beli (${data.jenisSPA}) dan Seksyen 12(2) Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 [Akta 118].`
 );
 y += 4;
 
 numPara(2,
-  `Namun, tempoh pembaikan Notis Kedua tersebut telah TAMAT pada ${data.tarikhDeadlineNotis2}, dan sehingga tarikh notis ini dikeluarkan — lebih TIGA (3) minggu selepas tarikh muktamad tersebut — kecacatan yang dilaporkan MASIH BELUM DISELESAIKAN oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama dan Notis Kedua yang kedua-duanya telah diakui terima oleh wakil pihak tuan sendiri.`
+  `Namun, tempoh pembaikan Notis Kedua tersebut telah TAMAT pada ${data.tarikhDeadlineNotis2}, dan sehingga tarikh notis ini dikeluarkan — lebih TIGA (3) minggu selepas tarikh muktamad tersebut — kecacatan yang dilaporkan MASIH BELUM DISELESAIKAN oleh pihak tuan. Ini jelas menunjukkan kegagalan berterusan pihak tuan mematuhi Notis Pertama dan Notis Kedua yang kedua-duanya telah diakui terima oleh wakil pihak tuan sendiri. Susulan turut dibuat oleh pemilik melalui WhatsApp kepada wakil Customer Care pihak tuan (Cik Laynia Nabila) pada 20 Oktober 2026 dan sekali lagi pada 23 Oktober 2026 — namun respons yang diterima hanyalah "sebentar saya tanya team dulu" dan "sorry saya masih tunggu jawapan team", tanpa sebarang tindakan pembaikan (rujuk Lampiran D).`
 );
 y += 4;
 
@@ -420,6 +423,62 @@ doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const cap2Text = "Akuan Terima Notis Kedua / Notis Akhir (Ruj: NOTIS-2/2026/016) — diterima dan ditandatangani oleh Cik Syafiqa (Customer Care) pada 10/9/2026 di pejabat pengurusan pemaju, Bandar Layangkasa, dengan cop rasmi PARKLAND CITY SDN BHD.";
 const cap2Lines = doc.splitTextToSize(cap2Text, cW - 20);
 for (const cl of cap2Lines) { doc.text(cl, pageW / 2, y, { align: "center" }); y += 4.5; }
+
+// ============================================================
+// LAMPIRAN C — AR CARD NOTIS 2 KE HQ
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampTC = "LAMPIRAN C";
+doc.text(lampTC, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampTC) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampTC) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Penghantaran Notis Kedua ke Ibu Pejabat — Pos Daftar AR", pageW / 2, y, { align: "center" });
+y += 8;
+const arImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/pupalan-ar-hq.jpg").toString("base64");
+const aW = 150; const aH = aW * 720 / 1280;
+const aX = (pageW - aW) / 2;
+doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+doc.rect(aX - 1, y - 1, aW + 2, aH + 2);
+doc.addImage(arImg, "JPEG", aX, y, aW, aH);
+y += aH + 6;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const arCap = doc.splitTextToSize("AR Card No. RW193876461MY — Notis Kedua dihantar melalui Pos Daftar AR kepada PARKLAND CITY SDN BHD, Ibu Pejabat Jalan Tun Perak, Melaka, dan DITERIMA pada 23 September 2026 (cop Pos Malaysia, Pusat Mel Melaka).", cW - 10);
+for (const c of arCap) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
+
+// ============================================================
+// LAMPIRAN D — SUSULAN WHATSAPP
+// ============================================================
+const waItems = [
+  { file: "pupalan-wa-1.jpg", cap: "Lampiran D-1: Susulan pemilik melalui WhatsApp kepada wakil Customer Care pihak pemaju (Cik Laynia Nabila) pada 20 Oktober 2026 — bertanya status pembaikan unit No. 6, Jalan Wau Barat 9 (Phase 5) beserta salinan akuan terima Notis 2; respons: akan semak dengan team." },
+  { file: "pupalan-wa-2.jpg", cap: "Lampiran D-2: Susulan kedua pada 23 Oktober 2026 — wakil pemaju memaklumkan masih menunggu jawapan team; tiada sebarang tindakan pembaikan diambil." },
+];
+for (const it of waItems) {
+  newPage();
+  y = 25;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  const dT = "LAMPIRAN D";
+  doc.text(dT, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(dT) / 2, y + 1, pageW / 2 + doc.getTextWidth(dT) / 2, y + 1);
+  y += 6;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+  doc.text("Susulan Pemilik Melalui WhatsApp — Tiada Tindakan Pembaikan", pageW / 2, y, { align: "center" });
+  y += 8;
+  const img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/" + it.file).toString("base64");
+  let iw = 85; let ih = iw * 1280 / 589;
+  const ix = (pageW - iw) / 2;
+  doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+  doc.rect(ix - 1, y - 1, iw + 2, ih + 2);
+  doc.addImage(img, "JPEG", ix, y, iw, ih);
+  y += ih + 5;
+  doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+  const cl = doc.splitTextToSize(it.cap, cW - 10);
+  for (const c of cl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
+}
 
 // ============================================================
 // AKUAN TERIMA x 2
