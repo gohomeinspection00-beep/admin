@@ -19,7 +19,11 @@ const data = {
 
   namaPemaju: "PARKLAND CITY SDN BHD",
   noSyarikat: "(201201031906 / 1016393-K)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "HQ") ? [
+    "(Parkland Headquarters Office)",
+    "No. 112, Jalan Tun Perak,",
+    "75300 Melaka.",
+  ] : [
     "Bangunan Parkland Group,",
     "Persiaran Wau Kikik, Bandar Layangkasa,",
     "81700 Pasir Gudang,",
@@ -542,6 +546,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_3_PUPALAN.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_3_PUPALAN.pdf");
+const outName = (process.argv[2] === "HQ") ? "NOTIS_3_PUPALAN_HQ.pdf" : "NOTIS_3_PUPALAN.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + ((process.argv[2] === "HQ") ? "NOTIS_3_PUPALAN_HQ.pdf" : "NOTIS_3_PUPALAN.pdf"));
 console.log(`Total pages: ${totalPages}`);
