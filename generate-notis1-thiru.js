@@ -299,6 +299,11 @@ numPara(5,
 );
 y += 4;
 
+numPara(5,
+  `Lebih membimbangkan, semakan terhadap rekod kes Defect 9996637-1 di dalam aplikasi KSL mendapati beberapa item telah ditanda "Completed" sedangkan pembaikan sebenarnya TIDAK dilaksanakan — ini merupakan SALAH NYATA STATUS PEMBAIKAN: (i) Item No. 45 ("Leakage observed on the ceiling") dan Item No. 50 ("Visible gaps around floor trap") ditanda "Completed" sedangkan gambar "selepas pembaikan" yang dimuat naik oleh kontraktor pihak tuan sendiri hanyalah NOTA BERTULIS TANGAN berbunyi "bukan orang paip — hantar kontraktor lain" dan "cat ceiling, bukan orang paip" — pengakuan jelas bahawa kerja pembaikan tidak dibuat kerana kontraktor yang dihantar bukan kontraktor paip; dan (ii) Item No. 8 ("Uneven surface on ceiling soffit", Carporch) ditanda "Completed" tetapi gambar "selepas pembaikan" yang dimuat naik menunjukkan KAWASAN YANG BERBEZA daripada kecacatan yang dilaporkan. Pihak tuan dituntut membetulkan status item-item tersebut di dalam sistem, menghantar kontraktor yang betul mengikut bidang kerja, dan mengemukakan bukti pembaikan sebenar di lokasi yang betul.`
+);
+y += 4;
+
 numPara(6,
   `Klausa ${data.klausaPembaikan} ${data.jenisSPA} Perjanjian Jual Beli memperuntukkan bahawa pemaju hendaklah, atas kos dan belanjanya sendiri, membaiki dan memperbetulkan apa-apa kecacatan, pengecutan atau kerosakan lain yang menjejaskan hartanah tersebut dalam tempoh ${data.tempohDLP} bulan dari tarikh penyerahan milikan kosong (DLP — Defect Liability Period).`
 );
