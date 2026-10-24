@@ -9725,7 +9725,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.8 · build 24 Oct 2026 · laser walls start anywhere, not just at a corner, and the meter dot goes green by itself</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.9 · build 24 Oct 2026 · doors and windows snap onto walls at real widths, and the dimension text resizes</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -19331,6 +19331,7 @@ function buildPlanEditor() {
     '<div class="pe-stage" id="peStage">' +
       '<canvas id="peCanvasEl"></canvas>' +
       '<div class="pe-laser" id="peLaser" style="display:none"></div>' +
+      '<div class="pe-laser" id="peOpening" style="display:none"></div>' +
       '<div class="pe-readout" id="peReadout" style="display:none"></div>' +
       '<div class="pe-zoom">' +
         '<button id="peZoomIn">+</button>' +
@@ -19372,6 +19373,22 @@ function buildPlanEditor() {
   // Pelan tanpa skala hanyalah lakaran. Sekali skala ditetapkan, jarak dan
   // luas pada lukisan menjadi ukuran sebenar.
   let peScale = { pxPerM: null, note: '' };
+  // Label dimensi pada pelan bilik kecil bertindih sesama sendiri. Saiznya
+  // boleh dilaraskan, dan laras itu dipakai pada label yang SUDAH ADA
+  // juga — kalau tidak, pelan yang sedang dilukis kekal sesak.
+  const PE_DIM = 'pocket_pe_dim_px_v1';
+  let peDimPx = 13;
+  try { const v = parseFloat(localStorage.getItem(PE_DIM)); if (v >= 7 && v <= 24) peDimPx = v; } catch (e) {}
+  function peDimSet(px) {
+    peDimPx = Math.max(7, Math.min(24, Math.round(px * 10) / 10));
+    try { localStorage.setItem(PE_DIM, String(peDimPx)); } catch (e) {}
+    let n = 0;
+    canvas.getObjects().forEach(function (o) {
+      if (o.peKind === 'dim') { o.set({ fontSize: peDimPx }); o.setCoords(); n++; }
+    });
+    if (n) { canvas.requestRenderAll(); saveHistory(); }
+    lwPaint();
+  }
   let measPts = [], measObjs = [];
   let gridOn = false;
 
@@ -19426,7 +19443,9 @@ function buildPlanEditor() {
     }
     canvas.selection = (m === 'select');
     canvas.skipTargetFind = (m !== 'select');
-    canvas.defaultCursor = (m === 'pan') ? 'grab' : (m === 'measure' || m === 'scale' || m === 'laser') ? 'crosshair' : 'default';
+    const placing = (m === 'door' || m === 'window');
+    canvas.defaultCursor = (m === 'pan') ? 'grab'
+      : (m === 'measure' || m === 'scale' || m === 'laser' || placing) ? 'crosshair' : 'default';
     if (m !== 'measure') clearMeasure();
     if (m === 'measure') redrawMeasure();
     if (m === 'scale') showReadout('Draw a line along something you know<small>THEN ENTER ITS REAL LENGTH</small>');
@@ -19448,24 +19467,173 @@ function buildPlanEditor() {
       }
     }
     lwPaint();
+    peOpeningPaint();
     ov.querySelectorAll('.pe-tool').forEach(function(b) { b.classList.toggle('active', b.dataset.petool === m); });
   }
 
   function addCentered(obj) { canvas.add(obj); canvas.setActiveObject(obj); canvas.requestRenderAll(); saveHistory(); }
 
-  function addDoor() {
-    const c = viewportCenter(), s = 70;
-    const leaf = new fabric.Line([0, 0, 0, -s], { stroke: '#111111', strokeWidth: 4 });
-    const arc = new fabric.Path('M 0 ' + (-s) + ' A ' + s + ' ' + s + ' 0 0 1 ' + s + ' 0', { fill: '', stroke: '#111111', strokeWidth: 2 });
-    const g = new fabric.Group([leaf, arc], { left: c.x, top: c.y, originX: 'center', originY: 'center' });
-    addCentered(g);
+  /* ---------- Bukaan yang melekat pada dindingnya ----------
+     Pintu dan tingkap dahulu dijatuhkan di tengah skrin, terapung dan
+     tidak berputar. Sekarang satu ketikan pada dinding meletakkannya DI
+     ATAS dinding itu, berputar mengikut sudutnya, dan — apabila pelan
+     sudah berskala — pada lebar sebenar. */
+  const PE_DOORM = 'pocket_pe_door_m_v1', PE_WINM = 'pocket_pe_win_m_v1';
+  let peDoorM = 0.9, peWinM = 1.2;
+  try {
+    const a = parseFloat(localStorage.getItem(PE_DOORM)); if (a > 0) peDoorM = a;
+    const b = parseFloat(localStorage.getItem(PE_WINM));  if (b > 0) peWinM = b;
+  } catch (e) {}
+
+  /* Hujung sebenar satu garisan. x1..y2 Fabric ialah koordinat tempatan
+   * dan TIDAK berubah apabila garisan itu dialihkan, jadi membacanya
+   * terus akan meletakkan pintu pada dinding hantu di tempat asalnya. */
+  function peLineEnds(o) {
+    const m = o.calcTransformMatrix();
+    const cx = (o.x1 + o.x2) / 2, cy = (o.y1 + o.y2) / 2;
+    const a = fabric.util.transformPoint(new fabric.Point(o.x1 - cx, o.y1 - cy), m);
+    const b = fabric.util.transformPoint(new fabric.Point(o.x2 - cx, o.y2 - cy), m);
+    return { x1: a.x, y1: a.y, x2: b.x, y2: b.y, o: o };
   }
-  function addWindow() {
-    const c = viewportCenter(), w = 90;
-    const base = new fabric.Rect({ width: w, height: 8, fill: '#ffffff', stroke: '#111111', strokeWidth: 2, originX: 'center', originY: 'center' });
-    const mid = new fabric.Line([-w / 2, 0, w / 2, 0], { stroke: '#111111', strokeWidth: 1 });
-    const g = new fabric.Group([base, mid], { left: c.x, top: c.y, originX: 'center', originY: 'center' });
-    addCentered(g);
+  /* Dinding ialah garisan tebal: alat Wall dan dinding laser kedua-duanya
+   * 6px. Garisan skala berbintik dan hantar seretan dikecualikan. */
+  function peWalls() {
+    return canvas.getObjects()
+      .filter(function (o) { return o.type === 'line' && !o.excludeFromExport && (o.strokeWidth || 0) >= 5; })
+      .map(peLineEnds);
+  }
+
+  function peOpeningPx(kind) {
+    const m = kind === 'door' ? peDoorM : peWinM;
+    return peScale.pxPerM ? m * peScale.pxPerM : (kind === 'door' ? 70 : 90);
+  }
+
+  function peOpeningShapes(kind, w) {
+    const parts = [];
+    // Jurang putih: dinding ialah garisan hitam di atas putih, jadi satu
+    // segi empat putih MEMBACA sebagai bukaan tanpa perlu memotong
+    // dinding itu sendiri.
+    parts.push(new fabric.Rect({ width: w, height: 9, fill: '#ffffff', stroke: '',
+      originX: 'center', originY: 'center', left: 0, top: 0 }));
+    // Jenang pada kedua-dua hujung — itu yang menjadikannya bukaan dan
+    // bukan sekadar celah.
+    [-w / 2, w / 2].forEach(function (x) {
+      parts.push(new fabric.Line([x, -6, x, 6], { stroke: '#111111', strokeWidth: 2 }));
+    });
+    if (kind === 'door') {
+      parts.push(new fabric.Line([-w / 2, 0, -w / 2, -w], { stroke: '#111111', strokeWidth: 3 }));
+      parts.push(new fabric.Path('M ' + (-w / 2) + ' ' + (-w) + ' A ' + w + ' ' + w + ' 0 0 1 ' + (w / 2) + ' 0',
+        { fill: '', stroke: '#111111', strokeWidth: 1.5 }));
+    } else {
+      [-3, 3].forEach(function (y) {
+        parts.push(new fabric.Line([-w / 2, y, w / 2, y], { stroke: '#111111', strokeWidth: 1.5 }));
+      });
+    }
+    return parts;
+  }
+
+  /* Pintu mempunyai empat orientasi: engsel kiri atau kanan, ayunan ke
+   * dalam atau ke luar. Sisi mana yang "dalam" bergantung pada bilik, dan
+   * bilik itu tidak dijejaki \u2014 satu tekaan akan salah separuh masa dan
+   * pintu yang terayun ke luar bangunan ialah lukisan yang salah. Jadi
+   * kedua-dua paksi diberikan terus kepada pengguna. */
+  let peLastOpening = null;
+  function peFlipOpening(axis) {
+    const a = canvas.getActiveObject();
+    const o = (a && (a.peKind === 'door' || a.peKind === 'window')) ? a
+            : (peLastOpening && canvas.contains(peLastOpening) ? peLastOpening : null);
+    if (!o) { showToast('Place a door first, or tap one to pick it.'); return; }
+    if (axis === 'x') o.set({ flipX: !o.flipX }); else o.set({ flipY: !o.flipY });
+    o.setCoords();
+    canvas.requestRenderAll();
+    saveHistory();
+  }
+
+  /** Jarak lekat diukur dalam piksel SKRIN: kanvas dizum. */
+  function peSnapPx() { return 34 / (canvas.getZoom() || 1); }
+
+  /* Lebar bukaan disimpan pada objek. Kotak sempadan kumpulan lebih
+   * besar daripada bukaan itu \u2014 ia merangkumi lengkok pintu dan lebar
+   * lejang jenang \u2014 jadi mengukurnya memberi pintu 0.98 m di tempat
+   * yang sepatutnya 0.90 m. */
+  function peOpeningWidthPx(o) {
+    if (typeof o.peW === 'number' && o.peW > 0) return o.peW * (o.scaleX || 1);
+    return (o.width || 0) * (o.scaleX || 1);
+  }
+  function peSnapOpening(o) {
+    const w = peWalls();
+    if (!w.length) return false;
+    const c = o.getCenterPoint();
+    const hit = peNearestWall(w, { x: c.x, y: c.y }, peOpeningWidthPx(o) / 2);
+    if (!hit || hit.dist > peSnapPx()) return false;
+    o.set({ left: hit.at.x, top: hit.at.y, angle: hit.deg });
+    o.setCoords();
+    return true;
+  }
+
+  function peAddOpening(kind, pt) {
+    const w = peOpeningPx(kind);
+    const g = new fabric.Group(peOpeningShapes(kind, w), {
+      left: pt.x, top: pt.y, originX: 'center', originY: 'center'
+    });
+    g.peKind = kind;
+    g.peW = w;
+    canvas.add(g);
+    const stuck = peSnapOpening(g);
+    peLastOpening = g;
+    canvas.setActiveObject(g);
+    canvas.requestRenderAll();
+    saveHistory();
+    showToast(stuck
+      ? (kind === 'door' ? 'Door' : 'Window') + ' on the wall \u00b7 ' +
+        (peScale.pxPerM ? fmtM(kind === 'door' ? peDoorM : peWinM) : 'no scale yet, so this is not a real width')
+      : 'No wall near that tap \u2014 dropped it loose. Drag it onto a wall and it will snap.');
+  }
+
+  // Menyeret satu bukaan mesti melekatkannya semula: satu pintu yang
+  // terapung 3px dari dindingnya kelihatan rosak pada cetakan.
+  canvas.on('object:modified', function (e) {
+    const o = e && e.target;
+    if (!o || (o.peKind !== 'door' && o.peKind !== 'window')) return;
+    if (peSnapOpening(o)) canvas.requestRenderAll();
+  });
+
+  function peOpeningPaint() {
+    const el = ov.querySelector('#peOpening');
+    if (!el) return;
+    const kind = (mode === 'door' || mode === 'window') ? mode : null;
+    if (!kind) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    const m = kind === 'door' ? peDoorM : peWinM;
+    el.innerHTML =
+      '<div class="pe-l-row">' +
+        '<span class="pe-l-step"><b>Tap the wall</b><span>' +
+          (peScale.pxPerM ? 'It snaps on, square to that wall, at the width below.'
+                          : 'No scale yet \u2014 draw one laser wall first and these become real widths.') +
+          (kind === 'door' ? ' Hinge and Swing turn the last door you placed.' : '') +
+        '</span></div>' +
+        '<button class="pe-l-b" id="peOpDone">Done</button>' +
+      '</div>' +
+      '<div class="pe-l-row2">' +
+        '<span class="pe-l-ang">' + (kind === 'door' ? 'Door' : 'Window') + ' ' + m.toFixed(2) + ' m</span>' +
+        (kind === 'door'
+          ? '<button class="pe-l-b" id="peOpHinge">Hinge</button>' +
+            '<button class="pe-l-b" id="peOpSwing">Swing</button>'
+          : '') +
+        '<button class="pe-l-b" id="peOpDn">\u2212</button>' +
+        '<button class="pe-l-b" id="peOpUp">+</button>' +
+      '</div>';
+    const set = function (v) {
+      v = Math.max(0.3, Math.min(6, Math.round(v * 100) / 100));
+      if (kind === 'door') { peDoorM = v; try { localStorage.setItem(PE_DOORM, String(v)); } catch (e) {} }
+      else { peWinM = v; try { localStorage.setItem(PE_WINM, String(v)); } catch (e) {} }
+      peOpeningPaint();
+    };
+    ov.querySelector('#peOpDn').onclick = function () { set(m - 0.1); };
+    ov.querySelector('#peOpUp').onclick = function () { set(m + 0.1); };
+    const hg = ov.querySelector('#peOpHinge'); if (hg) hg.onclick = function () { peFlipOpening('x'); };
+    const sw = ov.querySelector('#peOpSwing'); if (sw) sw.onclick = function () { peFlipOpening('y'); };
+    ov.querySelector('#peOpDone').onclick = function () { setMode('select'); };
   }
   function addText() {
     const c = viewportCenter();
@@ -19491,7 +19659,9 @@ function buildPlanEditor() {
   function saveHistory() {
     if (isRestoring) return;
     history = history.slice(0, histIndex + 1);
-    history.push(JSON.stringify(canvas.toJSON()));
+    // peKind mesti disenaraikan, kalau tidak satu undo menjadikan setiap
+    // pintu, tingkap dan label dimensi tidak dikenali lagi.
+    history.push(JSON.stringify(canvas.toJSON(['peKind', 'peW'])));
     if (history.length > 60) history.shift();
     histIndex = history.length - 1;
     updateUndoUI();
@@ -19710,17 +19880,19 @@ function buildPlanEditor() {
               : '<button class="pe-l-b" id="peLConn">Connect</button>') +
         '<button class="pe-l-b" id="peLDone">Done</button>' +
       '</div>' +
-      (LW.deg !== null
-        ? '<div class="pe-l-row2">' +
-            '<span class="pe-l-ang">' + lwDegTxt(LW.deg) + '</span>' +
-            '<button class="pe-l-b" id="peLType">Type length</button>' +
-            '<button class="pe-l-b" id="peLBack">Re-aim</button>' +
-          '</div>'
-        : (LW.pts.length > 1
-            ? '<div class="pe-l-row2"><span class="pe-l-ang">' + (LW.pts.length - 1) +
-              (LW.pts.length === 2 ? ' wall' : ' walls') + ' so far</span>' +
-              '<button class="pe-l-b" id="peLUndoW">Undo wall</button></div>'
-            : '')) +
+      '<div class="pe-l-row2">' +
+        '<span class="pe-l-ang">' +
+          (LW.deg !== null ? lwDegTxt(LW.deg)
+            : (LW.pts.length > 1 ? (LW.pts.length - 1) + (LW.pts.length === 2 ? ' wall' : ' walls') + ' so far'
+                                 : 'Text ' + peDimPx + 'px')) +
+        '</span>' +
+        (LW.deg !== null
+          ? '<button class="pe-l-b" id="peLType">Type length</button>' +
+            '<button class="pe-l-b" id="peLBack">Re-aim</button>'
+          : (LW.pts.length > 1 ? '<button class="pe-l-b" id="peLUndoW">Undo wall</button>' : '')) +
+        '<button class="pe-l-b" id="peDimDn" aria-label="Smaller dimension text">A\u2212</button>' +
+        '<button class="pe-l-b" id="peDimUp" aria-label="Larger dimension text">A+</button>' +
+      '</div>' +
       (have ? '<div class="pe-l-have">Last reading ' + fmtM(have) + ' \u2014 it will be used</div>' : '');
 
     const c = ov.querySelector('#peLConn'); if (c) c.onclick = lwConnect;
@@ -19731,6 +19903,8 @@ function buildPlanEditor() {
       lwPaint();
     };
     const u = ov.querySelector('#peLUndoW'); if (u) u.onclick = lwUndoWall;
+    const dn = ov.querySelector('#peDimDn'); if (dn) dn.onclick = function () { peDimSet(peDimPx - 1); };
+    const up = ov.querySelector('#peDimUp'); if (up) up.onclick = function () { peDimSet(peDimPx + 1); };
   }
 
   function lwDegTxt(deg) {
@@ -19806,9 +19980,10 @@ function buildPlanEditor() {
       canvas.add(line);
       const mid = { x: (LW.anchor.x + to.x) / 2, y: (LW.anchor.y + to.y) / 2 };
       const tag = new fabric.Text(fmtM(metres), {
-        left: mid.x, top: mid.y - 16, fontSize: 13, fontFamily: 'IBM Plex Mono, monospace',
+        left: mid.x, top: mid.y - peDimPx - 3, fontSize: peDimPx, fontFamily: 'IBM Plex Mono, monospace',
         fill: '#1B4FD8', originX: 'center', originY: 'center', backgroundColor: '#ffffff'
       });
+      tag.peKind = 'dim';
       canvas.add(tag);
       LW.objs.push([line, tag]);
       if (!LW.pts.length) LW.pts.push({ x: LW.anchor.x, y: LW.anchor.y });
@@ -19964,6 +20139,7 @@ function buildPlanEditor() {
       redrawMeasure();
       return;
     }
+    if (mode === 'door' || mode === 'window') { peAddOpening(mode, canvas.getPointer(o.e)); return; }
     if (mode === 'laser') { lwDown(o); return; }
     if (mode === 'wall' || mode === 'room' || mode === 'scale') startDraw(o);
   });
@@ -20023,9 +20199,7 @@ function buildPlanEditor() {
       const t = btn.dataset.petool;
       if (t === 'undo') { undo(); return; }
       if (t === 'redo') { redo(); return; }
-      if (t === 'door') { addDoor(); setMode('select'); }
-      else if (t === 'window') { addWindow(); setMode('select'); }
-      else if (t === 'text') { addText(); setMode('select'); }
+      if (t === 'text') { addText(); setMode('select'); }
       else if (t === 'delete') { deleteSel(); }
       else if (t === 'grid') { toggleGrid(); }
       else setMode(t);
@@ -20050,7 +20224,7 @@ function buildPlanEditor() {
       element: meta.element,
       location: meta.location,
       description: meta.description,
-      json: JSON.stringify(canvas.toJSON()),
+      json: JSON.stringify(canvas.toJSON(['peKind', 'peW'])),
       thumb: thumb,
       scalePxPerM: peScale.pxPerM || null,
       scaleNote: peScale.note || '',
@@ -26330,6 +26504,45 @@ function lwSnapDeg(raw, prev) {
     if (best) return best.d;
   }
   return r;
+}
+
+/* Dinding terdekat kepada satu ketikan, dan DI MANA pada dinding itu.
+ * Satu bukaan yang diletak dengan mata tidak pernah betul-betul lurus,
+ * dan pintu yang serong 2° pada pelan kelihatan seperti kecuaian. Jadi
+ * titik itu diunjurkan ke atas segmen, dan bukaan itu mengambil sudut
+ * segmen itu sendiri.
+ *
+ * halfPx ialah separuh lebar bukaan: ia dijepit supaya bukaan muat DI
+ * DALAM dindingnya, kerana pintu yang terjuih keluar dari hujung dinding
+ * ialah lukisan yang salah, bukan sekadar hodoh. */
+function peNearestWall(walls, pt, halfPx) {
+  let best = null;
+  for (let i = 0; i < walls.length; i++) {
+    const w = walls[i];
+    const dx = w.x2 - w.x1, dy = w.y2 - w.y1;
+    const len = Math.hypot(dx, dy);
+    if (len < 1e-6) continue;
+    let t = ((pt.x - w.x1) * dx + (pt.y - w.y1) * dy) / (len * len);
+    t = Math.max(0, Math.min(1, t));
+    const qx = w.x1 + dx * t, qy = w.y1 + dy * t;
+    const dist = Math.hypot(pt.x - qx, pt.y - qy);
+    if (!best || dist < best.dist) {
+      best = { i: i, dist: dist, len: len, t: t * len,
+               deg: Math.atan2(dy, dx) * 180 / Math.PI, at: { x: qx, y: qy } };
+    }
+  }
+  if (!best) return null;
+  const hw = halfPx || 0;
+  if (hw > 0) {
+    const w = walls[best.i];
+    const ux = (w.x2 - w.x1) / best.len, uy = (w.y2 - w.y1) / best.len;
+    // Dinding yang lebih pendek daripada bukaan itu sendiri tidak boleh
+    // dijepit kepada julat yang kosong — pusatkan sahaja.
+    const t = best.len > hw * 2 ? Math.max(hw, Math.min(best.len - hw, best.t)) : best.len / 2;
+    best.t = t;
+    best.at = { x: w.x1 + ux * t, y: w.y1 + uy * t };
+  }
+  return best;
 }
 
 /* Hujung dinding, dalam piksel kanvas. Darjah diukur seperti atan2:
