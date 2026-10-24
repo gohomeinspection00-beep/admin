@@ -11140,32 +11140,57 @@ function friendlyAuthError(e) {
 // Benar hanya selepas tetapan BENAR-BENAR turun dari pelayan. Satu muatan
 // yang gagal dan satu akaun tanpa kunci kelihatan sama dari dalam app,
 // dan kedua-duanya memerlukan jawapan yang berbeza daripada pengguna.
-let ayieConfigLoaded = false;
+let ayieConfigLoaded = false, ayieConfigWhy = '';
 
 async function loadConfig() {
   const base = { enabled: true, featureChat: true, featureVoice: true, featureConsultantMode: true };
   if (!pocketConfig) pocketConfig = base;
   if (!ayieConfig) ayieConfig = {};
 
-  const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout')), ms));
+  /* Dua dokumen, dibaca BERASINGAN.
+   *
+   * Dahulu Promise.all menggabungkan keduanya, dan Promise.all menolak
+   * sebaik SATU daripadanya menolak. settings/pocketConfig ditolak oleh
+   * peraturan Firestore untuk pengguna biasa, jadi ia menarik
+   * settings/ayieConfig jatuh bersamanya — dokumen yang memang
+   * dibenarkan, yang membawa kunci AI. Satu dokumen yang ditolak
+   * mematikan penterjemah, sembang dan Sketch to Real sekali gus.
+   *
+   * Setiap bacaan kini berdiri sendiri, dengan had masanya sendiri, dan
+   * apa yang sampai disimpan. */
+  const grab = function (id) {
+    return new Promise(function (resolve) {
+      let done = false;
+      const finish = function (v) { if (!done) { done = true; resolve(v); } };
+      const t = setTimeout(function () { finish({ ok: false, why: 'timeout' }); }, 8000);
+      db.collection('settings').doc(id).get().then(function (d) {
+        clearTimeout(t);
+        finish({ ok: true, data: (d && d.exists) ? d.data() : null });
+      }, function (e) {
+        clearTimeout(t);
+        finish({ ok: false, why: (e && (e.code || e.message)) || 'refused' });
+      });
+    });
+  };
 
-  try {
-    const [pocketDoc, ayieDoc] = await Promise.race([
-      Promise.all([
-        db.collection('settings').doc('pocketConfig').get(),
-        db.collection('settings').doc('ayieConfig').get()
-      ]),
-      timeout(8000)
-    ]);
-    pocketConfig = { ...base, ...(pocketDoc.exists ? pocketDoc.data() : {}) };
-    if (ayieDoc.exists) ayieConfig = ayieDoc.data();
+  const got = await Promise.all([grab('pocketConfig'), grab('ayieConfig')]);
+  const pk = got[0], ay = got[1];
+
+  // Satu cubaan semula yang gagal TIDAK boleh membuang tetapan yang
+  // sudah berjaya dimuat sebelum ini.
+  if (pk.ok) pocketConfig = { ...base, ...(pk.data || {}) };
+  else console.warn('[Config] pocketConfig:', pk.why);
+
+  if (ay.ok) {
+    if (ay.data) ayieConfig = ay.data;
     ayieConfigLoaded = true;
-    console.log('[Config] OK');
-  } catch (e) {
-    // Satu cubaan semula yang gagal TIDAK boleh membuang tetapan yang
-    // sudah berjaya dimuat sebelum ini.
-    console.warn('[Config] Defaults:', e.message);
+    ayieConfigWhy = '';
+  } else {
+    ayieConfigWhy = ay.why;
+    console.warn('[Config] ayieConfig:', ay.why);
   }
+  console.log('[Config] pocketConfig ' + (pk.ok ? 'ok' : pk.why) +
+              ', ayieConfig ' + (ay.ok ? 'ok' : ay.why));
 }
 
 /* Tetapan dimuat sekali sahaja, semasa log masuk, dengan had masa lapan
@@ -11191,6 +11216,10 @@ function aiKeyWhy(code) {
     return 'No signal. Translating and the other AI tools need the network.';
   if (code === 'no-key')
     return 'No AI key is set for this account \u2014 that is an administrator setting, not something on this phone.';
+  // Satu penolakan oleh peraturan tidak akan sembuh dengan mencuba lagi,
+  // dan orang yang boleh membetulkannya bukan orang yang memegang telefon.
+  if (/permission|denied|insufficient/i.test(ayieConfigWhy))
+    return 'The server refused to release the AI settings for this account \u2014 a permissions setting, not something this phone can fix.';
   return 'Could not fetch the AI settings from the server. Tried again just now and it is still not through.';
 }
 // Tetapan yang gagal dimuat semasa log masuk sepatutnya sembuh sendiri

@@ -176,12 +176,18 @@ service cloud.firestore {
     // wildcard makes every OTHER settings doc admin-only. (Firestore allows a
     // request if ANY matching rule allows it, so specific-allow wins over the
     // wildcard for these docs.) Writes always admin-only.
+    // pocketConfig: Pocket membacanya pada SETIAP log masuk sebagai pengguna
+    // biasa (loadConfig). Ia tiada di sini sebelum ini, jadi bacaan itu
+    // ditolak — dan kerana kedua-dua dokumen dibaca bersama, penolakan itu
+    // turut membunuh bacaan ayieConfig dan setiap ciri AI bersamanya.
+    match /settings/pocketConfig     { allow read: if isSignedIn(); allow write: if isAdmin(); }
     match /settings/ayieConfig       { allow read: if isSignedIn(); allow write: if isAdmin(); }
     match /settings/ayieTalkConfig   { allow read: if isSignedIn(); allow write: if isAdmin(); }
     match /settings/appLinks         { allow read: if isSignedIn(); allow write: if isAdmin(); }
     match /settings/voiceCorrections { allow read: if isSignedIn(); allow write: if isAdmin(); }
-    // appConfig, trackTimeline, and any future settings: admin-only (app never
-    // reads them as a normal user).
+    // appConfig, trackTimeline, and any future settings: admin-only. Anything
+    // the app reads as a normal user must be listed ABOVE, or the read is
+    // refused — and a refused read takes its companion read down with it.
     match /settings/{doc}            { allow read, write: if isAdmin(); }
 
     // ---- clock calibration + ping : public read, signed-in write ----
