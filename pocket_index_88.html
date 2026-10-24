@@ -9727,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.3 · build 25 Oct 2026 · an AI failure now says what it is in one sentence, and whether waiting will help</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.4 · build 25 Oct 2026 · a key changed by the administrator arrives without restarting the app</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -11220,15 +11220,34 @@ async function aiConfigEnsure() {
  * datang sebagai 429 RESOURCE_EXHAUSTED, tetapi satu akan sembuh dengan
  * menunggu seminit dan satu lagi tidak akan sembuh sampai seseorang
  * membayar. Jadi teks mesej diperiksa dahulu, bukan kodnya. */
+/* Kunci yang ditukar oleh pentadbir tidak sepatutnya memerlukan app
+ * dimulakan semula. Tetapan dimuat sekali semasa log masuk, jadi satu
+ * kunci baharu dalam Firestore tidak akan sampai sehingga sesi berakhir
+ * \u2014 dan pengguna akan menyangka pertukaran itu gagal.
+ *
+ * Jadi satu kegagalan yang menunjuk kepada KUNCI itu sendiri (kredit
+ * habis, kunci tidak sah, kebenaran ditolak) menandakan tetapan sebagai
+ * basi. Percubaan berikutnya mengambilnya semula dan mendapat kunci
+ * baharu. Had kadar biasa TIDAK mencetuskannya: kunci itu elok, ia cuma
+ * terlalu laju. */
+function aiKeyStale() {
+  if (ayieConfig) ayieConfig.apiKey = '';
+  ayieConfigLoaded = false;
+}
+
 function aiErrSay(status, err) {
   const m = String((err && err.error && err.error.message) || '');
   if (m) console.warn('[AI] ' + status + ': ' + m);
-  if (/credit|billing|prepay|depleted|free tier|plan and billing/i.test(m))
+  if (/credit|billing|prepay|depleted|free tier|plan and billing/i.test(m)) {
+    aiKeyStale();
     return 'The AI account has run out of credit. It has to be topped up on the Google AI billing page \u2014 nothing on this phone can fix it.';
+  }
   if (status === 429) return 'Too many AI requests just now. Wait a minute and try again.';
-  if (/api[_ ]?key[_ ]?invalid|api key not valid/i.test(m))
+  if (/api[_ ]?key[_ ]?invalid|api key not valid/i.test(m)) {
+    aiKeyStale();
     return 'The AI key is no longer valid. It has to be replaced in the account settings.';
-  if (status === 403) return 'This AI key is not allowed to use that model.';
+  }
+  if (status === 403) { aiKeyStale(); return 'This AI key is not allowed to use that model.'; }
   if (status === 404) return 'That AI model is not available to this key.';
   if (status === 503) return 'The AI service is busy. Try again in a moment.';
   if (status >= 500) return 'The AI service failed at its end. Nothing is wrong with your work.';
