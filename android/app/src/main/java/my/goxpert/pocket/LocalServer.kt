@@ -338,7 +338,12 @@ class LocalServer(
 
     companion object {
         /** Nama yang sama yang WebView sambung kepadanya. */
-        const val HOST = "localhost"
+        // "127.0.0.1", bukan "localhost": nama itu boleh diselesaikan kepada
+        // ::1 pada sesetengah telefon, dan Chrome yang membuka
+        // http://127.0.0.1:8765 kemudian tidak menemui apa-apa. Alamat
+        // berangka mengikat gelung balik yang betul setiap kali, dan WebView
+        // yang memuat "localhost" tetap sampai ke sini.
+        const val HOST = "127.0.0.1"
         const val PORT = 8765
         private const val BOUNDARY = "pocketframe"
 

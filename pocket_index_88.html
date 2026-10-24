@@ -9116,7 +9116,8 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .hw-chk.good{background:var(--success-soft);color:var(--success)}
 .hw-chk.warn{background:var(--warning-soft);color:var(--warning)}
 .hw-chk.bad{background:var(--critical-soft);color:var(--critical)}
-.hw-go{display:block;width:100%;padding:14px;border-radius:13px;background:var(--accent);color:var(--accent-fg);font-size:14.5px;font-weight:700;border:none;margin-bottom:10px;font-family:var(--font-body)}
+.hw-go{display:block;width:100%;padding:14px;border-radius:13px;background:var(--accent);color:var(--accent-fg);font-size:14.5px;font-weight:700;text-align:center;border:none;margin-bottom:10px;font-family:var(--font-body)}
+.hw-go.alt{background:var(--surface);color:var(--fg-2);border:1px solid var(--line-2)}
 .hw-go:disabled{opacity:.5}
 .hw-dev{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:8px}
 .hw-dev-t{min-width:0;flex:1}
@@ -9694,7 +9695,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.2 · build 24 Oct 2026 · BLE lab ready for the Mileseey M120: every byte offset decoded, commands can be sent, log can be copied</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.3 · build 24 Oct 2026 · BLE lab: every byte offset decoded, and one tap out to the browser where Bluetooth actually works</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -25735,6 +25736,16 @@ function enAsk(title, rows) {
 // tidak disenaraikan di sini, jadi senarai ini menentukan apa yang
 // boleh dilihat langsung.
 function hw16(x) { return '0000' + x.toString(16).padStart(4, '0') + '-0000-1000-8000-00805f9b34fb'; }
+// Pelayan tempatan app itu, dieja supaya WebView menghantarnya ke pelayar.
+// Portnya dibaca daripada alamat halaman ini sendiri, bukan ditulis dua
+// kali: satu APK yang menukar portnya tidak boleh memecahkan ini.
+function hwLoop() {
+  try {
+    if (/^(localhost|127\.0\.0\.1)$/i.test(location.hostname) && location.port)
+      return 'http://127.0.0.1:' + location.port;
+  } catch (e) {}
+  return 'http://127.0.0.1:8765';
+}
 const HW_EXTRA = 'pocket_hw_uuid_v1';
 // Chrome menyembunyikan setiap servis yang tidak disenaraikan di sini, dan
 // satu servis yang tersembunyi kelihatan sama seperti meter yang rosak.
@@ -25900,12 +25911,32 @@ async function hwBle() {
     // berbeza, dan surveyor yang berdiri di tapak patut tahu alat mana lagi
     // yang masih boleh dipakai di sini.
     const inApp = !!window.PocketNative;
-    el.innerHTML = '<div class="hw-chk bad"><div><b>' +
-      (inApp ? 'This app has no Web Bluetooth' : 'This browser has no Web Bluetooth') + '</b><span>' +
-      (inApp
-        ? 'Android WebView does not ship Web Bluetooth, and no bridge can stand in for it \u2014 it is a whole protocol stack, not one call. For laser meters, open Pocket in Chrome. Every other tool still works here.'
-        : 'Needs Chrome on Android, over https://. iPhone and Safari do not support it at all \u2014 no code can cover that.') +
-      '</span></div></div>';
+    if (!inApp) {
+      el.innerHTML = '<div class="hw-chk bad"><div><b>This browser has no Web Bluetooth</b>' +
+        '<span>Needs Chrome on Android, over https:// or http://localhost. iPhone and Safari do not support it at all \u2014 no code can cover that.</span></div></div>';
+      return;
+    }
+    // Pocket sudah menjalankan pelayannya sendiri. Membuka alamat gelung
+    // balik yang SAMA melalui ejaan yang berbeza menghantarnya keluar ke
+    // pelayar (leaveApp() menahan 'localhost' sahaja), dan 127.0.0.1 juga
+    // satu asal yang dipercayai \u2014 jadi Web Bluetooth hidup di sana.
+    el.innerHTML =
+      '<div class="hw-chk bad"><div><b>This app cannot reach Bluetooth</b>' +
+      '<span>Android WebView does not ship Web Bluetooth, and no bridge can stand in for it \u2014 it is a whole protocol stack, not one call. Every other tool still works here.</span></div></div>' +
+      '<div class="hw-chk good"><div><b>The same Pocket, one tap away</b>' +
+      '<span>Pocket is already serving itself at ' + hwLoop() + '. Opening that address in Chrome gives you this very screen with Bluetooth working \u2014 same account, same data.</span></div></div>' +
+      '<a class="hw-go" id="hwOpenBrowser" href="' + hwLoop() + '" style="text-decoration:none">Open Pocket in the browser</a>' +
+      '<button class="hw-go alt" id="hwCopyUrl">Copy the address instead</button>' +
+      '<p class="hw-hint"><b>Leave Pocket running.</b> The address only answers while this app is alive, so switch over with Home \u2014 do not swipe Pocket away.<br>' +
+      '<b>It has to be Chrome.</b> Samsung Internet and Firefox on Android do not do Web Bluetooth. If the wrong browser opens, copy the address and paste it into Chrome.</p>';
+    const cb = document.getElementById('hwCopyUrl');
+    if (cb) cb.onclick = function() {
+      const done = function() { showToast('Address copied \u2014 paste it into Chrome.'); };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(hwLoop()).then(done, function() { hwFallbackCopy(hwLoop(), done); });
+        else hwFallbackCopy(hwLoop(), done);
+      } catch (e) { hwFallbackCopy(hwLoop(), done); }
+    };
     return;
   }
   el.innerHTML =
