@@ -201,11 +201,18 @@ class BleLink(
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, state: Int) {
             if (state == android.bluetooth.BluetoothProfile.STATE_CONNECTED) {
                 emit("state", j("state" to "connected"))
+                discoverAsked = false
+                servicesDone = false
                 // Satu MTU yang lebih besar bermakna bacaan panjang tidak
                 // berpecah. Kegagalan di sini tidak penting: halaman
                 // memasang semula barisnya sendiri.
-                runCatching { g.requestMtu(185) }
-                main.postDelayed({ runCatching { g.discoverServices() } }, 250)
+                val asked = runCatching { g.requestMtu(185) }.getOrDefault(false)
+                // Jaring keselamatan sahaja. Sesetengah telefon tidak pernah
+                // memanggil onMtuChanged, dan tanpa ini sambungan itu
+                // tergantung tanpa satu pun servis dibaca. startDiscover()
+                // berpagar, jadi laluan yang sampai dahulu yang menang dan
+                // discoverServices TIDAK dipanggil dua kali.
+                main.postDelayed({ startDiscover(g) }, if (asked) 1200L else 0L)
             } else if (state == android.bluetooth.BluetoothProfile.STATE_DISCONNECTED) {
                 writables.clear()
                 emit("state", j("state" to "disconnected", "status" to status.toString()))
@@ -215,7 +222,7 @@ class BleLink(
         }
 
         override fun onMtuChanged(g: BluetoothGatt, mtu: Int, status: Int) {
-            runCatching { g.discoverServices() }
+            startDiscover(g)
         }
 
         @SuppressLint("MissingPermission")
@@ -224,45 +231,88 @@ class BleLink(
                 emit("error", j("msg" to "Services could not be read (status $status)"))
                 return
             }
-            writables.clear()
-            // Senarai menunggu: satu descriptor ditulis pada satu masa.
-            // Menulis dua serentak diam-diam menjatuhkan yang kedua, dan
-            // meter kemudian kelihatan senyap tanpa sebab.
-            val queue = ArrayList<BluetoothGattCharacteristic>()
-            for (sv in g.services) {
-                val chars = sv.characteristics ?: continue
-                emit("service", j("uuid" to sv.uuid.toString(), "chars" to chars.size.toString()))
-                for (c in chars) {
-                    val p = c.properties
-                    if (p and (BluetoothGattCharacteristic.PROPERTY_WRITE or
-                               BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0)
-                        writables.add(c)
-                    if (p and (BluetoothGattCharacteristic.PROPERTY_NOTIFY or
-                               BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0)
-                        queue.add(c)
+            // SEMUANYA pada satu benang, dan sekali sahaja. Dua laluan
+            // penemuan yang berkongsi satu barisan langganan saling
+            // memadam, dan akhirnya meter kelihatan tidak boleh memberi
+            // pemberitahuan sedangkan ia boleh.
+            main.post {
+                if (servicesDone) return@post
+                servicesDone = true
+                writables.clear()
+                pending.clear()
+                subs = 0
+                for (sv in g.services) {
+                    val chars = sv.characteristics ?: continue
+                    emit("service", j("uuid" to sv.uuid.toString(), "chars" to chars.size.toString()))
+                    for (c in chars) {
+                        val p = c.properties
+                        // Setiap ciri dinamakan bersama apa yang ia boleh
+                        // buat. Tanpa baris ini, satu meter yang senyap
+                        // tidak boleh dibezakan daripada satu pepijat di
+                        // sini \u2014 dan itu yang berlaku kali pertama.
+                        emit("char", j(
+                            "uuid" to c.uuid.toString(),
+                            "props" to propNames(p),
+                            "cccd" to (c.getDescriptor(CCCD) != null).toString()
+                        ))
+                        if (p and (BluetoothGattCharacteristic.PROPERTY_WRITE or
+                                   BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0)
+                            writables.add(c)
+                        if (p and (BluetoothGattCharacteristic.PROPERTY_NOTIFY or
+                                   BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0)
+                            pending.add(c)
+                    }
                 }
+                nextSub(g)
             }
-            pending.clear()
-            pending.addAll(queue)
-            subs = 0
-            nextSub(g)
         }
 
         override fun onDescriptorWrite(g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int) {
-            if (status == BluetoothGatt.GATT_SUCCESS) subs++
-            nextSub(g)
+            val okOne = status == BluetoothGatt.GATT_SUCCESS
+            if (okOne) subs++
+            emit("sub", j(
+                "uuid" to (d.characteristic?.uuid?.toString() ?: ""),
+                "ok" to okOne.toString(),
+                "status" to status.toString()
+            ))
+            main.post { nextSub(g) }
         }
 
         override fun onCharacteristicChanged(
             g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray
         ) = push(c.uuid, value)
 
-        @Deprecated("Pra-Android 13 memanggil bentuk ini.")
+        @Deprecated("Pre-Android 13 calls this form.")
         @Suppress("DEPRECATION")
         override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic) {
             push(c.uuid, c.value ?: ByteArray(0))
         }
     }
+
+    /** Berpagar: laluan MTU dan pemasa jaring keselamatan kedua-duanya
+     *  membawa ke sini, dan hanya yang pertama bermakna. */
+    @SuppressLint("MissingPermission")
+    private fun startDiscover(g: BluetoothGatt) {
+        main.post {
+            if (discoverAsked) return@post
+            discoverAsked = true
+            if (!runCatching { g.discoverServices() }.getOrDefault(false))
+                emit("error", j("msg" to "Could not start reading the services"))
+        }
+    }
+
+    private fun propNames(p: Int): String {
+        val sb = StringBuilder()
+        if (p and BluetoothGattCharacteristic.PROPERTY_READ != 0) sb.append("read ")
+        if (p and BluetoothGattCharacteristic.PROPERTY_WRITE != 0) sb.append("write ")
+        if (p and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0) sb.append("write-nr ")
+        if (p and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0) sb.append("notify ")
+        if (p and BluetoothGattCharacteristic.PROPERTY_INDICATE != 0) sb.append("indicate ")
+        return sb.toString().trim().ifEmpty { "none" }
+    }
+
+    private var discoverAsked = false
+    private var servicesDone = false
 
     private val pending = ArrayList<BluetoothGattCharacteristic>()
     private var subs = 0
@@ -276,7 +326,19 @@ class BleLink(
         val c = pending.removeAt(0)
         val on = runCatching { g.setCharacteristicNotification(c, true) }.getOrDefault(false)
         val d = c.getDescriptor(CCCD)
-        if (!on || d == null) { nextSub(g); return }
+        if (!on) {
+            emit("sub", j("uuid" to c.uuid.toString(), "ok" to "false", "status" to "refused"))
+            nextSub(g); return
+        }
+        if (d == null) {
+            // Tiada descriptor CCCD. Sesetengah tumpukan tetap
+            // menghantar pemberitahuan selepas setCharacteristicNotification,
+            // jadi ia dikira \u2014 tetapi dikatakan, supaya satu meter yang
+            // senyap selepas ini tidak kelihatan misteri.
+            subs++
+            emit("sub", j("uuid" to c.uuid.toString(), "ok" to "true", "status" to "no-cccd"))
+            nextSub(g); return
+        }
         val want = if (c.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0)
             BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
         else BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
@@ -290,7 +352,10 @@ class BleLink(
         }.getOrDefault(false)
         // Tiada panggilan balik akan datang untuk tulisan yang tidak
         // pernah bermula, jadi barisan itu mesti digerakkan di sini.
-        if (!wrote) nextSub(g)
+        if (!wrote) {
+            emit("sub", j("uuid" to c.uuid.toString(), "ok" to "false", "status" to "write-refused"))
+            nextSub(g)
+        }
     }
 
     private fun push(uuid: UUID, v: ByteArray) {
