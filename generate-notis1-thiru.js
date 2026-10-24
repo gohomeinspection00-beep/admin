@@ -47,7 +47,7 @@ const data = {
 
   tarikhPemeriksaan1: "15 September 2026",
   tarikhSerahanLaporan: "21 dan 22 September 2026",
-  kaedahSerahanLaporan: "aplikasi pihak pemaju (KSL)",
+  kaedahSerahanLaporan: "aplikasi pihak pemaju (SAMMO)",
   tarikhTamat30: "21 dan 22 Oktober 2026",
 
   tarikhNotis: "25 Oktober 2026",
@@ -79,8 +79,8 @@ const data = {
   kronologi: [
     { tarikh: "19 Ogos 2024", peristiwa: "Perjanjian Jual Beli (Sale and Purchase Agreement) ditandatangani — Azalea Heights 2C, Taman Puncak Tropicana (Ruj: 30622-1/eSPA/100724/PTD16655/01)" },
     { tarikh: "15 September 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (Full House Inspection) dijalankan ke atas hartanah" },
-    { tarikh: "21 September 2026", peristiwa: "Laporan kecacatan dikemukakan melalui aplikasi pihak pemaju (KSL) — Defect 9996637-1 — merupakan notis bertulis di bawah Klausa 27(1)" },
-    { tarikh: "22 September 2026", peristiwa: "Laporan kecacatan dikemukakan melalui aplikasi pihak pemaju (KSL) — Defect 1996947-2" },
+    { tarikh: "21 September 2026", peristiwa: "Laporan kecacatan dikemukakan melalui aplikasi pihak pemaju (SAMMO) — Defect 9996637-1 — merupakan notis bertulis di bawah Klausa 27(1)" },
+    { tarikh: "22 September 2026", peristiwa: "Laporan kecacatan dikemukakan melalui aplikasi pihak pemaju (SAMMO) — Defect 1996947-2" },
     { tarikh: "21 dan 22 Oktober 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — TIADA kecacatan berstatus Completed di dalam sistem pihak pemaju; Defect 1996947-2 masih berstatus Pending" },
     { tarikh: "25 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "9 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
@@ -261,7 +261,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan. Malah, rekod aplikasi KSL pihak tuan sendiri mengesahkan bahawa TIADA satu pun kes berstatus "Completed" — Defect 9996637-1 masih berstatus "In Progress" manakala Defect 1996947-2 masih berstatus "Pending" tanpa sebarang tindakan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan. Malah, rekod aplikasi SAMMO pihak tuan sendiri mengesahkan bahawa TIADA satu pun kes berstatus "Completed" — Defect 9996637-1 masih berstatus "In Progress" manakala Defect 1996947-2 masih berstatus "Pending" tanpa sebarang tindakan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
@@ -300,7 +300,7 @@ numPara(5,
 y += 4;
 
 numPara(5,
-  `Lebih membimbangkan, semakan terhadap rekod kes Defect 9996637-1 di dalam aplikasi KSL mendapati beberapa item telah ditanda "Completed" sedangkan pembaikan sebenarnya TIDAK dilaksanakan — ini merupakan SALAH NYATA STATUS PEMBAIKAN: (i) Item No. 45 ("Leakage observed on the ceiling") dan Item No. 50 ("Visible gaps around floor trap") ditanda "Completed" sedangkan gambar "selepas pembaikan" yang dimuat naik oleh kontraktor pihak tuan sendiri hanyalah NOTA BERTULIS TANGAN berbunyi "bukan orang paip — hantar kontraktor lain" dan "cat ceiling, bukan orang paip" — pengakuan jelas bahawa kerja pembaikan tidak dibuat kerana kontraktor yang dihantar bukan kontraktor paip; dan (ii) Item No. 8 ("Uneven surface on ceiling soffit", Carporch) ditanda "Completed" tetapi gambar "selepas pembaikan" yang dimuat naik menunjukkan KAWASAN YANG BERBEZA daripada kecacatan yang dilaporkan. Pihak tuan dituntut membetulkan status item-item tersebut di dalam sistem, menghantar kontraktor yang betul mengikut bidang kerja, dan mengemukakan bukti pembaikan sebenar di lokasi yang betul. Salinan rekod aplikasi bagi item-item tersebut dilampirkan sebagai LAMPIRAN A.`
+  `Lebih membimbangkan, semakan terhadap rekod kes Defect 9996637-1 di dalam aplikasi SAMMO mendapati beberapa item telah ditanda "Completed" sedangkan pembaikan sebenarnya TIDAK dilaksanakan — ini merupakan SALAH NYATA STATUS PEMBAIKAN: (i) Item No. 45 ("Leakage observed on the ceiling") dan Item No. 50 ("Visible gaps around floor trap") ditanda "Completed" sedangkan gambar "selepas pembaikan" yang dimuat naik oleh kontraktor pihak tuan sendiri hanyalah NOTA BERTULIS TANGAN berbunyi "bukan orang paip — hantar kontraktor lain" dan "cat ceiling, bukan orang paip" — pengakuan jelas bahawa kerja pembaikan tidak dibuat kerana kontraktor yang dihantar bukan kontraktor paip; dan (ii) Item No. 8 ("Uneven surface on ceiling soffit", Carporch) ditanda "Completed" tetapi gambar "selepas pembaikan" yang dimuat naik menunjukkan KAWASAN YANG BERBEZA daripada kecacatan yang dilaporkan. Pihak tuan dituntut membetulkan status item-item tersebut di dalam sistem, menghantar kontraktor yang betul mengikut bidang kerja, dan mengemukakan bukti pembaikan sebenar di lokasi yang betul. Salinan rekod aplikasi bagi item-item tersebut dilampirkan sebagai LAMPIRAN A.`
 );
 y += 4;
 
@@ -436,9 +436,9 @@ drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
 // LAMPIRAN A — REKOD APLIKASI KSL (ITEM 8, 45, 50)
 // ============================================================
 const lampItems = [
-  { file: "thiru-ksl-item8.jpg", w: 646, h: 1400, cap: "Lampiran A-1: Item No. 8 (Carporch — Uneven surface on ceiling soffit) ditanda \"Completed\" di dalam aplikasi KSL, tetapi gambar \"selepas pembaikan\" oleh kontraktor menunjukkan kawasan yang berbeza daripada kecacatan yang dilaporkan." },
+  { file: "thiru-ksl-item8.jpg", w: 646, h: 1400, cap: "Lampiran A-1: Item No. 8 (Carporch — Uneven surface on ceiling soffit) ditanda \"Completed\" di dalam aplikasi SAMMO, tetapi gambar \"selepas pembaikan\" oleh kontraktor menunjukkan kawasan yang berbeza daripada kecacatan yang dilaporkan." },
   { file: "thiru-ksl-item45.jpg", w: 646, h: 1400, cap: "Lampiran A-2: Item No. 45 (Leakage observed on the ceiling) ditanda \"Completed\" — gambar \"selepas pembaikan\" oleh kontraktor hanyalah nota bertulis \"cat ceiling bukan orang paep TQ\"; kerja pembaikan paip tidak dilaksanakan." },
-  { file: "thiru-ksl-item50.jpg", w: 646, h: 1400, cap: "Lampiran A-3: Item No. 50 (Yard — Visible gaps around floor trap) ditanda \"Completed\" — gambar \"selepas pembaikan\" oleh kontraktor hanyalah nota bertulis; kerja pembaikan tidak dilaksanakan." },
+  { file: "thiru-ksl-item50.jpg", w: 646, h: 1400, cap: "Lampiran A-3: Item No. 50 (Yard — Visible gaps around floor trap) ditanda \"Completed\" — gambar \"selepas pembaikan\" oleh kontraktor hanyalah nota bertulis \"bukan org paip, hantar contractor lain\"; kerja pembaikan tidak dilaksanakan." },
   { file: "thiru-ksl-nota.jpg", w: 646, h: 1400, cap: "Lampiran A-4: Nota bertulis tangan yang dimuat naik oleh kontraktor pihak pemaju sebagai gambar \"selepas pembaikan\" — \"Bukan orang paep. Hantar contractor lain, tq.\"" },
 ];
 for (const it of lampItems) {
@@ -451,7 +451,7 @@ for (const it of lampItems) {
   doc.line(pageW / 2 - doc.getTextWidth(lT2) / 2, y + 1, pageW / 2 + doc.getTextWidth(lT2) / 2, y + 1);
   y += 6;
   doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
-  doc.text("Rekod Aplikasi KSL — Status \"Completed\" Yang Tidak Tepat (Defect 9996637-1)", pageW / 2, y, { align: "center" });
+  doc.text("Rekod Aplikasi SAMMO — Status \"Completed\" Yang Tidak Tepat (Defect 9996637-1)", pageW / 2, y, { align: "center" });
   y += 8;
   const img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/" + it.file).toString("base64");
   let iw = 82; let ih = iw * it.h / it.w;
