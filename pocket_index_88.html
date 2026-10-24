@@ -9727,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.4 · build 25 Oct 2026 · a key changed by the administrator arrives without restarting the app</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.5 · build 25 Oct 2026 · a retired AI model steps aside for one that still answers</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -11223,7 +11223,7 @@ async function aiConfigEnsure() {
 /* Kunci yang ditukar oleh pentadbir tidak sepatutnya memerlukan app
  * dimulakan semula. Tetapan dimuat sekali semasa log masuk, jadi satu
  * kunci baharu dalam Firestore tidak akan sampai sehingga sesi berakhir
- * \u2014 dan pengguna akan menyangka pertukaran itu gagal.
+ * — dan pengguna akan menyangka pertukaran itu gagal.
  *
  * Jadi satu kegagalan yang menunjuk kepada KUNCI itu sendiri (kredit
  * habis, kunci tidak sah, kebenaran ditolak) menandakan tetapan sebagai
@@ -11275,7 +11275,76 @@ window.addEventListener('online', function () {
 });
 
 function getApiKey() { return ayieConfig.apiKey || ''; }
-function getModel() { return (pocketConfig && pocketConfig.model) || ayieConfig.model || 'gemini-2.5-flash'; }
+function getModel() { return (pocketConfig && pocketConfig.model) || ayieConfig.model || ''; }
+
+/* Google menutup model lama kepada kunci BAHARU tanpa menutupnya kepada
+ * kunci yang sudah sedia ada. Jadi app yang berjalan elok berbulan-bulan
+ * mati pada hari pentadbir menukar kunci, dan tiada satu baris pun dalam
+ * app yang berubah. Itulah yang berlaku kepada gemini-2.5-flash.
+ *
+ * Menyenaraikan model tidak membantu: senarai itu MASIH memaparkan model
+ * yang sudah ditutup. Hanya panggilan sebenar memberitahu, dengan 404.
+ *
+ * Jadi 404 menjatuhkan panggilan ke model seterusnya, dan model yang
+ * menjawab diingat untuk sesi ini — supaya harga percubaan itu
+ * dibayar sekali, bukan pada setiap ayat yang diterjemah. */
+const AI_MODELS = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
+let aiModelOk = '';
+function aiModelChain() {
+  const chain = [];
+  const add = function (m) { if (m && chain.indexOf(m) < 0) chain.push(m); };
+  add(aiModelOk);
+  add(getModel());
+  AI_MODELS.forEach(add);
+  return chain;
+}
+
+/* Model 3.x berfikir secara lalai, dan fikiran itu dibayar daripada
+ * belanjawan token keluaran yang SAMA. Diukur pada gemini-3.8-flash:
+ * 963 token fikiran untuk satu terjemahan yang panjangnya 28 token,
+ * daripada had 1024. Ayat yang sedikit lebih panjang akan kehabisan
+ * belanjawan sebelum satu huruf pun ditulis, dan pulang kosong.
+ * Dua generasi model menamakan tetapan itu berlainan. */
+function aiNoThink(model, cfg) {
+  const c = Object.assign({}, cfg || {});
+  c.thinkingConfig = model.indexOf('2.5') !== -1
+    ? { thinkingBudget: 0 }
+    : { thinkingLevel: 'low' };
+  return c;
+}
+
+/* Satu panggilan generateContent yang jatuh ke model seterusnya apabila
+ * MODEL itu yang ditolak (404), tetapi tidak apabila kunci, kredit atau
+ * kandungan yang ditolak: mencuba model lain tidak membetulkan satu pun
+ * daripada itu, ia cuma melambatkan ralat yang sama.
+ *
+ * makeBody menerima nama model kerana tetapan fikiran berbeza antara
+ * generasi — badan permintaan tidak boleh dibina sebelum kita tahu
+ * model mana yang akan menjawab. */
+async function aiGenerate(makeBody, tail) {
+  const apiKey = getApiKey();
+  const chain = aiModelChain();
+  const end = tail || '';
+  for (let i = 0; i < chain.length; i++) {
+    const res = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/' +
+      chain[i] + ':generateContent?key=' + apiKey,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(makeBody(chain[i])) });
+    if (res.ok) { aiModelOk = chain[i]; return res.json(); }
+    const e = await res.json().catch(function () { return {}; });
+    if (res.status === 404) {
+      if (aiModelOk === chain[i]) aiModelOk = '';
+      console.warn('[AI] 404 ' + chain[i] + ': ' +
+        String((e && e.error && e.error.message) || '').slice(0, 140));
+      continue;
+    }
+    throw new Error(aiErrSay(res.status, e) + end);
+  }
+  throw new Error('No AI model on this key would answer \u2014 every one of them ' +
+    'has been retired or blocked. An administrator has to set a current model ' +
+    'in the account settings.' + end);
+}
 
 // =======================================================
 // SHOW APP
@@ -12107,9 +12176,6 @@ async function sendMessage() {
 async function callGemini(history, isVoice = false) {
   const why = (typeof aiConfigEnsure === 'function') ? await aiConfigEnsure() : '';
   if (why) throw new Error(aiKeyWhy(why));
-  const apiKey = getApiKey();
-  
-  const model = getModel();
   const systemPrompt = getSystemPrompt(isVoice);
   
   const contents = [];
@@ -12129,32 +12195,27 @@ async function callGemini(history, isVoice = false) {
     }
   });
   
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
+  /* Mod suara mendapat belanjawan 512 token, dan model 3.x akan
+   * membelanjakannya untuk berfikir sebelum ia bercakap. Perundingan
+   * bertaip mampu menunggu dan benar-benar mendapat manfaat daripada
+   * fikiran itu, jadi hanya suara yang mematikannya. */
+  const data = await aiGenerate(function (model) {
+    const cfg = {
+      temperature: currentMode === 'consultant' ? 0.3 : 0.5,
+      maxOutputTokens: isVoice ? 512 : (currentMode === 'consultant' ? 4096 : 2048)
+    };
+    return {
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: contents,
-      generationConfig: {
-        temperature: currentMode === 'consultant' ? 0.3 : 0.5,
-        maxOutputTokens: isVoice ? 512 : (currentMode === 'consultant' ? 4096 : 2048)
-      },
+      generationConfig: isVoice ? aiNoThink(model, cfg) : cfg,
       safetySettings: [
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
       ]
-    })
+    };
   });
-  
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(aiErrSay(response.status, err));
-  }
-  
-  const data = await response.json();
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to process.';
 }
 
@@ -19333,8 +19394,11 @@ async function callGeminiImage(dataUrl, notes) {
     'Produce a clean floor-plan image.'
   ].filter(Boolean).join(' ');
 
-  // Free-tier-friendly image models on the same Gemini key. Try in order.
-  const models = ['gemini-2.5-flash-image', 'gemini-2.0-flash-preview-image-generation'];
+  // Model imej pada kunci Gemini yang sama, dicuba ikut turutan.
+  // gemini-2.0-flash-preview-image-generation dibuang: ia memulangkan 404
+  // sekarang, jadi ia hanya menambah satu perjalanan sia-sia ke rangkaian
+  // sebelum ralat sebenar sampai.
+  const models = ['gemini-2.5-flash-image', 'gemini-3.1-flash-image', 'gemini-3-pro-image'];
   let lastErr = 'Image generation not available on this key';
   for (let i = 0; i < models.length; i++) {
     const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + models[i] + ':generateContent?key=' + apiKey;
@@ -21030,11 +21094,6 @@ async function vtTranslate(text, toKey) {
   const lg = vtL(toKey);
   const why = (typeof aiConfigEnsure === 'function') ? await aiConfigEnsure() : '';
   if (why) throw new Error(aiKeyWhy(why));
-  const apiKey = getApiKey();
-  const model = (typeof getModel === 'function') ? getModel() : 'gemini-2.5-flash';
-  const genConfig = { temperature: 0.1, maxOutputTokens: 1024 };
-  if (model.indexOf('2.5') !== -1) genConfig.thinkingConfig = { thinkingBudget: 0 };
-
   const prompt =
     'You are a translator for a building inspection site. Translate the text into ' + lg.n + '.\n' +
     'Reply with exactly two lines and nothing else:\n' +
@@ -21043,18 +21102,15 @@ async function vtTranslate(text, toKey) {
     'If ' + lg.n + ' already uses Latin letters, write exactly "ROMAN: -".\n\n' +
     'Text: ' + text;
 
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
-  const res = await fetch(url, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: genConfig })
-  });
-  if (!res.ok) {
-    const e = await res.json().catch(function() { return {}; });
-    // Buku frasa dan setiap frasa yang pernah diterjemah masih ada pada
-    // telefon ini, dan itu yang berguna diketahui pada saat ini.
-    throw new Error(aiErrSay(res.status, e) + ' The Phrasebook still works.');
-  }
-  const data = await res.json();
+  // Buku frasa dan setiap frasa yang pernah diterjemah masih ada pada
+  // telefon ini, dan itu yang berguna diketahui pada saat satu panggilan
+  // gagal — jadi setiap ralat di sini membawa ayat itu bersamanya.
+  const data = await aiGenerate(function (model) {
+    return {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: aiNoThink(model, { temperature: 0.1, maxOutputTokens: 1024 })
+    };
+  }, ' The Phrasebook still works.');
   const raw = ((data.candidates && data.candidates[0] && data.candidates[0].content &&
     data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
     data.candidates[0].content.parts[0].text) || '').trim();
