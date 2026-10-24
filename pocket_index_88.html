@@ -8162,7 +8162,9 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .pe-l-b{flex:none;padding:8px 11px;border-radius:9px;background:var(--surface);border:none;font-size:11.5px;font-weight:700;color:var(--fg-2);font-family:var(--font-body)}
 .pe-l-row2{display:flex;align-items:center;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
 .pe-l-ang{flex:1;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--accent)}
-.pe-l-meter{flex:none;padding:5px 9px;border-radius:99px;background:var(--success-soft);color:var(--success);font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.04em}
+/* Bersambung mesti kelihatan seperti BUTANG yang bertukar hijau, bukan
+   satu cip kecil di tepi: itu tempat mata sudah memandang. */
+.pe-l-b.on{background:var(--success);color:#fff;border:none}
 .pe-l-have{margin-top:8px;padding:7px 9px;border-radius:9px;background:var(--success-soft);color:var(--success);font-size:11.5px;font-weight:650}
 .pe-l-list{max-height:220px;overflow-y:auto;font-size:12px;color:var(--muted)}
 
@@ -9725,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.9 · build 24 Oct 2026 · doors and windows snap onto walls at real widths, and the dimension text resizes</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.0 · build 24 Oct 2026 · the point shows itself and sticks anywhere along a wall, and walls are drawn where the geometry says</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -19458,7 +19460,7 @@ function buildPlanEditor() {
       if (wantLaser) {
         LW.off = laserOn(lwReading);
         // Tanpa ini, titik itu kekal kelabu apabila meter bersambung
-        // selepas pelan dibuka \u2014 walaupun bacaan sudah masuk.
+        // selepas pelan dibuka — walaupun bacaan sudah masuk.
         LW.offState = laserStateOn(lwPaint);
       } else {
         if (LW.off) { LW.off(); LW.off = null; }
@@ -19485,14 +19487,30 @@ function buildPlanEditor() {
     const b = parseFloat(localStorage.getItem(PE_WINM));  if (b > 0) peWinM = b;
   } catch (e) {}
 
-  /* Hujung sebenar satu garisan. x1..y2 Fabric ialah koordinat tempatan
-   * dan TIDAK berubah apabila garisan itu dialihkan, jadi membacanya
-   * terus akan meletakkan pintu pada dinding hantu di tempat asalnya. */
+  /* Hujung sebenar satu garisan.
+   *
+   * Dua perangkap, dan kedua-duanya senyap. x1..y2 Fabric ialah koordinat
+   * tempatan dan TIDAK berubah apabila garisan dialihkan, jadi membacanya
+   * terus meletakkan pintu pada dinding hantu di kedudukan asalnya. Dan
+   * pusat objek itu BUKAN pusat garisan: kotak sempadan Fabric dikembang
+   * oleh lebar lejang, jadi mengira pusat daripada x1..y2 memberi hujung
+   * yang tersasar separuh lejang — tiga piksel pada dinding 6px, cukup
+   * untuk pintu terapung dan untuk satu ketikan terlepas dindingnya.
+   * calcLinePoints() memulangkan hujung relatif kepada pusat SEBENAR. */
   function peLineEnds(o) {
     const m = o.calcTransformMatrix();
-    const cx = (o.x1 + o.x2) / 2, cy = (o.y1 + o.y2) / 2;
-    const a = fabric.util.transformPoint(new fabric.Point(o.x1 - cx, o.y1 - cy), m);
-    const b = fabric.util.transformPoint(new fabric.Point(o.x2 - cx, o.y2 - cy), m);
+    let p1, p2;
+    if (typeof o.calcLinePoints === 'function') {
+      const lp = o.calcLinePoints();
+      p1 = new fabric.Point(lp.x1, lp.y1);
+      p2 = new fabric.Point(lp.x2, lp.y2);
+    } else {
+      const cx = (o.x1 + o.x2) / 2, cy = (o.y1 + o.y2) / 2;
+      p1 = new fabric.Point(o.x1 - cx, o.y1 - cy);
+      p2 = new fabric.Point(o.x2 - cx, o.y2 - cy);
+    }
+    const a = fabric.util.transformPoint(p1, m);
+    const b = fabric.util.transformPoint(p2, m);
     return { x1: a.x, y1: a.y, x2: b.x, y2: b.y, o: o };
   }
   /* Dinding ialah garisan tebal: alat Wall dan dinding laser kedua-duanya
@@ -19501,6 +19519,28 @@ function buildPlanEditor() {
     return canvas.getObjects()
       .filter(function (o) { return o.type === 'line' && !o.excludeFromExport && (o.strokeWidth || 0) >= 5; })
       .map(peLineEnds);
+  }
+
+  /* Fabric mengembang kotak sempadan satu garisan dengan lebar lejangnya,
+   * dan pusat objek dikira daripada kotak YANG DIKEMBANG. Hasilnya satu
+   * garisan dilukis separuh lejang jauh daripada koordinat yang diberi:
+   * garisan pada y=100 dengan lejang 6px menduduki baris piksel 100-105,
+   * berpusat pada 103. Tiga piksel, pada setiap dinding.
+   *
+   * Itu memisahkan lukisan daripada geometri: titik dalam LW.pts, label
+   * dimensi dan ujian menutup bilik semuanya berada tiga piksel daripada
+   * garisan hitam yang dilihat pengguna, dan satu ketikan pada dinding
+   * boleh terlepas kerananya. Objek itu dialihkan balik supaya yang
+   * DILUKIS berada tepat di tempat yang diminta. */
+  function peFixLine(line, x1, y1, x2, y2) {
+    const want = { x: (x1 + x2) / 2, y: (y1 + y2) / 2 };
+    const got = line.getCenterPoint();
+    const dx = want.x - got.x, dy = want.y - got.y;
+    if (Math.abs(dx) > 1e-9 || Math.abs(dy) > 1e-9) {
+      line.set({ left: line.left + dx, top: line.top + dy });
+      line.setCoords();
+    }
+    return line;
   }
 
   function peOpeningPx(kind) {
@@ -19534,7 +19574,7 @@ function buildPlanEditor() {
 
   /* Pintu mempunyai empat orientasi: engsel kiri atau kanan, ayunan ke
    * dalam atau ke luar. Sisi mana yang "dalam" bergantung pada bilik, dan
-   * bilik itu tidak dijejaki \u2014 satu tekaan akan salah separuh masa dan
+   * bilik itu tidak dijejaki — satu tekaan akan salah separuh masa dan
    * pintu yang terayun ke luar bangunan ialah lukisan yang salah. Jadi
    * kedua-dua paksi diberikan terus kepada pengguna. */
   let peLastOpening = null;
@@ -19553,8 +19593,8 @@ function buildPlanEditor() {
   function peSnapPx() { return 34 / (canvas.getZoom() || 1); }
 
   /* Lebar bukaan disimpan pada objek. Kotak sempadan kumpulan lebih
-   * besar daripada bukaan itu \u2014 ia merangkumi lengkok pintu dan lebar
-   * lejang jenang \u2014 jadi mengukurnya memberi pintu 0.98 m di tempat
+   * besar daripada bukaan itu — ia merangkumi lengkok pintu dan lebar
+   * lejang jenang — jadi mengukurnya memberi pintu 0.98 m di tempat
    * yang sepatutnya 0.90 m. */
   function peOpeningWidthPx(o) {
     if (typeof o.peW === 'number' && o.peW > 0) return o.peW * (o.scaleX || 1);
@@ -19718,7 +19758,12 @@ function buildPlanEditor() {
       if (mode === 'wall') tiny = Math.hypot((tempObj.x2 - tempObj.x1), (tempObj.y2 - tempObj.y1)) < 4;
       else tiny = (tempObj.width < 4 && tempObj.height < 4);
       if (tiny) canvas.remove(tempObj);
-      else { tempObj.setCoords(); saveHistory(); }
+      else {
+        // Dinding yang dilukis dengan tangan mempunyai anjakan lejang yang
+        // sama, jadi ia dibetulkan di tempat yang sama.
+        if (mode === 'wall') peFixLine(tempObj, tempObj.x1, tempObj.y1, tempObj.x2, tempObj.y2);
+        tempObj.setCoords(); saveHistory();
+      }
     }
     tempObj = null;
   }
@@ -19850,12 +19895,14 @@ function buildPlanEditor() {
      dua tangan. Selepas satu dinding siap, sauh berpindah ke hujungnya
      sendiri, jadi bilik penuh ialah: satu ketikan, kemudian
      seret-tembak, seret-tembak. */
-  let LW = { on: false, anchor: null, deg: null, prevDeg: null,
-             pts: [], objs: [], pending: null, off: null, offState: null, ghost: null };
+  let LW = { on: false, anchor: null, anchorKind: 'free', deg: null, prevDeg: null,
+             pts: [], objs: [], pending: null, off: null, offState: null,
+             ghost: null, mark: null };
 
   function lwReset(keepPts) {
     if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; }
-    LW.anchor = null; LW.deg = null;
+    if (LW.mark) { canvas.remove(LW.mark); LW.mark = null; }
+    LW.anchor = null; LW.anchorKind = 'free'; LW.deg = null;
     if (!keepPts) { LW.pts = []; LW.objs = []; LW.prevDeg = null; }
     lwPaint();
   }
@@ -19869,14 +19916,15 @@ function buildPlanEditor() {
     const have = LW.pending;
     let step, hint;
     if (!LW.anchor) { step = 'Tap where the wall starts'; hint = 'Anywhere \u2014 a corner, a doorway, the middle of a room.'; }
-    else if (LW.deg === null) { step = 'Drag along the wall'; hint = 'Let go and the direction stays locked. Tap elsewhere to move the point.'; }
+    else if (LW.deg === null) { step = 'Drag along the wall';
+      hint = 'Point is ' + lwMarkTxt() + '. Let go and the direction stays locked — or tap elsewhere to move it.'; }
     else { step = 'Shoot it'; hint = live ? 'Press the button on the meter, or type the length.'
                                           : 'No meter connected \u2014 type the length.'; }
     el.innerHTML =
       '<div class="pe-l-row">' +
         '<span class="pe-l-dot' + (live ? ' on' : '') + '" title="' + (live ? 'Meter connected' : 'No meter') + '"></span>' +
         '<span class="pe-l-step"><b>' + step + '</b><span>' + hint + '</span></span>' +
-        (live ? '<span class="pe-l-meter">' + hwEsc((HW.conn && HW.conn.name) || 'Meter') + '</span>'
+        (live ? '<span class="pe-l-b on">' + hwEsc((HW.conn && HW.conn.name) || 'Connected') + '</span>'
               : '<button class="pe-l-b" id="peLConn">Connect</button>') +
         '<button class="pe-l-b" id="peLDone">Done</button>' +
       '</div>' +
@@ -19902,9 +19950,47 @@ function buildPlanEditor() {
       LW.deg = null; if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; canvas.requestRenderAll(); }
       lwPaint();
     };
+    lwPaintAnchor();
     const u = ov.querySelector('#peLUndoW'); if (u) u.onclick = lwUndoWall;
     const dn = ov.querySelector('#peDimDn'); if (dn) dn.onclick = function () { peDimSet(peDimPx - 1); };
     const up = ov.querySelector('#peDimUp'); if (up) up.onclick = function () { peDimSet(peDimPx + 1); };
+  }
+
+  /* Dahulu satu ketikan tidak meninggalkan apa-apa di skrin sehingga
+     seretan bermula \u2014 tiada cara untuk tahu DI MANA titik itu, atau sama
+     ada ia melekat pada apa-apa. Penanda ini kekal bersaiz tetap pada
+     skrin walaupun pelan dizum, dan warnanya mengatakan apa yang
+     ditangkapnya. */
+  const LW_MARK = { corner: '#15803d', wall: '#1B4FD8', free: '#737373' };
+  function lwPaintAnchor() {
+    if (LW.mark) { canvas.remove(LW.mark); LW.mark = null; }
+    if (!LW.on || !LW.anchor) { canvas.requestRenderAll(); return; }
+    const z = canvas.getZoom() || 1;
+    const col = LW_MARK[LW.anchorKind] || LW_MARK.free;
+    const parts = [
+      new fabric.Circle({ radius: 8 / z, fill: '#ffffff', stroke: col, strokeWidth: 2 / z,
+                          originX: 'center', originY: 'center', left: 0, top: 0 }),
+      new fabric.Circle({ radius: 2.6 / z, fill: col,
+                          originX: 'center', originY: 'center', left: 0, top: 0 })
+    ];
+    if (LW.anchorKind === 'corner') {
+      // Satu bucu dapat silang: ia bermakna "tepat di sini", bukan
+      // "di suatu tempat berhampiran".
+      parts.push(new fabric.Line([-13 / z, 0, 13 / z, 0], { stroke: col, strokeWidth: 1 / z }));
+      parts.push(new fabric.Line([0, -13 / z, 0, 13 / z], { stroke: col, strokeWidth: 1 / z }));
+    }
+    const g = new fabric.Group(parts, {
+      left: LW.anchor.x, top: LW.anchor.y, originX: 'center', originY: 'center',
+      excludeFromExport: true, selectable: false, evented: false
+    });
+    LW.mark = g;
+    canvas.add(g);
+    canvas.bringToFront(g);
+    canvas.requestRenderAll();
+  }
+  function lwMarkTxt() {
+    return LW.anchorKind === 'corner' ? 'on a corner'
+         : LW.anchorKind === 'wall' ? 'on a wall' : 'free point';
   }
 
   function lwDegTxt(deg) {
@@ -19941,6 +20027,7 @@ function buildPlanEditor() {
       };
     };
     HW.found = [];
+    HW.native = true;
     try { window.PocketNative.bleScan(); } catch (e) {}
     paint();
     const tick = setInterval(function () { if (!document.body.contains(sh)) { clearInterval(tick); return; } paint(); lwPaint(); }, 700);
@@ -19975,8 +20062,9 @@ function buildPlanEditor() {
     const close = lwCloseCheck(LW.pts, end, peScale.pxPerM);
     const put = function (to, closed) {
       if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; }
-      const line = new fabric.Line([LW.anchor.x, LW.anchor.y, to.x, to.y],
-        { stroke: '#111111', strokeWidth: 6, strokeLineCap: 'round' });
+      const line = peFixLine(new fabric.Line([LW.anchor.x, LW.anchor.y, to.x, to.y],
+        { stroke: '#111111', strokeWidth: 6, strokeLineCap: 'round' }),
+        LW.anchor.x, LW.anchor.y, to.x, to.y);
       canvas.add(line);
       const mid = { x: (LW.anchor.x + to.x) / 2, y: (LW.anchor.y + to.y) / 2 };
       const tag = new fabric.Text(fmtM(metres), {
@@ -19990,6 +20078,7 @@ function buildPlanEditor() {
       LW.pts.push({ x: to.x, y: to.y });
       LW.prevDeg = LW.deg;
       LW.anchor = closed ? null : { x: to.x, y: to.y };
+      LW.anchorKind = 'corner';
       LW.deg = null; LW.pending = null;
       canvas.requestRenderAll();
       saveHistory();
@@ -20025,6 +20114,7 @@ function buildPlanEditor() {
     if (LW.pts.length >= 2) {
       LW.pts.pop();
       LW.anchor = { x: LW.pts[LW.pts.length - 1].x, y: LW.pts[LW.pts.length - 1].y };
+      LW.anchorKind = 'corner';
     }
     if (LW.pts.length < 2) LW.prevDeg = null;
     LW.deg = null;
@@ -20034,7 +20124,7 @@ function buildPlanEditor() {
   }
 
   // Ketikan pertama meletakkan sauh. Selepas satu dinding siap, sauh
-  // sudah berada di hujungnya, jadi ketikan itu tidak diperlukan lagi \u2014
+  // sudah berada di hujungnya, jadi ketikan itu tidak diperlukan lagi —
   // satu bilik penuh ialah seret-tembak, seret-tembak.
   // Satu ketikan memindahkan titik; satu seretan menetapkan arah. Tanpa
   // perbezaan ini, sauh terkunci pada hujung dinding terakhir selama-lamanya
@@ -20048,7 +20138,7 @@ function buildPlanEditor() {
     const p = canvas.getPointer(o.e);
     lwDownAt = { x: p.x, y: p.y };
     lwMoved = false;
-    if (!LW.anchor) { LW.anchor = { x: p.x, y: p.y }; LW.deg = null; lwPaint(); return; }
+    if (!LW.anchor) { lwMoveAnchor(p); return; }
     lwDragging = true;              // mungkin seretan \u2014 disahkan bila ia bergerak
   }
 
@@ -20071,7 +20161,9 @@ function buildPlanEditor() {
     if (len < 6) return;
     const deg = lwSnapDeg(Math.atan2(dy, dx) * 180 / Math.PI, LW.prevDeg);
     const rad = deg * Math.PI / 180;
-    LW.ghost.set({ x2: LW.anchor.x + Math.cos(rad) * len, y2: LW.anchor.y + Math.sin(rad) * len });
+    const ex = LW.anchor.x + Math.cos(rad) * len, ey = LW.anchor.y + Math.sin(rad) * len;
+    LW.ghost.set({ x2: ex, y2: ey });
+    peFixLine(LW.ghost, LW.anchor.x, LW.anchor.y, ex, ey);
     canvas.requestRenderAll();
     showReadout(lwDegTxt(deg) + '<small>DIRECTION \u2014 LET GO TO LOCK IT</small>');
     LW.deg = deg;
@@ -20090,17 +20182,26 @@ function buildPlanEditor() {
     lwPaint();
   }
 
+  /** Tarikan diukur dalam piksel SKRIN. Bucu menarik lebih jauh daripada
+   *  badan dinding, kerana ia sasaran yang lebih kecil dan lebih kerap
+   *  dimaksudkan. */
+  function lwPullPx() { const z = canvas.getZoom() || 1; return { end: 20 / z, line: 13 / z }; }
+
   /** Titik boleh diletak di mana-mana, bukan hanya pada bucu. */
-  function lwMoveAnchor(p) {
+  function lwMoveAnchor(raw) {
+    const pull = lwPullPx();
+    const snap = lwSnapPoint(peWalls(), raw, pull.end, pull.line);
+    const p = { x: snap.x, y: snap.y };
     // Satu ketikan JAUH daripada hujung rantai memulakan larian baharu:
     // titik itu tidak lagi bersambung dengan dinding sebelumnya, jadi
     // ujian menutup bilik tidak boleh membandingkannya dengan permulaan
     // lama. Dinding yang sudah dilukis kekal, dan arah bangunan
-    // (prevDeg) kekal juga \u2014 bilik seterusnya masih di atas grid yang sama.
+    // (prevDeg) kekal juga — bilik seterusnya masih di atas grid yang sama.
     const last = LW.pts.length ? LW.pts[LW.pts.length - 1] : null;
     const atEnd = last && Math.hypot(p.x - last.x, p.y - last.y) < Math.max(lwTapPx(), 10);
     if (!atEnd) LW.pts = [];
     LW.anchor = { x: p.x, y: p.y };
+    LW.anchorKind = snap.kind;
     LW.deg = null;
     if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; canvas.requestRenderAll(); }
     lwPaint();
@@ -20405,12 +20506,17 @@ function buildPlanEditor() {
   function exportPNG() {
     canvas.discardActiveObject();
     clearMeasure();
+    // excludeFromExport menghalang penyirian, bukan lukisan: tanpa baris
+    // ini penanda titik muncul pada PNG yang dihantar kepada pelanggan.
+    const mark = LW.mark;
+    if (mark) { canvas.remove(mark); LW.mark = null; }
     // Grid ialah bantuan melukis, bukan sebahagian lukisan
     const hadGrid = gridOn;
     if (hadGrid) { canvas.backgroundColor = '#ffffff'; }
     canvas.requestRenderAll();
     const url = canvas.toDataURL({ format: 'png', multiplier: 2 });
     if (hadGrid) { canvas.backgroundColor = makeGridPattern(); canvas.requestRenderAll(); }
+    if (mark) lwPaintAnchor();
     pkSaveImage(url, 'plan-' + Date.now());
   }
   function useInAR() {
@@ -20437,7 +20543,7 @@ function buildPlanEditor() {
     ov.remove();
   }
 
-  // Pemegang untuk memeriksa keadaan editor \u2014 daripada konsol semasa
+  // Pemegang untuk memeriksa keadaan editor — daripada konsol semasa
   // memburu pepijat, dan daripada ujian. Ia duduk pada nod tindanan dan
   // bukan pada window, jadi ia hilang bersama editor dan tidak pernah
   // bertembung dengan apa-apa yang lain.
@@ -26404,7 +26510,7 @@ const LASER_SVC  = '0000ffb0-0000-1000-8000-00805f9b34fb';
 const LASER_CHAR = '0000ffb2-0000-1000-8000-00805f9b34fb';
 const LASER_FT = 0.3048, LASER_IN = 0.0254;
 
-// Luas dan isipadu datang melalui paip yang sama. Memasukkan 12 m\u00b2 ke
+// Luas dan isipadu datang melalui paip yang sama. Memasukkan 12 m² ke
 // dalam medan panjang memberi nombor yang salah dalam laporan tanpa satu
 // pun amaran, jadi ia dikenali dan DITOLAK sebagai panjang.
 function laserParse(line) {
@@ -26479,7 +26585,7 @@ function lwSnapDeg(raw, prev) {
   const norm = function (d) { let x = d % 360; if (x > 180) x -= 360; if (x < -180) x += 360; return x; };
   // Keluarga, dan URUTANNYA yang menentukan. Yang relatif mesti MENANG
   // ke atas paksi skrin apabila kedua-duanya dalam toleransi: kalau
-  // tidak, satu bilik yang terputar 7\u00b0 dibetulkan senyap-senyap kembali
+  // tidak, satu bilik yang terputar 7° dibetulkan senyap-senyap kembali
   // ke tepi telefon, satu dinding demi satu dinding, dan tidak pernah
   // bertemu semula. Jarak terdekat hanya memutuskan DALAM satu keluarga.
   const fams = [];
@@ -26579,6 +26685,28 @@ function lwFirstScale(canvasW, metres) {
   return Math.max(2, Math.min(2000, pxPerM));
 }
 
+/* Titik itu bebas, tetapi berhampiran lukisan ia tertarik. Dua kekuatan,
+ * dan urutannya penting: HUJUNG dinding menarik lebih kuat daripada
+ * badannya, kerana bucu bilik ialah tempat yang paling kerap dimaksudkan
+ * — tetapi mana-mana titik di SEPANJANG dinding juga sah, dan itulah
+ * yang membolehkan satu dinding pembahagi bermula di tengah bilik. */
+function lwSnapPoint(walls, pt, endPx, linePx) {
+  let end = null;
+  for (let i = 0; i < walls.length; i++) {
+    const w = walls[i];
+    const ends = [[w.x1, w.y1], [w.x2, w.y2]];
+    for (let k = 0; k < 2; k++) {
+      const d = Math.hypot(pt.x - ends[k][0], pt.y - ends[k][1]);
+      if (d <= endPx && (!end || d < end.d)) end = { x: ends[k][0], y: ends[k][1], d: d };
+    }
+  }
+  if (end) return { x: end.x, y: end.y, kind: 'corner', dist: end.d, deg: null };
+  const hit = peNearestWall(walls, pt, 0);
+  if (hit && hit.dist <= linePx)
+    return { x: hit.at.x, y: hit.at.y, kind: 'wall', dist: hit.dist, deg: hit.deg };
+  return { x: pt.x, y: pt.y, kind: 'free', dist: 0, deg: null };
+}
+
 /* ---------- Bas bacaan ----------
  * Sambungan itu hidup dalam Activity, bukan dalam satu skrin. Mana-mana
  * alat boleh mendengar tanpa memiliki radio itu. */
@@ -26598,7 +26726,7 @@ function laserEmit(r) {
 }
 /* Bacaan ialah satu bas; keadaan sambungan ialah bas yang lain. Tanpa
  * yang kedua, satu alat yang sudah terbuka tidak pernah tahu meter itu
- * baru sahaja bersambung \u2014 titiknya kekal kelabu sedangkan bacaan
+ * baru sahaja bersambung — titiknya kekal kelabu sedangkan bacaan
  * sudah mengalir masuk. */
 const LASER_STATE_SUBS = [];
 function laserStateOn(fn) {
@@ -26618,7 +26746,12 @@ function laserStateEmit() {
 
 /** Benar bila satu meter benar-benar bersambung sekarang. */
 function laserLive() {
-  if (HW.native) return !!(HW.conn && HW.conn.state === 'connected');
+  // HW.conn ditulis HANYA oleh jambatan asli, jadi ia diperiksa terus.
+  // Dahulu ini bertanya HW.native dahulu — satu bendera yang ditetapkan
+  // di dalam tab Devices sahaja. Menyambung dari Plan Editor tidak pernah
+  // menetapkannya, jadi titik itu kekal kelabu sedangkan meter bersambung
+  // dan bacaan sudah mengalir masuk.
+  if (HW.conn && HW.conn.state === 'connected') return true;
   return !!(HW.server && HW.server.connected);
 }
 
@@ -26665,7 +26798,7 @@ function hwNative() {
   return !!(window.PocketNative && typeof window.PocketNative.bleWhy === 'function');
 }
 // Sebab dalam satu perkataan daripada Kotlin, menjadi ayat yang boleh
-// ditindaklanjuti \u2014 radio yang tiada dan Bluetooth yang dimatikan ialah
+// ditindaklanjuti — radio yang tiada dan Bluetooth yang dimatikan ialah
 // dua masalah berbeza dengan dua pembetulan berbeza.
 const HW_WHY = {
   'no-adapter': ['This phone has no Bluetooth radio', 'Nothing in the app can work around that. The meter still reads on its own screen.'],
@@ -26795,7 +26928,7 @@ async function hwBle() {
     // Pocket sudah menjalankan pelayannya sendiri. Membuka alamat gelung
     // balik yang SAMA melalui ejaan yang berbeza menghantarnya keluar ke
     // pelayar (leaveApp() menahan 'localhost' sahaja), dan 127.0.0.1 juga
-    // satu asal yang dipercayai \u2014 jadi Web Bluetooth hidup di sana.
+    // satu asal yang dipercayai — jadi Web Bluetooth hidup di sana.
     el.innerHTML =
       '<div class="hw-chk bad"><div><b>This app cannot reach Bluetooth</b>' +
       '<span>Android WebView does not ship Web Bluetooth, and no bridge can stand in for it \u2014 it is a whole protocol stack, not one call. Every other tool still works here.</span></div></div>' +
@@ -26976,7 +27109,7 @@ function hwPaintDev() {
   if (d) d.onclick = function() { try { HW.dev.gatt.disconnect(); } catch (e) {} };
 }
 // Dalam pelayar, Chrome melukis pemilihnya sendiri. Dalam app, tiada
-// pemilih \u2014 jadi senarai inilah pemilih itu.
+// pemilih — jadi senarai inilah pemilih itu.
 function hwPaintDevNative(el) {
   if (HW.conn) {
     const done = HW.conn.state === 'connected';
@@ -31070,7 +31203,7 @@ function sosSave() {
       endAt: SOS.endAt, dueAt: SOS.dueAt, escAt: SOS.escAt, phase: SOS.phase,
       armedAt: SOS.armedAt, lastOk: SOS.lastOk, siteName: SOS.siteName, inspectionId: SOS.inspectionId,
       // Tanpa ketiga-tiga ini, satu app yang dimulakan semula lupa
-      // mengapa ia menggera, dan "False alarm \u2014 I am fine" kehilangan
+      // mengapa ia menggera, dan "False alarm — I am fine" kehilangan
       // amaran yang sepatutnya ditariknya balik.
       endAsked: SOS.endAsked, dueWhy: SOS.dueWhy, lastAlertId: SOS.lastAlertId,
       watchers: SOS.watchers
@@ -31178,7 +31311,7 @@ function sosPaintWatchers() {
  *
  * Skrin pemasangan berjanji: pada masa itu Pocket bertanya sekali, dan
  * tiada jawapan tetap menaikkan amaran. Janji itu tidak pernah ditulis
- * dalam kod \u2014 masa itu disimpan, dihantar kepada pemerhati, dipaparkan,
+ * dalam kod — masa itu disimpan, dihantar kepada pemerhati, dipaparkan,
  * dan tidak pernah disemak. Seorang surveyor yang tidak keluar dari
  * bangunan pada pukul 17:30 tidak menggerakkan sesiapa.
  *
