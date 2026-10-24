@@ -8162,6 +8162,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .pe-l-b{flex:none;padding:8px 11px;border-radius:9px;background:var(--surface);border:none;font-size:11.5px;font-weight:700;color:var(--fg-2);font-family:var(--font-body)}
 .pe-l-row2{display:flex;align-items:center;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
 .pe-l-ang{flex:1;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--accent)}
+.pe-l-meter{flex:none;padding:5px 9px;border-radius:99px;background:var(--success-soft);color:var(--success);font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.04em}
 .pe-l-have{margin-top:8px;padding:7px 9px;border-radius:9px;background:var(--success-soft);color:var(--success);font-size:11.5px;font-weight:650}
 .pe-l-list{max-height:220px;overflow-y:auto;font-size:12px;color:var(--muted)}
 
@@ -9724,7 +9725,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.7 · build 24 Oct 2026 · laser walls in the Plan Editor: tap a corner, drag the direction, shoot — the wall goes up</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.8 · build 24 Oct 2026 · laser walls start anywhere, not just at a corner, and the meter dot goes green by itself</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -19435,8 +19436,16 @@ function buildPlanEditor() {
     const wantLaser = (m === 'laser');
     if (wantLaser !== LW.on) {
       LW.on = wantLaser;
-      if (wantLaser) { LW.off = laserOn(lwReading); }
-      else { if (LW.off) { LW.off(); LW.off = null; } lwReset(false); }
+      if (wantLaser) {
+        LW.off = laserOn(lwReading);
+        // Tanpa ini, titik itu kekal kelabu apabila meter bersambung
+        // selepas pelan dibuka \u2014 walaupun bacaan sudah masuk.
+        LW.offState = laserStateOn(lwPaint);
+      } else {
+        if (LW.off) { LW.off(); LW.off = null; }
+        if (LW.offState) { LW.offState(); LW.offState = null; }
+        lwReset(false);
+      }
     }
     lwPaint();
     ov.querySelectorAll('.pe-tool').forEach(function(b) { b.classList.toggle('active', b.dataset.petool === m); });
@@ -19672,7 +19681,7 @@ function buildPlanEditor() {
      sendiri, jadi bilik penuh ialah: satu ketikan, kemudian
      seret-tembak, seret-tembak. */
   let LW = { on: false, anchor: null, deg: null, prevDeg: null,
-             pts: [], objs: [], pending: null, off: null, ghost: null };
+             pts: [], objs: [], pending: null, off: null, offState: null, ghost: null };
 
   function lwReset(keepPts) {
     if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; }
@@ -19689,15 +19698,16 @@ function buildPlanEditor() {
     const live = (typeof laserLive === 'function') && laserLive();
     const have = LW.pending;
     let step, hint;
-    if (!LW.anchor) { step = 'Tap the first corner'; hint = 'Then drag to point along the wall.'; }
-    else if (LW.deg === null) { step = 'Drag along the wall'; hint = 'Let go when the direction looks right \u2014 it stays locked.'; }
+    if (!LW.anchor) { step = 'Tap where the wall starts'; hint = 'Anywhere \u2014 a corner, a doorway, the middle of a room.'; }
+    else if (LW.deg === null) { step = 'Drag along the wall'; hint = 'Let go and the direction stays locked. Tap elsewhere to move the point.'; }
     else { step = 'Shoot it'; hint = live ? 'Press the button on the meter, or type the length.'
                                           : 'No meter connected \u2014 type the length.'; }
     el.innerHTML =
       '<div class="pe-l-row">' +
-        '<span class="pe-l-dot' + (live ? ' on' : '') + '"></span>' +
+        '<span class="pe-l-dot' + (live ? ' on' : '') + '" title="' + (live ? 'Meter connected' : 'No meter') + '"></span>' +
         '<span class="pe-l-step"><b>' + step + '</b><span>' + hint + '</span></span>' +
-        (live ? '' : '<button class="pe-l-b" id="peLConn">Connect</button>') +
+        (live ? '<span class="pe-l-meter">' + hwEsc((HW.conn && HW.conn.name) || 'Meter') + '</span>'
+              : '<button class="pe-l-b" id="peLConn">Connect</button>') +
         '<button class="pe-l-b" id="peLDone">Done</button>' +
       '</div>' +
       (LW.deg !== null
@@ -19834,8 +19844,13 @@ function buildPlanEditor() {
     const pair = LW.objs.pop();
     if (!pair) return;
     pair.forEach(function (o) { canvas.remove(o); });
-    LW.pts.pop();
-    LW.anchor = LW.pts.length ? { x: LW.pts[LW.pts.length - 1].x, y: LW.pts[LW.pts.length - 1].y } : null;
+    // Larian boleh bermula semula di tengah pelan, jadi rantai titik
+    // mungkin lebih pendek daripada timbunan dinding. Hanya surutkan
+    // sauh apabila dinding itu benar-benar milik larian ini.
+    if (LW.pts.length >= 2) {
+      LW.pts.pop();
+      LW.anchor = { x: LW.pts[LW.pts.length - 1].x, y: LW.pts[LW.pts.length - 1].y };
+    }
     if (LW.pts.length < 2) LW.prevDeg = null;
     LW.deg = null;
     canvas.requestRenderAll();
@@ -19846,22 +19861,36 @@ function buildPlanEditor() {
   // Ketikan pertama meletakkan sauh. Selepas satu dinding siap, sauh
   // sudah berada di hujungnya, jadi ketikan itu tidak diperlukan lagi \u2014
   // satu bilik penuh ialah seret-tembak, seret-tembak.
-  let lwDragging = false;
+  // Satu ketikan memindahkan titik; satu seretan menetapkan arah. Tanpa
+  // perbezaan ini, sauh terkunci pada hujung dinding terakhir selama-lamanya
+  // dan satu titik baharu di tengah bilik mustahil diletak.
+  let lwDragging = false, lwDownAt = null, lwMoved = false;
+
+  /** Ambang dalam piksel SKRIN, bukan piksel kanvas: kanvas dizum. */
+  function lwTapPx() { return 8 / (canvas.getZoom() || 1); }
+
   function lwDown(o) {
     const p = canvas.getPointer(o.e);
+    lwDownAt = { x: p.x, y: p.y };
+    lwMoved = false;
     if (!LW.anchor) { LW.anchor = { x: p.x, y: p.y }; LW.deg = null; lwPaint(); return; }
-    lwDragging = true;
-    LW.deg = null;
-    if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; }
-    LW.ghost = new fabric.Line([LW.anchor.x, LW.anchor.y, p.x, p.y], {
-      stroke: '#1B4FD8', strokeWidth: 4, strokeDashArray: [9, 7],
-      strokeLineCap: 'round', excludeFromExport: true, selectable: false, evented: false
-    });
-    canvas.add(LW.ghost);
+    lwDragging = true;              // mungkin seretan \u2014 disahkan bila ia bergerak
   }
+
   function lwMove(o) {
-    if (!lwDragging || !LW.ghost || !LW.anchor) return;
+    if (!lwDragging || !LW.anchor || !lwDownAt) return;
     const p = canvas.getPointer(o.e);
+    if (!lwMoved) {
+      if (Math.hypot(p.x - lwDownAt.x, p.y - lwDownAt.y) < lwTapPx()) return;
+      lwMoved = true;
+      LW.deg = null;
+      if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; }
+      LW.ghost = new fabric.Line([LW.anchor.x, LW.anchor.y, p.x, p.y], {
+        stroke: '#1B4FD8', strokeWidth: 4, strokeDashArray: [9, 7],
+        strokeLineCap: 'round', excludeFromExport: true, selectable: false, evented: false
+      });
+      canvas.add(LW.ghost);
+    }
     const dx = p.x - LW.anchor.x, dy = p.y - LW.anchor.y;
     const len = Math.hypot(dx, dy);
     if (len < 6) return;
@@ -19872,14 +19901,33 @@ function buildPlanEditor() {
     showReadout(lwDegTxt(deg) + '<small>DIRECTION \u2014 LET GO TO LOCK IT</small>');
     LW.deg = deg;
   }
+
   function lwUp() {
-    if (!lwDragging) return;
-    lwDragging = false;
+    const wasDrag = lwMoved;
+    const at = lwDownAt;
+    lwDragging = false; lwMoved = false; lwDownAt = null;
     showReadout('');
+    if (!wasDrag) { if (at) lwMoveAnchor(at); return; }
     if (LW.deg === null) { if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; canvas.requestRenderAll(); } lwPaint(); return; }
     // Satu bacaan yang sudah menunggu dipakai terus: menembak dahulu
     // kemudian melukis arah juga satu cara bekerja yang sah.
     if (LW.pending != null) { const m = LW.pending; LW.pending = null; lwPlace(m, 'laser'); return; }
+    lwPaint();
+  }
+
+  /** Titik boleh diletak di mana-mana, bukan hanya pada bucu. */
+  function lwMoveAnchor(p) {
+    // Satu ketikan JAUH daripada hujung rantai memulakan larian baharu:
+    // titik itu tidak lagi bersambung dengan dinding sebelumnya, jadi
+    // ujian menutup bilik tidak boleh membandingkannya dengan permulaan
+    // lama. Dinding yang sudah dilukis kekal, dan arah bangunan
+    // (prevDeg) kekal juga \u2014 bilik seterusnya masih di atas grid yang sama.
+    const last = LW.pts.length ? LW.pts[LW.pts.length - 1] : null;
+    const atEnd = last && Math.hypot(p.x - last.x, p.y - last.y) < Math.max(lwTapPx(), 10);
+    if (!atEnd) LW.pts = [];
+    LW.anchor = { x: p.x, y: p.y };
+    LW.deg = null;
+    if (LW.ghost) { canvas.remove(LW.ghost); LW.ghost = null; canvas.requestRenderAll(); }
     lwPaint();
   }
 
@@ -20209,6 +20257,7 @@ function buildPlanEditor() {
     // Satu langganan yang tertinggal akan melukis dinding ke dalam
     // kanvas yang sudah dibuang pada bacaan seterusnya.
     if (LW.off) { LW.off(); LW.off = null; }
+    if (LW.offState) { LW.offState(); LW.offState = null; }
     LW.on = false;
     try { canvas.dispose(); } catch (e) {}
     ov.remove();
@@ -26334,6 +26383,26 @@ function laserEmit(r) {
     try { LASER_SUBS[i](r); } catch (e) { console.warn('[laser]', e.message); }
   }
 }
+/* Bacaan ialah satu bas; keadaan sambungan ialah bas yang lain. Tanpa
+ * yang kedua, satu alat yang sudah terbuka tidak pernah tahu meter itu
+ * baru sahaja bersambung \u2014 titiknya kekal kelabu sedangkan bacaan
+ * sudah mengalir masuk. */
+const LASER_STATE_SUBS = [];
+function laserStateOn(fn) {
+  if (typeof fn === 'function' && LASER_STATE_SUBS.indexOf(fn) < 0) LASER_STATE_SUBS.push(fn);
+  return function () { laserStateOff(fn); };
+}
+function laserStateOff(fn) {
+  const i = LASER_STATE_SUBS.indexOf(fn);
+  if (i >= 0) LASER_STATE_SUBS.splice(i, 1);
+}
+function laserStateEmit() {
+  const live = laserLive();
+  for (let i = LASER_STATE_SUBS.length - 1; i >= 0; i--) {
+    try { LASER_STATE_SUBS[i](live); } catch (e) { console.warn('[laser state]', e.message); }
+  }
+}
+
 /** Benar bila satu meter benar-benar bersambung sekarang. */
 function laserLive() {
   if (HW.native) return !!(HW.conn && HW.conn.state === 'connected');
@@ -26435,6 +26504,7 @@ window.pkBle = function (kind, d) {
     else if (d.state === 'connected') { if (HW.conn) HW.conn.state = 'connected'; hwSay('ok', 'Connected. Reading services\u2026'); }
     else { HW.conn = null; HW.writables = []; hwSay('warn', 'Device disconnected'); hwPaintSend(); }
     hwPaintDev();
+    laserStateEmit();
     return;
   }
   if (kind === 'service') { hwSay('ok', 'Service ' + (HW_NAMES[d.uuid] || String(d.uuid).slice(0, 8)) + ' \u00b7 ' + d.chars + ' features'); return; }
@@ -26462,6 +26532,7 @@ window.pkBle = function (kind, d) {
       ? 'Ready. Press the measure button on the meter now.'
       : 'No characteristic can notify. This meter may need a wake-up command written to it first.');
     hwPaintDev(); hwPaintSend();
+    laserStateEmit();
     return;
   }
   if (kind === 'data') {
@@ -26476,6 +26547,7 @@ window.pkBle = function (kind, d) {
     const w = HW_WHY[d.msg];
     hwSay('bad', w ? w[0] + ' \u2014 ' + w[1] : String(d.msg || 'Something went wrong'));
     if (w) hwRender();
+    laserStateEmit();
     return;
   }
 };
@@ -26763,6 +26835,7 @@ async function hwScan() {
       hwSay('warn', 'Device disconnected');
       HW.writables = [];
       hwPaintDev(); hwPaintSend();
+      laserStateEmit();
     });
     hwSay('ok', 'Picked: ' + (dev.name || 'unnamed'));
     hwPaintDev();
@@ -26810,10 +26883,12 @@ async function hwConnect(dev) {
       }
     }
     hwPaintDev(); hwPaintRead(); hwPaintSend();
+    laserStateEmit();
     if (HW.subs) hwSay('ok', 'Ready. Press the measure button on the meter now.');
     else hwSay('warn', 'No characteristic can notify. This meter may need a wake-up command written to it first — use the send box below.');
   } catch (e) {
     hwSay('bad', 'Could not connect: ' + e.message);
+    laserStateEmit();
   }
 }
 
