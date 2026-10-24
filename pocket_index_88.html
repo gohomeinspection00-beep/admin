@@ -9727,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.0 · build 24 Oct 2026 · the point shows itself and sticks anywhere along a wall, and walls are drawn where the geometry says</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.1 · build 25 Oct 2026 · AI settings are fetched again instead of staying dead for the session, and the reason is named</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -11137,12 +11137,18 @@ function friendlyAuthError(e) {
 // =======================================================
 // CONFIG
 // =======================================================
+// Benar hanya selepas tetapan BENAR-BENAR turun dari pelayan. Satu muatan
+// yang gagal dan satu akaun tanpa kunci kelihatan sama dari dalam app,
+// dan kedua-duanya memerlukan jawapan yang berbeza daripada pengguna.
+let ayieConfigLoaded = false;
+
 async function loadConfig() {
-  pocketConfig = { enabled: true, featureChat: true, featureVoice: true, featureConsultantMode: true };
-  ayieConfig = {};
-  
+  const base = { enabled: true, featureChat: true, featureVoice: true, featureConsultantMode: true };
+  if (!pocketConfig) pocketConfig = base;
+  if (!ayieConfig) ayieConfig = {};
+
   const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout')), ms));
-  
+
   try {
     const [pocketDoc, ayieDoc] = await Promise.race([
       Promise.all([
@@ -11151,13 +11157,49 @@ async function loadConfig() {
       ]),
       timeout(8000)
     ]);
-    if (pocketDoc.exists) pocketConfig = { ...pocketConfig, ...pocketDoc.data() };
+    pocketConfig = { ...base, ...(pocketDoc.exists ? pocketDoc.data() : {}) };
     if (ayieDoc.exists) ayieConfig = ayieDoc.data();
+    ayieConfigLoaded = true;
     console.log('[Config] OK');
   } catch (e) {
+    // Satu cubaan semula yang gagal TIDAK boleh membuang tetapan yang
+    // sudah berjaya dimuat sebelum ini.
     console.warn('[Config] Defaults:', e.message);
   }
 }
+
+/* Tetapan dimuat sekali sahaja, semasa log masuk, dengan had masa lapan
+ * saat. Pada telefon dengan isyarat lemah — iaitu keadaan biasa di tapak
+ * — muatan itu gagal dan setiap ciri AI mati untuk SELURUH sesi, sambil
+ * memberitahu surveyor bahawa dia tidak menetapkan kunci yang sebenarnya
+ * bukan miliknya untuk ditetapkan. Jadi ia dicuba semula di sini, atas
+ * permintaan, dan sebabnya dibezakan. */
+let _cfgRetry = null;
+async function aiConfigEnsure() {
+  if (getApiKey()) return '';
+  if (navigator.onLine === false) return 'offline';
+  if (!_cfgRetry) {
+    _cfgRetry = loadConfig().then(function () { _cfgRetry = null; },
+                                  function () { _cfgRetry = null; });
+  }
+  await _cfgRetry;
+  if (getApiKey()) return '';
+  return ayieConfigLoaded ? 'no-key' : 'no-config';
+}
+function aiKeyWhy(code) {
+  if (code === 'offline')
+    return 'No signal. Translating and the other AI tools need the network.';
+  if (code === 'no-key')
+    return 'No AI key is set for this account \u2014 that is an administrator setting, not something on this phone.';
+  return 'Could not fetch the AI settings from the server. Tried again just now and it is still not through.';
+}
+// Tetapan yang gagal dimuat semasa log masuk sepatutnya sembuh sendiri
+// sebaik isyarat kembali, bukan menunggu app dimulakan semula.
+window.addEventListener('online', function () {
+  if (!ayieConfigLoaded && typeof currentUser !== 'undefined' && currentUser) {
+    loadConfig().catch(function () {});
+  }
+});
 
 function getApiKey() { return ayieConfig.apiKey || ''; }
 function getModel() { return (pocketConfig && pocketConfig.model) || ayieConfig.model || 'gemini-2.5-flash'; }
@@ -11990,8 +12032,9 @@ async function sendMessage() {
 // GEMINI CALL
 // =======================================================
 async function callGemini(history, isVoice = false) {
+  const why = (typeof aiConfigEnsure === 'function') ? await aiConfigEnsure() : '';
+  if (why) throw new Error(aiKeyWhy(why));
   const apiKey = getApiKey();
-  if (!apiKey) throw new Error('API key not configured');
   
   const model = getModel();
   const systemPrompt = getSystemPrompt(isVoice);
@@ -19201,8 +19244,9 @@ function showSketchResult(imgUrl) {
 }
 
 async function callGeminiImage(dataUrl, notes) {
-  const apiKey = (typeof getApiKey === 'function') ? getApiKey() : '';
-  if (!apiKey) throw new Error('AI key not set. Add your Gemini key in chat settings first.');
+  const why = (typeof aiConfigEnsure === 'function') ? await aiConfigEnsure() : '';
+  if (why) throw new Error(aiKeyWhy(why));
+  const apiKey = getApiKey();
   const base64 = dataUrl.split(',')[1] || dataUrl;
   const mime = dataUrl.indexOf('data:image/png') === 0 ? 'image/png' : 'image/jpeg';
   const prompt = [
@@ -20912,8 +20956,9 @@ async function vtTranslate(text, toKey) {
   if (cached) return cached;
 
   const lg = vtL(toKey);
-  const apiKey = (typeof getApiKey === 'function') ? getApiKey() : '';
-  if (!apiKey) throw new Error('AI key not set');
+  const why = (typeof aiConfigEnsure === 'function') ? await aiConfigEnsure() : '';
+  if (why) throw new Error(aiKeyWhy(why));
+  const apiKey = getApiKey();
   const model = (typeof getModel === 'function') ? getModel() : 'gemini-2.5-flash';
   const genConfig = { temperature: 0.1, maxOutputTokens: 1024 };
   if (model.indexOf('2.5') !== -1) genConfig.thinkingConfig = { thinkingBudget: 0 };
@@ -20983,8 +21028,13 @@ function vtRender() {
 
   h += '<div class="vt-hd">' +
     '<button class="vt-ic" id="vtClose" aria-label="Close">' + vtSvg(VT_I.back) + '</button>' +
+    // "offline pack" bercakap tentang Phrasebook, bukan tab yang sedang
+    // dibuka. Dibaca dari tab Talk ia berjanji sesuatu yang Talk tidak
+    // boleh tunaikan: percakapan bebas sentiasa memerlukan rangkaian.
     '<div class="vt-hd-t"><h2>Voice Translator</h2><p>' + peEsc(me.n) + ' &#8644; ' + peEsc(wk.n) +
-      (wk.book ? ' &middot; offline pack' : ' &middot; AI only') +
+      (VT.mode === 'book'
+        ? (wk.book ? ' &middot; offline pack' : ' &middot; AI the first time, then kept')
+        : ' &middot; needs the network') +
       (vtHasVoice(wk.k) ? '' : ' &middot; no voice, use Show') + '</p></div>' +
     '<button class="vt-savebtn" id="vtSaveBtn"' + (VT.turns.length ? '' : ' disabled') + '>' +
       (VT.editId ? 'Update' : 'Save') + '</button>' +
