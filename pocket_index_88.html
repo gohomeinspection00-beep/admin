@@ -9727,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.2 · build 25 Oct 2026 · the counter now has a measured accuracy, and says which area it counted</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.3 · build 25 Oct 2026 · an AI failure now says what it is in one sentence, and whether waiting will help</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -11211,6 +11211,31 @@ async function aiConfigEnsure() {
   if (getApiKey()) return '';
   return ayieConfigLoaded ? 'no-key' : 'no-config';
 }
+/* Google memulangkan satu perenggan penuh dengan dua URL dokumentasi.
+ * Ia tepat, dan ia menutup separuh skrin seorang surveyor yang berdiri
+ * di tapak. Satu ayat yang boleh ditindak lebih berguna; butiran penuh
+ * tetap pergi ke konsol untuk sesiapa yang menyiasat.
+ *
+ * Perbezaan yang penting di sini: kredit habis dan had kadar KEDUA-DUANYA
+ * datang sebagai 429 RESOURCE_EXHAUSTED, tetapi satu akan sembuh dengan
+ * menunggu seminit dan satu lagi tidak akan sembuh sampai seseorang
+ * membayar. Jadi teks mesej diperiksa dahulu, bukan kodnya. */
+function aiErrSay(status, err) {
+  const m = String((err && err.error && err.error.message) || '');
+  if (m) console.warn('[AI] ' + status + ': ' + m);
+  if (/credit|billing|prepay|depleted|free tier|plan and billing/i.test(m))
+    return 'The AI account has run out of credit. It has to be topped up on the Google AI billing page \u2014 nothing on this phone can fix it.';
+  if (status === 429) return 'Too many AI requests just now. Wait a minute and try again.';
+  if (/api[_ ]?key[_ ]?invalid|api key not valid/i.test(m))
+    return 'The AI key is no longer valid. It has to be replaced in the account settings.';
+  if (status === 403) return 'This AI key is not allowed to use that model.';
+  if (status === 404) return 'That AI model is not available to this key.';
+  if (status === 503) return 'The AI service is busy. Try again in a moment.';
+  if (status >= 500) return 'The AI service failed at its end. Nothing is wrong with your work.';
+  if (status === 400) return 'The AI refused the request' + (m ? ' \u2014 ' + m.split('.')[0] + '.' : '.');
+  return 'The AI could not be reached (error ' + status + ').';
+}
+
 function aiKeyWhy(code) {
   if (code === 'offline')
     return 'No signal. Translating and the other AI tools need the network.';
@@ -12107,8 +12132,7 @@ async function callGemini(history, isVoice = false) {
   
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    if (response.status === 429) throw new Error('Rate limit. Please wait.');
-    throw new Error(err?.error?.message || 'API Error ' + response.status);
+    throw new Error(aiErrSay(response.status, err));
   }
   
   const data = await response.json();
@@ -19308,9 +19332,9 @@ async function callGeminiImage(dataUrl, notes) {
     } catch (e) { lastErr = e.message; continue; }
     if (!res.ok) {
       const e = await res.json().catch(function() { return {}; });
-      lastErr = (e && e.error && e.error.message) || ('API ' + res.status);
+      lastErr = aiErrSay(res.status, e);
       if (res.status === 404 || res.status === 400) continue; // model unavailable -> try next
-      if (res.status === 429) throw new Error('Free quota reached — wait a bit and retry.');
+      if (res.status === 429) throw new Error(lastErr);
       throw new Error(lastErr);
     }
     const data = await res.json();
@@ -21007,8 +21031,9 @@ async function vtTranslate(text, toKey) {
   });
   if (!res.ok) {
     const e = await res.json().catch(function() { return {}; });
-    if (res.status === 429) throw new Error('Quota reached — wait a bit');
-    throw new Error((e && e.error && e.error.message) || ('API ' + res.status));
+    // Buku frasa dan setiap frasa yang pernah diterjemah masih ada pada
+    // telefon ini, dan itu yang berguna diketahui pada saat ini.
+    throw new Error(aiErrSay(res.status, e) + ' The Phrasebook still works.');
   }
   const data = await res.json();
   const raw = ((data.candidates && data.candidates[0] && data.candidates[0].content &&
