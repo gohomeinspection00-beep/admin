@@ -9727,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.1 · build 25 Oct 2026 · AI settings are fetched again instead of staying dead for the session, and the reason is named</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.2 · build 25 Oct 2026 · the counter now has a measured accuracy, and says which area it counted</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -21957,6 +21957,24 @@ function qsCountEnds() {
   for (i = 0; i < W * H; i++) { dog[i] = a[i] - b[i]; if (dog[i] > mx) mx = dog[i]; }
   if (mx <= 0) { showToast('Nothing found — try a brighter photo'); return; }
 
+  /* Satu ujian bentuk dicuba di sini dan DIBUANG. Idenya: satu puncak di
+   * atas batang panjang kelihatan sama seperti satu puncak di atas hujung
+   * bulat bagi penapis ini, jadi berjalan keluar dari pusat ke enam belas
+   * arah sepatutnya memisahkan keduanya — satu hujung tertutup pada setiap
+   * arah, satu batang terbuka sepanjang paksinya.
+   *
+   * Ia diukur tiga kali: pada kelabu mentah dengan ambang tetap, pada
+   * kelabu dengan ambang yang menentukur sendiri, dan pada DoG. Setiap
+   * kali ia menukar 4% pin palsu dengan 50-70% hujung yang HILANG.
+   * Sebabnya asas: dalam satu berkas yang padat setiap hujung mempunyai
+   * jiran pada hampir setiap arah, jadi "berjalan sampai gelap" tidak
+   * boleh membezakan hujung padat daripada batang.
+   *
+   * Arah tukar ganti itu juga salah, dan nota pada skrin sudah
+   * mengatakannya: pin tambahan kelihatan dan boleh dipadam, hujung yang
+   * hilang senyap dan tidak meninggalkan kesan. qstest.mjs menyimpan
+   * ukuran itu supaya cubaan seterusnya bermula dengan nombor. */
+
   const thr = mx * (QS.det.thr / 100), sep = Math.max(2, Math.round(r * 1.15)), pts = [];
   for (let y = sep; y < H - sep; y++) {
     for (let x = sep; x < W - sep; x++) {
@@ -21974,7 +21992,13 @@ function qsCountEnds() {
     QS.pins.push({ x:c.rg.x + q[0] / c.sc, y:c.rg.y + q[1] / c.sc, c:QS.active });
   });
   qsRender();
-  showToast('Found ' + pts.length + ' — check, then tap to fix');
+  // Pin sesat dalam gambar tapak hampir selalunya datang daripada benda
+  // di LUAR berkas — batang sisi, lantai, pekerja. Kotak kawasan membuang
+  // semuanya, dan ia ada di skrin sebelum ini; ia cuma tidak pernah
+  // disebut pada saat pengguna melihat hasilnya.
+  showToast('Found ' + pts.length +
+    (QS.region ? ' inside the box. Tap any pin to remove it.'
+               : ' across the whole photo. Tap any pin to remove it — or box just one bundle and count again.'));
 }
 
 // ---------- 6. PENGESAN: BATANG SELARI ----------
@@ -22049,7 +22073,9 @@ function qsCountBars() {
     QS.pins.push({ x:ix, y:iy, c:QS.active });
   });
   qsRender();
-  showToast('Found ' + keep.length + ' bars — check, then tap to fix');
+  showToast('Found ' + keep.length + ' bars' +
+    (QS.region ? ' inside the box. Tap any pin to remove it.'
+               : ' across the whole photo. Tap any pin to remove it — or box a clean stretch and count again.'));
 }
 
 function qsAutoCount() {
