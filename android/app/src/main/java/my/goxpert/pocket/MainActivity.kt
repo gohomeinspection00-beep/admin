@@ -116,6 +116,21 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    /**
+     * Radio BLE. Ia hidup selagi Activity hidup, bukan selagi satu skrin
+     * dibuka: seorang surveyor yang bertukar ke kamera di tengah ukuran
+     * tidak sepatutnya kehilangan meternya.
+     */
+    private val ble: BleLink by lazy {
+        BleLink(this) { kind, json -> bleEvent(kind, json) }
+    }
+
+    /** Halaman mendengar melalui satu fungsi; setiap peristiwa pergi ke sana. */
+    private fun bleEvent(kind: String, json: String) {
+        val js = "window.pkBle && window.pkBle(" + jsStr(kind) + "," + json + ")"
+        runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
+    }
+
     private fun sayEvent(k: String) {
         val js = "window.pkSaid && window.pkSaid(" + jsStr(k) + ")"
         runOnUiThread { runCatching { web.evaluateJavascript(js, null) } }
@@ -1289,6 +1304,30 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun canSay(): Boolean = ttsOk
 
+        // ---------- Meter laser melalui BLE ----------
+        // WebView tiada Web Bluetooth, dan tiada polyfill am yang boleh
+        // menggantikannya. Tetapi satu kerja ini kecil: cari, sambung,
+        // dengar, hantar bait. Penyahkodnya kekal dalam halaman.
+
+        /** Kosong bermakna boleh teruskan; selainnya satu perkataan sebab. */
+        @JavascriptInterface
+        fun bleWhy(): String = ble.why()
+
+        @JavascriptInterface
+        fun bleScan() { ble.scan() }
+
+        @JavascriptInterface
+        fun bleStopScan() { ble.stopScan() }
+
+        @JavascriptInterface
+        fun bleConnect(addr: String) { ble.connect(addr) }
+
+        @JavascriptInterface
+        fun bleDisconnect() { ble.disconnect() }
+
+        @JavascriptInterface
+        fun bleWrite(hex: String): Boolean = ble.write(hex)
+
         @JavascriptInterface
         fun savePdf(b64: String, name: String): String {
             return try {
@@ -1382,6 +1421,9 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         server?.stop()
         uvc.stop()
+        // Satu sambungan GATT yang tidak ditutup kekal dipegang oleh
+        // Android, dan meter itu kemudian menolak app yang dibuka semula.
+        runCatching { ble.stopScan(); ble.disconnect() }
         runCatching { tts?.stop(); tts?.shutdown() }
         tts = null
         runCatching { rec?.destroy() }

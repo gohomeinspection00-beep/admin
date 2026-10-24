@@ -9124,6 +9124,12 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .hw-dev-t b{display:block;font-size:13.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hw-dev-t span{display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--muted);margin-top:2px}
 .hw-dc{flex:none;padding:8px 11px;border-radius:9px;background:var(--surface);font-size:11.5px;font-weight:700;color:var(--fg-2);border:none}
+/* Dalam app tiada pemilih OS, jadi senarai ini ialah pemilih itu. */
+.hw-pick{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);margin-bottom:7px;font-family:var(--font-body)}
+.hw-pick-t{min-width:0;flex:1}
+.hw-pick-t b{display:block;font-size:13.5px;font-weight:650;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hw-pick-t span{display:block;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px}
+.hw-pick-r{flex:none;font-family:var(--font-mono);font-size:10.5px;color:var(--muted-2)}
 .hw-pad{padding:13px;border-radius:13px;background:var(--bg-2);border:1px solid var(--line);font-size:12.5px;color:var(--fg-dim);margin-bottom:9px;font-family:var(--font-mono)}
 .hw-log{max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:13px;background:var(--bg-2);padding:8px}
 .hw-log::-webkit-scrollbar{width:0}
@@ -9704,7 +9710,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.4 · build 24 Oct 2026 · the Mileseey laser is decoded: it sends plain text, and Pocket now reads it as a distance</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.5 · build 24 Oct 2026 · the laser meter works inside the app now — native Bluetooth, no Chrome</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -25787,7 +25793,7 @@ const HW_NAMES = {
   '0000180a-0000-1000-8000-00805f9b34fb': 'Device information'
 };
 
-let HW = { tab: 'ble', dev: null, server: null, log: [], subs: 0, last: null, pad: null, padRaf: 0, expect: 0, writables: [], rx: {}, read: null, reads: [] };
+let HW = { tab: 'ble', dev: null, server: null, log: [], subs: 0, last: null, pad: null, padRaf: 0, expect: 0, writables: [], rx: {}, read: null, reads: [], native: false, found: [], scanning: false, conn: null };
 
 function hwIco() {
   return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M12 3v18l5-5-10-10 10-10z" transform="translate(0,3) scale(0.85)"/></svg>';
@@ -25981,8 +25987,111 @@ function hwRender() {
 }
 
 // ---------- BLE ----------
+// Jambatan asli hanya wujud dalam APK yang membawanya. Satu APK lama
+// yang bertemu HTML ini masih mendapat laluan pelayar, dan tidak satu
+// butang pun yang tidak membawa ke mana-mana.
+function hwNative() {
+  return !!(window.PocketNative && typeof window.PocketNative.bleWhy === 'function');
+}
+// Sebab dalam satu perkataan daripada Kotlin, menjadi ayat yang boleh
+// ditindaklanjuti \u2014 radio yang tiada dan Bluetooth yang dimatikan ialah
+// dua masalah berbeza dengan dua pembetulan berbeza.
+const HW_WHY = {
+  'no-adapter': ['This phone has no Bluetooth radio', 'Nothing in the app can work around that. The meter still reads on its own screen.'],
+  'off': ['Bluetooth is switched off', 'Turn it on from the phone\u2019s quick settings, then press Search again.'],
+  'no-scan-permission': ['Pocket may not look for Bluetooth devices', 'Android asks once. If it was declined: Settings \u2192 Apps \u2192 Pocket \u2192 Permissions \u2192 Nearby devices.'],
+  'no-connect-permission': ['Pocket may not connect over Bluetooth', 'Settings \u2192 Apps \u2192 Pocket \u2192 Permissions \u2192 Nearby devices.'],
+  'no-location-permission': ['Android needs Location to find the meter', 'Below Android 12 a Bluetooth scan counts as locating you, so the Location permission is what lets Pocket see the meter. Settings \u2192 Apps \u2192 Pocket \u2192 Permissions.']
+};
+
+function hwNativeBle(el) {
+  const why = (function () { try { return window.PocketNative.bleWhy() || ''; } catch (e) { return 'off'; } })();
+  const warn = why && HW_WHY[why] ? HW_WHY[why] : (why ? [why, 'Bluetooth is not available right now.'] : null);
+  el.innerHTML =
+    (warn ? '<div class="hw-chk warn"><div><b>' + hwEsc(warn[0]) + '</b><span>' + warn[1] + '</span></div></div>' : '') +
+    '<p class="hw-hint">Switch the meter on, make sure its Bluetooth is active, then press Search. Once connected, <b>press the measure button on the meter</b> and the distance appears here.</p>' +
+    '<button class="hw-go" id="hwScan">' + (HW.scanning ? 'Searching\u2026' : 'Search for a device') + '</button>' +
+    '<div id="hwDev"></div>' +
+    '<div id="hwRead"></div>' +
+    '<div id="hwSend"></div>' +
+    '<div class="hw-sec"><span class="hw-sec-l">What comes in</span><span class="hw-sec-r"></span>' +
+      '<button class="hw-cp" id="hwCopy">Copy log</button></div>' +
+    '<div class="hw-log" id="hwLog"></div>';
+  document.getElementById('hwScan').onclick = function () {
+    if (HW.scanning) { try { window.PocketNative.bleStopScan(); } catch (e) {} return; }
+    HW.found = []; HW.log = []; HW.rx = {}; HW.read = null; HW.reads = []; HW.conn = null;
+    hwPaintRead(); hwPaintLog();
+    try { window.PocketNative.bleScan(); } catch (e) { hwSay('bad', 'Could not start the search: ' + e.message); }
+  };
+  document.getElementById('hwCopy').onclick = hwCopyLog;
+  hwPaintDev(); hwPaintRead(); hwPaintSend(); hwPaintLog();
+}
+
+// Kotlin menghantar setiap peristiwa ke sini.
+window.pkBle = function (kind, d) {
+  d = d || {};
+  if (kind === 'scan-start') { HW.scanning = true; HW.found = []; hwSay('ok', 'Searching\u2026'); hwScanBtn(); hwPaintDev(); return; }
+  if (kind === 'scan-end')   { HW.scanning = false; hwScanBtn(); hwPaintDev(); return; }
+  if (kind === 'found') {
+    // Meter yang tidak bernama tetap disenaraikan: ada yang hanya
+    // memberi namanya selepas disambung.
+    for (let i = 0; i < HW.found.length; i++) if (HW.found[i].addr === d.addr) return;
+    HW.found.push({ addr: d.addr, name: d.name || '', rssi: parseInt(d.rssi, 10) || 0 });
+    HW.found.sort(function (a, b) { return b.rssi - a.rssi; });
+    hwPaintDev();
+    return;
+  }
+  if (kind === 'state') {
+    if (d.state === 'connecting') { HW.conn = { addr: d.addr, name: d.name || '', state: 'connecting' }; hwSay('ok', 'Connecting to ' + (d.name || d.addr) + '\u2026'); }
+    else if (d.state === 'connected') { if (HW.conn) HW.conn.state = 'connected'; hwSay('ok', 'Connected. Reading services\u2026'); }
+    else { HW.conn = null; HW.writables = []; hwSay('warn', 'Device disconnected'); hwPaintSend(); }
+    hwPaintDev();
+    return;
+  }
+  if (kind === 'service') { hwSay('ok', 'Service ' + (HW_NAMES[d.uuid] || String(d.uuid).slice(0, 8)) + ' \u00b7 ' + d.chars + ' features'); return; }
+  if (kind === 'ready') {
+    HW.subs = parseInt(d.subs, 10) || 0;
+    // Jambatan memiliki ciri yang boleh ditulis, jadi kotak hantar
+    // hanya perlu tahu BERAPA, bukan yang mana.
+    HW.writables = [];
+    const n = parseInt(d.writables, 10) || 0;
+    for (let i = 0; i < n; i++) HW.writables.push({ uuid: 'native', properties: { write: true }, native: true });
+    hwSay(HW.subs ? 'ok' : 'warn', HW.subs
+      ? 'Ready. Press the measure button on the meter now.'
+      : 'No characteristic can notify. This meter may need a wake-up command written to it first.');
+    hwPaintDev(); hwPaintSend();
+    return;
+  }
+  if (kind === 'data') {
+    const buf = hwUnhex(d.hex);
+    HW.last = { uuid: d.uuid, bytes: d.hex };
+    hwSay('data', String(d.uuid).slice(0, 8) + ' \u2192 ' + d.hex, { buf: buf, uuid: d.uuid });
+    hwTakeReading(d.uuid, buf);
+    return;
+  }
+  if (kind === 'sent')  { hwSay('ok', 'Sent: ' + d.hex); return; }
+  if (kind === 'error') {
+    const w = HW_WHY[d.msg];
+    hwSay('bad', w ? w[0] + ' \u2014 ' + w[1] : String(d.msg || 'Something went wrong'));
+    if (w) hwRender();
+    return;
+  }
+};
+function hwScanBtn() {
+  const b = document.getElementById('hwScan');
+  if (b) b.textContent = HW.scanning ? 'Searching\u2026' : 'Search for a device';
+}
+function hwUnhex(h) {
+  const parts = String(h || '').trim().split(/[\s,]+/).filter(Boolean);
+  const out = new Uint8Array(parts.length);
+  for (let i = 0; i < parts.length; i++) out[i] = parseInt(parts[i], 16) & 0xff;
+  return out;
+}
+
 async function hwBle() {
   const el = document.getElementById('hwBody');
+  HW.native = hwNative();
+  if (HW.native) return hwNativeBle(el);
   const has = !!(navigator.bluetooth);
   let avail = has;
   try { if (has && navigator.bluetooth.getAvailability) avail = await navigator.bluetooth.getAvailability(); } catch (e) {}
@@ -26070,6 +26179,11 @@ function hwPaintSend() {
     const parts = v.split(/[\s,]+/).filter(Boolean);
     const bad = parts.filter(function(x) { return !/^[0-9a-fA-F]{1,2}$/.test(x); });
     if (!parts.length || bad.length) { hwSay('bad', 'Hex bytes only, like "aa 00 01".'); return; }
+    if (HW.native) {
+      try { window.PocketNative.bleWrite(v); }
+      catch (e) { hwSay('bad', 'Could not send: ' + e.message); }
+      return;
+    }
     const buf = new Uint8Array(parts.map(function(x) { return parseInt(x, 16); }));
     for (let i = 0; i < HW.writables.length; i++) {
       const ch = HW.writables[i];
@@ -26159,12 +26273,47 @@ function hwPaintRead() {
 function hwPaintDev() {
   const el = document.getElementById('hwDev');
   if (!el) return;
+  if (HW.native) return hwPaintDevNative(el);
   if (!HW.dev) { el.innerHTML = ''; return; }
   el.innerHTML = '<div class="hw-dev"><div class="hw-dev-t"><b>' + hwEsc(HW.dev.name || 'Unnamed') + '</b>' +
     '<span>' + (HW.server && HW.server.connected ? 'connected · ' + HW.subs + ' notifications heard' : 'disconnected') + '</span></div>' +
     '<button class="hw-dc" id="hwDisc">Disconnect</button></div>';
   const d = document.getElementById('hwDisc');
   if (d) d.onclick = function() { try { HW.dev.gatt.disconnect(); } catch (e) {} };
+}
+// Dalam pelayar, Chrome melukis pemilihnya sendiri. Dalam app, tiada
+// pemilih \u2014 jadi senarai inilah pemilih itu.
+function hwPaintDevNative(el) {
+  if (HW.conn) {
+    const done = HW.conn.state === 'connected';
+    el.innerHTML = '<div class="hw-dev"><div class="hw-dev-t"><b>' +
+      hwEsc(HW.conn.name || HW.conn.addr) + '</b><span>' +
+      (done ? 'connected \u00b7 ' + HW.subs + ' notifications heard' : 'connecting\u2026') +
+      '</span></div><button class="hw-dc" id="hwDisc">Disconnect</button></div>';
+    document.getElementById('hwDisc').onclick = function () {
+      try { window.PocketNative.bleDisconnect(); } catch (e) {}
+      HW.conn = null; hwPaintDev();
+    };
+    return;
+  }
+  if (!HW.found.length) {
+    el.innerHTML = HW.scanning
+      ? '<p class="hw-hint">Looking\u2026 the meter has to be switched on for it to answer.</p>'
+      : '';
+    return;
+  }
+  el.innerHTML = HW.found.map(function (d) {
+    return '<button class="hw-pick" data-addr="' + hwEsc(d.addr) + '">' +
+      '<span class="hw-pick-t"><b>' + hwEsc(d.name || 'Unnamed device') + '</b>' +
+      '<span>' + hwEsc(d.addr) + '</span></span>' +
+      '<span class="hw-pick-r">' + d.rssi + ' dBm</span></button>';
+  }).join('');
+  el.onclick = function (e) {
+    const b = e.target.closest('[data-addr]');
+    if (!b) return;
+    try { window.PocketNative.bleConnect(b.dataset.addr); }
+    catch (err) { hwSay('bad', 'Could not connect: ' + err.message); }
+  };
 }
 function hwPaintLog() {
   const el = document.getElementById('hwLog');
