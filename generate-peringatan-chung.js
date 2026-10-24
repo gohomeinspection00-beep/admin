@@ -2,7 +2,7 @@ const { jsPDF } = require("jspdf");
 const fs = require("fs");
 
 const data = {
-  noRujukan: "NOTIS-1/2026/060",
+  noRujukan: "PERINGATAN-1/2026/060",
 
   namaPembeli: "CHUNG SIEW HOOI",
   alamatPengirim: [
@@ -70,7 +70,7 @@ const data = {
     { tarikh: "16 Mei 2024", peristiwa: "Perjanjian Jual Beli (Sale and Purchase Agreement) ditandatangani — CANNA 3, Perjiranan 8 Fasa 3, Bandar Dato' Onn (Ruj: IKSA/SPA/JL(BDO-CANNA3)/44801(06)/24-NR)" },
     { tarikh: "30 September 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (Full House Inspection) dijalankan ke atas hartanah" },
     { tarikh: "5 Oktober 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi melalui aplikasi pihak pemaju (Kita) — merupakan notis bertulis di bawah Klausa 27(1); tempoh pembaikan 30 hari bermula" },
-    { tarikh: "25 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan — peringatan agar semua pembaikan disiapkan dalam baki tempoh 30 hari" },
+    { tarikh: "25 Oktober 2026", peristiwa: "Notis Peringatan Pembaikan Kecacatan (Reminder Notice) dikeluarkan — agar semua pembaikan disiapkan dalam baki tempoh 30 hari" },
     { tarikh: "4 November 2026", peristiwa: "TARIKH AKHIR — tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1)" },
   ],
 
@@ -228,7 +228,7 @@ y += 8;
 doc.setFont("helvetica", "bold");
 doc.setFontSize(SZ.TITLE);
 bk();
-const perkara1 = "Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim)";
+const perkara1 = "Notis Peringatan Pembaikan Kecacatan (Defect Rectification Reminder Notice)";
 const perkara2 = `Hartanah: ${data.jenisHartanah}`;
 const perkara3 = `di ${data.alamatHartanah}`;
 for (const pk of [perkara1, perkara2, perkara3]) {
@@ -249,7 +249,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Tempoh tiga puluh (30) hari tersebut sedang berjalan dan akan TAMAT pada ${data.tarikhTamat30}. Notis Pertama ini dikeluarkan sebagai PERINGATAN RASMI agar pihak tuan menyelaraskan dan menyiapkan SEMUA kerja pembaikan dalam baki tempoh tersebut, memandangkan sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan. Antara kecacatan yang dilaporkan adalah seperti berikut:`
+  `Tempoh tiga puluh (30) hari tersebut sedang berjalan dan akan TAMAT pada ${data.tarikhTamat30}. Notis Peringatan ini dikeluarkan sebagai PERINGATAN RASMI agar pihak tuan menyelaraskan dan menyiapkan SEMUA kerja pembaikan dalam baki tempoh tersebut, memandangkan sehingga tarikh notis ini dikeluarkan kecacatan yang dilaporkan masih belum diselesaikan. Antara kecacatan yang dilaporkan adalah seperti berikut:`
 );
 y += 5;
 
@@ -288,7 +288,7 @@ numPara(5,
 y += 4;
 
 numPara(6,
-  `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan terhadap kecacatan yang dilaporkan disiapkan sepenuhnya selewat-lewatnya pada ${data.tarikhDeadline}, iaitu tarikh tamat tempoh tiga puluh (30) hari di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA}. Sekiranya pembaikan masih tidak disempurnakan selepas tarikh tersebut, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari.`
+  `Dengan ini, saya mengeluarkan Notis Peringatan ini kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan terhadap kecacatan yang dilaporkan disiapkan sepenuhnya selewat-lewatnya pada ${data.tarikhDeadline}, iaitu tarikh tamat tempoh tiga puluh (30) hari di bawah Klausa ${data.klausaPembaikan} ${data.jenisSPA}. Sekiranya pembaikan masih tidak disempurnakan selepas tarikh tersebut, Notis Pertama (First Notice) rasmi akan dikeluarkan dengan tempoh tambahan ${data.tempohNotis2} hari, dan seterusnya Notis Kedua iaitu Notis Akhir (Final Notice) sekiranya masih gagal.`
 );
 y += 4;
 
@@ -301,7 +301,7 @@ numPara(8, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetap
 y += 2;
 bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
 bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
-bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan dan pihak berkepentingan (stakeholders); dan");
+bullet("Mengemukakan Notis Pertama (First Notice) rasmi dan seterusnya Notis Akhir (Final Notice) kepada pihak tuan dan pihak berkepentingan (stakeholders); dan");
 bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
 y += 4;
 
@@ -319,11 +319,11 @@ doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
 numPara(10,
-  `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
+  `Sekiranya pihak tuan masih gagal mengambil tindakan selepas notis-notis susulan dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
 
-para("Saya berharap pihak tuan mengambil tindakan segera terhadap Notis Pertama ini. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.");
+para("Saya berharap pihak tuan mengambil tindakan segera terhadap Notis Peringatan ini. Atas kerjasama dan perhatian tuan diucapkan ribuan terima kasih.");
 y += 4;
 para("Sekian.");
 y += 4;
@@ -388,7 +388,7 @@ function drawAkuanTerima(copyLabel) {
   y += 12;
 
   doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
-  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
+  const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Peringatan Pembaikan Kecacatan (Defect Rectification Reminder Notice) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
   const ls = doc.splitTextToSize(akText, cW);
   for (const l of ls) { doc.text(l, mL, y); y += LH; }
 
@@ -429,6 +429,6 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_CHUNG.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_CHUNG.pdf");
+fs.writeFileSync("/home/user/admin/NOTIS_PERINGATAN_CHUNG.pdf", Buffer.from(out));
+console.log("PDF generated: NOTIS_PERINGATAN_CHUNG.pdf");
 console.log(`Total pages: ${totalPages}`);
