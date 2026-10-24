@@ -9727,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.5 · build 25 Oct 2026 · a retired AI model steps aside for one that still answers</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.6 · build 25 Oct 2026 · translation takes the fast lane, and never hangs without saying so</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -11288,14 +11288,51 @@ function getModel() { return (pocketConfig && pocketConfig.model) || ayieConfig.
  * Jadi 404 menjatuhkan panggilan ke model seterusnya, dan model yang
  * menjawab diingat untuk sesi ini — supaya harga percubaan itu
  * dibayar sekali, bukan pada setiap ayat yang diterjemah. */
-const AI_MODELS = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
-let aiModelOk = '';
-function aiModelChain() {
+/* Dua barisan, kerana dua kerja yang sangat berbeza.
+ *
+ * Terjemahan ialah satu ayat pendek, dan surveyor berdiri di hadapan
+ * pekerja sambil menunggunya. Perundingan bertaip ialah soalan
+ * kejuruteraan yang jawapannya panjang, dan dia boleh duduk menunggu.
+ *
+ * Diukur pada kunci percuma, 25 Okt, dengan permintaan penterjemah
+ * yang sebenar:
+ *
+ *     gemini-3.5-flash-lite      4.5s   6.4s   6.3s
+ *     gemini-3.1-flash-lite      3.0s   3.2s  12.6s
+ *     gemini-flash-lite-latest   3.9s   6.7s   8.3s
+ *     gemini-3.8-flash          94.8s  99.6s
+ *
+ * Model besar itu memulangkan terjemahan yang SAMA, lima belas kali
+ * lebih lambat. Untuk satu ayat keselamatan di tapak itu bukan
+ * pertukaran, itu kerugian.
+ *
+ * Dan dengan soalan perundingan sebenar:
+ *
+ *     gemini-3.5-flash          16.8s
+ *     gemini-3.6-flash          16.0s
+ *     gemini-flash-latest      176.5s  142.6s
+ *
+ * Sebab itu gemini-flash-latest TIADA di sini walaupun alias itu
+ * kelihatan seperti jaring keselamatan yang sempurna terhadap model
+ * yang ditutup: ia lebih teruk daripada perkara yang ia sepatutnya
+ * selamatkan. Jangan masukkannya semula tanpa mengukurnya dahulu. */
+const AI_FAST = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
+const AI_FULL = ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-2.5-flash'];
+
+/* Model yang menjawab diingat SETIAP BARISAN. Satu ingatan yang
+ * dikongsi akan menurunkan perundingan kepada model lite hanya kerana
+ * satu terjemahan berlaku dahulu — senyap, dan pada bahagian yang
+ * paling memerlukan mutu. */
+let aiModelOk = { fast: '', full: '' };
+function aiModelChain(fast) {
   const chain = [];
   const add = function (m) { if (m && chain.indexOf(m) < 0) chain.push(m); };
-  add(aiModelOk);
+  add(aiModelOk[fast ? 'fast' : 'full']);
   add(getModel());
-  AI_MODELS.forEach(add);
+  (fast ? AI_FAST : AI_FULL).forEach(add);
+  // Kalau satu barisan penuh mati, jawapan yang perlahan atau yang
+  // lebih ringkas tetap lebih baik daripada tiada jawapan langsung.
+  (fast ? AI_FULL : AI_FAST).forEach(add);
   return chain;
 }
 
@@ -11321,26 +11358,56 @@ function aiNoThink(model, cfg) {
  * makeBody menerima nama model kerana tetapan fikiran berbeza antara
  * generasi — badan permintaan tidak boleh dibina sebelum kita tahu
  * model mana yang akan menjawab. */
-async function aiGenerate(makeBody, tail) {
+async function aiGenerate(makeBody, tail, opts) {
+  const o = opts || {};
+  const lane = o.fast ? 'fast' : 'full';
   const apiKey = getApiKey();
-  const chain = aiModelChain();
+  const chain = aiModelChain(o.fast);
   const end = tail || '';
+  let slow = 0, gone = 0;
   for (let i = 0; i < chain.length; i++) {
-    const res = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/' +
-      chain[i] + ':generateContent?key=' + apiKey,
-      { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(makeBody(chain[i])) });
-    if (res.ok) { aiModelOk = chain[i]; return res.json(); }
+    /* Tanpa had masa, satu model yang tergantung menggantung app:
+     * "Translating..." kekal di skrin dan tiada apa yang memberitahu
+     * surveyor sama ada hendak menunggu atau berpatah balik. Diukur
+     * 95s pada gemini-3.8-flash. Jadi masa habis dilayan seperti 404
+     * — cuba model seterusnya — kerana itulah tepatnya yang
+     * patut berlaku apabila satu model terlalu perlahan untuk digunakan. */
+    const ctl = new AbortController();
+    const timer = o.timeout ? setTimeout(function () { ctl.abort(); }, o.timeout) : 0;
+    let res;
+    try {
+      res = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/' +
+        chain[i] + ':generateContent?key=' + apiKey,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(makeBody(chain[i])), signal: ctl.signal });
+    } catch (err) {
+      if (timer) clearTimeout(timer);
+      // Rangkaian yang betul-betul putus tidak dibaiki oleh model lain.
+      if (!ctl.signal.aborted) throw err;
+      if (aiModelOk[lane] === chain[i]) aiModelOk[lane] = '';
+      slow++;
+      console.warn('[AI] timed out ' + chain[i] + ' after ' + o.timeout + 'ms');
+      continue;
+    }
+    if (timer) clearTimeout(timer);
+    if (res.ok) { aiModelOk[lane] = chain[i]; return res.json(); }
     const e = await res.json().catch(function () { return {}; });
     if (res.status === 404) {
-      if (aiModelOk === chain[i]) aiModelOk = '';
+      if (aiModelOk[lane] === chain[i]) aiModelOk[lane] = '';
+      gone++;
       console.warn('[AI] 404 ' + chain[i] + ': ' +
         String((e && e.error && e.error.message) || '').slice(0, 140));
       continue;
     }
     throw new Error(aiErrSay(res.status, e) + end);
   }
+  /* Dua kegagalan yang berbeza sama sekali, dan surveyor boleh
+   * bertindak atas satu daripadanya. Perlahan bermakna isyarat di sini
+   * — berjalan ke tempat lapang. Ditutup bermakna tetapan akaun,
+   * dan tiada apa di tapak yang boleh membetulkannya. */
+  if (slow)
+    throw new Error('The AI did not answer in time. The signal here may be too weak.' + end);
   throw new Error('No AI model on this key would answer \u2014 every one of them ' +
     'has been retired or blocked. An administrator has to set a current model ' +
     'in the account settings.' + end);
@@ -12198,7 +12265,10 @@ async function callGemini(history, isVoice = false) {
   /* Mod suara mendapat belanjawan 512 token, dan model 3.x akan
    * membelanjakannya untuk berfikir sebelum ia bercakap. Perundingan
    * bertaip mampu menunggu dan benar-benar mendapat manfaat daripada
-   * fikiran itu, jadi hanya suara yang mematikannya. */
+   * fikiran itu, jadi hanya suara yang mematikannya.
+   *
+   * Atas sebab yang sama suara mengambil barisan laju: perbualan yang
+   * dijeda sembilan puluh saat bukan lagi perbualan. */
   const data = await aiGenerate(function (model) {
     const cfg = {
       temperature: currentMode === 'consultant' ? 0.3 : 0.5,
@@ -12215,7 +12285,7 @@ async function callGemini(history, isVoice = false) {
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
       ]
     };
-  });
+  }, '', isVoice ? { fast: true, timeout: 45000 } : { timeout: 90000 });
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to process.';
 }
 
@@ -21087,6 +21157,15 @@ function vtCacheSet(text, toKey, val) {
   try { localStorage.setItem(vtCacheKey(text, toKey), JSON.stringify(val)); } catch (e) {}
 }
 
+/* Benar apabila hampir setiap huruf ialah A-Z. Tanda baca, nombor dan
+ * ruang diabaikan, jadi "Kren-er niche daraben na." lulus sementara
+ * satu baris Bengali dengan satu perkataan Inggeris di dalamnya tidak. */
+function vtLatinish(s) {
+  const letters = String(s || '').replace(/[^\p{L}]/gu, '');
+  if (!letters) return false;
+  return letters.replace(/[^A-Za-z]/g, '').length / letters.length > 0.8;
+}
+
 async function vtTranslate(text, toKey) {
   const cached = vtCacheGet(text, toKey);
   if (cached) return cached;
@@ -21094,12 +21173,27 @@ async function vtTranslate(text, toKey) {
   const lg = vtL(toKey);
   const why = (typeof aiConfigEnsure === 'function') ? await aiConfigEnsure() : '';
   if (why) throw new Error(aiKeyWhy(why));
+  /* Dahulu ini meminta "Baris 1 / Baris 2: ROMAN:" dan menghurai balasan
+   * itu. Diukur 25 Okt pada gemini-3.5-flash-lite, dengan kunci dan
+   * rangkaian yang sebenar, model memulangkan:
+   *
+   *     বিল্ডিং ইন্সপেকশন সাইটের জন্য অনুবাদ:
+   *     Line 2: ROMAN: Krene niche daranaben na.
+   *
+   * Baris pertama itu bukan terjemahan, ia tajuk — dan baris itulah
+   * yang ditayangkan kepada pekerja. Satu amaran kabel hidup yang tidak
+   * menyebut kabel langsung. Setiap label yang diminta ialah satu lagi
+   * benda yang boleh bocor ke dalam teks.
+   *
+   * Dengan responseSchema model tidak lagi menulis prosa untuk dihurai,
+   * ia mengisi medan. Tiada "Line 1:" untuk bocor kerana tiada baris.
+   * Diuji pada ketiga-tiga model lite: bersih, 0.8–3.2s. */
   const prompt =
-    'You are a translator for a building inspection site. Translate the text into ' + lg.n + '.\n' +
-    'Reply with exactly two lines and nothing else:\n' +
-    'Line 1: the translation in ' + lg.n + ', in its normal script. No quotes, no notes.\n' +
-    'Line 2: ROMAN: a simple Latin-letter pronunciation of line 1 that a Malay speaker can read aloud. ' +
-    'If ' + lg.n + ' already uses Latin letters, write exactly "ROMAN: -".\n\n' +
+    'Translate the text into ' + lg.n + ' for a building inspection site. ' +
+    'Keep it short and plain, the way it would be said to a worker.\n' +
+    'translation: the text in ' + lg.n + ', in its normal script.\n' +
+    'roman: a simple Latin-letter pronunciation of it that a Malay speaker can ' +
+    'read aloud. If ' + lg.n + ' already uses Latin letters, leave roman empty.\n\n' +
     'Text: ' + text;
 
   // Buku frasa dan setiap frasa yang pernah diterjemah masih ada pada
@@ -21108,20 +21202,55 @@ async function vtTranslate(text, toKey) {
   const data = await aiGenerate(function (model) {
     return {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: aiNoThink(model, { temperature: 0.1, maxOutputTokens: 1024 })
+      generationConfig: aiNoThink(model, {
+        temperature: 0.1, maxOutputTokens: 1024,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'OBJECT',
+          properties: { translation: { type: 'STRING' }, roman: { type: 'STRING' } },
+          required: ['translation', 'roman']
+        }
+      })
     };
-  }, ' The Phrasebook still works.');
+  }, ' The Phrasebook still works.', { fast: true, timeout: 30000 });
   const raw = ((data.candidates && data.candidates[0] && data.candidates[0].content &&
     data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
     data.candidates[0].content.parts[0].text) || '').trim();
 
-  const lines = raw.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
   let out = '', rom = '';
+  try {
+    const j = JSON.parse(raw);
+    if (j && typeof j.translation === 'string' && j.translation.trim()) {
+      out = j.translation.trim();
+      rom = String(j.roman == null ? '' : j.roman).trim();
+    }
+  } catch (e) { /* model abaikan skema — hurai baris, di bawah */ }
+
+  /* Penghurai baris kekal sebagai jaring. Satu model yang mengabaikan
+   * skema masih memberi dua baris yang boleh digunakan, dan kunci lama
+   * mencapai model lama yang tidak pernah menyokong skema langsung. */
+  const lines = out ? [] : raw.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
   for (let i = 0; i < lines.length; i++) {
     if (/^roman\s*:/i.test(lines[i])) rom = lines[i].replace(/^roman\s*:/i, '').trim();
     else if (!out) out = lines[i];
   }
   if (!out) out = raw;
+  /* Model yang lebih kecil memberi kedua-dua baris dengan betul tetapi
+   * kerap meninggalkan label "ROMAN:" yang diminta — pada 25 Okt,
+   * enam daripada enam kali. Gelung di atas kemudian membuang baris
+   * kedua itu secara senyap, dan surveyor kehilangan satu-satunya baris
+   * yang dia sendiri boleh baca kuat kepada pekerja.
+   *
+   * Jadi baris kedua tanpa label diterima sebagai sebutan apabila ia
+   * huruf Latin dan terjemahan itu bukan. Ujian yang sama itulah yang
+   * membezakan kedua-duanya pada skrin, dan bahasa yang memang ditulis
+   * dengan huruf Latin tidak terjejas: di situ kedua-dua baris Latin,
+   * jadi ujian ini gagal dan tiada apa yang diteka. */
+  if (!rom) {
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i] !== out && vtLatinish(lines[i]) && !vtLatinish(out)) { rom = lines[i]; break; }
+    }
+  }
   if (rom === '-' || rom.toLowerCase() === out.toLowerCase()) rom = '';
   const val = { out: out, rom: rom };
   vtCacheSet(text, toKey, val);
