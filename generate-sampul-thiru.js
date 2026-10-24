@@ -1,7 +1,7 @@
 const { jsPDF } = require("jspdf");
 const fs = require("fs");
 
-const pengirim = ["THIRUCHELVAM A/L SANMUGAM", "No. 1, Jalan Puncak 5/9,", "Taman Puncak Tropicana,", "81550 Gelang Patah, Johor.", "Tel: 011-5595 1367"];
+const pengirim = ["THIRUCHELVAM A/L SANMUGAM", "No. 1, Jalan Puncak 5/9,", "Taman Puncak Tropicana,", "81500 Pekan Nenas, Johor.", "Tel: 010-903 9625"];
 
 const sets = [
   {

@@ -8,11 +8,11 @@ const data = {
   alamatPengirim: [
     "No. 1, Jalan Puncak 5/9,",
     "Taman Puncak Tropicana,",
-    "81550 Gelang Patah,",
+    "81500 Pekan Nenas,",
     "Johor.",
   ],
   noKP: "940808-06-5799",
-  telefonPembeli: "011-5595 1367",
+  telefonPembeli: "010-903 9625",
   emailPembeli: "thirumacdrogba08@gmail.com",
 
   namaPemaju: "KSL MEDINI DEVELOPMENT SDN. BHD.",
@@ -34,8 +34,8 @@ const data = {
     "80150 Johor Bahru, Johor.",
   ],
 
-  alamatHartanah: "No. 1, Jalan Puncak 5/9, Taman Puncak Tropicana, 81550 Gelang Patah, Johor (PTD 16655, HS(M) 7576, Mukim Jeram Batu)",
-  jenisHartanah: "Rumah Teres 2 Tingkat (2 Storey Terrace House, 20' x 70', Intermediate)",
+  alamatHartanah: "No. 1, Jalan Puncak 5/9, Taman Puncak Tropicana, 81500 Pekan Nenas, Johor (PTD 16655, HS(M) 7576, Mukim Jeram Batu)",
+  jenisHartanah: "Rumah Teres 2 Tingkat (2 Storey Terrace House, 20' x 70', End Lot)",
   namaProyek: "Azalea Heights 2C — Taman Puncak Tropicana, Fasa 2C",
 
   noSPA: "30622-1/eSPA/100724/PTD16655/01",
