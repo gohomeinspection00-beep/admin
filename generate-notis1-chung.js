@@ -46,6 +46,12 @@ const data = {
   tempohNotis2: "15",
 
   kecacatan: [
+    { tag: "149", lokasi: "Family Area — M&E", kecacatan: "Suis tertanggal dari dinding dengan pendawaian terdedah (Detached switch on wall — Major defects)", status: "Belum Dibaiki" },
+    { tag: "206", lokasi: "Bathroom 2 — Lantai", kecacatan: "Pemotongan jubin lantai tidak sempurna (Improper cutting for floor tiles)", status: "Belum Dibaiki" },
+    { tag: "207", lokasi: "Bathroom 2 — Lantai", kecacatan: "Celahan ketara pada grouting jubin lantai (Visible gaps on floor tiles grouting — Jointing issue)", status: "Belum Dibaiki" },
+    { tag: "241", lokasi: "Bathroom 3 — Plumbing & Sanitary", kecacatan: "Sisa binaan di dalam floor trap (Construction leftover inside floor trap — Poor Drainage System)", status: "Belum Dibaiki" },
+    { tag: "242", lokasi: "Bathroom 3 — Fixtures", kecacatan: "Tangki simbahan tandas longgar (Loose on cistern toilet)", status: "Belum Dibaiki" },
+    { tag: "261", lokasi: "RC Flat Roof — Dinding", kecacatan: "Kerosakan pada dinding (Damaged on wall — Major defects)", status: "Belum Dibaiki" },
     { tag: "270", lokasi: "Water Tank Area — Plumbing & Sanitary", kecacatan: "Tiada sokongan yang sempurna pada distribution pipe yang disambung ke tangki air (Missing proper support for distribution pipe connected to water tank — Accessories defects)", status: "Belum Dibaiki" },
     { tag: "271", lokasi: "Water Tank Area — Fixtures", kecacatan: "Tangki air dalam keadaan kotor dan perlu dibersihkan (Water tank on dirty condition, need to be cleaned)", status: "Belum Dibaiki" },
     { tag: "272", lokasi: "Water Tank Area — Fixtures", kecacatan: "Pemasangan insulation sheet tidak sempurna (Improper installation of insulation sheet)", status: "Belum Dibaiki" },
@@ -263,7 +269,7 @@ for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus diberikan kepada tanda air bertakung (sign of stagnant water) pada papak lantai Flat Roof dan AC Ledge (item No. 276 dan No. 280) serta keretakan papak lantai yang menyeluruh dan keretakan dinding dengan corner bead terdedah (item No. 277, No. 281 dan No. 282). Kawasan-kawasan ini terdedah kepada cuaca: takungan air yang berterusan menunjukkan kecerunan (falls) yang tidak sempurna dan akan mempercepatkan kemerosotan lapisan kalis air, manakala keretakan yang dibiarkan akan membenarkan resapan air dan kebocoran ke ruang di bawahnya. Pihak tuan dituntut membetulkan PUNCA — kecerunan permukaan dan pembaikan keretakan mengikut amalan pembinaan yang baik — dan bukan sekadar tampalan kosmetik.`
+  `Perhatian khusus dan SEGERA diberikan kepada item No. 149 — suis yang tertanggal dari dinding di Family Area dengan pendawaian terdedah (kecacatan major). Pendawaian terdedah melibatkan RISIKO KEJUTAN ELEKTRIK DAN KEBAKARAN kepada penghuni, dan pembaikan hendaklah dilaksanakan dengan segera oleh orang kompeten (competent person) yang berdaftar dengan Suruhanjaya Tenaga. Perhatian turut diberikan kepada item No. 261 — kerosakan pada dinding RC Flat Roof (kecacatan major) yang hendaklah dibaiki dengan sempurna; item No. 241 — sisa binaan di dalam floor trap Bathroom 3 yang menjejaskan sistem saliran dan wajib dikeluarkan sepenuhnya; serta tanda air bertakung (sign of stagnant water) pada papak lantai Flat Roof dan AC Ledge (item No. 276 dan No. 280) serta keretakan papak lantai yang menyeluruh dan keretakan dinding dengan corner bead terdedah (item No. 277, No. 281 dan No. 282). Kawasan-kawasan ini terdedah kepada cuaca: takungan air yang berterusan menunjukkan kecerunan (falls) yang tidak sempurna dan akan mempercepatkan kemerosotan lapisan kalis air, manakala keretakan yang dibiarkan akan membenarkan resapan air dan kebocoran ke ruang di bawahnya. Pihak tuan dituntut membetulkan PUNCA — kecerunan permukaan dan pembaikan keretakan mengikut amalan pembinaan yang baik — dan bukan sekadar tampalan kosmetik.`
 );
 y += 4;
 
