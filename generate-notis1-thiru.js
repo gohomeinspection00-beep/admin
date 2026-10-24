@@ -300,7 +300,7 @@ numPara(5,
 y += 4;
 
 numPara(5,
-  `Lebih membimbangkan, semakan terhadap rekod kes Defect 9996637-1 di dalam aplikasi KSL mendapati beberapa item telah ditanda "Completed" sedangkan pembaikan sebenarnya TIDAK dilaksanakan — ini merupakan SALAH NYATA STATUS PEMBAIKAN: (i) Item No. 45 ("Leakage observed on the ceiling") dan Item No. 50 ("Visible gaps around floor trap") ditanda "Completed" sedangkan gambar "selepas pembaikan" yang dimuat naik oleh kontraktor pihak tuan sendiri hanyalah NOTA BERTULIS TANGAN berbunyi "bukan orang paip — hantar kontraktor lain" dan "cat ceiling, bukan orang paip" — pengakuan jelas bahawa kerja pembaikan tidak dibuat kerana kontraktor yang dihantar bukan kontraktor paip; dan (ii) Item No. 8 ("Uneven surface on ceiling soffit", Carporch) ditanda "Completed" tetapi gambar "selepas pembaikan" yang dimuat naik menunjukkan KAWASAN YANG BERBEZA daripada kecacatan yang dilaporkan. Pihak tuan dituntut membetulkan status item-item tersebut di dalam sistem, menghantar kontraktor yang betul mengikut bidang kerja, dan mengemukakan bukti pembaikan sebenar di lokasi yang betul.`
+  `Lebih membimbangkan, semakan terhadap rekod kes Defect 9996637-1 di dalam aplikasi KSL mendapati beberapa item telah ditanda "Completed" sedangkan pembaikan sebenarnya TIDAK dilaksanakan — ini merupakan SALAH NYATA STATUS PEMBAIKAN: (i) Item No. 45 ("Leakage observed on the ceiling") dan Item No. 50 ("Visible gaps around floor trap") ditanda "Completed" sedangkan gambar "selepas pembaikan" yang dimuat naik oleh kontraktor pihak tuan sendiri hanyalah NOTA BERTULIS TANGAN berbunyi "bukan orang paip — hantar kontraktor lain" dan "cat ceiling, bukan orang paip" — pengakuan jelas bahawa kerja pembaikan tidak dibuat kerana kontraktor yang dihantar bukan kontraktor paip; dan (ii) Item No. 8 ("Uneven surface on ceiling soffit", Carporch) ditanda "Completed" tetapi gambar "selepas pembaikan" yang dimuat naik menunjukkan KAWASAN YANG BERBEZA daripada kecacatan yang dilaporkan. Pihak tuan dituntut membetulkan status item-item tersebut di dalam sistem, menghantar kontraktor yang betul mengikut bidang kerja, dan mengemukakan bukti pembaikan sebenar di lokasi yang betul. Salinan rekod aplikasi bagi item-item tersebut dilampirkan sebagai LAMPIRAN A.`
 );
 y += 4;
 
@@ -431,6 +431,40 @@ function drawAkuanTerima(copyLabel) {
 
 drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
+
+// ============================================================
+// LAMPIRAN A — REKOD APLIKASI KSL (ITEM 8, 45, 50)
+// ============================================================
+const lampItems = [
+  { file: "thiru-ksl-item8.jpg", w: 646, h: 1400, cap: "Lampiran A-1: Item No. 8 (Carporch — Uneven surface on ceiling soffit) ditanda \"Completed\" di dalam aplikasi KSL, tetapi gambar \"selepas pembaikan\" oleh kontraktor menunjukkan kawasan yang berbeza daripada kecacatan yang dilaporkan." },
+  { file: "thiru-ksl-item45.jpg", w: 646, h: 1400, cap: "Lampiran A-2: Item No. 45 (Leakage observed on the ceiling) ditanda \"Completed\" — gambar \"selepas pembaikan\" oleh kontraktor hanyalah nota bertulis \"cat ceiling bukan orang paep TQ\"; kerja pembaikan paip tidak dilaksanakan." },
+  { file: "thiru-ksl-item50.jpg", w: 646, h: 1400, cap: "Lampiran A-3: Item No. 50 (Yard — Visible gaps around floor trap) ditanda \"Completed\" — gambar \"selepas pembaikan\" oleh kontraktor hanyalah nota bertulis; kerja pembaikan tidak dilaksanakan." },
+  { file: "thiru-ksl-nota.jpg", w: 646, h: 1400, cap: "Lampiran A-4: Nota bertulis tangan yang dimuat naik oleh kontraktor pihak pemaju sebagai gambar \"selepas pembaikan\" — \"Bukan orang paep. Hantar contractor lain, tq.\"" },
+];
+for (const it of lampItems) {
+  newPage();
+  y = 25;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  const lT2 = "LAMPIRAN A";
+  doc.text(lT2, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(lT2) / 2, y + 1, pageW / 2 + doc.getTextWidth(lT2) / 2, y + 1);
+  y += 6;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+  doc.text("Rekod Aplikasi KSL — Status \"Completed\" Yang Tidak Tepat (Defect 9996637-1)", pageW / 2, y, { align: "center" });
+  y += 8;
+  const img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/" + it.file).toString("base64");
+  let iw = 82; let ih = iw * it.h / it.w;
+  if (ih > 185) { ih = 185; iw = ih * it.w / it.h; }
+  const ix = (pageW - iw) / 2;
+  doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+  doc.rect(ix - 1, y - 1, iw + 2, ih + 2);
+  doc.addImage(img, "JPEG", ix, y, iw, ih);
+  y += ih + 5;
+  doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+  const cl = doc.splitTextToSize(it.cap, cW - 10);
+  for (const c of cl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
+}
 
 // ============================================================
 // FOOTER
