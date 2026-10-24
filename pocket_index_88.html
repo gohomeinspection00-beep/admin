@@ -9148,6 +9148,11 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
 .hw-exp input{min-width:0;flex:1;padding:8px 10px;border:1px solid var(--line-2);border-radius:9px;background:var(--bg);outline:none;font-family:var(--font-mono);font-size:15px;color:var(--fg)}
 .hw-exp input:focus{border-color:var(--accent)}
 .hw-exp span{flex:none;font-size:11.5px;color:var(--muted)}
+/* UUID terlalu panjang untuk duduk sebaris dengan labelnya. */
+.hw-exp.col{display:block}
+.hw-exp.col label{display:block;margin-bottom:7px}
+.hw-exp.col input{width:100%;font-size:12px}
+.hw-cp{flex:none;padding:7px 11px;border-radius:9px;background:var(--surface);font-size:11px;font-weight:700;color:var(--fg-2);border:none;font-family:var(--font-body)}
 
 </style>
 </head>
@@ -9689,7 +9694,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.1 · build 15 Oct 2026 · sign-in redesigned: last account, live signal, offline no longer locks the form</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v6.2 · build 24 Oct 2026 · BLE lab ready for the Mileseey M120: every byte offset decoded, commands can be sent, log can be copied</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -16876,7 +16881,7 @@ function armScreenStart() {
   '<div id="arStatus" class="ar-status"></div>';
   body.innerHTML = h;
   foot.innerHTML =
-    (ARM.items.length ? '<button class="tool-btn tool-btn-secondary" id="armSeeList">Senarai (' + ARM.items.length + ')</button>' : '') +
+    (ARM.items.length ? '<button class="tool-btn tool-btn-secondary" id="armSeeList">List (' + ARM.items.length + ')</button>' : '') +
     '<button class="tool-btn tool-btn-primary" id="arStartBtn" disabled>Checking the device…</button>';
   const see = document.getElementById('armSeeList');
   if (see) see.addEventListener('click', armScreenList);
@@ -17701,7 +17706,7 @@ function fpScreenPick() {
       '<button class="fp-segb' + (FP.mode === 'floor' ? ' on' : '') + '" data-fpmode="floor">Floor<small>Floor plan, horizontal</small></button>' +
       '<button class="fp-segb' + (FP.mode === 'wall' ? ' on' : '') + '" data-fpmode="wall">Dinding<small>Elevasi, menegak</small></button>' +
     '</div>' +
-    '<div class="fp-sec"><span class="fp-sec-l">Cara jajar</span><span class="fp-sec-r"></span></div>' +
+    '<div class="fp-sec"><span class="fp-sec-l">How to line it up</span><span class="fp-sec-r"></span></div>' +
     '<div class="fp-seg">' +
       '<button class="fp-segb' + (FP.pins === 'two' ? ' on' : '') + '" data-fppins="two">2 points<small>Scale right away, no adjusting</small></button>' +
       '<button class="fp-segb' + (FP.pins === 'one' ? ' on' : '') + '" data-fppins="one">1 point<small>Adjust rotation, scale, height</small></button>' +
@@ -18110,7 +18115,7 @@ async function fpStartAr() {
       '<button class="arm-b arm-b-go" id="fpTag">Point 1</button>' +
       '<button class="arm-b" id="fpPlus" style="display:none">+</button>' +
       '<button class="arm-b" id="fpPin" style="display:none">Pin here</button>' +
-      '<button class="arm-b" id="fpRedo" style="display:none">Jajar semula</button>' +
+      '<button class="arm-b" id="fpRedo" style="display:none">Line up again</button>' +
       '<button class="arm-b" id="fpExit">Exit</button>' +
     '</div>';
   document.body.appendChild(ov);
@@ -25729,27 +25734,40 @@ function enAsk(title, rows) {
 // Servis yang diketahui. Chrome menyembunyikan mana-mana servis yang
 // tidak disenaraikan di sini, jadi senarai ini menentukan apa yang
 // boleh dilihat langsung.
-const HW_SERVICES = [
-  '3ab10100-f831-4395-b29d-570977d5bf94',              // Leica DISTO
-  '6e400001-b5a3-f393-e0a9-e50e24dcca9e',              // Nordic UART (banyak meter murah)
-  '0000ffe0-0000-1000-8000-00805f9b34fb',              // HM-10 / CC2541
-  '0000fff0-0000-1000-8000-00805f9b34fb',              // generik Cina
-  '0000ffb0-0000-1000-8000-00805f9b34fb',
-  '0000180a-0000-1000-8000-00805f9b34fb',              // device info
-  '0000180f-0000-1000-8000-00805f9b34fb',              // battery
-  '0000fee7-0000-1000-8000-00805f9b34fb',
-  '49535343-fe7d-4ae5-8fa9-9fafd205e455'               // Microchip transparent UART
-];
+function hw16(x) { return '0000' + x.toString(16).padStart(4, '0') + '-0000-1000-8000-00805f9b34fb'; }
+const HW_EXTRA = 'pocket_hw_uuid_v1';
+// Chrome menyembunyikan setiap servis yang tidak disenaraikan di sini, dan
+// satu servis yang tersembunyi kelihatan sama seperti meter yang rosak.
+// Jadi: setiap UUID 16-bit dalam julat vendor (0xFE00-0xFFFF) disenaraikan,
+// bukan hanya yang kita kenal. Meter murah hampir sentiasa di situ.
+const HW_SERVICES = (function () {
+  const a = [
+    '3ab10100-f831-4395-b29d-570977d5bf94',            // Leica DISTO
+    '6e400001-b5a3-f393-e0a9-e50e24dcca9e',            // Nordic UART (banyak meter murah)
+    '49535343-fe7d-4ae5-8fa9-9fafd205e455',            // Microchip transparent UART
+    '0000180a-0000-1000-8000-00805f9b34fb',            // device info
+    '0000180f-0000-1000-8000-00805f9b34fb'             // battery
+  ];
+  for (let x = 0xfe00; x <= 0xffff; x++) a.push(hw16(x));
+  try {
+    const extra = (localStorage.getItem(HW_EXTRA) || '').trim().toLowerCase();
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(extra)) a.push(extra);
+  } catch (e) {}
+  return a;
+})();
 const HW_NAMES = {
   '3ab10100-f831-4395-b29d-570977d5bf94': 'Leica DISTO',
   '6e400001-b5a3-f393-e0a9-e50e24dcca9e': 'Nordic UART',
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455': 'Microchip UART',
   '0000ffe0-0000-1000-8000-00805f9b34fb': 'HM-10 UART',
-  '0000fff0-0000-1000-8000-00805f9b34fb': 'Generic FFF0',
+  '0000fff0-0000-1000-8000-00805f9b34fb': 'FFF0 (common on Mileseey)',
+  '0000ffb0-0000-1000-8000-00805f9b34fb': 'FFB0',
+  '0000fee7-0000-1000-8000-00805f9b34fb': 'FEE7',
   '0000180f-0000-1000-8000-00805f9b34fb': 'Battery',
   '0000180a-0000-1000-8000-00805f9b34fb': 'Device information'
 };
 
-let HW = { tab: 'ble', dev: null, server: null, log: [], subs: 0, last: null, pad: null, padRaf: 0, expect: 0 };
+let HW = { tab: 'ble', dev: null, server: null, log: [], subs: 0, last: null, pad: null, padRaf: 0, expect: 0, writables: [] };
 
 function hwIco() {
   return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M12 3v18l5-5-10-10 10-10z" transform="translate(0,3) scale(0.85)"/></svg>';
@@ -25760,37 +25778,82 @@ function hwHex(dv) {
   for (let i = 0; i < dv.byteLength; i++) out.push(dv.getUint8(i).toString(16).padStart(2, '0'));
   return out.join(' ');
 }
-// Meter murah menghantar jarak dalam salah satu daripada beberapa
-// bentuk sahaja. Semua ditunjuk, dan yang munasabah (0.05–200 m)
-// ditanda — itu memberi jawapan tanpa dokumentasi vendor.
+// Meter murah membungkus jarak di dalam satu bingkai: beberapa bait
+// pengepala, nilainya, kemudian checksum. Membaca offset 0 sahaja
+// terlepas nilai yang duduk di bait ke-3 — dan terlepas itu kelihatan
+// sama seperti "meter ini tidak serasi". Jadi SETIAP offset dibaca.
 function hwGuess(dv) {
-  const out = [];
-  const ok = function(v) { return isFinite(v) && v >= 0.05 && v <= 200; };
-  if (dv.byteLength >= 4) {
-    const f = dv.getFloat32(0, true);
-    out.push({ how: 'float32 LE (Leica)', v: f, m: f, good: ok(f) });
-    const fb = dv.getFloat32(0, false);
-    out.push({ how: 'float32 BE', v: fb, m: fb, good: ok(fb) });
-    const u32 = dv.getUint32(0, true);
-    out.push({ how: 'uint32 LE ÷1000 (mm)', v: u32, m: u32 / 1000, good: ok(u32 / 1000) });
+  const n = dv.byteLength;
+  const ok = function (v) { return isFinite(v) && v >= 0.05 && v <= 200; };
+  const all = [];
+  const add = function (how, m) { all.push({ how: how, m: m, good: ok(m) }); };
+  const at = function (i) { return n > 1 ? ' @' + i : ''; };
+
+  for (let i = 0; i + 2 <= n; i++) {
+    const le = dv.getUint16(i, true), be = dv.getUint16(i, false);
+    add('uint16 LE ÷1000 (mm)' + at(i), le / 1000);
+    add('uint16 BE ÷1000 (mm)' + at(i), be / 1000);
+    add('uint16 LE ÷100 (cm)' + at(i), le / 100);
+    add('uint16 BE ÷100 (cm)' + at(i), be / 100);
   }
-  if (dv.byteLength >= 2) {
-    const u16 = dv.getUint16(0, true);
-    out.push({ how: 'uint16 LE ÷1000 (mm)', v: u16, m: u16 / 1000, good: ok(u16 / 1000) });
-    out.push({ how: 'uint16 LE ÷100 (cm)', v: u16, m: u16 / 100, good: ok(u16 / 100) });
+  for (let i = 0; i + 4 <= n; i++) {
+    add('float32 LE' + at(i), dv.getFloat32(i, true));
+    add('float32 BE' + at(i), dv.getFloat32(i, false));
+    const u = dv.getUint32(i, true), ub = dv.getUint32(i, false);
+    add('uint32 LE ÷1000 (mm)' + at(i), u / 1000);
+    add('uint32 BE ÷1000 (mm)' + at(i), ub / 1000);
+    add('uint32 LE ÷10000' + at(i), u / 10000);
+    add('uint32 BE ÷10000' + at(i), ub / 10000);
   }
+  // Sesetengah meter menghantar nombor sebagai teks biasa.
   let txt = '';
-  try { txt = new TextDecoder().decode(dv.buffer || dv); } catch (e) {}
-  if (/[0-9]/.test(txt)) {
-    const m = txt.match(/-?\d+(\.\d+)?/);
-    if (m) {
-      const n = parseFloat(m[0]);
-      out.push({ how: 'ASCII text (m)', v: txt.trim(), m: n, good: ok(n) });
-      out.push({ how: 'ASCII text ÷1000 (mm)', v: txt.trim(), m: n / 1000, good: ok(n / 1000) });
-    }
+  try { txt = new TextDecoder().decode(new Uint8Array(dv.buffer, dv.byteOffset, n)); } catch (e) {}
+  const nums = txt.match(/-?\d+(\.\d+)?/g);
+  if (nums) for (let i = 0; i < nums.length && i < 4; i++) {
+    const v = parseFloat(nums[i]);
+    add('ASCII "' + nums[i] + '" (m)', v);
+    add('ASCII "' + nums[i] + '" \u00f71000 (mm)', v / 1000);
+  }
+
+  // Yang ditaip pengguna daripada skrin meter ialah jawapan muktamad.
+  const want = HW.expect > 0 ? HW.expect : 0;
+  const near = function (m) {
+    return want > 0 && typeof m === 'number' && isFinite(m) &&
+           Math.abs(m - want) <= Math.max(0.005, want * 0.01);
+  };
+  const hits = all.filter(function (g) { return near(g.m); });
+  const plain = all.filter(function (g) { return g.good && !near(g.m); });
+
+  // Tanpa nombor yang ditaip, senarai ini meneroka. Susun ikut yang
+  // paling mungkin dahulu — satu had yang membuang jawapan sebenar
+  // lebih teruk daripada senarai yang panjang sedikit.
+  const score = function (g) {
+    let v = 0;
+    if (/ASCII/.test(g.how)) v += 5;                                  // teks bersih jarang kebetulan
+    if (g.m >= 0.2 && g.m <= 60) v += 3;                              // julat meter tangan sebenar
+    if (Math.abs(g.m * 1000 - Math.round(g.m * 1000)) < 0.01) v += 2; // bilangan mm yang bulat
+    if (/float32/.test(g.how)) v += 1;
+    return v;
+  };
+  plain.sort(function (a, b) { return score(b) - score(a); });
+
+  // Buang pembacaan berganda yang memberi nombor yang sama.
+  const seen = {}, out = [];
+  const push = function (g) {
+    const k = (typeof g.m === 'number' && isFinite(g.m)) ? g.m.toFixed(4) : String(g.m);
+    if (seen[k]) return;
+    seen[k] = 1; out.push(g);
+  };
+  hits.forEach(push);
+  plain.forEach(function (g) { if (out.length < 24) push(g); });
+  if (!out.length) {
+    // Tiada satu pun dalam julat meter ini (0.2-40 m). Katakan begitu,
+    // jangan tunjuk senarai nombor karut.
+    return [{ how: 'nothing in a sane range', m: '\u2014', good: false }];
   }
   return out;
 }
+
 function hwSay(kind, text, data) {
   HW.log.unshift({ t: Date.now(), kind: kind, text: text, data: data || null });
   if (HW.log.length > 60) HW.log.length = 60;
@@ -25850,19 +25913,88 @@ async function hwBle() {
     '<p class="hw-hint">Switch the meter on, make sure its Bluetooth is active, then press Search. Once connected, <b>press the measure button on the meter</b> and watch what comes in.</p>' +
     '<button class="hw-go" id="hwScan">Search for a device</button>' +
     '<div id="hwDev"></div>' +
-    '<div class="hw-exp"><label for="hwExpect">Meter papar berapa?</label>' +
-      '<input id="hwExpect" type="text" inputmode="decimal" placeholder="cth. 3.421" value="' + (HW.expect || '') + '">' +
-      '<span>meter</span></div>' +
+    '<div class="hw-exp col"><label for="hwExpect">What the meter\u2019s own screen shows, in metres</label>' +
+      '<input id="hwExpect" type="text" inputmode="decimal" placeholder="e.g. 3.421" value="' + (HW.expect || '') + '"></div>' +
     '<p class="hw-hint">Type the number shown on the meter\u2019s own screen. The decoder that matches gets a &#10003; — that is a definite answer, not a guess.</p>' +
-    '<div class="hw-sec"><span class="hw-sec-l">What comes in</span><span class="hw-sec-r"></span></div>' +
-    '<div class="hw-log" id="hwLog"></div>';
+    '<div id="hwSend"></div>' +
+    '<div class="hw-sec"><span class="hw-sec-l">What comes in</span><span class="hw-sec-r"></span>' +
+      '<button class="hw-cp" id="hwCopy">Copy log</button></div>' +
+    '<div class="hw-log" id="hwLog"></div>' +
+    '<div class="hw-exp col"><label for="hwUuid">Service UUID, if you know it</label>' +
+      '<input id="hwUuid" type="text" inputmode="text" placeholder="0000fff0-0000-1000-8000-00805f9b34fb" value="' + hwEsc(hwUuidGet()) + '"></div>' +
+    '<p class="hw-hint">Only needed when nothing shows up at all. Chrome hides any service it was not asked for; every 16-bit vendor UUID is already covered, so this is for a meter using a long custom one. Search again after typing it.</p>';
   document.getElementById('hwScan').onclick = hwScan;
+  const uu = document.getElementById('hwUuid');
+  if (uu) uu.addEventListener('change', function() {
+    try { localStorage.setItem(HW_EXTRA, uu.value.trim().toLowerCase()); } catch (e) {}
+    hwSay('ok', 'Saved. Press Search again — the new UUID is used from the next reload.');
+  });
+  const cp = document.getElementById('hwCopy');
+  if (cp) cp.onclick = hwCopyLog;
   const ex = document.getElementById('hwExpect');
   if (ex) ex.addEventListener('input', function() {
     HW.expect = parseFloat(ex.value) || 0;
     hwPaintLog();
   });
-  hwPaintDev(); hwPaintLog();
+  hwPaintDev(); hwPaintSend(); hwPaintLog();
+}
+function hwUuidGet() { try { return localStorage.getItem(HW_EXTRA) || ''; } catch (e) { return ''; } }
+
+// Meter yang senyap selalunya menunggu satu arahan dahulu. Tanpa cara
+// menghantarnya, makmal ini tidak boleh membezakan "tidak serasi"
+// daripada "belum ditanya".
+function hwPaintSend() {
+  const el = document.getElementById('hwSend');
+  if (!el) return;
+  if (!HW.writables.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="hw-sec"><span class="hw-sec-l">Send a command</span><span class="hw-sec-r"></span></div>' +
+    '<p class="hw-hint">Only if nothing arrives when you press measure. Hex bytes, spaces allowed.</p>' +
+    '<div class="hw-exp"><input id="hwTx" type="text" inputmode="text" placeholder="e.g. aa 00 01" value="">' +
+      '<button class="hw-cp" id="hwTxGo">Send</button></div>';
+  document.getElementById('hwTxGo').onclick = async function() {
+    const v = (document.getElementById('hwTx').value || '').trim();
+    const parts = v.split(/[\s,]+/).filter(Boolean);
+    const bad = parts.filter(function(x) { return !/^[0-9a-fA-F]{1,2}$/.test(x); });
+    if (!parts.length || bad.length) { hwSay('bad', 'Hex bytes only, like "aa 00 01".'); return; }
+    const buf = new Uint8Array(parts.map(function(x) { return parseInt(x, 16); }));
+    for (let i = 0; i < HW.writables.length; i++) {
+      const ch = HW.writables[i];
+      try {
+        if (ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) await ch.writeValueWithoutResponse(buf);
+        else await ch.writeValue(buf);
+        hwSay('ok', 'Sent to ' + ch.uuid.slice(0, 8) + ': ' + v);
+      } catch (e) {
+        hwSay('warn', ch.uuid.slice(0, 8) + ' refused it: ' + e.message);
+      }
+    }
+  };
+}
+
+// Baitnya tidak berguna pada skrin telefon — ia berguna bila dihantar
+// kepada seseorang yang boleh menulis penyahkodnya.
+function hwCopyLog() {
+  const lines = ['GoXpert Pocket · BLE log',
+                 'device: ' + ((HW.dev && HW.dev.name) || 'unnamed'),
+                 'expected on meter: ' + (HW.expect || '—') + ' m',
+                 ''];
+  for (let i = HW.log.length - 1; i >= 0; i--) {
+    const r = HW.log[i];
+    lines.push(new Date(r.t).toLocaleTimeString('en-GB', { hour12: false }) + '  ' + r.text);
+  }
+  const txt = lines.join('\n');
+  const done = function() { showToast('Log copied — paste it wherever you need it.'); };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(done, function() { hwFallbackCopy(txt, done); }); }
+    else hwFallbackCopy(txt, done);
+  } catch (e) { hwFallbackCopy(txt, done); }
+}
+function hwFallbackCopy(txt, done) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); done();
+  } catch (e) { showToast('Could not copy. Take a screenshot of the log instead.'); }
 }
 function hwPaintDev() {
   const el = document.getElementById('hwDev');
@@ -25870,7 +26002,7 @@ function hwPaintDev() {
   if (!HW.dev) { el.innerHTML = ''; return; }
   el.innerHTML = '<div class="hw-dev"><div class="hw-dev-t"><b>' + hwEsc(HW.dev.name || 'Unnamed') + '</b>' +
     '<span>' + (HW.server && HW.server.connected ? 'connected · ' + HW.subs + ' notifications heard' : 'disconnected') + '</span></div>' +
-    '<button class="hw-dc" id="hwDisc">Putus</button></div>';
+    '<button class="hw-dc" id="hwDisc">Disconnect</button></div>';
   const d = document.getElementById('hwDisc');
   if (d) d.onclick = function() { try { HW.dev.gatt.disconnect(); } catch (e) {} };
 }
@@ -25882,10 +26014,11 @@ function hwPaintLog() {
     let h = '<div class="hw-row ' + r.kind + '"><span class="hw-tm">' +
       new Date(r.t).toLocaleTimeString('en-GB', { hour12: false }) + '</span>' +
       '<span class="hw-tx">' + hwEsc(r.text) + '</span></div>';
-    if (r.data && r.data.length) {
-      // Kalau surveyor menaip apa yang skrin meter papar, padanan itu
-      // muktamad — tiada lagi teka antara dua penyahkod munasabah.
-      const rows = r.data.map(function(g) {
+    if (r.data && r.data.buf) {
+      // Dinyahkod semula setiap kali dilukis, bukan sekali semasa tiba:
+      // nombor yang ditaip SELEPAS bingkai itu masuk mesti tetap dicari.
+      const guesses = hwGuess(new DataView(r.data.buf.buffer));
+      const rows = guesses.map(function(g) {
         const hit = HW.expect > 0 && typeof g.m === 'number' &&
           Math.abs(g.m - HW.expect) <= Math.max(0.005, HW.expect * 0.01);
         return { g: g, hit: hit };
@@ -25910,7 +26043,8 @@ async function hwScan() {
     HW.dev = dev; HW.log = []; HW.subs = 0;
     dev.addEventListener('gattserverdisconnected', function() {
       hwSay('warn', 'Device disconnected');
-      hwPaintDev();
+      HW.writables = [];
+      hwPaintDev(); hwPaintSend();
     });
     hwSay('ok', 'Picked: ' + (dev.name || 'unnamed'));
     hwPaintDev();
@@ -25924,12 +26058,13 @@ async function hwConnect(dev) {
   try {
     const server = await dev.gatt.connect();
     HW.server = server;
+    HW.writables = [];
     hwSay('ok', 'Connected. Reading services…');
     let services = [];
     try { services = await server.getPrimaryServices(); }
     catch (e) { hwSay('warn', 'No services recognised. ' + e.message); }
     if (!services.length) {
-      hwSay('bad', 'No services visible. If this meter is Bluetooth Classic (SPP), a browser simply cannot reach it — return it and look for one marked BLE.');
+      hwSay('bad', 'No services visible. Two things look like this: a Bluetooth Classic (SPP) meter, which no browser can reach, or a service UUID outside the range Chrome was asked for. Try the custom UUID box below before concluding anything about the meter.');
     }
     for (let i = 0; i < services.length; i++) {
       const sv = services[i];
@@ -25939,21 +26074,25 @@ async function hwConnect(dev) {
       hwSay('ok', 'Service ' + nm + ' · ' + chars.length + ' features');
       for (let c = 0; c < chars.length; c++) {
         const ch = chars[c];
+        if (ch.properties.write || ch.properties.writeWithoutResponse) HW.writables.push(ch);
         if (!ch.properties.notify && !ch.properties.indicate) continue;
         try {
           await ch.startNotifications();
           HW.subs++;
           ch.addEventListener('characteristicvaluechanged', function(ev) {
             const dv = ev.target.value;
+            // Salin baitnya: penimbal itu milik pelayar dan diguna semula.
+            const buf = new Uint8Array(dv.byteLength);
+            for (let k = 0; k < dv.byteLength; k++) buf[k] = dv.getUint8(k);
             HW.last = { uuid: ch.uuid, bytes: hwHex(dv) };
-            hwSay('data', ch.uuid.slice(0, 8) + ' → ' + hwHex(dv), hwGuess(dv));
+            hwSay('data', ch.uuid.slice(0, 8) + ' → ' + hwHex(dv), { buf: buf, uuid: ch.uuid });
           });
         } catch (e) {}
       }
     }
-    hwPaintDev();
+    hwPaintDev(); hwPaintSend();
     if (HW.subs) hwSay('ok', 'Ready. Press the measure button on the meter now.');
-    else hwSay('warn', 'No characteristic can notify. This meter may need a command sent first, or it is not BLE.');
+    else hwSay('warn', 'No characteristic can notify. This meter may need a wake-up command written to it first — use the send box below.');
   } catch (e) {
     hwSay('bad', 'Could not connect: ' + e.message);
   }
@@ -33519,7 +33658,7 @@ function smCustomRender() {
       '<button class="sm-sw' + (on ? ' on' : '') + '" data-smpick="' + k + '"><span class="sm-sw-knob"></span></button></div>';
   });
 
-  h += '<div class="sm-sec"><span class="sm-sec-lbl">Skrin</span><span class="sm-sec-rule"></span></div>';
+  h += '<div class="sm-sec"><span class="sm-sec-lbl">Screen</span><span class="sm-sec-rule"></span></div>';
   h += smRowSw('awake', 'Keep the screen on', 'No more unlocking every time you take a photo. The battery drains faster.', SM.awake);
   h += smRowSw('keepSpace', 'Remember the last space', 'When you open Site Mode again, it comes back to the same space.', SM.keepSpace);
   h += smRowSw('sun', 'Sunlight mode', 'Bigger tiles, solid black lines.', SM.sun);
@@ -36054,7 +36193,7 @@ async function mdStartAr() {
       '<button class="arm-b" id="mdArClip" style="display:none">Potong</button>' +
       '<button class="arm-b" id="mdArXray" style="display:none">X-ray</button>' +
       '<button class="arm-b" id="mdArPin" style="display:none">Sisihan</button>' +
-      '<button class="arm-b" id="mdArRedo" style="display:none">Jajar</button>' +
+      '<button class="arm-b" id="mdArRedo" style="display:none">Line up</button>' +
       '<button class="arm-b" id="mdArExit">Exit</button>' +
     '</div>';
   document.body.appendChild(ov);
