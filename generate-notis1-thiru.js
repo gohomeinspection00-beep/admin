@@ -17,7 +17,12 @@ const data = {
 
   namaPemaju: "KSL MEDINI DEVELOPMENT SDN. BHD.",
   noSyarikat: "(201301044792 / 1074615-X)",
-  alamatPenerima: (process.argv[2] === "SKUDAI") ? [
+  alamatPenerima: (process.argv[2] === "KSLCITY") ? [
+    "d/a KSL Holdings Berhad,",
+    "L1-95, KSL City, No. 33, Jalan Seladang,",
+    "Taman Abad, 80250 Johor Bahru,",
+    "Johor.",
+  ] : (process.argv[2] === "SKUDAI") ? [
     "(KSL Sales Office)",
     "Taman Nusa Bestari 2,",
     "81300 Skudai,",
@@ -436,7 +441,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-const outName = (process.argv[2] === "SKUDAI") ? "NOTIS_1_THIRU_SKUDAI.pdf" : "NOTIS_1_THIRU.pdf";
+const outName = (process.argv[2] === "KSLCITY") ? "NOTIS_1_THIRU_KSLCITY.pdf" : (process.argv[2] === "SKUDAI") ? "NOTIS_1_THIRU_SKUDAI.pdf" : "NOTIS_1_THIRU.pdf";
 fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
-console.log("PDF generated: " + ((process.argv[2] === "SKUDAI") ? "NOTIS_1_THIRU_SKUDAI.pdf" : "NOTIS_1_THIRU.pdf"));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
