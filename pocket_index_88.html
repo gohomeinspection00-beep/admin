@@ -9727,7 +9727,7 @@ body.on-library .library-content{padding-top:calc(16px + env(safe-area-inset-top
       <div class="pr-sec"><span class="pr-sec-l">About</span><span class="pr-sec-r"></span></div>
       <div class="pr-row" style="cursor:default">
         <span class="pr-ri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span>
-        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.7 · build 25 Oct 2026 · a quota limit no longer throws away a working key</span></span>
+        <span class="pr-rt"><b>GoXpert Pocket</b><span id="buildStamp">GoXpert Pocket · v7.8 · build 25 Oct 2026 · team chat has security rules, so it can finally write</span></span>
       </div>
 
       <button class="pr-out" id="profileSignOut">Sign out</button>
@@ -36394,7 +36394,7 @@ async function msFindPid() {
     if (MS.picks.some(function(p) { return p.uid === found.uid; })) { msRenderAdd(); showToast('They are already in the list'); return; }
     MS.picks.push(found);
     msRenderAdd();
-    showToast((found.name || pidPretty(found.id)) + ' ditambah');
+    showToast((found.name || pidPretty(found.id)) + ' added');
     return;
   }
   const id = await msStartDm(found);

@@ -303,6 +303,71 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ---- pocketRooms/{roomId} : chat peribadi dan kumpulan ----
+    //
+    // Koleksi ini TIADA di sini sebelum ini, jadi default-deny di bawah
+    // menolak setiap bacaan dan tulisan. Akibatnya: senarai bilik kekal
+    // kosong, menghantar mesej gagal, dan menjemput seseorang dengan
+    // Pocket ID mereka gagal pada langkah terakhir — carian kod itu
+    // dibenarkan oleh pocketIds, tetapi bilik yang hendak dicipta
+    // selepasnya ditolak. Satu punca, dan kelihatan seperti dua pepijat.
+    // Koleksi itu tidak pernah muncul dalam konsol kerana tiada satu pun
+    // dokumen berjaya ditulis.
+    function msRoomMembers(roomId) {
+      return get(/databases/$(database)/documents/pocketRooms/$(roomId)).data.members;
+    }
+    match /pocketRooms/{roomId} {
+      // msStartDm dan msPostSos memanggil get() pada bilik yang mungkin
+      // BELUM wujud, untuk memutuskan sama ada perlu menciptanya. Pada
+      // dokumen yang tiada, resource ialah null, jadi setiap ujian
+      // keahlian gagal dan ciptaan itu tidak pernah bermula. Membenarkan
+      // pengguna yang log masuk melihat "tidak wujud" tidak membocorkan
+      // apa-apa: tiada data untuk dibocorkan. Perangkap yang sama sudah
+      // didokumenkan pada backups/{projectId} di atas.
+      allow get: if (resource == null && isSignedIn())
+                    || (isSignedIn() && request.auth.uid in resource.data.members);
+
+      // Satu-satunya pertanyaan yang app jalankan:
+      //   where('members','array-contains', me)
+      // Firestore hanya membenarkan pertanyaan apabila klausa where-nya
+      // MENJAMIN setiap hasil melepasi peraturan, jadi predikat senarai
+      // mesti kekal ringkas — bentuk keahlian-tatasusunan yang
+      // didokumenkan, tiada pengawal jenis. Pengawal jenis itulah yang
+      // dahulu menolak keseluruhan pertanyaan array-contains pada
+      // backups.
+      allow list: if isSignedIn() && request.auth.uid in resource.data.members;
+
+      // Pencipta mesti ahli bilik yang dia cipta DAN mesti mengaku
+      // sebagai dirinya sendiri. Tanpa ujian kedua, sesiapa boleh
+      // mencipta bilik atas nama orang lain.
+      allow create: if isSignedIn()
+                       && request.resource.data.createdBy == request.auth.uid
+                       && request.auth.uid in request.resource.data.members;
+
+      // Setiap mesej mengemas kini lastText/lastAt pada bilik, jadi
+      // mana-mana ahli mesti boleh mengemas kini. Tetapi senarai ahli
+      // dibekukan: tanpa syarat itu, mana-mana ahli boleh menarik orang
+      // luar masuk ke dalam perbualan, atau menendang orang keluar.
+      allow update: if isSignedIn()
+                       && request.auth.uid in resource.data.members
+                       && request.resource.data.members == resource.data.members;
+
+      allow delete: if false;
+
+      match /messages/{msgId} {
+        // get() pada bilik yang sama dikira SEKALI untuk satu permintaan,
+        // jadi satu pertanyaan 120 mesej tidak melanggar had sepuluh
+        // capaian setiap permintaan.
+        allow read:   if isSignedIn() && request.auth.uid in msRoomMembers(roomId);
+        // Pengirim tidak boleh menulis mesej atas nama orang lain.
+        allow create: if isSignedIn()
+                         && request.auth.uid in msRoomMembers(roomId)
+                         && request.resource.data.by == request.auth.uid;
+        // Mesej yang dihantar kekal seperti yang dihantar.
+        allow update, delete: if false;
+      }
+    }
+
     // ---- default deny everything else ----
     match /{document=**} {
       allow read, write: if false;
