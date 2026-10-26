@@ -47,8 +47,8 @@ const data = {
 
   tarikhReInspection: "28 September 2026",
 
-  tarikhNotis: "26 Oktober 2026",
-  tarikhDeadline: "10 November 2026",
+  tarikhNotis: "27 Oktober 2026",
+  tarikhDeadline: "11 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -77,8 +77,8 @@ const data = {
     { tarikh: "5 Oktober 2026", peristiwa: "Notis Pertama diserahkan secara serahan tangan ke Pejabat Jualan pihak pemaju di Serkam — diakui terima dengan cop rasmi RECEIVED 05 OCT 2026, Customer Care Department (rujuk Lampiran A); pada hari yang sama, Notis Pertama turut dihantar ke Pejabat Berdaftar di Shah Alam melalui Pos Daftar AR No. RW130000625MY (resit pengeposan — Lampiran C)" },
     { tarikh: "12 Oktober 2026", peristiwa: "Notis Pertama DITERIMA di Pejabat Berdaftar pihak pemaju, Shah Alam — diakui terima oleh En. Ghazali Bin Othman dengan cop Pos Malaysia Shah Alam (rujuk Lampiran B)" },
     { tarikh: "16 Oktober 2026", peristiwa: "Tamat tarikh akhir pembaikan Notis Pertama (15 hari) — pembaikan masih tidak disempurnakan" },
-    { tarikh: "26 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/048" },
-    { tarikh: "10 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
+    { tarikh: "27 Oktober 2026", peristiwa: "Notis Kedua / Notis Akhir (Final Notice) dikeluarkan — Ruj. NOTIS-2/2026/048" },
+    { tarikh: "11 November 2026", peristiwa: "Tarikh akhir pembaikan Notis Kedua (15 hari) — TARIKH MUKTAMAD" },
   ],
 
   salinanKepada: [],
