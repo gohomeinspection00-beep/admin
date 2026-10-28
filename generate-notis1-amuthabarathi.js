@@ -53,8 +53,8 @@ const data = {
 
   tarikhReInspection: "1 Oktober 2026",
 
-  tarikhNotis: "9 Oktober 2026",
-  tarikhDeadline: "24 Oktober 2026",
+  tarikhNotis: "29 Oktober 2026",
+  tarikhDeadline: "13 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -80,8 +80,8 @@ const data = {
     { tarikh: "19 Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum disiapkan sepenuhnya" },
     { tarikh: "1 Oktober 2026", peristiwa: "Pemeriksaan Kedua (Re-Inspection) dijalankan — kecacatan masih belum diselesaikan" },
     { tarikh: "2 Oktober 2026", peristiwa: "Laporan Pemeriksaan Kedua (Re-Inspection Report) dikemukakan secara rasmi kepada pihak pemaju" },
-    { tarikh: "9 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "24 Oktober 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "29 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "13 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
