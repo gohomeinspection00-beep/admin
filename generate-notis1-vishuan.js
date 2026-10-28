@@ -65,7 +65,7 @@ const data = {
     { tarikh: "21 Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan" },
     { tarikh: "3 Oktober 2026", peristiwa: "Pemeriksaan Semula (Second Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
     { tarikh: "15 Oktober 2026", peristiwa: "Laporan Pemeriksaan Semula (2nd Inspection Report) diserahkan secara serahan tangan menggunakan Borang Aduan Kecacatan pihak pemaju — DITERIMA dengan cop rasmi RECEIVED 15 OCT 2026 (rujuk Lampiran A)" },
-    { tarikh: "26 Oktober 2026", peristiwa: "Notis Pertama dihantar melalui Pos Laju — Pos Daftar AR No. RW214685601MY — ke alamat pihak pemaju di No. 33, Jalan Perjiranan 4/5, Bandar Dato' Onn, 81100 Johor Bahru" },
+    { tarikh: "26 Oktober 2026", peristiwa: "Notis Pertama dihantar melalui Pos Laju — Pos Daftar AR No. RW214685601MY — ke alamat pihak pemaju di No. 33, Jalan Perjiranan 4/5, Bandar Dato' Onn, 81100 Johor Bahru (rujuk Lampiran B)" },
     { tarikh: "29 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "13 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
@@ -434,6 +434,31 @@ y += liH + 5;
 doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
 const lampCap = doc.splitTextToSize("Borang Aduan Kecacatan (Defect Complaint Form) St. Marco Park — Fasa 3B bagi unit No. 334 — ditandatangani oleh pemilik pada 10 Oktober 2026 dan DITERIMA oleh pihak pemaju dengan cop rasmi RECEIVED 15 OCT 2026.", cW - 10);
 for (const c of lampCap) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
+
+// ============================================================
+// LAMPIRAN B — AR CARD PENGHANTARAN NOTIS PERTAMA
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampTB = "LAMPIRAN B";
+doc.text(lampTB, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampTB) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampTB) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Penghantaran Notis Pertama — Pos Daftar AR (Proof of Posting)", pageW / 2, y, { align: "center" });
+y += 8;
+const arImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/vishuan-ar.jpg").toString("base64");
+const arW = 150; const arH = arW * 1080 / 810;
+const arX = (pageW - arW) / 2;
+doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+doc.rect(arX - 1, y - 1, arW + 2, arH + 2);
+doc.addImage(arImg, "JPEG", arX, y, arW, arH);
+y += arH + 5;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const arCap = doc.splitTextToSize("AR Card No. RW214685601MY — Notis Pertama dihantar melalui Pos Laju (Pos Daftar AR) kepada CASA BAYU IDAMAN SDN. BHD., No. 33, Jalan Perjiranan 4/5, Bandar Dato' Onn — dipos pada 26 Oktober 2026.", cW - 10);
+for (const c of arCap) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
 
 // ============================================================
 // FOOTER
