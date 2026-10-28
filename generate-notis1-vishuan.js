@@ -65,6 +65,7 @@ const data = {
     { tarikh: "21 Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan" },
     { tarikh: "3 Oktober 2026", peristiwa: "Pemeriksaan Semula (Second Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
     { tarikh: "15 Oktober 2026", peristiwa: "Laporan Pemeriksaan Semula (2nd Inspection Report) diserahkan secara serahan tangan menggunakan Borang Aduan Kecacatan pihak pemaju — DITERIMA dengan cop rasmi RECEIVED 15 OCT 2026 (rujuk Lampiran A)" },
+    { tarikh: "26 Oktober 2026", peristiwa: "Notis Pertama dihantar melalui Pos Laju — Pos Daftar AR No. RW214685601MY — ke alamat pihak pemaju di No. 33, Jalan Perjiranan 4/5, Bandar Dato' Onn, 81100 Johor Bahru" },
     { tarikh: "29 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "13 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
