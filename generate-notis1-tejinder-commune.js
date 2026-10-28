@@ -2,7 +2,7 @@ const { jsPDF } = require("jspdf");
 const fs = require("fs");
 
 const data = {
-  noRujukan: "SUSULAN-1/NOTIS-1/2026/054",
+  noRujukan: "NOTIS-1/2026/054",
 
   namaPembeli: "TEJINDER KAUR KHURANA",
   alamatPengirim: [
@@ -153,7 +153,7 @@ for (const line of data.alamatPenerima) { doc.text(line, mL, y); y += LH_S; }
 doc.text(data.tarikhNotis, pageW - mR, y - LH_S, { align: "right" });
 y += 3;
 doc.setFontSize(SZ.SMALL);
-doc.text(`Ruj. Kami: ${data.noRujukan}   Ruj. Notis Pertama: NOTIS-1/2026/054`, mL, y);
+doc.text(`Ruj. Kami: ${data.noRujukan}`, mL, y);
 y += 8;
 
 doc.setFontSize(SZ.BODY);
@@ -163,8 +163,8 @@ y += 8;
 doc.setFont("helvetica", "bold");
 doc.setFontSize(SZ.TITLE);
 bk();
-const perkara1 = "Surat Susulan — Pembaikan Kecacatan Masih Belum Diselesaikan";
-const perkara2 = "(Follow-Up Notice — Outstanding Defect Rectification)";
+const perkara1 = "Notis Pertama — Tuntutan Pembetulan Kecacatan";
+const perkara2 = "(First Notice — Defect Rectification Claim)";
 const perkara3 = `Hartanah: ${data.alamatHartanah}`;
 for (const pk of [perkara1, perkara2, perkara3]) {
   const ls = doc.splitTextToSize(pk, cW);
@@ -179,12 +179,12 @@ y += 6;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
 para(
-  `Saya, ${data.namaPembeli}, pemilik unit hartanah di alamat di atas, merujuk kepada Notis Pertama (NOTIS-1/2026/054) bertarikh 7 Oktober 2026 serta laporan-laporan kecacatan yang telah dikemukakan kepada pihak tuan melalui aplikasi EcoWorld.`
+  `Saya, ${data.namaPembeli}, pemilik unit hartanah di alamat di atas, telah menjalankan pemeriksaan kecacatan ke atas unit tersebut dan telah mengemukakan laporan kecacatan secara rasmi kepada pihak tuan melalui aplikasi EcoWorld, yang merupakan notis bertulis tuntutan pembaikan di dalam Tempoh Liabiliti Kecacatan (Defect Liability Period — sehingga 25 Februari 2028) di bawah Perjanjian Jual Beli.`
 );
 y += 4;
 
 numPara(2,
-  `Untuk makluman pihak tuan, laporan kecacatan bagi unit ini telah dikemukakan sebanyak TIGA (3) kali melalui aplikasi EcoWorld — pada 14 Mei 2026 (Kes MSP3-3C03-3363-001 hingga 006), 28 Julai 2026 (Kes 007 hingga 009) dan terkini pada 6 Oktober 2026 (Kes MSP3-3C03-3363-010), susulan Pemeriksaan Kali Ketiga (3rd Inspection) pada 5 Oktober 2026. Namun, sehingga tarikh surat ini dikeluarkan, kecacatan yang dilaporkan MASIH BELUM DIBAIKI — Kes MSP3-3C03-3363-010 masih berstatus "Work In Progress" di dalam sistem pihak tuan sendiri. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
+  `Untuk makluman pihak tuan, laporan kecacatan bagi unit ini telah dikemukakan sebanyak TIGA (3) kali melalui aplikasi EcoWorld — pada 14 Mei 2026 (Kes MSP3-3C03-3363-001 hingga 006), 28 Julai 2026 (Kes 007 hingga 009) dan terkini pada 6 Oktober 2026 (Kes MSP3-3C03-3363-010), susulan Pemeriksaan Kali Ketiga (3rd Inspection) pada 5 Oktober 2026. Namun, sehingga tarikh notis ini dikeluarkan, kecacatan yang dilaporkan MASIH BELUM DIBAIKI — Kes MSP3-3C03-3363-010 masih berstatus "Work In Progress" di dalam sistem pihak tuan sendiri. Antara kecacatan yang masih belum diselesaikan adalah seperti berikut:`
 );
 y += 5;
 
@@ -213,7 +213,38 @@ numPara(3,
 y += 4;
 
 numPara(4,
-  `Sehubungan itu, saya memohon agar pihak tuan menyiapkan SEMUA kerja pembaikan yang tertunggak selewat-lewatnya pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, saya akan meneruskan tindakan susulan sebagaimana dinyatakan di dalam Notis Pertama, termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR).`
+  `Dengan ini, saya mengeluarkan Notis Pertama (First Notice) kepada pihak tuan bagi menuntut agar SEMUA kerja pembaikan yang masih tertunggak disiapkan sepenuhnya dalam tempoh lima belas (15) hari dari tarikh notis ini dikeluarkan, iaitu sebelum atau pada ${data.tarikhDeadline}. Sekiranya pembaikan masih tidak disempurnakan, Notis Kedua iaitu Notis Akhir (Final Notice) akan dikeluarkan dengan tempoh tambahan lima belas (15) hari.`
+);
+y += 4;
+
+numPara(5, "Sekiranya tiada tindakan pembaikan diambil dalam tempoh yang ditetapkan, saya akan:");
+y += 2;
+function bullet(text) {
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(SZ.BODY);
+  bk();
+  const bi = 14; const ti = bi + 5;
+  checkBreak(LH + 1);
+  doc.text("\u2022", mL + bi, y);
+  const lines = doc.splitTextToSize(text, cW - ti);
+  for (const line of lines) { checkBreak(LH + 1); doc.text(line, mL + ti, y); y += LH; }
+}
+bullet("Melaksanakan pemeriksaan semula (Re-Inspection) bagi mengesahkan status terkini semua kecacatan;");
+bullet("Mendapatkan sebut harga rasmi pembaikan (Official Repair Quotation) daripada kontraktor bertauliah;");
+bullet("Mengemukakan Notis Kedua iaitu Notis Akhir (Final Notice) kepada pihak tuan dan pihak berkepentingan (stakeholders); dan");
+bullet("Mengambil tindakan selanjutnya termasuk memfailkan tuntutan ke Tribunal Tuntutan Pembeli Rumah (TTPR) atau apa-apa remedi lain yang diperuntukkan di bawah undang-undang.");
+y += 4;
+
+checkBreak(30);
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
+const lT = "Peringatan Tindakan Undang-undang (Legal Action Notice)";
+doc.text(lT, mL, y);
+doc.setLineWidth(0.3);
+doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
+y += 8;
+
+numPara(6,
+  `Sekiranya pihak tuan masih gagal mengambil tindakan selepas Notis Kedua (Final Notice) dikeluarkan, saya akan memfailkan tuntutan rasmi ke Tribunal Tuntutan Pembeli Rumah — TTPR (Homebuyer Claims Tribunal) di bawah Peraturan-peraturan Pemajuan Perumahan (Tribunal Tuntutan Pembeli Rumah) 2002 dan/atau apa-apa remedi lain yang diperuntukkan di bawah Akta Pemajuan Perumahan (Kawalan dan Pelesenan) 1966 (Akta 118) untuk mendapatkan perintah pembaikan atau pampasan yang sewajarnya.`
 );
 y += 4;
 
@@ -245,7 +276,7 @@ doc.text("(Acknowledgement of Receipt)", pageW / 2, y, { align: "center" });
 y += 12;
 
 doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.BODY); bk();
-const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Surat Susulan — Pembaikan Kecacatan (Follow-Up Notice) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
+const akText = `Dengan ini diakui bahawa ${data.namaPemaju} ${data.noSyarikat} telah menerima Notis Pertama — Tuntutan Pembetulan Kecacatan (First Notice — Defect Rectification Claim) bertarikh ${data.tarikhNotis} dengan rujukan ${data.noRujukan} daripada ${data.namaPembeli} berhubung hartanah di ${data.alamatHartanah}.`;
 const ls = doc.splitTextToSize(akText, cW);
 for (const l of ls) { doc.text(l, mL, y); y += LH; }
 
@@ -280,6 +311,6 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/SURAT_SUSULAN_TEJINDER.pdf", Buffer.from(out));
-console.log("PDF generated: SURAT_SUSULAN_TEJINDER.pdf");
+fs.writeFileSync("/home/user/admin/NOTIS_1_TEJINDER.pdf", Buffer.from(out));
+console.log("PDF generated: NOTIS_1_TEJINDER.pdf");
 console.log(`Total pages: ${totalPages}`);
