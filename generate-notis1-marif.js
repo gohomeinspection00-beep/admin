@@ -38,7 +38,7 @@ const data = {
   tarikhSerahanLaporan: "30 Julai 2026",
   kaedahSerahanLaporan: "WhatsApp kepada wakil pihak pemaju",
   tarikhTamat30: "29 Ogos 2026",
-  tarikhReInspection: "21 Oktober 2026",
+  tarikhReInspection: "22 Oktober 2026",
 
   tarikhNotis: "29 Oktober 2026",
   tarikhDeadline: "13 November 2026",
@@ -51,7 +51,6 @@ const data = {
     { tag: "126", lokasi: "Bathroom 1 — Dinding", kecacatan: "Bunyi berongga pada jubin dinding (Hollowness on wall tiles — Hollowness Issue)", status: "Masih Belum Diselesaikan (Not Fully Complete)" },
     { tag: "165", lokasi: "Water Tank Area — Struktur", kecacatan: "Besi tetulang terdedah pada dinding partition (Exposed RC bar on partition wall) — lepaan/plaster diperlukan", status: "Masih Belum Diselesaikan (Not Fully Complete)" },
     { tag: "166", lokasi: "Water Tank Area — Struktur", kecacatan: "Honeycomb pada dinding dengan besi tetulang terdedah (Honeycomb on wall — Exposed RC bar) — Kecacatan Major", status: "Masih Belum Diselesaikan (Not Complete)" },
-    { tag: "167", lokasi: "Water Tank Area — Struktur", kecacatan: "Bukaan pada dinding partition (Opening on partition wall) — Kecacatan Major", status: "Masih Belum Diselesaikan (Not Complete)" },
     { tag: "169", lokasi: "Top Roof — Bumbung", kecacatan: "Genting bumbung rosak dan retak (Damaged and crack on roof tiles) — Kecacatan Major", status: "Masih Belum Diselesaikan (Not Complete)" },
   ],
 
@@ -60,7 +59,7 @@ const data = {
     { tarikh: "27 Julai 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "30 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan (Defect Inspection Report) dikemukakan secara rasmi kepada pihak pemaju melalui WhatsApp — merupakan notis bertulis di bawah Klausa 27(1)" },
     { tarikh: "29 Ogos 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan sepenuhnya" },
-    { tarikh: "21 Oktober 2026", peristiwa: "Pemeriksaan Semula (Second Inspection / Re-Inspection) dijalankan — daripada 174 item yang disemak, LIMA PULUH (50) kecacatan masih belum diselesaikan (36 Not Complete dan 14 Not Fully Complete), di samping 3 kecacatan baharu (New Defect) dan 1 kecacatan baharu akibat kerja pembaikan (New Defect from Rectification Work)" },
+    { tarikh: "22 Oktober 2026", peristiwa: "Pemeriksaan Semula (Second Inspection / Re-Inspection) dijalankan — daripada 174 item yang disemak, LIMA PULUH (50) kecacatan masih belum diselesaikan (36 Not Complete dan 14 Not Fully Complete), di samping 3 kecacatan baharu (New Defect) dan 1 kecacatan baharu akibat kerja pembaikan (New Defect from Rectification Work)" },
     { tarikh: "29 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
     { tarikh: "13 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
@@ -264,7 +263,7 @@ for (const f of fnL) { checkBreak(5); doc.text(f, mL, y); y += 4.5; }
 y += 5;
 
 numPara(3,
-  `Perhatian khusus dan SEGERA diberikan kepada kluster kecacatan struktur di Water Tank Area — item No. 166 (honeycomb pada dinding dengan besi tetulang terdedah — kecacatan major), item No. 167 (bukaan pada dinding partition — kecacatan major) dan item No. 165 (besi tetulang terdedah pada dinding partition). Honeycomb dan besi tetulang (RC bar) yang terdedah akan mengalami kakisan (korosi) apabila terdedah kepada lembapan, yang seterusnya menjejaskan integriti struktur; ia hendaklah dibaiki dengan kaedah yang betul — permukaan dibersihkan, besi tetulang dirawat dan ditutup dengan lepaan/grout pembaikan yang bersesuaian — dan BUKAN sekadar tampalan kosmetik. Bukaan pada dinding partition hendaklah ditutup sepenuhnya bagi mengelakkan kemasukan air, haiwan perosak dan menjejaskan fungsi dinding tersebut.`
+  `Perhatian khusus dan SEGERA diberikan kepada kluster kecacatan struktur di Water Tank Area — item No. 166 (honeycomb pada dinding dengan besi tetulang terdedah — kecacatan major) dan item No. 165 (besi tetulang terdedah pada dinding partition). Honeycomb dan besi tetulang (RC bar) yang terdedah akan mengalami kakisan (korosi) apabila terdedah kepada lembapan, yang seterusnya menjejaskan integriti struktur; ia hendaklah dibaiki dengan kaedah yang betul — permukaan dibersihkan, besi tetulang dirawat dan ditutup dengan lepaan/grout pembaikan yang bersesuaian — dan BUKAN sekadar tampalan kosmetik.`
 );
 y += 4;
 
