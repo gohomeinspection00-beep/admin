@@ -41,8 +41,8 @@ const data = {
   tarikhTamat30: "21 Jun 2026",
   tarikhReInspection: "3 Oktober 2026",
 
-  tarikhNotis: "23 Oktober 2026",
-  tarikhDeadline: "7 November 2026",
+  tarikhNotis: "29 Oktober 2026",
+  tarikhDeadline: "13 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -64,8 +64,9 @@ const data = {
     { tarikh: "22 Mei 2026", peristiwa: "Laporan Pemeriksaan Kecacatan diserahkan secara rasmi melalui serahan tangan (hardcopy) di pejabat pengurusan pihak pemaju — merupakan notis bertulis di bawah Klausa 27(1)" },
     { tarikh: "21 Jun 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan" },
     { tarikh: "3 Oktober 2026", peristiwa: "Pemeriksaan Semula (Second Inspection) dijalankan — kecacatan yang dilaporkan masih belum diselesaikan" },
-    { tarikh: "23 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "7 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "15 Oktober 2026", peristiwa: "Laporan Pemeriksaan Semula (2nd Inspection Report) diserahkan secara serahan tangan menggunakan Borang Aduan Kecacatan pihak pemaju — DITERIMA dengan cop rasmi RECEIVED 15 OCT 2026 (rujuk Lampiran A)" },
+    { tarikh: "29 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "13 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
@@ -243,7 +244,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, Pemeriksaan Semula (Second Inspection) yang dijalankan pada ${data.tarikhReInspection} mengesahkan bahawa kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan — iaitu hampir LIMA (5) BULAN sejak laporan diserahkan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada ${data.tarikhTamat30}, Pemeriksaan Semula (Second Inspection) yang dijalankan pada ${data.tarikhReInspection} mengesahkan bahawa kecacatan yang dilaporkan masih belum diselesaikan oleh pihak tuan — iaitu hampir LIMA (5) BULAN sejak laporan diserahkan. Laporan Pemeriksaan Semula tersebut telah pun diserahkan secara serahan tangan kepada pihak tuan menggunakan Borang Aduan Kecacatan (Defect Complaint Form) St. Marco Park Fasa 3B dan DITERIMA dengan cop rasmi "RECEIVED 15 OCT 2026" (salinan dilampirkan sebagai LAMPIRAN A). Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
@@ -407,6 +408,31 @@ function drawAkuanTerima(copyLabel) {
 
 drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
+
+// ============================================================
+// LAMPIRAN A — BUKTI SERAHAN LAPORAN PEMERIKSAAN SEMULA
+// ============================================================
+newPage();
+y = 25;
+doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+const lampT = "LAMPIRAN A";
+doc.text(lampT, pageW / 2, y, { align: "center" });
+doc.setLineWidth(0.4);
+doc.line(pageW / 2 - doc.getTextWidth(lampT) / 2, y + 1, pageW / 2 + doc.getTextWidth(lampT) / 2, y + 1);
+y += 6;
+doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+doc.text("Bukti Serahan Laporan Pemeriksaan Semula (Proof of Submission — 2nd Inspection Report)", pageW / 2, y, { align: "center" });
+y += 8;
+const lampImg = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/vishuan-akuan-report2.jpg").toString("base64");
+const liW = 125; const liH = liW * 1280 / 960;
+const liX = (pageW - liW) / 2;
+doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+doc.rect(liX - 1, y - 1, liW + 2, liH + 2);
+doc.addImage(lampImg, "JPEG", liX, y, liW, liH);
+y += liH + 5;
+doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+const lampCap = doc.splitTextToSize("Borang Aduan Kecacatan (Defect Complaint Form) St. Marco Park — Fasa 3B bagi unit No. 334 — ditandatangani oleh pemilik pada 10 Oktober 2026 dan DITERIMA oleh pihak pemaju dengan cop rasmi RECEIVED 15 OCT 2026.", cW - 10);
+for (const c of lampCap) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
 
 // ============================================================
 // FOOTER
