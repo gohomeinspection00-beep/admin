@@ -17,7 +17,13 @@ const data = {
 
   namaPemaju: "TH TEBRAU LAND SDN. BHD.",
   noSyarikat: "(201201012411 / 985928-D)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "SITE") ? [
+    "PTD 209290, Jalan Kunyit,",
+    "Taman Sri Amar,",
+    "81100 Johor Bahru,",
+    "Johor Darul Ta'zim.",
+    "Tel: 012-715 4212",
+  ] : [
     "d/a Pejabat Pengurusan,",
     "L13, Menara A, Pangsapuri Seri Permata,",
     "Jalan Kunyit, Taman Sri Amar,",
@@ -419,6 +425,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_SITIAFIQAH.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_SITIAFIQAH.pdf");
+const outName = (process.argv[2] === "SITE") ? "NOTIS_1_SITIAFIQAH_SITE.pdf" : "NOTIS_1_SITIAFIQAH.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
