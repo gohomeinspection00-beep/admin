@@ -40,8 +40,8 @@ const data = {
   tarikhTamat30: "29 Ogos 2026",
   tarikhReInspection: "22 Oktober 2026",
 
-  tarikhNotis: "29 Oktober 2026",
-  tarikhDeadline: "13 November 2026",
+  tarikhNotis: "31 Oktober 2026",
+  tarikhDeadline: "15 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -60,8 +60,8 @@ const data = {
     { tarikh: "30 Julai 2026", peristiwa: "Laporan Pemeriksaan Kecacatan (Defect Inspection Report) dikemukakan secara rasmi kepada pihak pemaju melalui WhatsApp — merupakan notis bertulis di bawah Klausa 27(1)" },
     { tarikh: "29 Ogos 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan sepenuhnya" },
     { tarikh: "22 Oktober 2026", peristiwa: "Pemeriksaan Semula (Second Inspection / Re-Inspection) dijalankan — daripada 174 item yang disemak, LIMA PULUH (50) kecacatan masih belum diselesaikan (36 Not Complete dan 14 Not Fully Complete), di samping 3 kecacatan baharu (New Defect) dan 1 kecacatan baharu akibat kerja pembaikan (New Defect from Rectification Work)" },
-    { tarikh: "29 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "13 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "31 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "15 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
   salinanKepada: [],
