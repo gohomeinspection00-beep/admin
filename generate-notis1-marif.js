@@ -17,7 +17,12 @@ const data = {
 
   namaPemaju: "PAGOH JAYA (2000) SDN. BHD.",
   noSyarikat: "(199301001219 / 255956-P)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "PAGOH") ? [
+    "No. 1, Jalan Jaya 1/1,",
+    "84600 Pagoh,",
+    "Johor.",
+    "Tel: 012-475 3503",
+  ] : [
     "Suite 901, 9th Floor, Wisma Hangsam,",
     "No. 1, Jalan Hang Lekir,",
     "50000 Kuala Lumpur,",
@@ -419,6 +424,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_MUHAMMADARIF.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_MUHAMMADARIF.pdf");
+const outName = (process.argv[2] === "PAGOH") ? "NOTIS_1_MUHAMMADARIF_PAGOH.pdf" : "NOTIS_1_MUHAMMADARIF.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
