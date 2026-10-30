@@ -25,7 +25,7 @@ const data = {
   ],
 
   alamatHartanah: "No. 40, Jalan Pulai Duta 5/23, Taman Pulai Duta, 81300 Johor Bahru, Johor (SP32A, PTD 225003)",
-  jenisHartanah: "Rumah Teres Dua Tingkat (Terrace House 2 Storey, Built-up 2,052 kps)",
+  jenisHartanah: "Rumah Teres (Terrace House)",
   namaProyek: "Taman Pulai Duta, Johor Bahru",
 
   jenisSPA: "Jadual G",
