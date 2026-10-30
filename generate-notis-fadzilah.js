@@ -31,7 +31,7 @@ const data = {
   tempohProjek: "15 Januari 2026 hingga 15 Mei 2026",
 
   kecacatan: [
-    { tag: "33", lokasi: "External Area (Kiri) — Siling", kecacatan: "Keretakan pada papan siling (Crack on ceiling board) — KECACATAN MAJOR", },
+    { tag: "33", lokasi: "External Area (Kiri) — Siling", kecacatan: "Keretakan pada papan siling (Crack on ceiling board)", },
     { tag: "78", lokasi: "Bathroom 1 — Paip & Sanitari", kecacatan: "Kebocoran pada paip buangan sinki (Leaking on basin down pipe)", },
     { tag: "31", lokasi: "External Area (Kiri) — Dinding", kecacatan: "Kesan air dan bacaan kelembapan tinggi pada dinding luar (water mark and high moisture reading)", },
     { tag: "83", lokasi: "Bedroom 2 — Dinding", kecacatan: "Bacaan kelembapan tinggi dan corak suhu rendah pada dinding (pengimbas haba / thermal scanner)", },
@@ -274,30 +274,24 @@ numPara(5,
 y += 4;
 
 numPara(6,
-  `Bagi kecacatan major dan struktur — item No. 33 (keretakan pada papan siling, kecacatan major), No. 111 (besi tetulang terdedah pada rasuk) serta keretakan dinding yang berulang di dalam dan luar rumah (item No. 30, 40, 58, 66 dan 92) — pihak tuan dituntut mengemukakan PENJELASAN BERTULIS tentang punca keretakan memandangkan rumah baru sahaja disiapkan, dan membaikinya mengikut amalan pembinaan yang baik. Besi tetulang yang terdedah hendaklah dirawat dan ditutup dengan sempurna bagi mengelakkan kakisan.`
-);
-y += 4;
-
-numPara(7,
   `Selain itu, pemeriksaan turut mengesahkan KETIDAKPATUHAN kepada sebutharga pihak tuan sendiri: item No. 1 (tingkap W1 sepatutnya TUJUH (7) unit — hanya ENAM (6) dipasang) dan item No. 76 / 107 (pintu bilik air sepatutnya Single PVC Panel (D2) — folding door dipasang sebaliknya), di samping kerja mengecat yang tidak disiapkan (item No. 52, 53, 60, 85 dan 98). Pihak tuan dituntut memasang dan menyiapkan mengikut spesifikasi sebutharga, atau mengemukakan pelarasan harga secara bertulis bagi setiap item yang tidak dibekalkan mengikut spesifikasi.`
 );
 y += 4;
 
-numPara(8,
+numPara(7,
   `Dengan ini, saya menuntut agar pihak tuan: (a) mengemukakan JADUAL KERJA PEMBAIKAN BERTULIS (tarikh mula, tarikh siap dan skop setiap item) dalam tempoh TUJUH (7) hari dari tarikh notis ini — selaras dengan janji pihak tuan sendiri untuk menyusun jadual pekerja; dan (b) menyiapkan SEMUA kerja pembaikan dan kerja yang belum disiapkan dalam tempoh LIMA BELAS (15) hari dari tarikh notis ini, atas kos dan belanja pihak tuan sepenuhnya.`
 );
 y += 4;
 
-numPara(9, "Pihak tuan turut dituntut mengemukakan dokumen rasmi (official documentation) berikut bersama maklum balas bertulis:");
+numPara(8, "Pihak tuan turut dituntut mengemukakan dokumen rasmi (official documentation) berikut bersama maklum balas bertulis:");
 y += 2;
 bullet("Pengesahan bertulis TARIKH SERAHAN TAPAK/KUNCI serta tempoh dan tarikh tamat jaminan (warranty) — sebagaimana yang telah dipersetujui oleh pihak tuan di dalam WhatsApp;");
 bullet("Status kelulusan pelan dengan pihak berkuasa yang berkaitan secara bertulis — atau pengesahan bertulis di atas kepala surat syarikat, bertandatangan, bahawa tiada kelulusan diperlukan sebagaimana didakwa oleh pihak tuan;");
-bullet("Bukti pendaftaran CIDB yang AKTIF sepanjang tempoh pembinaan (rekod perakuan menunjukkan status DORMAN) — kehendak Akta Lembaga Pembangunan Industri Pembinaan Malaysia 1994 (Akta 520); dan");
-bullet("Pelan lengkap rumah sebagaimana diperuntukkan di dalam Surat Setuju Terima (\"Serta Pelan lengkap rumah disediakan\") — atau penjelasan bertulis pelan yang dimaksudkan dan telah diserahkan.");
+bullet("Pelan lengkap rumah sebagaimana diperuntukkan di dalam Surat Setuju Terima (\"Serta Pelan lengkap rumah disediakan\") — memandangkan setakat ini hanya pelan lantai (floor plan) sahaja yang diserahkan kepada pemilik.");
 y += 4;
 
-numPara(10,
-  `Sekiranya pihak tuan gagal mematuhi tuntutan di atas dalam tempoh yang ditetapkan, saya berhak melantik kontraktor pihak ketiga untuk menyiapkan kerja pembaikan dan MENUNTUT SEMULA KESEMUA KOS tersebut daripada pihak tuan, termasuk sebagai milikan tunggal, daripada pemiliknya secara peribadi. Hak saya untuk menuntut penalti kelewatan sebanyak RM850.00 sebulan di bawah Terma dan Syarat No. 1, tertakluk kepada pengesahan tarikh serahan sebenar, adalah dirizabkan sepenuhnya.`
+numPara(9,
+  `Sekiranya pihak tuan gagal mematuhi tuntutan di atas dalam tempoh yang ditetapkan, saya berhak melantik kontraktor pihak ketiga untuk menyiapkan kerja pembaikan dan MENUNTUT SEMULA KESEMUA KOS tersebut daripada pihak tuan, termasuk sebagai milikan tunggal, daripada pemiliknya secara peribadi.`
 );
 y += 4;
 
@@ -309,7 +303,7 @@ doc.setLineWidth(0.3);
 doc.line(mL, y + 1, mL + doc.getTextWidth(lT), y + 1);
 y += 8;
 
-numPara(11,
+numPara(10,
   `Sekiranya tiada maklum balas dan tindakan pembaikan dalam tempoh yang ditetapkan, saya akan, tanpa notis lanjut: (a) mengeluarkan Notis Akhir (Final Notice); (b) mengemukakan aduan rasmi kepada Lembaga Pembangunan Industri Pembinaan Malaysia (CIDB) berhubung kualiti kerja dan status pendaftaran; dan (c) memfailkan tuntutan ke Tribunal Tuntutan Pengguna Malaysia (TTPM) dan/atau mengambil tindakan undang-undang sivil terhadap Bumi Alam Services dan pemiliknya bagi mendapatkan perintah pembaikan, pampasan serta kos.`
 );
 y += 4;
