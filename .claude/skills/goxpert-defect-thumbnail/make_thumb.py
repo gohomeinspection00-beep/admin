@@ -83,7 +83,9 @@ chk = subprocess.run(["hyperframes", "check"], cwd=work, capture_output=True, te
 bad = [l for l in chk.stdout.splitlines() if "✗" in l or "overflow" in l]
 print("\n".join(bad) if bad else "check: ok")
 shutil.rmtree(os.path.join(work, "snapshots"), ignore_errors=True)
-subprocess.run(["hyperframes", "snapshot", "--at", "0.5", "--no-end"], cwd=work, check=True, capture_output=True)
+snap = subprocess.run(["hyperframes", "snapshot", "--at", "0.5", "--no-end"], cwd=work, capture_output=True, text=True)
+if not os.path.exists(os.path.join(work, "snapshots", "frame-00-at-0.5s.png")):
+    sys.exit("snapshot failed (fresh container? run: npm i -g hyperframes@0.8.132)\n" + snap.stdout[-800:] + snap.stderr[-800:])
 out = rel(cfg["out"]) if cfg.get("out") else os.path.join(work, "thumbnail.png")
 shutil.copy(os.path.join(work, "snapshots", "frame-00-at-0.5s.png"), out)
 print("thumbnail:", out)
