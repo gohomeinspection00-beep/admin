@@ -16,7 +16,13 @@ const data = {
 
   namaPemaju: "JLG LAND BERHAD",
   noSyarikat: "(197201000788 / 12379-K)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "TAPAK") ? [
+    "(dahulu dikenali sebagai Johor Land Berhad)",
+    "Pejabat Tapak (Site Office),",
+    "No. 83, Jalan Perjiranan 15/1, Perjiranan 15,",
+    "Bandar Dato' Onn,",
+    "81100 Johor Bahru, Johor.",
+  ] : [
     "(dahulu dikenali sebagai Johor Land Berhad)",
     "Level 16, Menara KOMTAR,",
     "80888 Ibrahim International Business District,",
@@ -37,8 +43,8 @@ const data = {
   tarikhSerahanLaporan: "22 September 2026",
   tarikhTamat30: "22 Oktober 2026",
 
-  tarikhNotis: "31 Oktober 2026",
-  tarikhDeadline: "15 November 2026",
+  tarikhNotis: "3 November 2026",
+  tarikhDeadline: "18 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -63,8 +69,8 @@ const data = {
     { tarikh: "22 Oktober 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan; 268 kes masih berstatus \"In Progress\" di dalam aplikasi JLG KITA (Lampiran A)" },
     { tarikh: "26 Oktober 2026", peristiwa: "Pemilik sekali lagi menghubungi Customer Service melalui WhatsApp (\"Sebulan da ni.. Any progress?\") — masih TIADA balasan" },
     { tarikh: "27 & 30 Oktober 2026", peristiwa: "TIGA (3) kes kecacatan tambahan dilaporkan di dalam aplikasi JLG KITA (Faulty Electrical — Dining Room; Cracked Ceiling — Bedroom 2; Floor — Guest Room)" },
-    { tarikh: "31 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "15 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "3 November 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "18 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 };
 
@@ -451,6 +457,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_HAFIZ.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_HAFIZ.pdf");
+const outName = (process.argv[2] === "TAPAK") ? "NOTIS_1_HAFIZ_TAPAK.pdf" : "NOTIS_1_HAFIZ.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
