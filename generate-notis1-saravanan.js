@@ -64,7 +64,7 @@ const data = {
     { tarikh: "18 Ogos 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "22 Ogos 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi melalui aplikasi IJM CONNEX pihak pemaju (Ticket ID: 6DP1214 - 6DP1387) dan diakui terima (acknowledged) oleh pihak pemaju pada hari yang sama — merupakan notis bertulis di bawah Klausa 27(1)" },
     { tarikh: "21 September 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan; kesemua tiket masih kekal berstatus New (tiada kemajuan kerja) di dalam sistem IJM CONNEX" },
-    { tarikh: "20 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "20 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan dan dipos kepada pihak pemaju secara Pos Berdaftar AR (AR Registered Post) — No. Rujukan Pengeposan: RW214685575MY" },
     { tarikh: "4 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 
