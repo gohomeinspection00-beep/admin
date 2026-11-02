@@ -1,0 +1,8 @@
+# Pakej hantaran — dijana semula dari website/ bila perlu, bukan fail sumber
+goxpert-website.zip
+*.zip
+
+# Sampah sistem
+.DS_Store
+Thumbs.db
+node_modules/
