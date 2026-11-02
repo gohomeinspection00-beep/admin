@@ -1703,8 +1703,8 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 /* ---- Alat terbang keluar ---- */
 .lp-tools { padding: 4.5rem 2rem; background: #fff; overflow: hidden; }
 .lp-tools-scene {
-    position: relative; height: 420px; max-width: 920px; margin: 1rem auto 0;
-    --rx: 330px; --ry: 148px;
+    position: relative; height: 480px; max-width: 980px; margin: 1rem auto 0;
+    --rx: 372px; --ry: 182px;
 }
 .lp-core {
     position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -1719,6 +1719,46 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
     font-style: normal; font-family: 'JetBrains Mono', monospace;
     font-size: 0.56rem; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.85;
 }
+/* orang pegang sijil kalibrasi di tengah bulatan alat */
+.lp-person {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    z-index: 3; width: 252px; text-align: center; pointer-events: none;
+}
+.lp-person::before {
+    content: ''; position: absolute; left: 50%; top: 52%;
+    width: 310px; height: 310px; margin: -155px 0 0 -155px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(21,101,192,0.16) 0%, rgba(21,101,192,0.05) 48%, transparent 72%);
+    z-index: -1;
+}
+.lp-person img {
+    width: 100%; max-width: none; display: block;
+    filter: drop-shadow(0 18px 34px rgba(0,0,0,0.22));
+    animation: lpFloat 5s ease-in-out infinite;
+}
+@keyframes lpFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.lp-person-tag {
+    display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 0.5rem;
+    padding: 0.4rem 0.95rem; border-radius: 999px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff; box-shadow: 0 10px 26px rgba(21,101,192,0.33);
+}
+.lp-person-tag svg { width: 15px; height: 15px; flex-shrink: 0; }
+.lp-person-tag b { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.05em; }
+.lp-person-tag i {
+    font-style: normal; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.52rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.88;
+}
+/* butang "lebih lanjut" bawah senarai servis */
+.lp-svc-more {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    width: 100%; margin-top: 1.35rem; padding: 0.85rem 1.2rem;
+    border: 2px solid var(--primary); border-radius: 12px;
+    color: var(--primary); font-weight: 700; font-size: 0.92rem;
+    background: #fff; text-decoration: none; transition: all 0.3s ease;
+}
+.lp-svc-more svg { width: 17px; height: 17px; transition: transform 0.3s ease; }
+.lp-svc-more:hover { background: var(--primary); color: #fff; }
+.lp-svc-more:hover svg { transform: translateX(4px); }
 .lp-tool {
     position: absolute; left: 50%; top: 50%; width: 112px; margin: -56px 0 0 -56px;
     text-align: center; opacity: 0; transform: translate(0, 0) scale(0.35);
@@ -1882,9 +1922,11 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
     .lp-tools, .lp-stickers, .lp-high, .lp-prob, .lp-svc { padding-left: 1.25rem; padding-right: 1.25rem; }
     .lp-tools-scene {
         height: auto; display: grid; grid-template-columns: repeat(4, 1fr);
-        gap: 0.85rem 0.5rem; margin-top: 1.5rem;
+        gap: 0.85rem 0.5rem; margin-top: 1.5rem; max-width: 100%;
     }
     .lp-core { position: static; transform: none; grid-column: 1 / -1; margin: 0 auto 1.25rem; width: 128px; height: 128px; }
+    .lp-person { position: static; transform: none; grid-column: 1 / -1; width: 190px; margin: 0 auto 1rem; }
+    .lp-person::before { width: 230px; height: 230px; margin: -115px 0 0 -115px; }
     .lp-tool { position: static; margin: 0; width: 100%; transform: scale(0.55); }
     .lp-tools-scene.in .lp-tool { transform: none; }
     .lp-tool img { height: 58px; }
@@ -2589,7 +2631,7 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
                 <p class="lp-hero-text" data-i18n="lp.heroText">Kami Building Surveyor berdaftar dengan peralatan yang dikalibrasi SIRIM. Dari inspection rumah hingga sokongan kes tribunal — Inspection Dengan Integriti.</p>
                 <div class="lp-hero-btns">
                     <a class="btn btn-whatsapp" id="lpWa2" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg><span data-i18n="lp.heroBtn1">WhatsApp Kami Sekarang</span></a>
-                    <a class="btn btn-secondary" href="#lpServis"><span data-i18n="lp.heroBtn2">Lihat Servis</span></a>
+                    <a class="btn btn-secondary" href="#lpServis" data-lp-scroll="lpServis"><span data-i18n="lp.heroBtn2">Lihat Servis</span></a>
                 </div>
                 <div class="trust-badges">
                     <span class="trust-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="hero.t1">SIRIM-Calibrated Equipment</span></span>
@@ -2620,12 +2662,25 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
                 <h2 data-i18n="lp.toolTitle">Kebanyakan Peralatan Dikalibrasi Oleh SIRIM</h2>
             </div>
             <div class="lp-tools-scene" id="lpToolsScene">
-                <span class="lp-core">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-                    <b>SIRIM</b><i data-i18n="lp.toolCore">Calibrated</i>
+                <span class="lp-person" id="lpPerson">
+                    <img src="img/sirim-person.webp" alt="GoXpert surveyor with SIRIM calibration certificates"
+                         loading="lazy" decoding="async"
+                         onerror="this.closest('.lp-person').classList.add('no-img');this.remove()">
+                    <span class="lp-person-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                        <b>SIRIM</b><i data-i18n="lp.toolCore">Calibrated</i>
+                    </span>
                 </span>
             </div>
         </div>
+    </section>
+
+    <!-- Bumbung + drone terbang -->
+    <section class="roof-section">
+        <img class="roof-img" src="img/roof.webp" alt="Roof inspection" loading="lazy" decoding="async"
+             onerror="this.closest('section').style.display='none'">
+        <div class="drone-wrap"><img src="img/drone.webp" alt="Drone survey" loading="lazy" decoding="async"
+             onerror="this.closest('.drone-wrap').style.display='none'"></div>
     </section>
 
     <!-- Sticker -->
@@ -2737,6 +2792,10 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
                 <div class="lp-svc-card">
                     <h3 data-i18n="lp.svListTitle">Semua Jenis Inspection</h3>
                     <ul class="lp-svc-list" id="lpSvcList"></ul>
+                    <a class="lp-svc-more" id="lpSvcMore" href="#/services">
+                        <span data-i18n="lp.svMore">Lebih Lanjut Tentang Servis</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    </a>
                 </div>
                 <div class="lp-cta-card">
                     <h3 data-i18n="lp.ctaTitle">Tak Pasti Servis Mana?</h3>
@@ -5179,6 +5238,7 @@ var I18N = {
         "lp.ctaBtn": "WhatsApp Us",
         "lp.ctaNote": "Reply within 1 working hour",
         "lp.sample": "See a real sample report (PDF)",
+        "lp.svMore": "More About Our Services",
         "faq.more": "More Questions & Answers",
         "nav.blog": "Articles", "nav.gallery": "Gallery",
         "hth.tag": "Latest Technology", "hth.title": "Thermal Imaging Reveals Hidden Problems",
@@ -5298,6 +5358,7 @@ var I18N = {
         "lp.ctaBtn": "WhatsApp Kami",
         "lp.ctaNote": "Balasan dalam 1 jam bekerja",
         "lp.sample": "Lihat contoh laporan sebenar (PDF)",
+        "lp.svMore": "Lebih Lanjut Tentang Servis",
         "faq.more": "Lagi Soalan & Jawapan",
         "nav.blog": "Artikel", "nav.gallery": "Galeri",
         "hth.tag": "Teknologi Terkini", "hth.title": "Thermal Imaging Mendedahkan Masalah Tersembunyi",
@@ -5978,11 +6039,38 @@ var FAQ_ALL = [
     /* kedudukan 8 alat mengelilingi bulatan SIRIM (unit, didarab --rx/--ry) */
     var LP_SLOTS = [[-1,-0.55],[-0.62,-1],[0.62,-1],[1,-0.55],[1,0.55],[0.62,1],[-0.62,1],[-1,0.55]];
 
+    var lpMusicWanted = false;   /* pelawat mahu lagu main (belum tekan senyap) */
+
+    function lpMusicIcon(on) {
+        return on
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+    }
+
+    /* berhenti terus — keluar ke page lain */
     function lpStopMusic() {
-        if (lpMusicEl) { try { lpMusicEl.pause(); } catch (e) {} }
+        lpMusicWanted = false;
+        if (lpMusicEl) { try { lpMusicEl.pause(); lpMusicEl.currentTime = 0; } catch (e) {} }
         var m = document.getElementById("lpMute");
         if (m) m.classList.remove("on");
     }
+
+    /* berhenti sementara — tukar tab / kecilkan tetingkap */
+    function lpPauseMusic() {
+        if (lpMusicEl) { try { lpMusicEl.pause(); } catch (e) {} }
+    }
+    function lpResumeMusic() {
+        if (lpMusicEl && lpMusicWanted) { try { lpMusicEl.play(); } catch (e) {} }
+    }
+
+    /* Lagu berhenti bila pelawat tukar tab atau keluar dari tetingkap,
+       dan sambung semula bila dia balik — melainkan dia sendiri tekan senyap. */
+    document.addEventListener("visibilitychange", function () {
+        if (document.hidden) lpPauseMusic(); else lpResumeMusic();
+    });
+    window.addEventListener("blur", lpPauseMusic);
+    window.addEventListener("focus", lpResumeMusic);
+    window.addEventListener("pagehide", lpPauseMusic);
 
     function renderLandingPage() {
         var page = document.getElementById("page-landing");
@@ -6123,12 +6211,6 @@ var FAQ_ALL = [
         if (!intro || !btn) return;
         document.body.classList.add("lp-intro-on", "lp-lock");
 
-        function speaker(on) {
-            return on
-                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/></svg>'
-                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
-        }
-
         btn.addEventListener("click", function () {
             intro.classList.add("gone");
             document.body.classList.remove("lp-lock");
@@ -6139,21 +6221,43 @@ var FAQ_ALL = [
             if (!a) return;
             lpMusicEl = a;
             a.src = LANDING_MUSIC;
-            a.volume = 0.3;
+            a.loop = true;
+            a.volume = 0.1;           /* kekuatan sama macam landing page lama */
             var p = a.play();
             if (p && p.then) {
                 p.then(function () {
+                    lpMusicWanted = true;
                     if (!mute) return;
                     mute.classList.add("on");
-                    mute.innerHTML = speaker(true);
+                    mute.innerHTML = lpMusicIcon(true);
                     mute.onclick = function () {
-                        a.muted = !a.muted;
-                        mute.innerHTML = speaker(!a.muted);
+                        if (a.paused) { lpMusicWanted = true; a.play(); }
+                        else { lpMusicWanted = false; a.pause(); }
+                        mute.innerHTML = lpMusicIcon(!a.paused);
                     };
-                }).catch(function () { /* fail lagu tiada — senyap sahaja */ });
+                }).catch(function () { /* lagu tak dibenarkan main — senyap sahaja */ });
             }
         }, { once: true });
     }
+
+    /* ---------- Scroll dalam landing page (butang "Lihat Servis") ---------- */
+    document.addEventListener("click", function (e) {
+        var a = e.target.closest ? e.target.closest("[data-lp-scroll]") : null;
+        if (!a) return;
+        var tgt = document.getElementById(a.getAttribute("data-lp-scroll"));
+        if (!tgt) return;
+        e.preventDefault();
+        var GAP = 74;
+        window.scrollTo({ top: tgt.getBoundingClientRect().top + window.scrollY - GAP, behavior: "smooth" });
+        /* gambar lazy-load boleh anjak kedudukan semasa scroll —
+           betulkan semula sehingga seksyen benar-benar di atas skrin */
+        var tries = 0;
+        var fix = setInterval(function () {
+            var off = tgt.getBoundingClientRect().top - GAP;
+            if (Math.abs(off) < 10 || ++tries > 24) { clearInterval(fix); return; }
+            window.scrollBy({ top: off, behavior: tries > 8 ? "auto" : "smooth" });
+        }, 260);
+    });
 
     /* ---------- Animasi bila masuk skrin ---------- */
     var lpIO = null;

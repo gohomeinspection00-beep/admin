@@ -71,23 +71,33 @@ berasingan, ia duduk dalam website yang sama.
   *Tap to continue*, baru page terbuka dan lagu latar main.
   (Pelayar tak izinkan lagu main sendiri tanpa pelawat tekan apa-apa —
   sebab itulah butang intro ini wajib ada.)
-- Butang pembesar suara muncul di bawah kanan untuk senyapkan lagu.
-  Lagu berhenti automatik bila pelawat keluar ke page lain.
+- **Lagu latar** `files/goxpert-chorus.mp3` — kekuatan 10% dan berulang
+  (sama macam landing page lama). Kelakuannya:
+  | Keadaan | Lagu |
+  |---|---|
+  | Tukar ke tab lain / kecilkan tetingkap | berhenti sementara |
+  | Balik ke tab landing | sambung semula |
+  | Tekan butang pembesar suara | berhenti (kekal senyap walaupun tukar tab) |
+  | Keluar ke page lain dalam website | berhenti terus dan reset |
 
-**Susunan seksyen:** Intro → Hero → Statistik → 8 alat mengelilingi lencana
-SIRIM (animasi pecah keluar bila masuk skrin) → Sticker penanda defect
-(marquee berjalan + demo sticker) → Poster (popup, kalau ada) →
-4 kategori kerja → 4 risiko tanpa inspection → Senarai 15 servis + kad CTA
-WhatsApp → Kenapa Kami → Review pelanggan → Footer.
+**Susunan seksyen:** Intro → Hero → Statistik → 8 alat mengelilingi gambar
+surveyor memegang sijil kalibrasi SIRIM (`img/sirim-person.webp`, animasi
+pecah keluar bila masuk skrin) → **Bumbung + drone terbang ikut scroll** →
+Sticker penanda defect (marquee berjalan + demo sticker) → Poster (popup,
+kalau ada) → 4 kategori kerja → 4 risiko tanpa inspection → Senarai 15 servis
++ kad CTA WhatsApp → Kenapa Kami → Review pelanggan → Footer.
 
-### Dua fail yang anda kena isi sendiri
+**Butang servis:** *Lihat Servis* di hero **scroll ke bawah dalam landing
+page yang sama** (tak keluar ke mana-mana). Di bawah senarai servis ada
+butang *Lebih Lanjut Tentang Servis* — barulah itu bawa ke page servis
+penuh di website utama (`/services/`).
 
-1. **Lagu latar** — letak MP3 dalam `website/files/` dan tulis namanya di
-   `LANDING_MUSIC` dalam `index.html`:
-   ```js
-   var LANDING_MUSIC = "files/goxpert-chorus.mp3";
-   ```
-   Biar `""` kalau tak nak lagu — skrin intro masih jalan, cuma senyap.
+### Fail tambahan
+
+1. ~~Lagu latar~~ — **sudah ada** (`files/goxpert-chorus.mp3`). Kalau nak
+   tukar lagu, ganti fail itu atau tukar nama di `LANDING_MUSIC` dalam
+   `index.html`. Biar `""` kalau tak nak lagu langsung — skrin intro masih
+   jalan, cuma senyap.
 
 2. **Poster** — letak gambar dalam `website/img/poster/` dan senaraikan
    dalam `LANDING_POSTERS`:
@@ -234,13 +244,13 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 | `img/svc/<servis>/` | 54 gambar slideshow untuk 12 sub-page servis |
 | `img/proj/` | 143 gambar untuk 58 projek |
 | `img/gal/` | 20 gambar pasukan / di tapak / ACPIM / latihan |
-| `img/` (root) | logo, pasangan thermal, bumbung + drone, 5 gambar re-inspection |
+| `img/` (root) | logo, pasangan thermal, bumbung + drone, surveyor + sijil SIRIM, 5 gambar re-inspection |
 | `img/sticker/` | 7 sticker penanda defect (PNG latar telus) |
 | `img/tool/` | 8 gambar alat berlatar telus (WebP) |
 | `img/review/` | 9 review pelanggan |
 | `img/report/` | 5 muka surat sample report |
 | `img/dms/` | 7 paparan sistem pengurusan defect |
-| `files/` | fail muat turun — `sample-report.pdf` (disalin ke `dist/files/`) |
+| `files/` | `sample-report.pdf` + `goxpert-chorus.mp3` (disalin ke `dist/files/`) |
 | `img/t/` | thumbnail 560px untuk grid — dijana automatik, jangan edit |
 
 **Prestasi:** gambar penuh dihadkan 900px (JPEG q72) untuk lightbox &

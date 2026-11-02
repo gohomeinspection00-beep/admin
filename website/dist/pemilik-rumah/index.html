@@ -362,7 +362,7 @@
                 <p class="lp-hero-text" data-i18n="lp.heroText">We are registered Building Surveyors with SIRIM-calibrated equipment. From home inspection to tribunal support — inspection with integrity.</p>
                 <div class="lp-hero-btns">
                     <a class="btn btn-whatsapp" id="lpWa2" href="https://wa.me/601131446591?text=Hi%2C%20I%20would%20like%20to%20get%20a%20quote%20for%20a%20building%20inspection." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"></path></svg><span data-i18n="lp.heroBtn1">WhatsApp Us Now</span></a>
-                    <a class="btn btn-secondary" href="#lpServis"><span data-i18n="lp.heroBtn2">See Services</span></a>
+                    <a class="btn btn-secondary" href="#lpServis" data-lp-scroll="lpServis"><span data-i18n="lp.heroBtn2">See Services</span></a>
                 </div>
                 <div class="trust-badges">
                     <span class="trust-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg><span data-i18n="hero.t1">SIRIM-Calibrated Equipment</span></span>
@@ -393,12 +393,21 @@
                 <h2 data-i18n="lp.toolTitle">Most of Our Instruments Are Calibrated by SIRIM</h2>
             </div>
             <div class="lp-tools-scene" id="lpToolsScene">
-                <span class="lp-core">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
-                    <b>SIRIM</b><i data-i18n="lp.toolCore">Calibrated</i>
+                <span class="lp-person" id="lpPerson">
+                    <img src="img/sirim-person.webp" alt="GoXpert surveyor with SIRIM calibration certificates" loading="lazy" decoding="async" onerror="this.closest('.lp-person').classList.add('no-img');this.remove()">
+                    <span class="lp-person-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                        <b>SIRIM</b><i data-i18n="lp.toolCore">Calibrated</i>
+                    </span>
                 </span>
             <span class="lp-tool" style="--x: -1; --y: -0.55; transition-delay: 0s;"><img src="img/tool/thermal.webp" alt="Thermal Camera" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>Thermal Camera</span></span><span class="lp-tool" style="--x: -0.62; --y: -1; transition-delay: 0.06s;"><img src="img/tool/insulation-tester.webp" alt="Insulation Tester" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>Insulation Tester</span></span><span class="lp-tool" style="--x: 0.62; --y: -1; transition-delay: 0.12s;"><img src="img/tool/earth-tester.webp" alt="Earth Tester" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>Earth Tester</span></span><span class="lp-tool" style="--x: 1; --y: -0.55; transition-delay: 0.18s;"><img src="img/tool/clamp-meter.webp" alt="Clamp Meter" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>Clamp Meter</span></span><span class="lp-tool" style="--x: 1; --y: 0.55; transition-delay: 0.24s;"><img src="img/tool/spirit-level.webp" alt="Spirit Level" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>Spirit Level</span></span><span class="lp-tool" style="--x: 0.62; --y: 1; transition-delay: 0.3s;"><img src="img/tool/laser-distance.webp" alt="Laser Distance" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>Laser Distance</span></span><span class="lp-tool" style="--x: -0.62; --y: 1; transition-delay: 0.36s;"><img src="img/tool/l-square.webp" alt="L Square" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>L Square</span></span><span class="lp-tool" style="--x: -1; --y: 0.55; transition-delay: 0.42s;"><img src="img/tool/measure-tape.webp" alt="Measuring Tape" loading="lazy" decoding="async" onerror="this.closest('.lp-tool').remove()"><span>Measuring Tape</span></span></div>
         </div>
+    </section>
+
+    <!-- Bumbung + drone terbang -->
+    <section class="roof-section" data-gx-checked="1">
+        <img class="roof-img" src="img/roof.webp" alt="Roof inspection" loading="lazy" decoding="async" onerror="this.closest('section').style.display='none'">
+        <div class="drone-wrap"><img src="img/drone.webp" alt="Drone survey" loading="lazy" decoding="async" onerror="this.closest('.drone-wrap').style.display='none'"></div>
     </section>
 
     <!-- Sticker -->
@@ -509,6 +518,10 @@
                 <div class="lp-svc-card">
                     <h3 data-i18n="lp.svListTitle">All Inspection Types</h3>
                     <ul class="lp-svc-list" id="lpSvcList"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Home Defect Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Pre-Purchase Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Sub-Sale Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Re-Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Commercial Building Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Electrical Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>After Renovation Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Joint Inspection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Maintenance Report</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Building Condition Assessment (BCA)</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Dilapidation Survey</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Building Monitoring</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Leak Detection</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Rectification Defect</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>Tribunal Consultation</li></ul>
+                    <a class="lp-svc-more" id="lpSvcMore" href="/services/">
+                        <span data-i18n="lp.svMore">More About Our Services</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                    </a>
                 </div>
                 <div class="lp-cta-card">
                     <h3 data-i18n="lp.ctaTitle">Not Sure Which Service?</h3>

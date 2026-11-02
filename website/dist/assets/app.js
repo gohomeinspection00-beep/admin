@@ -2344,6 +2344,7 @@ var I18N = {
         "lp.ctaBtn": "WhatsApp Us",
         "lp.ctaNote": "Reply within 1 working hour",
         "lp.sample": "See a real sample report (PDF)",
+        "lp.svMore": "More About Our Services",
         "faq.more": "More Questions & Answers",
         "nav.blog": "Articles", "nav.gallery": "Gallery",
         "hth.tag": "Latest Technology", "hth.title": "Thermal Imaging Reveals Hidden Problems",
@@ -2463,6 +2464,7 @@ var I18N = {
         "lp.ctaBtn": "WhatsApp Kami",
         "lp.ctaNote": "Balasan dalam 1 jam bekerja",
         "lp.sample": "Lihat contoh laporan sebenar (PDF)",
+        "lp.svMore": "Lebih Lanjut Tentang Servis",
         "faq.more": "Lagi Soalan & Jawapan",
         "nav.blog": "Artikel", "nav.gallery": "Galeri",
         "hth.tag": "Teknologi Terkini", "hth.title": "Thermal Imaging Mendedahkan Masalah Tersembunyi",
@@ -3143,11 +3145,38 @@ var FAQ_ALL = [
     /* kedudukan 8 alat mengelilingi bulatan SIRIM (unit, didarab --rx/--ry) */
     var LP_SLOTS = [[-1,-0.55],[-0.62,-1],[0.62,-1],[1,-0.55],[1,0.55],[0.62,1],[-0.62,1],[-1,0.55]];
 
+    var lpMusicWanted = false;   /* pelawat mahu lagu main (belum tekan senyap) */
+
+    function lpMusicIcon(on) {
+        return on
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+    }
+
+    /* berhenti terus — keluar ke page lain */
     function lpStopMusic() {
-        if (lpMusicEl) { try { lpMusicEl.pause(); } catch (e) {} }
+        lpMusicWanted = false;
+        if (lpMusicEl) { try { lpMusicEl.pause(); lpMusicEl.currentTime = 0; } catch (e) {} }
         var m = document.getElementById("lpMute");
         if (m) m.classList.remove("on");
     }
+
+    /* berhenti sementara — tukar tab / kecilkan tetingkap */
+    function lpPauseMusic() {
+        if (lpMusicEl) { try { lpMusicEl.pause(); } catch (e) {} }
+    }
+    function lpResumeMusic() {
+        if (lpMusicEl && lpMusicWanted) { try { lpMusicEl.play(); } catch (e) {} }
+    }
+
+    /* Lagu berhenti bila pelawat tukar tab atau keluar dari tetingkap,
+       dan sambung semula bila dia balik — melainkan dia sendiri tekan senyap. */
+    document.addEventListener("visibilitychange", function () {
+        if (document.hidden) lpPauseMusic(); else lpResumeMusic();
+    });
+    window.addEventListener("blur", lpPauseMusic);
+    window.addEventListener("focus", lpResumeMusic);
+    window.addEventListener("pagehide", lpPauseMusic);
 
     function renderLandingPage() {
         var page = document.getElementById("page-landing");
@@ -3288,12 +3317,6 @@ var FAQ_ALL = [
         if (!intro || !btn) return;
         document.body.classList.add("lp-intro-on", "lp-lock");
 
-        function speaker(on) {
-            return on
-                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/></svg>'
-                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
-        }
-
         btn.addEventListener("click", function () {
             intro.classList.add("gone");
             document.body.classList.remove("lp-lock");
@@ -3304,21 +3327,43 @@ var FAQ_ALL = [
             if (!a) return;
             lpMusicEl = a;
             a.src = LANDING_MUSIC;
-            a.volume = 0.3;
+            a.loop = true;
+            a.volume = 0.1;           /* kekuatan sama macam landing page lama */
             var p = a.play();
             if (p && p.then) {
                 p.then(function () {
+                    lpMusicWanted = true;
                     if (!mute) return;
                     mute.classList.add("on");
-                    mute.innerHTML = speaker(true);
+                    mute.innerHTML = lpMusicIcon(true);
                     mute.onclick = function () {
-                        a.muted = !a.muted;
-                        mute.innerHTML = speaker(!a.muted);
+                        if (a.paused) { lpMusicWanted = true; a.play(); }
+                        else { lpMusicWanted = false; a.pause(); }
+                        mute.innerHTML = lpMusicIcon(!a.paused);
                     };
-                }).catch(function () { /* fail lagu tiada — senyap sahaja */ });
+                }).catch(function () { /* lagu tak dibenarkan main — senyap sahaja */ });
             }
         }, { once: true });
     }
+
+    /* ---------- Scroll dalam landing page (butang "Lihat Servis") ---------- */
+    document.addEventListener("click", function (e) {
+        var a = e.target.closest ? e.target.closest("[data-lp-scroll]") : null;
+        if (!a) return;
+        var tgt = document.getElementById(a.getAttribute("data-lp-scroll"));
+        if (!tgt) return;
+        e.preventDefault();
+        var GAP = 74;
+        window.scrollTo({ top: tgt.getBoundingClientRect().top + window.scrollY - GAP, behavior: "smooth" });
+        /* gambar lazy-load boleh anjak kedudukan semasa scroll —
+           betulkan semula sehingga seksyen benar-benar di atas skrin */
+        var tries = 0;
+        var fix = setInterval(function () {
+            var off = tgt.getBoundingClientRect().top - GAP;
+            if (Math.abs(off) < 10 || ++tries > 24) { clearInterval(fix); return; }
+            window.scrollBy({ top: off, behavior: tries > 8 ? "auto" : "smooth" });
+        }, 260);
+    });
 
     /* ---------- Animasi bila masuk skrin ---------- */
     var lpIO = null;
