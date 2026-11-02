@@ -10,11 +10,6 @@ const sets = [
     penerima: ["IJM PROPERTIES SDN BHD (100180-M)", "(Pejabat Tapak / Site Office — Austin Duta)", "PTD 182037 & PTD 182038, Ground Floor,", "Jalan Austin Duta, Taman Austin Duta,", "81100 Johor Bahru, Johor."],
   },
   {
-    label: "AMUTHABARATHI (NOTIS 1) — ke Pejabat Berdaftar, Wisma IJM PJ  [Ruj: NOTIS-1/2026/055]",
-    pengirim,
-    penerima: ["IJM PROPERTIES SDN BHD (100180-M)", "(Pejabat Berdaftar / Registered Office)", "Tkt. 2, Wisma IJM, Jalan Yong Shook Lin,", "46050 Petaling Jaya, Selangor."],
-  },
-  {
     label: "AMUTHABARATHI (NOTIS 1) — ke City Plaza, Jalan Tebrau JB  [Ruj: NOTIS-1/2026/055]",
     pengirim,
     penerima: ["IJM PROPERTIES SDN BHD (100180-M)", "17th Floor, Unit 17-01, City Plaza,", "Jalan Tebrau,", "80250 Johor Bahru, Johor."],
