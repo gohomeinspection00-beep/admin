@@ -5488,8 +5488,10 @@ var I18N = {
         "gb.coBoxP": "Tell us your project and roughly how many are interested. We will send you the rate and a short message you can paste straight into your group.",
         "gb.coBtn": "Message Us as Coordinator",
         "gb.pfTag": "Projects We Have Inspected", "gb.pfTitle": "We Have Done This Before",
-        "gb.waGeneral": "Salam, saya nak tanya pasal inspection berkelompok untuk projek saya.",
-        "gb.waCoord": "Salam, saya penyelaras untuk projek saya dan nak tanya kadar inspection berkelompok.",
+        "gb.waGeneral": "Hi, I would like a group inspection rate.",
+        "gb.waCoord": "Hi, I am the group coordinator and would like a group inspection rate.",
+        "gb.waAsk": "Property type: \nBuilt-up (sq ft): \nUnits interested: ",
+        "gb.reply": "We confirm your group rate within 1 working hour",
         "lp.introTag": "Professional Building Inspection",
         "lp.introBtn": "Tap to continue",
         "lp.introSub": "Peace of mind is waiting",
@@ -5630,8 +5632,10 @@ var I18N = {
         "gb.coBoxP": "Beritahu kami projek anda dan lebih kurang berapa orang berminat. Kami hantar kadar dan satu mesej ringkas yang anda boleh paste terus dalam kumpulan.",
         "gb.coBtn": "Hubungi Kami Sebagai Penyelaras",
         "gb.pfTag": "Projek Yang Kami Dah Periksa", "gb.pfTitle": "Kami Pernah Buat Ini",
-        "gb.waGeneral": "Salam, saya nak tanya pasal inspection berkelompok untuk projek saya.",
-        "gb.waCoord": "Salam, saya penyelaras untuk projek saya dan nak tanya kadar inspection berkelompok.",
+        "gb.waGeneral": "Salam, saya nak dapatkan kadar inspection berkelompok.",
+        "gb.waCoord": "Salam, saya penyelaras kumpulan dan nak dapatkan kadar inspection berkelompok.",
+        "gb.waAsk": "Jenis rumah: \nKeluasan (kaki persegi): \nBilangan unit berminat: ",
+        "gb.reply": "Kami sahkan kadar kumpulan anda dalam 1 jam bekerja",
         "lp.introTag": "Building Inspection Profesional",
         "lp.introBtn": "Tekan untuk teruskan",
         "lp.introSub": "Ketenangan menanti anda",
@@ -6606,13 +6610,16 @@ var FAQ_ALL = [
         return { projek: q.projek || q.project || "", vp: q.vp || q.handover || "" };
     }
 
+    /* Harga berbeza ikut projek, jadi mesej pertama terus kumpulkan
+       maklumat yang diperlukan untuk sebut harga — pelawat cuma isi
+       tempat kosong dalam WhatsApp sebelum hantar. */
     function gbWaText(coord) {
         var g = gbParams();
-        var msg = t(coord ? "gb.waCoord" : "gb.waGeneral");
-        if (g.projek) {
-            msg += (lang === "bm" ? "\n\nProjek: " : "\n\nProject: ") + g.projek;
-            if (g.vp) msg += (lang === "bm" ? "\nSerahan kunci: " : "\nHandover: ") + g.vp;
-        }
+        var bm = lang === "bm";
+        var msg = t(coord ? "gb.waCoord" : "gb.waGeneral") + "\n";
+        msg += (bm ? "\nProjek: " : "\nProject: ") + (g.projek || "");
+        msg += (bm ? "\nSerahan kunci: " : "\nHandover: ") + (g.vp || "");
+        msg += "\n" + t("gb.waAsk");
         return msg;
     }
 
@@ -6667,6 +6674,10 @@ var FAQ_ALL = [
                         '<a class="btn btn-whatsapp" href="' + waLink(gbWaText(false)) + '" target="_blank" rel="noopener">' +
                         '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>' +
                         t("gb.noPriceBtn") + '</a>' +
+                        '<p class="lp-cta-note" style="justify-content:center;margin-top:0.9rem">' +
+                            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
+                            '<span>' + t("gb.reply") + '</span>' +
+                        '</p>' +
                     '</div>';
             }
         }
