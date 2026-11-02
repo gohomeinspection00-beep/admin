@@ -259,7 +259,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 19 Jun 2026 — lebih TIGA (3) BULAN yang lalu — Pemeriksaan Kedua (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mengesahkan bahawa kecacatan masih belum diselesaikan oleh pihak tuan. Laporan Pemeriksaan Kedua telah dikemukakan secara rasmi kepada pihak tuan pada 2 Oktober 2026. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 19 Jun 2026 — lebih TIGA (3) BULAN yang lalu — Pemeriksaan Kedua (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mengesahkan bahawa kecacatan masih belum diselesaikan oleh pihak tuan. Laporan Pemeriksaan Kedua telah dikemukakan secara rasmi kepada pihak tuan pada 2 Oktober 2026, dan tiket-tiket kecacatan susulan turut dikemukakan melalui aplikasi pihak tuan pada 8 Oktober 2026 (antaranya Ticket ID: AD11A5807 hingga AD11A5810) — namun sehingga tarikh notis ini dikeluarkan, kesemuanya masih kekal berstatus "In Progress" di dalam rekod aplikasi pihak tuan sendiri tanpa kemajuan kerja pembaikan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
