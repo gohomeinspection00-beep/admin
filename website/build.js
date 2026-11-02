@@ -19,7 +19,12 @@ const http = require("http");
 const { chromium } = require("playwright-core");
 
 const SRC = path.join(__dirname, "index.html");
-const OUT = path.join(__dirname, "dist");
+
+/* Bina ke dalam folder sementara, kemudian tukar masuk hanya bila
+   semuanya siap. Kalau build gagal di tengah jalan, dist/ yang lama
+   kekal utuh — tiada risiko memuat naik laman yang separuh siap. */
+const FINAL = path.join(__dirname, "dist");
+const OUT = path.join(__dirname, "dist.tmp");
 const CHROME = process.env.CHROME_PATH || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 
 const html = fs.readFileSync(SRC, "utf8");
@@ -392,6 +397,7 @@ function copyDir(from, to) {
 }
 
 (async () => {
+  try {
     fs.rmSync(OUT, { recursive: true, force: true });
     fs.mkdirSync(path.join(OUT, "assets"), { recursive: true });
 
@@ -508,8 +514,22 @@ function copyDir(from, to) {
         home.replace(/<title>[\s\S]*?<\/title>/, "<title>Page not found — GoXpert</title>")
             .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex">'));
 
+    /* ---- tukar masuk: dist/ lama hanya diganti selepas semuanya siap ---- */
+    const OLD = FINAL + ".old";
+    fs.rmSync(OLD, { recursive: true, force: true });
+    if (fs.existsSync(FINAL)) fs.renameSync(FINAL, OLD);
+    fs.renameSync(OUT, FINAL);
+    fs.rmSync(OLD, { recursive: true, force: true });
+
     const n = PAGES.length * LANGS.length;
     console.log("Siap: " + n + " page HTML (" + PAGES.length + " x " + LANGS.length +
                 " bahasa) + assets + sitemap.xml + robots.txt + llms.txt -> dist/");
     if (errors.length) console.log("RALAT JS semasa pra-render:", [...new Set(errors)].slice(0, 5));
+  } catch (e) {
+    /* Gagal: buang folder sementara, biar dist/ lama tak disentuh. */
+    fs.rmSync(OUT, { recursive: true, force: true });
+    console.error("BUILD GAGAL — dist/ lama tidak diubah.");
+    console.error(e && e.stack || e);
+    process.exitCode = 1;
+  }
 })();

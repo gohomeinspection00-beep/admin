@@ -2,6 +2,10 @@
 goxpert-website.zip
 *.zip
 
+# Folder sementara build — wujud hanya kalau build gagal di tengah jalan
+website/dist.tmp/
+website/dist.old/
+
 # Sampah sistem
 .DS_Store
 Thumbs.db
