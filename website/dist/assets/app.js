@@ -2866,11 +2866,16 @@ var FAQ_ALL = [
        versi berbilang fail (dist/) guna "/services/bca/". */
     function url(h) {
         if (!window.GX_STATIC) return h;
-        if (!h || h === "#" || h === "#/") return "/";
-        if (h.indexOf("#/") === 0) return "/" + h.slice(2).replace(/\/+$/, "") + "/";
+        var pre = lang === "bm" ? "/ms" : "";
+        if (!h || h === "#" || h === "#/") return pre + "/";
+        if (h.indexOf("#/") === 0) return pre + "/" + h.slice(2).replace(/\/+$/, "") + "/";
         return h;
     }
-    var lang = localStorage.getItem("gx_lang") || "en";
+
+    /* Versi berbilang fail: bahasa ditetapkan oleh fail itu sendiri
+       (page BM berada di /ms/...), jadi Google boleh baca kedua-duanya.
+       Versi satu-fail: ikut pilihan yang disimpan. */
+    var lang = window.GX_LANG || localStorage.getItem("gx_lang") || "en";
 
     function t(key) {
         return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || "";
@@ -3500,9 +3505,23 @@ var FAQ_ALL = [
     });
 
     /* ---------- Tukar bahasa ---------- */
+    /* URL page yang sama dalam bahasa satu lagi (versi berbilang fail) */
+    function otherLangUrl() {
+        var p = location.pathname.replace(/\/+$/, "/") || "/";
+        if (p.indexOf("/ms/") === 0 || p === "/ms") {
+            p = p.replace(/^\/ms/, "") || "/";
+        } else {
+            p = "/ms" + (p === "/" ? "/" : p);
+        }
+        if (p.charAt(p.length - 1) !== "/") p += "/";
+        return p + location.search + location.hash;
+    }
+
     function switchLang() {
-        lang = lang === "en" ? "bm" : "en";
-        localStorage.setItem("gx_lang", lang);
+        var next = lang === "en" ? "bm" : "en";
+        try { localStorage.setItem("gx_lang", next); } catch (e) {}
+        if (window.GX_STATIC) { location.href = otherLangUrl(); return; }
+        lang = next;
         renderAll();
     }
     document.getElementById("langToggle").addEventListener("click", switchLang);
@@ -4663,11 +4682,13 @@ var FAQ_ALL = [
         var faqSchema = {
             "@context": "https://schema.org",
             "@type": "FAQPage",
+            "inLanguage": lang === "bm" ? "ms-MY" : "en-MY",
             "mainEntity": FAQ_ALL.map(function (f) {
+                var x = f[lang] || f.en;
                 return {
                     "@type": "Question",
-                    "name": f.en[0],
-                    "acceptedAnswer": { "@type": "Answer", "text": f.en[1] }
+                    "name": x[0],
+                    "acceptedAnswer": { "@type": "Answer", "text": x[1] }
                 };
             })
         };

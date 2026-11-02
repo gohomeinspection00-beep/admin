@@ -2,7 +2,8 @@
 
 **Dua bentuk:**
 - `website/index.html` — satu fail, untuk edit & test cepat (klik dua kali, terus jalan)
-- `website/dist/` — laman siap terbit, 30 fail HTML berasingan (lihat di bawah)
+- `website/dist/` — laman siap terbit, 60 fail HTML berasingan
+  (30 page × 2 bahasa — lihat di bawah)
 Berasingan sepenuhnya daripada app GoInspect di root repo.
 
 ## Status
@@ -117,6 +118,37 @@ penuh di website utama (`/services/`).
    dan ditukar kepada `www.goxpert.my` terus pada gambar.
 
 Lepas tukar, jalankan `node build.js` semula untuk kemas kini `dist/`.
+
+
+## Dwibahasa: Google boleh baca versi BM
+
+Dulu laman terbit **semuanya dalam Bahasa Inggeris**. Teks BM hanya
+muncul selepas pelayar jalankan JavaScript, jadi Google tak pernah
+nampak. Orang yang cari *"inspection rumah baru"* atau *"jurukur
+bangunan berdaftar"* takkan jumpa kita langsung.
+
+Sekarang setiap page wujud sebagai **dua fail HTML sebenar**:
+
+| Bahasa | URL | `<html lang>` |
+|---|---|---|
+| Inggeris | `goxpert.my/faq/` | `en` |
+| Melayu | `goxpert.my/ms/faq/` | `ms` |
+
+Setiap page membawa tag `hreflang` yang memberitahu Google kedua-dua URL
+itu page yang sama dalam bahasa berbeza — jadi ia **tidak** dikira
+kandungan bertindih (duplicate content). `sitemap.xml` turut
+menyenaraikan kedua-duanya dengan anotasi `xhtml:link`.
+
+**Butang tukar bahasa** dalam laman terbit tidak lagi sekadar menukar
+teks — ia membawa pelawat ke URL bahasa yang satu lagi untuk page yang
+sama (`/services/bca/` ↔ `/ms/services/bca/`). Dalam fail tunggal
+`index.html`, ia masih bertukar terus tanpa muat semula.
+
+Pautan dalam page BM semuanya menghala ke `/ms/...`, jadi pelawat kekal
+dalam bahasa pilihannya sepanjang melayari laman.
+
+JSON-LD juga mengikut bahasa: nama servis, tajuk artikel, FAQ dan
+breadcrumb pada page BM semuanya dalam BM, dengan `inLanguage: ms-MY`.
 
 ## Untuk terbit (deploy) — folder `dist/`
 

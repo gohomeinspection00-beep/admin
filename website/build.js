@@ -40,43 +40,73 @@ const SVC = dataArray("SVC");
 const BLOG = dataArray("BLOG");
 const SITE = (CONFIG.siteUrl || "https://goxpert.my/").replace(/\/+$/, "");
 
+/* ---- bahasa ----
+   EN di /..., BM di /ms/...  — dua-dua jadi fail HTML sebenar supaya
+   Google boleh baca versi BM, bukan hanya selepas JavaScript jalan. */
+const LANGS = [
+    { code: "en", htmlLang: "en", ogLocale: "en_MY", hreflang: "en-MY", prefix: "" },
+    { code: "bm", htmlLang: "ms", ogLocale: "ms_MY", hreflang: "ms-MY", prefix: "/ms" }
+];
+const pathFor = (lang, out) => lang.prefix + "/" + (out ? out + "/" : "");
+const urlFor  = (lang, out) => SITE + pathFor(lang, out);
+
 /* ---- senarai page ---- */
 const PAGES = [
     { out: "", key: "home", hash: "",
       title: "GoXpert — Building Surveying & Inspection Malaysia",
-      desc: "RISM-registered Building Surveyors with SIRIM-calibrated equipment. Home defect inspection (DLP), Building Condition Assessment, dilapidation survey, thermal imaging and tribunal support across Johor, Melaka, Negeri Sembilan and Selangor." },
+      desc: "RISM-registered Building Surveyors with SIRIM-calibrated equipment. Home defect inspection (DLP), Building Condition Assessment, dilapidation survey, thermal imaging and tribunal support across Johor, Melaka, Negeri Sembilan and Selangor.",
+      titleBm: "GoXpert — Jurukur Bangunan & Inspection Rumah Malaysia",
+      descBm: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), pemeriksaan kecacatan, sub-sale, thermal imaging dan sokongan Tribunal Tuntutan Pembeli Rumah — Johor, Melaka, Negeri Sembilan, Selangor." },
     { out: "services", key: "services", hash: "#/services",
       title: "All Inspection & Surveying Services — GoXpert",
-      desc: "Sixteen building surveying services for homeowners, corporations, JMB/MC and legal proceedings — residential defect inspection, commercial condition assessment, and technical testing." },
+      desc: "Sixteen building surveying services for homeowners, corporations, JMB/MC and legal proceedings — residential defect inspection, commercial condition assessment, and technical testing.",
+      titleBm: "Semua Servis Inspection & Jurukur Bangunan — GoXpert",
+      descBm: "Enam belas servis jurukur bangunan untuk pemilik rumah, syarikat, JMB/MC dan kes tribunal — inspection kecacatan rumah, penilaian keadaan bangunan komersial dan ujian teknikal." },
     { out: "projects", key: "projects", hash: "#/projects",
       title: "Projects We Have Handled — GoXpert",
-      desc: "Inspection and surveying work completed across Malaysia: residential, commercial, infrastructure, public buildings, land and rivers." },
+      desc: "Inspection and surveying work completed across Malaysia: residential, commercial, infrastructure, public buildings, land and rivers.",
+      titleBm: "Projek Yang Kami Kendalikan — GoXpert",
+      descBm: "Kerja inspection dan jurukur bangunan yang telah disiapkan di seluruh Malaysia: kediaman, komersial, infrastruktur, bangunan awam, tanah dan sungai." },
     { out: "gallery", key: "gallery", hash: "#/gallery",
       title: "Gallery — From Our Site Visits | GoXpert",
-      desc: "Our team, our instruments and the defects we actually find — photographed on real inspections." },
+      desc: "Our team, our instruments and the defects we actually find — photographed on real inspections.",
+      titleBm: "Galeri — Dari Lawatan Tapak Kami | GoXpert",
+      descBm: "Pasukan kami, peralatan kami dan kecacatan yang benar-benar kami jumpa — dirakam semasa inspection sebenar." },
     { out: "about", key: "about", hash: "#/about",
       title: "About GoXpert — Registered Building Surveyors",
-      desc: "Who we are, the principles we do not compromise, and what backs our reports. Registered Building Surveyors operating across four Malaysian states." },
+      desc: "Who we are, the principles we do not compromise, and what backs our reports. Registered Building Surveyors operating across four Malaysian states.",
+      titleBm: "Tentang GoXpert — Jurukur Bangunan Berdaftar",
+      descBm: "Siapa kami, prinsip yang kami tak kompromi, dan apa yang menyokong laporan kami. Building Surveyor berdaftar yang beroperasi di empat negeri." },
     { out: "faq", key: "faq", hash: "#/faq",
       title: "Questions & Answers — GoXpert Building Inspection",
-      desc: "Thirty-nine answers about home defect inspection, DLP, sub-sale inspection, BCA, reports, pricing and tribunal support." },
+      desc: "Thirty-nine answers about home defect inspection, DLP, sub-sale inspection, BCA, reports, pricing and tribunal support.",
+      titleBm: "Soalan & Jawapan — Inspection Bangunan GoXpert",
+      descBm: "Tiga puluh sembilan jawapan tentang inspection kecacatan rumah, DLP, inspection sub-sale, BCA, laporan, harga dan sokongan tribunal." },
     { out: "blog", key: "blog", hash: "#/blog",
       title: "Articles & Guides From the Field — GoXpert",
-      desc: "What we learn on site, written up so property owners can use it — no jargon, no sales pitch." },
+      desc: "What we learn on site, written up so property owners can use it — no jargon, no sales pitch.",
+      titleBm: "Artikel & Panduan Dari Tapak — GoXpert",
+      descBm: "Apa yang kami pelajari di tapak, ditulis supaya pemilik hartanah boleh guna — tanpa jargon, tanpa ayat jualan." },
     { out: "pemilik-rumah", key: "landing", hash: "#/pemilik-rumah",
       title: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
-      desc: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." }
+      desc: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor.",
+      titleBm: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
+      descBm: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." }
 ];
 SVC.forEach(s => PAGES.push({
     out: "services/" + s.slug, key: "service", param: s.slug, hash: "#/services/" + s.slug,
     title: s.name.en + " — GoXpert Building Surveyors",
     desc: (s.tag.en + " " + s.desc.en).replace(/\s+/g, " ").slice(0, 300),
+    titleBm: s.name.bm + " — Jurukur Bangunan GoXpert",
+    descBm: (s.tag.bm + " " + s.desc.bm).replace(/\s+/g, " ").slice(0, 300),
     svc: s
 }));
 BLOG.forEach(b => PAGES.push({
     out: "blog/" + b.slug, key: "article", param: b.slug, hash: "#/blog/" + b.slug,
     title: b.title.en + " — GoXpert",
-    desc: b.excerpt.en, article: b
+    desc: b.excerpt.en,
+    titleBm: b.title.bm + " — GoXpert",
+    descBm: b.excerpt.bm, article: b
 }));
 
 /* ---- pecahkan CSS & JS keluar dari fail sumber ---- */
@@ -92,12 +122,13 @@ function esc(x) {
 }
 
 /* ---- tukar pautan hash jadi laluan sebenar ---- */
-function realLinks(s) {
+function realLinks(s, lang) {
+    const p = lang.prefix;   // "" untuk EN, "/ms" untuk BM
     return s
-        .replace(/href="#\/services\/([a-z0-9-]+)"/g, 'href="/services/$1/"')
-        .replace(/href="#\/blog\/([a-z0-9-]+)"/g, 'href="/blog/$1/"')
-        .replace(/href="#\/(services|projects|gallery|about|faq|blog|pemilik-rumah)"/g, 'href="/$1/"')
-        .replace(/href="#"/g, 'href="/"');
+        .replace(/href="#\/services\/([a-z0-9-]+)"/g, 'href="' + p + '/services/$1/"')
+        .replace(/href="#\/blog\/([a-z0-9-]+)"/g, 'href="' + p + '/blog/$1/"')
+        .replace(/href="#\/(services|projects|gallery|about|faq|blog|pemilik-rumah)"/g, 'href="' + p + '/$1/"')
+        .replace(/href="#"/g, 'href="' + p + '/"');
 }
 
 /* ---- JSON-LD ---- */
@@ -145,37 +176,42 @@ const ORG = {
 };
 if (CONFIG.ssm) ORG.identifier = { "@type": "PropertyValue", name: "Malaysian company registration number", value: CONFIG.ssm };
 
-function crumbs(page) {
-    const parts = [{ name: "Home", url: SITE + "/" }];
-    if (page.key === "service") parts.push({ name: "Services", url: SITE + "/services/" });
-    if (page.key === "article") parts.push({ name: "Articles", url: SITE + "/blog/" });
-    parts.push({ name: page.title.split(" — ")[0], url: SITE + "/" + page.out + (page.out ? "/" : "") });
+function crumbs(page, lang) {
+    const bm = lang.code === "bm";
+    const parts = [{ name: bm ? "Utama" : "Home", url: urlFor(lang, "") }];
+    if (page.key === "service") parts.push({ name: bm ? "Servis" : "Services", url: urlFor(lang, "services") });
+    if (page.key === "article") parts.push({ name: bm ? "Artikel" : "Articles", url: urlFor(lang, "blog") });
+    parts.push({ name: (bm ? (page.titleBm || page.title) : page.title).split(" — ")[0], url: urlFor(lang, page.out) });
     return {
         "@type": "BreadcrumbList",
         itemListElement: parts.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.name, item: p.url }))
     };
 }
 
-function jsonLd(page, faqNodes) {
+function jsonLd(page, faqNodes, lang) {
+    const L = lang.code;               // "en" atau "bm"
+    const bm = L === "bm";
     const graph = [ORG, {
         "@type": "WebSite", "@id": SITE + "/#website", url: SITE + "/",
         name: CONFIG.companyName || "GoXpert", publisher: { "@id": SITE + "/#organisation" },
         inLanguage: ["en-MY", "ms-MY"]
     }];
-    if (page.key !== "home") graph.push(crumbs(page));
+    if (page.key !== "home") graph.push(crumbs(page, lang));
     if (page.key === "service") {
+        const sv = page.svc;
         graph.push({
             "@type": "Service",
-            name: page.svc.name.en,
-            serviceType: page.svc.name.en,
-            description: page.svc.desc.en,
-            url: SITE + "/services/" + page.svc.slug + "/",
+            name: sv.name[L] || sv.name.en,
+            serviceType: sv.name.en,
+            description: sv.desc[L] || sv.desc.en,
+            url: urlFor(lang, "services/" + sv.slug),
             provider: { "@id": SITE + "/#organisation" },
             areaServed: ["Johor", "Melaka", "Negeri Sembilan", "Selangor"].map(n => ({ "@type": "State", name: n })),
-            audience: { "@type": "Audience", audienceType: (page.svc.who && page.svc.who.en || []).join(", ") },
+            audience: { "@type": "Audience", audienceType: ((sv.who && sv.who[L]) || (sv.who && sv.who.en) || []).join(", ") },
+            inLanguage: lang.hreflang,
             hasOfferCatalog: {
-                "@type": "OfferCatalog", name: "What is included",
-                itemListElement: (page.svc.inc.en || []).map(x => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: x } }))
+                "@type": "OfferCatalog", name: bm ? "Apa yang termasuk" : "What is included",
+                itemListElement: ((sv.inc[L] || sv.inc.en) || []).map(x => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: x } }))
             }
         });
     }
@@ -183,13 +219,14 @@ function jsonLd(page, faqNodes) {
         const a = page.article;
         graph.push({
             "@type": "BlogPosting",
-            headline: a.title.en, description: a.excerpt.en,
-            url: SITE + "/blog/" + a.slug + "/",
+            headline: a.title[L] || a.title.en,
+            description: a.excerpt[L] || a.excerpt.en,
+            url: urlFor(lang, "blog/" + a.slug),
             datePublished: a.date, dateModified: a.date,
             image: a.cover ? SITE + "/" + a.cover : undefined,
             author: { "@id": SITE + "/#organisation" },
             publisher: { "@id": SITE + "/#organisation" },
-            inLanguage: "en-MY", isAccessibleForFree: true
+            inLanguage: lang.hreflang, isAccessibleForFree: true
         });
     }
     if (page.key === "faq" && faqNodes) graph.push(faqNodes);
@@ -197,37 +234,46 @@ function jsonLd(page, faqNodes) {
 }
 
 /* ---- rangka HTML ---- */
-function shell(page, parts, faqNodes) {
-    const url = SITE + "/" + (page.out ? page.out + "/" : "");
+function shell(page, parts, faqNodes, lang) {
+    const bm = lang.code === "bm";
+    const title = (bm && page.titleBm) || page.title;
+    const desc = (bm && page.descBm) || page.desc;
+    const url = urlFor(lang, page.out);
     const og = page.ogImage || (SITE + "/img/gal/our-team-1.jpg");
+    /* hreflang: beritahu Google kedua-dua URL ini page yang sama dalam
+       bahasa berbeza, supaya ia tak dikira kandungan bertindih */
+    const alts = LANGS.map(l =>
+        `<link rel="alternate" hreflang="${l.hreflang}" href="${urlFor(l, page.out)}">`
+    ).join("\n") + `\n<link rel="alternate" hreflang="x-default" href="${urlFor(LANGS[0], page.out)}">`;
     return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${lang.htmlLang}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="/">
-<title>${esc(page.title)}</title>
-<meta name="description" content="${esc(page.desc)}">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}">
 <meta name="theme-color" content="#1565C0">
 <meta name="author" content="${esc(CONFIG.legalName)}">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <link rel="canonical" href="${url}">
+${alts}
 <meta property="og:type" content="${page.key === "article" ? "article" : "website"}">
 <meta property="og:site_name" content="${esc(CONFIG.companyName)}">
-<meta property="og:locale" content="en_MY">
-<meta property="og:locale:alternate" content="ms_MY">
+<meta property="og:locale" content="${lang.ogLocale}">
+<meta property="og:locale:alternate" content="${LANGS.find(l => l.code !== lang.code).ogLocale}">
 <meta property="og:url" content="${url}">
-<meta property="og:title" content="${esc(page.title)}">
-<meta property="og:description" content="${esc(page.desc)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc)}">
 <meta property="og:image" content="${og}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(page.title)}">
-<meta name="twitter:description" content="${esc(page.desc)}">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(desc)}">
 <meta name="twitter:image" content="${og}">
 ${FAVICON}
 <link rel="stylesheet" href="/assets/style.css">
 <script type="application/ld+json">
-${jsonLd(page, faqNodes)}
+${jsonLd(page, faqNodes, lang)}
 </script>
 </head>
 <body${page.key === "landing" ? ' class="lp-on"' : ""}>
@@ -236,7 +282,7 @@ ${parts.nav}
 ${parts.page}
 ${parts.footer}
 ${parts.floats}
-<script>window.GX_STATIC=1;window.GX_PAGE=${JSON.stringify({ key: page.key, param: page.param || null })};</script>
+<script>window.GX_STATIC=1;window.GX_LANG=${JSON.stringify(lang.code)};window.GX_PAGE=${JSON.stringify({ key: page.key, param: page.param || null })};</script>
 <script src="/assets/app.js" defer></script>
 </body>
 </html>
@@ -294,6 +340,9 @@ function llmsTxt() {
     L.push("- [Articles](" + SITE + "/blog/)");
     L.push("- [For homeowners — new homes & sub-sale](" + SITE + "/pemilik-rumah/)");
     L.push("");
+    L.push("Every page above also exists in Bahasa Malaysia under " + SITE + "/ms/");
+    L.push("(for example " + SITE + "/ms/services/ and " + SITE + "/ms/faq/).");
+    L.push("");
     L.push("## Articles");
     L.push("");
     BLOG.forEach(b => L.push("- [" + b.title.en + "](" + SITE + "/blog/" + b.slug + "/): " + b.excerpt.en));
@@ -350,10 +399,19 @@ function copyDir(from, to) {
     const errors = [];
     page.on("pageerror", e => errors.push(e.message));
 
-    let faqNodes = null;
-    for (const P of PAGES) {
+    let faqNodes = {};
+    for (const lang of LANGS) {
+      /* Paksa bahasa SEBELUM halaman dimuat, supaya pra-render
+         menangkap teks dalam bahasa yang betul. */
+      await page.context().clearCookies();
+      await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "domcontentloaded" });
+      await page.evaluate(code => { try { localStorage.setItem("gx_lang", code); } catch (e) {} }, lang.code);
+
+      for (const P of PAGES) {
         await page.goto(`http://localhost:${port}/index.html${P.hash}`, { waitUntil: "domcontentloaded" });
         await page.waitForTimeout(P.key === "home" ? 900 : 550);
+        const got = await page.evaluate(() => (window.GX_DEBUG_LANG = (localStorage.getItem("gx_lang") || "en")));
+        if (got !== lang.code) throw new Error("Bahasa pra-render salah: mahu " + lang.code + ", dapat " + got);
 
         const parts = await page.evaluate(key => {
             const id = { home: "page-home", services: "page-services", service: "page-service",
@@ -376,7 +434,7 @@ function copyDir(from, to) {
         }, P.key);
 
         if (P.key === "faq") {
-            faqNodes = await page.evaluate(() => {
+            faqNodes[lang.code] = await page.evaluate(() => {
                 const n = [...document.querySelectorAll('script[type="application/ld+json"]')]
                     .map(x => JSON.parse(x.textContent))
                     .find(x => x["@type"] === "FAQPage");
@@ -384,14 +442,16 @@ function copyDir(from, to) {
             });
         }
 
-        for (const k of Object.keys(parts)) parts[k] = realLinks(parts[k]);
+        for (const k of Object.keys(parts)) parts[k] = realLinks(parts[k], lang);
 
-        const dir = path.join(OUT, P.out);
+        const dir = path.join(OUT, lang.prefix.replace(/^\//, ""), P.out);
         fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(path.join(dir, "index.html"), shell(P, parts, P.key === "faq" ? faqNodes : null));
+        fs.writeFileSync(path.join(dir, "index.html"),
+            shell(P, parts, P.key === "faq" ? faqNodes[lang.code] : null, lang));
         process.stdout.write(".");
+      }
+      process.stdout.write(" " + lang.code + "\n");
     }
-    console.log("");
     await browser.close();
     srv.close();
 
@@ -408,13 +468,22 @@ function copyDir(from, to) {
     /* sitemap */
     const today = fs.statSync(SRC).mtime.toISOString().slice(0, 10);
     const sm = ['<?xml version="1.0" encoding="UTF-8"?>',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
-    PAGES.forEach(P => {
-        const loc = SITE + "/" + (P.out ? P.out + "/" : "");
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+        '        xmlns:xhtml="http://www.w3.org/1999/xhtml">'];
+    LANGS.forEach(lang => PAGES.forEach(P => {
         const pr = P.key === "home" ? "1.0" : (P.key === "service" || P.key === "services") ? "0.9" : "0.7";
-        sm.push("  <url><loc>" + loc + "</loc><lastmod>" + (P.article ? P.article.date : today) +
-                "</lastmod><changefreq>monthly</changefreq><priority>" + pr + "</priority></url>");
-    });
+        const alts = LANGS.map(l =>
+            '    <xhtml:link rel="alternate" hreflang="' + l.hreflang + '" href="' + urlFor(l, P.out) + '"/>'
+        ).join("\n") +
+        '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + urlFor(LANGS[0], P.out) + '"/>';
+        sm.push("  <url>",
+                "    <loc>" + urlFor(lang, P.out) + "</loc>",
+                alts,
+                "    <lastmod>" + (P.article ? P.article.date : today) + "</lastmod>",
+                "    <changefreq>monthly</changefreq>",
+                "    <priority>" + pr + "</priority>",
+                "  </url>");
+    }));
     sm.push("</urlset>");
     fs.writeFileSync(path.join(OUT, "sitemap.xml"), sm.join("\n") + "\n");
 
@@ -433,7 +502,8 @@ function copyDir(from, to) {
         home.replace(/<title>[\s\S]*?<\/title>/, "<title>Page not found — GoXpert</title>")
             .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex">'));
 
-    const n = PAGES.length;
-    console.log("Siap: " + n + " page HTML + assets + sitemap.xml + robots.txt + llms.txt -> dist/");
+    const n = PAGES.length * LANGS.length;
+    console.log("Siap: " + n + " page HTML (" + PAGES.length + " x " + LANGS.length +
+                " bahasa) + assets + sitemap.xml + robots.txt + llms.txt -> dist/");
     if (errors.length) console.log("RALAT JS semasa pra-render:", [...new Set(errors)].slice(0, 5));
 })();

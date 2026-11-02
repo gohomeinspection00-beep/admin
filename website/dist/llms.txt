@@ -59,6 +59,9 @@
 - [Articles](https://goxpert.my/blog/)
 - [For homeowners — new homes & sub-sale](https://goxpert.my/pemilik-rumah/)
 
+Every page above also exists in Bahasa Malaysia under https://goxpert.my/ms/
+(for example https://goxpert.my/ms/services/ and https://goxpert.my/ms/faq/).
+
 ## Articles
 
 - [DLP: What Every New Homeowner Must Know Before It Expires](https://goxpert.my/blog/dlp-guide/): The Defect Liability Period is the only window where the developer must fix defects for free. Here is how to use it properly.

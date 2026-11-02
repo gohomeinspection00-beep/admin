@@ -1,33 +1,544 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://goxpert.my/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://goxpert.my/services/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/projects/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/gallery/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/about/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/faq/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/blog/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/pemilik-rumah/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/services/home-defect/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/pre-purchase/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/sub-sale/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/re-inspection/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/after-renovation/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/joint-inspection/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/bca/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/dilapidation/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/monitoring/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/commercial-inspection/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/maintenance-audit/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/electrical/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/leak-detection/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/thermal-imaging/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/rectification/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/services/tribunal/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://goxpert.my/blog/dlp-guide/</loc><lastmod>2026-07-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/blog/common-defects/</loc><lastmod>2026-07-10</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/blog/hollow-tiles/</loc><lastmod>2026-06-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/blog/subsale-checklist/</loc><lastmod>2026-05-30</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/blog/damp-paint-myth/</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://goxpert.my/blog/bca-for-jmb/</loc><lastmod>2026-04-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://goxpert.my/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/projects/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/projects/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/projects/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/projects/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/gallery/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/gallery/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/gallery/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/gallery/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/about/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/about/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/faq/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/faq/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/faq/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/faq/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/blog/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/pemilik-rumah/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/pemilik-rumah/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/pemilik-rumah/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/pemilik-rumah/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/home-defect/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/home-defect/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/home-defect/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/home-defect/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/pre-purchase/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/pre-purchase/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/pre-purchase/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/pre-purchase/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/sub-sale/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/sub-sale/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/sub-sale/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/sub-sale/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/re-inspection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/re-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/re-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/re-inspection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/after-renovation/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/after-renovation/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/after-renovation/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/after-renovation/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/joint-inspection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/joint-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/joint-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/joint-inspection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/bca/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/bca/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/bca/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/bca/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/dilapidation/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/dilapidation/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/dilapidation/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/dilapidation/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/monitoring/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/monitoring/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/monitoring/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/monitoring/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/commercial-inspection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/commercial-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/commercial-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/commercial-inspection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/maintenance-audit/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/maintenance-audit/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/maintenance-audit/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/maintenance-audit/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/electrical/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/electrical/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/electrical/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/electrical/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/leak-detection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/leak-detection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/leak-detection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/leak-detection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/thermal-imaging/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/thermal-imaging/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/thermal-imaging/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/thermal-imaging/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/rectification/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/rectification/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/rectification/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/rectification/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/tribunal/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/tribunal/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/tribunal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/tribunal/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/blog/dlp-guide/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/dlp-guide/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/dlp-guide/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/dlp-guide/"/>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/blog/common-defects/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/common-defects/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/common-defects/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/common-defects/"/>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/blog/hollow-tiles/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/hollow-tiles/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/hollow-tiles/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/hollow-tiles/"/>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/blog/subsale-checklist/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/subsale-checklist/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/subsale-checklist/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/subsale-checklist/"/>
+    <lastmod>2026-05-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/blog/damp-paint-myth/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/damp-paint-myth/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/damp-paint-myth/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/damp-paint-myth/"/>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/blog/bca-for-jmb/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/bca-for-jmb/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/bca-for-jmb/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/bca-for-jmb/"/>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/projects/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/projects/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/projects/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/projects/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/gallery/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/gallery/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/gallery/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/gallery/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/about/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/about/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/faq/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/faq/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/faq/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/faq/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/blog/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/pemilik-rumah/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/pemilik-rumah/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/pemilik-rumah/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/pemilik-rumah/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/home-defect/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/home-defect/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/home-defect/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/home-defect/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/pre-purchase/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/pre-purchase/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/pre-purchase/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/pre-purchase/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/sub-sale/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/sub-sale/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/sub-sale/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/sub-sale/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/re-inspection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/re-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/re-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/re-inspection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/after-renovation/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/after-renovation/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/after-renovation/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/after-renovation/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/joint-inspection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/joint-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/joint-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/joint-inspection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/bca/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/bca/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/bca/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/bca/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/dilapidation/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/dilapidation/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/dilapidation/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/dilapidation/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/monitoring/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/monitoring/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/monitoring/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/monitoring/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/commercial-inspection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/commercial-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/commercial-inspection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/commercial-inspection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/maintenance-audit/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/maintenance-audit/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/maintenance-audit/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/maintenance-audit/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/electrical/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/electrical/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/electrical/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/electrical/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/leak-detection/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/leak-detection/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/leak-detection/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/leak-detection/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/thermal-imaging/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/thermal-imaging/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/thermal-imaging/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/thermal-imaging/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/rectification/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/rectification/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/rectification/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/rectification/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/tribunal/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/tribunal/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/tribunal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/tribunal/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/blog/dlp-guide/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/dlp-guide/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/dlp-guide/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/dlp-guide/"/>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/blog/common-defects/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/common-defects/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/common-defects/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/common-defects/"/>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/blog/hollow-tiles/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/hollow-tiles/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/hollow-tiles/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/hollow-tiles/"/>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/blog/subsale-checklist/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/subsale-checklist/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/subsale-checklist/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/subsale-checklist/"/>
+    <lastmod>2026-05-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/blog/damp-paint-myth/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/damp-paint-myth/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/damp-paint-myth/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/damp-paint-myth/"/>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/blog/bca-for-jmb/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/blog/bca-for-jmb/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/blog/bca-for-jmb/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/blog/bca-for-jmb/"/>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
