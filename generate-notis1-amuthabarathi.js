@@ -259,7 +259,7 @@ para(
 y += 4;
 
 numPara(2,
-  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 19 Jun 2026 — lebih TIGA (3) BULAN yang lalu — Pemeriksaan Kedua (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mengesahkan bahawa kecacatan masih belum diselesaikan oleh pihak tuan. Laporan Pemeriksaan Kedua telah dikemukakan secara rasmi kepada pihak tuan pada 2 Oktober 2026, dan tiket-tiket kecacatan susulan turut dikemukakan melalui aplikasi pihak tuan pada 8 Oktober 2026 (antaranya Ticket ID: AD11A5807 hingga AD11A5810) — namun sehingga tarikh notis ini dikeluarkan, kesemuanya masih kekal berstatus "In Progress" di dalam rekod aplikasi pihak tuan sendiri tanpa kemajuan kerja pembaikan. Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
+  `Namun, walaupun tempoh tiga puluh (30) hari tersebut telah tamat pada 19 Jun 2026 — lebih TIGA (3) BULAN yang lalu — Pemeriksaan Kedua (Re-Inspection) yang dijalankan pada ${data.tarikhReInspection} mengesahkan bahawa kecacatan masih belum diselesaikan oleh pihak tuan. Laporan Pemeriksaan Kedua telah dikemukakan secara rasmi kepada pihak tuan pada 2 Oktober 2026, dan tiket-tiket kecacatan susulan turut dikemukakan melalui aplikasi pihak tuan pada 8 Oktober 2026 (antaranya Ticket ID: AD11A5807 hingga AD11A5810) — namun sehingga tarikh notis ini dikeluarkan, kesemuanya masih kekal berstatus "In Progress" di dalam rekod aplikasi pihak tuan sendiri tanpa kemajuan kerja pembaikan (Lampiran B). Antara kecacatan yang masih wujud dan belum dibaiki adalah seperti berikut:`
 );
 y += 5;
 
@@ -311,7 +311,7 @@ drawTable(
 y += 5;
 
 numPara(5,
-  `Kesemua penolakan di atas — yang dibuat semasa submission 20 Mei 2026 dan/atau 2 Oktober 2026 — adalah DIPERTIKAIKAN dan tidak boleh diterima, atas alasan berikut:`
+  `Kesemua penolakan di atas — yang dibuat semasa submission 20 Mei 2026 dan/atau 2 Oktober 2026 — adalah DIPERTIKAIKAN dan tidak boleh diterima (rekod penolakan di dalam aplikasi pihak tuan dilampirkan sebagai Lampiran A-1 dan A-2), atas alasan berikut:`
 );
 y += 2;
 bullet(`Alasan "Wear and Tear (not a defect)" — kecacatan berkenaan telah dilaporkan seawal 20 Mei 2026, iaitu di dalam Tempoh Liabiliti Kecacatan (DLP) dan dalam tempoh awal milikan. "Wear and tear" merujuk kepada kelusuhan akibat penggunaan penghuni dari semasa ke semasa, dan tidak terpakai kepada keadaan yang wujud sejak serahan milikan. Malah, najis kelawar tersebut berada di TEMPAT YANG SAMA sejak pemeriksaan pertama dan tidak pernah dibersihkan, tanpa sebarang penambahan najis baru di kawasan lain — menunjukkan ia berkemungkinan besar telah sedia wujud sejak proses pembinaan lagi dan tidak dibersihkan semasa serahan milikan, iaitu isu penyiapan dan kebersihan kerja (housekeeping) pihak tuan, bukan "wear and tear". Kebersihan tangki air juga adalah keadaan semasa serahan yang menjejaskan bekalan air domestik penghuni;`);
@@ -450,6 +450,41 @@ function drawAkuanTerima(copyLabel) {
 
 drawAkuanTerima("Salinan Pemaju (Developer's Copy)");
 drawAkuanTerima("Salinan Pemilik (Owner's Copy)");
+
+
+// ============================================================
+// LAMPIRAN A & B — REKOD APLIKASI PEMAJU
+// ============================================================
+const lampiranList = [
+  { file: "amutha-reject-1.jpg", title: "LAMPIRAN A-1", sub: "Rekod Penolakan Tiket di dalam Aplikasi Pihak Pemaju", cap: "Tiket AD11A5787 (najis kelawar pada ceiling board, Family Area) berstatus REJECTED di dalam aplikasi pihak pemaju — penolakan ini dipertikaikan sebagaimana perenggan 5 notis ini." },
+  { file: "amutha-reject-2.jpg", title: "LAMPIRAN A-2", sub: "Rekod Penolakan Tiket di dalam Aplikasi Pihak Pemaju", cap: "Tiket AD11A5793 (tangki air dalam keadaan kotor) berstatus REJECTED di dalam aplikasi pihak pemaju — penolakan ini dipertikaikan sebagaimana perenggan 5 notis ini." },
+  { file: "amutha-inprogress.jpg", title: "LAMPIRAN B", sub: "Rekod Status Tiket di dalam Aplikasi Pihak Pemaju", cap: "Tiket AD11A5807 hingga AD11A5810 (dikemukakan 8 Oktober 2026) masih berstatus \"In Progress\" di dalam aplikasi pihak pemaju sehingga tarikh notis ini dikeluarkan." },
+];
+
+for (const L of lampiranList) {
+  newPage();
+  y = 25;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.TITLE); bk();
+  doc.text(L.title, pageW / 2, y, { align: "center" });
+  doc.setLineWidth(0.4);
+  doc.line(pageW / 2 - doc.getTextWidth(L.title) / 2, y + 1, pageW / 2 + doc.getTextWidth(L.title) / 2, y + 1);
+  y += 6;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(SZ.SMALL);
+  doc.text(L.sub, pageW / 2, y, { align: "center" });
+  y += 8;
+
+  const img = "data:image/jpeg;base64," + fs.readFileSync("/home/user/admin/" + L.file).toString("base64");
+  const ih = 180;
+  const iw = ih * 590 / 1280;
+  const ix = (pageW - iw) / 2;
+  doc.setLineWidth(0.3); doc.setDrawColor(0, 0, 0);
+  doc.rect(ix - 1, y - 1, iw + 2, ih + 2);
+  doc.addImage(img, "JPEG", ix, y, iw, ih);
+  y += ih + 6;
+  doc.setFont("helvetica", "italic"); doc.setFontSize(SZ.FOOTNOTE); bk();
+  const cl = doc.splitTextToSize(L.cap, cW - 10);
+  for (const c of cl) { doc.text(c, pageW / 2, y, { align: "center" }); y += 4.3; }
+}
 
 // ============================================================
 // FOOTER
