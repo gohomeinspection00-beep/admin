@@ -99,7 +99,7 @@ penuh di website utama (`/services/`).
    `index.html`. Biar `""` kalau tak nak lagu langsung — skrin intro masih
    jalan, cuma senyap.
 
-2. **Poster** — 5 daripada 13 poster sudah masuk (`img/poster/`).
+2. **Poster** — 10 daripada 13 poster sudah masuk (`img/poster/`).
    Untuk tambah lagi, letak fail dalam `website/img/poster/` dan
    senaraikan dalam `LANDING_POSTERS` dalam `index.html`:
    ```js
@@ -112,8 +112,12 @@ penuh di website utama (`/services/`).
    Tajuk dipapar dalam popup dan bertukar ikut bahasa. Kalau senarai ini
    kosong, **seksyen poster tersembunyi automatik** — tiada kotak kosong.
 
-   Masih belum ada: Defect Inspection, Portfolio, Lantai/Dinding/Siling,
-   Bumbung, Plumbing, Opening, Moisture, Elektrikal.
+   Masih belum ada: Pintu & Tingkap, Moisture Detector, Elektrikal
+   Inspection.
+
+   **Nota:** poster Defect Inspection asalnya tertulis
+   `www.gohomeinspection.asia` (domain lama). Baris itu telah ditampal
+   dan ditukar kepada `www.goxpert.my` terus pada gambar.
 
 Lepas tukar, jalankan `node build.js` semula untuk kemas kini `dist/`.
 
