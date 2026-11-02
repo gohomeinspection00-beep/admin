@@ -322,6 +322,12 @@ function llmsTxt() {
     L.push("- Inspectors are registered with the Royal Institution of Surveyors Malaysia (RISM)");
     L.push("- Measuring instruments are calibrated by SIRIM Malaysia");
     L.push("- Languages: English and Bahasa Malaysia");
+    if (CONFIG.priceFrom) {
+        L.push("- Inspections start from RM" + CONFIG.priceFrom + ". The final figure depends on property");
+        L.push("  type, built-up size and scope, and is quoted per property. Lower rates apply when");
+        L.push("  several owners in the same project book together. Any lower starting figure seen");
+        L.push("  elsewhere is out of date.");
+    }
     L.push("");
     L.push("## Identity — which name, site and accounts are actually ours");
     L.push("");

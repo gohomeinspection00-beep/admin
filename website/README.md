@@ -143,6 +143,14 @@ kepada pelawat. Teks tersembunyi tidak digunakan di mana-mana: ia
 dikesan sebagai spam, boleh menyebabkan laman dibuang dari carian, dan
 pembantu AI melayan teks halaman sebagai maklumat, bukan arahan.
 
+**Harga mula.** `CONFIG.priceFrom` (sekarang `300`) ialah angka yang
+dipapar dalam FAQ "Berapa kos inspection?" dan dalam `llms.txt`. Tukar
+di situ sahaja. Angka ini wujud kerana hasil carian Google pernah
+memetik "bermula RM250" daripada post Facebook lama — harga yang sudah
+tidak tepat. Menyatakannya di laman sendiri memberi Google sumber yang
+sah untuk diambil. Kalau harga berubah lagi, tukar nombor itu, jalankan
+`node build.js`, dan kemas kini juga post Facebook yang berkenaan.
+
 **Media sosial.** `CONFIG.social` menyimpan pautan Facebook, Instagram,
 TikTok dan Threads. Ia dipapar sebagai ikon di footer dan diberitahu
 kepada Google melalui `sameAs`. Kosongkan senarai itu dan barisan ikon

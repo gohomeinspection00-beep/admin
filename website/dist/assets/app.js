@@ -17,6 +17,10 @@ var CONFIG = {
        dan domain lama sudah tamat — jadi sesiapa yang mencarinya tidak
        menjumpai apa-apa. Baris ini menyambungkan dua nama itu. */
     formerName: "Go Home Inspection (GOHI)",
+    /* Harga mula. Angka ini muncul di FAQ (yang Google baca sebagai
+       FAQPage), di bahagian hubungi, dan dalam llms.txt. Tukar di sini
+       sahaja. Biar "" kalau tak mahu papar harga langsung. */
+    priceFrom: 300,
     /* Pautan sosial — dipapar di footer dan diberitahu kepada Google
        (sameAs) supaya ia tahu akaun ini milik syarikat yang sama. */
     social: [
@@ -2921,9 +2925,9 @@ var FAQ_ALL = [
            "Untuk unit standard, inspection biasanya 2 hingga 4 jam; rumah teres dan hartanah komersial mengambil masa lebih lama. Laporan penuh menyusul dalam beberapa hari bekerja — kami sahkan tempoh tepat dalam sebut harga anda."] },
     { cat: "process", home: true,
       en: ["How much does an inspection cost?",
-           "It depends on property type, size and the scope you need, so we quote per property rather than publishing a flat rate. Send us the property type, built-up area and location on WhatsApp and you will get a clear quotation — usually within one working hour."],
+           "Our inspections start from RM300. The final figure depends on property type, built-up size and the scope you need — a small apartment is not priced the same as a double-storey terrace or a commercial unit. Send us the property type, built-up area and location on WhatsApp and you will get a clear quotation, usually within one working hour. If several owners in the same project book together, the rate per unit is lower."],
       bm: ["Berapa kos inspection?",
-           "Ia bergantung jenis hartanah, saiz dan skop yang anda perlukan, jadi kami beri sebut harga ikut hartanah dan bukan kadar tetap. Hantar jenis hartanah, keluasan binaan dan lokasi melalui WhatsApp dan anda akan dapat sebut harga jelas — biasanya dalam satu jam bekerja."] },
+           "Inspection kami bermula dari RM300. Angka muktamad bergantung pada jenis hartanah, keluasan binaan dan skop yang anda perlukan — apartment kecil tidak sama harganya dengan rumah teres dua tingkat atau unit komersial. Hantar jenis hartanah, keluasan binaan dan lokasi melalui WhatsApp dan anda akan dapat sebut harga jelas, biasanya dalam satu jam bekerja. Kalau beberapa pemilik dalam projek yang sama tempah bersama, kadar seunit lebih rendah."] },
     { cat: "process",
       en: ["How do I book an inspection?",
            "Message us on WhatsApp or fill in the quotation form on this site. Tell us the property type, location, size and your preferred date — we confirm availability and price before anything is committed."],
