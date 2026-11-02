@@ -112,6 +112,13 @@ const ORG = {
     description: "Registered Building Surveyors providing building inspection, condition assessment and tribunal documentation across Malaysia.",
     slogan: "Inspection with integrity.",
     priceRange: "$$",
+    logo: { "@type": "ImageObject", url: SITE + "/img/icon-512.png", width: 512, height: 512 },
+    image: [SITE + "/img/gal/our-team-1.jpg", SITE + "/img/sirim-person.webp"],
+    openingHoursSpecification: [{
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        opens: "09:00", closes: "18:00"
+    }],
     areaServed: ["Johor", "Melaka", "Negeri Sembilan", "Selangor"].map(n => ({ "@type": "State", name: n })),
     knowsAbout: [
         "Home defect inspection", "Defect Liability Period (DLP)", "Pre-purchase property inspection",
@@ -285,6 +292,7 @@ function llmsTxt() {
     L.push("- [About us](" + SITE + "/about/)");
     L.push("- [Questions and answers](" + SITE + "/faq/)");
     L.push("- [Articles](" + SITE + "/blog/)");
+    L.push("- [For homeowners — new homes & sub-sale](" + SITE + "/pemilik-rumah/)");
     L.push("");
     L.push("## Articles");
     L.push("");
@@ -389,6 +397,10 @@ function copyDir(from, to) {
 
     /* gambar + fail muat turun (PDF dsb.) */
     copyDir(path.join(__dirname, "img"), path.join(OUT, "img"));
+    for (const f of ["favicon.ico", "site.webmanifest"]) {
+        const src = path.join(__dirname, f);
+        if (fs.existsSync(src)) fs.copyFileSync(src, path.join(OUT, f));
+    }
     if (fs.existsSync(path.join(__dirname, "files"))) {
         copyDir(path.join(__dirname, "files"), path.join(OUT, "files"));
     }
