@@ -2,8 +2,8 @@
 
 **Dua bentuk:**
 - `website/index.html` — satu fail, untuk edit & test cepat (klik dua kali, terus jalan)
-- `website/dist/` — laman siap terbit, 62 fail HTML berasingan
-  (31 page × 2 bahasa — lihat di bawah)
+- `website/dist/` — laman siap terbit, 66 fail HTML berasingan
+  (33 page × 2 bahasa — lihat di bawah)
 Berasingan sepenuhnya daripada app GoInspect di root repo.
 
 ## Status
@@ -20,7 +20,7 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Artikel penuh | `index.html#/blog/<slug>` cth `#/blog/dlp-guide` | ✅ Siap |
 | Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap (58 projek, 143 gambar) |
 | Servis (semua 16, ikut kategori) | `index.html#/services` | ✅ Siap — setiap kad ada gambar |
-| Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (16 servis) |
+| Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (18 servis) |
 | **Landing page pemilik rumah** | `index.html#/pemilik-rumah` | ✅ Siap (ada skrin intro + lagu) |
 
 ### Sub-page servis: kandungan penuh
@@ -43,8 +43,21 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Teknikal | Thermal Imaging | 6 kad nilai · 4 peringkat · 5 aplikasi · thermal reveal |
 | Teknikal | Rectification Defect | 6 kad nilai · 4 peringkat · 6 "cara salah vs cara betul" |
 | Teknikal | Tribunal | 6 kad nilai · 4 peringkat · 5 elemen pek bukti |
+| Komersial | Fire Safety Inspection | 6 kad nilai · 4 peringkat · 6 kawasan masalah |
+| Teknikal | Measured Drawing | 6 kad nilai · 4 peringkat · 6 sebab · butang borang Google |
 
-**Semua 16 servis kini ada kandungan penuh.**
+**Semua 18 servis ada kandungan penuh.**
+
+> **Fire Safety Inspection** sengaja menyatakan hadnya pada page itu
+> sendiri: ia pemeriksaan keadaan dan dokumentasi, **bukan** pensijilan
+> BOMBA dan bukan kelulusan pematuhan. Jangan buang ayat itu — ia
+> melindungi syarikat daripada dakwaan perkhidmatan terkawal yang tidak
+> dipegang.
+
+> **Measured Drawing** ialah satu-satunya servis yang ada butang borang.
+> Medan `form` dalam entri `SVC` menyimpan pautan Google Form; butang
+> "Isi borang sebut harga" muncul di kad tepi hanya untuk servis yang
+> ada medan itu.
 
 ## Home page — susunan seksyen
 

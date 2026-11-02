@@ -2028,3 +2028,5 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 }
 .foot-social a:hover { background: var(--primary); color: #fff; transform: translateY(-3px); }
 .foot-social svg { width: 19px; height: 19px; }
+.svc-form-btn { width: 100%; justify-content: center; margin-top: 0.7rem; gap: 0.5rem; }
+.svc-form-btn svg { width: 17px; height: 17px; }

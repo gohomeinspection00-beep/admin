@@ -191,6 +191,24 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://goxpert.my/services/fire-safety/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/fire-safety/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/fire-safety/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/fire-safety/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/services/measured-drawing/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/measured-drawing/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/measured-drawing/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/measured-drawing/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://goxpert.my/services/leak-detection/</loc>
     <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/leak-detection/"/>
     <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/leak-detection/"/>
@@ -465,6 +483,24 @@
     <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/electrical/"/>
     <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/electrical/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/electrical/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/fire-safety/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/fire-safety/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/fire-safety/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/fire-safety/"/>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/services/measured-drawing/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/measured-drawing/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/measured-drawing/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/services/measured-drawing/"/>
     <lastmod>2026-11-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>

@@ -209,6 +209,71 @@ var SVC = [
       get:  { en: ["Electrical test report with readings", "Safety issue list by severity", "Rectification recommendations"],
               bm: ["Laporan ujian elektrik dengan bacaan", "Senarai isu keselamatan ikut tahap", "Cadangan pembaikan"] } },
 
+    { slug: "fire-safety", cat: "commercial", img: "img/proj/supermarket-1.jpg",
+      gal: ["img/proj/supermarket-1.jpg", "img/proj/shoplot-1-1.jpg", "img/proj/bangunan-pasar-1.jpg", "img/proj/tadika-1.jpg"],
+      who:  { en: ["JMB / MC & building managers", "Shoplot & factory owners", "Before a BOMBA inspection"],
+              bm: ["JMB / MC & pengurus bangunan", "Pemilik kedai & kilang", "Sebelum pemeriksaan BOMBA"] },
+      tools: ["Laser Distance", "Thermal Camera", "Measuring Tape"],
+      name: { en: "Fire Safety Inspection", bm: "Fire Safety Inspection" },
+      tag:  { en: "Know what needs fixing before the authorities tell you.",
+              bm: "Tahu apa yang perlu dibaiki sebelum pihak berkuasa yang beritahu." },
+      desc: { en: "We inspect and document the condition of your building's fire safety provisions — escape routes, fire doors, extinguishers, hose reels, detection, emergency lighting and fire-rated compartmentation — and report what we find with photographic evidence. This is a condition inspection and documentation service. It is not a BOMBA certification and not a compliance approval; what it gives you is a clear, evidence-backed picture of what needs attention before an official inspection.",
+              bm: "Kami memeriksa dan mendokumenkan keadaan kelengkapan keselamatan kebakaran bangunan anda — laluan keluar kecemasan, pintu rintangan api, alat pemadam, hose reel, sistem pengesan, lampu kecemasan dan pengkompartmenan rintangan api — dan melaporkan apa yang kami temui dengan bukti bergambar. Ini perkhidmatan pemeriksaan keadaan dan dokumentasi. Ia bukan pensijilan BOMBA dan bukan kelulusan pematuhan; apa yang anda dapat ialah gambaran jelas, bersandarkan bukti, tentang apa yang perlu diberi perhatian sebelum pemeriksaan rasmi." },
+      inc:  { en: ["Escape routes — obstruction, width and access",
+                   "Fire doors — installation, self-closers, damage, seals",
+                   "Fire extinguishers — presence, placement, service date",
+                   "Hose reels & hydrants — access and physical condition",
+                   "Smoke detection & alarm system — presence and placement",
+                   "Emergency lighting & EXIT signage — presence and condition",
+                   "Compartmentation — unsealed service penetrations through fire-rated walls",
+                   "Fire appliance access — unobstructed approach routes"],
+              bm: ["Laluan keluar kecemasan — halangan, lebar dan akses",
+                   "Pintu rintangan api — pemasangan, penutup automatik, kerosakan, gasket",
+                   "Alat pemadam api — kehadiran, kedudukan, tarikh servis",
+                   "Hose reel & pili bomba — akses dan keadaan fizikal",
+                   "Sistem pengesan asap & penggera — kehadiran dan kedudukan",
+                   "Lampu kecemasan & papan tanda EXIT — kehadiran dan keadaan",
+                   "Pengkompartmenan — tembusan servis tidak dikedap menembusi dinding rintangan api",
+                   "Akses kenderaan bomba — laluan menghampiri tidak terhalang"] },
+      get:  { en: ["Condition report with photographic evidence for every finding",
+                   "Findings ranked by urgency, so you know what to fix first",
+                   "A clear note of what falls outside our scope and needs a registered competent person"],
+              bm: ["Laporan keadaan dengan bukti bergambar bagi setiap penemuan",
+                   "Penemuan disusun ikut keutamaan, jadi anda tahu apa yang perlu dibaiki dahulu",
+                   "Nota jelas tentang apa yang di luar skop kami dan perlukan orang kompeten berdaftar"] } },
+
+    { slug: "measured-drawing", cat: "technical", img: "img/svc/measured-drawing/1.jpg",
+      gal: ["img/svc/measured-drawing/1.jpg", "img/svc/measured-drawing/poster.jpg"],
+      who:  { en: ["Owners with no original drawings", "Renovation & extension submissions", "Building records for management"],
+              bm: ["Pemilik tanpa lukisan asal", "Permohonan renovation & sambungan", "Rekod bangunan untuk pengurusan"] },
+      tools: ["Laser Distance", "Measuring Tape", "L Square"],
+      /* Borang Google untuk kumpul maklumat sebut harga. Servis lain
+         tiada borang — butang ini muncul hanya bila "form" diisi. */
+      form: "https://docs.google.com/forms/d/e/1FAIpQLSeRQL0LjgH_ydN_JmfMCNRZKKGfJr8L3I6U362gM_WfdX-0TA/viewform",
+      name: { en: "Measured Drawing", bm: "Measured Drawing" },
+      tag:  { en: "Accurate drawings. A complete building record.",
+              bm: "Lukisan tepat. Rekod bangunan lengkap." },
+      desc: { en: "Many buildings have no usable drawings — lost, never issued, or long out of date after years of alterations. We measure the building as it actually stands today, using laser distance meters and LiDAR scanning where the job calls for it, and produce drawings you can rely on: for authority submission, for a renovation or extension, or simply as a proper record of what you own.",
+              bm: "Banyak bangunan tiada lukisan yang boleh digunakan — hilang, tidak pernah dikeluarkan, atau sudah lama tidak tepat selepas bertahun diubah suai. Kami mengukur bangunan mengikut keadaannya hari ini, menggunakan alat ukur laser dan imbasan LiDAR jika kerja itu memerlukannya, dan menghasilkan lukisan yang boleh anda pegang: untuk permohonan kepada pihak berkuasa, untuk renovation atau sambungan, atau sekadar sebagai rekod sebenar hartanah anda." },
+      inc:  { en: ["Landed homes, apartments and condominiums",
+                   "Shoplots and commercial buildings",
+                   "As-built drawings of the building as it stands",
+                   "Drawings prepared for authority submission",
+                   "Renovation and extension drawings",
+                   "LiDAR scanning and 3D plans where required"],
+              bm: ["Rumah landed, apartment dan kondominium",
+                   "Kedai dan bangunan komersial",
+                   "Lukisan as-built mengikut keadaan sebenar bangunan",
+                   "Lukisan disediakan untuk permohonan pihak berkuasa",
+                   "Lukisan renovation dan sambungan",
+                   "Imbasan LiDAR dan pelan 3D jika diperlukan"] },
+      get:  { en: ["Floor plans, elevations and sections in CAD and PDF",
+                   "A measured record of the building as it stands today",
+                   "Drawings suitable for submission, renovation or management records"],
+              bm: ["Pelan lantai, elevasi dan keratan dalam format CAD dan PDF",
+                   "Rekod berukur mengikut keadaan sebenar bangunan hari ini",
+                   "Lukisan sesuai untuk permohonan, renovation atau rekod pengurusan"] } },
+
     { slug: "leak-detection", cat: "technical", img: "img/svc/leak-detection/1.jpg",
       gal: ["img/svc/leak-detection/1.jpg", "img/svc/leak-detection/2.jpg", "img/svc/leak-detection/3.jpg", "img/svc/leak-detection/4.jpg", "img/svc/leak-detection/5.jpg"],
       who:  { en: ["Homes with damp stains", "Recurring leak problems"], bm: ["Rumah ada kesan lembap", "Masalah bocor berulang"] },
@@ -1417,6 +1482,130 @@ var DMS_GALLERY = ["img/dms/1.jpg", "img/dms/2.jpg", "img/dms/3.jpg", "img/dms/4
         ],
         toolsShowcase: base.toolsShowcase,
     };
+
+    /* ---------- Fire Safety Inspection ---------- */
+    SVC_EXTRAS["fire-safety"] = {
+        stats: [
+            { num: "8",   lbl: { en: "Areas Checked", bm: "Kawasan Diperiksa" } },
+            { num: "100%", lbl: { en: "Photo Evidence", bm: "Bukti Bergambar" } },
+            { num: "3",   lbl: { en: "Urgency Levels", bm: "Tahap Keutamaan" } },
+            { num: "0",   lbl: { en: "Repairs Sold", bm: "Pembaikian Dijual" } }
+        ],
+        sec: Object.assign({}, base.sec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "Find the Gaps Before an Official Inspection Does", bm: "Kenal Pasti Kelemahan Sebelum Pemeriksaan Rasmi" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages of a Fire Safety Inspection", bm: "4 Peringkat Pemeriksaan Keselamatan Kebakaran" },
+            dmsSub:   { en: "A walk-through, a record, and a prioritised list you can act on", bm: "Pemeriksaan menyeluruh, rekod, dan senarai berkeutamaan yang boleh anda tindak" },
+            scopeTag:   { en: "Inspection Scope", bm: "Skop Pemeriksaan" },
+            scopeTitle: { en: "6 Areas Where Problems Are Usually Found", bm: "6 Kawasan Di Mana Masalah Biasa Ditemui" },
+            scopeSub:   { en: "These are the items that most often fail on the day it matters", bm: "Inilah item yang paling kerap gagal pada hari ia diperlukan" },
+            lblDefect: { en: "What We Look For", bm: "Apa Yang Kami Cari" },
+            lblTools:  { en: "Why It Matters", bm: "Kenapa Ia Penting" }
+        }),
+        values: [
+            { icon: VICONS.check,  t: { en: "Evidence, Not Opinion", bm: "Bukti, Bukan Pendapat" }, d: { en: "Every finding carries a photograph and a location, so nothing is a matter of argument", bm: "Setiap penemuan disertakan gambar dan lokasi, jadi tiada apa yang boleh dipertikaikan" } },
+            { icon: VICONS.list,   t: { en: "Ranked by Urgency", bm: "Disusun Ikut Keutamaan" }, d: { en: "You know what must be fixed now and what can wait, so the budget goes to the right place", bm: "Anda tahu apa yang perlu dibaiki sekarang dan apa yang boleh tunggu, jadi bajet pergi ke tempat betul" } },
+            { icon: VICONS.shield, t: { en: "Honest About Our Limits", bm: "Jujur Tentang Had Kami" }, d: { en: "Anything requiring a registered competent person is named as such — we do not pretend otherwise", bm: "Apa-apa yang perlukan orang kompeten berdaftar dinyatakan sebagai itu — kami tidak berpura-pura sebaliknya" } },
+            { icon: VICONS.doc,    t: { en: "A Record You Can Hand Over", bm: "Rekod Yang Boleh Diserahkan" }, d: { en: "A written condition report for your committee, your owner or your insurer", bm: "Laporan keadaan bertulis untuk jawatankuasa, pemilik atau penanggung insurans anda" } },
+            { icon: VICONS.people, t: { en: "Useful for JMB and MC", bm: "Berguna Untuk JMB dan MC" }, d: { en: "Turns a vague worry into a funded, scheduled list of works", bm: "Menukar kebimbangan kabur kepada senarai kerja berjadual yang berbajet" } },
+            { icon: VICONS.money,  t: { en: "We Do Not Sell the Fix", bm: "Kami Tidak Menjual Pembaikian" }, d: { en: "We do not supply or install fire equipment, so there is nothing for us to over-specify", bm: "Kami tidak membekal atau memasang kelengkapan kebakaran, jadi tiada apa untuk kami lebihkan" } }
+        ],
+        dms: [
+            { t: { en: "Scope & Building Review", bm: "Semakan Skop & Bangunan" }, d: { en: "We agree the areas to cover and review any drawings or past reports you have", bm: "Kami persetujui kawasan yang dirangkumi dan semak lukisan atau laporan lepas yang anda ada" } },
+            { t: { en: "On-Site Walk-Through", bm: "Pemeriksaan Di Tapak" }, d: { en: "Every escape route, door, appliance and service penetration is checked and photographed", bm: "Setiap laluan keluar, pintu, kelengkapan dan tembusan servis diperiksa dan dirakam" } },
+            { t: { en: "Findings Recorded & Ranked", bm: "Penemuan Direkod & Disusun" }, d: { en: "Each item is logged with its location, photograph and urgency level", bm: "Setiap item direkod dengan lokasi, gambar dan tahap keutamaannya" } },
+            { t: { en: "Report & Walk-Through With You", bm: "Laporan & Penerangan Bersama Anda" }, d: { en: "We hand over the report and go through it, so your team knows exactly what to action first", bm: "Kami serahkan laporan dan terangkannya, supaya pasukan anda tahu apa perlu ditindak dahulu" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V8h12v13M10 21v-5h4v5"/></svg>',
+              t: { en: "Escape Routes", bm: "Laluan Keluar Kecemasan" }, s: { en: "The route out on the worst day", bm: "Laluan keluar pada hari terburuk" },
+              defects: { en: ["Corridors used for storage", "Exit doors locked or blocked", "Insufficient width", "Route not obvious without signage"], bm: ["Koridor dijadikan tempat simpanan", "Pintu keluar berkunci atau terhalang", "Lebar tidak mencukupi", "Laluan tidak jelas tanpa papan tanda"] },
+              tools: { en: ["A blocked route is the single most common and most dangerous finding"], bm: ["Laluan terhalang ialah penemuan paling biasa dan paling berbahaya"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><circle cx="16" cy="12" r="1"/></svg>',
+              t: { en: "Fire Doors", bm: "Pintu Rintangan Api" }, s: { en: "Only work when closed", bm: "Hanya berkesan bila tertutup" },
+              defects: { en: ["Self-closer removed or wedged open", "Damaged or missing intumescent seals", "Gaps too wide at the frame", "Ordinary door fitted in a fire-rated opening"], bm: ["Penutup automatik ditanggalkan atau disendal", "Gasket pengembang rosak atau hilang", "Jurang terlalu lebar pada kusen", "Pintu biasa dipasang pada bukaan rintangan api"] },
+              tools: { en: ["A wedged-open fire door gives the same protection as no door at all"], bm: ["Pintu rintangan api yang disendal memberi perlindungan sama seperti tiada pintu"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v4H9zM8 7h8l1 14H7z"/></svg>',
+              t: { en: "Extinguishers & Hose Reels", bm: "Alat Pemadam & Hose Reel" }, s: { en: "Present, reachable, in date", bm: "Ada, boleh dicapai, belum luput" },
+              defects: { en: ["Service date expired", "Unit missing from its bracket", "Blocked by furniture or stock", "Wrong type for the risk present"], bm: ["Tarikh servis sudah luput", "Unit hilang dari pemegangnya", "Terhalang perabot atau stok", "Jenis tidak sesuai dengan risiko di situ"] },
+              tools: { en: ["Equipment nobody can reach in five seconds is equipment you do not have"], bm: ["Kelengkapan yang tak boleh dicapai dalam lima saat sama seperti tiada"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>',
+              t: { en: "Detection & Alarm", bm: "Pengesan & Penggera" }, s: { en: "The warning that buys time", bm: "Amaran yang memberi masa" },
+              defects: { en: ["Detectors missing from enclosed areas", "Units painted over or covered", "Call points obstructed", "No evidence of routine testing"], bm: ["Pengesan tiada di kawasan tertutup", "Unit tercat atau tertutup", "Titik panggilan terhalang", "Tiada bukti ujian berkala"] },
+              tools: { en: ["Detection decides how much time everyone else gets"], bm: ["Pengesan menentukan berapa banyak masa yang orang lain dapat"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6M5 9h14l-1 12H6z"/></svg>',
+              t: { en: "Emergency Lighting & Signage", bm: "Lampu Kecemasan & Papan Tanda" }, s: { en: "When the power goes", bm: "Bila bekalan elektrik terputus" },
+              defects: { en: ["Fittings present but not functioning", "EXIT signs missing at turns", "Signage obscured by later works", "No illumination on stairs"], bm: ["Lampu ada tetapi tidak berfungsi", "Papan tanda EXIT tiada pada selekoh", "Papan tanda terlindung kerja kemudian", "Tiada pencahayaan di tangga"] },
+              tools: { en: ["In smoke and darkness, signage is the only thing people can follow"], bm: ["Dalam asap dan gelap, papan tanda sahaja yang boleh diikut orang"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v14H3z"/><path d="M9 5v14M15 5v14"/></svg>',
+              t: { en: "Compartmentation", bm: "Pengkompartmenan" }, s: { en: "The part nobody looks at", bm: "Bahagian yang tiada siapa periksa" },
+              defects: { en: ["Pipes and cables passing through fire-rated walls unsealed", "Holes left after later renovation works", "Ceiling voids open between units", "Fire-rated wall not carried to the slab above"], bm: ["Paip dan kabel menembusi dinding rintangan api tanpa kedap", "Lubang ditinggalkan selepas kerja ubah suai kemudian", "Ruang siling terbuka antara unit", "Dinding rintangan api tidak sampai ke lantai atas"] },
+              tools: { en: ["An unsealed penetration lets smoke travel the whole floor in minutes"], bm: ["Tembusan tidak dikedap membenarkan asap merebak seluruh tingkat dalam beberapa minit"] } }
+        ]
+    };
+
+    /* ---------- Measured Drawing ---------- */
+    SVC_EXTRAS["measured-drawing"] = {
+        stats: [
+            { num: "4",  lbl: { en: "Property Types", bm: "Jenis Hartanah" } },
+            { num: "6",  lbl: { en: "Drawing Outputs", bm: "Hasil Lukisan" } },
+            { num: "3D", lbl: { en: "LiDAR Scanning", bm: "Imbasan LiDAR" } },
+            { num: "2",  lbl: { en: "Formats: CAD & PDF", bm: "Format: CAD & PDF" } }
+        ],
+        sec: Object.assign({}, base.sec, {
+            valTag:   { en: "Why It Matters", bm: "Kenapa Ia Penting" },
+            valTitle: { en: "You Cannot Plan Around a Building You Have No Drawings Of", bm: "Anda Tak Boleh Merancang Untuk Bangunan Yang Tiada Lukisannya" },
+            dmsBadge: { en: "How It Works", bm: "Cara Ia Berfungsi" },
+            dmsTitle: { en: "4 Stages From Site to Drawing", bm: "4 Peringkat Dari Tapak Ke Lukisan" },
+            dmsSub:   { en: "Measured on site, drawn to scale, checked against the building", bm: "Diukur di tapak, dilukis mengikut skala, disemak semula dengan bangunan" },
+            scopeTag:   { en: "What We Draw", bm: "Apa Yang Kami Lukis" },
+            scopeSub:   { en: "The same survey serves different purposes — tell us which one you need", bm: "Ukuran yang sama melayani tujuan berbeza — beritahu kami yang mana anda perlukan" },
+            scopeTitle: { en: "6 Reasons Owners Ask For Measured Drawings", bm: "6 Sebab Pemilik Meminta Measured Drawing" },
+            lblDefect: { en: "Typical Situation", bm: "Keadaan Biasa" },
+            lblTools:  { en: "What You Get", bm: "Apa Yang Anda Dapat" }
+        }),
+        values: [
+            { icon: VICONS.doc,    t: { en: "Drawn From the Building, Not the Plan", bm: "Dilukis Dari Bangunan, Bukan Dari Pelan" }, d: { en: "We measure what is actually there today, including every alteration made over the years", bm: "Kami mengukur apa yang benar-benar ada hari ini, termasuk setiap pengubahsuaian selama ini" } },
+            { icon: VICONS.check,  t: { en: "Accurate Enough to Build From", bm: "Cukup Tepat Untuk Dijadikan Asas Kerja" }, d: { en: "Laser measurement and, where the job needs it, LiDAR scanning", bm: "Pengukuran laser dan, jika kerja itu memerlukan, imbasan LiDAR" } },
+            { icon: VICONS.home,   t: { en: "Any Property Type", bm: "Semua Jenis Hartanah" }, d: { en: "Landed homes, apartments and condominiums, shoplots and commercial buildings", bm: "Rumah landed, apartment dan kondominium, kedai dan bangunan komersial" } },
+            { icon: VICONS.list,   t: { en: "Ready for Submission", bm: "Sedia Untuk Permohonan" }, d: { en: "Prepared in the form authorities expect, so your application is not sent back", bm: "Disediakan dalam bentuk yang pihak berkuasa jangkakan, supaya permohonan anda tidak dikembalikan" } },
+            { icon: VICONS.system, t: { en: "CAD and PDF", bm: "CAD dan PDF" }, d: { en: "Editable files for your architect or contractor, and a readable set for everyone else", bm: "Fail boleh edit untuk arkitek atau kontraktor anda, dan set mudah dibaca untuk orang lain" } },
+            { icon: VICONS.chklist,t: { en: "A Record That Lasts", bm: "Rekod Yang Kekal" }, d: { en: "Once drawn, you never have to guess your own building's dimensions again", bm: "Sekali dilukis, anda tidak perlu meneka dimensi bangunan sendiri lagi" } }
+        ],
+        dms: [
+            { t: { en: "Brief & Site Visit", bm: "Taklimat & Lawatan Tapak" }, d: { en: "We confirm what the drawings are for, and what level of detail that purpose needs", bm: "Kami sahkan lukisan itu untuk apa, dan tahap perincian yang tujuan itu perlukan" } },
+            { t: { en: "Measurement On Site", bm: "Pengukuran Di Tapak" }, d: { en: "Laser distance measurement throughout, with LiDAR scanning where geometry is complex", bm: "Pengukuran jarak laser menyeluruh, dengan imbasan LiDAR jika geometri rumit" } },
+            { t: { en: "Drafting to Scale", bm: "Melukis Mengikut Skala" }, d: { en: "Floor plans, elevations and sections drawn up from the measured data", bm: "Pelan lantai, elevasi dan keratan dilukis dari data ukuran" } },
+            { t: { en: "Check & Handover", bm: "Semakan & Penyerahan" }, d: { en: "Drawings checked back against the building, then issued in CAD and PDF", bm: "Lukisan disemak semula dengan bangunan, kemudian diserahkan dalam CAD dan PDF" } }
+        ],
+        elements: [
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>',
+              t: { en: "No Original Drawings", bm: "Tiada Lukisan Asal" }, s: { en: "Lost, or never issued", bm: "Hilang, atau tidak pernah dikeluarkan" },
+              defects: { en: ["Developer never handed over a set", "Drawings lost over the years", "Only a sales brochure layout exists", "Building altered far beyond the original plan"], bm: ["Pemaju tak pernah serahkan satu set", "Lukisan hilang selama bertahun", "Hanya susun atur brosur jualan yang ada", "Bangunan diubah jauh dari pelan asal"] },
+              tools: { en: ["A complete measured set of the building as it stands today"], bm: ["Satu set berukur lengkap mengikut keadaan bangunan hari ini"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>',
+              t: { en: "Authority Submission", bm: "Permohonan Pihak Berkuasa" }, s: { en: "Renovation or legalisation", bm: "Renovation atau pengesahan" },
+              defects: { en: ["Submission needs existing-condition drawings", "Unapproved alteration to be regularised", "Local authority asked for a measured set", "Application returned for incomplete drawings"], bm: ["Permohonan perlukan lukisan keadaan sedia ada", "Pengubahsuaian tanpa kelulusan perlu dikemas kini", "Pihak berkuasa tempatan minta set berukur", "Permohonan dikembalikan kerana lukisan tak lengkap"] },
+              tools: { en: ["Drawings prepared in the form the submission requires"], bm: ["Lukisan disediakan dalam bentuk yang permohonan itu perlukan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>',
+              t: { en: "Renovation & Extension", bm: "Renovation & Sambungan" }, s: { en: "Before design starts", bm: "Sebelum reka bentuk bermula" },
+              defects: { en: ["Architect needs accurate existing dimensions", "Extension must tie into what is already built", "Structural openings to be planned", "Contractor quoting blind without drawings"], bm: ["Arkitek perlukan dimensi sedia ada yang tepat", "Sambungan kena padan dengan apa yang sudah dibina", "Bukaan struktur perlu dirancang", "Kontraktor beri sebut harga tanpa lukisan"] },
+              tools: { en: ["A reliable base drawing for your design team to work from"], bm: ["Lukisan asas yang boleh dipercayai untuk pasukan reka bentuk anda"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/></svg>',
+              t: { en: "As-Built Record", bm: "Rekod As-Built" }, s: { en: "What was actually built", bm: "Apa yang sebenarnya dibina" },
+              defects: { en: ["Built differently from the approved plan", "Variations never recorded", "Services routed differently on site", "Handover pack incomplete"], bm: ["Dibina berbeza dari pelan diluluskan", "Perubahan tidak pernah direkod", "Servis dipasang berlainan di tapak", "Pek penyerahan tidak lengkap"] },
+              tools: { en: ["An as-built set matching the building in front of you"], bm: ["Set as-built yang padan dengan bangunan di hadapan anda"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg>',
+              t: { en: "Building Records for Management", bm: "Rekod Bangunan Untuk Pengurusan" }, s: { en: "JMB, MC and asset owners", bm: "JMB, MC dan pemilik aset" },
+              defects: { en: ["No drawings for maintenance planning", "Common areas never documented", "Insurance or valuation needs a floor area", "Handover between managing agents"], bm: ["Tiada lukisan untuk rancangan penyelenggaraan", "Kawasan sepunya tidak pernah didokumen", "Insurans atau penilaian perlukan keluasan lantai", "Penyerahan antara ejen pengurusan"] },
+              tools: { en: ["A documented set the committee can keep and hand on"], bm: ["Satu set berdokumen yang jawatankuasa boleh simpan dan serahkan"] } },
+            { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>',
+              t: { en: "LiDAR Scan & 3D Plan", bm: "Imbasan LiDAR & Pelan 3D" }, s: { en: "Where geometry is complex", bm: "Bila geometri rumit" },
+              defects: { en: ["Irregular or heritage building", "Curved or sloping elements", "Large site, limited access time", "3D model required for design work"], bm: ["Bangunan tidak sekata atau warisan", "Elemen melengkung atau condong", "Tapak besar, masa akses terhad", "Model 3D diperlukan untuk kerja reka bentuk"] },
+              tools: { en: ["Point-cloud data and a 3D plan alongside the 2D set"], bm: ["Data point-cloud dan pelan 3D bersama set 2D"] } }
+        ]
+    };
 })();
 
 /* =========================================================
@@ -2401,6 +2590,7 @@ var I18N = {
         "nav.landing": "For Homeowners",
         "nav.group": "Group Booking",
         "foot.formerly": "Formerly",
+        "det.form": "Fill in the quotation form",
         "ab.nameT": "Same team, new name",
         "ab.nameB": "We previously operated as Go Home Inspection (GOHI) — same team, same company registration, same way of working. Our earlier website gohomeinspection.asia is no longer active, so if someone referred you to that name, you are in the right place.",
         "gb.badge": "Group Inspection",
@@ -2548,6 +2738,7 @@ var I18N = {
         "nav.landing": "Pemilik Rumah",
         "nav.group": "Tempahan Berkelompok",
         "foot.formerly": "Dahulunya",
+        "det.form": "Isi borang sebut harga",
         "ab.nameT": "Pasukan sama, nama baharu",
         "ab.nameB": "Dahulu kami beroperasi sebagai Go Home Inspection (GOHI) — pasukan yang sama, pendaftaran syarikat yang sama, cara kerja yang sama. Website lama kami gohomeinspection.asia sudah tidak aktif, jadi kalau ada orang rujuk nama itu kepada anda, anda memang di tempat yang betul.",
         "gb.badge": "Inspection Berkelompok",
@@ -2747,7 +2938,7 @@ var SERVICES_LIST = [
     "Commercial Building Inspection", "Electrical Inspection", "After Renovation Inspection",
     "Joint Inspection", "Maintenance Report", "Building Condition Assessment (BCA)",
     "Dilapidation Survey", "Building Monitoring", "Leak Detection", "Rectification Defect",
-    "Tribunal Consultation"
+    "Tribunal Consultation", "Fire Safety Inspection", "Measured Drawing"
 ];
 
 /* =========================================================
@@ -4373,6 +4564,10 @@ var FAQ_ALL = [
                             (s.get[lang] || s.get.en).map(function (x) { return "<li>" + x + "</li>"; }).join("") +
                         '</ul>' +
                         '<a class="btn" href="' + waLink(waMsg) + '" target="_blank" rel="noopener">' + t("det.cta") + '</a>' +
+                        (s.form ?
+                            '<a class="btn btn-secondary svc-form-btn" href="' + s.form + '" target="_blank" rel="noopener noreferrer">' +
+                            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg>' +
+                            '<span>' + t("det.form") + '</span></a>' : "") +
                         '<p class="svc-side-note">🕐 ' + t("det.note") + '</p>' +
                     '</div>' +
                     (related.length ?

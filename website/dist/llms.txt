@@ -69,6 +69,8 @@ company, so this section states plainly which ones are current.
 - [Commercial Building Inspection](https://goxpert.my/services/commercial-inspection/): Offices, shoplots and factories — inspected to scope.
 - [Maintenance Report / Condition Audit](https://goxpert.my/services/maintenance-audit/): Know what needs fixing first — and what it will cost.
 - [Electrical Inspection](https://goxpert.my/services/electrical/): Calibrated testing for a system you cannot see.
+- [Fire Safety Inspection](https://goxpert.my/services/fire-safety/): Know what needs fixing before the authorities tell you.
+- [Measured Drawing](https://goxpert.my/services/measured-drawing/): Accurate drawings. A complete building record.
 - [Leak Detection & Moisture Survey](https://goxpert.my/services/leak-detection/): Find the source — not just the stain.
 - [Thermal Imaging](https://goxpert.my/services/thermal-imaging/): See what the naked eye cannot.
 - [Rectification Defect](https://goxpert.my/services/rectification/): The right repair method, verified after the work.
