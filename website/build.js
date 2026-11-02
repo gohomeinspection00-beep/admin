@@ -62,7 +62,10 @@ const PAGES = [
       desc: "Thirty-nine answers about home defect inspection, DLP, sub-sale inspection, BCA, reports, pricing and tribunal support." },
     { out: "blog", key: "blog", hash: "#/blog",
       title: "Articles & Guides From the Field — GoXpert",
-      desc: "What we learn on site, written up so property owners can use it — no jargon, no sales pitch." }
+      desc: "What we learn on site, written up so property owners can use it — no jargon, no sales pitch." },
+    { out: "pemilik-rumah", key: "landing", hash: "#/pemilik-rumah",
+      title: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
+      desc: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." }
 ];
 SVC.forEach(s => PAGES.push({
     out: "services/" + s.slug, key: "service", param: s.slug, hash: "#/services/" + s.slug,
@@ -93,7 +96,7 @@ function realLinks(s) {
     return s
         .replace(/href="#\/services\/([a-z0-9-]+)"/g, 'href="/services/$1/"')
         .replace(/href="#\/blog\/([a-z0-9-]+)"/g, 'href="/blog/$1/"')
-        .replace(/href="#\/(services|projects|gallery|about|faq|blog)"/g, 'href="/$1/"')
+        .replace(/href="#\/(services|projects|gallery|about|faq|blog|pemilik-rumah)"/g, 'href="/$1/"')
         .replace(/href="#"/g, 'href="/"');
 }
 
@@ -220,7 +223,7 @@ ${FAVICON}
 ${jsonLd(page, faqNodes)}
 </script>
 </head>
-<body>
+<body${page.key === "landing" ? ' class="lp-on"' : ""}>
 ${parts.progress}
 ${parts.nav}
 ${parts.page}
@@ -347,7 +350,8 @@ function copyDir(from, to) {
         const parts = await page.evaluate(key => {
             const id = { home: "page-home", services: "page-services", service: "page-service",
                 projects: "page-projects", gallery: "page-gallery", about: "page-about",
-                faq: "page-faq", blog: "page-blog", article: "page-article" }[key];
+                faq: "page-faq", blog: "page-blog", article: "page-article",
+                landing: "page-landing" }[key];
             const el = document.getElementById(id);
             if (el) el.removeAttribute("hidden");
             /* buang kelas animasi "belum masuk skrin" supaya kandungan

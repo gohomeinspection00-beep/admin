@@ -2,7 +2,7 @@
 
 **Dua bentuk:**
 - `website/index.html` — satu fail, untuk edit & test cepat (klik dua kali, terus jalan)
-- `website/dist/` — laman siap terbit, 29 fail HTML berasingan (lihat di bawah)
+- `website/dist/` — laman siap terbit, 30 fail HTML berasingan (lihat di bawah)
 Berasingan sepenuhnya daripada app GoInspect di root repo.
 
 ## Status
@@ -20,6 +20,7 @@ Semua "page" berada dalam satu fail `index.html` (hash routing `#/...`):
 | Projek (senarai penuh + penapis) | `index.html#/projects` | ✅ Siap (58 projek, 143 gambar) |
 | Servis (semua 16, ikut kategori) | `index.html#/services` | ✅ Siap — setiap kad ada gambar |
 | Sub-page setiap servis | `index.html#/services/<slug>` cth `#/services/bca` | ✅ Siap (16 servis) |
+| **Landing page pemilik rumah** | `index.html#/pemilik-rumah` | ✅ Siap (ada skrin intro + lagu) |
 
 ### Sub-page servis: kandungan penuh
 
@@ -54,6 +55,49 @@ Untuk Siapa → Kenapa Kami → Projek (6) → Peralatan → Proses → Review �
 Seksyen thermal & drone guna gambar dari hosting `arleta.site`
 (atribut `data-src` dalam HTML). Kalau gambar gagal load, seksyen itu
 tersembunyi automatik.
+
+
+## Landing page "Untuk Pemilik Rumah"
+
+URL: `index.html#/pemilik-rumah` → terbit sebagai `goxpert.my/pemilik-rumah/`
+Ada dalam menu atas (**Untuk Pemilik Rumah** / *For Homeowners*) dan footer.
+Ini page untuk dikongsi terus (WhatsApp, Facebook, iklan) — bukan page jualan
+berasingan, ia duduk dalam website yang sama.
+
+**Beza dengan page lain:**
+- Navbar utama disembunyikan; ganti dengan bar ringkas sendiri —
+  ikon rumah **Laman Utama** (balik ke home) + butang tukar bahasa BM/EN.
+- Ada skrin **intro** penuh: pelawat tekan *Tekan untuk teruskan* /
+  *Tap to continue*, baru page terbuka dan lagu latar main.
+  (Pelayar tak izinkan lagu main sendiri tanpa pelawat tekan apa-apa —
+  sebab itulah butang intro ini wajib ada.)
+- Butang pembesar suara muncul di bawah kanan untuk senyapkan lagu.
+  Lagu berhenti automatik bila pelawat keluar ke page lain.
+
+**Susunan seksyen:** Intro → Hero → Statistik → 8 alat mengelilingi lencana
+SIRIM (animasi pecah keluar bila masuk skrin) → Sticker penanda defect
+(marquee berjalan + demo sticker) → Poster (popup, kalau ada) →
+4 kategori kerja → 4 risiko tanpa inspection → Senarai 15 servis + kad CTA
+WhatsApp → Kenapa Kami → Review pelanggan → Footer.
+
+### Dua fail yang anda kena isi sendiri
+
+1. **Lagu latar** — letak MP3 dalam `website/files/` dan tulis namanya di
+   `LANDING_MUSIC` dalam `index.html`:
+   ```js
+   var LANDING_MUSIC = "files/goxpert-chorus.mp3";
+   ```
+   Biar `""` kalau tak nak lagu — skrin intro masih jalan, cuma senyap.
+
+2. **Poster** — letak gambar dalam `website/img/poster/` dan senaraikan
+   dalam `LANDING_POSTERS`:
+   ```js
+   var LANDING_POSTERS = ["img/poster/1.jpg", "img/poster/2.jpg"];
+   ```
+   Kalau senarai ini kosong, **seksyen poster tersembunyi automatik** —
+   tiada kotak kosong terpapar.
+
+Lepas tukar, jalankan `node build.js` semula untuk kemas kini `dist/`.
 
 ## Untuk terbit (deploy) — folder `dist/`
 

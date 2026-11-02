@@ -2251,6 +2251,52 @@ var PROJECTS = [
 /* =========================================================
    KAMUS BAHASA (EN utama, BM terjemahan)
    ========================================================= */
+/* =========================================================
+   LANDING PAGE — "Untuk Pemilik Rumah" (#/pemilik-rumah)
+
+   LANDING_MUSIC  : lagu latar. Letak fail dalam folder files/
+                    dan isi nama di sini. Lagu hanya main SELEPAS
+                    pelawat tekan butang intro (peraturan pelayar).
+                    Biar kosong "" = tiada lagu.
+   LANDING_POSTERS: senarai poster untuk popup. Biar kosong =
+                    seksyen poster tersembunyi automatik.
+   ========================================================= */
+var LANDING_MUSIC = "files/goxpert-chorus.mp3";
+
+var LANDING_POSTERS = [
+    /* contoh: "img/poster/1.jpg", "img/poster/2.jpg", ... */
+];
+
+var LANDING_HIGH = [
+    { icon: "M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1zM9 22V12h6v10",
+      en: ["New Homes", "Find every defect while the DLP warranty still covers it"],
+      bm: ["Rumah Baru", "Kenal pasti kecacatan selagi warranty DLP masih ada"] },
+    { icon: "M3 9h18M9 21V9M21 5H3a1 1 0 00-1 1v13a1 1 0 001 1h18a1 1 0 001-1V6a1 1 0 00-1-1z",
+      en: ["Sub-Sale", "Check the real condition before or after buying a pre-owned home"],
+      bm: ["Sub-Sale", "Semak keadaan sebenar sebelum atau selepas beli rumah lama"] },
+    { icon: "M4 2h16v20H4zM9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M12 6h.01M12 10h.01",
+      en: ["Commercial", "Condition assessment for shops, offices and commercial buildings"],
+      bm: ["Komersial", "Penilaian keadaan untuk kedai, pejabat dan bangunan komersial"] },
+    { icon: "M12 3v18M5 8l7-5 7 5M4 14h5a3 3 0 010 6H4zM15 14h5a3 3 0 01-3 6h-2z",
+      en: ["Tribunal", "Complete documentation for Tribunal for Homebuyer Claims"],
+      bm: ["Tribunal", "Dokumentasi lengkap untuk kes Tribunal Tuntutan Pembeli Rumah"] }
+];
+
+var LANDING_PROB = [
+    { icon: "M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z",
+      en: ["Hidden Defects", "Leaks, structural cracks and electrical faults cannot be seen with the naked eye"],
+      bm: ["Kecacatan Tersembunyi", "Kebocoran, retak struktur dan masalah elektrikal tak dapat dilihat dengan mata kasar"] },
+    { icon: "M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6",
+      en: ["Unexpected Costs", "Repair bills can run into tens of thousands of ringgit after you move in"],
+      bm: ["Kos Tidak Dijangka", "Kos pembaikan boleh mencecah puluhan ribu ringgit selepas masuk rumah"] },
+    { icon: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M9 15l2 2 4-4",
+      en: ["No Proof to Claim", "Without a professional report it is hard to make the developer rectify anything"],
+      bm: ["Tiada Bukti Tuntutan", "Tanpa laporan profesional, sukar untuk menuntut pemaju membuat pembaikan"] },
+    { icon: "M12 3a9 9 0 109 9M12 7v5l3 2M19 3v4M17 5h4",
+      en: ["DLP Expires", "Once the Defect Liability Period ends, every repair becomes your expense"],
+      bm: ["Tempoh DLP Tamat", "Bila tempoh DLP tamat, setiap pembaikan jadi tanggungan anda sendiri"] }
+];
+
 var I18N = {
     en: {
         "nav.services": "Services", "nav.why": "Why Us", "nav.coverage": "Coverage",
@@ -2269,6 +2315,35 @@ var I18N = {
         "p1.s3": "Re-Inspection", "p1.s4": "After-Renovation Inspection", "p1.s5": "Joint Inspection with Developer",
         "pillar.more": "See More Services",
         "nav.projects": "Projects", "nav.about": "About", "nav.home": "Home",
+        "nav.landing": "For Homeowners",
+        "lp.introTag": "Professional Building Inspection",
+        "lp.introBtn": "Tap to continue",
+        "lp.introSub": "Peace of mind is waiting",
+        "lp.navHome": "Main Website",
+        "lp.heroBadge": "RISM-Registered Building Surveyor",
+        "lp.heroH1a": "Building Inspection ", "lp.heroH1b": "You Can Trust", "lp.heroH1c": " in Malaysia",
+        "lp.heroText": "We are registered Building Surveyors with SIRIM-calibrated equipment. From home inspection to tribunal support \u2014 inspection with integrity.",
+        "lp.heroBtn1": "WhatsApp Us Now", "lp.heroBtn2": "See Services",
+        "lp.statTitle": "Our Record So Far", "lp.statSub": "Real numbers from work on site",
+        "lp.toolTag": "Professional Equipment",
+        "lp.toolTitle": "Most of Our Instruments Are Calibrated by SIRIM",
+        "lp.toolCore": "Calibrated",
+        "lp.stkTag": "Marking System",
+        "lp.stkTitle": "Every Defect Is Tagged on Site",
+        "lp.stkSub": "Our custom stickers go on every defect, so the contractor can see exactly what needs fixing.",
+        "lp.demoCap": "A Major sticker placed on a structural crack",
+        "lp.posTitle": "Are You a Homeowner?",
+        "lp.posSub": "New home or sub-sale \u2014 see what we can do for you.",
+        "lp.posBtn": "Tap Here to View",
+        "lp.hlTag": "What We Do", "lp.hlTitle": "Professional Inspection for Every Need",
+        "lp.prTag": "The Risk of Skipping It", "lp.prTitle": "Why Do So Many Buyers Regret It?",
+        "lp.svTag": "Full Service List", "lp.svTitle": "Every Inspection Service We Offer",
+        "lp.svListTitle": "All Inspection Types",
+        "lp.ctaTitle": "Not Sure Which Service?",
+        "lp.ctaText": "Message us for a free consultation. We will help you pick the right one.",
+        "lp.ctaBtn": "WhatsApp Us",
+        "lp.ctaNote": "Reply within 1 working hour",
+        "lp.sample": "See a real sample report (PDF)",
         "faq.more": "More Questions & Answers",
         "nav.blog": "Articles", "nav.gallery": "Gallery",
         "hth.tag": "Latest Technology", "hth.title": "Thermal Imaging Reveals Hidden Problems",
@@ -2359,6 +2434,35 @@ var I18N = {
         "p1.s3": "Re-Inspection", "p1.s4": "Inspection Selepas Renovation", "p1.s5": "Joint Inspection Bersama Pemaju",
         "pillar.more": "Lihat Lebih Banyak Servis",
         "nav.projects": "Projek", "nav.about": "Tentang Kami", "nav.home": "Utama",
+        "nav.landing": "Untuk Pemilik Rumah",
+        "lp.introTag": "Building Inspection Profesional",
+        "lp.introBtn": "Tekan untuk teruskan",
+        "lp.introSub": "Ketenangan menanti anda",
+        "lp.navHome": "Laman Utama",
+        "lp.heroBadge": "Building Surveyor Berdaftar RISM",
+        "lp.heroH1a": "Pakar Inspection Bangunan ", "lp.heroH1b": "Yang Dipercayai", "lp.heroH1c": " Di Malaysia",
+        "lp.heroText": "Kami Building Surveyor berdaftar dengan peralatan yang dikalibrasi SIRIM. Dari inspection rumah hingga sokongan kes tribunal \u2014 Inspection Dengan Integriti.",
+        "lp.heroBtn1": "WhatsApp Kami Sekarang", "lp.heroBtn2": "Lihat Servis",
+        "lp.statTitle": "Rekod Kami Setakat Ini", "lp.statSub": "Angka sebenar dari kerja di tapak",
+        "lp.toolTag": "Peralatan Profesional",
+        "lp.toolTitle": "Kebanyakan Peralatan Kami Dikalibrasi Oleh SIRIM",
+        "lp.toolCore": "Calibrated",
+        "lp.stkTag": "Sistem Penandaan",
+        "lp.stkTitle": "Setiap Kecacatan Ditanda Di Tapak",
+        "lp.stkSub": "Sticker khas kami melekat pada setiap kecacatan, jadi kontraktor nampak dengan jelas apa yang perlu dibaiki.",
+        "lp.demoCap": "Contoh penggunaan sticker Major pada kecacatan retak",
+        "lp.posTitle": "Anda Pemilik Rumah?",
+        "lp.posSub": "Sama ada rumah baru atau sub-sale, lihat apa yang kami tawarkan untuk anda.",
+        "lp.posBtn": "Klik Sini Untuk Lihat",
+        "lp.hlTag": "Apa Yang Kami Buat", "lp.hlTitle": "Inspection Profesional Untuk Setiap Keperluan",
+        "lp.prTag": "Risiko Tanpa Inspection", "lp.prTitle": "Kenapa Ramai Pembeli Menyesal?",
+        "lp.svTag": "Servis Lengkap", "lp.svTitle": "Senarai Servis Inspection Kami",
+        "lp.svListTitle": "Semua Jenis Inspection",
+        "lp.ctaTitle": "Tak Pasti Servis Mana?",
+        "lp.ctaText": "Hubungi kami untuk konsultasi percuma. Kami bantu pilihkan servis yang sesuai.",
+        "lp.ctaBtn": "WhatsApp Kami",
+        "lp.ctaNote": "Balasan dalam 1 jam bekerja",
+        "lp.sample": "Lihat contoh laporan sebenar (PDF)",
         "faq.more": "Lagi Soalan & Jawapan",
         "nav.blog": "Artikel", "nav.gallery": "Galeri",
         "hth.tag": "Teknologi Terkini", "hth.title": "Thermal Imaging Mendedahkan Masalah Tersembunyi",
@@ -2779,7 +2883,10 @@ var FAQ_ALL = [
         var heroTitle = document.getElementById("heroTitle");
         if (heroTitle) heroTitle.innerHTML =
             t("hero.title.pre") + '<span class="highlight">' + t("hero.title.hl") + "</span>";
-        document.getElementById("langToggle").textContent = lang === "en" ? "BM" : "EN";
+        var langTxt = lang === "en" ? "BM" : "EN";
+        document.getElementById("langToggle").textContent = langTxt;
+        var lpLang = document.getElementById("lpLang");
+        if (lpLang) lpLang.textContent = langTxt;
     }
 
     /* ---------- Render kandungan dinamik ---------- */
@@ -3027,6 +3134,208 @@ var FAQ_ALL = [
             '</div></section>';
     }
 
+
+    /* ================================================================
+       LANDING PAGE — "Untuk Pemilik Rumah" (#/pemilik-rumah)
+       ================================================================ */
+    var lpIntroShown = false, lpBuilt = false, lpMusicEl = null;
+
+    /* kedudukan 8 alat mengelilingi bulatan SIRIM (unit, didarab --rx/--ry) */
+    var LP_SLOTS = [[-1,-0.55],[-0.62,-1],[0.62,-1],[1,-0.55],[1,0.55],[0.62,1],[-0.62,1],[-1,0.55]];
+
+    function lpStopMusic() {
+        if (lpMusicEl) { try { lpMusicEl.pause(); } catch (e) {} }
+        var m = document.getElementById("lpMute");
+        if (m) m.classList.remove("on");
+    }
+
+    function renderLandingPage() {
+        var page = document.getElementById("page-landing");
+        if (!page) return;
+
+        /* ---- alat ---- */
+        var scene = document.getElementById("lpToolsScene");
+        if (scene) {
+            scene.querySelectorAll(".lp-tool").forEach(function (x) { x.remove(); });
+            EQUIPMENT.forEach(function (e, i) {
+                var sl = LP_SLOTS[i % LP_SLOTS.length];
+                var d = document.createElement("span");
+                d.className = "lp-tool";
+                d.style.setProperty("--x", sl[0]);
+                d.style.setProperty("--y", sl[1]);
+                d.style.transitionDelay = (0.06 * i) + "s";
+                d.innerHTML = '<img src="' + e.img + '" alt="' + e.en + '" loading="lazy" ' +
+                              'decoding="async" onerror="this.closest(\'.lp-tool\').remove()">' +
+                              '<span>' + (e[lang] || e.en) + '</span>';
+                scene.appendChild(d);
+            });
+        }
+
+        /* ---- sticker berjalan (dua salinan untuk gelung mulus) ---- */
+        var stk = document.getElementById("lpStkTrack");
+        var stickers = (SVC_EXTRAS["home-defect"] || {}).stickers || [];
+        if (stk && stickers.length) {
+            var one = stickers.map(function (x) {
+                return '<span class="lp-stk"><img src="' + tcSrc(x.img) + '" alt="' + x.label +
+                       '" loading="lazy" decoding="async" onerror="this.closest(\'.lp-stk\').remove()">' +
+                       '<span>' + x.label + '</span></span>';
+            }).join("");
+            stk.innerHTML = one + one;
+        }
+
+        /* ---- review ---- */
+        var rt = document.getElementById("lpRevTrack"), rd = document.getElementById("lpRevDots");
+        if (rt && rd && !rt.childElementCount) {
+            var h = "", dh = "";
+            for (var i = 1; i <= CONFIG.reviewCount; i++) {
+                h += '<div class="review-slide"><img src="img/review/' + i + '.jpg" alt="Client review ' + i +
+                     '" loading="lazy" decoding="async"></div>';
+                dh += '<span class="review-dot' + (i === 1 ? " active" : "") + '" data-i="' + (i - 1) + '"></span>';
+            }
+            rt.innerHTML = h; rd.innerHTML = dh;
+            lpCarousel(rt, rd, document.getElementById("lpRevPrev"), document.getElementById("lpRevNext"), CONFIG.reviewCount);
+        }
+
+        /* ---- kad kategori & risiko ---- */
+        var hg = document.getElementById("lpHighGrid");
+        if (hg) hg.innerHTML = LANDING_HIGH.map(function (c) {
+            var d = c[lang] || c.en;
+            return '<div class="lp-high-card"><div class="lp-high-ico">' + svgIcon(c.icon) +
+                   '</div><h3>' + d[0] + '</h3><p>' + d[1] + '</p></div>';
+        }).join("");
+        var pg = document.getElementById("lpProbGrid");
+        if (pg) pg.innerHTML = LANDING_PROB.map(function (c) {
+            var d = c[lang] || c.en;
+            return '<div class="lp-prob-card"><div class="lp-prob-ico">' + svgIcon(c.icon) +
+                   '</div><h4>' + d[0] + '</h4><p>' + d[1] + '</p></div>';
+        }).join("");
+
+        /* ---- senarai servis & kenapa kami ---- */
+        var sl = document.getElementById("lpSvcList");
+        if (sl) sl.innerHTML = SERVICES_LIST.map(function (x) {
+            return '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                   '<path d="M20 6L9 17l-5-5"/></svg>' + x + '</li>';
+        }).join("");
+        var wg = document.getElementById("lpWhyGrid");
+        if (wg) wg.innerHTML = WHYUS.map(function (w) {
+            var d = w[lang] || w.en;
+            return '<div class="why-card"><div class="why-icon">' + svgIcon(w.icon) +
+                   '</div><h4>' + d[0] + '</h4><p>' + d[1] + '</p></div>';
+        }).join("");
+
+        /* ---- poster ---- */
+        lpPosters();
+
+        /* ---- animasi masuk skrin ---- */
+        lpObserve();
+
+        /* ---- intro + lagu (sekali setiap muat page) ---- */
+        if (!lpIntroShown) { lpIntroShown = true; lpIntro(); }
+        if (!lpBuilt) { lpBuilt = true; }
+    }
+
+    /* ---------- Carousel ringkas (review landing) ---------- */
+    function lpCarousel(track, dots, prev, next, total) {
+        var cur = 0, timer = null;
+        function go(i) {
+            cur = (i + total) % total;
+            track.style.transform = "translateX(-" + cur * 100 + "%)";
+            dots.querySelectorAll(".review-dot").forEach(function (d, j) {
+                d.classList.toggle("active", j === cur);
+            });
+        }
+        function start() { stop(); timer = setInterval(function () { go(cur + 1); }, 5000); }
+        function stop() { if (timer) clearInterval(timer); }
+        if (prev) prev.addEventListener("click", function () { go(cur - 1); start(); });
+        if (next) next.addEventListener("click", function () { go(cur + 1); start(); });
+        dots.addEventListener("click", function (e) {
+            var d = e.target.closest(".review-dot");
+            if (d) { go(parseInt(d.getAttribute("data-i"), 10)); start(); }
+        });
+        var x0 = null;
+        track.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; stop(); }, { passive: true });
+        track.addEventListener("touchend", function (e) {
+            if (x0 === null) return;
+            var dx = e.changedTouches[0].clientX - x0;
+            if (Math.abs(dx) > 45) go(cur + (dx < 0 ? 1 : -1));
+            x0 = null; start();
+        });
+        start();
+    }
+
+    /* ---------- Poster popup ---------- */
+    function lpPosters() {
+        var sec = document.getElementById("lpPosterCta");
+        if (!sec) return;
+        if (!window.LANDING_POSTERS || !LANDING_POSTERS.length) { sec.style.display = "none"; return; }
+        sec.style.display = "";
+        var btn = document.getElementById("lpPosterBtn");
+        if (btn && !btn.dataset.wired) {
+            btn.dataset.wired = "1";
+            btn.addEventListener("click", function () {
+                lbOpenItems(LANDING_POSTERS.map(function (p, i) {
+                    return { src: tcSrc(p), label: t("lp.posTitle") + " " + (i + 1) + "/" + LANDING_POSTERS.length };
+                }), 0);
+            });
+        }
+    }
+
+    /* ---------- Skrin intro + lagu ---------- */
+    function lpIntro() {
+        var intro = document.getElementById("lpIntro");
+        var btn = document.getElementById("lpIntroBtn");
+        var mute = document.getElementById("lpMute");
+        if (!intro || !btn) return;
+        document.body.classList.add("lp-intro-on", "lp-lock");
+
+        function speaker(on) {
+            return on
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+        }
+
+        btn.addEventListener("click", function () {
+            intro.classList.add("gone");
+            document.body.classList.remove("lp-lock");
+            setTimeout(function () { document.body.classList.remove("lp-intro-on"); }, 800);
+
+            if (!window.LANDING_MUSIC) return;
+            var a = document.getElementById("lpMusic");
+            if (!a) return;
+            lpMusicEl = a;
+            a.src = LANDING_MUSIC;
+            a.volume = 0.3;
+            var p = a.play();
+            if (p && p.then) {
+                p.then(function () {
+                    if (!mute) return;
+                    mute.classList.add("on");
+                    mute.innerHTML = speaker(true);
+                    mute.onclick = function () {
+                        a.muted = !a.muted;
+                        mute.innerHTML = speaker(!a.muted);
+                    };
+                }).catch(function () { /* fail lagu tiada — senyap sahaja */ });
+            }
+        }, { once: true });
+    }
+
+    /* ---------- Animasi bila masuk skrin ---------- */
+    var lpIO = null;
+    function lpObserve() {
+        if (!("IntersectionObserver" in window)) {
+            document.querySelectorAll(".lp-tools-scene, #lpDemo, .lp-stat, .lp-high-card, .lp-prob-card")
+                .forEach(function (el) { el.classList.add("in"); });
+            return;
+        }
+        if (lpIO) lpIO.disconnect();
+        lpIO = new IntersectionObserver(function (es) {
+            es.forEach(function (e) { e.target.classList.toggle("in", e.isIntersecting); });
+        }, { threshold: 0.2, rootMargin: "-5% 0px -10% 0px" });
+        document.querySelectorAll(".lp-tools-scene, #lpDemo, .lp-stat, .lp-high-card, .lp-prob-card")
+            .forEach(function (el) { lpIO.observe(el); });
+    }
+
     /* ---------- Page FAQ penuh (#/faq) ---------- */
     var faqFilter = "all";
     function renderFaqPage() {
@@ -3086,7 +3395,8 @@ var FAQ_ALL = [
     /* ---------- Pautan WhatsApp ---------- */
     function applyWaLinks() {
         var link = waLink(t("wa.default"));
-        ["heroWa", "finalWa", "whatsappFloat", "contactWa", "footWa", "faqWa"].forEach(function (id) {
+        ["heroWa", "finalWa", "whatsappFloat", "contactWa", "footWa", "faqWa",
+         "lpWa1", "lpWa2", "lpWa3", "lpWa4"].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.href = link;
         });
@@ -3125,11 +3435,16 @@ var FAQ_ALL = [
     });
 
     /* ---------- Tukar bahasa ---------- */
-    document.getElementById("langToggle").addEventListener("click", function () {
+    function switchLang() {
         lang = lang === "en" ? "bm" : "en";
         localStorage.setItem("gx_lang", lang);
         renderAll();
-    });
+    }
+    document.getElementById("langToggle").addEventListener("click", switchLang);
+    (function () {
+        var b = document.getElementById("lpLang");
+        if (b) b.addEventListener("click", switchLang);
+    })();
 
     /* ---------- Kad servis: 3 gambar terkeluar di belakang ----------
        Desktop: bila mouse atas kad.
@@ -4177,7 +4492,7 @@ var FAQ_ALL = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -4186,7 +4501,8 @@ var FAQ_ALL = [
         var pageKey = "home", param = null, anchor = null;
         if (h.indexOf("#/") === 0) {
             var parts = h.slice(2).split("/");
-            if (parts[0] === "projects") pageKey = "projects";
+            if (parts[0] === "pemilik-rumah") pageKey = "landing";
+            else if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
             else if (parts[0] === "faq") pageKey = "faq";
             else if (parts[0] === "blog" && parts[1] && BLOG_BY_SLUG[parts[1]]) { pageKey = "article"; param = parts[1]; }
@@ -4216,6 +4532,9 @@ var FAQ_ALL = [
         if (pageKey === "blog") renderBlogPage();
         if (pageKey === "gallery") renderGalleryPage();
         if (pageKey === "article") renderArticlePage(param);
+        if (pageKey === "landing") renderLandingPage();
+        document.body.classList.toggle("lp-on", pageKey === "landing");
+        if (pageKey !== "landing") lpStopMusic();
 
         if (!skipScroll) {
             if (pageKey !== "home") {
@@ -4231,6 +4550,7 @@ var FAQ_ALL = [
             var key = a.getAttribute("data-nav");
             a.classList.toggle("active",
                 (key === "home" && pageKey === "home") ||
+                (key === "landing" && pageKey === "landing") ||
                 (key === "projects" && pageKey === "projects") ||
                 (key === "about" && pageKey === "about") ||
                 (key === "faq" && pageKey === "faq") ||
