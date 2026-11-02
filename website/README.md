@@ -129,6 +129,20 @@ masih merujuk nama itu; sesiapa yang mencarinya tidak menjumpai apa-apa.
 Home Inspection (GOHI)" di footer, dan nama itu turut dimasukkan ke
 dalam `alternateName` JSON-LD supaya Google mengaitkan kedua-dua nama.
 
+**Pengenalan untuk mesin.** `dist/llms.txt` kini ada bahagian
+**Identity** yang menyatakan dengan jelas: nama lama dan nama baharu
+ialah syarikat yang sama, domain lama sudah tamat dan tidak lagi di
+bawah kawalan syarikat, serta senarai akaun sosial, telefon dan emel
+yang rasmi. Ini maklumat fakta yang boleh disemak — bukan arahan
+tersembunyi — dan inilah yang membantu enjin carian serta pembantu AI
+membezakan akaun semasa daripada yang lama. `robots.txt` menunjuk ke
+fail itu.
+
+Page Tentang Kami juga memaparkan nota yang sama secara **nampak**
+kepada pelawat. Teks tersembunyi tidak digunakan di mana-mana: ia
+dikesan sebagai spam, boleh menyebabkan laman dibuang dari carian, dan
+pembantu AI melayan teks halaman sebagai maklumat, bukan arahan.
+
 **Media sosial.** `CONFIG.social` menyimpan pautan Facebook, Instagram,
 TikTok dan Threads. Ia dipapar sebagai ikon di footer dan diberitahu
 kepada Google melalui `sameAs`. Kosongkan senarai itu dan barisan ikon

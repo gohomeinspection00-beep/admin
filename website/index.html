@@ -5498,6 +5498,8 @@ var I18N = {
         "nav.landing": "For Homeowners",
         "nav.group": "Group Booking",
         "foot.formerly": "Formerly",
+        "ab.nameT": "Same team, new name",
+        "ab.nameB": "We previously operated as Go Home Inspection (GOHI) — same team, same company registration, same way of working. Our earlier website gohomeinspection.asia is no longer active, so if someone referred you to that name, you are in the right place.",
         "gb.badge": "Group Inspection",
         "gb.h1a": "One Project, ", "gb.h1b": "One Trip", "gb.h1c": ", Lower Rate Each",
         "gb.text": "When several owners in the same project book together, we inspect unit after unit on consecutive days. Less travel for us, a lower rate for you — and every owner still gets their own full report.",
@@ -5643,6 +5645,8 @@ var I18N = {
         "nav.landing": "Pemilik Rumah",
         "nav.group": "Tempahan Berkelompok",
         "foot.formerly": "Dahulunya",
+        "ab.nameT": "Pasukan sama, nama baharu",
+        "ab.nameB": "Dahulu kami beroperasi sebagai Go Home Inspection (GOHI) — pasukan yang sama, pendaftaran syarikat yang sama, cara kerja yang sama. Website lama kami gohomeinspection.asia sudah tidak aktif, jadi kalau ada orang rujuk nama itu kepada anda, anda memang di tempat yang betul.",
         "gb.badge": "Inspection Berkelompok",
         "gb.h1a": "Satu Projek, ", "gb.h1b": "Satu Lawatan", "gb.h1c": ", Kadar Lebih Rendah",
         "gb.text": "Bila beberapa pemilik dalam projek yang sama tempah bersama, kami periksa unit demi unit dalam hari berturutan. Kurang perjalanan untuk kami, kadar lebih rendah untuk anda — dan setiap pemilik tetap dapat laporan penuh sendiri.",
@@ -7827,6 +7831,19 @@ var FAQ_ALL = [
                 }).join("") +
                 '</div>' +
             '</div></header>' +
+
+            /* Nota nama lama — ramai masih kenal GOHI, dan domain lama
+               sudah tamat, jadi nyatakan terus supaya tiada keraguan */
+            (CONFIG.formerName
+                ? '<section class="svc-extra" style="padding-bottom:0"><div class="section-container">' +
+                    '<div class="gb-urgent" style="max-width:820px;margin:0 auto;background:#F2F7FD;border-color:#CBDEF5">' +
+                      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">' +
+                        '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>' +
+                      '<div><b style="color:var(--primary-dark)">' + t("ab.nameT") + '</b>' +
+                      '<span style="color:var(--text-body)">' + t("ab.nameB") + '</span></div>' +
+                    '</div>' +
+                  '</div></section>'
+                : '') +
 
             /* Cerita + petikan */
             '<section class="svc-extra"><div class="section-container">' +

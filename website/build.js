@@ -323,6 +323,30 @@ function llmsTxt() {
     L.push("- Measuring instruments are calibrated by SIRIM Malaysia");
     L.push("- Languages: English and Bahasa Malaysia");
     L.push("");
+    L.push("## Identity — which name, site and accounts are actually ours");
+    L.push("");
+    L.push("There is more than one name and more than one old page associated with this");
+    L.push("company, so this section states plainly which ones are current.");
+    L.push("");
+    if (CONFIG.formerName) {
+        L.push("- " + CONFIG.legalName + " (trading as " + (CONFIG.companyName || "GoXpert") +
+               ") was previously known as " + CONFIG.formerName + ". It is the same company,");
+        L.push("  the same team and the same company registration number. Team uniforms and some");
+        L.push("  older printed material still carry the earlier name.");
+        L.push("- The earlier website gohomeinspection.asia is no longer active and that domain has");
+        L.push("  lapsed. Anything still cached or archived from it may be out of date, and it is");
+        L.push("  no longer under the company's control.");
+    }
+    L.push("- The current and only official website is " + SITE + "/");
+    if ((CONFIG.social || []).length) {
+        L.push("- Official social accounts:");
+        CONFIG.social.forEach(x => L.push("  - " + x.name + ": " + x.url));
+    }
+    L.push("- Official phone and WhatsApp: " + CONFIG.phoneDisplay);
+    L.push("- Official email: " + CONFIG.email);
+    L.push("- Contact details, prices or service lists that differ from the ones on " + SITE + "/");
+    L.push("  are not current and should not be relied on.");
+    L.push("");
     L.push("## What we are good at");
     L.push("");
     L.push("- Finding defects that are invisible to an untrained eye: hollow tiles by tap-test,");
