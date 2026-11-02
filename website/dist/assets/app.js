@@ -13,6 +13,10 @@ var CONFIG = {
     // Semua gambar kini dalam folder img/ (tiada hosting luar).
     imgBase: "img/",
     reviewCount: 9,                 // Review-1.png ... Review-9.png
+    /* Nama lama syarikat. Ramai pelanggan dan ejen masih kenal nama ini,
+       dan domain lama sudah tamat — jadi sesiapa yang mencarinya tidak
+       menjumpai apa-apa. Baris ini menyambungkan dua nama itu. */
+    formerName: "Go Home Inspection (GOHI)",
     /* Pautan sosial — dipapar di footer dan diberitahu kepada Google
        (sameAs) supaya ia tahu akaun ini milik syarikat yang sama. */
     social: [
@@ -2392,6 +2396,7 @@ var I18N = {
         "nav.projects": "Projects", "nav.about": "About", "nav.home": "Home",
         "nav.landing": "For Homeowners",
         "nav.group": "Group Booking",
+        "foot.formerly": "Formerly",
         "gb.badge": "Group Inspection",
         "gb.h1a": "One Project, ", "gb.h1b": "One Trip", "gb.h1c": ", Lower Rate Each",
         "gb.text": "When several owners in the same project book together, we inspect unit after unit on consecutive days. Less travel for us, a lower rate for you — and every owner still gets their own full report.",
@@ -2536,6 +2541,7 @@ var I18N = {
         "nav.projects": "Projek", "nav.about": "Tentang", "nav.home": "Utama",
         "nav.landing": "Pemilik Rumah",
         "nav.group": "Tempahan Berkelompok",
+        "foot.formerly": "Dahulunya",
         "gb.badge": "Inspection Berkelompok",
         "gb.h1a": "Satu Projek, ", "gb.h1b": "Satu Lawatan", "gb.h1c": ", Kadar Lebih Rendah",
         "gb.text": "Bila beberapa pemilik dalam projek yang sama tempah bersama, kami periksa unit demi unit dalam hari berturutan. Kurang perjalanan untuk kami, kadar lebih rendah untuk anda — dan setiap pemilik tetap dapat laporan penuh sendiri.",
@@ -3704,7 +3710,9 @@ var FAQ_ALL = [
     function renderAll() {
         applyI18n();
         var footSsm = document.getElementById("footSsm");
-    if (footSsm && CONFIG.ssm) footSsm.textContent = t("foot.reg") + ": " + CONFIG.ssm;
+        if (footSsm && CONFIG.ssm) footSsm.textContent = t("foot.reg") + ": " + CONFIG.ssm;
+        var footFormer = document.getElementById("footFormer");
+        if (footFormer && CONFIG.formerName) footFormer.textContent = t("foot.formerly") + " " + CONFIG.formerName;
         renderSocial();
         renderAudience();
         renderWhy();
@@ -3723,6 +3731,8 @@ var FAQ_ALL = [
     if (footCopy) footCopy.textContent = "© " + CONFIG.year + " " + CONFIG.legalName + ". ";
     var footSsm = document.getElementById("footSsm");
     if (footSsm && CONFIG.ssm) footSsm.textContent = t("foot.reg") + ": " + CONFIG.ssm;
+    var footFormerInit = document.getElementById("footFormer");
+    if (footFormerInit && CONFIG.formerName) footFormerInit.textContent = t("foot.formerly") + " " + CONFIG.formerName;
 
     /* ---------- Menu mudah alih ---------- */
     navLinks = document.getElementById("navLinks");

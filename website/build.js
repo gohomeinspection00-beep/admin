@@ -146,7 +146,7 @@ const ORG = {
     "@type": "ProfessionalService",
     "@id": SITE + "/#organisation",
     name: CONFIG.legalName || "GO XPERT SOLUTION",
-    alternateName: CONFIG.companyName || "GoXpert",
+    alternateName: [CONFIG.companyName || "GoXpert"].concat(CONFIG.formerName ? [CONFIG.formerName] : []),
     url: SITE + "/",
     telephone: "+" + CONFIG.phoneRaw,
     email: CONFIG.email,
@@ -250,7 +250,7 @@ function shell(page, parts, faqNodes, lang) {
     const title = (bm && page.titleBm) || page.title;
     const desc = (bm && page.descBm) || page.desc;
     const url = urlFor(lang, page.out);
-    const og = page.ogImage || (SITE + "/img/gal/our-team-1.jpg");
+    const og = page.ogImage || (SITE + "/img/og-share.jpg");
     /* hreflang: beritahu Google kedua-dua URL ini page yang sama dalam
        bahasa berbeza, supaya ia tak dikira kandungan bertindih */
     const alts = LANGS.map(l =>

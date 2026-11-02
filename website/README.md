@@ -120,6 +120,26 @@ penuh di website utama (`/services/`).
 Lepas tukar, jalankan `node build.js` semula untuk kemas kini `dist/`.
 
 
+## Nama lama, media sosial, gambar kongsi
+
+**Nama lama.** Syarikat ini dahulunya **Go Home Inspection (GOHI)**, dan
+domain lama `gohomeinspection.asia` sudah tamat. Ejen dan pelanggan lama
+masih merujuk nama itu; sesiapa yang mencarinya tidak menjumpai apa-apa.
+`CONFIG.formerName` dalam `index.html` memaparkan baris "Dahulunya Go
+Home Inspection (GOHI)" di footer, dan nama itu turut dimasukkan ke
+dalam `alternateName` JSON-LD supaya Google mengaitkan kedua-dua nama.
+
+**Media sosial.** `CONFIG.social` menyimpan pautan Facebook, Instagram,
+TikTok dan Threads. Ia dipapar sebagai ikon di footer dan diberitahu
+kepada Google melalui `sameAs`. Kosongkan senarai itu dan barisan ikon
+tersembunyi automatik.
+
+**Gambar kongsi.** `img/og-share.jpg` (1200×630) ialah gambar yang
+muncul apabila pautan laman ini di-paste ke Facebook, WhatsApp atau
+Threads. Sebelum ini gambar pasukan 900×600 digunakan, yang terpotong
+pada saiz yang Facebook mahu. Untuk menukarnya, ganti fail itu dengan
+gambar 1200×630 yang lain.
+
 ## Dwibahasa: Google boleh baca versi BM
 
 Dulu laman terbit **semuanya dalam Bahasa Inggeris**. Teks BM hanya
