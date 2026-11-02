@@ -2017,3 +2017,14 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
     .gb-coord-left, .gb-coord-right { padding: 1.8rem 1.4rem; }
     .gb-hero-btns .btn { width: 100%; justify-content: center; }
 }
+
+/* ---- pautan sosial di footer ---- */
+.foot-social { display: flex; gap: 0.6rem; margin-top: 1.1rem; flex-wrap: wrap; }
+.foot-social a {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85);
+    transition: all 0.25s ease;
+}
+.foot-social a:hover { background: var(--primary); color: #fff; transform: translateY(-3px); }
+.foot-social svg { width: 19px; height: 19px; }

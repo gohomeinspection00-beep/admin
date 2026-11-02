@@ -153,6 +153,7 @@ const ORG = {
     description: "Registered Building Surveyors providing building inspection, condition assessment and tribunal documentation across Malaysia.",
     slogan: "Inspection with integrity.",
     priceRange: "$$",
+    sameAs: (CONFIG.social || []).map(x => x.url),
     logo: { "@type": "ImageObject", url: SITE + "/img/icon-512.png", width: 512, height: 512 },
     image: [SITE + "/img/gal/our-team-1.jpg", SITE + "/img/sirim-person.webp"],
     openingHoursSpecification: [{
