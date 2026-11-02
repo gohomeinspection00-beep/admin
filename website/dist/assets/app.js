@@ -2264,7 +2264,14 @@ var PROJECTS = [
 var LANDING_MUSIC = "files/goxpert-chorus.mp3";
 
 var LANDING_POSTERS = [
-    /* contoh: "img/poster/1.jpg", "img/poster/2.jpg", ... */
+    /* { img: "img/poster/xxx.jpg", en: "English title", bm: "Tajuk BM" }
+       Tambah poster baru di sini — seksyen poster muncul sendiri.
+       Kalau senarai ini kosong, seksyen itu tersembunyi automatik. */
+    { img: "img/poster/sirim.jpg",      en: "SIRIM-Calibrated Equipment", bm: "Peralatan Dikalibrasi SIRIM" },
+    { img: "img/poster/thermal.jpg",    en: "Thermal Scanner",            bm: "Thermal Scanner" },
+    { img: "img/poster/siling.jpg",     en: "Above-Ceiling Area",         bm: "Kawasan Atas Siling" },
+    { img: "img/poster/water-tank.jpg", en: "Water Tank Area",            bm: "Kawasan Tangki Air" },
+    { img: "img/poster/sp-review.jpg",  en: "S&P Review",                 bm: "Semakan S&P" }
 ];
 
 var LANDING_HIGH = [
@@ -3293,17 +3300,22 @@ var FAQ_ALL = [
     }
 
     /* ---------- Poster popup ---------- */
+    var lpPosterWired = false;
     function lpPosters() {
         var sec = document.getElementById("lpPosterCta");
         if (!sec) return;
         if (!window.LANDING_POSTERS || !LANDING_POSTERS.length) { sec.style.display = "none"; return; }
         sec.style.display = "";
         var btn = document.getElementById("lpPosterBtn");
-        if (btn && !btn.dataset.wired) {
-            btn.dataset.wired = "1";
+        if (btn && !lpPosterWired) {
+            lpPosterWired = true;
             btn.addEventListener("click", function () {
-                lbOpenItems(LANDING_POSTERS.map(function (p, i) {
-                    return { src: tcSrc(p), label: t("lp.posTitle") + " " + (i + 1) + "/" + LANDING_POSTERS.length };
+                /* lightbox sudah papar kiraan "1 / 5" sendiri —
+                   label cuma perlu nama poster */
+                lbOpenItems(LANDING_POSTERS.map(function (p) {
+                    var src = typeof p === "string" ? p : p.img;
+                    var name = typeof p === "string" ? "" : (p[lang] || p.en || "");
+                    return { src: tcSrc(src), label: name };
                 }), 0);
             });
         }

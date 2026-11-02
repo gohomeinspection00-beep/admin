@@ -99,13 +99,21 @@ penuh di website utama (`/services/`).
    `index.html`. Biar `""` kalau tak nak lagu langsung — skrin intro masih
    jalan, cuma senyap.
 
-2. **Poster** — letak gambar dalam `website/img/poster/` dan senaraikan
-   dalam `LANDING_POSTERS`:
+2. **Poster** — 5 daripada 13 poster sudah masuk (`img/poster/`).
+   Untuk tambah lagi, letak fail dalam `website/img/poster/` dan
+   senaraikan dalam `LANDING_POSTERS` dalam `index.html`:
    ```js
-   var LANDING_POSTERS = ["img/poster/1.jpg", "img/poster/2.jpg"];
+   var LANDING_POSTERS = [
+       { img: "img/poster/sirim.jpg", en: "SIRIM-Calibrated Equipment",
+                                      bm: "Peralatan Dikalibrasi SIRIM" },
+       ...
+   ];
    ```
-   Kalau senarai ini kosong, **seksyen poster tersembunyi automatik** —
-   tiada kotak kosong terpapar.
+   Tajuk dipapar dalam popup dan bertukar ikut bahasa. Kalau senarai ini
+   kosong, **seksyen poster tersembunyi automatik** — tiada kotak kosong.
+
+   Masih belum ada: Defect Inspection, Portfolio, Lantai/Dinding/Siling,
+   Bumbung, Plumbing, Opening, Moisture, Elektrikal.
 
 Lepas tukar, jalankan `node build.js` semula untuk kemas kini `dist/`.
 
@@ -250,6 +258,7 @@ Gambar sebenar sudah dimasukkan ke dalam folder `img/` (≈38 MB):
 | `img/review/` | 9 review pelanggan |
 | `img/report/` | 5 muka surat sample report |
 | `img/dms/` | 7 paparan sistem pengurusan defect |
+| `img/poster/` | poster landing page (popup) |
 | `files/` | `sample-report.pdf` + `goxpert-chorus.mp3` (disalin ke `dist/files/`) |
 | `img/t/` | thumbnail 560px untuk grid — dijana automatik, jangan edit |
 
