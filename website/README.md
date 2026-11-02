@@ -92,14 +92,14 @@ page yang sama** (tak keluar ke mana-mana). Di bawah senarai servis ada
 butang *Lebih Lanjut Tentang Servis* — barulah itu bawa ke page servis
 penuh di website utama (`/services/`).
 
-### Fail tambahan
+### Fail tambahan (semua sudah lengkap)
 
 1. ~~Lagu latar~~ — **sudah ada** (`files/goxpert-chorus.mp3`). Kalau nak
    tukar lagu, ganti fail itu atau tukar nama di `LANDING_MUSIC` dalam
    `index.html`. Biar `""` kalau tak nak lagu langsung — skrin intro masih
    jalan, cuma senyap.
 
-2. **Poster** — 10 daripada 13 poster sudah masuk (`img/poster/`).
+2. **Poster** — kesemua 13 poster sudah masuk (`img/poster/`).
    Untuk tambah lagi, letak fail dalam `website/img/poster/` dan
    senaraikan dalam `LANDING_POSTERS` dalam `index.html`:
    ```js
@@ -111,9 +111,6 @@ penuh di website utama (`/services/`).
    ```
    Tajuk dipapar dalam popup dan bertukar ikut bahasa. Kalau senarai ini
    kosong, **seksyen poster tersembunyi automatik** — tiada kotak kosong.
-
-   Masih belum ada: Pintu & Tingkap, Moisture Detector, Elektrikal
-   Inspection.
 
    **Nota:** poster Defect Inspection asalnya tertulis
    `www.gohomeinspection.asia` (domain lama). Baris itu telah ditampal
