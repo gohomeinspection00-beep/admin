@@ -1906,3 +1906,114 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 @media (max-width: 480px) {
     .lp-high-grid, .lp-prob-grid { grid-template-columns: 1fr; }
 }
+
+/* ================= INSPECTION BERKELOMPOK (#/inspection-berkelompok) ================= */
+.gb-hero {
+    padding: 7rem 2rem 3.5rem; background: linear-gradient(160deg, #F4F8FD 0%, #fff 70%);
+    position: relative; overflow: hidden;
+}
+.gb-hero-in { max-width: 920px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
+.gb-proj {
+    display: inline-flex; align-items: center; gap: 0.55rem; margin-bottom: 1.1rem;
+    padding: 0.5rem 1.1rem; border-radius: 999px; font-weight: 700; font-size: 0.9rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff;
+    box-shadow: 0 10px 26px rgba(21,101,192,0.3);
+}
+.gb-proj svg { width: 16px; height: 16px; flex-shrink: 0; }
+.gb-hero h1 { font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.15; margin-bottom: 1rem; }
+.gb-hero h1 .hl { color: var(--primary); }
+.gb-hero-text { font-size: 1.07rem; color: var(--text-body); max-width: 660px; margin: 0 auto 1.9rem; }
+.gb-hero-btns { display: flex; gap: 0.9rem; justify-content: center; flex-wrap: wrap; }
+
+/* jalur urgensi DLP */
+.gb-urgent {
+    display: flex; align-items: flex-start; gap: 0.85rem; max-width: 760px;
+    margin: 2.2rem auto 0; padding: 1.05rem 1.3rem; text-align: left;
+    background: #FFF6E8; border: 1px solid #F3D5A4; border-radius: 14px;
+}
+.gb-urgent svg { width: 22px; height: 22px; color: #B9761A; flex-shrink: 0; margin-top: 2px; }
+.gb-urgent b { display: block; color: #8A5612; font-size: 0.95rem; margin-bottom: 0.15rem; }
+.gb-urgent span { font-size: 0.9rem; color: #7A5A2E; line-height: 1.55; }
+
+/* jadual harga */
+.gb-tiers { padding: 4.5rem 2rem; background: #fff; }
+.gb-tier-grid { display: grid; gap: 1.2rem; max-width: 980px; margin: 1rem auto 0; }
+.gb-tier-grid.n2 { grid-template-columns: repeat(2, 1fr); }
+.gb-tier-grid.n3 { grid-template-columns: repeat(3, 1fr); }
+.gb-tier-grid.n4 { grid-template-columns: repeat(4, 1fr); }
+.gb-tier {
+    position: relative; background: var(--bg); border: 2px solid transparent;
+    border-radius: 18px; padding: 1.8rem 1.4rem; text-align: center; transition: all 0.3s ease;
+}
+.gb-tier:hover { background: #fff; border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 14px 34px rgba(0,0,0,0.09); }
+.gb-tier.best { background: #fff; border-color: var(--primary); box-shadow: 0 14px 34px rgba(21,101,192,0.14); }
+.gb-tier-flag {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--accent, #F7A41D); color: #4A3000; font-size: 0.68rem; font-weight: 800;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 0.3rem 0.8rem; border-radius: 999px;
+    white-space: nowrap;
+}
+.gb-tier-units { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.gb-tier-price { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1.1; margin: 0.6rem 0 0.1rem; }
+.gb-tier-per { font-size: 0.8rem; color: var(--text-muted); }
+.gb-tier-save { display: inline-block; margin-top: 0.8rem; font-size: 0.8rem; font-weight: 700; color: #1B7A3E; background: #E6F5EC; padding: 0.3rem 0.7rem; border-radius: 999px; }
+.gb-tier-note { max-width: 760px; margin: 1.6rem auto 0; text-align: center; font-size: 0.87rem; color: var(--text-muted); line-height: 1.6; }
+.gb-noprice {
+    max-width: 640px; margin: 1.5rem auto 0; padding: 2rem 1.6rem; text-align: center;
+    background: var(--bg); border-radius: 18px;
+}
+.gb-noprice p { color: var(--text-body); margin-bottom: 1.2rem; }
+
+/* langkah */
+.gb-steps { padding: 4.5rem 2rem; background: var(--bg); }
+.gb-step-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1040px; margin: 1rem auto 0; }
+.gb-step { background: #fff; border-radius: 16px; padding: 1.6rem 1.3rem; position: relative; }
+.gb-step-n {
+    width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff;
+    font-weight: 800; font-size: 0.9rem; margin-bottom: 0.85rem;
+}
+.gb-step h4 { font-size: 1rem; margin-bottom: 0.4rem; color: var(--text-dark); }
+.gb-step p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+/* penyelaras */
+.gb-coord { padding: 4.5rem 2rem; background: #fff; }
+.gb-coord-box {
+    max-width: 920px; margin: 0 auto; border-radius: 22px; overflow: hidden;
+    display: grid; grid-template-columns: 1.15fr 1fr; background: var(--bg);
+}
+.gb-coord-left { padding: 2.4rem 2.1rem; }
+.gb-coord-left h3 { font-size: 1.35rem; margin-bottom: 0.7rem; }
+.gb-coord-left > p { color: var(--text-body); margin-bottom: 1.3rem; font-size: 0.95rem; }
+.gb-coord-list { list-style: none; display: grid; gap: 0.7rem; }
+.gb-coord-list li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.92rem; color: var(--text-body); }
+.gb-coord-list svg { width: 17px; height: 17px; color: var(--accent, #F7A41D); flex-shrink: 0; margin-top: 3px; }
+.gb-coord-right {
+    padding: 2.4rem 2.1rem; color: #fff; display: flex; flex-direction: column; justify-content: center;
+    background: linear-gradient(140deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+.gb-coord-right h4 { font-size: 1.1rem; margin-bottom: 0.6rem; }
+.gb-coord-right p { font-size: 0.9rem; opacity: 0.92; margin-bottom: 1.3rem; line-height: 1.6; }
+.gb-coord-right .btn { width: 100%; justify-content: center; background: #fff; color: var(--primary); }
+
+/* projek lepas */
+.gb-proof { padding: 4.5rem 2rem; background: var(--bg); }
+.gb-proof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; max-width: 1100px; margin: 1rem auto 0; }
+.gb-proof-card { background: #fff; border-radius: 14px; overflow: hidden; }
+.gb-proof-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.gb-proof-card.img-missing img { display: none; }
+.gb-proof-card span { display: block; padding: 0.75rem 0.9rem; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); }
+
+@media (max-width: 900px) {
+    .gb-coord-box { grid-template-columns: 1fr; }
+    .gb-step-grid { grid-template-columns: repeat(2, 1fr); }
+    .gb-tier-grid.n3, .gb-tier-grid.n4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+    .gb-hero { padding: 6.5rem 1.25rem 2.5rem; }
+    .gb-tiers, .gb-steps, .gb-coord, .gb-proof { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .gb-step-grid { grid-template-columns: 1fr; }
+    .gb-tier-grid.n2, .gb-tier-grid.n3, .gb-tier-grid.n4 { grid-template-columns: 1fr; }
+    .gb-coord-left, .gb-coord-right { padding: 1.8rem 1.4rem; }
+    .gb-hero-btns .btn { width: 100%; justify-content: center; }
+}

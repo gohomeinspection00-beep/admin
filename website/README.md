@@ -2,8 +2,8 @@
 
 **Dua bentuk:**
 - `website/index.html` — satu fail, untuk edit & test cepat (klik dua kali, terus jalan)
-- `website/dist/` — laman siap terbit, 60 fail HTML berasingan
-  (30 page × 2 bahasa — lihat di bawah)
+- `website/dist/` — laman siap terbit, 62 fail HTML berasingan
+  (31 page × 2 bahasa — lihat di bawah)
 Berasingan sepenuhnya daripada app GoInspect di root repo.
 
 ## Status
@@ -149,6 +149,59 @@ dalam bahasa pilihannya sepanjang melayari laman.
 
 JSON-LD juga mengikut bahasa: nama servis, tajuk artikel, FAQ dan
 breadcrumb pada page BM semuanya dalam BM, dengan `inLanguage: ms-MY`.
+
+
+## Page tempahan berkelompok
+
+URL: `index.html#/inspection-berkelompok` → terbit sebagai
+`goxpert.my/inspection-berkelompok/` (dan `/ms/inspection-berkelompok/`).
+
+Dibina untuk satu kegunaan: **di-paste ke dalam kumpulan Facebook atau
+WhatsApp projek perumahan**, di mana ramai pemilik perlukan inspection
+pada masa yang sama selepas serahan kunci.
+
+Page ini **tiada dalam menu atas** — ia page yang sampai melalui link
+yang dikongsi, bukan page yang orang cari dalam menu. Ia ada di footer.
+
+### Nama projek terus dalam link
+
+Tambah `?projek=` pada link, dan page akan papar nama projek itu di
+kepala page serta memasukkannya ke dalam mesej WhatsApp:
+
+```
+goxpert.my/inspection-berkelompok/?projek=Residensi%20Suria&vp=Mac%202026
+```
+
+- `projek` — nama projek seperti yang ahli kumpulan kenal
+- `vp` — bulan serahan kunci (pilihan)
+
+Gunakan `%20` untuk ruang, atau tanda `+`. Tiada apa-apa perlu dibina
+semula — cuma tukar link yang di-paste. Tanpa `?projek=`, page papar
+versi generik yang tetap berfungsi penuh.
+
+### Harga
+
+`GROUP_TIERS` dalam `index.html` menentukan jadual kadar. **Selagi
+senarai itu kosong, jadual tersembunyi** dan page papar ajakan hubungi —
+supaya tiada harga rekaan keluar ke laman sebenar. Isi begini:
+
+```js
+var GROUP_TIERS = [
+    { units: { en: "5 – 9 units",   bm: "5 – 9 unit"   }, price: 550,
+      save: { en: "Save 15%", bm: "Jimat 15%" } },
+    { units: { en: "10 – 19 units", bm: "10 – 19 unit" }, price: 480,
+      save: { en: "Save 25%", bm: "Jimat 25%" }, best: true },
+    { units: { en: "20+ units",     bm: "20+ unit"     }, price: 420,
+      save: { en: "Save 35%", bm: "Jimat 35%" } }
+];
+```
+
+`price` nombor sahaja tanpa "RM". `best: true` menandakan satu tier
+sebagai "Paling Dipilih". Syarat di bawah jadual ada dalam
+`GROUP_PRICE_NOTE`.
+
+Semua pendaftaran masuk melalui WhatsApp, sama seperti seluruh laman —
+tiada borang atau pangkalan data untuk dijaga.
 
 ## Untuk terbit (deploy) — folder `dist/`
 

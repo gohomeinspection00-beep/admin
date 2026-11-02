@@ -58,6 +58,7 @@
 - [Questions and answers](https://goxpert.my/faq/)
 - [Articles](https://goxpert.my/blog/)
 - [For homeowners — new homes & sub-sale](https://goxpert.my/pemilik-rumah/)
+- [Group inspection booking for a whole project](https://goxpert.my/inspection-berkelompok/)
 
 Every page above also exists in Bahasa Malaysia under https://goxpert.my/ms/
 (for example https://goxpert.my/ms/services/ and https://goxpert.my/ms/faq/).

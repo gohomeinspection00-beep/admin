@@ -2312,6 +2312,54 @@ var LANDING_PROB = [
       bm: ["Tempoh DLP Tamat", "Bila tempoh DLP tamat, setiap pembaikan jadi tanggungan anda sendiri"] }
 ];
 
+/* =========================================================
+   INSPECTION BERKELOMPOK — harga ikut bilangan unit
+
+   Isi GROUP_TIERS dengan kadar sebenar. Selagi senarai ini
+   KOSONG, jadual harga tersembunyi dan page papar ajakan
+   "hubungi untuk kadar kumpulan" — tiada harga palsu keluar.
+
+   units : label bilangan unit
+   price : harga seunit (nombor sahaja, tanpa "RM")
+   save  : teks penjimatan — biar "" kalau tak mahu papar
+   best  : true untuk tandakan satu tier sebagai pilihan terbaik
+   ========================================================= */
+var GROUP_TIERS = [
+    /* contoh — padam dan ganti dengan kadar sebenar:
+    { units: { en: "5 – 9 units",   bm: "5 – 9 unit"   }, price: 550, save: { en: "Save 15%", bm: "Jimat 15%" } },
+    { units: { en: "10 – 19 units", bm: "10 – 19 unit" }, price: 480, save: { en: "Save 25%", bm: "Jimat 25%" }, best: true },
+    { units: { en: "20+ units",     bm: "20+ unit"     }, price: 420, save: { en: "Save 35%", bm: "Jimat 35%" } }
+    */
+];
+
+/* Nota bawah jadual harga — syarat yang perlu pelanggan tahu */
+var GROUP_PRICE_NOTE = {
+    en: "Rates are per unit and apply to units in the same project inspected on the same trip. Final rate depends on property type and built-up size — message us with your project and we will confirm in writing.",
+    bm: "Kadar adalah seunit dan terpakai untuk unit dalam projek yang sama yang diperiksa dalam satu lawatan. Kadar muktamad bergantung pada jenis hartanah dan keluasan binaan — hubungi kami dengan maklumat projek anda dan kami sahkan secara bertulis."
+};
+
+var GROUP_STEPS = [
+    { en: ["Collect names in your group", "One coordinator gathers the unit numbers of everyone who wants in. A WhatsApp list is enough."],
+      bm: ["Kumpul nama dalam kumpulan anda", "Seorang penyelaras kumpulkan nombor unit sesiapa yang berminat. Senarai WhatsApp pun memadai."] },
+    { en: ["Send us the list", "Message us the project name, handover date and how many units. We confirm the rate in writing."],
+      bm: ["Hantar senarai kepada kami", "WhatsApp nama projek, tarikh serahan kunci dan berapa unit. Kami sahkan kadar secara bertulis."] },
+    { en: ["We schedule by block", "We inspect unit after unit over consecutive days, so nobody waits weeks for a slot."],
+      bm: ["Kami jadualkan ikut blok", "Kami periksa unit demi unit dalam hari berturutan, jadi tiada siapa tunggu berminggu untuk slot."] },
+    { en: ["Each owner gets their own report", "Separate report per unit, with photos, readings and repair priority — yours alone, not a shared summary."],
+      bm: ["Setiap pemilik dapat laporan sendiri", "Laporan berasingan setiap unit, lengkap gambar, bacaan dan keutamaan pembaikan — milik anda sahaja, bukan ringkasan dikongsi."] }
+];
+
+var GROUP_COORD = {
+    en: ["Everyone in the group sees the same defects raised properly, not a mix of guesses",
+         "You are not paying more for organising — the coordinator pays the same group rate",
+         "We handle the scheduling, you only pass on the dates",
+         "We can join your group chat to answer questions directly, if you want"],
+    bm: ["Semua orang dalam kumpulan dapat defect dibangkitkan dengan betul, bukan campuran tekaan",
+         "Anda tak bayar lebih sebab menguruskan — penyelaras bayar kadar kumpulan yang sama",
+         "Kami uruskan penjadualan, anda cuma sampaikan tarikh",
+         "Kami boleh masuk group chat anda untuk jawab soalan terus, kalau anda mahu"]
+};
+
 var I18N = {
     en: {
         "nav.services": "Services", "nav.why": "Why Us", "nav.coverage": "Coverage",
@@ -2331,6 +2379,28 @@ var I18N = {
         "pillar.more": "See More Services",
         "nav.projects": "Projects", "nav.about": "About", "nav.home": "Home",
         "nav.landing": "For Homeowners",
+        "nav.group": "Group Booking",
+        "gb.badge": "Group Inspection",
+        "gb.h1a": "One Project, ", "gb.h1b": "One Trip", "gb.h1c": ", Lower Rate Each",
+        "gb.text": "When several owners in the same project book together, we inspect unit after unit on consecutive days. Less travel for us, a lower rate for you — and every owner still gets their own full report.",
+        "gb.btn1": "WhatsApp Us About Your Project", "gb.btn2": "See the Rates",
+        "gb.urgentT": "Your DLP clock is already running",
+        "gb.urgentB": "The Defect Liability Period starts the day you take vacant possession — not the day you move in. Once it expires, every repair becomes your own cost. Book while the developer is still liable.",
+        "gb.prTag": "Group Rates", "gb.prTitle": "The More Units, The Lower Each Pays",
+        "gb.prSub": "Same inspection, same report — the saving comes from doing one trip instead of many.",
+        "gb.best": "Most Chosen",
+        "gb.perUnit": "per unit",
+        "gb.noPrice": "Group rates depend on your project, property type and how many units join. Message us with those three things and we will confirm the rate in writing — no obligation.",
+        "gb.noPriceBtn": "Get Our Group Rate",
+        "gb.stTag": "How It Works", "gb.stTitle": "Four Steps, Start to Report",
+        "gb.coTag": "For Coordinators", "gb.coTitle": "Organising For Your Group?",
+        "gb.coText": "If you are the one holding the group together, this is what you should know before you put our name forward.",
+        "gb.coBoxT": "Talk to us first",
+        "gb.coBoxP": "Tell us your project and roughly how many are interested. We will send you the rate and a short message you can paste straight into your group.",
+        "gb.coBtn": "Message Us as Coordinator",
+        "gb.pfTag": "Projects We Have Inspected", "gb.pfTitle": "We Have Done This Before",
+        "gb.waGeneral": "Salam, saya nak tanya pasal inspection berkelompok untuk projek saya.",
+        "gb.waCoord": "Salam, saya penyelaras untuk projek saya dan nak tanya kadar inspection berkelompok.",
         "lp.introTag": "Professional Building Inspection",
         "lp.introBtn": "Tap to continue",
         "lp.introSub": "Peace of mind is waiting",
@@ -2435,7 +2505,7 @@ var I18N = {
     },
     bm: {
         "nav.services": "Servis", "nav.why": "Kenapa Kami", "nav.coverage": "Kawasan",
-        "nav.faq": "Soalan Lazim", "nav.contact": "Hubungi", "nav.cta": "Sebut Harga",
+        "nav.faq": "Soalan", "nav.contact": "Hubungi", "nav.cta": "Sebut Harga",
         "hero.badge": "Building Surveyor Berdaftar RISM",
         "hero.title.pre": "Ukur Bangunan & Inspection ", "hero.title.hl": "Yang Anda Boleh Percaya",
         "hero.text": "Dari inspection rumah hingga Building Condition Assessment dan dokumentasi tribunal — Building Surveyor berdaftar dengan peralatan dikalibrasi SIRIM. Inspection Dengan Integriti.",
@@ -2449,8 +2519,30 @@ var I18N = {
         "p1.s1": "Home Defect Inspection (DLP)", "p1.s2": "Pre-Purchase Inspection", "p1.s2b": "Sub-Sale Inspection",
         "p1.s3": "Re-Inspection", "p1.s4": "Inspection Selepas Renovation", "p1.s5": "Joint Inspection Bersama Pemaju",
         "pillar.more": "Lihat Lebih Banyak Servis",
-        "nav.projects": "Projek", "nav.about": "Tentang Kami", "nav.home": "Utama",
-        "nav.landing": "Untuk Pemilik Rumah",
+        "nav.projects": "Projek", "nav.about": "Tentang", "nav.home": "Utama",
+        "nav.landing": "Pemilik Rumah",
+        "nav.group": "Tempahan Berkelompok",
+        "gb.badge": "Inspection Berkelompok",
+        "gb.h1a": "Satu Projek, ", "gb.h1b": "Satu Lawatan", "gb.h1c": ", Kadar Lebih Rendah",
+        "gb.text": "Bila beberapa pemilik dalam projek yang sama tempah bersama, kami periksa unit demi unit dalam hari berturutan. Kurang perjalanan untuk kami, kadar lebih rendah untuk anda — dan setiap pemilik tetap dapat laporan penuh sendiri.",
+        "gb.btn1": "WhatsApp Kami Pasal Projek Anda", "gb.btn2": "Lihat Kadar",
+        "gb.urgentT": "Tempoh DLP anda sudah pun berjalan",
+        "gb.urgentB": "Defect Liability Period bermula pada hari anda ambil kunci — bukan hari anda pindah masuk. Bila ia tamat, setiap pembaikan jadi kos anda sendiri. Tempah selagi pemaju masih bertanggungjawab.",
+        "gb.prTag": "Kadar Kumpulan", "gb.prTitle": "Lebih Ramai Unit, Lebih Rendah Bayaran Setiap Satu",
+        "gb.prSub": "Inspection sama, laporan sama — penjimatan datang dari satu lawatan, bukan banyak kali.",
+        "gb.best": "Paling Dipilih",
+        "gb.perUnit": "seunit",
+        "gb.noPrice": "Kadar kumpulan bergantung pada projek anda, jenis hartanah dan berapa unit yang sertai. Hubungi kami dengan tiga maklumat itu dan kami sahkan kadar secara bertulis — tanpa sebarang ikatan.",
+        "gb.noPriceBtn": "Dapatkan Kadar Kumpulan Kami",
+        "gb.stTag": "Cara Ia Berjalan", "gb.stTitle": "Empat Langkah, Dari Mula Hingga Laporan",
+        "gb.coTag": "Untuk Penyelaras", "gb.coTitle": "Anda Yang Uruskan Untuk Kumpulan?",
+        "gb.coText": "Kalau anda orang yang menyatukan kumpulan ni, inilah yang anda patut tahu sebelum cadangkan nama kami.",
+        "gb.coBoxT": "Bincang dengan kami dulu",
+        "gb.coBoxP": "Beritahu kami projek anda dan lebih kurang berapa orang berminat. Kami hantar kadar dan satu mesej ringkas yang anda boleh paste terus dalam kumpulan.",
+        "gb.coBtn": "Hubungi Kami Sebagai Penyelaras",
+        "gb.pfTag": "Projek Yang Kami Dah Periksa", "gb.pfTitle": "Kami Pernah Buat Ini",
+        "gb.waGeneral": "Salam, saya nak tanya pasal inspection berkelompok untuk projek saya.",
+        "gb.waCoord": "Salam, saya penyelaras untuk projek saya dan nak tanya kadar inspection berkelompok.",
         "lp.introTag": "Building Inspection Profesional",
         "lp.introBtn": "Tekan untuk teruskan",
         "lp.introSub": "Ketenangan menanti anda",
@@ -3406,6 +3498,119 @@ var FAQ_ALL = [
             .forEach(function (el) { lpIO.observe(el); });
     }
 
+
+    /* ================================================================
+       INSPECTION BERKELOMPOK (#/inspection-berkelompok)
+
+       Page ini boleh dipersonalkan terus dari link, tanpa bina semula:
+         /inspection-berkelompok/?projek=Residensi%20Suria&vp=Mac%202026
+       Nama projek dipapar di kepala page dan dimasukkan ke dalam
+       mesej WhatsApp, supaya pelawat rasa ia memang untuk projek dia.
+       ================================================================ */
+    function gbParams() {
+        var q = {};
+        try {
+            new URLSearchParams(location.search).forEach(function (v, k) {
+                q[k.toLowerCase()] = v.trim().slice(0, 80);
+            });
+        } catch (e) {}
+        return { projek: q.projek || q.project || "", vp: q.vp || q.handover || "" };
+    }
+
+    function gbWaText(coord) {
+        var g = gbParams();
+        var msg = t(coord ? "gb.waCoord" : "gb.waGeneral");
+        if (g.projek) {
+            msg += (lang === "bm" ? "\n\nProjek: " : "\n\nProject: ") + g.projek;
+            if (g.vp) msg += (lang === "bm" ? "\nSerahan kunci: " : "\nHandover: ") + g.vp;
+        }
+        return msg;
+    }
+
+    function renderGroupPage() {
+        var page = document.getElementById("page-group");
+        if (!page) return;
+        var g = gbParams();
+
+        /* ---- nama projek dari link ---- */
+        var tag = document.getElementById("gbProj");
+        var badge = document.getElementById("gbBadge");
+        if (tag) {
+            if (g.projek) {
+                document.getElementById("gbProjName").textContent =
+                    g.projek + (g.vp ? " · " + (lang === "bm" ? "VP " : "VP ") + g.vp : "");
+                tag.style.display = "";
+                if (badge) badge.style.display = "none";
+            } else {
+                tag.style.display = "none";
+                if (badge) badge.style.display = "";
+            }
+        }
+
+        /* ---- pautan WhatsApp (bawa nama projek sekali) ---- */
+        var w1 = document.getElementById("gbWa1"), w2 = document.getElementById("gbWa2");
+        if (w1) w1.href = waLink(gbWaText(false));
+        if (w2) w2.href = waLink(gbWaText(true));
+
+        /* ---- jadual kadar ---- */
+        var box = document.getElementById("gbTierBox");
+        if (box) {
+            if (window.GROUP_TIERS && GROUP_TIERS.length) {
+                var n = Math.min(GROUP_TIERS.length, 4);
+                box.innerHTML =
+                    '<div class="gb-tier-grid n' + n + '">' +
+                    GROUP_TIERS.map(function (x) {
+                        return '<div class="gb-tier' + (x.best ? " best" : "") + '">' +
+                            (x.best ? '<span class="gb-tier-flag">' + t("gb.best") + '</span>' : '') +
+                            '<span class="gb-tier-units">' + t2(x.units) + '</span>' +
+                            '<div class="gb-tier-price">RM' + x.price + '</div>' +
+                            '<span class="gb-tier-per">' + t("gb.perUnit") + '</span>' +
+                            (x.save ? '<span class="gb-tier-save">' + t2(x.save) + '</span>' : '') +
+                        '</div>';
+                    }).join("") +
+                    '</div>' +
+                    '<p class="gb-tier-note">' + t2(GROUP_PRICE_NOTE) + '</p>';
+            } else {
+                /* Belum ada kadar rasmi — jangan sesekali papar harga rekaan. */
+                box.innerHTML =
+                    '<div class="gb-noprice">' +
+                        '<p>' + t("gb.noPrice") + '</p>' +
+                        '<a class="btn btn-whatsapp" href="' + waLink(gbWaText(false)) + '" target="_blank" rel="noopener">' +
+                        '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>' +
+                        t("gb.noPriceBtn") + '</a>' +
+                    '</div>';
+            }
+        }
+
+        /* ---- langkah ---- */
+        var st = document.getElementById("gbSteps");
+        if (st) st.innerHTML = GROUP_STEPS.map(function (x, i) {
+            var d = x[lang] || x.en;
+            return '<div class="gb-step"><div class="gb-step-n">' + (i + 1) + '</div>' +
+                   '<h4>' + d[0] + '</h4><p>' + d[1] + '</p></div>';
+        }).join("");
+
+        /* ---- senarai penyelaras ---- */
+        var cl = document.getElementById("gbCoordList");
+        if (cl) cl.innerHTML = (GROUP_COORD[lang] || GROUP_COORD.en).map(function (x) {
+            return '<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                   '<path d="M20 6L9 17l-5-5"/></svg>' + x + '</li>';
+        }).join("");
+
+        /* ---- projek kediaman sebagai bukti ---- */
+        var pf = document.getElementById("gbProof");
+        if (pf) {
+            var res = PROJECTS.filter(function (x) { return x.cat === "residential" && x.photos && x.photos.length; }).slice(0, 8);
+            pf.innerHTML = res.map(function (x) {
+                return '<div class="gb-proof-card">' +
+                    '<img src="' + thumbSrc(projSrc(x.photos[0])) + '" alt="' + t2(x.name) + '" loading="lazy" decoding="async" ' +
+                    'onerror="this.closest(\'.gb-proof-card\').classList.add(\'img-missing\')">' +
+                    '<span>' + t2(x.name) + '</span></div>';
+            }).join("");
+            hideBrokenSections(pf.closest("section"));
+        }
+    }
+
     /* ---------- Page FAQ penuh (#/faq) ---------- */
     var faqFilter = "all";
     function renderFaqPage() {
@@ -3465,7 +3670,7 @@ var FAQ_ALL = [
     /* ---------- Pautan WhatsApp ---------- */
     function applyWaLinks() {
         var link = waLink(t("wa.default"));
-        ["heroWa", "finalWa", "whatsappFloat", "contactWa", "footWa", "faqWa",
+        ["heroWa", "finalWa", "whatsappFloat", "contactWa", "footWa", "faqWa", "gbWa1", "gbWa2",
          "lpWa1", "lpWa2", "lpWa3", "lpWa4"].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.href = link;
@@ -4576,7 +4781,7 @@ var FAQ_ALL = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing", group: "page-group" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -4586,6 +4791,7 @@ var FAQ_ALL = [
         if (h.indexOf("#/") === 0) {
             var parts = h.slice(2).split("/");
             if (parts[0] === "pemilik-rumah") pageKey = "landing";
+            else if (parts[0] === "inspection-berkelompok") pageKey = "group";
             else if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
             else if (parts[0] === "faq") pageKey = "faq";
@@ -4617,6 +4823,7 @@ var FAQ_ALL = [
         if (pageKey === "gallery") renderGalleryPage();
         if (pageKey === "article") renderArticlePage(param);
         if (pageKey === "landing") renderLandingPage();
+        if (pageKey === "group") renderGroupPage();
         document.body.classList.toggle("lp-on", pageKey === "landing");
         if (pageKey !== "landing") lpStopMusic();
 
@@ -4635,6 +4842,7 @@ var FAQ_ALL = [
             a.classList.toggle("active",
                 (key === "home" && pageKey === "home") ||
                 (key === "landing" && pageKey === "landing") ||
+                (key === "group" && pageKey === "group") ||
                 (key === "projects" && pageKey === "projects") ||
                 (key === "about" && pageKey === "about") ||
                 (key === "faq" && pageKey === "faq") ||

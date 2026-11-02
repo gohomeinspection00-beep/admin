@@ -91,7 +91,12 @@ const PAGES = [
       title: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
       desc: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor.",
       titleBm: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
-      descBm: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." }
+      descBm: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." },
+    { out: "inspection-berkelompok", key: "group", hash: "#/inspection-berkelompok",
+      title: "Group Inspection Booking for Your Project — GoXpert",
+      desc: "Several owners in the same project booking together pay a lower rate each. One trip, unit after unit, and every owner still receives their own full defect report.",
+      titleBm: "Tempahan Inspection Berkelompok Untuk Projek Anda — GoXpert",
+      descBm: "Beberapa pemilik dalam projek yang sama tempah bersama, kadar lebih rendah setiap satu. Satu lawatan, unit demi unit, dan setiap pemilik tetap dapat laporan kecacatan penuh sendiri." }
 ];
 SVC.forEach(s => PAGES.push({
     out: "services/" + s.slug, key: "service", param: s.slug, hash: "#/services/" + s.slug,
@@ -127,7 +132,7 @@ function realLinks(s, lang) {
     return s
         .replace(/href="#\/services\/([a-z0-9-]+)"/g, 'href="' + p + '/services/$1/"')
         .replace(/href="#\/blog\/([a-z0-9-]+)"/g, 'href="' + p + '/blog/$1/"')
-        .replace(/href="#\/(services|projects|gallery|about|faq|blog|pemilik-rumah)"/g, 'href="' + p + '/$1/"')
+        .replace(/href="#\/(services|projects|gallery|about|faq|blog|pemilik-rumah|inspection-berkelompok)"/g, 'href="' + p + '/$1/"')
         .replace(/href="#"/g, 'href="' + p + '/"');
 }
 
@@ -339,6 +344,7 @@ function llmsTxt() {
     L.push("- [Questions and answers](" + SITE + "/faq/)");
     L.push("- [Articles](" + SITE + "/blog/)");
     L.push("- [For homeowners — new homes & sub-sale](" + SITE + "/pemilik-rumah/)");
+    L.push("- [Group inspection booking for a whole project](" + SITE + "/inspection-berkelompok/)");
     L.push("");
     L.push("Every page above also exists in Bahasa Malaysia under " + SITE + "/ms/");
     L.push("(for example " + SITE + "/ms/services/ and " + SITE + "/ms/faq/).");
@@ -417,7 +423,7 @@ function copyDir(from, to) {
             const id = { home: "page-home", services: "page-services", service: "page-service",
                 projects: "page-projects", gallery: "page-gallery", about: "page-about",
                 faq: "page-faq", blog: "page-blog", article: "page-article",
-                landing: "page-landing" }[key];
+                landing: "page-landing", group: "page-group" }[key];
             const el = document.getElementById(id);
             if (el) el.removeAttribute("hidden");
             /* buang kelas animasi "belum masuk skrin" supaya kandungan
