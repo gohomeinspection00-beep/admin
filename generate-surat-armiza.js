@@ -87,10 +87,12 @@ doc.setFont("helvetica", "bold"); doc.setFontSize(SZ.BODY); bk();
 doc.text("KEPADA PIHAK KONTRAKTOR / PEMAJU", mL, y);
 y += LH_S;
 doc.setFont("helvetica", "normal");
+doc.setFontSize(SZ.SMALL);
 doc.text(`(Unit: ${data.alamatHartanah})`, mL, y);
-y += LH_S;
+y += LH_S + 1;
 
-doc.text(data.tarikhSurat, pageW - mR, y - LH_S, { align: "right" });
+doc.setFontSize(SZ.BODY);
+doc.text(data.tarikhSurat, pageW - mR, y, { align: "right" });
 y += 3;
 doc.setFontSize(SZ.SMALL);
 doc.text(`Ruj. Kami: ${data.noRujukan}`, mL, y);
