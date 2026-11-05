@@ -43,8 +43,8 @@ const data = {
   tarikhSerahanLaporan: "28 September 2026",
   tarikhTamat30: "28 Oktober 2026",
 
-  tarikhNotis: "31 Oktober 2026",
-  tarikhDeadline: "15 November 2026",
+  tarikhNotis: "6 November 2026",
+  tarikhDeadline: "21 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -60,8 +60,8 @@ const data = {
     { tarikh: "10 September 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (Full House Inspection) dijalankan ke atas hartanah" },
     { tarikh: "28 September 2026", peristiwa: "Laporan Pemeriksaan Kecacatan (Defect Inspection Report) diserahkan secara rasmi kepada pihak pemaju melalui serahan tangan (hardcopy) — merupakan notis bertulis di bawah Klausa 27(1)" },
     { tarikh: "28 Oktober 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan" },
-    { tarikh: "31 Oktober 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "15 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "6 November 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "21 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 };
 
