@@ -17,7 +17,13 @@ const data = {
 
   namaPemaju: "SCIENTEX QUATARI SDN. BHD.",
   noSyarikat: "(197601002045 / 28008-M)",
-  alamatPenerima: [
+  alamatPenerima: (process.argv[2] === "HQ") ? [
+    "(Pejabat Berdaftar / Registered Office)",
+    "No. 9, Persiaran Selangor, Seksyen 15,",
+    "40200 Shah Alam,",
+    "Selangor Darul Ehsan.",
+    "Tel: 03-5524 8888",
+  ] : [
     "Pejabat Jualan Taman Pulai Mutiara,",
     "Persiaran Pulai Mutiara, Taman Pulai Mutiara,",
     "81300 Johor Bahru,",
@@ -409,6 +415,7 @@ for (let p = 1; p <= doc.internal.getNumberOfPages(); p++) {
 }
 
 const out = doc.output("arraybuffer");
-fs.writeFileSync("/home/user/admin/NOTIS_1_FAIZ.pdf", Buffer.from(out));
-console.log("PDF generated: NOTIS_1_FAIZ.pdf");
+const outName = (process.argv[2] === "HQ") ? "NOTIS_1_FAIZ_HQ.pdf" : "NOTIS_1_FAIZ.pdf";
+fs.writeFileSync("/home/user/admin/" + outName, Buffer.from(out));
+console.log("PDF generated: " + outName);
 console.log(`Total pages: ${totalPages}`);
