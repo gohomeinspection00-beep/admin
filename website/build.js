@@ -101,7 +101,16 @@ const PAGES = [
       title: "Group Inspection Booking for Your Project — GoXpert",
       desc: "Several owners in the same project booking together pay a lower rate each. One trip, unit after unit, and every owner still receives their own full defect report.",
       titleBm: "Tempahan Inspection Berkelompok Untuk Projek Anda — GoXpert",
-      descBm: "Beberapa pemilik dalam projek yang sama tempah bersama, kadar lebih rendah setiap satu. Satu lawatan, unit demi unit, dan setiap pemilik tetap dapat laporan kecacatan penuh sendiri." }
+      descBm: "Beberapa pemilik dalam projek yang sama tempah bersama, kadar lebih rendah setiap satu. Satu lawatan, unit demi unit, dan setiap pemilik tetap dapat laporan kecacatan penuh sendiri." },
+    /* Page review: dihantar melalui link selepas inspection sahaja.
+       noindex: true menjadikannya tidak diindeks Google dan ia
+       dikecualikan dari sitemap.xml dan llms.txt. Tiada page lain
+       memaut kepadanya. */
+    { out: "review", key: "review", hash: "#/review", noindex: true,
+      title: "How did we do? — GoXpert",
+      desc: "Tell us how your inspection went.",
+      titleBm: "Macam mana kerja kami? — GoXpert",
+      descBm: "Beritahu kami bagaimana inspection anda." }
 ];
 SVC.forEach(s => PAGES.push({
     out: "services/" + s.slug, key: "service", param: s.slug, hash: "#/services/" + s.slug,
@@ -266,7 +275,7 @@ function shell(page, parts, faqNodes, lang) {
 <meta name="description" content="${esc(desc)}">
 <meta name="theme-color" content="#1565C0">
 <meta name="author" content="${esc(CONFIG.legalName)}">
-<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="robots" content="${page.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1"}">
 <link rel="canonical" href="${url}">
 ${alts}
 <meta property="og:type" content="${page.key === "article" ? "article" : "website"}">
@@ -381,6 +390,8 @@ function llmsTxt() {
     L.push("- [Articles](" + SITE + "/blog/)");
     L.push("- [For homeowners — new homes & sub-sale](" + SITE + "/pemilik-rumah/)");
     L.push("- [Group inspection booking for a whole project](" + SITE + "/inspection-berkelompok/)");
+    /* page review sengaja tidak disenaraikan — ia untuk pelanggan yang
+       sudah selesai inspection, dihantar melalui link peribadi */
     L.push("");
     L.push("Every page above also exists in Bahasa Malaysia under " + SITE + "/ms/");
     L.push("(for example " + SITE + "/ms/services/ and " + SITE + "/ms/faq/).");
@@ -460,7 +471,7 @@ function copyDir(from, to) {
             const id = { home: "page-home", services: "page-services", service: "page-service",
                 projects: "page-projects", gallery: "page-gallery", about: "page-about",
                 faq: "page-faq", blog: "page-blog", article: "page-article",
-                landing: "page-landing", group: "page-group" }[key];
+                landing: "page-landing", group: "page-group", review: "page-review" }[key];
             const el = document.getElementById(id);
             if (el) el.removeAttribute("hidden");
             /* buang kelas animasi "belum masuk skrin" supaya kandungan
@@ -513,7 +524,7 @@ function copyDir(from, to) {
     const sm = ['<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
         '        xmlns:xhtml="http://www.w3.org/1999/xhtml">'];
-    LANGS.forEach(lang => PAGES.forEach(P => {
+    LANGS.forEach(lang => PAGES.filter(P => !P.noindex).forEach(P => {
         const pr = P.key === "home" ? "1.0" : (P.key === "service" || P.key === "services") ? "0.9" : "0.7";
         const alts = LANGS.map(l =>
             '    <xhtml:link rel="alternate" hreflang="' + l.hreflang + '" href="' + urlFor(l, P.out) + '"/>'
@@ -553,8 +564,9 @@ function copyDir(from, to) {
     fs.rmSync(OLD, { recursive: true, force: true });
 
     const n = PAGES.length * LANGS.length;
+    const nIdx = PAGES.filter(P => !P.noindex).length * LANGS.length;
     console.log("Siap: " + n + " page HTML (" + PAGES.length + " x " + LANGS.length +
-                " bahasa) + assets + sitemap.xml + robots.txt + llms.txt -> dist/");
+                " bahasa, " + nIdx + " diindeks) + assets + sitemap.xml + robots.txt + llms.txt -> dist/");
     if (errors.length) console.log("RALAT JS semasa pra-render:", [...new Set(errors)].slice(0, 5));
   } catch (e) {
     /* Gagal: buang folder sementara, biar dist/ lama tak disentuh. */

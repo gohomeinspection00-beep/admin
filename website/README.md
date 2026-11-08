@@ -2,8 +2,8 @@
 
 **Dua bentuk:**
 - `website/index.html` — satu fail, untuk edit & test cepat (klik dua kali, terus jalan)
-- `website/dist/` — laman siap terbit, 66 fail HTML berasingan
-  (33 page × 2 bahasa — lihat di bawah)
+- `website/dist/` — laman siap terbit, 68 fail HTML berasingan
+  (34 page × 2 bahasa; 66 diindeks — lihat di bawah)
 Berasingan sepenuhnya daripada app GoInspect di root repo.
 
 ## Status
@@ -142,6 +142,17 @@ masih merujuk nama itu; sesiapa yang mencarinya tidak menjumpai apa-apa.
 Home Inspection (GOHI)" di footer, dan nama itu turut dimasukkan ke
 dalam `alternateName` JSON-LD supaya Google mengaitkan kedua-dua nama.
 
+> **Nota untuk sesiapa yang mengubah kod ini:** `build.js` menjana HTML
+> dengan **memuat page dalam pelayar dan menyimpan DOM yang terhasil**.
+> Jadi apa-apa penanda "sudah dipasang" yang disimpan dalam DOM —
+> atribut seperti `data-wired`, atau semakan seperti
+> `if (!box.childElementCount)` yang turut memasang pendengar klik —
+> akan **ikut tersimpan ke dalam fail terbit**, dan pendengar itu tidak
+> pernah dipasang pada laman sebenar. Butang nampak elok tetapi mati.
+> Ini sudah berlaku tiga kali: butang poster, bintang review, dan
+> carousel review landing page. Guna pemboleh ubah JS sebagai penanda,
+> dan pisahkan "bina HTML" daripada "pasang pendengar".
+
 **Pengenalan untuk mesin.** `dist/llms.txt` kini ada bahagian
 **Identity** yang menyatakan dengan jelas: nama lama dan nama baharu
 ialah syarikat yang sama, domain lama sudah tamat dan tidak lagi di
@@ -205,6 +216,50 @@ dalam bahasa pilihannya sepanjang melayari laman.
 JSON-LD juga mengikut bahasa: nama servis, tajuk artikel, FAQ dan
 breadcrumb pada page BM semuanya dalam BM, dengan `inLanguage: ms-MY`.
 
+
+
+## Page review (tidak diindeks)
+
+URL: `index.html#/review` → terbit sebagai `goxpert.my/review/`
+(dan `/ms/review/`). Dihantar melalui WhatsApp kepada pemilik selepas
+inspection siap.
+
+**Page ini tidak diindeks Google:** ia membawa
+`<meta name="robots" content="noindex, nofollow">`, tiada dalam
+`sitemap.xml`, tiada dalam `llms.txt`, dan **tiada page lain memaut
+kepadanya**. Ia hanya sampai melalui link yang anda hantar sendiri.
+
+> Tidak diindeks ≠ sulit. Sesiapa yang ada link boleh membukanya. Untuk
+> page ini tiada masalah — tiada maklumat sulit di situ.
+
+Pelawat memilih bintang, kemudian **dua pilihan dipapar: tulis review di
+Google, atau hantar maklum balas terperinci melalui Google Form.**
+
+### Jangan tapis butang Google ikut bintang
+
+Reka bentuk asal yang diminta ialah: 5 bintang → Google, 1–4 bintang →
+borang sahaja. Itu dipanggil **review gating**, dan Google melarangnya
+secara khusus — hukumannya boleh sampai semua review dibuang dan Google
+Business Profile digantung.
+
+Jadi kedua-dua butang dipapar kepada **semua** pelanggan, tidak kira
+bintang yang dipilih. Hanya ayat galakan yang berubah. Pelanggan yang
+berpuas hati tetap akan tekan Google; yang tidak berpuas hati biasanya
+tidak — tanpa perlu menapis sesiapa.
+
+Amaran ini ditulis juga dalam komen kod, di `CONFIG` dan di atas
+`renderReviewPage()`.
+
+### Pautan
+
+Dalam `CONFIG`:
+
+```js
+reviewGoogle: "https://g.page/r/..../review",
+reviewForm:   "https://docs.google.com/forms/d/e/..../viewform",
+```
+
+Kosongkan mana-mana satu dan butang itu tersembunyi automatik.
 
 ## Page tempahan berkelompok
 

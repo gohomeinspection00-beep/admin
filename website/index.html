@@ -2071,6 +2071,55 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 .foot-social svg { width: 19px; height: 19px; }
 .svc-form-btn { width: 100%; justify-content: center; margin-top: 0.7rem; gap: 0.5rem; }
 .svc-form-btn svg { width: 17px; height: 17px; }
+/* ================= PAGE REVIEW (#/review) ================= */
+.rv-wrap { padding: 7rem 2rem 4.5rem; background: linear-gradient(165deg, #F4F8FD 0%, #fff 60%); min-height: 70vh; }
+.rv-box { max-width: 620px; margin: 0 auto; text-align: center; }
+.rv-logo { width: 150px; margin: 0 auto 1.6rem; display: block; }
+.rv-box h1 { font-size: clamp(1.6rem, 3.6vw, 2.25rem); line-height: 1.25; margin-bottom: 0.8rem; }
+.rv-lede { color: var(--text-body); font-size: 1.03rem; margin-bottom: 2.2rem; }
+
+.rv-stars { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.9rem; }
+.rv-star {
+    width: 52px; height: 52px; border: none; background: none; padding: 0; cursor: pointer;
+    color: #D9E2EC; transition: transform 0.18s ease, color 0.18s ease;
+}
+.rv-star svg { width: 100%; height: 100%; display: block; }
+.rv-star:hover { transform: scale(1.15); }
+.rv-star.lit { color: #F5A623; }
+.rv-hint { font-size: 0.88rem; color: var(--text-muted); min-height: 1.4em; margin-bottom: 2rem; }
+
+.rv-next { display: none; }
+.rv-next.on { display: block; animation: rvIn 0.45s ease both; }
+@keyframes rvIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.rv-thanks {
+    background: #fff; border-radius: 20px; padding: 2rem 1.7rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.08); text-align: left;
+}
+.rv-thanks h2 { font-size: 1.2rem; margin-bottom: 0.5rem; text-align: center; }
+.rv-thanks > p { color: var(--text-body); font-size: 0.95rem; margin-bottom: 1.5rem; text-align: center; }
+.rv-acts { display: grid; gap: 0.8rem; }
+.rv-act {
+    display: flex; align-items: center; gap: 0.9rem; padding: 1rem 1.1rem;
+    border: 2px solid var(--border, #E3E9F0); border-radius: 14px;
+    transition: all 0.25s ease; text-decoration: none;
+}
+.rv-act:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,0.08); }
+.rv-act-ico { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rv-act-ico svg { width: 20px; height: 20px; }
+.rv-act-g .rv-act-ico { background: #FFF3E0; color: #E8930C; }
+.rv-act-f .rv-act-ico { background: #EAF2FC; color: var(--primary); }
+.rv-act b { display: block; font-size: 0.97rem; color: var(--text-dark); margin-bottom: 0.15rem; }
+.rv-act span { display: block; font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
+.rv-note { margin-top: 1.4rem; font-size: 0.84rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
+.rv-again { margin-top: 1.1rem; font-size: 0.85rem; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
+
+@media (max-width: 560px) {
+    .rv-wrap { padding: 6rem 1.25rem 3rem; }
+    .rv-star { width: 44px; height: 44px; }
+    .rv-stars { gap: 0.3rem; }
+    .rv-thanks { padding: 1.6rem 1.2rem; }
+}
 </style>
 </head>
 <body>
@@ -2715,6 +2764,38 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 <!-- ==================== FOOTER ==================== -->
 
 <!-- ############ PAGE: LANDING — UNTUK PEMILIK RUMAH ############ -->
+<main id="page-review" class="vpage" hidden>
+    <section class="rv-wrap">
+        <div class="rv-box">
+            <img class="rv-logo" src="img/logo.png" alt="GO XPERT SOLUTION" onerror="this.remove()">
+            <h1 data-i18n="rv.title">Thank You for Choosing GoXpert</h1>
+            <p class="rv-lede" data-i18n="rv.lede">Your inspection is complete. Tell us how it went — it takes less than a minute, and it genuinely shapes how we work.</p>
+
+            <div class="rv-stars" id="rvStars"><!-- dijana oleh JS --></div>
+            <p class="rv-hint" id="rvHint" data-i18n="rv.hint">Tap a star to rate your experience</p>
+
+            <div class="rv-next" id="rvNext">
+                <div class="rv-thanks">
+                    <h2 data-i18n="rv.thanksT">Thank you — that is recorded</h2>
+                    <p data-i18n="rv.thanksP">Both options below are open to you. Use either, or both.</p>
+                    <div class="rv-acts">
+                        <a class="rv-act rv-act-g" id="rvGoogle" href="#" target="_blank" rel="noopener noreferrer">
+                            <span class="rv-act-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.2 6.8.9-5 4.7 1.3 6.7L12 17.3 6 20.5l1.3-6.7-5-4.7 6.8-.9z"/></svg></span>
+                            <span><b data-i18n="rv.gT">Write a review on Google</b><span data-i18n="rv.gD">Public, and it helps other homeowners find an inspector they can trust</span></span>
+                        </a>
+                        <a class="rv-act rv-act-f" id="rvForm" href="#" target="_blank" rel="noopener noreferrer">
+                            <span class="rv-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></span>
+                            <span><b data-i18n="rv.fT">Send us detailed feedback</b><span data-i18n="rv.fD">Private, straight to us — tell us what worked and what did not</span></span>
+                        </a>
+                    </div>
+                    <p class="rv-note" data-i18n="rv.note">Whatever you write, we read it. If something went wrong, we would rather hear it from you than not hear it at all.</p>
+                </div>
+                <button class="rv-again" id="rvAgain" type="button" data-i18n="rv.again">Change my rating</button>
+            </div>
+        </div>
+    </section>
+</main>
+
 <main id="page-group" class="vpage" hidden>
 
     <!-- Hero -->
@@ -3124,6 +3205,13 @@ var CONFIG = {
        FAQPage), di bahagian hubungi, dan dalam llms.txt. Tukar di sini
        sahaja. Biar "" kalau tak mahu papar harga langsung. */
     priceFrom: 300,
+    /* Page review (#/review) — dihantar melalui link selepas inspection,
+       tidak diindeks Google dan tiada pautan dari page lain.
+       Kedua-dua butang dipapar kepada SEMUA pelanggan tanpa mengira
+       bintang yang dipilih. Jangan tapis ikut bintang: Google melarang
+       "review gating" dan boleh menggantung Business Profile. */
+    reviewGoogle: "https://g.page/r/CaOXZxfnnMH4EB0/review",
+    reviewForm:   "https://docs.google.com/forms/d/e/1FAIpQLSdcMl6gtBAtO0qc5_I2RYs5HQvG2reQb4q_gml3Ivs1je_LmQ/viewform",
     /* Pautan sosial — dipapar di footer dan diberitahu kepada Google
        (sameAs) supaya ia tahu akaun ini milik syarikat yang sama. */
     social: [
@@ -5694,6 +5782,22 @@ var I18N = {
         "nav.group": "Group Booking",
         "foot.formerly": "Formerly",
         "det.form": "Fill in the quotation form",
+        "rv.title": "Thank You for Choosing GoXpert",
+        "rv.lede": "Your inspection is complete. Tell us how it went — it takes less than a minute, and it genuinely shapes how we work.",
+        "rv.hint": "Tap a star to rate your experience",
+        "rv.thanksT": "Thank you — that is recorded",
+        "rv.thanksP": "Both options below are open to you. Use either, or both.",
+        "rv.gT": "Write a review on Google",
+        "rv.gD": "Public, and it helps other homeowners find an inspector they can trust",
+        "rv.fT": "Send us detailed feedback",
+        "rv.fD": "Private, straight to us — tell us what worked and what did not",
+        "rv.note": "Whatever you write, we read it. If something went wrong, we would rather hear it from you than not hear it at all.",
+        "rv.again": "Change my rating",
+        "rv.s1": "We let you down. Please tell us what happened.",
+        "rv.s2": "Not good enough. We want to know why.",
+        "rv.s3": "Something fell short — tell us what.",
+        "rv.s4": "Good, but not perfect. What would have made it a five?",
+        "rv.s5": "That is good to hear. Thank you.",
         "ab.nameT": "Same team, new name",
         "ab.nameB": "We previously operated as Go Home Inspection (GOHI) — same team, same company registration, same way of working. Our earlier website gohomeinspection.asia is no longer active, so if someone referred you to that name, you are in the right place.",
         "gb.badge": "Group Inspection",
@@ -5842,6 +5946,22 @@ var I18N = {
         "nav.group": "Tempahan Berkelompok",
         "foot.formerly": "Dahulunya",
         "det.form": "Isi borang sebut harga",
+        "rv.title": "Terima Kasih Kerana Memilih GoXpert",
+        "rv.lede": "Inspection anda sudah selesai. Beritahu kami bagaimana pengalaman anda — kurang seminit, dan ia betul-betul mempengaruhi cara kami bekerja.",
+        "rv.hint": "Tekan bintang untuk beri penilaian",
+        "rv.thanksT": "Terima kasih — ia sudah direkod",
+        "rv.thanksP": "Kedua-dua pilihan di bawah terbuka untuk anda. Guna mana-mana, atau kedua-duanya.",
+        "rv.gT": "Tulis review di Google",
+        "rv.gD": "Terbuka kepada umum, dan ia membantu pemilik rumah lain mencari inspector yang boleh dipercayai",
+        "rv.fT": "Hantar maklum balas terperinci",
+        "rv.fD": "Peribadi, terus kepada kami — beritahu apa yang baik dan apa yang kurang",
+        "rv.note": "Apa sahaja yang anda tulis, kami baca. Kalau ada yang tak kena, kami lebih rela dengar daripada anda berbanding tidak dengar langsung.",
+        "rv.again": "Tukar penilaian saya",
+        "rv.s1": "Kami mengecewakan anda. Tolong beritahu apa yang berlaku.",
+        "rv.s2": "Belum cukup baik. Kami nak tahu kenapa.",
+        "rv.s3": "Ada yang kurang — beritahu kami apa.",
+        "rv.s4": "Baik, tapi belum sempurna. Apa yang boleh jadikannya lima?",
+        "rv.s5": "Gembira mendengarnya. Terima kasih.",
         "ab.nameT": "Pasukan sama, nama baharu",
         "ab.nameB": "Dahulu kami beroperasi sebagai Go Home Inspection (GOHI) — pasukan yang sama, pendaftaran syarikat yang sama, cara kerja yang sama. Website lama kami gohomeinspection.asia sudah tidak aktif, jadi kalau ada orang rujuk nama itu kepada anda, anda memang di tempat yang betul.",
         "gb.badge": "Inspection Berkelompok",
@@ -6576,7 +6696,7 @@ var FAQ_ALL = [
     /* ================================================================
        LANDING PAGE — "Untuk Pemilik Rumah" (#/pemilik-rumah)
        ================================================================ */
-    var lpIntroShown = false, lpBuilt = false, lpMusicEl = null;
+    var lpIntroShown = false, lpBuilt = false, lpMusicEl = null, lpCarouselWired = false;
 
     /* kedudukan 8 alat mengelilingi bulatan SIRIM (unit, didarab --rx/--ry) */
     var LP_SLOTS = [[-1,-0.55],[-0.62,-1],[0.62,-1],[1,-0.55],[1,0.55],[0.62,1],[-0.62,1],[-1,0.55]];
@@ -6648,17 +6768,28 @@ var FAQ_ALL = [
             stk.innerHTML = one + one;
         }
 
-        /* ---- review ---- */
+        /* ---- review ----
+           Bina slaid hanya jika belum ada, TAPI pasang carousel setiap
+           kali page dimuat. build.js menjana HTML dengan memuat page
+           dalam pelayar, jadi slaid yang dijana ikut tersimpan ke dalam
+           fail terbit — kalau pemasangan carousel diikat pada keadaan
+           DOM, butang dan auto-slide tak pernah hidup pada laman
+           sebenar. */
         var rt = document.getElementById("lpRevTrack"), rd = document.getElementById("lpRevDots");
-        if (rt && rd && !rt.childElementCount) {
-            var h = "", dh = "";
-            for (var i = 1; i <= CONFIG.reviewCount; i++) {
-                h += '<div class="review-slide"><img src="img/review/' + i + '.jpg" alt="Client review ' + i +
-                     '" loading="lazy" decoding="async"></div>';
-                dh += '<span class="review-dot' + (i === 1 ? " active" : "") + '" data-i="' + (i - 1) + '"></span>';
+        if (rt && rd) {
+            if (!rt.childElementCount) {
+                var h = "", dh = "";
+                for (var i = 1; i <= CONFIG.reviewCount; i++) {
+                    h += '<div class="review-slide"><img src="img/review/' + i + '.jpg" alt="Client review ' + i +
+                         '" loading="lazy" decoding="async"></div>';
+                    dh += '<span class="review-dot' + (i === 1 ? " active" : "") + '" data-i="' + (i - 1) + '"></span>';
+                }
+                rt.innerHTML = h; rd.innerHTML = dh;
             }
-            rt.innerHTML = h; rd.innerHTML = dh;
-            lpCarousel(rt, rd, document.getElementById("lpRevPrev"), document.getElementById("lpRevNext"), CONFIG.reviewCount);
+            if (!lpCarouselWired) {
+                lpCarouselWired = true;
+                lpCarousel(rt, rd, document.getElementById("lpRevPrev"), document.getElementById("lpRevNext"), CONFIG.reviewCount);
+            }
         }
 
         /* ---- kad kategori & risiko ---- */
@@ -6939,6 +7070,95 @@ var FAQ_ALL = [
                     '<span>' + t2(x.name) + '</span></div>';
             }).join("");
             hideBrokenSections(pf.closest("section"));
+        }
+    }
+
+
+    /* ================================================================
+       PAGE REVIEW (#/review)
+
+       Dihantar melalui link selepas inspection. Tidak diindeks Google,
+       tiada dalam sitemap, tiada pautan dari page lain.
+
+       PENTING — kedua-dua butang (Google dan borang) dipapar kepada
+       SEMUA pelanggan, tidak kira bintang yang dipilih. Menapis butang
+       Google supaya hanya pelanggan gembira nampaknya ialah "review
+       gating", yang dilarang Google dan boleh menyebabkan Business
+       Profile digantung dan semua review dibuang. Jangan ubah ini.
+       ================================================================ */
+    var rvPicked = 0;
+    /* Jangan guna keadaan DOM sebagai penanda "sudah dipasang":
+       build.js menjana HTML dengan memuat page dalam pelayar, jadi
+       bintang yang dijana ikut tersimpan ke dalam fail terbit — dan
+       pendengar klik tak pernah dipasang semula pada laman sebenar. */
+    var rvWired = false, rvAgainWired = false;
+
+    function renderReviewPage() {
+        var page = document.getElementById("page-review");
+        if (!page) return;
+
+        var box = document.getElementById("rvStars");
+        if (box && !box.childElementCount) {
+            var star = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg>';
+            for (var i = 1; i <= 5; i++) {
+                var b = document.createElement("button");
+                b.type = "button";
+                b.className = "rv-star";
+                b.setAttribute("data-n", i);
+                b.setAttribute("aria-label", i + " / 5");
+                b.innerHTML = star;
+                box.appendChild(b);
+            }
+        }
+        if (box && !rvWired) {
+            rvWired = true;
+            box.addEventListener("click", function (e) {
+                var t = e.target.closest(".rv-star");
+                if (t) rvPick(parseInt(t.getAttribute("data-n"), 10));
+            });
+            /* pratonton semasa mouse melepasi bintang */
+            box.addEventListener("mouseover", function (e) {
+                var t = e.target.closest(".rv-star");
+                if (t) rvLight(parseInt(t.getAttribute("data-n"), 10));
+            });
+            box.addEventListener("mouseleave", function () { rvLight(rvPicked); });
+        }
+
+        var g = document.getElementById("rvGoogle"), f = document.getElementById("rvForm");
+        if (g) g.href = CONFIG.reviewGoogle || "#";
+        if (f) f.href = CONFIG.reviewForm || "#";
+        /* sorok butang yang tiada pautan, bukan papar pautan mati */
+        if (g) g.style.display = CONFIG.reviewGoogle ? "" : "none";
+        if (f) f.style.display = CONFIG.reviewForm ? "" : "none";
+
+        var again = document.getElementById("rvAgain");
+        if (again && !rvAgainWired) {
+            rvAgainWired = true;
+            again.addEventListener("click", function () {
+                rvPicked = 0;
+                rvLight(0);
+                document.getElementById("rvNext").classList.remove("on");
+                document.getElementById("rvHint").textContent = t("rv.hint");
+                document.getElementById("rvStars").scrollIntoView({ behavior: "smooth", block: "center" });
+            });
+        }
+        rvLight(rvPicked);
+    }
+
+    function rvLight(n) {
+        var st = document.querySelectorAll("#rvStars .rv-star");
+        for (var i = 0; i < st.length; i++) st[i].classList.toggle("lit", i < n);
+    }
+
+    function rvPick(n) {
+        rvPicked = n;
+        rvLight(n);
+        var hint = document.getElementById("rvHint");
+        if (hint) hint.textContent = t("rv.s" + n);
+        var next = document.getElementById("rvNext");
+        if (next) {
+            next.classList.add("on");
+            setTimeout(function () { next.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 120);
         }
     }
 
@@ -8149,7 +8369,7 @@ var FAQ_ALL = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing", group: "page-group" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing", group: "page-group", review: "page-review" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -8160,6 +8380,7 @@ var FAQ_ALL = [
             var parts = h.slice(2).split("/");
             if (parts[0] === "pemilik-rumah") pageKey = "landing";
             else if (parts[0] === "inspection-berkelompok") pageKey = "group";
+            else if (parts[0] === "review") pageKey = "review";
             else if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
             else if (parts[0] === "faq") pageKey = "faq";
@@ -8192,6 +8413,7 @@ var FAQ_ALL = [
         if (pageKey === "article") renderArticlePage(param);
         if (pageKey === "landing") renderLandingPage();
         if (pageKey === "group") renderGroupPage();
+        if (pageKey === "review") renderReviewPage();
         document.body.classList.toggle("lp-on", pageKey === "landing");
         if (pageKey !== "landing") lpStopMusic();
 
