@@ -265,21 +265,38 @@ tersembunyi. ID medan disimpan dalam `CONFIG.reviewFields`:
 
 | Medan borang | Soalan Google Form |
 |---|---|
-| `emailAddress` | Email (perlu mod **Responder input**) |
 | `entry.2016564230` | Your Name (Optional) |
 | `entry.1393555004` | Inspection Date (`_year` / `_month` / `_day`) |
 | `entry.313442101` | Review Inspection Quality — diisi dari bintang |
 | `entry.1292019355` | Review Inspector |
 | `entry.461575552` | General Comment |
 
-**Dua perkara yang boleh merosakkan ini tanpa amaran:**
+#### Emel
 
-1. **Mod email di Google Forms mesti "Responder input".** Kalau ia
-   "Verified", Google menolak hantaran dari luar kerana ia memerlukan
-   log masuk — borang kita akan nampak berjaya tetapi tiada apa masuk.
-2. **Jangan ubah susunan atau jenis soalan di Google Forms.** ID medan
+Pemilik sengaja **mematikan** "Collect email addresses" di Google Forms
+supaya emel bersifat sukarela. Akibatnya Google **membuang** medan khas
+`emailAddress` yang borang kita hantar. Jadi:
+
+- Emel adalah **pilihan**. Kosong pun boleh hantar; kalau diisi, format
+  disemak.
+- Selagi `CONFIG.reviewFields.emailEntry` kosong, emel **dilampirkan pada
+  hujung komen** (`Emel: nama@contoh.com`) supaya ia tidak hilang.
+- Isi `emailEntry` dengan ID soalan "Email" biasa (jenis *Short answer*)
+  dalam borang, dan emel masuk ke lajurnya sendiri — lebih kemas untuk
+  disusun kemudian.
+- Emel juga tetap dihantar dalam medan khas `emailAddress`. Google
+  membuangnya selagi "Collect email addresses" dimatikan, tetapi kalau
+  ia dihidupkan semula nanti Google **mewajibkan** medan itu — tanpanya
+  seluruh hantaran ditolak. Jadi ia dibiar di situ dengan sengaja.
+
+#### Dua perkara yang boleh merosakkan ini tanpa amaran
+
+1. **Jangan ubah susunan atau jenis soalan di Google Forms.** ID medan
    boleh berubah, dan hantaran akan gagal **senyap** — pelayar tidak
    dibenarkan membaca balasan Google (CORS), jadi kita tak dapat tahu.
+2. **Jangan tanda mana-mana soalan sebagai Required di Google Forms.**
+   Kalau hantaran kita tidak menyertakan soalan itu, Google menolak
+   seluruh hantaran. Medan wajib dikawal oleh borang di laman ini.
 
 Selepas apa-apa perubahan pada borang Google, hantar satu ujian melalui
 `goxpert.my/review/` dan semak kiraan **Responses** bertambah.
