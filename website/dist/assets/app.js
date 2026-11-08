@@ -46,7 +46,15 @@ var CONFIG = {
        akan gagal SENYAP. Uji semula setiap kali borang diubah. */
     reviewPost: "https://docs.google.com/forms/d/e/1FAIpQLSdcMl6gtBAtO0qc5_I2RYs5HQvG2reQb4q_gml3Ivs1je_LmQ/formResponse",
     reviewFields: {
-        email:     "emailAddress",      // perlu "Responder input" di Google Forms
+        /* Emel: pemilik sengaja MEMATIKAN "Collect email addresses" di
+           Google Forms supaya ia sukarela. Bila ia OFF, Google membuang
+           medan khas "emailAddress" — jadi jangan guna itu.
+
+           Isi emailEntry dengan ID soalan "Email" biasa (teks pendek)
+           dalam borang. Selagi ia kosong, emel yang pelanggan taip
+           DILAMPIRKAN pada komen supaya ia tidak hilang senyap. */
+        emailEntry: "",                 // cth "entry.1234567890"
+        email:     "emailAddress",      // hanya dipakai jika mod "Responder input"
         name:      "entry.2016564230",  // Your Name (Optional)
         date:      "entry.1393555004",  // Inspection Date -> _year/_month/_day
         quality:   "entry.313442101",   // Review Inspection Quality (1-5)
@@ -2639,9 +2647,10 @@ var I18N = {
         "rv.popBtn": "Open Google now",
         "rv.fmT": "Tell us what went wrong",
         "rv.fmP": "This goes straight to us, and nobody else sees it.",
-        "rv.fEmail": "Email",
+        "rv.fEmail": "Email, if you would like a reply",
         "rv.fName": "Name",
         "rv.fDate": "Inspection date",
+        "rv.fQual": "Inspection quality",
         "rv.fInsp": "How was the inspector?",
         "rv.fComment": "What could we have done better?",
         "rv.optional": "(optional)",
@@ -2820,9 +2829,10 @@ var I18N = {
         "rv.popBtn": "Buka Google sekarang",
         "rv.fmT": "Beritahu kami apa yang kurang",
         "rv.fmP": "Ini terus kepada kami sahaja, tiada orang lain nampak.",
-        "rv.fEmail": "Emel",
+        "rv.fEmail": "Emel, kalau anda mahu kami balas",
         "rv.fName": "Nama",
         "rv.fDate": "Tarikh inspection",
+        "rv.fQual": "Kualiti inspection",
         "rv.fInsp": "Bagaimana dengan inspector kami?",
         "rv.fComment": "Apa yang kami boleh buat lebih baik?",
         "rv.optional": "(pilihan)",
@@ -4006,22 +4016,27 @@ var FAQ_ALL = [
         if (g) g.style.display = CONFIG.reviewGoogle ? "" : "none";
         if (f) f.style.display = CONFIG.reviewForm ? "" : "none";
 
-        var mini = document.getElementById("rvInsp");
-        if (mini && !mini.childElementCount) {
-            var ms = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg>';
-            for (var k = 1; k <= 5; k++) {
-                var mb = document.createElement("button");
-                mb.type = "button"; mb.setAttribute("data-n", k);
-                mb.setAttribute("aria-label", k + " / 5");
-                mb.innerHTML = ms;
-                mini.appendChild(mb);
+        var ms = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg>';
+        ["rvQual", "rvInsp"].forEach(function (id) {
+            var m = document.getElementById(id);
+            if (!m) return;
+            if (!m.childElementCount) {
+                for (var k = 1; k <= 5; k++) {
+                    var mb = document.createElement("button");
+                    mb.type = "button"; mb.setAttribute("data-n", k);
+                    mb.setAttribute("aria-label", k + " / 5");
+                    mb.innerHTML = ms;
+                    m.appendChild(mb);
+                }
             }
-        }
-        if (mini && !rvMiniWired) {
+        });
+        if (!rvMiniWired) {
             rvMiniWired = true;
-            mini.addEventListener("click", function (e) {
-                var b = e.target.closest("button");
-                if (b) rvMiniSet(parseInt(b.getAttribute("data-n"), 10));
+            document.addEventListener("click", function (e) {
+                var b = e.target.closest ? e.target.closest("#rvQual button, #rvInsp button") : null;
+                if (!b) return;
+                var n = parseInt(b.getAttribute("data-n"), 10);
+                if (b.closest("#rvQual")) rvQualSet(n); else rvMiniSet(n);
             });
         }
         var send = document.getElementById("rvSend");
@@ -4072,6 +4087,7 @@ var FAQ_ALL = [
         else {
             rvShow("rvForm", true);
             rvMiniSet(0);
+            rvQualSet(n);
             setTimeout(function () {
                 var e = document.getElementById("rvForm");
                 if (e) e.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -4117,6 +4133,13 @@ var FAQ_ALL = [
         var b = document.querySelectorAll("#rvInsp button");
         for (var i = 0; i < b.length; i++) b[i].classList.toggle("lit", i < n);
     }
+    /* Kualiti inspection: diisi dari bintang besar di atas, tapi pelanggan
+       masih boleh ubah di sini. Nilai inilah yang dihantar. */
+    function rvQualSet(n) {
+        rvPicked = n;
+        var b = document.querySelectorAll("#rvQual button");
+        for (var i = 0; i < b.length; i++) b[i].classList.toggle("lit", i < n);
+    }
 
     /* ---------- hantar borang ke Google Form ----------
        Kita POST terus ke formResponse melalui iframe tersembunyi.
@@ -4130,8 +4153,9 @@ var FAQ_ALL = [
         var cmtEl = document.getElementById("rvComment");
         var ok = true;
 
+        /* Emel pilihan: hanya disemak kalau diisi */
         var email = (emailEl.value || "").trim();
-        var badEmail = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        var badEmail = email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         document.getElementById("rvfEmail").classList.toggle("bad", badEmail);
         if (badEmail) ok = false;
 
@@ -4162,11 +4186,18 @@ var FAQ_ALL = [
             i.type = "hidden"; i.name = name; i.value = val;
             f.appendChild(i);
         }
-        add(F.email, email);
+        /* Hantar emel ke soalan sendiri jika ada; kalau tidak, lampirkan
+           pada komen supaya ia tidak hilang tanpa disedari. */
+        var body = cmt;
+        if (email) {
+            if (F.emailEntry) add(F.emailEntry, email);
+            else if (F.email) add(F.email, email);
+            if (!F.emailEntry) body = cmt + "\n\nEmel: " + email;
+        }
         add(F.name, (document.getElementById("rvName").value || "").trim());
         add(F.quality, rvPicked);
         if (rvInspVal) add(F.inspector, rvInspVal);
-        add(F.comment, cmt);
+        add(F.comment, body);
 
         var d = (document.getElementById("rvDate").value || "").split("-");
         if (d.length === 3 && F.date) {
