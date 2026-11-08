@@ -232,34 +232,70 @@ kepadanya**. Ia hanya sampai melalui link yang anda hantar sendiri.
 > Tidak diindeks ≠ sulit. Sesiapa yang ada link boleh membukanya. Untuk
 > page ini tiada masalah — tiada maklumat sulit di situ.
 
-Pelawat memilih bintang, kemudian **dua pilihan dipapar: tulis review di
-Google, atau hantar maklum balas terperinci melalui Google Form.**
+Pelawat memilih bintang, kemudian:
 
-### Jangan tapis butang Google ikut bintang
+| Bintang | Apa berlaku |
+|---|---|
+| **5** | Popup "Terima kasih", kiraan 3 saat, lalu Google review dibuka |
+| **1–4** | Borang dalaman terbuka terus, dihantar ke Google Form yang sama |
 
-Reka bentuk asal yang diminta ialah: 5 bintang → Google, 1–4 bintang →
-borang sahaja. Itu dipanggil **review gating**, dan Google melarangnya
-secara khusus — hukumannya boleh sampai semua review dibuang dan Google
-Business Profile digantung.
+Tiada pilihan diberi kepada pelawat dalam kedua-dua kes.
 
-Jadi kedua-dua butang dipapar kepada **semua** pelanggan, tidak kira
-bintang yang dipilih. Hanya ayat galakan yang berubah. Pelanggan yang
-berpuas hati tetap akan tekan Google; yang tidak berpuas hati biasanya
-tidak — tanpa perlu menapis sesiapa.
+### AMARAN: ini review gating
 
-Amaran ini ditulis juga dalam komen kod, di `CONFIG` dan di atas
-`renderReviewPage()`.
+Aliran di atas menghantar hanya pelanggan 5 bintang ke Google. Google
+**melarang** ini — polisi *Prohibited & Restricted Content* untuk review
+melarang menapis atau memilih-milih siapa diminta memberi review. Jika
+dikesan, semua review boleh dibuang dan Google Business Profile boleh
+digantung.
+
+Pemilik telah dimaklumkan dan memilih aliran ini. Untuk kembali kepada
+aliran selamat, tukar satu baris dalam `CONFIG`:
+
+```js
+reviewGating: false,   // papar kedua-dua pilihan kepada semua pelanggan
+```
+
+Markup dan kod untuk aliran selamat itu masih ada dan berfungsi.
+
+### Borang dalaman
+
+Borang di laman ini POST terus ke Google Form yang sama, melalui iframe
+tersembunyi. ID medan disimpan dalam `CONFIG.reviewFields`:
+
+| Medan borang | Soalan Google Form |
+|---|---|
+| `emailAddress` | Email (perlu mod **Responder input**) |
+| `entry.2016564230` | Your Name (Optional) |
+| `entry.1393555004` | Inspection Date (`_year` / `_month` / `_day`) |
+| `entry.313442101` | Review Inspection Quality — diisi dari bintang |
+| `entry.1292019355` | Review Inspector |
+| `entry.461575552` | General Comment |
+
+**Dua perkara yang boleh merosakkan ini tanpa amaran:**
+
+1. **Mod email di Google Forms mesti "Responder input".** Kalau ia
+   "Verified", Google menolak hantaran dari luar kerana ia memerlukan
+   log masuk — borang kita akan nampak berjaya tetapi tiada apa masuk.
+2. **Jangan ubah susunan atau jenis soalan di Google Forms.** ID medan
+   boleh berubah, dan hantaran akan gagal **senyap** — pelayar tidak
+   dibenarkan membaca balasan Google (CORS), jadi kita tak dapat tahu.
+
+Selepas apa-apa perubahan pada borang Google, hantar satu ujian melalui
+`goxpert.my/review/` dan semak kiraan **Responses** bertambah.
 
 ### Pautan
 
 Dalam `CONFIG`:
 
 ```js
-reviewGoogle: "https://g.page/r/..../review",
-reviewForm:   "https://docs.google.com/forms/d/e/..../viewform",
+reviewGoogle: "https://g.page/r/..../review",      // link review Google
+reviewRedirectSec: 3,                              // saat sebelum dibuka
+reviewPost: "https://docs.google.com/forms/d/e/..../formResponse",
+reviewForm: "https://docs.google.com/forms/d/e/..../viewform",
 ```
 
-Kosongkan mana-mana satu dan butang itu tersembunyi automatik.
+`reviewForm` hanya digunakan bila `reviewGating` dimatikan.
 
 ## Page tempahan berkelompok
 

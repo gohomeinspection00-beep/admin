@@ -2073,8 +2073,69 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 .rv-note { margin-top: 1.4rem; font-size: 0.84rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
 .rv-again { margin-top: 1.1rem; font-size: 0.85rem; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
 
+/* ---- popup terima kasih (5 bintang) ---- */
+.rv-pop {
+    position: fixed; inset: 0; z-index: 11000; display: none;
+    align-items: center; justify-content: center; padding: 1.5rem;
+    background: rgba(12, 22, 38, 0.62); backdrop-filter: blur(4px);
+}
+.rv-pop.on { display: flex; animation: rvFade 0.3s ease both; }
+@keyframes rvFade { from { opacity: 0; } to { opacity: 1; } }
+.rv-pop-box {
+    background: #fff; border-radius: 22px; padding: 2.4rem 2rem 2rem;
+    max-width: 430px; width: 100%; text-align: center;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.3); animation: rvPopIn 0.42s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes rvPopIn { from { opacity: 0; transform: translateY(26px) scale(0.95); } to { opacity: 1; transform: none; } }
+.rv-pop-stars { display: flex; justify-content: center; gap: 0.25rem; margin-bottom: 1.1rem; }
+.rv-pop-stars svg { width: 30px; height: 30px; color: #F5A623; }
+.rv-pop-box h2 { font-size: 1.35rem; margin-bottom: 0.6rem; }
+.rv-pop-box p { color: var(--text-body); font-size: 0.96rem; line-height: 1.6; margin-bottom: 1.5rem; }
+.rv-ring { position: relative; width: 58px; height: 58px; margin: 0 auto 1.2rem; }
+.rv-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.rv-ring circle { fill: none; stroke-width: 4; }
+.rv-ring .bg { stroke: #E3E9F0; }
+.rv-ring .fg { stroke: var(--primary); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.rv-ring b {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem; font-weight: 800; color: var(--primary);
+}
+.rv-pop-box .btn { width: 100%; justify-content: center; }
+
+/* ---- borang dalaman (1-4 bintang) ---- */
+.rv-form { background: #fff; border-radius: 20px; padding: 1.9rem 1.6rem; box-shadow: 0 14px 40px rgba(0,0,0,0.08); text-align: left; }
+.rv-form h2 { font-size: 1.2rem; margin-bottom: 0.4rem; text-align: center; }
+.rv-form > p { color: var(--text-body); font-size: 0.93rem; margin-bottom: 1.5rem; text-align: center; }
+.rv-f { margin-bottom: 1.1rem; }
+.rv-f label { display: block; font-size: 0.86rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.4rem; }
+.rv-f label .opt { font-weight: 400; color: var(--text-muted); }
+.rv-f input, .rv-f textarea {
+    width: 100%; padding: 0.75rem 0.9rem; font: inherit; font-size: 0.95rem;
+    border: 1.5px solid var(--border, #E3E9F0); border-radius: 11px; background: #fff;
+    color: var(--text-dark); transition: border-color 0.2s ease;
+}
+.rv-f input:focus, .rv-f textarea:focus { outline: none; border-color: var(--primary); }
+.rv-f textarea { min-height: 110px; resize: vertical; }
+.rv-f.bad input, .rv-f.bad textarea { border-color: #D93025; }
+.rv-err { display: none; font-size: 0.8rem; color: #D93025; margin-top: 0.3rem; }
+.rv-f.bad .rv-err { display: block; }
+.rv-mini { display: flex; gap: 0.25rem; }
+.rv-mini button { width: 34px; height: 34px; border: none; background: none; padding: 0; cursor: pointer; color: #D9E2EC; transition: color 0.15s ease, transform 0.15s ease; }
+.rv-mini button svg { width: 100%; height: 100%; display: block; }
+.rv-mini button:hover { transform: scale(1.12); }
+.rv-mini button.lit { color: #F5A623; }
+.rv-form .btn { width: 100%; justify-content: center; margin-top: 0.4rem; }
+.rv-sending { opacity: 0.6; pointer-events: none; }
+.rv-done { text-align: center; padding: 2.2rem 1.4rem; }
+.rv-done-ico { width: 64px; height: 64px; margin: 0 auto 1.1rem; border-radius: 50%; background: #E6F5EC; display: flex; align-items: center; justify-content: center; }
+.rv-done-ico svg { width: 30px; height: 30px; color: #1B7A3E; }
+.rv-done h2 { font-size: 1.25rem; margin-bottom: 0.6rem; }
+.rv-done p { color: var(--text-body); font-size: 0.95rem; line-height: 1.6; }
+
 @media (max-width: 560px) {
     .rv-wrap { padding: 6rem 1.25rem 3rem; }
+    .rv-pop-box { padding: 2rem 1.3rem 1.6rem; }
+    .rv-form { padding: 1.5rem 1.2rem; }
     .rv-star { width: 44px; height: 44px; }
     .rv-stars { gap: 0.3rem; }
     .rv-thanks { padding: 1.6rem 1.2rem; }

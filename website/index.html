@@ -2114,8 +2114,69 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 .rv-note { margin-top: 1.4rem; font-size: 0.84rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
 .rv-again { margin-top: 1.1rem; font-size: 0.85rem; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
 
+/* ---- popup terima kasih (5 bintang) ---- */
+.rv-pop {
+    position: fixed; inset: 0; z-index: 11000; display: none;
+    align-items: center; justify-content: center; padding: 1.5rem;
+    background: rgba(12, 22, 38, 0.62); backdrop-filter: blur(4px);
+}
+.rv-pop.on { display: flex; animation: rvFade 0.3s ease both; }
+@keyframes rvFade { from { opacity: 0; } to { opacity: 1; } }
+.rv-pop-box {
+    background: #fff; border-radius: 22px; padding: 2.4rem 2rem 2rem;
+    max-width: 430px; width: 100%; text-align: center;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.3); animation: rvPopIn 0.42s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes rvPopIn { from { opacity: 0; transform: translateY(26px) scale(0.95); } to { opacity: 1; transform: none; } }
+.rv-pop-stars { display: flex; justify-content: center; gap: 0.25rem; margin-bottom: 1.1rem; }
+.rv-pop-stars svg { width: 30px; height: 30px; color: #F5A623; }
+.rv-pop-box h2 { font-size: 1.35rem; margin-bottom: 0.6rem; }
+.rv-pop-box p { color: var(--text-body); font-size: 0.96rem; line-height: 1.6; margin-bottom: 1.5rem; }
+.rv-ring { position: relative; width: 58px; height: 58px; margin: 0 auto 1.2rem; }
+.rv-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.rv-ring circle { fill: none; stroke-width: 4; }
+.rv-ring .bg { stroke: #E3E9F0; }
+.rv-ring .fg { stroke: var(--primary); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.rv-ring b {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem; font-weight: 800; color: var(--primary);
+}
+.rv-pop-box .btn { width: 100%; justify-content: center; }
+
+/* ---- borang dalaman (1-4 bintang) ---- */
+.rv-form { background: #fff; border-radius: 20px; padding: 1.9rem 1.6rem; box-shadow: 0 14px 40px rgba(0,0,0,0.08); text-align: left; }
+.rv-form h2 { font-size: 1.2rem; margin-bottom: 0.4rem; text-align: center; }
+.rv-form > p { color: var(--text-body); font-size: 0.93rem; margin-bottom: 1.5rem; text-align: center; }
+.rv-f { margin-bottom: 1.1rem; }
+.rv-f label { display: block; font-size: 0.86rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.4rem; }
+.rv-f label .opt { font-weight: 400; color: var(--text-muted); }
+.rv-f input, .rv-f textarea {
+    width: 100%; padding: 0.75rem 0.9rem; font: inherit; font-size: 0.95rem;
+    border: 1.5px solid var(--border, #E3E9F0); border-radius: 11px; background: #fff;
+    color: var(--text-dark); transition: border-color 0.2s ease;
+}
+.rv-f input:focus, .rv-f textarea:focus { outline: none; border-color: var(--primary); }
+.rv-f textarea { min-height: 110px; resize: vertical; }
+.rv-f.bad input, .rv-f.bad textarea { border-color: #D93025; }
+.rv-err { display: none; font-size: 0.8rem; color: #D93025; margin-top: 0.3rem; }
+.rv-f.bad .rv-err { display: block; }
+.rv-mini { display: flex; gap: 0.25rem; }
+.rv-mini button { width: 34px; height: 34px; border: none; background: none; padding: 0; cursor: pointer; color: #D9E2EC; transition: color 0.15s ease, transform 0.15s ease; }
+.rv-mini button svg { width: 100%; height: 100%; display: block; }
+.rv-mini button:hover { transform: scale(1.12); }
+.rv-mini button.lit { color: #F5A623; }
+.rv-form .btn { width: 100%; justify-content: center; margin-top: 0.4rem; }
+.rv-sending { opacity: 0.6; pointer-events: none; }
+.rv-done { text-align: center; padding: 2.2rem 1.4rem; }
+.rv-done-ico { width: 64px; height: 64px; margin: 0 auto 1.1rem; border-radius: 50%; background: #E6F5EC; display: flex; align-items: center; justify-content: center; }
+.rv-done-ico svg { width: 30px; height: 30px; color: #1B7A3E; }
+.rv-done h2 { font-size: 1.25rem; margin-bottom: 0.6rem; }
+.rv-done p { color: var(--text-body); font-size: 0.95rem; line-height: 1.6; }
+
 @media (max-width: 560px) {
     .rv-wrap { padding: 6rem 1.25rem 3rem; }
+    .rv-pop-box { padding: 2rem 1.3rem 1.6rem; }
+    .rv-form { padding: 1.5rem 1.2rem; }
     .rv-star { width: 44px; height: 44px; }
     .rv-stars { gap: 0.3rem; }
     .rv-thanks { padding: 1.6rem 1.2rem; }
@@ -2774,6 +2835,43 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
             <div class="rv-stars" id="rvStars"><!-- dijana oleh JS --></div>
             <p class="rv-hint" id="rvHint" data-i18n="rv.hint">Tap a star to rate your experience</p>
 
+            <!-- borang dalaman: 1-4 bintang -->
+            <div class="rv-next" id="rvForm">
+                <div class="rv-form" id="rvFormBox">
+                    <h2 data-i18n="rv.fmT">Tell us what went wrong</h2>
+                    <p data-i18n="rv.fmP">This goes straight to us, and nobody else sees it.</p>
+                    <div class="rv-f" id="rvfEmail">
+                        <label><span data-i18n="rv.fEmail">Email</span></label>
+                        <input type="email" id="rvEmail" autocomplete="email" inputmode="email">
+                        <span class="rv-err" data-i18n="rv.eEmail">Please enter a valid email</span>
+                    </div>
+                    <div class="rv-f">
+                        <label><span data-i18n="rv.fName">Name</span> <span class="opt" data-i18n="rv.optional">(optional)</span></label>
+                        <input type="text" id="rvName" autocomplete="name">
+                    </div>
+                    <div class="rv-f">
+                        <label><span data-i18n="rv.fDate">Inspection date</span> <span class="opt" data-i18n="rv.optional">(optional)</span></label>
+                        <input type="date" id="rvDate">
+                    </div>
+                    <div class="rv-f">
+                        <label><span data-i18n="rv.fInsp">How was the inspector?</span> <span class="opt" data-i18n="rv.optional">(optional)</span></label>
+                        <div class="rv-mini" id="rvInsp"></div>
+                    </div>
+                    <div class="rv-f" id="rvfComment">
+                        <label><span data-i18n="rv.fComment">What could we have done better?</span></label>
+                        <textarea id="rvComment"></textarea>
+                        <span class="rv-err" data-i18n="rv.eComment">Please tell us a little about it</span>
+                    </div>
+                    <button class="btn btn-primary" id="rvSend" type="button" data-i18n="rv.send">Send to GoXpert</button>
+                </div>
+                <div class="rv-form rv-done" id="rvDone" style="display:none">
+                    <div class="rv-done-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+                    <h2 data-i18n="rv.doneT">Thank you — we have it</h2>
+                    <p data-i18n="rv.doneP">We read every one of these. If something needs putting right, we will contact you.</p>
+                </div>
+            </div>
+
+            <!-- pilihan penuh: bila reviewGating dimatikan -->
             <div class="rv-next" id="rvNext">
                 <div class="rv-thanks">
                     <h2 data-i18n="rv.thanksT">Thank you — that is recorded</h2>
@@ -2794,6 +2892,23 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
             </div>
         </div>
     </section>
+
+    <!-- popup 5 bintang -->
+    <div class="rv-pop" id="rvPop">
+        <div class="rv-pop-box">
+            <div class="rv-pop-stars"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg></div>
+            <h2 data-i18n="rv.popT">Thank you!</h2>
+            <p data-i18n="rv.popP">We would be grateful if you shared that on Google. Opening it for you now.</p>
+            <div class="rv-ring">
+                <svg viewBox="0 0 44 44"><circle class="bg" cx="22" cy="22" r="19"/><circle class="fg" id="rvRing" cx="22" cy="22" r="19"/></svg>
+                <b id="rvCount">3</b>
+            </div>
+            <a class="btn btn-primary" id="rvGo" href="#" data-i18n="rv.popBtn">Open Google now</a>
+        </div>
+    </div>
+
+    <!-- sasaran tersembunyi untuk hantaran borang -->
+    <iframe name="rvSink" id="rvSink" style="display:none" title="submit" aria-hidden="true"></iframe>
 </main>
 
 <main id="page-group" class="vpage" hidden>
@@ -3205,13 +3320,38 @@ var CONFIG = {
        FAQPage), di bahagian hubungi, dan dalam llms.txt. Tukar di sini
        sahaja. Biar "" kalau tak mahu papar harga langsung. */
     priceFrom: 300,
-    /* Page review (#/review) — dihantar melalui link selepas inspection,
-       tidak diindeks Google dan tiada pautan dari page lain.
-       Kedua-dua butang dipapar kepada SEMUA pelanggan tanpa mengira
-       bintang yang dipilih. Jangan tapis ikut bintang: Google melarang
-       "review gating" dan boleh menggantung Business Profile. */
+    /* ================= PAGE REVIEW (#/review) =================
+       Dihantar melalui link selepas inspection. Tidak diindeks Google
+       dan tiada pautan dari page lain.
+
+       AMARAN — aliran di bawah ialah "review gating": 5 bintang dihantar
+       ke Google, 1-4 bintang hanya ke borang dalaman. Google MELARANG
+       ini secara khusus (polisi Prohibited & Restricted Content untuk
+       review). Jika dikesan, semua review boleh dibuang dan Google
+       Business Profile boleh digantung. Pemilik telah dimaklumkan dan
+       memilih aliran ini. Jika anda mewarisi kod ini dan mahu selamat,
+       papar kedua-dua pilihan kepada semua pelanggan.
+
+       reviewGating: false  =  papar dua pilihan kepada semua (selamat)
+       reviewGating: true   =  aliran bertapis seperti diminta pemilik   */
+    reviewGating: true,
     reviewGoogle: "https://g.page/r/CaOXZxfnnMH4EB0/review",
+    reviewRedirectSec: 3,            // saat sebelum Google dibuka
     reviewForm:   "https://docs.google.com/forms/d/e/1FAIpQLSdcMl6gtBAtO0qc5_I2RYs5HQvG2reQb4q_gml3Ivs1je_LmQ/viewform",
+
+    /* Borang dalaman menghantar terus ke Google Form yang sama.
+       ID medan diambil dari HTML borang itu. Kalau borang diubah di
+       Google (soalan ditambah/dibuang), ID boleh berubah — hantaran
+       akan gagal SENYAP. Uji semula setiap kali borang diubah. */
+    reviewPost: "https://docs.google.com/forms/d/e/1FAIpQLSdcMl6gtBAtO0qc5_I2RYs5HQvG2reQb4q_gml3Ivs1je_LmQ/formResponse",
+    reviewFields: {
+        email:     "emailAddress",      // perlu "Responder input" di Google Forms
+        name:      "entry.2016564230",  // Your Name (Optional)
+        date:      "entry.1393555004",  // Inspection Date -> _year/_month/_day
+        quality:   "entry.313442101",   // Review Inspection Quality (1-5)
+        inspector: "entry.1292019355",  // Review Inspector (1-5)
+        comment:   "entry.461575552"    // General Comment
+    },
     /* Pautan sosial — dipapar di footer dan diberitahu kepada Google
        (sameAs) supaya ia tahu akaun ini milik syarikat yang sama. */
     social: [
@@ -5793,6 +5933,23 @@ var I18N = {
         "rv.fD": "Private, straight to us — tell us what worked and what did not",
         "rv.note": "Whatever you write, we read it. If something went wrong, we would rather hear it from you than not hear it at all.",
         "rv.again": "Change my rating",
+        "rv.popT": "Thank you!",
+        "rv.popP": "We would be grateful if you shared that on Google. Opening it for you now.",
+        "rv.popBtn": "Open Google now",
+        "rv.fmT": "Tell us what went wrong",
+        "rv.fmP": "This goes straight to us, and nobody else sees it.",
+        "rv.fEmail": "Email",
+        "rv.fName": "Name",
+        "rv.fDate": "Inspection date",
+        "rv.fInsp": "How was the inspector?",
+        "rv.fComment": "What could we have done better?",
+        "rv.optional": "(optional)",
+        "rv.eEmail": "Please enter a valid email",
+        "rv.eComment": "Please tell us a little about it",
+        "rv.send": "Send to GoXpert",
+        "rv.sending": "Sending...",
+        "rv.doneT": "Thank you — we have it",
+        "rv.doneP": "We read every one of these. If something needs putting right, we will contact you.",
         "rv.s1": "We let you down. Please tell us what happened.",
         "rv.s2": "Not good enough. We want to know why.",
         "rv.s3": "Something fell short — tell us what.",
@@ -5957,6 +6114,23 @@ var I18N = {
         "rv.fD": "Peribadi, terus kepada kami — beritahu apa yang baik dan apa yang kurang",
         "rv.note": "Apa sahaja yang anda tulis, kami baca. Kalau ada yang tak kena, kami lebih rela dengar daripada anda berbanding tidak dengar langsung.",
         "rv.again": "Tukar penilaian saya",
+        "rv.popT": "Terima kasih!",
+        "rv.popP": "Kami amat menghargai kalau anda sudi kongsikan di Google. Kami bukakan sekarang.",
+        "rv.popBtn": "Buka Google sekarang",
+        "rv.fmT": "Beritahu kami apa yang kurang",
+        "rv.fmP": "Ini terus kepada kami sahaja, tiada orang lain nampak.",
+        "rv.fEmail": "Emel",
+        "rv.fName": "Nama",
+        "rv.fDate": "Tarikh inspection",
+        "rv.fInsp": "Bagaimana dengan inspector kami?",
+        "rv.fComment": "Apa yang kami boleh buat lebih baik?",
+        "rv.optional": "(pilihan)",
+        "rv.eEmail": "Sila masukkan emel yang sah",
+        "rv.eComment": "Tolong ceritakan sedikit",
+        "rv.send": "Hantar kepada GoXpert",
+        "rv.sending": "Menghantar...",
+        "rv.doneT": "Terima kasih — kami dah terima",
+        "rv.doneP": "Kami baca setiap satu. Kalau ada yang perlu dibetulkan, kami akan hubungi anda.",
         "rv.s1": "Kami mengecewakan anda. Tolong beritahu apa yang berlaku.",
         "rv.s2": "Belum cukup baik. Kami nak tahu kenapa.",
         "rv.s3": "Ada yang kurang — beritahu kami apa.",
@@ -7091,7 +7265,7 @@ var FAQ_ALL = [
        build.js menjana HTML dengan memuat page dalam pelayar, jadi
        bintang yang dijana ikut tersimpan ke dalam fail terbit — dan
        pendengar klik tak pernah dipasang semula pada laman sebenar. */
-    var rvWired = false, rvAgainWired = false;
+    var rvWired = false, rvAgainWired = false, rvMiniWired = false, rvSendWired = false;
 
     function renderReviewPage() {
         var page = document.getElementById("page-review");
@@ -7131,6 +7305,27 @@ var FAQ_ALL = [
         if (g) g.style.display = CONFIG.reviewGoogle ? "" : "none";
         if (f) f.style.display = CONFIG.reviewForm ? "" : "none";
 
+        var mini = document.getElementById("rvInsp");
+        if (mini && !mini.childElementCount) {
+            var ms = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.95 5.98 6.6.96-4.78 4.65 1.13 6.57L12 17.66l-5.9 3.1 1.13-6.57L2.45 9.54l6.6-.96z"/></svg>';
+            for (var k = 1; k <= 5; k++) {
+                var mb = document.createElement("button");
+                mb.type = "button"; mb.setAttribute("data-n", k);
+                mb.setAttribute("aria-label", k + " / 5");
+                mb.innerHTML = ms;
+                mini.appendChild(mb);
+            }
+        }
+        if (mini && !rvMiniWired) {
+            rvMiniWired = true;
+            mini.addEventListener("click", function (e) {
+                var b = e.target.closest("button");
+                if (b) rvMiniSet(parseInt(b.getAttribute("data-n"), 10));
+            });
+        }
+        var send = document.getElementById("rvSend");
+        if (send && !rvSendWired) { rvSendWired = true; send.addEventListener("click", rvSubmit); }
+
         var again = document.getElementById("rvAgain");
         if (again && !rvAgainWired) {
             rvAgainWired = true;
@@ -7150,16 +7345,142 @@ var FAQ_ALL = [
         for (var i = 0; i < st.length; i++) st[i].classList.toggle("lit", i < n);
     }
 
+    function rvShow(id, on) {
+        var el = document.getElementById(id);
+        if (el) el.classList.toggle("on", !!on);
+    }
+
     function rvPick(n) {
         rvPicked = n;
         rvLight(n);
         var hint = document.getElementById("rvHint");
         if (hint) hint.textContent = t("rv.s" + n);
-        var next = document.getElementById("rvNext");
-        if (next) {
-            next.classList.add("on");
-            setTimeout(function () { next.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 120);
+
+        if (!CONFIG.reviewGating) {
+            /* aliran selamat: dua pilihan untuk semua */
+            rvShow("rvNext", true);
+            setTimeout(function () {
+                var e = document.getElementById("rvNext");
+                if (e) e.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }, 120);
+            return;
         }
+
+        rvShow("rvNext", false);
+        if (n === 5) { rvShow("rvForm", false); rvPopup(); }
+        else {
+            rvShow("rvForm", true);
+            rvMiniSet(0);
+            setTimeout(function () {
+                var e = document.getElementById("rvForm");
+                if (e) e.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 120);
+        }
+    }
+
+    /* ---------- 5 bintang: popup, kemudian buka Google ---------- */
+    var rvTimer = null;
+    function rvPopup() {
+        var pop = document.getElementById("rvPop");
+        var go = document.getElementById("rvGo");
+        var url = CONFIG.reviewGoogle;
+        if (!pop || !url) { if (url) location.href = url; return; }
+        if (go) go.href = url;
+        pop.classList.add("on");
+        document.body.style.overflow = "hidden";
+
+        var secs = CONFIG.reviewRedirectSec || 3;
+        var left = secs;
+        var ring = document.getElementById("rvRing");
+        var cnt = document.getElementById("rvCount");
+        var C = 2 * Math.PI * 19;
+        if (ring) { ring.style.strokeDasharray = C; ring.style.strokeDashoffset = "0"; }
+        if (cnt) cnt.textContent = left;
+
+        if (rvTimer) clearInterval(rvTimer);
+        rvTimer = setInterval(function () {
+            left--;
+            if (cnt) cnt.textContent = Math.max(left, 0);
+            if (ring) ring.style.strokeDashoffset = C * (1 - left / secs);
+            if (left <= 0) {
+                clearInterval(rvTimer); rvTimer = null;
+                location.href = url;
+            }
+        }, 1000);
+    }
+
+    /* ---------- bintang kecil dalam borang ---------- */
+    var rvInspVal = 0;
+    function rvMiniSet(n) {
+        rvInspVal = n;
+        var b = document.querySelectorAll("#rvInsp button");
+        for (var i = 0; i < b.length; i++) b[i].classList.toggle("lit", i < n);
+    }
+
+    /* ---------- hantar borang ke Google Form ----------
+       Kita POST terus ke formResponse melalui iframe tersembunyi.
+       Pelayar tak benarkan kita BACA balasan Google (CORS), jadi kita
+       tak dapat tahu sama ada ia diterima. Kalau borang di Google
+       diubah dan ID medan bertukar, hantaran gagal SENYAP — uji semula
+       setiap kali borang itu diubah. */
+    function rvSubmit() {
+        var F = CONFIG.reviewFields || {};
+        var emailEl = document.getElementById("rvEmail");
+        var cmtEl = document.getElementById("rvComment");
+        var ok = true;
+
+        var email = (emailEl.value || "").trim();
+        var badEmail = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        document.getElementById("rvfEmail").classList.toggle("bad", badEmail);
+        if (badEmail) ok = false;
+
+        var cmt = (cmtEl.value || "").trim();
+        document.getElementById("rvfComment").classList.toggle("bad", cmt.length < 3);
+        if (cmt.length < 3) ok = false;
+
+        if (!ok) {
+            var bad = document.querySelector("#rvFormBox .rv-f.bad input, #rvFormBox .rv-f.bad textarea");
+            if (bad) bad.focus();
+            return;
+        }
+
+        var box = document.getElementById("rvFormBox");
+        var btn = document.getElementById("rvSend");
+        box.classList.add("rv-sending");
+        btn.textContent = t("rv.sending");
+
+        var f = document.createElement("form");
+        f.method = "POST";
+        f.action = CONFIG.reviewPost;
+        f.target = "rvSink";
+        f.style.display = "none";
+
+        function add(name, val) {
+            if (!name || val === "" || val == null) return;
+            var i = document.createElement("input");
+            i.type = "hidden"; i.name = name; i.value = val;
+            f.appendChild(i);
+        }
+        add(F.email, email);
+        add(F.name, (document.getElementById("rvName").value || "").trim());
+        add(F.quality, rvPicked);
+        if (rvInspVal) add(F.inspector, rvInspVal);
+        add(F.comment, cmt);
+
+        var d = (document.getElementById("rvDate").value || "").split("-");
+        if (d.length === 3 && F.date) {
+            add(F.date + "_year", d[0]);
+            add(F.date + "_month", String(parseInt(d[1], 10)));
+            add(F.date + "_day", String(parseInt(d[2], 10)));
+        }
+
+        document.body.appendChild(f);
+        f.submit();
+        setTimeout(function () { f.remove(); }, 2000);
+
+        box.style.display = "none";
+        document.getElementById("rvDone").style.display = "";
+        document.getElementById("rvDone").scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
     /* ---------- Page FAQ penuh (#/faq) ---------- */
