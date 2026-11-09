@@ -688,3 +688,53 @@ ketiga-tiga aplikasi dan menyebut nama yang betul, navbar ditolak ke
 tutup kekal selepas muat semula, salin berfungsi, tiada overflow, tiada
 ralat JavaScript. Page `/review/` tiada blok kerana ia tiada CTA
 WhatsApp — itu betul.
+
+## Alamat ikut bahasa
+
+Alamat sepadan dengan bahasa page: perkataan English di sisi English,
+perkataan Melayu di sisi Melayu.
+
+| Page | English | Melayu |
+|---|---|---|
+| Landing pemilik rumah | `/homeowners/` | `/ms/pemilik-rumah/` |
+| Tempahan berkelompok | `/group-booking/` | `/ms/inspection-berkelompok/` |
+
+Semua page lain memakai slug yang sama dalam dua bahasa, dibezakan oleh
+awalan `/ms` sahaja.
+
+Dalam `build.js`, medan `outEn` pada entri PAGES memberi slug English;
+`out` ialah slug Melayu dan juga lalai. Pembantu `outFor(lang, P)`
+dipakai di setiap tempat alamat dibina — shell, hreflang, breadcrumb,
+sitemap dan direktori keluaran — supaya tiada satu pun tertinggal.
+
+### Alias
+
+Slug Melayu di sisi English (`/pemilik-rumah/`, `/inspection-berkelompok/`)
+dahulunya alamat sebenar dan sudah dihantar kepada Google. Ia kekal
+dibina sebagai salinan yang boleh dibuka, dengan `canonical` menunjuk ke
+alamat baharu, dan **tidak** dimasukkan ke dalam sitemap. Jadi pautan
+lama tidak mati dan Google tahu mana yang rasmi.
+
+Worker ini melayan fail statik sahaja tanpa kod, jadi pengalihan (301)
+tidak tersedia. Salinan dengan canonical ialah cara yang ada.
+
+### Tiga tempat yang mesti seiring
+
+Menukar slug sebuah page bermakna menyentuh ketiga-tiga ini bersama:
+
+1. `outEn` dalam PAGES (`build.js`) — menentukan fail dan alamat.
+2. `realLinks()` (`build.js`) — menukar `href="#/..."` dalam HTML statik.
+3. `SLUG_EN` / `SLUG_BM` (`index.html`) — dipakai oleh `url()` untuk
+   membina pautan, dan oleh `otherLangUrl()` untuk butang bahasa.
+
+Nombor 3 yang paling senang terlepas. Tanpanya, butang bahasa dari
+`/homeowners/` menghantar pelawat ke `/ms/homeowners/` — alamat yang
+tidak wujud.
+
+Routing hash menerima kedua-dua slug, jadi `#/pemilik-rumah` dan
+`#/homeowners` sama-sama membuka page yang betul.
+
+Diuji 9 November 2026: 1,683 pautan dalaman merentas 70 fail diperiksa,
+tiada satu pun pecah; butang bahasa dari setiap page mendarat pada
+alamat yang wujud; hreflang berpasangan betul; sitemap mengandungi empat
+alamat sebenar dan tiada alias.

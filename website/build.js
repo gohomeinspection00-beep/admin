@@ -52,6 +52,9 @@ const LANGS = [
     { code: "en", htmlLang: "en", ogLocale: "en_MY", hreflang: "en-MY", prefix: "" },
     { code: "bm", htmlLang: "ms", ogLocale: "ms_MY", hreflang: "ms-MY", prefix: "/ms" }
 ];
+/* Slug sebenar bagi satu page dalam satu bahasa. Kebanyakan page guna
+   slug yang sama untuk dua-dua bahasa; hanya yang ada outEn berbeza. */
+const outFor = (lang, P) => (lang.code === "en" && P.outEn) ? P.outEn : P.out;
 const pathFor = (lang, out) => lang.prefix + "/" + (out ? out + "/" : "");
 const urlFor  = (lang, out) => SITE + pathFor(lang, out);
 
@@ -92,12 +95,16 @@ const PAGES = [
       desc: "What we learn on site, written up so property owners can use it — no jargon, no sales pitch.",
       titleBm: "Artikel & Panduan Dari Tapak — GoXpert",
       descBm: "Apa yang kami pelajari di tapak, ditulis supaya pemilik hartanah boleh guna — tanpa jargon, tanpa ayat jualan." },
-    { out: "pemilik-rumah", key: "landing", hash: "#/pemilik-rumah",
-      title: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
-      desc: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor.",
+    /* outEn: slug berasingan untuk sisi English. Tanpa ia, page English
+       duduk di alamat Melayu — alamat dan kandungan bercanggah, dan
+       Google menerima isyarat bahasa yang tidak konsisten. Slug lama
+       kekal boleh dibuka sebagai alias; lihat ALIAS di bawah. */
+    { out: "pemilik-rumah", outEn: "homeowners", key: "landing", hash: "#/pemilik-rumah",
+      title: "For Homeowners — New Home & Sub-Sale Inspection | GoXpert",
+      desc: "RISM-registered Building Surveyors with SIRIM-calibrated equipment. New home (DLP), sub-sale and post-renovation inspection, plus tribunal support across Johor, Melaka, Negeri Sembilan and Selangor.",
       titleBm: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
       descBm: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." },
-    { out: "inspection-berkelompok", key: "group", hash: "#/inspection-berkelompok",
+    { out: "inspection-berkelompok", outEn: "group-booking", key: "group", hash: "#/inspection-berkelompok",
       title: "Group Inspection Booking for Your Project — GoXpert",
       desc: "Several owners in the same project booking together pay a lower rate each. One trip, unit after unit, and every owner still receives their own full defect report.",
       titleBm: "Tempahan Inspection Berkelompok Untuk Projek Anda — GoXpert",
@@ -146,7 +153,12 @@ function realLinks(s, lang) {
     return s
         .replace(/href="#\/services\/([a-z0-9-]+)"/g, 'href="' + p + '/services/$1/"')
         .replace(/href="#\/blog\/([a-z0-9-]+)"/g, 'href="' + p + '/blog/$1/"')
-        .replace(/href="#\/(services|projects|gallery|about|faq|blog|pemilik-rumah|inspection-berkelompok)"/g, 'href="' + p + '/$1/"')
+        .replace(/href="#\/(services|projects|gallery|about|faq|blog)"/g, 'href="' + p + '/$1/"')
+        /* Dua page ini ada slug berbeza ikut bahasa. */
+        .replace(/href="#\/pemilik-rumah"/g,
+                 'href="' + p + "/" + (lang.code === "en" ? "homeowners" : "pemilik-rumah") + '/"')
+        .replace(/href="#\/inspection-berkelompok"/g,
+                 'href="' + p + "/" + (lang.code === "en" ? "group-booking" : "inspection-berkelompok") + '/"')
         .replace(/href="#"/g, 'href="' + p + '/"');
 }
 
@@ -223,7 +235,7 @@ function crumbs(page, lang) {
     const parts = [{ name: bm ? "Utama" : "Home", url: urlFor(lang, "") }];
     if (page.key === "service") parts.push({ name: bm ? "Servis" : "Services", url: urlFor(lang, "services") });
     if (page.key === "article") parts.push({ name: bm ? "Artikel" : "Articles", url: urlFor(lang, "blog") });
-    parts.push({ name: (bm ? (page.titleBm || page.title) : page.title).split(" — ")[0], url: urlFor(lang, page.out) });
+    parts.push({ name: (bm ? (page.titleBm || page.title) : page.title).split(" — ")[0], url: urlFor(lang, outFor(lang, page)) });
     return {
         "@type": "BreadcrumbList",
         itemListElement: parts.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.name, item: p.url }))
@@ -280,13 +292,13 @@ function shell(page, parts, faqNodes, lang) {
     const bm = lang.code === "bm";
     const title = (bm && page.titleBm) || page.title;
     const desc = (bm && page.descBm) || page.desc;
-    const url = urlFor(lang, page.out);
+    const url = page.canonical || urlFor(lang, outFor(lang, page));
     const og = page.ogImage || (SITE + "/img/og-share.jpg");
     /* hreflang: beritahu Google kedua-dua URL ini page yang sama dalam
        bahasa berbeza, supaya ia tak dikira kandungan bertindih */
     const alts = LANGS.map(l =>
-        `<link rel="alternate" hreflang="${l.hreflang}" href="${urlFor(l, page.out)}">`
-    ).join("\n") + `\n<link rel="alternate" hreflang="x-default" href="${urlFor(LANGS[0], page.out)}">`;
+        `<link rel="alternate" hreflang="${l.hreflang}" href="${urlFor(l, outFor(l, page))}">`
+    ).join("\n") + `\n<link rel="alternate" hreflang="x-default" href="${urlFor(LANGS[0], outFor(LANGS[0], page))}">`;
     return `<!DOCTYPE html>
 <html lang="${lang.htmlLang}">
 <head>
@@ -534,11 +546,26 @@ function copyDir(from, to) {
 
         for (const k of Object.keys(parts)) parts[k] = realLinks(parts[k], lang);
 
-        const dir = path.join(OUT, lang.prefix.replace(/^\//, ""), P.out);
+        const dir = path.join(OUT, lang.prefix.replace(/^\//, ""), outFor(lang, P));
         fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(path.join(dir, "index.html"),
             shell(P, parts, P.key === "faq" ? faqNodes[lang.code] : null, lang));
         process.stdout.write(".");
+
+        /* Alias: slug English lama kekal boleh dibuka supaya pautan yang
+           sudah dikongsi tidak mati, tetapi canonicalnya menunjuk ke
+           alamat baharu, jadi Google tahu mana yang rasmi. Alias tidak
+           masuk sitemap. */
+        if (lang.code === "en" && P.outEn) {
+            const aliasDir = path.join(OUT, P.out);
+            fs.mkdirSync(aliasDir, { recursive: true });
+            const aliasPage = Object.assign({}, P, {
+                canonical: urlFor(lang, P.outEn)
+            });
+            fs.writeFileSync(path.join(aliasDir, "index.html"),
+                shell(aliasPage, parts, null, lang));
+            process.stdout.write("a");
+        }
       }
       process.stdout.write(" " + lang.code + "\n");
     }
@@ -563,11 +590,11 @@ function copyDir(from, to) {
     LANGS.forEach(lang => PAGES.filter(P => !P.noindex).forEach(P => {
         const pr = P.key === "home" ? "1.0" : (P.key === "service" || P.key === "services") ? "0.9" : "0.7";
         const alts = LANGS.map(l =>
-            '    <xhtml:link rel="alternate" hreflang="' + l.hreflang + '" href="' + urlFor(l, P.out) + '"/>'
+            '    <xhtml:link rel="alternate" hreflang="' + l.hreflang + '" href="' + urlFor(l, outFor(l, P)) + '"/>'
         ).join("\n") +
-        '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + urlFor(LANGS[0], P.out) + '"/>';
+        '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + urlFor(LANGS[0], outFor(LANGS[0], P)) + '"/>';
         sm.push("  <url>",
-                "    <loc>" + urlFor(lang, P.out) + "</loc>",
+                "    <loc>" + urlFor(lang, outFor(lang, P)) + "</loc>",
                 alts,
                 "    <lastmod>" + (P.article ? P.article.date : today) + "</lastmod>",
                 "    <changefreq>monthly</changefreq>",

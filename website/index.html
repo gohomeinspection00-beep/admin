@@ -6692,11 +6692,22 @@ var FAQ_ALL = [
 
     /* Pautan dalaman. Versi satu-fail guna "#/services/bca";
        versi berbilang fail (dist/) guna "/services/bca/". */
+    /* Dua page membawa slug berbeza ikut bahasa: alamat English memakai
+       perkataan English, alamat Melayu memakai perkataan Melayu. Hash
+       dalaman kekal satu (#/pemilik-rumah) supaya routing tidak perlu
+       tahu bahasa; penukaran berlaku hanya semasa membina alamat. */
+    var SLUG_EN = { "pemilik-rumah": "homeowners", "inspection-berkelompok": "group-booking" };
+    var SLUG_BM = { "homeowners": "pemilik-rumah", "group-booking": "inspection-berkelompok" };
+
     function url(h) {
         if (!window.GX_STATIC) return h;
         var pre = lang === "bm" ? "/ms" : "";
         if (!h || h === "#" || h === "#/") return pre + "/";
-        if (h.indexOf("#/") === 0) return pre + "/" + h.slice(2).replace(/\/+$/, "") + "/";
+        if (h.indexOf("#/") === 0) {
+            var seg = h.slice(2).replace(/\/+$/, "").split("/");
+            if (lang !== "bm" && SLUG_EN[seg[0]]) seg[0] = SLUG_EN[seg[0]];
+            return pre + "/" + seg.join("/") + "/";
+        }
         return h;
     }
 
@@ -7884,10 +7895,20 @@ var FAQ_ALL = [
     /* URL page yang sama dalam bahasa satu lagi (versi berbilang fail) */
     function otherLangUrl() {
         var p = location.pathname.replace(/\/+$/, "/") || "/";
+        var toBm;
         if (p.indexOf("/ms/") === 0 || p === "/ms") {
-            p = p.replace(/^\/ms/, "") || "/";
+            p = p.replace(/^\/ms/, "") || "/"; toBm = false;
         } else {
-            p = "/ms" + (p === "/" ? "/" : p);
+            p = "/ms" + (p === "/" ? "/" : p); toBm = true;
+        }
+        /* Page yang slugnya berbeza ikut bahasa mesti ditukar sekali.
+           Tanpa ini, butang bahasa dari /homeowners/ menghantar pelawat
+           ke /ms/homeowners/ — alamat yang tidak wujud. */
+        var seg = p.split("/").filter(Boolean);
+        var i = toBm ? 1 : 0;
+        if (seg[i]) {
+            var map = toBm ? SLUG_BM : SLUG_EN;
+            if (map[seg[i]]) { seg[i] = map[seg[i]]; p = "/" + seg.join("/") + "/"; }
         }
         if (p.charAt(p.length - 1) !== "/") p += "/";
         return p + location.search + location.hash;
@@ -8993,8 +9014,8 @@ var FAQ_ALL = [
         var pageKey = "home", param = null, anchor = null;
         if (h.indexOf("#/") === 0) {
             var parts = h.slice(2).split("/");
-            if (parts[0] === "pemilik-rumah") pageKey = "landing";
-            else if (parts[0] === "inspection-berkelompok") pageKey = "group";
+            if (parts[0] === "pemilik-rumah" || parts[0] === "homeowners") pageKey = "landing";
+            else if (parts[0] === "inspection-berkelompok" || parts[0] === "group-booking") pageKey = "group";
             else if (parts[0] === "review") pageKey = "review";
             else if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
