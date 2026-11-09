@@ -582,3 +582,29 @@ sendiri ia hanya menyokong HTML, CSS dan JS, sedangkan laman ini ada
 390 gambar, satu MP3 dan satu PDF. Ia menerima seretan, mengira 468
 fail dengan saiz yang betul, mencipta versi baru — tetapi versi itu
 mengandungi aset lama. Diuji dua kali, 9 November 2026.
+
+## Google Analytics
+
+`CONFIG.ga` memegang Measurement ID GA4 (`G-…`). `build.js` menyuntik
+tag gtag ke dalam `<head>` setiap page hanya apabila baris itu ada isi;
+kosongkan dan laman berjalan tanpa penjejakan, tanpa perubahan lain.
+
+ID ini bukan rahsia — ia terpapar dalam sumber setiap page yang
+menggunakannya, jadi ia tinggal dalam fail sumber seperti tetapan biasa.
+
+Google menawarkan bekas **Google Tag Manager** (`GTM-…`) semasa pemasangan.
+Ia tidak digunakan di sini. GTM ialah lapisan tambahan dengan tetapannya
+sendiri; jika tetapan itu salah, data berhenti sampai tanpa sebarang
+tanda. Tag gtag terus lebih mudah disahkan.
+
+### Klik WhatsApp
+
+Laman ini tiada troli dan tiada borang tempahan, jadi bilangan pelawat
+tidak memberitahu apa-apa tentang perniagaan. Yang bermakna ialah berapa
+ramai menekan WhatsApp. Klik itu dihantar sebagai acara `whatsapp_click`
+dengan `page_path` dan `link_text`, supaya pemilik nampak page mana yang
+benar-benar menghasilkan lead.
+
+Diuji 9 November 2026: tag dimuat pada kesemua 69 fail HTML, dan satu
+klik pada butang WhatsApp merekod
+`["event","whatsapp_click",{"page_path":"/","link_text":"Get a Free Quote"}]`.

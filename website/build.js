@@ -270,7 +270,9 @@ function shell(page, parts, faqNodes, lang) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<base href="/">
+${CONFIG.ga ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${CONFIG.ga}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',${JSON.stringify(CONFIG.ga)});</script>
+` : ""}<base href="/">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <meta name="theme-color" content="#1565C0">
