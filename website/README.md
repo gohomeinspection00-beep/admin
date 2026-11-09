@@ -632,76 +632,59 @@ tidak muncul untuk carian begitu.
 senarai yang sama ditulis dua kali di `build.js`; pasti satu daripadanya
 akan terlupa dikemas kini apabila liputan berubah.
 
-## Pelayar dalam-app dan jalan ganti WhatsApp
+## Popup WhatsApp
 
-TikTok, Instagram, Facebook dan Messenger membuka pautan dalam pelayar
-kecil mereka sendiri. Pelayar itu selalunya tidak dibenarkan melompat
-keluar ke aplikasi lain, jadi butang WhatsApp ditekan dan **tiada apa
-berlaku** — tiada ralat, tiada tanda. Pelanggan menyangka butang rosak.
-Pemilik telah mengesahkan ini berlaku dari TikTok.
+Setiap pautan WhatsApp di laman ini membuka popup dahulu, bukan terus
+melompat ke WhatsApp. Popup itu memberi dua jalan: butang **Buka
+WhatsApp**, dan nombor telefon sebagai teks yang boleh disalin.
+
+### Kenapa
+
+TikTok, Instagram dan Facebook membuka pautan dalam pelayar kecil mereka
+sendiri. Pelayar itu selalunya tidak dibenarkan melompat keluar ke
+aplikasi lain, jadi butang WhatsApp ditekan dan **tiada apa berlaku** —
+tiada ralat, tiada tanda. Pelanggan menyangka butang rosak lalu tutup.
+Pemilik mengesahkan ini berlaku dari TikTok.
 
 Ini tidak kelihatan dalam Analytics: `whatsapp_click` tetap direkod,
 kerana klik memang berlaku. Yang gagal ialah lompatan selepas itu.
 
-Dua perkara menanganinya.
+### Apa yang dicuba dahulu, dan kenapa ia gagal
 
-**Jalur amaran** (`#iabBar`) muncul hanya apabila tandatangan pelayar
-sepadan dengan salah satu aplikasi itu, dan menyebut nama aplikasi yang
-betul. Ia `position: fixed` kerana navbar juga `fixed`; navbar dan
-kandungan ditolak ke bawah sebanyak `--iab-h`, yang diukur selepas jalur
-dipaparkan. Boleh ditutup, dan pilihan itu disimpan dalam `localStorage`
-supaya ia tidak muncul lagi pada pelayar itu.
+Percubaan pertama ialah mengesan pelayar dalam-app daripada tandatangan
+pelayarnya, lalu memaparkan jalur amaran. Ia **tidak berfungsi**: TikTok
+pada telefon pemilik tidak menghantar tandatangan yang dijangka, jadi
+jalur itu tidak pernah muncul di tempat ia paling diperlukan.
 
-**Blok nombor telefon** (`.wa-fallback`) muncul pada syarat yang sama.
-Nombor ditulis sebagai teks yang boleh disalin: butang boleh gagal
-senyap, teks tidak boleh. Boleh ditutup, tetapi hanya dalam
-`sessionStorage` — ia kembali pada lawatan berikutnya, kerana ia jaring
-keselamatan.
+Popup tidak mengesan apa-apa, jadi ia tidak boleh tersalah teka. Nombor
+telefon sentiasa ada di situ, sama ada WhatsApp terbuka atau tidak.
 
-### Skop: dua page sahaja, pelayar dalam-app sahaja
+Harganya satu ketukan tambahan untuk semua orang. Itu diterima, kerana
+ketukan yang tidak membawa ke mana-mana lebih mahal.
 
-Kedua-duanya terhad kepada page pemilik rumah — `/homeowners/` dan
-`/ms/pemilik-rumah/` — dan hanya untuk pelawat dari pelayar dalam-app.
-Page itu yang dikongsi di TikTok dan Instagram. Laman utama tidak, jadi
-tiada sebab mengganggu pelawat di sana.
+### Nota pelaksanaan
 
-Dalam Chrome atau Safari, pada mana-mana page, tiada satu pun daripada
-keduanya wujud.
+- Pendengar dipasang **sekali** pada `document` dan diingat dengan
+  pemboleh ubah JS, bukan atribut DOM. `build.js` menyimpan DOM yang
+  sudah dirender; penanda dalam DOM akan terbakar ke dalam fail terbitan
+  dan pendengar tidak akan dipasang pada laman sebenar.
+- `[hidden]` sahaja tidak cukup untuk menyembunyikan popup: ia memberi
+  `display:none` daripada pelayar, dan mana-mana peraturan CSS dengan
+  `display` akan mengatasinya. `.wam[hidden] { display: none !important }`
+  yang melakukannya. Kesilapan ini pernah berlaku di sini, dan sebuah
+  jalur kosong muncul kepada setiap pelawat di setiap page.
+- Ujian memeriksa **tinggi sebenar elemen pada skrin**, bukan sifat
+  `.hidden`. Ujian yang memeriksa sifat itu lulus walaupun elemen masih
+  kelihatan — itulah yang melepaskan pepijat di atas.
+- Butang "Buka WhatsApp" di dalam popup dilangkau oleh penjejak
+  `whatsapp_click`. Tanpa itu, setiap lead dikira dua kali.
+- Pautan `wa.me` asal dibawa masuk ke dalam popup sepenuhnya, termasuk
+  teks mesej yang sudah disediakan untuk page itu.
 
-Syarat itu diperiksa di hujung `route()`, yang menerima `pageKey`. Kerana
-prerender berjalan dalam Chromium biasa pada page biasa, tiada apa yang
-terbakar ke dalam fail terbitan — kedua-duanya dibina pada masa larian
-sahaja. Menukar page dalam mod satu-fail membuang blok yang sedia ada.
-
-### Tiga perkara yang mudah dirosakkan
-
-1. **Blok dibina sekali per page, dan pemeriksaannya ialah kandungan
-   sebenar** (adakah `.wa-fallback` sudah ada di sebelah butang), bukan
-   penanda "sudah dipasang" dalam DOM. `build.js` menyimpan DOM yang
-   sudah dirender; penanda begitu akan terbakar ke dalam fail terbitan
-   dan blok tidak akan dibina pada laman sebenar.
-
-2. **`wireWaFallback()` dipanggil di hujung `route()`**, bukan sekali
-   semasa muat. Page servis dan artikel menjana butang WhatsApp mereka
-   sendiri di dalam `route()`, selepas `renderAll()` selesai.
-
-3. **Butang WhatsApp tidak semuanya berkelas `.btn-whatsapp`.** Page
-   servis menjana CTAnya sebagai `<a class="btn" href="wa.me/…">`. Kedua
-   -dua bentuk dicari; butang terapung dan pautan footer ditinggalkan.
-
-### Had
-
-Pengesanan membaca tandatangan pelayar. Jika aplikasi itu mengubahnya,
-jalur berhenti muncul. Ia tidak akan tersilap papar kepada pelawat
-biasa, jadi kegagalannya sentiasa ke arah senyap.
-
-Diuji 9 November 2026: tujuh page × empat tandatangan pelayar (Chrome,
-Safari, TikTok, Instagram). Jalur dan blok muncul pada `/homeowners/`
-dan `/ms/pemilik-rumah/` dalam TikTok dan Instagram sahaja — 4 daripada
-28 gabungan. Semua yang lain kosong, termasuk muka depan dan page servis
-dalam TikTok. Tiada overflow, tiada ralat JavaScript. Nama aplikasi
-disebut betul, navbar ditolak ke 92px, tutup kekal selepas muat semula,
-salin berfungsi.
+Diuji 9 November 2026 pada tujuh page, EN dan BM: popup tertutup semasa
+muat (0px), terbuka pada ketukan, tertutup dengan butang silang, teks
+mengikut bahasa page, pautan dalam popup sama dengan pautan asal, tiada
+acara Analytics berganda, tiada ralat JavaScript.
 
 ## Alamat ikut bahasa
 

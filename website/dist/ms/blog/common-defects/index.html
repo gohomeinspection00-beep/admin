@@ -502,12 +502,19 @@
 </script>
 </head>
 <body>
-<div class="iab-bar" id="iabBar" hidden="">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M12 9v4M12 17h.01"></path><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path>
-    </svg>
-    <div class="iab-txt"><b id="iabTitle"></b><span id="iabBody"></span></div>
-    <button type="button" class="iab-x" id="iabX" aria-label="Close">×</button>
+<div class="wam" id="waModal" hidden="">
+    <div class="wam-bg" id="wamBg"></div>
+    <div class="wam-card" role="dialog" aria-modal="true" aria-labelledby="wamTitle">
+        <button type="button" class="wam-x" id="wamX" aria-label="Tutup">×</button>
+        <h3 id="wamTitle">Hubungi kami di WhatsApp</h3>
+        <a class="btn btn-whatsapp" id="wamGo" href="/ms/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"></path></svg>
+            <span id="wamGoTxt">Buka WhatsApp</span>
+        </a>
+        <p class="wam-note" id="wamNote">Kalau WhatsApp tak terbuka — ada aplikasi menyekatnya — salin nombor ini dan mesej kami terus dari WhatsApp.</p>
+        <div class="wam-num"><span id="wamNum">+6011-3144 6591</span><button type="button" class="wam-copy" id="wamCopy">Salin</button></div>
+        <a class="btn btn-secondary" id="wamCall" href="tel:+601131446591"><span id="wamCallTxt">Telefon sahaja</span></a>
+    </div>
 </div>
 <div class="scroll-progress" id="scrollProgress"></div>
 <nav class="navbar" id="navbar">

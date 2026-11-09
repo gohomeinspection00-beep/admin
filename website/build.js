@@ -333,7 +333,7 @@ ${jsonLd(page, faqNodes, lang)}
 </script>
 </head>
 <body${page.key === "landing" ? ' class="lp-on"' : ""}>
-${parts.iab}
+${parts.wam}
 ${parts.progress}
 ${parts.nav}
 ${parts.page}
@@ -526,7 +526,7 @@ function copyDir(from, to) {
             (el || document).querySelectorAll(".reveal").forEach(x => x.classList.add("visible"));
             const grab = s => { const n = document.querySelector(s); return n ? n.outerHTML : ""; };
             return {
-                iab: grab("#iabBar"),
+                wam: grab("#waModal"),
                 progress: grab(".scroll-progress"),
                 nav: grab("#navbar"),
                 page: el ? el.outerHTML : "",

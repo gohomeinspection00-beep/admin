@@ -151,79 +151,66 @@ img { max-width: 100%; }
 }
 .btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); }
 
-/* ==================== PELAYAR DALAM-APP + JALAN GANTI WHATSAPP ====================
-   TikTok, Instagram dan Facebook membuka pautan dalam pelayar kecil mereka
-   sendiri. Pelayar itu selalunya tidak dibenarkan melompat keluar ke aplikasi
-   lain, jadi butang WhatsApp ditekan dan tiada apa berlaku — tiada ralat,
-   tiada tanda. Pelanggan ingat butang rosak lalu tutup.
+/* ==================== POPUP WHATSAPP ====================
+   Setiap butang WhatsApp membuka popup ini dahulu, bukan terus melompat
+   ke WhatsApp.
 
-   Dua perkara di bawah ialah jawapannya: jalur amaran (hanya untuk pelawat
-   dari aplikasi itu) dan nombor telefon sebagai teks (untuk semua pelawat,
-   kerana teks tidak boleh gagal senyap). */
-/* Atribut [hidden] memberi display:none daripada pelayar sahaja, dan
-   mana-mana peraturan CSS dengan display: flex akan mengatasinya. Tanpa
-   baris ini, jalur dan blok di bawah kekal nampak walaupun hidden=true
-   — dan jalur itu muncul kosong, kerana teksnya hanya diisi apabila
-   ia memang patut dipapar. */
-.iab-bar[hidden], .wa-fallback[hidden] { display: none !important; }
+   Sebabnya: TikTok, Instagram dan Facebook membuka pautan dalam pelayar
+   kecil mereka sendiri, yang selalunya tidak dibenarkan melompat keluar
+   ke aplikasi lain. Butang ditekan, tiada apa berlaku, tiada ralat.
 
-.iab-bar {
-    display: flex; gap: 0.7rem; align-items: flex-start;
-    background: #FFF4E8; border-bottom: 1px solid #FFD9B8; color: #6B3A10;
-    padding: 0.85rem 1rem; font-size: 0.86rem; line-height: 1.5;
-    /* Navbar ialah position:fixed top:0, jadi jalur ini mesti fixed juga
-       dan duduk di atasnya — kalau tidak ia tersorok di belakang navbar.
-       Navbar dan kandungan ditolak ke bawah sebanyak --iab-h, yang diukur
-       oleh JavaScript selepas jalur dipaparkan. */
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1200;
-}
-body.iab-on { padding-top: var(--iab-h, 0px); }
-body.iab-on .navbar { top: var(--iab-h, 0px); }
-.iab-bar > svg { width: 19px; height: 19px; flex: none; margin-top: 2px; color: var(--orange); }
-.iab-txt { min-width: 0; flex: 1; }
-.iab-txt b { display: block; font-weight: 700; margin-bottom: 0.1rem; }
-.iab-bar kbd {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.82em; font-weight: 600;
-    background: rgba(0,0,0,0.07); border-radius: 5px; padding: 0.05rem 0.32rem;
-}
-.iab-x {
-    flex: none; border: none; background: transparent; color: inherit; opacity: 0.6;
-    font-size: 1.35rem; line-height: 1; padding: 0 0.15rem; cursor: pointer;
-    font-family: inherit;
-}
-.iab-x:hover { opacity: 1; }
+   Percubaan pertama ialah mengesan pelayar itu daripada tandatangannya
+   dan memberi amaran. Ia tidak berfungsi — TikTok pada telefon pemilik
+   tidak menghantar tandatangan yang dijangka. Popup ini tidak mengesan
+   apa-apa, jadi ia tidak boleh tersalah teka: nombor telefon sentiasa
+   ada di situ, sama ada WhatsApp terbuka atau tidak.
 
-.wa-fallback {
-    border: 1px solid var(--border); border-radius: 14px; background: var(--bg);
-    padding: 0.95rem 1rem; margin: 1rem auto 0; max-width: 420px;
-    display: flex; flex-direction: column; gap: 0.7rem; text-align: left;
-    position: relative;
+   Harganya satu ketukan tambahan untuk semua orang. Itu diterima, kerana
+   ketukan yang tidak membawa ke mana-mana lebih mahal. */
+.wam { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: flex-end; justify-content: center; }
+.wam[hidden] { display: none !important; }
+.wam-bg { position: absolute; inset: 0; background: rgba(12, 22, 38, 0.55); }
+.wam-card {
+    position: relative; z-index: 1; width: 100%; max-width: 420px;
+    background: var(--bg-white); border-radius: 20px 20px 0 0;
+    padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -10px 50px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column; gap: 0.9rem;
+    animation: wamUp 0.22s ease-out;
 }
-.wa-fb-h {
-    font-size: 0.76rem; font-weight: 600; color: var(--text-muted);
-    display: flex; align-items: center; gap: 0.4rem; padding-right: 1.4rem;
+@keyframes wamUp { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .wam-card { animation: none; } }
+@media (min-width: 560px) {
+    .wam { align-items: center; }
+    .wam-card { border-radius: 20px; }
 }
-.wa-fb-h svg { width: 15px; height: 15px; flex: none; }
-.wa-fb-num { display: flex; align-items: center; gap: 0.6rem; }
-.wa-fb-num > span {
-    font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; font-weight: 600;
+.wam-x {
+    position: absolute; top: 0.7rem; right: 0.8rem; border: none; background: transparent;
+    color: var(--text-muted); font-size: 1.6rem; line-height: 1; padding: 0 0.2rem;
+    cursor: pointer; font-family: inherit;
+}
+.wam-card h3 { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); padding-right: 1.8rem; margin: 0; }
+.wam-note { font-size: 0.86rem; color: var(--text-body); margin: 0; }
+.wam-num {
+    display: flex; align-items: center; gap: 0.6rem;
+    border: 1px solid var(--border); border-radius: 12px;
+    background: var(--bg); padding: 0.7rem 0.85rem;
+}
+.wam-num > span {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; font-weight: 600;
     color: var(--text-dark); user-select: all; min-width: 0; overflow-wrap: anywhere;
 }
-.wa-fb-copy {
+.wam-copy {
     margin-left: auto; flex: none; border: 1px solid var(--border);
     background: var(--bg-white); color: var(--text-body); border-radius: 9px;
-    font-family: inherit; font-size: 0.74rem; font-weight: 600;
-    padding: 0.4rem 0.6rem; cursor: pointer;
+    font-family: inherit; font-size: 0.78rem; font-weight: 600;
+    padding: 0.45rem 0.7rem; cursor: pointer;
 }
-.wa-fb-copy.done { border-color: #25D366; color: #128C7E; }
-.wa-fb-row { display: flex; gap: 0.55rem; }
-.wa-fb-row .btn { flex: 1; font-size: 0.86rem; padding: 0.72rem 0.6rem; width: auto; }
-.wa-fb-x {
-    position: absolute; top: 0.5rem; right: 0.55rem; border: none; background: transparent;
-    color: var(--text-muted); opacity: 0.6; font-size: 1.25rem; line-height: 1;
-    padding: 0 0.15rem; cursor: pointer; font-family: inherit;
-}
-.wa-fb-x:hover { opacity: 1; }
+.wam-copy.done { border-color: #25D366; color: #128C7E; }
+.wam .btn { width: 100%; }
+
+
+
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;
@@ -2268,17 +2255,7 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 </head>
 <body>
 
-<!-- Jalur amaran pelayar dalam-app. Tersembunyi secara lalai dan hanya
-     dibuka oleh JavaScript apabila tandatangan TikTok/Instagram/Facebook
-     dikesan. Prerender berjalan dalam Chromium biasa, jadi ia disimpan
-     dalam keadaan tersembunyi — betul. -->
-<div class="iab-bar" id="iabBar" hidden>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>
-    </svg>
-    <div class="iab-txt"><b id="iabTitle"></b><span id="iabBody"></span></div>
-    <button type="button" class="iab-x" id="iabX" aria-label="Close">&times;</button>
-</div>
+
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -3383,6 +3360,24 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
 </button>
 
 <!-- ==================== LIGHTBOX GALERI PROJEK ==================== -->
+
+<!-- Popup WhatsApp. Disimpan tersembunyi dalam HTML dan dibuka oleh
+     JavaScript apabila mana-mana butang WhatsApp ditekan. -->
+<div class="wam" id="waModal" hidden>
+    <div class="wam-bg" id="wamBg"></div>
+    <div class="wam-card" role="dialog" aria-modal="true" aria-labelledby="wamTitle">
+        <button type="button" class="wam-x" id="wamX" aria-label="Close">&times;</button>
+        <h3 id="wamTitle"></h3>
+        <a class="btn btn-whatsapp" id="wamGo" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+            <span id="wamGoTxt"></span>
+        </a>
+        <p class="wam-note" id="wamNote"></p>
+        <div class="wam-num"><span id="wamNum"></span><button type="button" class="wam-copy" id="wamCopy"></button></div>
+        <a class="btn btn-secondary" id="wamCall" href="#"><span id="wamCallTxt"></span></a>
+    </div>
+</div>
+
 <div class="lb" id="lightbox" aria-modal="true" role="dialog">
     <div class="lb-overlay" id="lbOverlay"></div>
     <div class="lb-content">
@@ -6175,12 +6170,11 @@ var I18N = {
         "proc.tag": "How It Works", "proc.title": "A Clear Process from Start to Finish",
         "rev.tag": "Client Reviews", "rev.title": "What Our Clients Say",
         "cov.reply": "Reply Time", "cov.tag": "Coverage Area", "cov.title": "Operating Across 4 Main States",
-        "iab.title": "The WhatsApp button will not work here",
-        "iab.body": "You opened this from {app}. Tap \u22EF in the top corner, then choose Open in browser.",
-        "iab.close": "Close",
-        "wa.fbTitle": "WhatsApp button not working? Call or copy our number:",
-        "wa.fbCopy": "Copy", "wa.fbCopied": "Copied", "wa.fbHold": "Press and hold to copy",
-        "wa.fbCall": "Call", "wa.fbEmail": "Email",
+        "wam.title": "Contact us on WhatsApp",
+        "wam.go": "Open WhatsApp",
+        "wam.note": "If WhatsApp does not open \u2014 some apps block it \u2014 copy our number and message us from WhatsApp directly.",
+        "wam.copy": "Copy", "wam.copied": "Copied", "wam.hold": "Press and hold to copy",
+        "wam.call": "Call us instead", "wam.close": "Close",
         "cov.note": "Property outside these areas? Contact us — we welcome requests from any location in Malaysia.",
         "faq.title": "Frequently Asked Questions",
         "con.tag": "Contact Us", "con.title": "Get Your Quote Today",
@@ -6363,12 +6357,11 @@ var I18N = {
         "proc.tag": "Cara Ia Berfungsi", "proc.title": "Proses Jelas Dari Mula Hingga Akhir",
         "rev.tag": "Review Pelanggan", "rev.title": "Apa Kata Pelanggan Kami",
         "cov.reply": "Masa Balas", "cov.tag": "Kawasan Liputan", "cov.title": "Beroperasi di 4 Negeri Utama",
-        "iab.title": "Butang WhatsApp tak berfungsi di sini",
-        "iab.body": "Awak membuka dari {app}. Tekan \u22EF di penjuru atas, pilih Open in browser.",
-        "iab.close": "Tutup",
-        "wa.fbTitle": "Butang WhatsApp tak berfungsi? Telefon atau salin nombor:",
-        "wa.fbCopy": "Salin", "wa.fbCopied": "Disalin", "wa.fbHold": "Tekan-tahan untuk salin",
-        "wa.fbCall": "Telefon", "wa.fbEmail": "Emel",
+        "wam.title": "Hubungi kami di WhatsApp",
+        "wam.go": "Buka WhatsApp",
+        "wam.note": "Kalau WhatsApp tak terbuka \u2014 ada aplikasi menyekatnya \u2014 salin nombor ini dan mesej kami terus dari WhatsApp.",
+        "wam.copy": "Salin", "wam.copied": "Disalin", "wam.hold": "Tekan-tahan untuk salin",
+        "wam.call": "Telefon sahaja", "wam.close": "Tutup",
         "cov.note": "Hartanah di luar kawasan? Hubungi kami — kami mengalu-alukan permintaan dari mana-mana lokasi di Malaysia.",
         "faq.title": "Soalan Lazim",
         "con.tag": "Hubungi Kami", "con.title": "Dapatkan Sebut Harga Hari Ini",
@@ -6746,6 +6739,10 @@ var FAQ_ALL = [
         gaWaWired = true;
         document.addEventListener("click", function (e) {
             var a = e.target && e.target.closest && e.target.closest('a[href*="wa.me"]');
+            /* Butang "Buka WhatsApp" di dalam popup dilangkau: ia ketukan
+               kedua pada niat yang sama, dan mengiranya akan menggandakan
+               setiap lead dalam laporan. */
+            if (a && a.id === "wamGo") return;
             if (!a || typeof window.gtag !== "function") return;
             window.gtag("event", "whatsapp_click", {
                 page_path: location.pathname,
@@ -6754,148 +6751,97 @@ var FAQ_ALL = [
         }, true);
     })();
 
-    /* ================= PELAYAR DALAM-APP ====================
-       TikTok, Instagram, Facebook dan Messenger membuka pautan dalam
-       pelayar kecil mereka sendiri, yang selalunya tidak dibenarkan
-       melompat keluar ke WhatsApp. Butang ditekan, tiada apa berlaku,
-       tiada ralat. Pelanggan ingat butang rosak.
+    /* ================= POPUP WHATSAPP =================
+       Setiap pautan WhatsApp di laman ini membuka popup dahulu. Lihat
+       nota penuh di atas peraturan CSS .wam — ringkasnya: pelayar dalam
+       TikTok dan Instagram selalunya tidak boleh melompat ke WhatsApp,
+       dan mengesan pelayar itu daripada tandatangannya tidak boleh
+       dipercayai. Popup tidak mengesan apa-apa, jadi ia tidak boleh
+       tersalah teka.
 
-       Pengesanan membaca tandatangan pelayar. Kalau aplikasi itu
-       mengubah tandatangan mereka nanti, jalur ini berhenti muncul —
-       ia tidak akan tersilap papar kepada pelawat biasa, jadi
-       kegagalannya sentiasa ke arah senyap, bukan mengganggu. */
-    function inAppName() {
-        var ua = navigator.userAgent || "";
-        if (/TikTok|BytedanceWebview|musical_ly/i.test(ua)) return "TikTok";
-        if (/Messenger/i.test(ua)) return "Messenger";
-        if (/Instagram/i.test(ua)) return "Instagram";
-        if (/FBAN|FBAV|FB_IAB|FBIOS/i.test(ua)) return "Facebook";
-        return null;
-    }
-    function gxGet(store, k) { try { return window[store].getItem(k); } catch (e) { return null; } }
-    function gxSet(store, k, v) { try { window[store].setItem(k, v); } catch (e) {} }
+       Pendengar dipasang sekali pada document dan diingat dengan
+       pemboleh ubah JS, bukan atribut pada elemen: build.js menyimpan
+       DOM yang sudah dirender, jadi penanda dalam DOM akan terbakar ke
+       dalam fail terbitan dan pendengar tidak akan dipasang pada laman
+       sebenar. */
+    var wamWired = false, wamLast = null;
 
-    var iabWired = false;
-    /* Kedua-dua jalur amaran dan blok nombor hanya muncul pada page
-       pemilik rumah (/homeowners/ dan /ms/pemilik-rumah/), dan hanya
-       untuk pelawat yang datang melalui pelayar dalam-app. Page itu yang
-       dikongsi di TikTok dan Instagram; laman utama tidak, jadi tiada
-       sebab mengganggu pelawat di sana.
-
-       Kerana prerender berjalan dalam Chromium biasa, kedua-duanya tidak
-       akan terbakar ke dalam fail terbitan — ia dibina pada masa larian
-       sahaja, pada pelayar yang betul. */
-    function wireIab(pageKey) {
-        var bar = document.getElementById("iabBar");
-        if (!bar) return;
-        var app = (pageKey === "landing") ? inAppName() : null;
-        if (!app || gxGet("localStorage", "gx_iab_off") === "1") {
-            bar.hidden = true; document.body.classList.remove("iab-on"); return;
-        }
-        document.getElementById("iabTitle").textContent = t("iab.title");
-        document.getElementById("iabBody").innerHTML =
-            t("iab.body").replace("{app}", app).replace("⋯", '<kbd>⋯</kbd>');
-        bar.hidden = false;
-        document.body.classList.add("iab-on");
-        document.body.style.setProperty("--iab-h", bar.offsetHeight + "px");
-        if (iabWired) return;
-        iabWired = true;
-        document.getElementById("iabX").addEventListener("click", function () {
-            bar.hidden = true;
-            document.body.classList.remove("iab-on");
-            gxSet("localStorage", "gx_iab_off", "1");
-        });
-        window.addEventListener("resize", function () {
-            if (!bar.hidden) document.body.style.setProperty("--iab-h", bar.offsetHeight + "px");
-        });
+    function wamFill() {
+        var g = function (id) { return document.getElementById(id); };
+        if (!g("waModal")) return;
+        g("wamTitle").textContent   = t("wam.title");
+        g("wamGoTxt").textContent   = t("wam.go");
+        g("wamNote").textContent    = t("wam.note");
+        g("wamNum").textContent     = CONFIG.phoneDisplay;
+        g("wamCopy").textContent    = t("wam.copy");
+        g("wamCallTxt").textContent = t("wam.call");
+        g("wamCall").href           = "tel:+" + CONFIG.phoneRaw;
+        g("wamX").setAttribute("aria-label", t("wam.close"));
     }
 
-    /* ---------- Nombor telefon sebagai jalan kedua ----------
-       Dipapar kepada SEMUA pelawat, bukan hanya yang dari TikTok, kerana
-       sesetengah orang memang lebih suka menelefon. Nombor ditulis sebagai
-       teks yang boleh disalin: butang boleh gagal senyap dalam pelayar
-       dalam-app, teks tidak boleh.
-
-       Blok dibina sekali sahaja dan pemeriksaannya ialah KANDUNGAN sebenar
-       (adakah .wa-fallback sudah ada di sebelah butang), bukan penanda
-       "sudah dipasang" dalam DOM. build.js menyimpan DOM yang sudah
-       dirender, jadi penanda begitu akan terbakar ke dalam fail terbitan
-       dan blok tidak akan dibina pada laman sebenar. */
-    var waFbWired = false;
-    function waFallbackHtml() {
-        var ic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
-        return '<div class="wa-fallback">' +
-            '<button type="button" class="wa-fb-x" aria-label="' + t("iab.close") + '">&times;</button>' +
-            '<span class="wa-fb-h">' + ic + t("wa.fbTitle") + '</span>' +
-            '<span class="wa-fb-num"><span>' + CONFIG.phoneDisplay + '</span>' +
-            '<button type="button" class="wa-fb-copy">' + t("wa.fbCopy") + '</button></span>' +
-            '<span class="wa-fb-row">' +
-                '<a class="btn btn-primary" href="tel:+' + CONFIG.phoneRaw + '">' + ic + t("wa.fbCall") + '</a>' +
-                '<a class="btn btn-secondary" href="mailto:' + CONFIG.email + '">' + t("wa.fbEmail") + '</a>' +
-            '</span></div>';
+    function wamOpen(href) {
+        var m = document.getElementById("waModal");
+        if (!m) { if (href) window.open(href, "_blank", "noopener"); return; }
+        wamFill();
+        document.getElementById("wamGo").href = href || waLink(t("wa.default"));
+        m.hidden = false;
+        document.body.style.overflow = "hidden";
+        var go = document.getElementById("wamGo");
+        if (go.focus) try { go.focus(); } catch (e) {}
     }
-    function wireWaFallback(pageKey) {
-        /* Di luar page pemilik rumah, atau pada pelayar biasa, blok ini
-           tidak wujud langsung — dan dibuang kalau ia sempat dibina
-           sebelum pelawat menukar page. */
-        if (pageKey !== "landing" || !inAppName()) {
-            var old = document.querySelectorAll(".wa-fallback");
-            for (var k = 0; k < old.length; k++) old[k].parentNode.removeChild(old[k]);
-            return;
-        }
-        /* Butang WhatsApp tidak semuanya berkelas .btn-whatsapp — page
-           servis menjana CTAnya sebagai <a class="btn" href="wa.me/...">.
-           Jadi kedua-dua bentuk dicari. Butang terapung dan pautan footer
-           sengaja ditinggalkan: blok ini milik CTA utama page. */
-        var all = [].slice.call(document.querySelectorAll(
-            '.btn-whatsapp, a.btn[href*="wa.me"]'));
-        var ok = function (b) {
-            return !b.closest("form") && !b.closest("footer") &&
-                   !b.classList.contains("whatsapp-float");
-        };
-        var btn = null;
-        for (var i = 0; i < all.length; i++) {
-            if (ok(all[i]) && all[i].offsetParent !== null) { btn = all[i]; break; }
-        }
-        if (!btn) btn = all.filter(ok)[0];
-        if (!btn) return;
-        var box = btn.nextElementSibling;
-        if (!box || !box.classList || !box.classList.contains("wa-fallback")) {
-            btn.insertAdjacentHTML("afterend", waFallbackHtml());
-            box = btn.nextElementSibling;
-        }
-        if (box && gxGet("sessionStorage", "gx_wafb_off") === "1") box.hidden = true;
-        if (waFbWired) return;
-        waFbWired = true;
+    function wamClose() {
+        var m = document.getElementById("waModal");
+        if (!m) return;
+        m.hidden = true;
+        document.body.style.overflow = "";
+        if (wamLast && wamLast.focus) try { wamLast.focus(); } catch (e) {}
+    }
+
+    function wireWaModal() {
+        if (wamWired) return;
+        wamWired = true;
+
         document.addEventListener("click", function (e) {
-            var tgt = e.target;
-            if (!tgt || !tgt.closest) return;
-            var x = tgt.closest(".wa-fb-x");
-            if (x) {
-                var b = x.closest(".wa-fallback");
-                if (b) { b.hidden = true; gxSet("sessionStorage", "gx_wafb_off", "1"); }
+            var tg = e.target;
+            if (!tg || !tg.closest) return;
+
+            if (tg.closest("#wamX") || tg.closest("#wamBg")) { e.preventDefault(); wamClose(); return; }
+
+            var cp = tg.closest("#wamCopy");
+            if (cp) {
+                var num = document.getElementById("wamNum");
+                var done = function () {
+                    cp.textContent = t("wam.copied"); cp.classList.add("done");
+                    setTimeout(function () { cp.textContent = t("wam.copy"); cp.classList.remove("done"); }, 1800);
+                };
+                var pick = function () {
+                    try {
+                        var r = document.createRange(); r.selectNodeContents(num);
+                        var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+                    } catch (err) {}
+                    cp.textContent = t("wam.hold");
+                    setTimeout(function () { cp.textContent = t("wam.copy"); }, 2400);
+                };
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(num.textContent.trim()).then(done, pick);
+                    } else { pick(); }
+                } catch (err) { pick(); }
                 return;
             }
-            var c = tgt.closest(".wa-fb-copy");
-            if (!c) return;
-            var num = c.parentNode.querySelector("span");
-            var done = function () {
-                c.textContent = t("wa.fbCopied"); c.classList.add("done");
-                setTimeout(function () { c.textContent = t("wa.fbCopy"); c.classList.remove("done"); }, 1800);
-            };
-            var pick = function () {
-                try {
-                    var r = document.createRange(); r.selectNodeContents(num);
-                    var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-                } catch (err) {}
-                c.textContent = t("wa.fbHold");
-                setTimeout(function () { c.textContent = t("wa.fbCopy"); }, 2400);
-            };
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(num.textContent.trim()).then(done, pick);
-                } else { pick(); }
-            } catch (err) { pick(); }
+
+            /* Pautan "Buka WhatsApp" di dalam popup dibiarkan lalu. */
+            if (tg.closest("#wamGo")) return;
+
+            var a = tg.closest('a[href*="wa.me"]');
+            if (!a) return;
+            e.preventDefault();
+            wamLast = a;
+            wamOpen(a.getAttribute("href"));
+        }, true);
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") wamClose();
         });
     }
 
@@ -7892,6 +7838,8 @@ var FAQ_ALL = [
         renderFaq();
         renderServiceSelect();
         applyWaLinks();
+        wireWaModal();
+        wamFill();
         initReveal();
         route(true);   // render semula page dalaman semasa (tanpa scroll)
                        // route() memanggil wireWaFallback() di hujungnya
@@ -9080,8 +9028,6 @@ var FAQ_ALL = [
            WhatsApp mereka sendiri di sini, selepas renderAll berjalan.
            Jadi blok nombor dibina semula pada setiap pertukaran page,
            bukan sekali sahaja semasa muat. */
-        wireIab(pageKey);
-        wireWaFallback(pageKey);
 
         if (!skipScroll) {
             if (pageKey !== "home") {
