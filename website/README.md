@@ -652,12 +652,26 @@ kandungan ditolak ke bawah sebanyak `--iab-h`, yang diukur selepas jalur
 dipaparkan. Boleh ditutup, dan pilihan itu disimpan dalam `localStorage`
 supaya ia tidak muncul lagi pada pelayar itu.
 
-**Blok nombor telefon** (`.wa-fallback`) dipapar kepada **semua**
-pelawat, bukan hanya yang datang dari aplikasi itu, kerana sesetengah
-orang memang lebih suka menelefon. Nombor ditulis sebagai teks yang
-boleh disalin: butang boleh gagal senyap, teks tidak boleh. Boleh
-ditutup, tetapi hanya dalam `sessionStorage` — ia kembali pada lawatan
-berikutnya, kerana ia jaring keselamatan.
+**Blok nombor telefon** (`.wa-fallback`) muncul pada syarat yang sama.
+Nombor ditulis sebagai teks yang boleh disalin: butang boleh gagal
+senyap, teks tidak boleh. Boleh ditutup, tetapi hanya dalam
+`sessionStorage` — ia kembali pada lawatan berikutnya, kerana ia jaring
+keselamatan.
+
+### Skop: dua page sahaja, pelayar dalam-app sahaja
+
+Kedua-duanya terhad kepada page pemilik rumah — `/homeowners/` dan
+`/ms/pemilik-rumah/` — dan hanya untuk pelawat dari pelayar dalam-app.
+Page itu yang dikongsi di TikTok dan Instagram. Laman utama tidak, jadi
+tiada sebab mengganggu pelawat di sana.
+
+Dalam Chrome atau Safari, pada mana-mana page, tiada satu pun daripada
+keduanya wujud.
+
+Syarat itu diperiksa di hujung `route()`, yang menerima `pageKey`. Kerana
+prerender berjalan dalam Chromium biasa pada page biasa, tiada apa yang
+terbakar ke dalam fail terbitan — kedua-duanya dibina pada masa larian
+sahaja. Menukar page dalam mod satu-fail membuang blok yang sedia ada.
 
 ### Tiga perkara yang mudah dirosakkan
 
@@ -681,13 +695,13 @@ Pengesanan membaca tandatangan pelayar. Jika aplikasi itu mengubahnya,
 jalur berhenti muncul. Ia tidak akan tersilap papar kepada pelawat
 biasa, jadi kegagalannya sentiasa ke arah senyap.
 
-Diuji 9 November 2026 dengan tandatangan TikTok, Instagram, Facebook dan
-Safari biasa, pada 390px dan 1280px, EN dan BM: jalur muncul hanya untuk
-ketiga-tiga aplikasi dan menyebut nama yang betul, navbar ditolak ke
-92px, satu blok sahaja per page (tiada pendua daripada prerender),
-tutup kekal selepas muat semula, salin berfungsi, tiada overflow, tiada
-ralat JavaScript. Page `/review/` tiada blok kerana ia tiada CTA
-WhatsApp — itu betul.
+Diuji 9 November 2026: tujuh page × empat tandatangan pelayar (Chrome,
+Safari, TikTok, Instagram). Jalur dan blok muncul pada `/homeowners/`
+dan `/ms/pemilik-rumah/` dalam TikTok dan Instagram sahaja — 4 daripada
+28 gabungan. Semua yang lain kosong, termasuk muka depan dan page servis
+dalam TikTok. Tiada overflow, tiada ralat JavaScript. Nama aplikasi
+disebut betul, navbar ditolak ke 92px, tutup kekal selepas muat semula,
+salin berfungsi.
 
 ## Alamat ikut bahasa
 

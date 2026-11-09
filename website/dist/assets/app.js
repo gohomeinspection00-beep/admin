@@ -3378,10 +3378,19 @@ var FAQ_ALL = [
     function gxSet(store, k, v) { try { window[store].setItem(k, v); } catch (e) {} }
 
     var iabWired = false;
-    function wireIab() {
+    /* Kedua-dua jalur amaran dan blok nombor hanya muncul pada page
+       pemilik rumah (/homeowners/ dan /ms/pemilik-rumah/), dan hanya
+       untuk pelawat yang datang melalui pelayar dalam-app. Page itu yang
+       dikongsi di TikTok dan Instagram; laman utama tidak, jadi tiada
+       sebab mengganggu pelawat di sana.
+
+       Kerana prerender berjalan dalam Chromium biasa, kedua-duanya tidak
+       akan terbakar ke dalam fail terbitan — ia dibina pada masa larian
+       sahaja, pada pelayar yang betul. */
+    function wireIab(pageKey) {
         var bar = document.getElementById("iabBar");
         if (!bar) return;
-        var app = inAppName();
+        var app = (pageKey === "landing") ? inAppName() : null;
         if (!app || gxGet("localStorage", "gx_iab_off") === "1") {
             bar.hidden = true; document.body.classList.remove("iab-on"); return;
         }
@@ -3427,7 +3436,15 @@ var FAQ_ALL = [
                 '<a class="btn btn-secondary" href="mailto:' + CONFIG.email + '">' + t("wa.fbEmail") + '</a>' +
             '</span></div>';
     }
-    function wireWaFallback() {
+    function wireWaFallback(pageKey) {
+        /* Di luar page pemilik rumah, atau pada pelayar biasa, blok ini
+           tidak wujud langsung — dan dibuang kalau ia sempat dibina
+           sebelum pelawat menukar page. */
+        if (pageKey !== "landing" || !inAppName()) {
+            var old = document.querySelectorAll(".wa-fallback");
+            for (var k = 0; k < old.length; k++) old[k].parentNode.removeChild(old[k]);
+            return;
+        }
         /* Butang WhatsApp tidak semuanya berkelas .btn-whatsapp — page
            servis menjana CTAnya sebagai <a class="btn" href="wa.me/...">.
            Jadi kedua-dua bentuk dicari. Butang terapung dan pautan footer
@@ -4477,7 +4494,6 @@ var FAQ_ALL = [
         renderFaq();
         renderServiceSelect();
         applyWaLinks();
-        wireIab();
         initReveal();
         route(true);   // render semula page dalaman semasa (tanpa scroll)
                        // route() memanggil wireWaFallback() di hujungnya
@@ -5666,7 +5682,8 @@ var FAQ_ALL = [
            WhatsApp mereka sendiri di sini, selepas renderAll berjalan.
            Jadi blok nombor dibina semula pada setiap pertukaran page,
            bukan sekali sahaja semasa muat. */
-        wireWaFallback();
+        wireIab(pageKey);
+        wireWaFallback(pageKey);
 
         if (!skipScroll) {
             if (pageKey !== "home") {
