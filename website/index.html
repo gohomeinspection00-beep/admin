@@ -160,6 +160,13 @@ img { max-width: 100%; }
    Dua perkara di bawah ialah jawapannya: jalur amaran (hanya untuk pelawat
    dari aplikasi itu) dan nombor telefon sebagai teks (untuk semua pelawat,
    kerana teks tidak boleh gagal senyap). */
+/* Atribut [hidden] memberi display:none daripada pelayar sahaja, dan
+   mana-mana peraturan CSS dengan display: flex akan mengatasinya. Tanpa
+   baris ini, jalur dan blok di bawah kekal nampak walaupun hidden=true
+   — dan jalur itu muncul kosong, kerana teksnya hanya diisi apabila
+   ia memang patut dipapar. */
+.iab-bar[hidden], .wa-fallback[hidden] { display: none !important; }
+
 .iab-bar {
     display: flex; gap: 0.7rem; align-items: flex-start;
     background: #FFF4E8; border-bottom: 1px solid #FFD9B8; color: #6B3A10;
