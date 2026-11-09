@@ -558,3 +558,27 @@ layout tak pernah pecah.
 
 Senarai penuh warna, gambar, link & struktur dari 2 fail HTML asal ada dalam
 perbualan Claude (sesi `claude/company-website-lnp12i`).
+
+## Menerbitkan dari sesi Claude: apa yang tidak berfungsi
+
+Wrangler memuat naik aset dalam dua langkah. Langkah pertama meminta
+sesi muat naik dan menerima **JWT**; langkah kedua menghantar fail
+dengan JWT itu dalam header `Authorization`.
+
+Sesi Claude awan menyuntik kunci API tersimpan ke dalam setiap
+permintaan ke `api.cloudflare.com`, **menulis ganti** header itu. Jadi
+langkah kedua tiba di Cloudflare membawa kunci API di tempat yang
+sepatutnya ada JWT, dan dijawab `401 Unauthorized`.
+
+Disahkan: `/workers/scripts` → 200, `/assets-upload-session` → 200 (JWT
+diterima), `/workers/assets/upload` → 401.
+
+Jadi penerbitan dijalankan **di komputer pemilik**, bukan dari sesi
+Claude. `npx wrangler deploy` di sana menggunakan OAuth pelayar dan
+tiada proxy di tengah. Token API tidak diperlukan langsung.
+
+Uploader dalam dashboard Cloudflare juga tidak memadai: ia menyatakan
+sendiri ia hanya menyokong HTML, CSS dan JS, sedangkan laman ini ada
+390 gambar, satu MP3 dan satu PDF. Ia menerima seretan, mengira 468
+fail dengan saiz yang betul, mencipta versi baru — tetapi versi itu
+mengandungi aset lama. Diuji dua kali, 9 November 2026.

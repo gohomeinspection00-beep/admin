@@ -1,0 +1,26 @@
+{
+	// Laman statik GoXpert, diterbitkan ke Worker yang sudah melayan
+	// goxpert.my. Lihat bahagian "Di mana laman ini hidup" dalam README.
+	//
+	// Terbit:  cd website && npm run deploy
+	//
+	// Tiada "main" di sini dengan sengaja: laman ini fail statik tulen,
+	// tiada kod Worker yang berjalan. Cloudflare melayan fail terus, dan
+	// permintaan jenis ini tidak dikenakan bayaran.
+	//
+	// "routes" juga sengaja ditinggalkan. Domain goxpert.my dan
+	// www.goxpert.my sudah dilekatkan pada Worker ini melalui dashboard;
+	// mengisytiharkannya di sini berisiko menggantikan apa yang ada.
+	"name": "proud-rain-b73f",
+	"compatibility_date": "2026-11-09",
+	"assets": {
+		"directory": "./dist",
+
+		// Laluan yang tiada fail memulangkan 404 dengan dist/404.html.
+		// JANGAN tukar kepada "single-page-application": setiap page di
+		// sini ialah fail HTML sebenar, dan tetapan itu akan memulangkan
+		// muka depan dengan kod 200 untuk URL yang salah — Google lalu
+		// mengindeks laman hantu.
+		"not_found_handling": "404-page"
+	}
+}
