@@ -2777,6 +2777,12 @@ var I18N = {
         "proc.tag": "How It Works", "proc.title": "A Clear Process from Start to Finish",
         "rev.tag": "Client Reviews", "rev.title": "What Our Clients Say",
         "cov.reply": "Reply Time", "cov.tag": "Coverage Area", "cov.title": "Operating Across 4 Main States",
+        "iab.title": "The WhatsApp button will not work here",
+        "iab.body": "You opened this from {app}. Tap \u22EF in the top corner, then choose Open in browser.",
+        "iab.close": "Close",
+        "wa.fbTitle": "WhatsApp button not working? Call or copy our number:",
+        "wa.fbCopy": "Copy", "wa.fbCopied": "Copied", "wa.fbHold": "Press and hold to copy",
+        "wa.fbCall": "Call", "wa.fbEmail": "Email",
         "cov.note": "Property outside these areas? Contact us — we welcome requests from any location in Malaysia.",
         "faq.title": "Frequently Asked Questions",
         "con.tag": "Contact Us", "con.title": "Get Your Quote Today",
@@ -2959,6 +2965,12 @@ var I18N = {
         "proc.tag": "Cara Ia Berfungsi", "proc.title": "Proses Jelas Dari Mula Hingga Akhir",
         "rev.tag": "Review Pelanggan", "rev.title": "Apa Kata Pelanggan Kami",
         "cov.reply": "Masa Balas", "cov.tag": "Kawasan Liputan", "cov.title": "Beroperasi di 4 Negeri Utama",
+        "iab.title": "Butang WhatsApp tak berfungsi di sini",
+        "iab.body": "Awak membuka dari {app}. Tekan \u22EF di penjuru atas, pilih Open in browser.",
+        "iab.close": "Tutup",
+        "wa.fbTitle": "Butang WhatsApp tak berfungsi? Telefon atau salin nombor:",
+        "wa.fbCopy": "Salin", "wa.fbCopied": "Disalin", "wa.fbHold": "Tekan-tahan untuk salin",
+        "wa.fbCall": "Telefon", "wa.fbEmail": "Emel",
         "cov.note": "Hartanah di luar kawasan? Hubungi kami — kami mengalu-alukan permintaan dari mana-mana lokasi di Malaysia.",
         "faq.title": "Soalan Lazim",
         "con.tag": "Hubungi Kami", "con.title": "Dapatkan Sebut Harga Hari Ini",
@@ -3332,6 +3344,135 @@ var FAQ_ALL = [
             });
         }, true);
     })();
+
+    /* ================= PELAYAR DALAM-APP ====================
+       TikTok, Instagram, Facebook dan Messenger membuka pautan dalam
+       pelayar kecil mereka sendiri, yang selalunya tidak dibenarkan
+       melompat keluar ke WhatsApp. Butang ditekan, tiada apa berlaku,
+       tiada ralat. Pelanggan ingat butang rosak.
+
+       Pengesanan membaca tandatangan pelayar. Kalau aplikasi itu
+       mengubah tandatangan mereka nanti, jalur ini berhenti muncul —
+       ia tidak akan tersilap papar kepada pelawat biasa, jadi
+       kegagalannya sentiasa ke arah senyap, bukan mengganggu. */
+    function inAppName() {
+        var ua = navigator.userAgent || "";
+        if (/TikTok|BytedanceWebview|musical_ly/i.test(ua)) return "TikTok";
+        if (/Messenger/i.test(ua)) return "Messenger";
+        if (/Instagram/i.test(ua)) return "Instagram";
+        if (/FBAN|FBAV|FB_IAB|FBIOS/i.test(ua)) return "Facebook";
+        return null;
+    }
+    function gxGet(store, k) { try { return window[store].getItem(k); } catch (e) { return null; } }
+    function gxSet(store, k, v) { try { window[store].setItem(k, v); } catch (e) {} }
+
+    var iabWired = false;
+    function wireIab() {
+        var bar = document.getElementById("iabBar");
+        if (!bar) return;
+        var app = inAppName();
+        if (!app || gxGet("localStorage", "gx_iab_off") === "1") {
+            bar.hidden = true; document.body.classList.remove("iab-on"); return;
+        }
+        document.getElementById("iabTitle").textContent = t("iab.title");
+        document.getElementById("iabBody").innerHTML =
+            t("iab.body").replace("{app}", app).replace("⋯", '<kbd>⋯</kbd>');
+        bar.hidden = false;
+        document.body.classList.add("iab-on");
+        document.body.style.setProperty("--iab-h", bar.offsetHeight + "px");
+        if (iabWired) return;
+        iabWired = true;
+        document.getElementById("iabX").addEventListener("click", function () {
+            bar.hidden = true;
+            document.body.classList.remove("iab-on");
+            gxSet("localStorage", "gx_iab_off", "1");
+        });
+        window.addEventListener("resize", function () {
+            if (!bar.hidden) document.body.style.setProperty("--iab-h", bar.offsetHeight + "px");
+        });
+    }
+
+    /* ---------- Nombor telefon sebagai jalan kedua ----------
+       Dipapar kepada SEMUA pelawat, bukan hanya yang dari TikTok, kerana
+       sesetengah orang memang lebih suka menelefon. Nombor ditulis sebagai
+       teks yang boleh disalin: butang boleh gagal senyap dalam pelayar
+       dalam-app, teks tidak boleh.
+
+       Blok dibina sekali sahaja dan pemeriksaannya ialah KANDUNGAN sebenar
+       (adakah .wa-fallback sudah ada di sebelah butang), bukan penanda
+       "sudah dipasang" dalam DOM. build.js menyimpan DOM yang sudah
+       dirender, jadi penanda begitu akan terbakar ke dalam fail terbitan
+       dan blok tidak akan dibina pada laman sebenar. */
+    var waFbWired = false;
+    function waFallbackHtml() {
+        var ic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
+        return '<div class="wa-fallback">' +
+            '<button type="button" class="wa-fb-x" aria-label="' + t("iab.close") + '">&times;</button>' +
+            '<span class="wa-fb-h">' + ic + t("wa.fbTitle") + '</span>' +
+            '<span class="wa-fb-num"><span>' + CONFIG.phoneDisplay + '</span>' +
+            '<button type="button" class="wa-fb-copy">' + t("wa.fbCopy") + '</button></span>' +
+            '<span class="wa-fb-row">' +
+                '<a class="btn btn-primary" href="tel:+' + CONFIG.phoneRaw + '">' + ic + t("wa.fbCall") + '</a>' +
+                '<a class="btn btn-secondary" href="mailto:' + CONFIG.email + '">' + t("wa.fbEmail") + '</a>' +
+            '</span></div>';
+    }
+    function wireWaFallback() {
+        /* Butang WhatsApp tidak semuanya berkelas .btn-whatsapp — page
+           servis menjana CTAnya sebagai <a class="btn" href="wa.me/...">.
+           Jadi kedua-dua bentuk dicari. Butang terapung dan pautan footer
+           sengaja ditinggalkan: blok ini milik CTA utama page. */
+        var all = [].slice.call(document.querySelectorAll(
+            '.btn-whatsapp, a.btn[href*="wa.me"]'));
+        var ok = function (b) {
+            return !b.closest("form") && !b.closest("footer") &&
+                   !b.classList.contains("whatsapp-float");
+        };
+        var btn = null;
+        for (var i = 0; i < all.length; i++) {
+            if (ok(all[i]) && all[i].offsetParent !== null) { btn = all[i]; break; }
+        }
+        if (!btn) btn = all.filter(ok)[0];
+        if (!btn) return;
+        var box = btn.nextElementSibling;
+        if (!box || !box.classList || !box.classList.contains("wa-fallback")) {
+            btn.insertAdjacentHTML("afterend", waFallbackHtml());
+            box = btn.nextElementSibling;
+        }
+        if (box && gxGet("sessionStorage", "gx_wafb_off") === "1") box.hidden = true;
+        if (waFbWired) return;
+        waFbWired = true;
+        document.addEventListener("click", function (e) {
+            var tgt = e.target;
+            if (!tgt || !tgt.closest) return;
+            var x = tgt.closest(".wa-fb-x");
+            if (x) {
+                var b = x.closest(".wa-fallback");
+                if (b) { b.hidden = true; gxSet("sessionStorage", "gx_wafb_off", "1"); }
+                return;
+            }
+            var c = tgt.closest(".wa-fb-copy");
+            if (!c) return;
+            var num = c.parentNode.querySelector("span");
+            var done = function () {
+                c.textContent = t("wa.fbCopied"); c.classList.add("done");
+                setTimeout(function () { c.textContent = t("wa.fbCopy"); c.classList.remove("done"); }, 1800);
+            };
+            var pick = function () {
+                try {
+                    var r = document.createRange(); r.selectNodeContents(num);
+                    var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+                } catch (err) {}
+                c.textContent = t("wa.fbHold");
+                setTimeout(function () { c.textContent = t("wa.fbCopy"); }, 2400);
+            };
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(num.textContent.trim()).then(done, pick);
+                } else { pick(); }
+            } catch (err) { pick(); }
+        });
+    }
+
     function svgIcon(path, cls) {
         return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"' +
                (cls ? ' class="' + cls + '"' : '') + '><path d="' + path + '"/></svg>';
@@ -4325,8 +4466,10 @@ var FAQ_ALL = [
         renderFaq();
         renderServiceSelect();
         applyWaLinks();
+        wireIab();
         initReveal();
         route(true);   // render semula page dalaman semasa (tanpa scroll)
+                       // route() memanggil wireWaFallback() di hujungnya
     }
 
     /* ---------- Footer info ---------- */
@@ -5497,6 +5640,12 @@ var FAQ_ALL = [
         if (pageKey === "review") renderReviewPage();
         document.body.classList.toggle("lp-on", pageKey === "landing");
         if (pageKey !== "landing") lpStopMusic();
+
+        /* Page servis, artikel dan beberapa page lain menjana butang
+           WhatsApp mereka sendiri di sini, selepas renderAll berjalan.
+           Jadi blok nombor dibina semula pada setiap pertukaran page,
+           bukan sekali sahaja semasa muat. */
+        wireWaFallback();
 
         if (!skipScroll) {
             if (pageKey !== "home") {

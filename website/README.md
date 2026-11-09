@@ -631,3 +631,60 @@ tidak muncul untuk carian begitu.
 `AREA_SERVED` dikongsi oleh ORG dan oleh setiap page servis. Dahulu
 senarai yang sama ditulis dua kali di `build.js`; pasti satu daripadanya
 akan terlupa dikemas kini apabila liputan berubah.
+
+## Pelayar dalam-app dan jalan ganti WhatsApp
+
+TikTok, Instagram, Facebook dan Messenger membuka pautan dalam pelayar
+kecil mereka sendiri. Pelayar itu selalunya tidak dibenarkan melompat
+keluar ke aplikasi lain, jadi butang WhatsApp ditekan dan **tiada apa
+berlaku** — tiada ralat, tiada tanda. Pelanggan menyangka butang rosak.
+Pemilik telah mengesahkan ini berlaku dari TikTok.
+
+Ini tidak kelihatan dalam Analytics: `whatsapp_click` tetap direkod,
+kerana klik memang berlaku. Yang gagal ialah lompatan selepas itu.
+
+Dua perkara menanganinya.
+
+**Jalur amaran** (`#iabBar`) muncul hanya apabila tandatangan pelayar
+sepadan dengan salah satu aplikasi itu, dan menyebut nama aplikasi yang
+betul. Ia `position: fixed` kerana navbar juga `fixed`; navbar dan
+kandungan ditolak ke bawah sebanyak `--iab-h`, yang diukur selepas jalur
+dipaparkan. Boleh ditutup, dan pilihan itu disimpan dalam `localStorage`
+supaya ia tidak muncul lagi pada pelayar itu.
+
+**Blok nombor telefon** (`.wa-fallback`) dipapar kepada **semua**
+pelawat, bukan hanya yang datang dari aplikasi itu, kerana sesetengah
+orang memang lebih suka menelefon. Nombor ditulis sebagai teks yang
+boleh disalin: butang boleh gagal senyap, teks tidak boleh. Boleh
+ditutup, tetapi hanya dalam `sessionStorage` — ia kembali pada lawatan
+berikutnya, kerana ia jaring keselamatan.
+
+### Tiga perkara yang mudah dirosakkan
+
+1. **Blok dibina sekali per page, dan pemeriksaannya ialah kandungan
+   sebenar** (adakah `.wa-fallback` sudah ada di sebelah butang), bukan
+   penanda "sudah dipasang" dalam DOM. `build.js` menyimpan DOM yang
+   sudah dirender; penanda begitu akan terbakar ke dalam fail terbitan
+   dan blok tidak akan dibina pada laman sebenar.
+
+2. **`wireWaFallback()` dipanggil di hujung `route()`**, bukan sekali
+   semasa muat. Page servis dan artikel menjana butang WhatsApp mereka
+   sendiri di dalam `route()`, selepas `renderAll()` selesai.
+
+3. **Butang WhatsApp tidak semuanya berkelas `.btn-whatsapp`.** Page
+   servis menjana CTAnya sebagai `<a class="btn" href="wa.me/…">`. Kedua
+   -dua bentuk dicari; butang terapung dan pautan footer ditinggalkan.
+
+### Had
+
+Pengesanan membaca tandatangan pelayar. Jika aplikasi itu mengubahnya,
+jalur berhenti muncul. Ia tidak akan tersilap papar kepada pelawat
+biasa, jadi kegagalannya sentiasa ke arah senyap.
+
+Diuji 9 November 2026 dengan tandatangan TikTok, Instagram, Facebook dan
+Safari biasa, pada 390px dan 1280px, EN dan BM: jalur muncul hanya untuk
+ketiga-tiga aplikasi dan menyebut nama yang betul, navbar ditolak ke
+92px, satu blok sahaja per page (tiada pendua daripada prerender),
+tutup kekal selepas muat semula, salin berfungsi, tiada overflow, tiada
+ralat JavaScript. Page `/review/` tiada blok kerana ia tiada CTA
+WhatsApp — itu betul.
