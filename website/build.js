@@ -151,6 +151,33 @@ function realLinks(s, lang) {
 }
 
 /* ---- JSON-LD ---- */
+/* Kawasan yang dilayan: negeri DAN bandar. Orang mencari "building
+   inspection Johor Bahru", bukan "building inspection Malaysia", jadi
+   nama bandar perlu wujud sebagai data berstruktur yang Google boleh
+   baca, bukan hanya sebagai teks dalam page.
+
+   Johor didahulukan kerana itu kawasan utama syarikat. Selangor kekal
+   dalam senarai tetapi diletak terakhir.
+
+   Satu senarai dikongsi oleh ORG dan oleh setiap page servis. Dahulu
+   senarai yang sama ditulis dua kali, dan satu daripadanya pasti akan
+   terlupa dikemas kini apabila liputan berubah. */
+const AREA_SERVED = [
+    { "@type": "State", name: "Johor" },
+    { "@type": "State", name: "Melaka" },
+    { "@type": "State", name: "Negeri Sembilan" },
+    { "@type": "State", name: "Selangor" }
+].concat([
+    "Johor Bahru", "Iskandar Puteri", "Pasir Gudang", "Skudai", "Kulai",
+    "Batu Pahat", "Muar", "Kluang", "Segamat", "Pontian", "Kota Tinggi", "Mersing",
+    "Bandar Melaka", "Ayer Keroh", "Alor Gajah", "Jasin", "Masjid Tanah",
+    "Batu Berendam", "Merlimau", "Durian Tunggal",
+    "Seremban", "Nilai", "Port Dickson", "Senawang", "Bahau", "Kuala Pilah",
+    "Rembau", "Tampin",
+    "Shah Alam", "Petaling Jaya", "Subang Jaya", "Klang", "Puchong",
+    "Cyberjaya", "Kajang", "Rawang"
+].map(n => ({ "@type": "City", name: n })));
+
 const ORG = {
     "@type": "ProfessionalService",
     "@id": SITE + "/#organisation",
@@ -168,9 +195,9 @@ const ORG = {
     openingHoursSpecification: [{
         "@type": "OpeningHoursSpecification",
         dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-        opens: "09:00", closes: "18:00"
+        opens: "09:00", closes: "17:30"
     }],
-    areaServed: ["Johor", "Melaka", "Negeri Sembilan", "Selangor"].map(n => ({ "@type": "State", name: n })),
+    areaServed: AREA_SERVED,
     knowsAbout: [
         "Home defect inspection", "Defect Liability Period (DLP)", "Pre-purchase property inspection",
         "Sub-sale house inspection", "Building Condition Assessment (BCA)", "Dilapidation survey",
@@ -188,11 +215,6 @@ const ORG = {
         "@type": "Offer",
         itemOffered: { "@type": "Service", name: s.name.en, description: s.tag.en, url: SITE + "/services/" + s.slug + "/" }
     })),
-    openingHoursSpecification: [{
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-        opens: "09:00", closes: "18:00"
-    }]
 };
 if (CONFIG.ssm) ORG.identifier = { "@type": "PropertyValue", name: "Malaysian company registration number", value: CONFIG.ssm };
 
@@ -226,7 +248,7 @@ function jsonLd(page, faqNodes, lang) {
             description: sv.desc[L] || sv.desc.en,
             url: urlFor(lang, "services/" + sv.slug),
             provider: { "@id": SITE + "/#organisation" },
-            areaServed: ["Johor", "Melaka", "Negeri Sembilan", "Selangor"].map(n => ({ "@type": "State", name: n })),
+            areaServed: AREA_SERVED,
             audience: { "@type": "Audience", audienceType: ((sv.who && sv.who[L]) || (sv.who && sv.who.en) || []).join(", ") },
             inLanguage: lang.hreflang,
             hasOfferCatalog: {
@@ -329,7 +351,17 @@ function llmsTxt() {
     L.push("- Website: " + SITE + "/");
     L.push("- WhatsApp / phone: " + CONFIG.phoneDisplay);
     L.push("- Email: " + CONFIG.email);
-    L.push("- States served: Johor, Melaka, Negeri Sembilan, Selangor (other locations on request)");
+    L.push("- States served: Johor (main area), Melaka, Negeri Sembilan, Selangor.");
+    L.push("  Every town in these states is covered. Elsewhere in Malaysia on request.");
+    L.push("  Johor: Johor Bahru, Iskandar Puteri, Pasir Gudang, Skudai, Kulai, Batu Pahat,");
+    L.push("    Muar, Kluang, Segamat, Pontian, Kota Tinggi, Mersing");
+    L.push("  Melaka: Bandar Melaka, Ayer Keroh, Alor Gajah, Jasin, Masjid Tanah,");
+    L.push("    Batu Berendam, Merlimau, Durian Tunggal");
+    L.push("  Negeri Sembilan: Seremban, Nilai, Port Dickson, Senawang, Bahau,");
+    L.push("    Kuala Pilah, Rembau, Tampin");
+    L.push("  Selangor: Shah Alam, Petaling Jaya, Subang Jaya, Klang, Puchong,");
+    L.push("    Cyberjaya, Kajang, Rawang");
+    L.push("- Business hours: Monday to Saturday, 9:00am to 5:30pm. Closed Sunday.");
     L.push("- Inspectors are registered with the Royal Institution of Surveyors Malaysia (RISM)");
     L.push("- Measuring instruments are calibrated by SIRIM Malaysia");
     L.push("- Languages: English and Bahasa Malaysia");

@@ -608,3 +608,26 @@ benar-benar menghasilkan lead.
 Diuji 9 November 2026: tag dimuat pada kesemua 69 fail HTML, dan satu
 klik pada butang WhatsApp merekod
 `["event","whatsapp_click",{"page_path":"/","link_text":"Get a Free Quote"}]`.
+
+## Waktu operasi dan kawasan liputan
+
+Waktu operasi ialah **Isnin hingga Sabtu, 9:00 pagi hingga 5:30 petang,
+Ahad tutup**. Angka ini muncul di tiga tempat dan ketiga-tiganya mesti
+sepadan: teks hubungi dalam EN, teks hubungi dalam BM, dan
+`openingHoursSpecification` dalam JSON-LD. Yang ketiga itu yang Google
+papar dalam hasil carian, jadi kesilapan di situ bermakna pelanggan
+diberitahu waktu yang salah.
+
+Kawasan liputan ialah **Johor, Melaka, Negeri Sembilan dan Selangor**,
+semua bandar dalam negeri tersebut, dan tempat lain di Malaysia atas
+permintaan. Johor disenaraikan dahulu kerana itu kawasan utama.
+
+Nama bandar ditulis penuh dalam HTML dan dalam `AREA_SERVED` di
+`build.js`, bukan dijana oleh JavaScript. Sebabnya: orang mencari
+"building inspection Johor Bahru", bukan "building inspection Malaysia".
+Tanpa nama bandar sebagai teks dan sebagai data berstruktur, laman ini
+tidak muncul untuk carian begitu.
+
+`AREA_SERVED` dikongsi oleh ORG dan oleh setiap page servis. Dahulu
+senarai yang sama ditulis dua kali di `build.js`; pasti satu daripadanya
+akan terlupa dikemas kini apabila liputan berubah.

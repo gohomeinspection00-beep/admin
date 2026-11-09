@@ -1331,6 +1331,14 @@ section { padding: 5rem 2rem; }
     border-color: var(--primary); box-shadow: var(--shadow); transform: translateX(5px);
 }
 .cov-row svg { width: 19px; height: 19px; color: var(--primary); flex-shrink: 0; }
+/* Nama negeri di atas, bandar di bawahnya. Bandar ditulis penuh dalam
+   HTML dan bukan dijana oleh JavaScript, kerana inilah teks yang dicari
+   orang — "building inspection Johor Bahru", bukan "inspection Malaysia". */
+.cov-name { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.cov-name small {
+    font-weight: 500; font-size: 0.72rem; color: var(--text-muted);
+    line-height: 1.5; letter-spacing: 0.01em;
+}
 .cov-row .cov-idx {
     margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
     font-weight: 600; color: var(--text-muted); letter-spacing: 0.1em;
@@ -2564,21 +2572,21 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
                 <span class="section-tag" data-i18n="cov.tag">Coverage Area</span>
                 <h2 data-i18n="cov.title">Operating Across 4 Main States</h2>
                 <div class="cov-list" id="covList">
-                    <div class="cov-row" data-st="0">
+                    <div class="cov-row" data-st="3">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span>Selangor</span><span class="cov-idx">01</span>
-                    </div>
-                    <div class="cov-row" data-st="1">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span>Negeri Sembilan</span><span class="cov-idx">02</span>
+                        <span class="cov-name">Johor<small>Johor Bahru · Iskandar Puteri · Pasir Gudang · Skudai · Kulai · Batu Pahat · Muar · Kluang · Segamat · Pontian · Kota Tinggi · Mersing</small></span><span class="cov-idx">01</span>
                     </div>
                     <div class="cov-row" data-st="2">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span>Melaka</span><span class="cov-idx">03</span>
+                        <span class="cov-name">Melaka<small>Bandar Melaka · Ayer Keroh · Alor Gajah · Jasin · Masjid Tanah · Batu Berendam · Merlimau · Durian Tunggal</small></span><span class="cov-idx">02</span>
                     </div>
-                    <div class="cov-row" data-st="3">
+                    <div class="cov-row" data-st="1">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span>Johor</span><span class="cov-idx">04</span>
+                        <span class="cov-name">Negeri Sembilan<small>Seremban · Nilai · Port Dickson · Senawang · Bahau · Kuala Pilah · Rembau · Tampin</small></span><span class="cov-idx">03</span>
+                    </div>
+                    <div class="cov-row" data-st="0">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span class="cov-name">Selangor<small>Shah Alam · Petaling Jaya · Subang Jaya · Klang · Puchong · Cyberjaya · Kajang · Rawang</small></span><span class="cov-idx">04</span>
                     </div>
                 </div>
                 <div class="cov-stats">
@@ -2635,7 +2643,7 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
                     </div>
                     <div class="contact-row">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                        <div><span class="label" data-i18n="con.hours">Business Hours</span><span data-i18n="con.hours.v">Mon – Sat: 9:00 am – 6:00 pm</span></div>
+                        <div><span class="label" data-i18n="con.hours">Business Hours</span><span data-i18n="con.hours.v">Mon – Sat: 9:00 am – 5:30 pm</span></div>
                     </div>
                 </div>
             </div>
@@ -6084,7 +6092,7 @@ var I18N = {
         "faq.title": "Frequently Asked Questions",
         "con.tag": "Contact Us", "con.title": "Get Your Quote Today",
         "con.card.title": "Let's Connect", "con.card.sub": "Questions or ready to book? We're here to help.",
-        "con.area": "Coverage", "con.hours": "Business Hours", "con.hours.v": "Mon – Sat: 9:00 am – 6:00 pm",
+        "con.area": "Coverage", "con.hours": "Business Hours", "con.hours.v": "Mon – Sat: 9:00 am – 5:30 pm",
         "form.title": "Request a Quote", "form.sub": "Fill in what you can — we'll handle the rest on WhatsApp.",
         "form.name": "Full Name", "form.phone": "Phone Number", "form.service": "Type of Service",
         "form.location": "Property Location", "form.size": "Built-up Size (sqft)", "form.storey": "Storeys",
@@ -6266,7 +6274,7 @@ var I18N = {
         "faq.title": "Soalan Lazim",
         "con.tag": "Hubungi Kami", "con.title": "Dapatkan Sebut Harga Hari Ini",
         "con.card.title": "Jom Berhubung", "con.card.sub": "Ada soalan atau ingin membuat tempahan? Kami sedia membantu.",
-        "con.area": "Kawasan", "con.hours": "Waktu Operasi", "con.hours.v": "Isnin – Sabtu: 9:00 pagi – 6:00 petang",
+        "con.area": "Kawasan", "con.hours": "Waktu Operasi", "con.hours.v": "Isnin – Sabtu: 9:00 pagi – 5:30 petang",
         "form.title": "Isi Borang Pertanyaan", "form.sub": "Isi mana yang boleh — selebihnya kita sambung di WhatsApp.",
         "form.name": "Nama Penuh", "form.phone": "No. Telefon", "form.service": "Jenis Servis",
         "form.location": "Lokasi Hartanah", "form.size": "Keluasan (sqft)", "form.storey": "Tingkat",
@@ -8851,7 +8859,7 @@ var FAQ_ALL = [
             "openingHoursSpecification": [{
                 "@type": "OpeningHoursSpecification",
                 "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-                "opens": "09:00", "closes": "18:00"
+                "opens": "09:00", "closes": "17:30"
             }],
             "hasOfferCatalog": {
                 "@type": "OfferCatalog",

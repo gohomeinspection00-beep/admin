@@ -2781,7 +2781,7 @@ var I18N = {
         "faq.title": "Frequently Asked Questions",
         "con.tag": "Contact Us", "con.title": "Get Your Quote Today",
         "con.card.title": "Let's Connect", "con.card.sub": "Questions or ready to book? We're here to help.",
-        "con.area": "Coverage", "con.hours": "Business Hours", "con.hours.v": "Mon – Sat: 9:00 am – 6:00 pm",
+        "con.area": "Coverage", "con.hours": "Business Hours", "con.hours.v": "Mon – Sat: 9:00 am – 5:30 pm",
         "form.title": "Request a Quote", "form.sub": "Fill in what you can — we'll handle the rest on WhatsApp.",
         "form.name": "Full Name", "form.phone": "Phone Number", "form.service": "Type of Service",
         "form.location": "Property Location", "form.size": "Built-up Size (sqft)", "form.storey": "Storeys",
@@ -2963,7 +2963,7 @@ var I18N = {
         "faq.title": "Soalan Lazim",
         "con.tag": "Hubungi Kami", "con.title": "Dapatkan Sebut Harga Hari Ini",
         "con.card.title": "Jom Berhubung", "con.card.sub": "Ada soalan atau ingin membuat tempahan? Kami sedia membantu.",
-        "con.area": "Kawasan", "con.hours": "Waktu Operasi", "con.hours.v": "Isnin – Sabtu: 9:00 pagi – 6:00 petang",
+        "con.area": "Kawasan", "con.hours": "Waktu Operasi", "con.hours.v": "Isnin – Sabtu: 9:00 pagi – 5:30 petang",
         "form.title": "Isi Borang Pertanyaan", "form.sub": "Isi mana yang boleh — selebihnya kita sambung di WhatsApp.",
         "form.name": "Nama Penuh", "form.phone": "No. Telefon", "form.service": "Jenis Servis",
         "form.location": "Lokasi Hartanah", "form.size": "Keluasan (sqft)", "form.storey": "Tingkat",
@@ -5548,7 +5548,7 @@ var FAQ_ALL = [
             "openingHoursSpecification": [{
                 "@type": "OpeningHoursSpecification",
                 "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-                "opens": "09:00", "closes": "18:00"
+                "opens": "09:00", "closes": "17:30"
             }],
             "hasOfferCatalog": {
                 "@type": "OfferCatalog",
