@@ -366,6 +366,29 @@ sebagai "Paling Dipilih". Syarat di bawah jadual ada dalam
 Semua pendaftaran masuk melalui WhatsApp, sama seperti seluruh laman —
 tiada borang atau pangkalan data untuk dijaga.
 
+## Di mana laman ini hidup (Cloudflare)
+
+Akaun Cloudflare `gohomeinspection00@gmail.com` ada **tiga Worker**.
+Hanya satu daripadanya laman ini:
+
+| Worker | Untuk apa | Sentuh? |
+|---|---|---|
+| **`proud-rain-b73f`** | **Laman ini.** Melayan `goxpert.my` dan `www.goxpert.my` | **Ya — ini sahaja** |
+| `empty-voice-eaa7` | GoXpert Pocket (projek lain) | Jangan |
+| `reinspection-form` | Borang re-inspection | Jangan |
+
+`proud-rain-b73f` ialah Worker jenis **static assets** — ia melayan fail
+terus, sama bentuk dengan `dist/`. Jadi menerbitkan versi baru bermakna
+**mengganti isi Worker itu**, bukan memindahkan domain. Domain dan DNS
+tidak perlu disentuh langsung, dan tiada masa mati.
+
+`goxpert.my` sudah menjadi zone dalam akaun yang sama, jadi tiada kerja
+nameserver yang tertunggak.
+
+**Jangan** buat projek Pages baru untuk laman ini. Itu menghasilkan laman
+kedua di `*.pages.dev` sementara `goxpert.my` kekal lama — dua versi,
+dua tempat, dan domain masih perlu dipindahkan selepas itu.
+
 ## Untuk terbit (deploy) — folder `dist/`
 
 `dist/` ialah laman siap terbit: **satu fail HTML untuk setiap page**,
