@@ -48,8 +48,8 @@ const data = {
   tarikhSerahanLaporan: "3 Oktober 2026",
   tarikhTamat30: "2 November 2026",
 
-  tarikhNotis: "2 November 2026",
-  tarikhDeadline: "17 November 2026",
+  tarikhNotis: "13 November 2026",
+  tarikhDeadline: "28 November 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -73,8 +73,9 @@ const data = {
     { tarikh: "1 Julai 2026", peristiwa: "Notis Pemilikan Kosong (Vacant Possession) dan CFO/CCC — Tempoh Liabiliti Kecacatan (DLP) 24 bulan bermula, tamat 1 Julai 2028 (sebagaimana disahkan di dalam Notis Penyerahan Kunci pihak pemaju sendiri)" },
     { tarikh: "18 September 2026", peristiwa: "Pemeriksaan Kecacatan Kali Pertama (First Defect Inspection) dijalankan ke atas hartanah" },
     { tarikh: "3 Oktober 2026", peristiwa: "Laporan Pemeriksaan Kecacatan dikemukakan secara rasmi kepada pihak pemaju melalui aplikasi rasmi JLG KITA — merupakan notis bertulis di bawah Klausa 27(1)" },
-    { tarikh: "2 November 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan; Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "17 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "2 November 2026", peristiwa: "Tamat tempoh tiga puluh (30) hari pembaikan di bawah Klausa 27(1) — pembaikan masih belum diselesaikan" },
+    { tarikh: "13 November 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "28 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 };
 
