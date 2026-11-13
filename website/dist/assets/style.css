@@ -49,6 +49,11 @@ img { max-width: 100%; }
 .nav-container {
     max-width: 1200px; margin: 0 auto; padding: 0.75rem 2rem;
     display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    /* Sauh untuk .mega-wide. Panel service lebar 860px; kalau ia disauh
+       pada butang "Services" (yang duduk dekat kiri) dan dipusatkan,
+       hujung kirinya keluar skrin. Disauh pada bekas nav, ia tidak boleh
+       keluar sebab bekas nav sendiri sentiasa dalam viewport. */
+    position: relative;
 }
 .logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
 .logo img { height: 40px; width: auto; max-width: 190px; object-fit: contain; transition: transform 0.3s ease; }
@@ -111,6 +116,114 @@ img { max-width: 100%; }
 .btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); }
 
 
+
+
+
+/* ==================== MENU DROPDOWN ====================
+   Menu pernah ada sembilan item dan pecah kepada dua baris pada 1180px
+   ke bawah — jalur yang sebahagian besarnya tablet landskap dan laptop
+   kecil. Lima item dengan dua dropdown menyelesaikannya.
+
+   Dropdown dibuka oleh hover HANYA pada peranti yang ada tetikus sebenar
+   (@media hover/pointer). Pada peranti sentuh, hover tidak wujud — tap
+   yang membukanya, melalui JavaScript. Dropdown yang bergantung pada
+   hover sahaja memang mati pada tablet, iaitu peranti yang paling
+   terjejas oleh masalah asal. */
+.has-menu { position: relative; }
+.nav-top {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    background: none; border: none; cursor: pointer; font-family: inherit;
+    font-size: inherit; font-weight: inherit; color: inherit; padding: 0;
+}
+.nav-top .caret { width: 13px; height: 13px; transition: transform 0.2s ease; flex: none; }
+.has-menu.open > .nav-top .caret { transform: rotate(180deg); }
+.has-menu.active > .nav-top { color: var(--primary); font-weight: 700; }
+
+.mega {
+    position: absolute; top: calc(100% + 0.9rem); left: 0; z-index: 1100;
+    background: var(--bg-white); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow-lg); padding: 1.4rem; text-align: left;
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+.has-menu.open > .mega { opacity: 1; visibility: visible; transform: none; }
+@media (hover: hover) and (pointer: fine) {
+    .has-menu:hover > .mega { opacity: 1; visibility: visible; transform: none; }
+    .has-menu:hover > .nav-top .caret { transform: rotate(180deg); }
+}
+/* jambatan tak kelihatan supaya tetikus tidak jatuh antara butang dan panel */
+.has-menu > .mega::before { content: ""; position: absolute; top: -2rem; left: 0; right: 0; height: 2rem; }
+
+/* Disauh pada .nav-container, bukan pada <li>. Sebab itu li service
+   dijadikan position:static — kalau ia relative, ia yang jadi sauh dan
+   panel keluar skrin semula. */
+.has-menu[data-group="services"] { position: static; }
+.mega-wide { width: min(860px, 100%); left: 0; }
+
+.mega-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+.mega-col > b {
+    display: block; font-size: 0.7rem; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--primary); margin-bottom: 0.7rem; font-weight: 700;
+}
+.mega a {
+    display: block; padding: 0.42rem 0.5rem; margin-left: -0.5rem; border-radius: 8px;
+    font-size: 0.89rem; font-weight: 500; color: var(--text-body); line-height: 1.4;
+    text-decoration: none; transition: background 0.15s ease, color 0.15s ease;
+}
+.mega a:hover, .mega a:focus-visible { background: var(--bg); color: var(--primary-dark); }
+.mega-all {
+    display: flex; align-items: center; gap: 0.4rem; margin-top: 1.2rem;
+    padding-top: 1.1rem; border-top: 1px solid var(--border);
+    font-weight: 700; color: var(--primary); font-size: 0.9rem;
+}
+.mega-sm { width: 232px; }
+.mega-sm a { font-size: 0.92rem; }
+
+/* --- mobile + tablet: dropdown jadi accordion dalam menu hamburger ---
+   Had 1024px, bukan 768px. Tujuh item menu muat satu baris sehingga
+   kira-kira 1100px; di bawah itu ia pecah dua baris dalam bahasa
+   Inggeris. Jadi hamburger mesti mengambil alih pada 1100px ke bawah,
+   bukan 768px. Angka ini diukur, bukan diagak: pada 1100px satu baris,
+   pada 1060px dua baris. */
+@media (max-width: 1100px) {
+    /* Dipindahkan dari blok 768px: bar menu mesti bertukar jadi hamburger
+       pada had yang sama dengan accordion di bawah, kalau tidak menu pecah
+       dua baris antara 769px dan 1024px. Diletak di ATAS peraturan .mega
+       sebab ".nav-links a" dan ".mega a" sama berat — yang kemudian menang,
+       dan pautan dalam accordion mesti ikut .mega a. */
+    .nav-links {
+        position: fixed; top: 64px; left: 0; right: 0;
+        background: white; border-bottom: 1px solid var(--border);
+        flex-direction: column; gap: 0; padding: 0.5rem 1.5rem 1rem;
+        display: none; align-items: stretch;
+        max-height: calc(100vh - 64px); overflow-y: auto;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links li { border-bottom: 1px solid var(--border); }
+    .nav-links li:last-child { border-bottom: none; }
+    .nav-links a { display: block; padding: 0.9rem 0; }
+    .menu-toggle { display: flex; }
+    .nav-cta span { display: none; }
+
+    .has-menu { position: static; }
+    .nav-top { width: 100%; justify-content: space-between; padding: 0.9rem 0; }
+    .mega, .mega-wide, .mega-sm {
+        position: static; width: auto; left: auto; transform: none; opacity: 1;
+        visibility: visible; box-shadow: none; border: none; border-radius: 0;
+        padding: 0 0 0.6rem 0.6rem; display: none; transition: none;
+    }
+    .has-menu.open > .mega { display: block; transform: none; }
+    /* ":not(.open)" penting. Tanpa ia, ".has-menu:hover > .mega" berat sama
+       dengan ".has-menu.open > .mega" dan sebab ia datang kemudian, ia
+       menang — accordion tak pernah terbuka pada peranti yang melekatkan
+       keadaan hover selepas tap (termasuk kebanyakan telefon). */
+    .has-menu:not(.open):hover > .mega { display: none; }
+    .has-menu.open > .mega-wide { transform: none; }
+    .mega-cols { grid-template-columns: 1fr; gap: 1rem; }
+    .mega a { padding: 0.5rem 0; margin-left: 0; }
+    .mega-all { margin-top: 0.9rem; padding-top: 0.8rem; }
+    .mega > .mega::before { display: none; }
+}
 
 /* ==================== PAGE TEKNOLOGI ====================
    Hujah page ini satu ayat: inspector yang datang ke tapak ialah orang
@@ -1631,18 +1744,9 @@ section { padding: 5rem 2rem; }
 }
 @media (max-width: 768px) {
     section { padding: 3.5rem 1.25rem; }
-    .nav-links {
-        position: fixed; top: 64px; left: 0; right: 0;
-        background: white; border-bottom: 1px solid var(--border);
-        flex-direction: column; gap: 0; padding: 0.5rem 1.5rem 1rem;
-        display: none; align-items: stretch;
-    }
-    .nav-links.open { display: flex; }
-    .nav-links li { border-bottom: 1px solid var(--border); }
-    .nav-links li:last-child { border-bottom: none; }
-    .nav-links a { display: block; padding: 0.9rem 0; }
-    .menu-toggle { display: flex; }
-    .nav-cta span { display: none; }
+    /* Peraturan nav (.nav-links, .menu-toggle, .nav-cta span) dipindahkan
+       ke blok @media (max-width: 1100px) di atas — hamburger kena ambil
+       alih lebih awal daripada baki susun atur mobile. */
     .hero { padding: 6.5rem 1.25rem 3rem; min-height: auto; }
     .hero-container { grid-template-columns: 1fr; gap: 2.5rem; }
     .stats-strip-in { grid-template-columns: repeat(2, 1fr); padding: 0 1.25rem; }

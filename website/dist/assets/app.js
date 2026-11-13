@@ -90,10 +90,12 @@ var CONFIG = {
    - inc : senarai "apa yang termasuk"
    - get : senarai "apa yang anda terima"
    ========================================================= */
+/* Label kategori. Satu sumber: dipakai oleh tajuk di page servis, oleh
+   label pada setiap kad servis, dan oleh dropdown Services dalam menu. */
 var SVC_CATS = {
-    residential: { en: "Residential", bm: "Kediaman" },
-    commercial:  { en: "Commercial & Asset", bm: "Komersial & Aset" },
-    technical:   { en: "Technical & Legal", bm: "Teknikal & Perundangan" }
+    residential: { en: "General Inspection",  bm: "Inspection Umum" },
+    commercial:  { en: "Special Inspection",  bm: "Inspection Khas" },
+    technical:   { en: "Technical & Legal",   bm: "Teknikal & Perundangan" }
 };
 
 var SVC = [
@@ -2618,6 +2620,7 @@ var I18N = {
     en: {
         "nav.services": "Services", "nav.why": "Why Us", "nav.coverage": "Coverage",
         "nav.tech": "Technology",
+        "nav.allSvc": "View all services \u2192", "nav.aboutUs": "About GoXpert",
         "tc.tag": "Digital Innovation",
         "tc.title": "We Build the Tools We Inspect With",
         "tc.sub": "Every report this practice produces comes out of software we designed and built ourselves \u2014 so findings are captured the same way on every job, by every inspector.",
@@ -2834,6 +2837,7 @@ var I18N = {
     bm: {
         "nav.services": "Servis", "nav.why": "Kenapa Kami", "nav.coverage": "Kawasan",
         "nav.tech": "Teknologi",
+        "nav.allSvc": "Lihat semua servis \u2192", "nav.aboutUs": "Tentang GoXpert",
         "tc.tag": "Inovasi Digital",
         "tc.title": "Kami Bina Alat Yang Kami Guna",
         "tc.sub": "Setiap laporan yang kami keluarkan terhasil daripada perisian yang kami reka dan bina sendiri \u2014 jadi penemuan direkod dengan cara yang sama pada setiap kerja, oleh setiap inspector.",
@@ -4168,6 +4172,81 @@ var FAQ_ALL = [
         return msg;
     }
 
+    /* ---------- Menu dropdown ----------
+       Dibuka oleh hover hanya pada peranti bertetikus (peraturan CSS
+       @media hover/pointer). Di sini ditambah tap, papan kekunci, dan
+       tutup bila tekan di luar — supaya ia berfungsi pada tablet, yang
+       merupakan peranti paling terjejas oleh menu dua baris dahulu.
+
+       Pendengar dipasang sekali dan diingat dengan pemboleh ubah JS,
+       bukan atribut DOM: build.js menyimpan DOM yang sudah dirender,
+       jadi penanda dalam DOM akan terbakar ke dalam fail terbitan dan
+       pendengar tidak akan dipasang pada laman sebenar. Atas sebab yang
+       sama, setiap dropdown ditutup sebelum DOM disimpan. */
+    var megaWired = false;
+
+    function megaCloseAll() {
+        var all = document.querySelectorAll(".has-menu.open");
+        for (var i = 0; i < all.length; i++) {
+            all[i].classList.remove("open");
+            var b = all[i].querySelector(".nav-top");
+            if (b) b.setAttribute("aria-expanded", "false");
+        }
+    }
+
+    function renderMegaSvc() {
+        var box = document.getElementById("megaSvc");
+        if (!box || typeof SVC === "undefined") return;
+        var order = ["residential", "commercial", "technical"];
+        box.innerHTML = order.map(function (cat) {
+            var items = SVC.filter(function (x) { return x.cat === cat; });
+            if (!items.length) return "";
+            return '<div class="mega-col"><b>' + (SVC_CATS[cat][lang] || SVC_CATS[cat].en) + "</b>" +
+                items.map(function (x) {
+                    return '<a href="' + url("#/services/" + x.slug) + '">' + t2(x.name) + "</a>";
+                }).join("") + "</div>";
+        }).join("");
+    }
+
+    function wireMega() {
+        if (megaWired) return;
+        megaWired = true;
+
+        document.addEventListener("click", function (e) {
+            var btn = e.target.closest && e.target.closest(".nav-top");
+            if (btn) {
+                e.preventDefault();
+                var li = btn.parentNode, isOpen = li.classList.contains("open");
+                megaCloseAll();
+                if (!isOpen) { li.classList.add("open"); btn.setAttribute("aria-expanded", "true"); }
+                return;
+            }
+            /* pautan di dalam dropdown menutupnya; klik di luar juga */
+            if (!e.target.closest || !e.target.closest(".has-menu") || e.target.closest(".mega a")) megaCloseAll();
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") megaCloseAll();
+        });
+
+        /* Pada peranti bertetikus, dropdown yang dibuka dengan klik mesti
+           tertutup bila tetikus keluar — kalau tidak kelas .open kekal dan
+           panel terus terbuka walaupun kursor dah jauh. Hanya untuk
+           tetikus sebenar: pada skrin sentuh mouseleave tidak boleh
+           dipercayai, dan di sana accordion ditutup oleh tap. */
+        if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            document.addEventListener("mouseout", function (e) {
+                var li = e.target.closest && e.target.closest(".has-menu");
+                if (!li || !li.classList.contains("open")) return;
+                var to = e.relatedTarget;
+                if (to && li.contains(to)) return;   /* masih dalam menu yang sama */
+                li.classList.remove("open");
+                var b = li.querySelector(".nav-top");
+                if (b) b.setAttribute("aria-expanded", "false");
+            });
+        }
+    }
+
     /* ---------- Page teknologi ---------- */
     function renderTechPage() {
         var g = function (id) { return document.getElementById(id); };
@@ -4641,6 +4720,9 @@ var FAQ_ALL = [
         renderFaq();
         renderServiceSelect();
         applyWaLinks();
+        renderMegaSvc();
+        wireMega();
+        megaCloseAll();
         wireWaModal();
         wamFill();
         initReveal();
@@ -4933,6 +5015,7 @@ var FAQ_ALL = [
     window.addEventListener("popstate", function () {
         if (lb.classList.contains("active")) lbClose(true);
         if (navLinks) navLinks.classList.remove("open");
+        megaCloseAll();
     });
     /* leret kiri/kanan dalam lightbox */
     (function () {
@@ -5859,6 +5942,14 @@ var FAQ_ALL = [
                 (key === "gallery" && pageKey === "gallery") ||
                 (key === "tech" && pageKey === "tech") ||
                 (key === "services" && (pageKey === "services" || pageKey === "service")));
+        });
+
+        /* Butang kumpulan tiada data-nav, jadi li ditandakan aktif
+           mengikut page yang sedang dibuka. */
+        var grp = { services: "services", service: "services",
+                    about: "about", projects: "about", gallery: "about" }[pageKey];
+        document.querySelectorAll(".has-menu").forEach(function (li) {
+            li.classList.toggle("active", li.getAttribute("data-group") === grp);
         });
 
         currentPage = pageKey;

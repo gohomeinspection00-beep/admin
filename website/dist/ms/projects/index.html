@@ -507,14 +507,30 @@
         </a>
         <ul class="nav-links" id="navLinks">
             <li><a href="/ms/" data-nav="home" data-i18n="nav.home" class="">Utama</a></li>
-            <li><a href="/ms/services/" data-nav="services" data-i18n="nav.services" class="">Servis</a></li>
-            <li><a href="/ms/about/" data-nav="about" data-i18n="nav.about">Tentang</a></li>
-            <li><a href="/ms/projects/" data-nav="projects" data-i18n="nav.projects" class="active">Projek</a></li>
+            <li class="has-menu" data-group="services">
+                <button type="button" class="nav-top" aria-expanded="false" aria-haspopup="true">
+                    <span data-i18n="nav.services">Servis</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+                <div class="mega mega-wide">
+                    <div class="mega-cols" id="megaSvc"><div class="mega-col"><b>Inspection Umum</b><a href="/ms/services/home-defect/">Home Defect Inspection (DLP)</a><a href="/ms/services/pre-purchase/">Pre-Purchase Inspection</a><a href="/ms/services/sub-sale/">Sub-Sale Inspection</a><a href="/ms/services/re-inspection/">Re-Inspection</a><a href="/ms/services/after-renovation/">After-Renovation Inspection</a><a href="/ms/services/joint-inspection/">Joint Inspection Bersama Pemaju</a></div><div class="mega-col"><b>Inspection Khas</b><a href="/ms/services/bca/">Building Condition Assessment (BCA)</a><a href="/ms/services/dilapidation/">Dilapidation Survey</a><a href="/ms/services/monitoring/">Building Monitoring</a><a href="/ms/services/commercial-inspection/">Commercial Building Inspection</a><a href="/ms/services/maintenance-audit/">Maintenance Report / Condition Audit</a><a href="/ms/services/fire-safety/">Fire Safety Inspection</a></div><div class="mega-col"><b>Teknikal &amp; Perundangan</b><a href="/ms/services/electrical/">Electrical Inspection</a><a href="/ms/services/measured-drawing/">Measured Drawing</a><a href="/ms/services/leak-detection/">Leak Detection &amp; Moisture Survey</a><a href="/ms/services/thermal-imaging/">Thermal Imaging</a><a href="/ms/services/rectification/">Rectification Defect</a><a href="/ms/services/tribunal/">Tribunal Consultation &amp; Documentation</a></div></div>
+                    <a class="mega-all" href="/ms/services/" data-i18n="nav.allSvc">Lihat semua servis →</a>
+                </div>
+            </li>
             <li><a href="/ms/teknologi/" data-nav="tech" data-i18n="nav.tech">Teknologi</a></li>
+            <li class="has-menu active" data-group="about">
+                <button type="button" class="nav-top" aria-expanded="false" aria-haspopup="true">
+                    <span data-i18n="nav.about">Tentang</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+                <div class="mega mega-sm">
+                    <a href="/ms/about/" data-nav="about" data-i18n="nav.aboutUs">Tentang GoXpert</a>
+                    <a href="/ms/gallery/" data-nav="gallery" data-i18n="nav.gallery">Galeri</a>
+                    <a href="#contact" data-i18n="nav.contact">Hubungi</a>
+                    <a href="/ms/projects/" data-nav="projects" data-i18n="nav.projects" class="active">Projek</a>
+                </div>
+            </li>
             <li><a href="/ms/blog/" data-nav="blog" data-i18n="nav.blog">Artikel</a></li>
             <li><a href="/ms/faq/" data-nav="faq" data-i18n="nav.faq">Soalan</a></li>
             <li><a href="/ms/pemilik-rumah/" data-nav="landing" data-i18n="nav.landing">Pemilik Rumah</a></li>
-            <li><a href="#contact" data-i18n="nav.contact">Hubungi</a></li>
         </ul>
         <div class="nav-right">
             <button class="lang-toggle" id="langToggle" type="button">EN</button>

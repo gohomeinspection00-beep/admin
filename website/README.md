@@ -885,10 +885,42 @@ enam langkah, peralatan, piawai, CTA.
 
 ### Menu
 
-"Technology" menggantikan "Gallery" dalam menu atas; Gallery kekal dalam
-footer. Menu sudah pernah pecah kepada dua baris, jadi menambah item
-tanpa membuang satu akan memecahkannya semula. Diuji: satu baris dalam
-EN dan BM pada 1280px.
+Tujuh item di atas: **Home · Services ▾ · Technology · About ▾ ·
+Articles · FAQ · Untuk Pemilik Rumah**. Gallery kekal dalam footer
+juga.
+
+**Dua dropdown.** *Services ▾* menjana 18 servis dalam tiga lajur
+(`renderMegaSvc()`), dibaca terus daripada tatasusunan `SVC` dan label
+kategori daripada `SVC_CATS` — jadi menambah servis tidak perlu sentuh
+HTML menu. *About ▾* ialah empat pautan tetap: About GoXpert, Gallery,
+Contact, Projects.
+
+Tiga perkara dalam CSS menu yang mudah pecah kalau diubah tanpa ukur:
+
+1. **Had hamburger ialah 1100px, bukan 768px.** Tujuh item hanya muat
+   satu baris sehingga kira-kira 1100px; pada 1060px ia pecah dua baris
+   dalam EN. Peraturan `.nav-links` / `.menu-toggle` sengaja duduk dalam
+   blok `@media (max-width: 1100px)` bersama peraturan accordion, bukan
+   dalam blok mobile 768px di bawah. Kedua-duanya mesti sentiasa sama
+   nilai, kalau tidak ada jalur lebar yang dapat bar penuh tetapi
+   accordion, atau sebaliknya.
+
+2. **Panel `.mega-wide` disauh pada `.nav-container`**, bukan pada
+   `<li>`-nya — sebab itu `li[data-group="services"]` dijadikan
+   `position: static`. Panel itu 860px lebar manakala butang "Services"
+   duduk dekat kiri; disauh pada butang dan dipusatkan, hujung kirinya
+   keluar skrin (diukur: −49px pada 1280px, −156px pada 1024px).
+
+3. **`.has-menu:not(.open):hover > .mega`** — `:not(.open)` itu bukan
+   hiasan. Tanpa ia, peraturan hover berat sama dengan
+   `.has-menu.open > .mega` dan kerana ia datang kemudian, ia menang:
+   accordion tidak pernah terbuka pada peranti yang melekatkan keadaan
+   hover selepas tap, iaitu kebanyakan telefon.
+
+Diuji 13 November 2026, EN dan BM: satu baris pada 1101–1440px,
+hamburger pada 1100px ke bawah; kedua-dua panel penuh dalam skrin pada
+1120/1280/1440px; dropdown yang dibuka dengan klik tertutup bila tetikus
+keluar; accordion buka dan tutup pada 1100/820/390px tanpa overflow.
 
 ### Gambar
 
