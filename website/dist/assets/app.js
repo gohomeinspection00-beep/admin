@@ -2617,6 +2617,34 @@ var GROUP_COORD = {
 var I18N = {
     en: {
         "nav.services": "Services", "nav.why": "Why Us", "nav.coverage": "Coverage",
+        "nav.tech": "Technology",
+        "tc.tag": "Digital Innovation",
+        "tc.title": "We Build the Tools We Inspect With",
+        "tc.sub": "Every report this practice produces comes out of software we designed and built ourselves \u2014 so findings are captured the same way on every job, by every inspector.",
+        "tc.barisTag": "Rating System",
+        "tc.barisTitle": "One rating, traceable from site to report",
+        "tc.barisBody": "We rate every defect using BARIS \u2014 the Building Assessment Rating & Inspection System used by RISM and JKR. It combines condition severity with repair urgency into a single rating, so a repair plan can be ordered by priority instead of by opinion.",
+        "tc.giTag": "Inspection Platform",
+        "tc.giTitle": "GoInspect \u2014 the platform behind every report",
+        "tc.giBody": "Designed and built in-house. Every residential report we issue is produced with it, on phone or laptop.",
+        "tc.giOut1": "Tagged floor plan", "tc.giOut2": "Maintenance planner", "tc.giOut3": "95-page user manual",
+        "tc.gpTag": "Field Toolbox",
+        "tc.gpTitle": "GoXpert Pocket \u2014 17 site tools in one phone",
+        "tc.gpBody": "The whole site toolbox in one phone: AI, augmented reality, the phone's own sensors and plug-in field devices \u2014 and it works with no signal.",
+        "tc.awTitle": "Four awards at URBIEE 2026",
+        "tc.awSub": "Urban Innovation and Entrepreneur Exhibition \u00b7 UiTM Perak \u00b7 26 October 2026 \u00b7 Group entry",
+        "tc.awBest1": "Best Team Presentation (A)", "tc.awBest2": "Best Category (A)",
+        "tc.ghTag": "For Homeowners", "tc.ghBadge": "In development",
+        "tc.ghBody": "A home companion for Malaysian buyers and owners \u2014 putting a building surveyor's knowledge into every step, from choosing a home to claiming defects after handover. 25 tools planned across four stages.",
+        "tc.ghNote": "Not yet released. We will announce it here when it is.",
+        "tc.stTag": "Methodology", "tc.stTitle": "The same six steps on every job",
+        "tc.toolTag": "Instruments", "tc.toolTitle": "Calibrated instruments",
+        "tc.toolNote": "Calibrated by SIRIM Malaysia. Calibration certificates available on request.",
+        "tc.sdTag": "Standards", "tc.sdTitle": "Standards and codes we work to",
+        "tc.sdBody": "Every report is written against published codes, not house rules.",
+        "tc.ctaTitle": "Working on something bigger?",
+        "tc.ctaBody": "Building Condition Assessment, dilapidation survey, or a project with real reporting requirements \u2014 tell us what you have.",
+        "tc.ctaBtn": "WhatsApp Us",
         "nav.faq": "FAQ", "nav.contact": "Contact", "nav.cta": "Get a Quote",
         "hero.badge": "We Are Building Surveyors",
         "hero.title.pre": "Building Surveying & Inspection ", "hero.title.hl": "You Can Trust",
@@ -2805,6 +2833,34 @@ var I18N = {
     },
     bm: {
         "nav.services": "Servis", "nav.why": "Kenapa Kami", "nav.coverage": "Kawasan",
+        "nav.tech": "Teknologi",
+        "tc.tag": "Inovasi Digital",
+        "tc.title": "Kami Bina Alat Yang Kami Guna",
+        "tc.sub": "Setiap laporan yang kami keluarkan terhasil daripada perisian yang kami reka dan bina sendiri \u2014 jadi penemuan direkod dengan cara yang sama pada setiap kerja, oleh setiap inspector.",
+        "tc.barisTag": "Sistem Rating",
+        "tc.barisTitle": "Satu rating, boleh dijejak dari tapak ke laporan",
+        "tc.barisBody": "Kami menilai setiap kecacatan menggunakan BARIS \u2014 Building Assessment Rating & Inspection System yang digunakan oleh RISM dan JKR. Ia menggabungkan tahap kerosakan dengan keutamaan pembaikan menjadi satu rating, jadi pelan pembaikan boleh disusun ikut keutamaan, bukan ikut pendapat.",
+        "tc.giTag": "Platform Inspection",
+        "tc.giTitle": "GoInspect \u2014 platform di sebalik setiap laporan",
+        "tc.giBody": "Direka dan dibina sendiri. Setiap laporan kediaman yang kami keluarkan dihasilkan dengannya, di telefon atau komputer riba.",
+        "tc.giOut1": "Pelan lantai bertanda", "tc.giOut2": "Perancang penyelenggaraan", "tc.giOut3": "Manual pengguna 95 muka surat",
+        "tc.gpTag": "Kotak Alat Tapak",
+        "tc.gpTitle": "GoXpert Pocket \u2014 17 alat tapak dalam satu telefon",
+        "tc.gpBody": "Seluruh kotak alat tapak dalam satu telefon: AI, augmented reality, sensor telefon sendiri dan peranti yang boleh dipasang \u2014 dan ia berfungsi tanpa isyarat.",
+        "tc.awTitle": "Empat anugerah di URBIEE 2026",
+        "tc.awSub": "Urban Innovation and Entrepreneur Exhibition \u00b7 UiTM Perak \u00b7 26 Oktober 2026 \u00b7 Penyertaan berkumpulan",
+        "tc.awBest1": "Best Team Presentation (A)", "tc.awBest2": "Best Category (A)",
+        "tc.ghTag": "Untuk Pemilik Rumah", "tc.ghBadge": "Dalam pembangunan",
+        "tc.ghBody": "Pendamping rumah untuk pembeli dan pemilik di Malaysia \u2014 membawa pengetahuan building surveyor ke setiap langkah, dari memilih rumah hingga menuntut kecacatan selepas serahan. 25 alat dirancang merentas empat peringkat.",
+        "tc.ghNote": "Belum dilancarkan. Kami akan umumkan di sini apabila ia sedia.",
+        "tc.stTag": "Metodologi", "tc.stTitle": "Enam langkah yang sama pada setiap kerja",
+        "tc.toolTag": "Peralatan", "tc.toolTitle": "Peralatan yang ditentukur",
+        "tc.toolNote": "Ditentukur oleh SIRIM Malaysia. Sijil kalibrasi boleh diminta.",
+        "tc.sdTag": "Piawai", "tc.sdTitle": "Piawai dan kod yang kami ikut",
+        "tc.sdBody": "Setiap laporan ditulis berdasarkan kod yang diterbitkan, bukan peraturan sendiri.",
+        "tc.ctaTitle": "Ada projek yang lebih besar?",
+        "tc.ctaBody": "Building Condition Assessment, dilapidation survey, atau projek dengan keperluan pelaporan sebenar \u2014 beritahu kami apa yang ada.",
+        "tc.ctaBtn": "WhatsApp Kami",
         "nav.faq": "Soalan", "nav.contact": "Hubungi", "nav.cta": "Sebut Harga",
         "hero.badge": "Kami Building Surveyor",
         "hero.title.pre": "Ukur Bangunan & Inspection ", "hero.title.hl": "Yang Anda Boleh Percaya",
@@ -3044,6 +3100,97 @@ var EQUIPMENT = [
     { img: "img/tool/l-square.webp",          emoji: "📐", en: "L Square",          bm: "L Square" },
     { img: "img/tool/measure-tape.webp",      emoji: "📐", en: "Measuring Tape",    bm: "Pita Pengukur" }
 ];
+
+/* ==================== DATA PAGE TEKNOLOGI ====================
+   BARIS ialah sistem RISM dan JKR, bukan ciptaan firma ini. Teks dalam
+   page mesti sentiasa menyatakan itu. */
+var TECH = {
+    baris: [
+        { n: 1, en: "Good",        bm: "Baik" },
+        { n: 2, en: "Fair",        bm: "Sederhana" },
+        { n: 3, en: "Poor",        bm: "Lemah" },
+        { n: 4, en: "Bad",         bm: "Teruk" },
+        { n: 5, en: "Dilapidated", bm: "Rosak Teruk" }
+    ],
+    giFeat: [
+        { en: ["Floor-plan tagging", "Pin each defect on the plan with its photo"],
+          bm: ["Tanda pada pelan lantai", "Setiap kecacatan ditanda pada pelan dengan gambarnya"] },
+        { en: ["Submission mode", "Review and submit defects for developer approval"],
+          bm: ["Mod hantaran", "Semak dan hantar senarai kecacatan untuk kelulusan pemaju"] },
+        { en: ["Re-inspection mode", "Before and after status for every defect"],
+          bm: ["Mod re-inspection", "Status sebelum dan selepas bagi setiap kecacatan"] },
+        { en: ["Offline mode", "Inspect without signal, sync later"],
+          bm: ["Mod luar talian", "Inspect tanpa isyarat, selaras kemudian"] },
+        { en: ["Contractor and defect forms", "Work orders by trade for repairers"],
+          bm: ["Borang kontraktor dan kecacatan", "Arahan kerja mengikut bidang untuk tukang"] },
+        { en: ["Maintenance planner", "Priorities, trades and cost per item"],
+          bm: ["Perancang penyelenggaraan", "Keutamaan, bidang dan kos setiap item"] },
+        { en: ["Ayie, AI assistant", "Answers inspection questions on site"],
+          bm: ["Ayie, pembantu AI", "Menjawab soalan inspection di tapak"] }
+    ],
+    gpStats: [
+        { v: "17", en: "site tools in one app", bm: "alat tapak dalam satu app" },
+        { v: "5",  en: "tool categories",       bm: "kategori alat" },
+        { v: "4",  en: "augmented reality tools", bm: "alat augmented reality" },
+        { v: "0",  en: "signal needed — works offline", bm: "isyarat diperlukan — jalan luar talian" }
+    ],
+    gpFeat: [
+        { en: ["AI", "Spots defects in photos, redraws sketches, translates speech"],
+          bm: ["AI", "Mengesan kecacatan dalam gambar, melukis semula lakaran, menterjemah pertuturan"] },
+        { en: ["Augmented reality", "Pins defects in real space, measures with the camera"],
+          bm: ["Augmented reality", "Menanda kecacatan dalam ruang sebenar, mengukur dengan kamera"] },
+        { en: ["Phone sensors", "Turns the phone into a spirit level and compass"],
+          bm: ["Sensor telefon", "Menukar telefon menjadi spirit level dan kompas"] },
+        { en: ["Field devices", "USB endoscope, Bluetooth laser meter and remote"],
+          bm: ["Peranti tapak", "Endoskop USB, laser meter Bluetooth dan alat kawalan"] }
+    ],
+    ghFeat: [
+        { en: ["Before you buy", "Compare homes, home score, market price, true cost, loan check, risk map"],
+          bm: ["Sebelum beli", "Banding rumah, skor rumah, harga pasaran, kos sebenar, semak pinjaman, peta risiko"] },
+        { en: ["Agents and paperwork", "Trusted agent, agent check, negotiation coach, SPA review, buying checklist"],
+          bm: ["Ejen dan dokumen", "Ejen dipercayai, semak ejen, panduan rundingan, semakan SPA, senarai semak"] },
+        { en: ["After you get the keys", "Defect scan, defect report, hire inspector, DLP tracker, claim assistant"],
+          bm: ["Selepas dapat kunci", "Imbas kecacatan, laporan kecacatan, upah inspector, penjejak DLP, pembantu tuntutan"] },
+        { en: ["Home Passport", "Every defect, repair and inspection for a home in one place"],
+          bm: ["Home Passport", "Setiap kecacatan, pembaikan dan inspection sebuah rumah di satu tempat"] }
+    ],
+    steps: [
+        { en: ["Visual inspection", "Element-by-element walk-through"],
+          bm: ["Pemeriksaan visual", "Elemen demi elemen"] },
+        { en: ["Aerial drone survey", "Roofs, facades and under-decks"],
+          bm: ["Tinjauan drone udara", "Bumbung, fasad dan bawah dek"] },
+        { en: ["Non-destructive testing", "Moisture, thermal, crack and tapping"],
+          bm: ["Ujian tanpa musnah", "Kelembapan, thermal, retak dan ketukan"] },
+        { en: ["Defect tagging", "Unique ID, linked to plan and photo"],
+          bm: ["Penandaan kecacatan", "ID unik, dipautkan ke pelan dan gambar"] },
+        { en: ["BARIS rating", "Severity combined with repair priority"],
+          bm: ["Rating BARIS", "Tahap kerosakan digabung dengan keutamaan pembaikan"] },
+        { en: ["Structured report", "Register, sheets and recommendations"],
+          bm: ["Laporan berstruktur", "Daftar, helaian dan cadangan"] }
+    ],
+    /* Nama alat kekal sama dalam dua bahasa. "hi" menandakan alat yang
+       belum pernah disebut di muka depan. */
+    tools: [
+        { n: "Laser distance meter" }, { n: "Crack gauge", hi: 1 }, { n: "Spirit level" },
+        { n: "Tapping rod", hi: 1 }, { n: "Digital moisture meter", hi: 1 },
+        { n: "Thermal imaging scanner" }, { n: "Multimeter", hi: 1 },
+        { n: "Earth resistance tester" }, { n: "RCCD and socket tester", hi: 1 },
+        { n: "Certified drone with 4K camera", hi: 1 }
+    ],
+    std: [
+        { en: "RISM codes of practice", bm: "Kod amalan RISM",
+          items: ["CP BS 101 (3rd ed)", "CP BS 102", "CP BS 103", "CP BS 105"] },
+        { en: "Acts and regulations", bm: "Akta dan peraturan",
+          items: ["UBBL 1984", "Act 133", "Act 118", "OSHA 1994",
+                  "Fire Services Act 1988", "Electricity Supply Act 1990",
+                  "CAAM drone rules", "CIDB"] },
+        { en: "Technical manuals", bm: "Manual teknikal",
+          items: ["JKR Bridge Inspection Manual", "BS 8000-3", "BS 6150:2019",
+                  "BS EN 1993", "BS EN 1090"] },
+        { en: "Malaysian Standards", bm: "Piawaian Malaysia",
+          items: ["MS 1184", "MS 1294-1", "MS 1506", "MS 1017"] }
+    ]
+};
 
 var PROCESS = [
     { en: ["Enquire", "WhatsApp or form — free consultation on the right service."],
@@ -3306,8 +3453,8 @@ var FAQ_ALL = [
        perkataan English, alamat Melayu memakai perkataan Melayu. Hash
        dalaman kekal satu (#/pemilik-rumah) supaya routing tidak perlu
        tahu bahasa; penukaran berlaku hanya semasa membina alamat. */
-    var SLUG_EN = { "pemilik-rumah": "homeowners", "inspection-berkelompok": "group-booking" };
-    var SLUG_BM = { "homeowners": "pemilik-rumah", "group-booking": "inspection-berkelompok" };
+    var SLUG_EN = { "pemilik-rumah": "homeowners", "inspection-berkelompok": "group-booking", "teknologi": "technology" };
+    var SLUG_BM = { "homeowners": "pemilik-rumah", "group-booking": "inspection-berkelompok", "technology": "teknologi" };
 
     function url(h) {
         if (!window.GX_STATIC) return h;
@@ -4019,6 +4166,48 @@ var FAQ_ALL = [
         msg += (bm ? "\nSerahan kunci: " : "\nHandover: ") + (g.vp || "");
         msg += "\n" + t("gb.waAsk");
         return msg;
+    }
+
+    /* ---------- Page teknologi ---------- */
+    function renderTechPage() {
+        var g = function (id) { return document.getElementById(id); };
+        if (!g("barisScale")) return;
+
+        g("barisScale").innerHTML = TECH.baris.map(function (b) {
+            return '<div class="baris-cell baris-' + b.n + '"><b>' + b.n + '</b><span>' + t2(b) + '</span></div>';
+        }).join("");
+
+        var feat = function (rows) {
+            return rows.map(function (r) {
+                var v = r[lang] || r.en;
+                return '<li><span class="dot"></span><span><b>' + v[0] + '</b><span>' + v[1] + '</span></span></li>';
+            }).join("");
+        };
+        g("giFeat").innerHTML = feat(TECH.giFeat);
+        g("gpFeat").innerHTML = feat(TECH.gpFeat);
+        g("ghFeat").innerHTML = feat(TECH.ghFeat);
+
+        g("gpStats").innerHTML = TECH.gpStats.map(function (x) {
+            return '<div class="tech-stat"><b>' + x.v + '</b><span>' + t2(x) + '</span></div>';
+        }).join("");
+
+        g("techSteps").innerHTML = TECH.steps.map(function (x, i) {
+            var v = x[lang] || x.en;
+            return '<div class="step-card"><em>' + ("0" + (i + 1)).slice(-2) + '</em>' +
+                   '<b>' + v[0] + '</b><span>' + v[1] + '</span></div>';
+        }).join("");
+
+        g("techTools").innerHTML = TECH.tools.map(function (x) {
+            return '<span' + (x.hi ? ' class="hi"' : '') + '>' + x.n + '</span>';
+        }).join("");
+
+        g("techStd").innerHTML = TECH.std.map(function (x) {
+            return '<div class="std-card"><b>' + t2(x) + '</b><ul>' +
+                   x.items.map(function (i) { return '<li>' + i + '</li>'; }).join("") + '</ul></div>';
+        }).join("");
+
+        var wa = g("techWa");
+        if (wa) wa.href = waLink(t("wa.default"));
     }
 
     function renderGroupPage() {
@@ -5592,7 +5781,7 @@ var FAQ_ALL = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing", group: "page-group", review: "page-review" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing", group: "page-group", review: "page-review", tech: "page-tech" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -5604,6 +5793,7 @@ var FAQ_ALL = [
             if (parts[0] === "pemilik-rumah" || parts[0] === "homeowners") pageKey = "landing";
             else if (parts[0] === "inspection-berkelompok" || parts[0] === "group-booking") pageKey = "group";
             else if (parts[0] === "review") pageKey = "review";
+            else if (parts[0] === "technology" || parts[0] === "teknologi") pageKey = "tech";
             else if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
             else if (parts[0] === "faq") pageKey = "faq";
@@ -5637,6 +5827,7 @@ var FAQ_ALL = [
         if (pageKey === "landing") renderLandingPage();
         if (pageKey === "group") renderGroupPage();
         if (pageKey === "review") renderReviewPage();
+        if (pageKey === "tech") renderTechPage();
         document.body.classList.toggle("lp-on", pageKey === "landing");
         if (pageKey !== "landing") lpStopMusic();
 
@@ -5666,6 +5857,7 @@ var FAQ_ALL = [
                 (key === "faq" && pageKey === "faq") ||
                 (key === "blog" && (pageKey === "blog" || pageKey === "article")) ||
                 (key === "gallery" && pageKey === "gallery") ||
+                (key === "tech" && pageKey === "tech") ||
                 (key === "services" && (pageKey === "services" || pageKey === "service")));
         });
 

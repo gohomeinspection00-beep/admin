@@ -110,6 +110,125 @@ img { max-width: 100%; }
 }
 .btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); }
 
+
+
+/* ==================== PAGE TEKNOLOGI ====================
+   Hujah page ini satu ayat: inspector yang datang ke tapak ialah orang
+   yang membina alat yang dia guna. Anugerah ialah bukti kepada ayat itu,
+   bukan tajuknya — sebab itu BARIS dan metodologi diletak sebelum app.
+
+   BARIS bukan ciptaan firma ini. Ia sistem RISM dan JKR yang firma ini
+   gunakan, dan teks mesti sentiasa menyatakan itu. Dalam page tentang
+   alat yang dibina sendiri, pembaca mudah tersalah sangka. */
+.tech-hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--accent) 100%);
+    color: #fff; padding: 5.5rem 0 4.5rem; position: relative; overflow: hidden;
+}
+.tech-hero .section-container { position: relative; z-index: 1; }
+.tech-hero .section-tag { background: rgba(255,255,255,0.18); color: #fff; }
+.tech-hero h1 {
+    font-size: clamp(1.9rem, 5.2vw, 3.1rem); font-weight: 800; line-height: 1.15;
+    margin: 0.9rem 0 1.1rem; max-width: 18ch; text-wrap: balance;
+}
+.tech-hero p { font-size: 1.04rem; line-height: 1.7; max-width: 62ch; color: rgba(255,255,255,0.93); }
+
+.tech-sec { padding: 4.5rem 0; }
+.tech-sec.alt { background: var(--bg); }
+
+/* --- BARIS --- */
+.baris-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.7rem; margin-top: 2rem; }
+.baris-cell {
+    border-radius: 14px; padding: 1.1rem 0.6rem; text-align: center; border: 1px solid var(--border);
+}
+.baris-cell b { display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 600; line-height: 1; }
+.baris-cell span { display: block; margin-top: 0.4rem; font-size: 0.82rem; font-weight: 600; }
+.baris-1 { background: #E8F5E9; border-color: #C8E6C9; color: #1B5E20; }
+.baris-2 { background: #E3F2FD; border-color: #BBDEFB; color: #0D47A1; }
+.baris-3 { background: #FFF8E1; border-color: #FFE082; color: #8D6E00; }
+.baris-4 { background: #FFEBEE; border-color: #FFCDD2; color: #B71C1C; }
+.baris-5 { background: #FCE4EC; border-color: #F8BBD0; color: #880E4F; }
+
+/* --- blok app --- */
+.app-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 2.5rem; align-items: center; }
+.app-shot { display: flex; justify-content: center; }
+.app-shot img { width: 100%; max-width: 300px; border-radius: 22px; box-shadow: var(--shadow-lg); }
+.app-feat { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.5rem; }
+.app-feat li { display: flex; gap: 0.8rem; align-items: flex-start; list-style: none; }
+.app-feat .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex: none; margin-top: 0.45rem; }
+.app-feat b { display: block; font-size: 0.97rem; color: var(--text-dark); }
+.app-feat span { font-size: 0.89rem; color: var(--text-body); }
+.app-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; margin-top: 2.5rem; }
+.app-out figure { margin: 0; }
+.app-out img { width: 100%; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.app-out figcaption { margin-top: 0.6rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+
+/* --- statistik --- */
+.tech-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.8rem 0 0; }
+.tech-stat { background: var(--bg-white); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; }
+.tech-stat b { display: block; font-size: 1.7rem; font-weight: 800; color: var(--primary); line-height: 1.1; }
+.tech-stat span { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+.tech-flow { width: 100%; margin-top: 2rem; border-radius: 16px; box-shadow: var(--shadow); }
+
+/* --- anugerah --- */
+.awards {
+    margin-top: 2.5rem; border: 1px solid var(--border); border-radius: 20px;
+    background: linear-gradient(180deg, #FFFDF5 0%, var(--bg-white) 100%); padding: 2rem 1.5rem;
+}
+.awards h3 { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); margin: 0 0 0.3rem; }
+.awards > p { font-size: 0.88rem; color: var(--text-muted); margin: 0 0 1.6rem; }
+.award-row { display: flex; gap: 1.5rem; align-items: flex-end; justify-content: center; flex-wrap: wrap; }
+.award-row figure { margin: 0; text-align: center; max-width: 150px; }
+.award-row img { max-height: 120px; width: auto; max-width: 100%; }
+.award-row figcaption { margin-top: 0.6rem; font-size: 0.78rem; font-weight: 700; color: var(--text-dark); }
+
+/* --- enam langkah --- */
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+.step-card {
+    background: var(--bg-white); border: 1px solid var(--border); border-radius: 16px; padding: 1.4rem;
+    border-top: 3px solid var(--accent);
+}
+.step-card em {
+    font-family: 'JetBrains Mono', monospace; font-style: normal; font-size: 0.78rem;
+    font-weight: 600; color: var(--accent); letter-spacing: 0.08em;
+}
+.step-card b { display: block; margin: 0.45rem 0 0.3rem; font-size: 1.02rem; color: var(--text-dark); }
+.step-card span { font-size: 0.88rem; color: var(--text-body); }
+
+/* --- alat --- */
+.tool-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.8rem; }
+.tool-chips span {
+    background: var(--bg-white); border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.55rem 1rem; font-size: 0.88rem; font-weight: 600; color: var(--text-dark);
+}
+.tool-chips span.hi { border-color: var(--primary); color: var(--primary-dark); }
+
+/* --- piawai --- */
+.std-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-top: 1.8rem; }
+.std-card { background: var(--bg-white); border: 1px solid var(--border); border-radius: 14px; padding: 1.3rem; }
+.std-card b { display: block; font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.7rem; }
+.std-card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+.std-card li { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text-body); }
+
+.tech-badge {
+    display: inline-block; background: var(--orange); color: #fff; border-radius: 999px;
+    padding: 0.25rem 0.7rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; vertical-align: middle; margin-left: 0.6rem;
+}
+
+@media (max-width: 900px) {
+    .app-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .steps-grid { grid-template-columns: repeat(2, 1fr); }
+    .tech-stats { grid-template-columns: repeat(2, 1fr); }
+    .std-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .baris-scale { grid-template-columns: repeat(2, 1fr); }
+    .steps-grid { grid-template-columns: 1fr; }
+    .app-out { grid-template-columns: 1fr; }
+    .tech-sec { padding: 3.2rem 0; }
+    .tech-hero { padding: 4rem 0 3.2rem; }
+}
+
 /* ==================== POPUP WHATSAPP ====================
    Setiap butang WhatsApp membuka popup ini dahulu, bukan terus melompat
    ke WhatsApp.

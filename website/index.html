@@ -151,6 +151,125 @@ img { max-width: 100%; }
 }
 .btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); }
 
+
+
+/* ==================== PAGE TEKNOLOGI ====================
+   Hujah page ini satu ayat: inspector yang datang ke tapak ialah orang
+   yang membina alat yang dia guna. Anugerah ialah bukti kepada ayat itu,
+   bukan tajuknya — sebab itu BARIS dan metodologi diletak sebelum app.
+
+   BARIS bukan ciptaan firma ini. Ia sistem RISM dan JKR yang firma ini
+   gunakan, dan teks mesti sentiasa menyatakan itu. Dalam page tentang
+   alat yang dibina sendiri, pembaca mudah tersalah sangka. */
+.tech-hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--accent) 100%);
+    color: #fff; padding: 5.5rem 0 4.5rem; position: relative; overflow: hidden;
+}
+.tech-hero .section-container { position: relative; z-index: 1; }
+.tech-hero .section-tag { background: rgba(255,255,255,0.18); color: #fff; }
+.tech-hero h1 {
+    font-size: clamp(1.9rem, 5.2vw, 3.1rem); font-weight: 800; line-height: 1.15;
+    margin: 0.9rem 0 1.1rem; max-width: 18ch; text-wrap: balance;
+}
+.tech-hero p { font-size: 1.04rem; line-height: 1.7; max-width: 62ch; color: rgba(255,255,255,0.93); }
+
+.tech-sec { padding: 4.5rem 0; }
+.tech-sec.alt { background: var(--bg); }
+
+/* --- BARIS --- */
+.baris-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.7rem; margin-top: 2rem; }
+.baris-cell {
+    border-radius: 14px; padding: 1.1rem 0.6rem; text-align: center; border: 1px solid var(--border);
+}
+.baris-cell b { display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 600; line-height: 1; }
+.baris-cell span { display: block; margin-top: 0.4rem; font-size: 0.82rem; font-weight: 600; }
+.baris-1 { background: #E8F5E9; border-color: #C8E6C9; color: #1B5E20; }
+.baris-2 { background: #E3F2FD; border-color: #BBDEFB; color: #0D47A1; }
+.baris-3 { background: #FFF8E1; border-color: #FFE082; color: #8D6E00; }
+.baris-4 { background: #FFEBEE; border-color: #FFCDD2; color: #B71C1C; }
+.baris-5 { background: #FCE4EC; border-color: #F8BBD0; color: #880E4F; }
+
+/* --- blok app --- */
+.app-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 2.5rem; align-items: center; }
+.app-shot { display: flex; justify-content: center; }
+.app-shot img { width: 100%; max-width: 300px; border-radius: 22px; box-shadow: var(--shadow-lg); }
+.app-feat { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.5rem; }
+.app-feat li { display: flex; gap: 0.8rem; align-items: flex-start; list-style: none; }
+.app-feat .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex: none; margin-top: 0.45rem; }
+.app-feat b { display: block; font-size: 0.97rem; color: var(--text-dark); }
+.app-feat span { font-size: 0.89rem; color: var(--text-body); }
+.app-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; margin-top: 2.5rem; }
+.app-out figure { margin: 0; }
+.app-out img { width: 100%; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.app-out figcaption { margin-top: 0.6rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+
+/* --- statistik --- */
+.tech-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.8rem 0 0; }
+.tech-stat { background: var(--bg-white); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; }
+.tech-stat b { display: block; font-size: 1.7rem; font-weight: 800; color: var(--primary); line-height: 1.1; }
+.tech-stat span { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+.tech-flow { width: 100%; margin-top: 2rem; border-radius: 16px; box-shadow: var(--shadow); }
+
+/* --- anugerah --- */
+.awards {
+    margin-top: 2.5rem; border: 1px solid var(--border); border-radius: 20px;
+    background: linear-gradient(180deg, #FFFDF5 0%, var(--bg-white) 100%); padding: 2rem 1.5rem;
+}
+.awards h3 { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); margin: 0 0 0.3rem; }
+.awards > p { font-size: 0.88rem; color: var(--text-muted); margin: 0 0 1.6rem; }
+.award-row { display: flex; gap: 1.5rem; align-items: flex-end; justify-content: center; flex-wrap: wrap; }
+.award-row figure { margin: 0; text-align: center; max-width: 150px; }
+.award-row img { max-height: 120px; width: auto; max-width: 100%; }
+.award-row figcaption { margin-top: 0.6rem; font-size: 0.78rem; font-weight: 700; color: var(--text-dark); }
+
+/* --- enam langkah --- */
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+.step-card {
+    background: var(--bg-white); border: 1px solid var(--border); border-radius: 16px; padding: 1.4rem;
+    border-top: 3px solid var(--accent);
+}
+.step-card em {
+    font-family: 'JetBrains Mono', monospace; font-style: normal; font-size: 0.78rem;
+    font-weight: 600; color: var(--accent); letter-spacing: 0.08em;
+}
+.step-card b { display: block; margin: 0.45rem 0 0.3rem; font-size: 1.02rem; color: var(--text-dark); }
+.step-card span { font-size: 0.88rem; color: var(--text-body); }
+
+/* --- alat --- */
+.tool-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.8rem; }
+.tool-chips span {
+    background: var(--bg-white); border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.55rem 1rem; font-size: 0.88rem; font-weight: 600; color: var(--text-dark);
+}
+.tool-chips span.hi { border-color: var(--primary); color: var(--primary-dark); }
+
+/* --- piawai --- */
+.std-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-top: 1.8rem; }
+.std-card { background: var(--bg-white); border: 1px solid var(--border); border-radius: 14px; padding: 1.3rem; }
+.std-card b { display: block; font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.7rem; }
+.std-card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+.std-card li { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text-body); }
+
+.tech-badge {
+    display: inline-block; background: var(--orange); color: #fff; border-radius: 999px;
+    padding: 0.25rem 0.7rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; vertical-align: middle; margin-left: 0.6rem;
+}
+
+@media (max-width: 900px) {
+    .app-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .steps-grid { grid-template-columns: repeat(2, 1fr); }
+    .tech-stats { grid-template-columns: repeat(2, 1fr); }
+    .std-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .baris-scale { grid-template-columns: repeat(2, 1fr); }
+    .steps-grid { grid-template-columns: 1fr; }
+    .app-out { grid-template-columns: 1fr; }
+    .tech-sec { padding: 3.2rem 0; }
+    .tech-hero { padding: 4rem 0 3.2rem; }
+}
+
 /* ==================== POPUP WHATSAPP ====================
    Setiap butang WhatsApp membuka popup ini dahulu, bukan terus melompat
    ke WhatsApp.
@@ -2272,7 +2391,7 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
             <li><a href="#/services" data-nav="services" data-i18n="nav.services">Services</a></li>
             <li><a href="#/about" data-nav="about" data-i18n="nav.about">About</a></li>
             <li><a href="#/projects" data-nav="projects" data-i18n="nav.projects">Projects</a></li>
-            <li><a href="#/gallery" data-nav="gallery" data-i18n="nav.gallery">Gallery</a></li>
+            <li><a href="#/teknologi" data-nav="tech" data-i18n="nav.tech">Technology</a></li>
             <li><a href="#/blog" data-nav="blog" data-i18n="nav.blog">Articles</a></li>
             <li><a href="#/faq" data-nav="faq" data-i18n="nav.faq">FAQ</a></li>
             <li><a href="#/pemilik-rumah" data-nav="landing" data-i18n="nav.landing">For Homeowners</a></li>
@@ -2987,6 +3106,137 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
     <iframe name="rvSink" id="rvSink" style="display:none" title="submit" aria-hidden="true"></iframe>
 </main>
 
+<!-- ==================== PAGE TEKNOLOGI ==================== -->
+<main id="page-tech" class="vpage" hidden>
+
+    <section class="tech-hero">
+        <div class="hero-bg-shapes"><div class="shape shape-1"></div><div class="shape shape-2"></div></div>
+        <div class="section-container">
+            <span class="section-tag" data-i18n="tc.tag">Digital Innovation</span>
+            <h1 data-i18n="tc.title">We Build the Tools We Inspect With</h1>
+            <p data-i18n="tc.sub">Every report this practice produces comes out of software we designed and built ourselves — so findings are captured the same way on every job, by every inspector.</p>
+        </div>
+    </section>
+
+    <!-- BARIS -->
+    <section class="tech-sec">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <span class="section-tag" data-i18n="tc.barisTag">Rating System</span>
+                <h2 data-i18n="tc.barisTitle">One rating, traceable from site to report</h2>
+                <p data-i18n="tc.barisBody">We rate every defect using BARIS — the Building Assessment Rating &amp; Inspection System used by RISM and JKR. It combines condition severity with repair urgency into a single rating, so a repair plan can be ordered by priority instead of by opinion.</p>
+            </div>
+            <div class="baris-scale" id="barisScale"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+
+    <!-- GoInspect -->
+    <section class="tech-sec alt">
+        <div class="section-container">
+            <div class="app-grid">
+                <div class="app-shot"><img src="img/tech/goinspect-app.webp" alt="GoInspect" width="416" height="900" loading="lazy" decoding="async"></div>
+                <div>
+                    <span class="section-tag" data-i18n="tc.giTag">Inspection Platform</span>
+                    <h2 data-i18n="tc.giTitle">GoInspect — the platform behind every report</h2>
+                    <p data-i18n="tc.giBody">Designed and built in-house. Every residential report we issue is produced with it, on phone or laptop.</p>
+                    <ul class="app-feat" id="giFeat"><!-- dijana oleh JS --></ul>
+                </div>
+            </div>
+            <div class="app-out">
+                <figure><img src="img/tech/goinspect-floorplan.webp" alt="" width="744" height="716" loading="lazy" decoding="async"><figcaption data-i18n="tc.giOut1">Tagged floor plan</figcaption></figure>
+                <figure><img src="img/tech/goinspect-planner.webp" alt="" width="744" height="758" loading="lazy" decoding="async"><figcaption data-i18n="tc.giOut2">Maintenance planner</figcaption></figure>
+                <figure><img src="img/tech/goinspect-manual.webp" alt="" width="560" height="794" loading="lazy" decoding="async"><figcaption data-i18n="tc.giOut3">95-page user manual</figcaption></figure>
+            </div>
+        </div>
+    </section>
+
+    <!-- GoXpert Pocket -->
+    <section class="tech-sec">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <span class="section-tag" data-i18n="tc.gpTag">Field Toolbox</span>
+                <h2 data-i18n="tc.gpTitle">GoXpert Pocket — 17 site tools in one phone</h2>
+                <p data-i18n="tc.gpBody">The whole site toolbox in one phone: AI, augmented reality, the phone's own sensors and plug-in field devices — and it works with no signal.</p>
+            </div>
+            <div class="tech-stats" id="gpStats"><!-- dijana oleh JS --></div>
+            <ul class="app-feat" id="gpFeat" style="margin-top:2rem"><!-- dijana oleh JS --></ul>
+            <img class="tech-flow" src="img/tech/pocket-flow.webp" alt="" width="1100" height="711" loading="lazy" decoding="async">
+
+            <div class="awards">
+                <h3 data-i18n="tc.awTitle">Four awards at URBIEE 2026</h3>
+                <p data-i18n="tc.awSub">Urban Innovation and Entrepreneur Exhibition · UiTM Perak · 26 October 2026 · Group entry</p>
+                <div class="award-row">
+                    <figure><img src="img/tech/award-platinum.webp" alt="" width="271" height="700" loading="lazy" decoding="async"><figcaption>Platinum</figcaption></figure>
+                    <figure><img src="img/tech/award-gold.webp" alt="" width="420" height="473" loading="lazy" decoding="async"><figcaption>Gold</figcaption></figure>
+                    <figure><img src="img/tech/award-presentation.webp" alt="" width="560" height="286" loading="lazy" decoding="async"><figcaption data-i18n="tc.awBest1">Best Team Presentation (A)</figcaption></figure>
+                    <figure><img src="img/tech/award-category.webp" alt="" width="560" height="268" loading="lazy" decoding="async"><figcaption data-i18n="tc.awBest2">Best Category (A)</figcaption></figure>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GoHome -->
+    <section class="tech-sec alt">
+        <div class="section-container">
+            <div class="app-grid">
+                <div>
+                    <span class="section-tag" data-i18n="tc.ghTag">For Homeowners</span>
+                    <h2>GoHome<span class="tech-badge" data-i18n="tc.ghBadge">In development</span></h2>
+                    <p data-i18n="tc.ghBody">A home companion for Malaysian buyers and owners — putting a building surveyor's knowledge into every step, from choosing a home to claiming defects after handover. 25 tools planned across four stages.</p>
+                    <ul class="app-feat" id="ghFeat"><!-- dijana oleh JS --></ul>
+                    <p style="margin-top:1.4rem;font-size:0.88rem;color:var(--text-muted)" data-i18n="tc.ghNote">Not yet released. We will announce it here when it is.</p>
+                </div>
+                <div class="app-shot"><img src="img/tech/gohome-1.webp" alt="GoHome" width="416" height="900" loading="lazy" decoding="async"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enam langkah -->
+    <section class="tech-sec">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <span class="section-tag" data-i18n="tc.stTag">Methodology</span>
+                <h2 data-i18n="tc.stTitle">The same six steps on every job</h2>
+            </div>
+            <div class="steps-grid" id="techSteps"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+
+    <!-- Alat -->
+    <section class="tech-sec alt">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <span class="section-tag" data-i18n="tc.toolTag">Instruments</span>
+                <h2 data-i18n="tc.toolTitle">Calibrated instruments</h2>
+                <p data-i18n="tc.toolNote">Calibrated by SIRIM Malaysia. Calibration certificates available on request.</p>
+            </div>
+            <div class="tool-chips" id="techTools"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+
+    <!-- Piawai -->
+    <section class="tech-sec">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <span class="section-tag" data-i18n="tc.sdTag">Standards</span>
+                <h2 data-i18n="tc.sdTitle">Standards and codes we work to</h2>
+                <p data-i18n="tc.sdBody">Every report is written against published codes, not house rules.</p>
+            </div>
+            <div class="std-grid" id="techStd"><!-- dijana oleh JS --></div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <h2 data-i18n="tc.ctaTitle">Working on something bigger?</h2>
+        <p data-i18n="tc.ctaBody">Building Condition Assessment, dilapidation survey, or a project with real reporting requirements — tell us what you have.</p>
+        <a class="btn btn-whatsapp" id="techWa" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+            <span data-i18n="tc.ctaBtn">WhatsApp Us</span>
+        </a>
+    </section>
+
+</main>
+
 <main id="page-group" class="vpage" hidden>
 
     <!-- Hero -->
@@ -3329,6 +3579,7 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
                     <li><a href="#/about" data-i18n="nav.about">About</a></li>
                     <li><a href="#/projects" data-i18n="nav.projects">Projects</a></li>
                     <li><a href="#/gallery" data-i18n="nav.gallery">Gallery</a></li>
+                    <li><a href="#/teknologi" data-i18n="nav.tech">Technology</a></li>
                     <li><a href="#/blog" data-i18n="nav.blog">Articles</a></li>
                     <li><a href="#/pemilik-rumah" data-i18n="nav.landing">For Homeowners</a></li>
                     <li><a href="#/inspection-berkelompok" data-i18n="nav.group">Group Booking</a></li>
@@ -6010,6 +6261,34 @@ var GROUP_COORD = {
 var I18N = {
     en: {
         "nav.services": "Services", "nav.why": "Why Us", "nav.coverage": "Coverage",
+        "nav.tech": "Technology",
+        "tc.tag": "Digital Innovation",
+        "tc.title": "We Build the Tools We Inspect With",
+        "tc.sub": "Every report this practice produces comes out of software we designed and built ourselves \u2014 so findings are captured the same way on every job, by every inspector.",
+        "tc.barisTag": "Rating System",
+        "tc.barisTitle": "One rating, traceable from site to report",
+        "tc.barisBody": "We rate every defect using BARIS \u2014 the Building Assessment Rating & Inspection System used by RISM and JKR. It combines condition severity with repair urgency into a single rating, so a repair plan can be ordered by priority instead of by opinion.",
+        "tc.giTag": "Inspection Platform",
+        "tc.giTitle": "GoInspect \u2014 the platform behind every report",
+        "tc.giBody": "Designed and built in-house. Every residential report we issue is produced with it, on phone or laptop.",
+        "tc.giOut1": "Tagged floor plan", "tc.giOut2": "Maintenance planner", "tc.giOut3": "95-page user manual",
+        "tc.gpTag": "Field Toolbox",
+        "tc.gpTitle": "GoXpert Pocket \u2014 17 site tools in one phone",
+        "tc.gpBody": "The whole site toolbox in one phone: AI, augmented reality, the phone's own sensors and plug-in field devices \u2014 and it works with no signal.",
+        "tc.awTitle": "Four awards at URBIEE 2026",
+        "tc.awSub": "Urban Innovation and Entrepreneur Exhibition \u00b7 UiTM Perak \u00b7 26 October 2026 \u00b7 Group entry",
+        "tc.awBest1": "Best Team Presentation (A)", "tc.awBest2": "Best Category (A)",
+        "tc.ghTag": "For Homeowners", "tc.ghBadge": "In development",
+        "tc.ghBody": "A home companion for Malaysian buyers and owners \u2014 putting a building surveyor's knowledge into every step, from choosing a home to claiming defects after handover. 25 tools planned across four stages.",
+        "tc.ghNote": "Not yet released. We will announce it here when it is.",
+        "tc.stTag": "Methodology", "tc.stTitle": "The same six steps on every job",
+        "tc.toolTag": "Instruments", "tc.toolTitle": "Calibrated instruments",
+        "tc.toolNote": "Calibrated by SIRIM Malaysia. Calibration certificates available on request.",
+        "tc.sdTag": "Standards", "tc.sdTitle": "Standards and codes we work to",
+        "tc.sdBody": "Every report is written against published codes, not house rules.",
+        "tc.ctaTitle": "Working on something bigger?",
+        "tc.ctaBody": "Building Condition Assessment, dilapidation survey, or a project with real reporting requirements \u2014 tell us what you have.",
+        "tc.ctaBtn": "WhatsApp Us",
         "nav.faq": "FAQ", "nav.contact": "Contact", "nav.cta": "Get a Quote",
         "hero.badge": "We Are Building Surveyors",
         "hero.title.pre": "Building Surveying & Inspection ", "hero.title.hl": "You Can Trust",
@@ -6198,6 +6477,34 @@ var I18N = {
     },
     bm: {
         "nav.services": "Servis", "nav.why": "Kenapa Kami", "nav.coverage": "Kawasan",
+        "nav.tech": "Teknologi",
+        "tc.tag": "Inovasi Digital",
+        "tc.title": "Kami Bina Alat Yang Kami Guna",
+        "tc.sub": "Setiap laporan yang kami keluarkan terhasil daripada perisian yang kami reka dan bina sendiri \u2014 jadi penemuan direkod dengan cara yang sama pada setiap kerja, oleh setiap inspector.",
+        "tc.barisTag": "Sistem Rating",
+        "tc.barisTitle": "Satu rating, boleh dijejak dari tapak ke laporan",
+        "tc.barisBody": "Kami menilai setiap kecacatan menggunakan BARIS \u2014 Building Assessment Rating & Inspection System yang digunakan oleh RISM dan JKR. Ia menggabungkan tahap kerosakan dengan keutamaan pembaikan menjadi satu rating, jadi pelan pembaikan boleh disusun ikut keutamaan, bukan ikut pendapat.",
+        "tc.giTag": "Platform Inspection",
+        "tc.giTitle": "GoInspect \u2014 platform di sebalik setiap laporan",
+        "tc.giBody": "Direka dan dibina sendiri. Setiap laporan kediaman yang kami keluarkan dihasilkan dengannya, di telefon atau komputer riba.",
+        "tc.giOut1": "Pelan lantai bertanda", "tc.giOut2": "Perancang penyelenggaraan", "tc.giOut3": "Manual pengguna 95 muka surat",
+        "tc.gpTag": "Kotak Alat Tapak",
+        "tc.gpTitle": "GoXpert Pocket \u2014 17 alat tapak dalam satu telefon",
+        "tc.gpBody": "Seluruh kotak alat tapak dalam satu telefon: AI, augmented reality, sensor telefon sendiri dan peranti yang boleh dipasang \u2014 dan ia berfungsi tanpa isyarat.",
+        "tc.awTitle": "Empat anugerah di URBIEE 2026",
+        "tc.awSub": "Urban Innovation and Entrepreneur Exhibition \u00b7 UiTM Perak \u00b7 26 Oktober 2026 \u00b7 Penyertaan berkumpulan",
+        "tc.awBest1": "Best Team Presentation (A)", "tc.awBest2": "Best Category (A)",
+        "tc.ghTag": "Untuk Pemilik Rumah", "tc.ghBadge": "Dalam pembangunan",
+        "tc.ghBody": "Pendamping rumah untuk pembeli dan pemilik di Malaysia \u2014 membawa pengetahuan building surveyor ke setiap langkah, dari memilih rumah hingga menuntut kecacatan selepas serahan. 25 alat dirancang merentas empat peringkat.",
+        "tc.ghNote": "Belum dilancarkan. Kami akan umumkan di sini apabila ia sedia.",
+        "tc.stTag": "Metodologi", "tc.stTitle": "Enam langkah yang sama pada setiap kerja",
+        "tc.toolTag": "Peralatan", "tc.toolTitle": "Peralatan yang ditentukur",
+        "tc.toolNote": "Ditentukur oleh SIRIM Malaysia. Sijil kalibrasi boleh diminta.",
+        "tc.sdTag": "Piawai", "tc.sdTitle": "Piawai dan kod yang kami ikut",
+        "tc.sdBody": "Setiap laporan ditulis berdasarkan kod yang diterbitkan, bukan peraturan sendiri.",
+        "tc.ctaTitle": "Ada projek yang lebih besar?",
+        "tc.ctaBody": "Building Condition Assessment, dilapidation survey, atau projek dengan keperluan pelaporan sebenar \u2014 beritahu kami apa yang ada.",
+        "tc.ctaBtn": "WhatsApp Kami",
         "nav.faq": "Soalan", "nav.contact": "Hubungi", "nav.cta": "Sebut Harga",
         "hero.badge": "Kami Building Surveyor",
         "hero.title.pre": "Ukur Bangunan & Inspection ", "hero.title.hl": "Yang Anda Boleh Percaya",
@@ -6437,6 +6744,97 @@ var EQUIPMENT = [
     { img: "img/tool/l-square.webp",          emoji: "📐", en: "L Square",          bm: "L Square" },
     { img: "img/tool/measure-tape.webp",      emoji: "📐", en: "Measuring Tape",    bm: "Pita Pengukur" }
 ];
+
+/* ==================== DATA PAGE TEKNOLOGI ====================
+   BARIS ialah sistem RISM dan JKR, bukan ciptaan firma ini. Teks dalam
+   page mesti sentiasa menyatakan itu. */
+var TECH = {
+    baris: [
+        { n: 1, en: "Good",        bm: "Baik" },
+        { n: 2, en: "Fair",        bm: "Sederhana" },
+        { n: 3, en: "Poor",        bm: "Lemah" },
+        { n: 4, en: "Bad",         bm: "Teruk" },
+        { n: 5, en: "Dilapidated", bm: "Rosak Teruk" }
+    ],
+    giFeat: [
+        { en: ["Floor-plan tagging", "Pin each defect on the plan with its photo"],
+          bm: ["Tanda pada pelan lantai", "Setiap kecacatan ditanda pada pelan dengan gambarnya"] },
+        { en: ["Submission mode", "Review and submit defects for developer approval"],
+          bm: ["Mod hantaran", "Semak dan hantar senarai kecacatan untuk kelulusan pemaju"] },
+        { en: ["Re-inspection mode", "Before and after status for every defect"],
+          bm: ["Mod re-inspection", "Status sebelum dan selepas bagi setiap kecacatan"] },
+        { en: ["Offline mode", "Inspect without signal, sync later"],
+          bm: ["Mod luar talian", "Inspect tanpa isyarat, selaras kemudian"] },
+        { en: ["Contractor and defect forms", "Work orders by trade for repairers"],
+          bm: ["Borang kontraktor dan kecacatan", "Arahan kerja mengikut bidang untuk tukang"] },
+        { en: ["Maintenance planner", "Priorities, trades and cost per item"],
+          bm: ["Perancang penyelenggaraan", "Keutamaan, bidang dan kos setiap item"] },
+        { en: ["Ayie, AI assistant", "Answers inspection questions on site"],
+          bm: ["Ayie, pembantu AI", "Menjawab soalan inspection di tapak"] }
+    ],
+    gpStats: [
+        { v: "17", en: "site tools in one app", bm: "alat tapak dalam satu app" },
+        { v: "5",  en: "tool categories",       bm: "kategori alat" },
+        { v: "4",  en: "augmented reality tools", bm: "alat augmented reality" },
+        { v: "0",  en: "signal needed — works offline", bm: "isyarat diperlukan — jalan luar talian" }
+    ],
+    gpFeat: [
+        { en: ["AI", "Spots defects in photos, redraws sketches, translates speech"],
+          bm: ["AI", "Mengesan kecacatan dalam gambar, melukis semula lakaran, menterjemah pertuturan"] },
+        { en: ["Augmented reality", "Pins defects in real space, measures with the camera"],
+          bm: ["Augmented reality", "Menanda kecacatan dalam ruang sebenar, mengukur dengan kamera"] },
+        { en: ["Phone sensors", "Turns the phone into a spirit level and compass"],
+          bm: ["Sensor telefon", "Menukar telefon menjadi spirit level dan kompas"] },
+        { en: ["Field devices", "USB endoscope, Bluetooth laser meter and remote"],
+          bm: ["Peranti tapak", "Endoskop USB, laser meter Bluetooth dan alat kawalan"] }
+    ],
+    ghFeat: [
+        { en: ["Before you buy", "Compare homes, home score, market price, true cost, loan check, risk map"],
+          bm: ["Sebelum beli", "Banding rumah, skor rumah, harga pasaran, kos sebenar, semak pinjaman, peta risiko"] },
+        { en: ["Agents and paperwork", "Trusted agent, agent check, negotiation coach, SPA review, buying checklist"],
+          bm: ["Ejen dan dokumen", "Ejen dipercayai, semak ejen, panduan rundingan, semakan SPA, senarai semak"] },
+        { en: ["After you get the keys", "Defect scan, defect report, hire inspector, DLP tracker, claim assistant"],
+          bm: ["Selepas dapat kunci", "Imbas kecacatan, laporan kecacatan, upah inspector, penjejak DLP, pembantu tuntutan"] },
+        { en: ["Home Passport", "Every defect, repair and inspection for a home in one place"],
+          bm: ["Home Passport", "Setiap kecacatan, pembaikan dan inspection sebuah rumah di satu tempat"] }
+    ],
+    steps: [
+        { en: ["Visual inspection", "Element-by-element walk-through"],
+          bm: ["Pemeriksaan visual", "Elemen demi elemen"] },
+        { en: ["Aerial drone survey", "Roofs, facades and under-decks"],
+          bm: ["Tinjauan drone udara", "Bumbung, fasad dan bawah dek"] },
+        { en: ["Non-destructive testing", "Moisture, thermal, crack and tapping"],
+          bm: ["Ujian tanpa musnah", "Kelembapan, thermal, retak dan ketukan"] },
+        { en: ["Defect tagging", "Unique ID, linked to plan and photo"],
+          bm: ["Penandaan kecacatan", "ID unik, dipautkan ke pelan dan gambar"] },
+        { en: ["BARIS rating", "Severity combined with repair priority"],
+          bm: ["Rating BARIS", "Tahap kerosakan digabung dengan keutamaan pembaikan"] },
+        { en: ["Structured report", "Register, sheets and recommendations"],
+          bm: ["Laporan berstruktur", "Daftar, helaian dan cadangan"] }
+    ],
+    /* Nama alat kekal sama dalam dua bahasa. "hi" menandakan alat yang
+       belum pernah disebut di muka depan. */
+    tools: [
+        { n: "Laser distance meter" }, { n: "Crack gauge", hi: 1 }, { n: "Spirit level" },
+        { n: "Tapping rod", hi: 1 }, { n: "Digital moisture meter", hi: 1 },
+        { n: "Thermal imaging scanner" }, { n: "Multimeter", hi: 1 },
+        { n: "Earth resistance tester" }, { n: "RCCD and socket tester", hi: 1 },
+        { n: "Certified drone with 4K camera", hi: 1 }
+    ],
+    std: [
+        { en: "RISM codes of practice", bm: "Kod amalan RISM",
+          items: ["CP BS 101 (3rd ed)", "CP BS 102", "CP BS 103", "CP BS 105"] },
+        { en: "Acts and regulations", bm: "Akta dan peraturan",
+          items: ["UBBL 1984", "Act 133", "Act 118", "OSHA 1994",
+                  "Fire Services Act 1988", "Electricity Supply Act 1990",
+                  "CAAM drone rules", "CIDB"] },
+        { en: "Technical manuals", bm: "Manual teknikal",
+          items: ["JKR Bridge Inspection Manual", "BS 8000-3", "BS 6150:2019",
+                  "BS EN 1993", "BS EN 1090"] },
+        { en: "Malaysian Standards", bm: "Piawaian Malaysia",
+          items: ["MS 1184", "MS 1294-1", "MS 1506", "MS 1017"] }
+    ]
+};
 
 var PROCESS = [
     { en: ["Enquire", "WhatsApp or form — free consultation on the right service."],
@@ -6699,8 +7097,8 @@ var FAQ_ALL = [
        perkataan English, alamat Melayu memakai perkataan Melayu. Hash
        dalaman kekal satu (#/pemilik-rumah) supaya routing tidak perlu
        tahu bahasa; penukaran berlaku hanya semasa membina alamat. */
-    var SLUG_EN = { "pemilik-rumah": "homeowners", "inspection-berkelompok": "group-booking" };
-    var SLUG_BM = { "homeowners": "pemilik-rumah", "group-booking": "inspection-berkelompok" };
+    var SLUG_EN = { "pemilik-rumah": "homeowners", "inspection-berkelompok": "group-booking", "teknologi": "technology" };
+    var SLUG_BM = { "homeowners": "pemilik-rumah", "group-booking": "inspection-berkelompok", "technology": "teknologi" };
 
     function url(h) {
         if (!window.GX_STATIC) return h;
@@ -7412,6 +7810,48 @@ var FAQ_ALL = [
         msg += (bm ? "\nSerahan kunci: " : "\nHandover: ") + (g.vp || "");
         msg += "\n" + t("gb.waAsk");
         return msg;
+    }
+
+    /* ---------- Page teknologi ---------- */
+    function renderTechPage() {
+        var g = function (id) { return document.getElementById(id); };
+        if (!g("barisScale")) return;
+
+        g("barisScale").innerHTML = TECH.baris.map(function (b) {
+            return '<div class="baris-cell baris-' + b.n + '"><b>' + b.n + '</b><span>' + t2(b) + '</span></div>';
+        }).join("");
+
+        var feat = function (rows) {
+            return rows.map(function (r) {
+                var v = r[lang] || r.en;
+                return '<li><span class="dot"></span><span><b>' + v[0] + '</b><span>' + v[1] + '</span></span></li>';
+            }).join("");
+        };
+        g("giFeat").innerHTML = feat(TECH.giFeat);
+        g("gpFeat").innerHTML = feat(TECH.gpFeat);
+        g("ghFeat").innerHTML = feat(TECH.ghFeat);
+
+        g("gpStats").innerHTML = TECH.gpStats.map(function (x) {
+            return '<div class="tech-stat"><b>' + x.v + '</b><span>' + t2(x) + '</span></div>';
+        }).join("");
+
+        g("techSteps").innerHTML = TECH.steps.map(function (x, i) {
+            var v = x[lang] || x.en;
+            return '<div class="step-card"><em>' + ("0" + (i + 1)).slice(-2) + '</em>' +
+                   '<b>' + v[0] + '</b><span>' + v[1] + '</span></div>';
+        }).join("");
+
+        g("techTools").innerHTML = TECH.tools.map(function (x) {
+            return '<span' + (x.hi ? ' class="hi"' : '') + '>' + x.n + '</span>';
+        }).join("");
+
+        g("techStd").innerHTML = TECH.std.map(function (x) {
+            return '<div class="std-card"><b>' + t2(x) + '</b><ul>' +
+                   x.items.map(function (i) { return '<li>' + i + '</li>'; }).join("") + '</ul></div>';
+        }).join("");
+
+        var wa = g("techWa");
+        if (wa) wa.href = waLink(t("wa.default"));
     }
 
     function renderGroupPage() {
@@ -8985,7 +9425,7 @@ var FAQ_ALL = [
     function t2(o) { return o ? (o[lang] || o.en) : ""; }
 
     /* ---------- Router page dalaman (#/...) ---------- */
-    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing", group: "page-group", review: "page-review" };
+    var VPAGES = { home: "page-home", projects: "page-projects", services: "page-services", service: "page-service", about: "page-about", faq: "page-faq", blog: "page-blog", article: "page-article", gallery: "page-gallery", landing: "page-landing", group: "page-group", review: "page-review", tech: "page-tech" };
     var currentPage = "home";
 
     function route(skipScroll) {
@@ -8997,6 +9437,7 @@ var FAQ_ALL = [
             if (parts[0] === "pemilik-rumah" || parts[0] === "homeowners") pageKey = "landing";
             else if (parts[0] === "inspection-berkelompok" || parts[0] === "group-booking") pageKey = "group";
             else if (parts[0] === "review") pageKey = "review";
+            else if (parts[0] === "technology" || parts[0] === "teknologi") pageKey = "tech";
             else if (parts[0] === "projects") pageKey = "projects";
             else if (parts[0] === "about") pageKey = "about";
             else if (parts[0] === "faq") pageKey = "faq";
@@ -9030,6 +9471,7 @@ var FAQ_ALL = [
         if (pageKey === "landing") renderLandingPage();
         if (pageKey === "group") renderGroupPage();
         if (pageKey === "review") renderReviewPage();
+        if (pageKey === "tech") renderTechPage();
         document.body.classList.toggle("lp-on", pageKey === "landing");
         if (pageKey !== "landing") lpStopMusic();
 
@@ -9059,6 +9501,7 @@ var FAQ_ALL = [
                 (key === "faq" && pageKey === "faq") ||
                 (key === "blog" && (pageKey === "blog" || pageKey === "article")) ||
                 (key === "gallery" && pageKey === "gallery") ||
+                (key === "tech" && pageKey === "tech") ||
                 (key === "services" && (pageKey === "services" || pageKey === "service")));
         });
 

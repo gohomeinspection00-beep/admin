@@ -855,3 +855,49 @@ paling biasa.
 Skrip yang melaporkan kejayaan tanpa memeriksanya lebih buruk daripada
 tiada skrip: ia memindahkan kesilapan ke tempat yang lebih sukar
 dikesan.
+
+## Page teknologi (`/technology/`, `/ms/teknologi/`)
+
+Page ini wujud untuk menunjukkan firma ini membina perisiannya sendiri.
+Hujahnya satu ayat: **inspector yang datang ke tapak ialah orang yang
+membina alat yang dia guna.** Anugerah URBIEE ialah bukti kepada ayat
+itu, bukan tajuknya — sebab itu BARIS dan metodologi diletak sebelum
+app.
+
+Susunan: BARIS, GoInspect, GoXpert Pocket dengan blok anugerah, GoHome,
+enam langkah, peralatan, piawai, CTA.
+
+### Tiga perkara yang tidak boleh diubah tanpa berfikir
+
+1. **BARIS bukan ciptaan firma ini.** Ia sistem RISM dan JKR yang firma
+   ini gunakan. Dalam page tentang alat yang dibina sendiri, pembaca
+   sangat mudah tersalah sangka. Teks EN dan BM kedua-duanya menyebut
+   RISM dan JKR; jangan buang.
+
+2. **GoHome belum dilancarkan.** Ia dilabel "In development" /
+   "Dalam pembangunan" dan teksnya berakhir dengan "Not yet released".
+   Memasang app yang belum wujud sebagai sedia ada ialah jenis dakwaan
+   berlebihan yang sama seperti yang pernah dibersihkan dari laman ini.
+
+3. **URBIEE ialah penyertaan berkumpulan**, dan ia dinyatakan dalam
+   subtajuk blok anugerah. Sijil asal membawa nama yang tersalah cetak,
+   jadi hanya trofi dipaparkan — bukan sijil.
+
+### Menu
+
+"Technology" menggantikan "Gallery" dalam menu atas; Gallery kekal dalam
+footer. Menu sudah pernah pecah kepada dua baris, jadi menambah item
+tanpa membuang satu akan memecahkannya semula. Diuji: satu baris dalam
+EN dan BM pada 1280px.
+
+### Gambar
+
+Dalam `img/tech/`, dikeluarkan daripada portfolio pemilik dengan
+`pdfimages`. Trofi ialah WebP dengan alpha, digabungkan daripada imej
+dan topeng kelabu yang berasingan dalam PDF. Jumlah 376 KB.
+
+Diuji 13 November 2026: 390px dan 1280px, EN dan BM — 5 sel BARIS, 7
+ciri GoInspect, 4 statistik, 4 ciri Pocket, 4 ciri GoHome, 6 langkah,
+10 alat, 4 kumpulan piawai; 10 imej, tiada yang pecah; tiada overflow,
+tiada ralat JavaScript, tiada 4xx. Seluruh laman: 1,956 pautan dan imej
+merentas 73 fail, tiada yang pecah.

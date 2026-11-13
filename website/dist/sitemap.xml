@@ -83,6 +83,15 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goxpert.my/technology/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/technology/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/teknologi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/technology/"/>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goxpert.my/services/home-defect/</loc>
     <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/services/home-defect/"/>
     <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/services/home-defect/"/>
@@ -375,6 +384,15 @@
     <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/group-booking/"/>
     <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/inspection-berkelompok/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/group-booking/"/>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goxpert.my/ms/teknologi/</loc>
+    <xhtml:link rel="alternate" hreflang="en-MY" href="https://goxpert.my/technology/"/>
+    <xhtml:link rel="alternate" hreflang="ms-MY" href="https://goxpert.my/ms/teknologi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://goxpert.my/technology/"/>
     <lastmod>2026-11-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

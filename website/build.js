@@ -113,6 +113,11 @@ const PAGES = [
        noindex: true menjadikannya tidak diindeks Google dan ia
        dikecualikan dari sitemap.xml dan llms.txt. Tiada page lain
        memaut kepadanya. */
+    { out: "teknologi", outEn: "technology", key: "tech", hash: "#/teknologi",
+      title: "Technology \u2014 Inspection Software We Built Ourselves | GoXpert",
+      desc: "GoInspect and GoXpert Pocket \u2014 inspection software designed and built in-house, winner of four awards at URBIEE 2026. BARIS rating, drone survey, SIRIM-calibrated instruments and the codes we work to.",
+      titleBm: "Teknologi \u2014 Perisian Inspection Yang Kami Bina Sendiri | GoXpert",
+      descBm: "GoInspect dan GoXpert Pocket \u2014 perisian inspection yang direka dan dibina sendiri, pemenang empat anugerah di URBIEE 2026. Rating BARIS, tinjauan drone, peralatan ditentukur SIRIM dan kod yang kami ikut." },
     { out: "review", key: "review", hash: "#/review", noindex: true,
       title: "How did we do? — GoXpert",
       desc: "Tell us how your inspection went.",
@@ -159,6 +164,8 @@ function realLinks(s, lang) {
                  'href="' + p + "/" + (lang.code === "en" ? "homeowners" : "pemilik-rumah") + '/"')
         .replace(/href="#\/inspection-berkelompok"/g,
                  'href="' + p + "/" + (lang.code === "en" ? "group-booking" : "inspection-berkelompok") + '/"')
+        .replace(/href="#\/teknologi"/g,
+                 'href="' + p + "/" + (lang.code === "en" ? "technology" : "teknologi") + '/"')
         .replace(/href="#"/g, 'href="' + p + '/"');
 }
 
@@ -529,7 +536,8 @@ function copyDir(from, to) {
             const id = { home: "page-home", services: "page-services", service: "page-service",
                 projects: "page-projects", gallery: "page-gallery", about: "page-about",
                 faq: "page-faq", blog: "page-blog", article: "page-article",
-                landing: "page-landing", group: "page-group", review: "page-review" }[key];
+                landing: "page-landing", group: "page-group", review: "page-review",
+                tech: "page-tech" }[key];
             const el = document.getElementById(id);
             if (el) el.removeAttribute("hidden");
             /* buang kelas animasi "belum masuk skrin" supaya kandungan
