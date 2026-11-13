@@ -766,3 +766,60 @@ Diuji 13 November 2026: tiada pautan `sample-report` tinggal dalam
 mana-mana daripada 71 fail HTML; PDF tiada dalam `dist/files/`; butang
 di landing page dan di page servis membuka popup WhatsApp dengan mesej
 dalam bahasa yang betul; tiada ralat JavaScript.
+
+## Kelayakan: apa yang laman ini boleh dan tidak boleh dakwa
+
+Laman ini pernah mendakwa, di 22 tempat, bahawa **setiap inspector ialah
+Registered Building Surveyor berdaftar RISM**. Itu tidak tepat, dan
+pemilik membetulkannya pada 13 November 2026.
+
+Yang betul:
+
+- Inspector memiliki **ijazah dalam Building Surveying**.
+- Mereka **Graduate Member RISM**. Graduate Member ialah gred keahlian
+  Royal Institution of Surveyors Malaysia — ia **bukan** pendaftaran.
+- **Registered Building Surveyor** ialah gelaran berdaftar yang
+  berasingan. Firma ini **bekerjasama dengan** mereka; ia bukan
+  kelayakan firma sendiri.
+- Laporan yang disediakan dengan kerjasama RBS: **Building Condition
+  Assessment** dan **dilapidation survey** sahaja.
+
+### Kenapa ini penting lebih daripada ayat biasa
+
+"Registered Building Surveyor" ialah gelaran berdaftar di Malaysia, dan
+laporan firma ini masuk ke Tribunal Tuntutan Pembeli Rumah. Pihak lawan
+memang memeriksa kelayakan. Dakwaan yang melebihi kenyataan bukan
+sekadar salah tulis — ia boleh meruntuhkan laporan di dalam prosiding.
+
+Dakwaan itu juga berada dalam JSON-LD sebagai `hasCredential`, yang
+Google baca sebagai pernyataan kelayakan rasmi, dan dalam `llms.txt`,
+yang pembantu AI baca dan ulang.
+
+### Sebelum menukar apa-apa ayat kelayakan
+
+Dakwaan ini tersebar jauh daripada satu baris. Semak kesemuanya:
+
+```
+badge hero (EN/BM)        chip pada 5 kad page servis
+badge landing (EN/BM)     teks artikel blog (EN/BM)
+chip hero.t2 (EN/BM)      soalan FAQ (EN/BM)
+perenggan hero (EN/BM)    meta description (index.html + PAGES)
+kad "kenapa kami"         ORG description (build.js)
+senarai VALUES            hasCredential (JSON-LD)
+                          llms.txt
+```
+
+Cara memeriksa yang masih tinggal:
+
+```
+grep -rn "RISM-[Rr]egistered\|RISM registered\|berdaftar RISM\|\
+Berdaftar RISM\|registered under the Royal\|Registered with the Royal" \
+  index.html build.js dist
+```
+
+Harus pulangkan sifar.
+
+Diuji 13 November 2026: sifar padanan dalam `index.html`, `build.js` dan
+kesemua 71 fail terbitan; teks BM muncul pada page BM dan teks EN pada
+page EN; FAQPage JSON-LD membawa `inLanguage` yang betul untuk
+kedua-duanya; tiada overflow, tiada ralat JavaScript.

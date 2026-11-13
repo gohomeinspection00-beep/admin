@@ -62,9 +62,9 @@ const urlFor  = (lang, out) => SITE + pathFor(lang, out);
 const PAGES = [
     { out: "", key: "home", hash: "",
       title: "GoXpert — Building Surveying & Inspection Malaysia",
-      desc: "RISM-registered Building Surveyors with SIRIM-calibrated equipment. Home defect inspection (DLP), Building Condition Assessment, dilapidation survey, thermal imaging and tribunal support across Johor, Melaka, Negeri Sembilan and Selangor.",
+      desc: "Graduate Members of RISM with SIRIM-calibrated equipment. Home defect inspection (DLP), Building Condition Assessment, dilapidation survey, thermal imaging and tribunal support across Johor, Melaka, Negeri Sembilan and Selangor.",
       titleBm: "GoXpert — Jurukur Bangunan & Inspection Rumah Malaysia",
-      descBm: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), pemeriksaan kecacatan, sub-sale, thermal imaging dan sokongan Tribunal Tuntutan Pembeli Rumah — Johor, Melaka, Negeri Sembilan, Selangor." },
+      descBm: "Graduate Member RISM dengan peralatan ditentukur SIRIM. Inspection rumah baru (DLP), pemeriksaan kecacatan, sub-sale, thermal imaging dan sokongan Tribunal Tuntutan Pembeli Rumah — Johor, Melaka, Negeri Sembilan, Selangor." },
     { out: "services", key: "services", hash: "#/services",
       title: "All Inspection & Surveying Services — GoXpert",
       desc: "Sixteen building surveying services for homeowners, corporations, JMB/MC and legal proceedings — residential defect inspection, commercial condition assessment, and technical testing.",
@@ -101,9 +101,9 @@ const PAGES = [
        kekal boleh dibuka sebagai alias; lihat ALIAS di bawah. */
     { out: "pemilik-rumah", outEn: "homeowners", key: "landing", hash: "#/pemilik-rumah",
       title: "For Homeowners — New Home & Sub-Sale Inspection | GoXpert",
-      desc: "RISM-registered Building Surveyors with SIRIM-calibrated equipment. New home (DLP), sub-sale and post-renovation inspection, plus tribunal support across Johor, Melaka, Negeri Sembilan and Selangor.",
+      desc: "Graduate Members of RISM with SIRIM-calibrated equipment. New home (DLP), sub-sale and post-renovation inspection, plus tribunal support across Johor, Melaka, Negeri Sembilan and Selangor.",
       titleBm: "Untuk Pemilik Rumah — Inspection Rumah Baru & Sub-Sale | GoXpert",
-      descBm: "Building Surveyor berdaftar RISM dengan peralatan dikalibrasi SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." },
+      descBm: "Graduate Member RISM dengan peralatan ditentukur SIRIM. Inspection rumah baru (DLP), sub-sale, selepas renovation dan sokongan tribunal — Johor, Melaka, Negeri Sembilan, Selangor." },
     { out: "inspection-berkelompok", outEn: "group-booking", key: "group", hash: "#/inspection-berkelompok",
       title: "Group Inspection Booking for Your Project — GoXpert",
       desc: "Several owners in the same project booking together pay a lower rate each. One trip, unit after unit, and every owner still receives their own full defect report.",
@@ -198,7 +198,7 @@ const ORG = {
     url: SITE + "/",
     telephone: "+" + CONFIG.phoneRaw,
     email: CONFIG.email,
-    description: "Registered Building Surveyors providing building inspection, condition assessment and tribunal documentation across Malaysia.",
+    description: "Building inspection, condition assessment and tribunal documentation across Malaysia. Inspectors hold degrees in Building Surveying and are Graduate Members of RISM; Building Condition Assessment and dilapidation survey reports are produced in collaboration with Registered Building Surveyors.",
     slogan: "Inspection with integrity.",
     priceRange: "$$",
     sameAs: (CONFIG.social || []).map(x => x.url),
@@ -218,8 +218,14 @@ const ORG = {
         "Defect rectification supervision", "Tribunal for Homebuyer Claims documentation"
     ],
     hasCredential: [
-        { "@type": "EducationalOccupationalCredential", credentialCategory: "Professional registration",
-          name: "Registered with the Royal Institution of Surveyors Malaysia (RISM)" },
+        /* Graduate Member ialah gred keahlian RISM, bukan pendaftaran.
+           Registered Building Surveyor ialah gelaran berdaftar yang
+           berasingan, dan firma ini bekerjasama dengan mereka — ia bukan
+           kelayakan firma sendiri, jadi ia tidak disenaraikan di sini. */
+        { "@type": "EducationalOccupationalCredential", credentialCategory: "Professional membership",
+          name: "Graduate Members of the Royal Institution of Surveyors Malaysia (RISM)" },
+        { "@type": "EducationalOccupationalCredential", credentialCategory: "Academic qualification",
+          name: "Degrees in Building Surveying" },
         { "@type": "EducationalOccupationalCredential", credentialCategory: "Equipment calibration",
           name: "Inspection instruments calibrated by SIRIM Malaysia" }
     ],
@@ -375,7 +381,12 @@ function llmsTxt() {
     L.push("  Selangor: Shah Alam, Petaling Jaya, Subang Jaya, Klang, Puchong,");
     L.push("    Cyberjaya, Kajang, Rawang");
     L.push("- Business hours: Monday to Saturday, 9:00am to 5:30pm. Closed Sunday.");
-    L.push("- Inspectors are registered with the Royal Institution of Surveyors Malaysia (RISM)");
+    L.push("- Inspectors hold degrees in Building Surveying and are Graduate Members of the");
+    L.push("  Royal Institution of Surveyors Malaysia (RISM). Graduate Member is a membership");
+    L.push("  grade, not a registration.");
+    L.push("- Reports that carry professional weight (Building Condition Assessment and");
+    L.push("  dilapidation survey) are produced in collaboration with Registered Building");
+    L.push("  Surveyors.");
     L.push("- Measuring instruments are calibrated by SIRIM Malaysia");
     L.push("- Languages: English and Bahasa Malaysia");
     if (CONFIG.priceFrom) {

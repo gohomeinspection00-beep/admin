@@ -559,7 +559,7 @@ var DMS_GALLERY = ["img/dms/1.jpg", "img/dms/2.jpg", "img/dms/3.jpg", "img/dms/4
             dmsSub: { en: "If you proceed to buy — we help you manage the entire repair process from start to finish with a complete system", bm: "Kalau En/Pn jadi beli rumah tu — kami bantu anda urus proses pembaikian dari awal hingga habis dengan sistem yang lengkap" }
         }),
         values: [
-            { icon: VICONS.grad,   t: { en: "Registered Building Surveyor", bm: "Building Surveyor Berdaftar" }, d: { en: "RISM registered inspector with professional degree", bm: "Inspector berdaftar RISM dengan ijazah profesional" } },
+            { icon: VICONS.grad,   t: { en: "Graduate Member of RISM", bm: "Graduate Member RISM" }, d: { en: "Graduate Member of RISM with a degree in Building Surveying", bm: "Graduate Member RISM dengan ijazah Building Surveying" } },
             { icon: VICONS.check,  t: { en: "SIRIM Calibrated Equipment", bm: "Peralatan SIRIM Calibrated" }, d: { en: "Thermal scanner, Spirit Level, and more — calibrated by SIRIM", bm: "Thermal scanner, Spirit Level, dan pelbagai alat lagi — dicalibrate oleh SIRIM" } },
             { icon: VICONS.home,   t: { en: "Comprehensive Inspection", bm: "Pemeriksaan Menyeluruh" }, d: { en: "Floor to roof — including electrical & plumbing (as permitted)", bm: "Dari lantai hingga bumbung — termasuk elektrik & plumbing (setakat dibenarkan)" } },
             { icon: VICONS.doc,    t: { en: "Detailed Report + Analysis", bm: "Laporan Detail + Analisis" }, d: { en: "Complete PDF with photos, floor plan tagging & analysis", bm: "PDF lengkap dengan photo, tagging atas floor plan & analisis" } },
@@ -580,7 +580,7 @@ var DMS_GALLERY = ["img/dms/1.jpg", "img/dms/2.jpg", "img/dms/3.jpg", "img/dms/4
             dmsSub: { en: "We help you manage the entire repair process from start to finish with a complete system", bm: "Kami bantu anda urus proses pembaikian dari awal hingga habis dengan sistem yang lengkap" }
         }),
         values: [
-            { icon: VICONS.grad,   t: { en: "Registered Building Surveyor", bm: "Building Surveyor Berdaftar" }, d: { en: "RISM registered inspector with professional degree", bm: "Inspector berdaftar RISM dengan ijazah profesional" } },
+            { icon: VICONS.grad,   t: { en: "Graduate Member of RISM", bm: "Graduate Member RISM" }, d: { en: "Graduate Member of RISM with a degree in Building Surveying", bm: "Graduate Member RISM dengan ijazah Building Surveying" } },
             { icon: VICONS.check,  t: { en: "SIRIM Calibrated Equipment", bm: "Peralatan SIRIM Calibrated" }, d: { en: "Thermal scanner, Spirit Level, and many more tools", bm: "Thermal scanner, Spirit Level, dan pelbagai alat lagi" } },
             { icon: VICONS.home,   t: { en: "Comprehensive Inspection", bm: "Pemeriksaan Menyeluruh" }, d: { en: "Floor to roof — including electrical & plumbing", bm: "Dari lantai hingga bumbung — termasuk elektrik & plumbing" } },
             { icon: VICONS.doc,    t: { en: "Detailed Report + Analysis", bm: "Laporan Detail + Analisis" }, d: { en: "Complete PDF with photos, floor plan tagging & analysis", bm: "PDF lengkap dengan photo, tagging atas floor plan & analisis" } },
@@ -765,7 +765,7 @@ var DMS_GALLERY = ["img/dms/1.jpg", "img/dms/2.jpg", "img/dms/3.jpg", "img/dms/4
         ],
         values: [
             { icon: VICONS.check,  t: { en: "Instrument Evidence, Not Opinions", bm: "Bukti Alat, Bukan Pendapat" }, d: { en: "Calibrated readings are hard to argue with — moisture %, hollowness, electrical values", bm: "Bacaan alat dikalibrasi sukar dipertikai — % lembapan, hollowness, nilai elektrik" } },
-            { icon: VICONS.grad,   t: { en: "Registered Building Surveyor", bm: "Building Surveyor Berdaftar" }, d: { en: "A RISM-registered professional speaks with authority the developer's team respects", bm: "Profesional berdaftar RISM bercakap dengan autoriti yang dihormati pasukan pemaju" } },
+            { icon: VICONS.grad,   t: { en: "Graduate Member of RISM", bm: "Graduate Member RISM" }, d: { en: "A qualified surveyor speaks with authority the developer's team respects", bm: "Surveyor berkelayakan bercakap dengan autoriti yang dihormati pasukan pemaju" } },
             { icon: VICONS.shield, t: { en: "No Unfair Defect Closures", bm: "Tiada Penutupan Defect Tak Adil" }, d: { en: "Nothing gets closed until the repair is verified — you are never pressured to sign", bm: "Tiada apa ditutup selagi pembaikian belum disahkan — anda tidak akan didesak menandatangan" } },
             { icon: VICONS.doc,    t: { en: "Session Fully Documented", bm: "Sesi Didokumen Sepenuhnya" }, d: { en: "Photos, readings and outcomes recorded per defect — useful if the case escalates", bm: "Gambar, bacaan dan keputusan direkod bagi setiap defect — berguna jika kes dieskalasi" } },
             { icon: VICONS.chat,   t: { en: "On-the-Spot Advice", bm: "Nasihat Terus Di Tapak" }, d: { en: "Accept, dispute or escalate — we advise you before you commit to anything", bm: "Terima, pertikai atau eskalasi — kami nasihatkan sebelum anda bersetuju dengan apa-apa" } },
@@ -905,7 +905,7 @@ var DMS_GALLERY = ["img/dms/1.jpg", "img/dms/2.jpg", "img/dms/3.jpg", "img/dms/4
             { icon: VICONS.shield, t: { en: "Protection for Both Sides", bm: "Perlindungan Untuk Kedua Pihak" }, d: { en: "Owners prove new damage; contractors disprove false claims — the record is neutral", bm: "Pemilik buktikan kerosakan baru; kontraktor tolak dakwaan palsu — rekodnya neutral" } },
             { icon: VICONS.chklist, t: { en: "Post-Construction Comparison", bm: "Perbandingan Selepas Pembinaan" }, d: { en: "We return after works and compare item by item against the original record", bm: "Kami kembali selepas kerja dan banding item demi item dengan rekod asal" } },
             { icon: VICONS.people, t: { en: "Support for Damage Claims", bm: "Sokongan Tuntutan Kerosakan" }, d: { en: "Clear before-and-after evidence to support a claim against the responsible party", bm: "Bukti sebelum-selepas jelas untuk menyokong tuntutan terhadap pihak bertanggungjawab" } },
-            { icon: VICONS.grad,   t: { en: "Prepared by a Registered Surveyor", bm: "Disediakan Surveyor Berdaftar" }, d: { en: "A RISM-registered professional's record carries weight in negotiation and proceedings", bm: "Rekod profesional berdaftar RISM mempunyai nilai dalam rundingan dan prosiding" } }
+            { icon: VICONS.grad,   t: { en: "With a Registered Building Surveyor", bm: "Dengan Registered Building Surveyor" }, d: { en: "A record prepared with a Registered Building Surveyor carries weight in negotiation and proceedings", bm: "Rekod yang disediakan bersama Registered Building Surveyor mempunyai nilai dalam rundingan dan prosiding" } }
         ],
         dms: [
             { t: { en: "Engaged Before Works Start", bm: "Dilantik Sebelum Kerja Bermula" }, d: { en: "Contact us as soon as you learn of nearby construction, demolition or piling", bm: "Hubungi kami sebaik anda tahu tentang pembinaan, perobohan atau cerucuk berhampiran" } },
@@ -1490,7 +1490,7 @@ var DMS_GALLERY = ["img/dms/1.jpg", "img/dms/2.jpg", "img/dms/3.jpg", "img/dms/4
             lblTools:  { en: "Why It Counts", bm: "Kenapa Ia Penting" }
         }),
         values: [
-            { icon: VICONS.grad,   t: { en: "Prepared by a Registered Surveyor", bm: "Disediakan Surveyor Berdaftar" }, d: { en: "A RISM-registered professional's report carries far more weight than a homeowner's complaint", bm: "Laporan profesional berdaftar RISM jauh lebih bernilai daripada aduan pemilik rumah" } },
+            { icon: VICONS.grad,   t: { en: "With a Registered Building Surveyor", bm: "Dengan Registered Building Surveyor" }, d: { en: "A surveyor's report carries far more weight than a homeowner's complaint", bm: "Laporan surveyor jauh lebih bernilai daripada aduan pemilik rumah" } },
             { icon: VICONS.check,  t: { en: "Instrument Readings, Not Adjectives", bm: "Bacaan Alat, Bukan Kata Sifat" }, d: { en: "\"Very damp\" is an opinion; a recorded moisture value is evidence", bm: "\"Sangat lembap\" ialah pendapat; nilai lembapan yang direkod ialah bukti" } },
             { icon: VICONS.doc,    t: { en: "Organised Evidence Pack", bm: "Pek Bukti Tersusun" }, d: { en: "Defects, photos, readings and chronology arranged so your case is easy to follow", bm: "Defect, gambar, bacaan dan kronologi disusun supaya kes anda mudah difahami" } },
             { icon: VICONS.list,   t: { en: "Chronology & Correspondence", bm: "Kronologi & Surat-Menyurat" }, d: { en: "Guidance on documenting what you reported, when, and how the developer responded", bm: "Panduan mendokumen apa anda laporkan, bila, dan bagaimana pemaju bertindak balas" } },
@@ -2191,12 +2191,12 @@ var ABOUT = {
     story: {
         en: [
             "GoXpert is a firm of registered Building Surveyors serving property owners across Malaysia. We inspect homes, commercial buildings and assets — and we report exactly what we find, whether it is convenient or not.",
-            "Most property owners face the developer or contractor alone, without the technical knowledge to argue their case. That imbalance is the reason this firm exists. Our surveyors are RISM-registered and hold degrees in Building Surveying, and our instruments are calibrated by SIRIM Malaysia — so what we report is measured, not assumed.",
+            "Most property owners face the developer or contractor alone, without the technical knowledge to argue their case. That imbalance is the reason this firm exists. Our inspectors hold degrees in Building Surveying and are Graduate Members of RISM, our instruments are calibrated by SIRIM Malaysia, and reports that carry professional weight are produced in collaboration with Registered Building Surveyors — so what we report is measured, not assumed.",
             "We do not carry out repairs and we do not take referral fees from contractors. Our only product is an honest, defensible assessment of your property's condition."
         ],
         bm: [
             "GoXpert ialah firma Building Surveyor berdaftar yang berkhidmat untuk pemilik hartanah di seluruh Malaysia. Kami memeriksa rumah, bangunan komersial dan aset — dan kami laporkan dengan tepat apa yang kami temui, sama ada ia menyenangkan atau tidak.",
-            "Kebanyakan pemilik hartanah berdepan pemaju atau kontraktor seorang diri, tanpa pengetahuan teknikal untuk mempertahankan kes mereka. Ketidakseimbangan itulah sebab firma ini wujud. Surveyor kami berdaftar RISM dan memiliki ijazah dalam Building Surveying, dan alat kami dikalibrasi oleh SIRIM Malaysia — jadi apa yang kami laporkan adalah diukur, bukan diandaikan.",
+            "Kebanyakan pemilik hartanah berdepan pemaju atau kontraktor seorang diri, tanpa pengetahuan teknikal untuk mempertahankan kes mereka. Ketidakseimbangan itulah sebab firma ini wujud. Inspector kami memiliki ijazah Building Surveying dan merupakan Graduate Member RISM, alat kami ditentukur oleh SIRIM Malaysia, dan laporan yang memerlukan pengesahan profesional disediakan dengan kerjasama Registered Building Surveyor — jadi apa yang kami laporkan adalah diukur, bukan diandaikan.",
             "Kami tidak menjalankan kerja pembaikian dan kami tidak mengambil komisen rujukan daripada kontraktor. Satu-satunya produk kami ialah penilaian keadaan hartanah anda yang jujur dan kukuh."
         ]
     },
@@ -2226,7 +2226,7 @@ var ABOUT = {
     credTitle: { en: "What Backs Our Reports", bm: "Apa Yang Menyokong Laporan Kami" },
     credSub:   { en: "Qualifications and calibration are what separate a professional report from an opinion", bm: "Kelayakan dan kalibrasi yang membezakan laporan profesional daripada sekadar pendapat" },
     creds: [
-        { t: { en: "RISM-Registered Surveyors", bm: "Surveyor Berdaftar RISM" }, d: { en: "Every inspector is registered under the Royal Institution of Surveyors Malaysia and holds a degree in Building Surveying", bm: "Setiap inspector berdaftar di bawah Royal Institution of Surveyors Malaysia dan memiliki ijazah dalam Building Surveying" } },
+        { t: { en: "Qualified Surveyors", bm: "Surveyor Berkelayakan" }, d: { en: "Our inspectors hold degrees in Building Surveying and are Graduate Members of RISM. Reports that carry professional weight (Building Condition Assessment and dilapidation survey) are produced in collaboration with Registered Building Surveyors.", bm: "Inspector kami memiliki ijazah Building Surveying dan merupakan Graduate Member RISM. Laporan yang memerlukan pengesahan profesional (Building Condition Assessment dan dilapidation survey) disediakan dengan kerjasama Registered Building Surveyor." } },
         { t: { en: "SIRIM-Calibrated Instruments", bm: "Alat Dikalibrasi SIRIM" }, d: { en: "Our testing equipment is calibrated by SIRIM Malaysia — calibration certificates available on request", bm: "Peralatan ujian kami dikalibrasi oleh SIRIM Malaysia — sijil kalibrasi boleh dimohon" } },
         { t: { en: "Documented Methodology", bm: "Metodologi Berdokumentasi" }, d: { en: "The same systematic process applied to every property, so results are consistent and comparable", bm: "Proses sistematik yang sama untuk setiap hartanah, supaya keputusan konsisten dan boleh dibanding" } },
         { t: { en: "Tribunal-Ready Reporting", bm: "Laporan Sedia Tribunal" }, d: { en: "Our reports are structured to hold up when a claim is disputed, not just to look thorough", bm: "Laporan kami distrukturkan supaya kukuh bila tuntutan dipertikai, bukan sekadar nampak lengkap" } }
@@ -2618,11 +2618,11 @@ var I18N = {
     en: {
         "nav.services": "Services", "nav.why": "Why Us", "nav.coverage": "Coverage",
         "nav.faq": "FAQ", "nav.contact": "Contact", "nav.cta": "Get a Quote",
-        "hero.badge": "RISM-Registered Building Surveyors",
+        "hero.badge": "RISM Graduate Members",
         "hero.title.pre": "Building Surveying & Inspection ", "hero.title.hl": "You Can Trust",
-        "hero.text": "From home defect inspection to Building Condition Assessment and tribunal documentation — registered Building Surveyors with SIRIM-calibrated equipment. Inspection with integrity.",
+        "hero.text": "Degrees in Building Surveying, Graduate Members of RISM, SIRIM-calibrated equipment. BCA and dilapidation reports are produced in collaboration with Registered Building Surveyors.",
         "hero.cta1": "Get a Free Quote", "hero.cta2": "View Our Services",
-        "hero.t1": "SIRIM-Calibrated Equipment", "hero.t2": "Registered with RISM", "hero.t3": "Tribunal Support",
+        "hero.t1": "SIRIM-Calibrated Equipment", "hero.t2": "RISM Graduate Members", "hero.t3": "Tribunal Support",
         "pin.1": "Crack 2.4 mm", "pin.2": "Moisture 78%", "pin.3": "Hollow ×12",
         "stats.units": "Units Inspected", "stats.projects": "Projects", "stats.inspectors": "Inspectors", "stats.states": "States Covered",
         "pillars.tag": "Our Services", "pillars.title": "One Firm. Every Building Survey Need.",
@@ -2699,9 +2699,9 @@ var I18N = {
         "lp.introBtn": "Tap to continue",
         "lp.introSub": "Peace of mind is waiting",
         "lp.navHome": "Main Website",
-        "lp.heroBadge": "RISM-Registered Building Surveyor",
+        "lp.heroBadge": "RISM Graduate Members",
         "lp.heroH1a": "Building Inspection ", "lp.heroH1b": "You Can Trust", "lp.heroH1c": " in Malaysia",
-        "lp.heroText": "We are registered Building Surveyors with SIRIM-calibrated equipment. From home inspection to tribunal support \u2014 inspection with integrity.",
+        "lp.heroText": "Degrees in Building Surveying, Graduate Members of RISM, SIRIM-calibrated equipment. BCA and dilapidation reports are produced in collaboration with Registered Building Surveyors.",
         "lp.heroBtn1": "WhatsApp Us Now", "lp.heroBtn2": "See Services",
         "lp.statTitle": "Our Record So Far", "lp.statSub": "Real numbers from work on site",
         "lp.toolTag": "Professional Equipment",
@@ -2806,11 +2806,11 @@ var I18N = {
     bm: {
         "nav.services": "Servis", "nav.why": "Kenapa Kami", "nav.coverage": "Kawasan",
         "nav.faq": "Soalan", "nav.contact": "Hubungi", "nav.cta": "Sebut Harga",
-        "hero.badge": "Building Surveyor Berdaftar RISM",
+        "hero.badge": "Graduate Member RISM",
         "hero.title.pre": "Ukur Bangunan & Inspection ", "hero.title.hl": "Yang Anda Boleh Percaya",
-        "hero.text": "Dari inspection rumah hingga Building Condition Assessment dan dokumentasi tribunal — Building Surveyor berdaftar dengan peralatan dikalibrasi SIRIM. Inspection Dengan Integriti.",
+        "hero.text": "Ijazah Building Surveying, Graduate Member RISM, peralatan ditentukur SIRIM. Laporan BCA dan dilapidation disediakan dengan kerjasama Registered Building Surveyor.",
         "hero.cta1": "Dapatkan Sebut Harga Percuma", "hero.cta2": "Lihat Servis Kami",
-        "hero.t1": "Peralatan Dikalibrasi SIRIM", "hero.t2": "Berdaftar Dengan RISM", "hero.t3": "Sokongan Tribunal",
+        "hero.t1": "Peralatan Dikalibrasi SIRIM", "hero.t2": "Graduate Member RISM", "hero.t3": "Sokongan Tribunal",
         "pin.1": "Retak 2.4 mm", "pin.2": "Lembapan 78%", "pin.3": "Hollow ×12",
         "stats.units": "Unit Diperiksa", "stats.projects": "Projek", "stats.inspectors": "Inspector", "stats.states": "Negeri Diliputi",
         "pillars.tag": "Servis Kami", "pillars.title": "Satu Firma. Semua Keperluan Ukur Bangunan.",
@@ -2887,9 +2887,9 @@ var I18N = {
         "lp.introBtn": "Tekan untuk teruskan",
         "lp.introSub": "Ketenangan menanti anda",
         "lp.navHome": "Laman Utama",
-        "lp.heroBadge": "Building Surveyor Berdaftar RISM",
+        "lp.heroBadge": "Graduate Member RISM",
         "lp.heroH1a": "Pakar Inspection Bangunan ", "lp.heroH1b": "Yang Dipercayai", "lp.heroH1c": " Di Malaysia",
-        "lp.heroText": "Kami Building Surveyor berdaftar dengan peralatan yang dikalibrasi SIRIM. Dari inspection rumah hingga sokongan kes tribunal \u2014 Inspection Dengan Integriti.",
+        "lp.heroText": "Ijazah Building Surveying, Graduate Member RISM, peralatan ditentukur SIRIM. Laporan BCA dan dilapidation disediakan dengan kerjasama Registered Building Surveyor.",
         "lp.heroBtn1": "WhatsApp Kami Sekarang", "lp.heroBtn2": "Lihat Servis",
         "lp.statTitle": "Rekod Kami Setakat Ini", "lp.statSub": "Angka sebenar dari kerja di tapak",
         "lp.toolTag": "Peralatan Profesional",
@@ -3015,8 +3015,8 @@ var AUDIENCES = [
 
 var WHYUS = [
     { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
-      en: ["Registered Building Surveyors", "All surveyors are RISM-registered and hold degrees in Building Surveying."],
-      bm: ["Building Surveyor Berdaftar", "Semua surveyor berdaftar di bawah RISM dan memiliki ijazah dalam bidang Building Surveying."] },
+      en: ["Qualified Surveyors", "Our inspectors hold degrees in Building Surveying and are Graduate Members of RISM. Reports that carry professional weight (Building Condition Assessment and dilapidation survey) are produced in collaboration with Registered Building Surveyors."],
+      bm: ["Surveyor Berkelayakan", "Inspector kami memiliki ijazah Building Surveying dan merupakan Graduate Member RISM. Laporan yang memerlukan pengesahan profesional (Building Condition Assessment dan dilapidation survey) disediakan dengan kerjasama Registered Building Surveyor."] },
     { icon: "M9 12l2 2 4-4 M22 12A10 10 0 112 12a10 10 0 0120 0z",
       en: ["SIRIM-Calibrated Equipment", "Inspection equipment calibrated by SIRIM Malaysia for accurate, valid results."],
       bm: ["Peralatan Dikalibrasi SIRIM", "Peralatan inspection dikalibrasi oleh SIRIM Malaysia untuk keputusan tepat dan sahih."] },
@@ -3105,10 +3105,10 @@ var FAQ_ALL = [
       bm: ["Kawasan mana yang anda liputi?",
            "Kami beroperasi di Johor, Melaka, Negeri Sembilan dan Selangor — dan fleksibel untuk lokasi lain. Hubungi kami untuk semak kawasan anda."] },
     { cat: "general",
-      en: ["Are your surveyors registered?",
-           "Yes. Every inspector is registered under the Royal Institution of Surveyors Malaysia (RISM) and holds a degree in Building Surveying. Inspections are never subcontracted out to unqualified personnel."],
-      bm: ["Adakah surveyor anda berdaftar?",
-           "Ya. Setiap inspector berdaftar di bawah Royal Institution of Surveyors Malaysia (RISM) dan memiliki ijazah dalam Building Surveying. Pemeriksaan tidak pernah disubkontrak kepada orang tidak bertauliah."] },
+      en: ["What are your surveyors' qualifications?",
+           "Our inspectors hold degrees in Building Surveying and are Graduate Members of the Royal Institution of Surveyors Malaysia (RISM). Reports that carry professional weight — Building Condition Assessment and dilapidation survey — are produced in collaboration with Registered Building Surveyors. Inspections are never subcontracted out to unqualified personnel."],
+      bm: ["Apakah kelayakan surveyor anda?",
+           "Inspector kami memiliki ijazah Building Surveying dan merupakan Graduate Member Royal Institution of Surveyors Malaysia (RISM). Laporan yang memerlukan pengesahan profesional — Building Condition Assessment dan dilapidation survey — disediakan dengan kerjasama Registered Building Surveyor. Pemeriksaan tidak pernah disubkontrak kepada orang tidak bertauliah."] },
     { cat: "general",
       en: ["What is the difference between a home inspection and a BCA?",
            "A home inspection focuses on defects in an individual unit, usually during the DLP. A Building Condition Assessment (BCA) evaluates the overall condition of an entire building — structure, services and finishes — and is typically commissioned by JMB/MC, corporations or asset owners."],

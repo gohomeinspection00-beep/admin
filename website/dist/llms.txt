@@ -24,7 +24,12 @@
   Selangor: Shah Alam, Petaling Jaya, Subang Jaya, Klang, Puchong,
     Cyberjaya, Kajang, Rawang
 - Business hours: Monday to Saturday, 9:00am to 5:30pm. Closed Sunday.
-- Inspectors are registered with the Royal Institution of Surveyors Malaysia (RISM)
+- Inspectors hold degrees in Building Surveying and are Graduate Members of the
+  Royal Institution of Surveyors Malaysia (RISM). Graduate Member is a membership
+  grade, not a registration.
+- Reports that carry professional weight (Building Condition Assessment and
+  dilapidation survey) are produced in collaboration with Registered Building
+  Surveyors.
 - Measuring instruments are calibrated by SIRIM Malaysia
 - Languages: English and Bahasa Malaysia
 - Inspections start from RM300. The final figure depends on property
