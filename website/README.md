@@ -823,3 +823,35 @@ Diuji 13 November 2026: sifar padanan dalam `index.html`, `build.js` dan
 kesemua 71 fail terbitan; teks BM muncul pada page BM dan teks EN pada
 page EN; FAQPage JSON-LD membawa `inLanguage` yang betul untuk
 kedua-duanya; tiada overflow, tiada ralat JavaScript.
+
+## Pakej terbit untuk pemilik (`website/deploy/`)
+
+Pemilik menerbitkan laman dari komputernya sendiri, bukan dari sesi
+Claude — lihat bahagian "Menerbitkan dari sesi Claude: apa yang tidak
+berfungsi" di atas.
+
+Pakej yang dihantar kepadanya ialah `dist/`, `wrangler.jsonc`, dan
+kedua-dua fail dalam folder ini:
+
+- `DEPLOY.bat` — menjalankan `npx wrangler deploy` dan melaporkan
+  hasilnya.
+- `BACA-DULU.txt` — arahan dan senarai ralat biasa, dalam BM.
+
+Kedua-duanya disimpan di sini supaya ia dijejak bersama kod. Versi
+pertama hanya wujud dalam skrip pembungkusan, dan akibatnya pepijat di
+bawah tidak kelihatan sehingga pemilik melaporkannya.
+
+### Pepijat yang pernah ada di sini
+
+`DEPLOY.bat` versi pertama mencetak "Selesai. Semak goxpert.my" tanpa
+memeriksa kod keluar `wrangler`. Apabila deploy gagal kerana masa tamat
+rangkaian, skrip tetap mengucapkan selesai. Pemilik menutup tetingkap
+itu dengan yakin laman sudah berubah, sedangkan ia tidak.
+
+Versi sekarang membaca `ERRORLEVEL` dan mencetak **BERJAYA** atau
+**GAGAL**, dan pada kegagalan ia menerangkan maksud tiga ralat yang
+paling biasa.
+
+Skrip yang melaporkan kejayaan tanpa memeriksanya lebih buruk daripada
+tiada skrip: ia memindahkan kesilapan ke tempat yang lebih sukar
+dikesan.

@@ -1,0 +1,80 @@
+GOXPERT — CARA TERBIT LAMAN KE goxpert.my
+=========================================
+
+Kandungan folder ini:
+
+  dist\            laman siap (468 fail)
+  wrangler.jsonc   tetapan - jangan ubah
+  DEPLOY.bat       klik dua kali untuk terbit
+
+
+SEKALI SAHAJA — PASANG NODE.JS
+------------------------------
+
+1. Buka https://nodejs.org
+2. Muat turun versi "LTS"
+3. Pasang. Tekan Next sampai habis, tak payah ubah apa-apa.
+4. RESTART komputer (penting - kalau tidak DEPLOY.bat tak jumpa npx)
+
+
+SETIAP KALI NAK TERBIT
+----------------------
+
+1. Klik dua kali DEPLOY.bat
+2. Tekan sebarang kekunci bila diminta
+
+   Kali PERTAMA sahaja: pelayar akan terbuka dan Cloudflare minta
+   kebenaran. Klik "Allow". Lepas tu balik ke tetingkap hitam itu.
+   Kali seterusnya langkah ini tak berulang.
+
+3. Tunggu. Kali pertama ambil beberapa minit kerana 468 fail naik.
+   Kali kedua jauh lebih laju - hanya fail yang berubah dihantar.
+
+4. Bila nampak "Selesai", buka https://goxpert.my
+
+
+KALAU ADA MASALAH
+-----------------
+
+DEPLOY.bat akan beritahu BERJAYA atau GAGAL di hujung.
+Kalau ia kata GAGAL, laman TIDAK berubah langsung.
+
+"The request to Cloudflare's API timed out"
+    Masalah rangkaian. Cuba jalankan semula.
+    Kalau gagal lagi, guna hotspot telefon - rangkaian
+    kampus dan pejabat selalunya menyekat panggilan
+    API seperti ini walaupun web biasa boleh dibuka.
+
+"npx is not recognized"
+    Node.js belum dipasang, atau komputer belum di-restart.
+
+"Authentication error"
+    Jalankan DEPLOY.bat semula dan klik "Allow" dalam pelayar.
+    Pastikan pelayar log masuk Cloudflare dengan akaun
+    gohomeinspection00@gmail.com, bukan akaun lain.
+
+Laman nampak sama macam sebelum ini
+    Tekan Ctrl+Shift+R dalam pelayar untuk muat semula tanpa cache.
+
+
+KALAU NAK PATAH BALIK
+---------------------
+
+Versi lama masih tersimpan di Cloudflare.
+
+  dash.cloudflare.com
+    > Compute > Workers & Pages
+    > proud-rain-b73f
+    > Deployments
+    > cari e08a926b (12 Ogos 2026) > Rollback
+
+Itu versi yang hidup sebelum perubahan ini.
+
+
+JANGAN SENTUH DUA WORKER INI
+----------------------------
+
+  empty-voice-eaa7    GoXpert Pocket
+  reinspection-form   borang re-inspection
+
+Hanya proud-rain-b73f yang melayan laman ini.
