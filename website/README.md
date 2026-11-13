@@ -735,3 +735,34 @@ Diuji 9 November 2026: 1,683 pautan dalaman merentas 70 fail diperiksa,
 tiada satu pun pecah; butang bahasa dari setiap page mendarat pada
 alamat yang wujud; hreflang berpasangan betul; sitemap mengandungi empat
 alamat sebenar dan tiada alias.
+
+## Laporan contoh: diminta, bukan dimuat turun
+
+Butang laporan contoh dahulunya memaut terus ke
+`files/sample-report.pdf`. Kini ia membuka WhatsApp dengan mesej yang
+sudah ditulis, dalam bahasa page itu.
+
+Sebabnya: muat turun terus tidak meninggalkan apa-apa. Pemilik tidak
+tahu siapa yang mengambilnya, dan tiada perbualan bermula. Permintaan
+melalui WhatsApp menukar pelawat tanpa nama menjadi mesej yang boleh
+dibalas.
+
+Fail PDF **tidak diterbitkan**. `build.js` membuangnya daripada `dist/`
+selepas menyalin folder `files/`, kerana meninggalkannya pada alamat
+yang boleh diteka akan memintas permintaan itu sepenuhnya. Fail asal
+kekal dalam repo.
+
+### Untuk memulihkan muat turun terus
+
+1. Buang baris `fs.rmSync(... "sample-report.pdf" ...)` dalam `build.js`.
+2. Kembalikan medan `pdf: "files/sample-report.pdf"` dalam objek `ex`
+   (`CONFIG` servis), dan jadikan butang `.rep-cta` bersyarat padanya
+   semula.
+3. Tukar `repBtn` dan `lp.sample` kembali kepada teks muat turun.
+
+Tiga tempat, dan ketiga-tiganya mesti seiring.
+
+Diuji 13 November 2026: tiada pautan `sample-report` tinggal dalam
+mana-mana daripada 71 fail HTML; PDF tiada dalam `dist/files/`; butang
+di landing page dan di page servis membuka popup WhatsApp dengan mesej
+dalam bahasa yang betul; tiada ralat JavaScript.

@@ -580,6 +580,11 @@ function copyDir(from, to) {
     }
     if (fs.existsSync(path.join(__dirname, "files"))) {
         copyDir(path.join(__dirname, "files"), path.join(OUT, "files"));
+        /* Laporan contoh tidak diterbitkan. Pelawat memintanya melalui
+           WhatsApp, jadi menyimpan fail itu pada alamat yang boleh diteka
+           akan memintas permintaan itu sepenuhnya. Fail asal kekal dalam
+           repo; buang baris ini untuk menerbitkannya semula. */
+        fs.rmSync(path.join(OUT, "files", "sample-report.pdf"), { force: true });
     }
 
     /* sitemap */

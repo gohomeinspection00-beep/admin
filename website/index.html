@@ -3283,9 +3283,9 @@ body.lp-intro-on .lp-intro.gone { opacity: 0; visibility: hidden; }
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
                         <span data-i18n="lp.ctaNote">Balasan dalam 1 jam bekerja</span>
                     </p>
-                    <a class="lp-sample" href="files/sample-report.pdf" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
-                        <span data-i18n="lp.sample">Lihat contoh laporan sebenar (PDF)</span>
+                    <a class="lp-sample" id="lpSampleWa" href="#" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>
+                        <span data-i18n="lp.sample">Minta contoh laporan melalui WhatsApp</span>
                     </a>
                 </div>
             </div>
@@ -3792,7 +3792,7 @@ var SVC_EXTRAS = {
             repTag:     { en: "Professional Report", bm: "Laporan Profesional" },
             repTitle:   { en: "Sample Inspection Report", bm: "Contoh Laporan Pemeriksaan" },
             repSub:     { en: "Detailed PDF report with photos, analysis and repair recommendations", bm: "Laporan PDF terperinci dengan gambar, analisis dan cadangan pembaikan" },
-            repBtn:     { en: "Download Sample Report (PDF)", bm: "Muat Turun Sample Report (PDF)" },
+            repBtn:     { en: "Request a Sample Report on WhatsApp", bm: "Minta Contoh Laporan Melalui WhatsApp" },
             toolsTag:   { en: "Professional Equipment", bm: "Peralatan Profesional" },
             toolsTitle: { en: "SIRIM Calibrated Equipment", bm: "Peralatan Dikalibrasi SIRIM" },
             toolsSub:   { en: "We use the latest calibrated equipment for accurate and reliable results", bm: "Kami menggunakan peralatan terkini dan dikalibrasi supaya keputusan tepat dan sahih" },
@@ -3874,9 +3874,10 @@ var SVC_EXTRAS = {
             { img: "img/sticker/minor.png",      label: "Minor" },
             { img: "img/sticker/spesifik.png",   label: "Spesifik" }
         ],
-        reports: ["img/report/1.jpg", "img/report/2.jpg", "img/report/3.jpg", "img/report/4.jpg", "img/report/5.jpg"],
-        /* Fail PDF sample report. Biar kosong = butang muat turun sorok. */
-        pdf: "files/sample-report.pdf"
+        reports: ["img/report/1.jpg", "img/report/2.jpg", "img/report/3.jpg", "img/report/4.jpg", "img/report/5.jpg"]
+        /* Dahulu ada medan "pdf" di sini yang memaut terus ke
+           files/sample-report.pdf. Laporan contoh kini diminta melalui
+           WhatsApp; lihat nota dalam README untuk cara memulihkannya. */
     }
 };
 
@@ -6114,7 +6115,7 @@ var I18N = {
         "lp.ctaText": "Message us for a free consultation. We will help you pick the right one.",
         "lp.ctaBtn": "WhatsApp Us",
         "lp.ctaNote": "Reply within 1 working hour",
-        "lp.sample": "See a real sample report (PDF)",
+        "lp.sample": "Request a sample report on WhatsApp",
         "lp.svMore": "More About Our Services",
         "faq.more": "More Questions & Answers",
         "nav.blog": "Articles", "nav.gallery": "Gallery",
@@ -6192,6 +6193,7 @@ var I18N = {
         "foot.area": "Johor · Melaka · Negeri Sembilan · Selangor", "foot.rights": "All Rights Reserved.",
         "foot.reg": "Reg. No.",
         "wa.default": "Hi, I would like to get a quote for a building inspection.",
+        "wa.sample": "Hi, may I see a sample inspection report?",
         "form.selectPlaceholder": "Select a service"
     },
     bm: {
@@ -6301,7 +6303,7 @@ var I18N = {
         "lp.ctaText": "Hubungi kami untuk konsultasi percuma. Kami bantu pilihkan servis yang sesuai.",
         "lp.ctaBtn": "WhatsApp Kami",
         "lp.ctaNote": "Balasan dalam 1 jam bekerja",
-        "lp.sample": "Lihat contoh laporan sebenar (PDF)",
+        "lp.sample": "Minta contoh laporan melalui WhatsApp",
         "lp.svMore": "Lebih Lanjut Tentang Servis",
         "faq.more": "Lagi Soalan & Jawapan",
         "nav.blog": "Artikel", "nav.gallery": "Galeri",
@@ -6379,6 +6381,7 @@ var I18N = {
         "foot.area": "Johor · Melaka · Negeri Sembilan · Selangor", "foot.rights": "Hak Cipta Terpelihara.",
         "foot.reg": "No. Pendaftaran",
         "wa.default": "Salam, saya ingin dapatkan sebut harga untuk inspection.",
+        "wa.sample": "Salam, boleh saya lihat contoh laporan inspection?",
         "form.selectPlaceholder": "Pilih servis"
     }
 };
@@ -7820,6 +7823,10 @@ var FAQ_ALL = [
             var el = document.getElementById(id);
             if (el) el.href = link;
         });
+        /* Permintaan contoh laporan membawa mesejnya sendiri, supaya
+           pemilik tahu apa yang diminta sebelum membuka perbualan. */
+        var smp = document.getElementById("lpSampleWa");
+        if (smp) smp.href = waLink(t("wa.sample"));
     }
 
     /* ---------- Render semua ---------- */
@@ -8745,10 +8752,12 @@ var FAQ_ALL = [
                         '<p>' + xt(ex.sec.repSub) + '</p>' +
                     '</div>' +
                     mkGal(ex.reports, "rep") +
-                    (ex.pdf ?
-                        '<div class="rep-cta"><a class="btn btn-primary" href="' + ex.pdf + '" target="_blank" rel="noopener">' +
-                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>' +
-                        '<span>' + xt(ex.sec.repBtn) + '</span></a></div>' : "") +
+                    /* Laporan contoh tidak lagi dimuat turun terus. Pelawat
+                       memintanya melalui WhatsApp, supaya pemilik tahu siapa
+                       yang meminta dan boleh menyambung perbualan. */
+                    '<div class="rep-cta"><a class="btn btn-whatsapp" href="' + waLink(t("wa.sample")) + '" target="_blank" rel="noopener">' +
+                        '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2A9.9 9.9 0 002.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 004.74 1.2h.01a9.9 9.9 0 009.94-9.9A9.9 9.9 0 0012.04 2"/></svg>' +
+                        '<span>' + xt(ex.sec.repBtn) + '</span></a></div>' +
                     '</div></section>';
             }
             if (ex.stickers) {
