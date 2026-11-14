@@ -38,8 +38,8 @@ const data = {
   tarikhSerahanLaporan: "16 Oktober 2026",
   tarikhReInspection: "7 November 2026",
 
-  tarikhNotis: "14 November 2026",
-  tarikhDeadline: "29 November 2026",
+  tarikhNotis: "16 November 2026",
+  tarikhDeadline: "1 Disember 2026",
   tempohNotis1: "15",
   tempohNotis2: "15",
 
@@ -68,8 +68,8 @@ const data = {
     { tarikh: "16 Oktober 2026", peristiwa: "Laporan Pemeriksaan Kecacatan (Defect Inspection Report, 91 muka surat) dikemukakan secara rasmi kepada pihak pemaju melalui WhatsApp rasmi pihak pemaju — diterima tanpa sebarang bantahan" },
     { tarikh: "Oktober — November 2026", peristiwa: "Pihak pemaju menjalankan kerja pembaikan ke atas kecacatan yang dilaporkan — pengakuan tanggungjawab pembaikan melalui tindakan (course of conduct)" },
     { tarikh: "7 November 2026", peristiwa: "Pemeriksaan Semula (Re-Inspection) dijalankan — ENAM BELAS (16) kecacatan disahkan masih belum diselesaikan" },
-    { tarikh: "14 November 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
-    { tarikh: "29 November 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
+    { tarikh: "16 November 2026", peristiwa: "Notis Pertama (First Notice) dikeluarkan" },
+    { tarikh: "1 Disember 2026", peristiwa: "Tarikh akhir pembaikan (15 hari dari Notis Pertama)" },
   ],
 };
 
